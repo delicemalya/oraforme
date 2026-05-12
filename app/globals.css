@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #0D1117;
+  color: #E6EDF3;
+  font-family: var(--font-geist), Arial, sans-serif;
+}
+
+/* ── Light mode: invert the dashboard shell colours ── */
+html[data-theme="light"] #dashboard-shell {
+  filter: invert(1);
+}
+/* Re-invert images/videos so they stay natural */
+html[data-theme="light"] #dashboard-shell img,
+html[data-theme="light"] #dashboard-shell video,
+html[data-theme="light"] #dashboard-shell canvas {
+  filter: invert(1);
+}
+/* Pages outside the dashboard (login, onboarding…) */
+html[data-theme="light"] body {
+  background: #F6F8FA !important;
+  color: #1F2328 !important;
+}
+
+::selection {
+  background: #F0A30A33;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #161B22; }
+::-webkit-scrollbar-thumb { background: #30363D; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #8B949E; }
+
+/* ── Form elements — always readable on dark background ── */
+input, textarea, select {
+  color: #E6EDF3;
+  background-color: #21262D;
+  border-color: #30363D;
+}
+input::placeholder, textarea::placeholder {
+  color: #484F58;
+}
+select option {
+  background-color: #21262D;
+  color: #E6EDF3;
+}
+/* autofill override (Chrome/Edge dark mode) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #E6EDF3;
+  -webkit-box-shadow: 0 0 0 1000px #21262D inset;
+  caret-color: #E6EDF3;
+}
+/* focus ring on all form elements */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #F0A30A;
+  box-shadow: 0 0 0 2px #F0A30A22;
 }

@@ -1,0 +1,40 @@
+import { createSupabaseServerClient } from '@/lib/supabase-client-server'
+import { redirect } from 'next/navigation'
+import AdminSidebar from '@/components/admin/AdminSidebar'
+import { SUPER_ADMIN_EMAIL } from '@/lib/admin-config'
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user || user.email !== SUPER_ADMIN_EMAIL) {
+    redirect('/dashboard')
+  }
+
+  return (
+    <div className="flex h-screen bg-[#0D1117] overflow-hidden">
+      <AdminSidebar />
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        {/* Admin header */}
+        <header className="h-14 bg-[#161B22] border-b border-[#30363D] flex items-center px-4 lg:px-6 shrink-0">
+          <div className="w-8 lg:hidden shrink-0" />
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#F85149] animate-pulse" />
+            <span className="text-sm font-medium text-[#E6EDF3]">Panneau Super Admin</span>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full bg-[#F85149]/20 border border-[#F85149]/30 flex items-center justify-center">
+              <span className="text-[#F85149] text-xs font-bold">A</span>
+            </div>
+            <span className="text-sm text-[#8B949E] hidden sm:block">{SUPER_ADMIN_EMAIL}</span>
+          </div>
+        </header>
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 lg:p-6 max-w-[1400px] mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
