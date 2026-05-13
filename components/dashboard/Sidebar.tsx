@@ -11,7 +11,7 @@ import {
   Wallet, BookOpen, Smartphone, ShoppingCart,
   Receipt, BarChart2, Truck,
   BookMarked, Calculator, HeartHandshake, Users, UsersRound,
-  Layers, CreditCard,
+  Layers, CreditCard, Activity,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { SUPER_ADMIN_EMAIL } from '@/lib/admin-config'
@@ -578,6 +578,22 @@ export default function Sidebar() {
           >
             <Store size={15} className="shrink-0" />
             <span>{t('nav.modules')}</span>
+          </Link>
+        )}
+
+        {/* Analytics BI — owner + Direction Générale */}
+        {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
+          <Link
+            href="/dashboard/analytics"
+            onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+              isActive('/dashboard/analytics')
+                ? 'bg-[#1D4ED8]/10 text-[#388BFD] font-medium'
+                : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+            }`}
+          >
+            <Activity size={15} className="shrink-0" />
+            <span>Analytics & BI</span>
           </Link>
         )}
 
