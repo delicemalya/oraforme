@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
-import { Plus, BookOpen, X, Loader2, Download, Scale, List, BarChart2 } from 'lucide-react'
+import { Plus, BookOpen, X, Loader2, Download, Scale, List, BarChart2, GitMerge, CheckCircle, AlertTriangle, Circle, Trash2 } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
 import { OHADA_ACCOUNTS, resolveAccounts, accountLabel, type AccountCode } from '@/lib/accounting-engine'
 
@@ -45,7 +45,37 @@ type GrandLivreLine = {
   solde: number
 }
 
-const TABS = ['Journal', 'Partie double', 'Grand Livre', 'Rapport mensuel', 'Analyse MIAA+']
+type RapprochementEntry = {
+  id: string
+  date_releve: string
+  reference: string
+  montant: number
+  type: 'debit' | 'credit'
+  libelle: string | null
+  statut: 'non_rapproche' | 'rapproche' | 'ecart'
+  created_at: string
+}
+
+function downloadCSV(data: Record<string, unknown>[], filename: string) {
+  if (!data.length) return
+  const headers = Object.keys(data[0])
+  const rows = data.map(row =>
+    headers.map(h => {
+      const val = row[h]
+      if (val === null || val === undefined) return ''
+      const s = String(val)
+      return s.includes(';') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s
+    }).join(';')
+  )
+  const csv = '﻿' + [headers.join(';'), ...rows].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = filename; a.click()
+  URL.revokeObjectURL(url)
+}
+
+const TABS = ['Journal', 'Partie double', 'Grand Livre', 'Rapport mensuel', 'Analyse MIAA+', 'Rapprochement']
 const CATS_RECETTE = ['Vente produit', 'Prestation service', 'Loyer reçu', 'Autre recette']
 const CATS_DEPENSE = ['Achats', 'Salaires', 'Loyer', 'Charges', 'Taxes', 'Autre dépense']
 const MONTHS_FR = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
@@ -69,6 +99,20 @@ export default function ComptabilitePage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth())
   const [selectedYear] = useState(new Date().getFullYear())
   const [tenantId, setTenantId] = useState<string | null>(null)
+
+  // Rapprochement state
+  const [rapprochements, setRapprochements] = useState<RapprochementEntry[]>([])
+  const [rapLoading, setRapLoading] = useState(false)
+  const [rapFilter, setRapFilter] = useState<'all' | 'non_rapproche' | 'rapproche' | 'ecart'>('all')
+  const [showRapModal, setShowRapModal] = useState(false)
+  const [rapSaving, setRapSaving] = useState(false)
+  const [rapForm, setRapForm] = useState({
+    date_releve: new Date().toISOString().split('T')[0],
+    reference: '',
+    montant: '',
+    type: 'credit' as 'credit' | 'debit',
+    libelle: '',
+  })
 
   const [form, setForm] = useState({
     type: 'recette' as 'recette' | 'depense',
@@ -153,6 +197,7 @@ export default function ComptabilitePage() {
   }, [tenantId, loadTenant])
 
   useEffect(() => { load() }, [load])
+  useEffect(() => { if (tab === 5) loadRapprochements() }, [tab, rapFilter]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function save() {
     if (!form.libelle || !form.montant_ht) return
@@ -201,6 +246,52 @@ export default function ComptabilitePage() {
     load()
   }
 
+  async function loadRapprochements() {
+    setRapLoading(true)
+    try {
+      const res = await fetch(`/api/rapprochement?statut=${rapFilter}`)
+      const json = await res.json()
+      setRapprochements(json.data ?? [])
+    } catch {
+      setRapprochements([])
+    }
+    setRapLoading(false)
+  }
+
+  async function saveRapprochement() {
+    if (!rapForm.reference || !rapForm.montant || !rapForm.date_releve) return
+    setRapSaving(true)
+    await fetch('/api/rapprochement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        date_releve: rapForm.date_releve,
+        reference: rapForm.reference,
+        montant: Number(rapForm.montant),
+        type: rapForm.type,
+        libelle: rapForm.libelle || null,
+      }),
+    })
+    setShowRapModal(false)
+    setRapForm({ date_releve: new Date().toISOString().split('T')[0], reference: '', montant: '', type: 'credit', libelle: '' })
+    setRapSaving(false)
+    loadRapprochements()
+  }
+
+  async function updateRapStatut(id: string, statut: 'rapproche' | 'ecart' | 'non_rapproche') {
+    await fetch('/api/rapprochement', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, statut }),
+    })
+    setRapprochements(prev => prev.map(r => r.id === id ? { ...r, statut } : r))
+  }
+
+  async function deleteRap(id: string) {
+    await fetch(`/api/rapprochement?id=${id}`, { method: 'DELETE' })
+    setRapprochements(prev => prev.filter(r => r.id !== id))
+  }
+
   async function analyserMIAA() {
     setAiLoading(true)
     const totalRecettes = entries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ht, 0)
@@ -236,7 +327,7 @@ export default function ComptabilitePage() {
   const reportDepenses  = monthEntries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ht, 0)
   const reportBenef     = reportRecettes - reportDepenses
 
-  const TAB_ICONS = [List, BookOpen, Scale, BarChart2, null]
+  const TAB_ICONS = [List, BookOpen, Scale, BarChart2, null, GitMerge]
 
   return (
     <div className="space-y-6">
@@ -507,8 +598,41 @@ export default function ComptabilitePage() {
                 </div>
               ))}
             </div>
-            <button className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
-              <Download size={14} /> Exporter PDF (à venir)
+            <button
+              onClick={() => downloadCSV(
+                monthEntries.map(e => ({
+                  date: e.date,
+                  libelle: e.libelle,
+                  type: e.type,
+                  categorie: e.categorie,
+                  montant_ht: e.montant_ht,
+                  tva: e.tva,
+                  ca: e.ca,
+                  montant_ttc: e.montant_ttc,
+                  compte_debit: e.debit_account ?? '',
+                  compte_credit: e.credit_account ?? '',
+                })),
+                `journal_${MONTHS_FR[selectedMonth]}_${selectedYear}.csv`
+              )}
+              className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
+            >
+              <Download size={14} /> Exporter CSV ({monthEntries.length} lignes)
+            </button>
+            <button
+              onClick={() => downloadCSV(
+                grandLivre.map(gl => ({
+                  compte: gl.account_number,
+                  intitule: gl.account_name,
+                  type: gl.account_type,
+                  total_debit: gl.total_debit,
+                  total_credit: gl.total_credit,
+                  solde: gl.solde,
+                })),
+                `grand_livre_${selectedYear}.csv`
+              )}
+              className="mt-2 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
+            >
+              <Download size={14} /> Exporter Grand Livre CSV
             </button>
           </div>
         </div>
@@ -543,6 +667,204 @@ export default function ComptabilitePage() {
           )}
         </div>
       )}
+
+      {/* Tab 5 — Rapprochement bancaire */}
+      {tab === 5 && (() => {
+        const filtered = rapFilter === 'all' ? rapprochements : rapprochements.filter(r => r.statut === rapFilter)
+        const totalCredit = rapprochements.filter(r => r.type === 'credit').reduce((s, r) => s + r.montant, 0)
+        const totalDebit  = rapprochements.filter(r => r.type === 'debit').reduce((s, r) => s + r.montant, 0)
+        const nbNonRap    = rapprochements.filter(r => r.statut === 'non_rapproche').length
+        const nbEcart     = rapprochements.filter(r => r.statut === 'ecart').length
+
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-[#484F58]">
+                Comparez les relevés bancaires avec vos transactions enregistrées
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => downloadCSV(
+                    rapprochements.map(r => ({ date: r.date_releve, reference: r.reference, libelle: r.libelle ?? '', type: r.type, montant: r.montant, statut: r.statut })),
+                    'rapprochement_bancaire.csv'
+                  )}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
+                >
+                  <Download size={12} /> CSV
+                </button>
+                <button onClick={() => setShowRapModal(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-[#388BFD]/10 border border-[#388BFD]/30 text-[#388BFD] hover:bg-[#388BFD]/20 transition-colors">
+                  <Plus size={12} /> Ajouter ligne
+                </button>
+              </div>
+            </div>
+
+            {/* KPIs */}
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { label: 'Crédits totaux',    value: fmtFCFA(totalCredit), color: '#2EA043' },
+                { label: 'Débits totaux',     value: fmtFCFA(totalDebit),  color: '#F85149' },
+                { label: 'Non rapprochés',    value: nbNonRap,             color: '#F0A30A' },
+                { label: 'Écarts détectés',   value: nbEcart,              color: '#F85149' },
+              ].map(k => (
+                <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                  <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">{k.label}</p>
+                  <p className="text-lg font-bold" style={{ color: k.color }}>{k.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Filter */}
+            <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1 w-fit">
+              {([['all', 'Tous'], ['non_rapproche', 'Non rapprochés'], ['rapproche', 'Rapprochés'], ['ecart', 'Écarts']] as const).map(([v, l]) => (
+                <button key={v} onClick={() => setRapFilter(v)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${rapFilter === v ? 'bg-[#388BFD]/10 text-[#388BFD]' : 'text-[#8B949E] hover:text-[#E6EDF3]'}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+
+            {/* Table */}
+            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+              {rapLoading ? (
+                <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-[#484F58]" /></div>
+              ) : filtered.length === 0 ? (
+                <div className="text-center py-12">
+                  <GitMerge size={32} className="text-[#30363D] mx-auto mb-3" />
+                  <p className="text-[#484F58] text-sm">Aucune ligne de rapprochement</p>
+                  <p className="text-[#30363D] text-xs mt-1">Ajoutez vos lignes de relevé bancaire pour les rapprocher</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[#30363D]">
+                        {['Date', 'Référence', 'Libellé', 'Type', 'Montant', 'Statut', 'Actions'].map(h => (
+                          <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#484F58] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#21262D]">
+                      {filtered.map(r => (
+                        <tr key={r.id} className="hover:bg-[#21262D]/30 transition-colors">
+                          <td className="px-4 py-2.5 text-[#8B949E] text-xs whitespace-nowrap">
+                            {new Date(r.date_releve).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
+                          </td>
+                          <td className="px-4 py-2.5 font-mono text-[11px] text-[#E6EDF3]">{r.reference}</td>
+                          <td className="px-4 py-2.5 text-[#8B949E] text-xs max-w-[160px] truncate">{r.libelle ?? '—'}</td>
+                          <td className="px-4 py-2.5">
+                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${r.type === 'credit' ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'bg-[#F85149]/10 text-[#F85149]'}`}>
+                              {r.type === 'credit' ? '↑ Crédit' : '↓ Débit'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-semibold whitespace-nowrap" style={{ color: r.type === 'credit' ? '#2EA043' : '#F85149' }}>
+                            {fmtFCFA(r.montant)}
+                          </td>
+                          <td className="px-4 py-2.5">
+                            {r.statut === 'rapproche'     && <span className="flex items-center gap-1 text-[10px] text-[#2EA043]"><CheckCircle size={10} /> Rapproché</span>}
+                            {r.statut === 'non_rapproche' && <span className="flex items-center gap-1 text-[10px] text-[#F0A30A]"><Circle size={10} /> En attente</span>}
+                            {r.statut === 'ecart'         && <span className="flex items-center gap-1 text-[10px] text-[#F85149]"><AlertTriangle size={10} /> Écart</span>}
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <div className="flex items-center gap-1">
+                              {r.statut !== 'rapproche' && (
+                                <button onClick={() => updateRapStatut(r.id, 'rapproche')}
+                                  className="px-2 py-1 rounded text-[10px] bg-[#2EA043]/10 text-[#2EA043] hover:bg-[#2EA043]/20 transition-colors" title="Marquer rapproché">
+                                  ✓
+                                </button>
+                              )}
+                              {r.statut !== 'ecart' && (
+                                <button onClick={() => updateRapStatut(r.id, 'ecart')}
+                                  className="px-2 py-1 rounded text-[10px] bg-[#F85149]/10 text-[#F85149] hover:bg-[#F85149]/20 transition-colors" title="Signaler écart">
+                                  !
+                                </button>
+                              )}
+                              {r.statut !== 'non_rapproche' && (
+                                <button onClick={() => updateRapStatut(r.id, 'non_rapproche')}
+                                  className="px-2 py-1 rounded text-[10px] bg-[#F0A30A]/10 text-[#F0A30A] hover:bg-[#F0A30A]/20 transition-colors" title="Remettre en attente">
+                                  ↺
+                                </button>
+                              )}
+                              <button onClick={() => deleteRap(r.id)}
+                                className="px-2 py-1 rounded text-[10px] bg-[#484F58]/10 text-[#484F58] hover:bg-[#F85149]/10 hover:text-[#F85149] transition-colors" title="Supprimer">
+                                <Trash2 size={10} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Modal rapprochement */}
+      <AnimatePresence>
+        {showRapModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60" onClick={() => setShowRapModal(false)} />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              <button onClick={() => setShowRapModal(false)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
+              <h3 className="text-base font-bold text-[#E6EDF3] mb-4">Nouvelle ligne de relevé</h3>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Date relevé</label>
+                    <input type="date" value={rapForm.date_releve} onChange={e => setRapForm(f => ({ ...f, date_releve: e.target.value }))}
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Type</label>
+                    <div className="flex gap-2">
+                      {(['credit', 'debit'] as const).map(t => (
+                        <button key={t} onClick={() => setRapForm(f => ({ ...f, type: t }))}
+                          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${rapForm.type === t ? t === 'credit' ? 'bg-[#2EA043] text-white' : 'bg-[#F85149] text-white' : 'bg-[#21262D] text-[#8B949E]'}`}>
+                          {t === 'credit' ? '↑ Crédit' : '↓ Débit'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Référence</label>
+                  <input value={rapForm.reference} onChange={e => setRapForm(f => ({ ...f, reference: e.target.value }))}
+                    placeholder="VIR-2025-001, CHQ-456…"
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
+                </div>
+                <div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
+                  <input type="number" value={rapForm.montant} onChange={e => setRapForm(f => ({ ...f, montant: e.target.value }))}
+                    placeholder="0"
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
+                </div>
+                <div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Libellé (optionnel)</label>
+                  <input value={rapForm.libelle} onChange={e => setRapForm(f => ({ ...f, libelle: e.target.value }))}
+                    placeholder="Description…"
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
+                </div>
+              </div>
+              <div className="flex gap-2 mt-5">
+                <button onClick={() => setShowRapModal(false)}
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+                  Annuler
+                </button>
+                <button onClick={saveRapprochement} disabled={rapSaving || !rapForm.reference || !rapForm.montant}
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#388BFD] text-white hover:bg-[#388BFD]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                  {rapSaving && <Loader2 size={13} className="animate-spin" />}
+                  Enregistrer
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Modal */}
       <AnimatePresence>
