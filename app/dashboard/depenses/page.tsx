@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { Receipt, Plus, X, Loader2, TrendingDown, TrendingUp, BookOpen } from 'lucide-react'
+import { Receipt, Plus, X, Loader2, TrendingDown, TrendingUp, BookOpen, Trash2 } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
 import { resolveAccounts, accountLabel } from '@/lib/accounting-engine'
 
@@ -73,6 +73,8 @@ export default function DepensesPage() {
     credit_account: '571000',
   })
 
+  const [deleting, setDeleting] = useState<string | null>(null)
+
   const load = useCallback(async () => {
     if (!tenantId) return
     const [{ data: dep }, { data: cc }] = await Promise.all([
@@ -90,38 +92,26 @@ export default function DepensesPage() {
     if (!form.description || !form.montant || !tenantId) return
     setSaving(true)
     const montant = parseInt(form.montant)
-    const { data: { user } } = await supabase.auth.getUser()
 
-    const { data: dep } = await supabase.from('depenses').insert({
-      tenant_id:       tenantId,
-      categorie:       form.categorie,
-      description:     form.description,
-      montant,
-      date:            form.date,
-      mode_paiement:   form.mode_paiement,
-      reference_piece: form.reference_piece || null,
-      cost_center_id:  form.cost_center_id  || null,
-      debit_account:   form.debit_account,
-      credit_account:  form.credit_account,
-    }).select('id').single()
-
-    // Sync trésorerie + déclenche trigger auto-journal
-    await supabase.from('transactions').insert({
-      tenant_id:       tenantId,
-      type:            'sortie',
-      categorie:       CATEGORIES.find(c => c.id === form.categorie)?.label ?? form.categorie,
-      description:     form.description,
-      montant,
-      date:            form.date,
-      mode_paiement:   form.mode_paiement,
-      source:          'depense',
-      source_id:       dep?.id ?? null,
-      debit_account:   form.debit_account,
-      credit_account:  form.credit_account,
-      reference:       form.reference_piece || null,
-      cost_center_id:  form.cost_center_id  || null,
-      created_by:      user?.id,
+    // fn_create_depense() is SECURITY DEFINER → écrit depense + transaction
+    // atomiquement côté serveur, même pour les utilisateurs non-financiers
+    const { error } = await supabase.rpc('fn_create_depense', {
+      p_categorie:      form.categorie,
+      p_description:    form.description,
+      p_montant:        montant,
+      p_date:           form.date,
+      p_mode_paiement:  form.mode_paiement,
+      p_reference:      form.reference_piece || null,
+      p_cost_center_id: form.cost_center_id  || null,
+      p_debit_account:  form.debit_account,
+      p_credit_account: form.credit_account,
     })
+
+    if (error) {
+      console.error('fn_create_depense error:', error.message)
+      setSaving(false)
+      return
+    }
 
     setShowModal(false)
     setForm({
@@ -130,6 +120,15 @@ export default function DepensesPage() {
       reference_piece: '', cost_center_id: '', debit_account: '601000', credit_account: '571000',
     })
     setSaving(false)
+    load()
+  }
+
+  async function deleteDepense(id: string) {
+    if (!confirm('Supprimer cette dépense et la transaction associée ?')) return
+    setDeleting(id)
+    // fn_delete_depense() is SECURITY DEFINER → supprime depense + transaction liée
+    await supabase.rpc('fn_delete_depense', { p_dep_id: id })
+    setDeleting(null)
     load()
   }
 
@@ -270,7 +269,7 @@ export default function DepensesPage() {
             {filtered.slice(0, 50).map(d => {
               const cat = CATEGORIES.find(c => c.id === d.categorie)
               return (
-                <div key={d.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#21262D]/30">
+                <div key={d.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#21262D]/30 group">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[#21262D] text-base">
                     {cat?.label.split(' ')[0] ?? '📦'}
                   </div>
@@ -284,6 +283,16 @@ export default function DepensesPage() {
                       {new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                     </p>
                   </div>
+                  <button
+                    onClick={() => deleteDepense(d.id)}
+                    disabled={deleting === d.id}
+                    className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[#484F58] hover:text-[#F85149] hover:bg-[#F85149]/10 transition-all"
+                    title="Supprimer"
+                  >
+                    {deleting === d.id
+                      ? <Loader2 size={13} className="animate-spin" />
+                      : <Trash2 size={13} />}
+                  </button>
                 </div>
               )
             })}
