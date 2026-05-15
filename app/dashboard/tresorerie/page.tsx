@@ -10,8 +10,9 @@ import {
 } from 'recharts'
 import {
   Plus, Minus, TrendingUp, TrendingDown, Wallet, X, Loader2,
-  BookOpen, ChevronDown, ChevronUp, Settings2,
+  BookOpen, ChevronDown, ChevronUp, Settings2, Smartphone,
 } from 'lucide-react'
+import { MOBILE_MONEY_MODES } from '@/lib/erp-core'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   OHADA_ACCOUNTS, resolveAccounts, accountLabel,
@@ -225,6 +226,29 @@ export default function TresoreriePage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Mobile Money summary */}
+      {(() => {
+        const mmIn  = filtered.filter(t => t.type === 'entree' && MOBILE_MONEY_MODES.includes(t.mode_paiement)).reduce((s, t) => s + t.montant, 0)
+        const mmOut = filtered.filter(t => t.type === 'sortie' && MOBILE_MONEY_MODES.includes(t.mode_paiement)).reduce((s, t) => s + t.montant, 0)
+        const mmCount = filtered.filter(t => MOBILE_MONEY_MODES.includes(t.mode_paiement)).length
+        if (mmCount === 0) return null
+        return (
+          <div className="flex items-center gap-3 px-4 py-3 bg-[#161B22] border border-[#30363D] rounded-xl">
+            <div className="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center shrink-0">
+              <Smartphone size={15} className="text-[#F97316]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-[#E6EDF3]">Mobile Money</p>
+              <p className="text-[10px] text-[#484F58]">{mmCount} transaction{mmCount > 1 ? 's' : ''} via Airtel Money / MTN MoMo</p>
+            </div>
+            <div className="flex gap-4 text-xs">
+              <span className="text-[#2EA043] font-medium">+{fmtFCFA(mmIn)}</span>
+              {mmOut > 0 && <span className="text-[#F85149] font-medium">-{fmtFCFA(mmOut)}</span>}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Toolbar */}
       <div className="flex flex-wrap gap-3 items-center">

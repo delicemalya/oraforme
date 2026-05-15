@@ -8,11 +8,12 @@ import {
   ChefHat, GraduationCap, Hotel, Bot,
   LogOut, Menu, X, Building2, Lock,
   Settings, ShieldAlert, ShieldCheck, Store,
-  Wallet, BookOpen, Smartphone, ShoppingCart,
+  Wallet, BookOpen, ShoppingCart,
   Receipt, BarChart2, Truck,
   BookMarked, Calculator, HeartHandshake, Users, UsersRound,
   Layers, CreditCard, Activity,
 } from 'lucide-react'
+import { CORE_MODULE_IDS, CORE_SECTION_LABEL } from '@/lib/erp-core'
 import { useState, useEffect } from 'react'
 import { SUPER_ADMIN_EMAIL } from '@/lib/admin-config'
 import type { LucideIcon } from 'lucide-react'
@@ -22,20 +23,21 @@ import { useLocale } from '@/lib/hooks/useLocale'
 // ── Generic modules (tenants sans secteur défini) ─────────────────────────────
 
 const ALL_MODULES = [
-  { id: 'facturation',  label: 'FacturePro',         icon: FileText,      href: '/dashboard/facturation' },
-  { id: 'tresorerie',   label: 'Trésorerie',          icon: Wallet,        href: '/dashboard/tresorerie' },
-  { id: 'comptabilite', label: 'Comptabilité',        icon: BookOpen,      href: '/dashboard/comptabilite' },
-  { id: 'mobilemoney',  label: 'Mobile Money',        icon: Smartphone,    href: '/dashboard/mobilemoney' },
-  { id: 'stock',        label: 'Stock & Inventaire',  icon: Package,       href: '/dashboard/stock' },
-  { id: 'rh',           label: 'RH Premium',          icon: UserCheck,     href: '/dashboard/rh' },
-  { id: 'ecole',        label: 'École & Université',  icon: GraduationCap, href: '/dashboard/ecole' },
-  { id: 'restaurant',   label: 'Resto POS',           icon: ChefHat,       href: '/dashboard/restaurant' },
-  { id: 'achats',       label: 'Achats & Fourn.',     icon: ShoppingCart,  href: '/dashboard/achats' },
-  { id: 'depenses',     label: 'Dépenses',            icon: Receipt,       href: '/dashboard/depenses' },
-  { id: 'rapports',     label: 'Rapports IA',         icon: BarChart2,     href: '/dashboard/rapports' },
-  { id: 'hotel',        label: 'Hôtel & Hébergement', icon: Hotel,         href: '/dashboard/hotel' },
-  { id: 'transport',    label: 'Transport VTC',       icon: Truck,         href: '/dashboard/transport' },
-  { id: 'bizbot',       label: 'MIAA+ Assistant',     icon: Bot,           href: '/dashboard/miaa' },
+  { id: 'rh',           label: 'RH & Paie',           icon: UserCheck,     href: '/dashboard/rh' },
+  { id: 'comptabilite', label: 'Comptabilité',         icon: BookOpen,      href: '/dashboard/comptabilite' },
+  { id: 'tresorerie',   label: 'Trésorerie',           icon: Wallet,        href: '/dashboard/tresorerie' },
+  { id: 'stock',        label: 'Stock & Inventaire',   icon: Package,       href: '/dashboard/stock' },
+  // Business modules (sector-specific)
+  { id: 'facturation',  label: 'FacturePro',           icon: FileText,      href: '/dashboard/facturation' },
+  { id: 'ecole',        label: 'École & Université',   icon: GraduationCap, href: '/dashboard/ecole' },
+  { id: 'restaurant',   label: 'Resto POS',            icon: ChefHat,       href: '/dashboard/restaurant' },
+  { id: 'achats',       label: 'Achats & Fourn.',      icon: ShoppingCart,  href: '/dashboard/achats' },
+  { id: 'depenses',     label: 'Dépenses',             icon: Receipt,       href: '/dashboard/depenses' },
+  { id: 'rapports',     label: 'Rapports IA',          icon: BarChart2,     href: '/dashboard/rapports' },
+  { id: 'hotel',        label: 'Hôtel & Hébergement',  icon: Hotel,         href: '/dashboard/hotel' },
+  { id: 'transport',    label: 'Transport VTC',        icon: Truck,         href: '/dashboard/transport' },
+  { id: 'bizbot',       label: 'MIAA+ Assistant',      icon: Bot,           href: '/dashboard/miaa' },
+  // mobilemoney removed — intégré comme mode de paiement dans Trésorerie
 ]
 
 // ── Navigation par secteur métier ─────────────────────────────────────────────
@@ -337,11 +339,17 @@ export default function Sidebar() {
       })
     : null
 
+  // ── Split sector nav: Core ERP vs Métier ────────────────────────────────────
+  const coreNavItems     = sectorNav ? sectorNav.filter(item => CORE_MODULE_IDS.has(item.id))     : []
+  const businessNavItems = sectorNav ? sectorNav.filter(item => !CORE_MODULE_IDS.has(item.id))    : []
+
   // Modules actifs pour les tenants sans secteur (filtrage identique)
-  const activeModules   = ALL_MODULES.filter(m =>
+  const allActiveModules  = ALL_MODULES.filter(m =>
     modulesActifs.includes(m.id) && (isOwner || permissions[m.id]?.can_view !== false)
   )
-  const inactiveModules = ALL_MODULES.filter(m => !modulesActifs.includes(m.id))
+  const coreActiveModules     = allActiveModules.filter(m => CORE_MODULE_IDS.has(m.id))
+  const businessActiveModules = allActiveModules.filter(m => !CORE_MODULE_IDS.has(m.id))
+  const inactiveModules       = ALL_MODULES.filter(m => !modulesActifs.includes(m.id))
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -420,60 +428,90 @@ export default function Sidebar() {
         {/* ── Navigation SECTEUR ───────────────────────────────────────────── */}
         {loaded && sectorNav && (
           <>
-            <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">
-              {SECTOR_LABEL[secteur!] ?? secteur}
-            </p>
+            {/* Core ERP items */}
+            {coreNavItems.length > 0 && (
+              <>
+                <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">
+                  {CORE_SECTION_LABEL}
+                </p>
+                {coreNavItems.map(item => {
+                  const Icon = item.icon
+                  const active = isActive(item.href)
+                  const canEdit = isOwner || permissions[item.id]?.can_edit
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group"
+                      style={{ background: active ? `${item.color}18` : 'transparent' }}
+                    >
+                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? item.color : '#484F58' }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? item.color : '#8B949E' }}>
+                          {item.label}
+                        </div>
+                        <div className="text-[10px] text-[#484F58] truncate flex items-center gap-1">
+                          {item.sublabel}
+                          {!isOwner && !canEdit && <Lock size={8} className="text-[#30363D]" />}
+                        </div>
+                      </div>
+                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: item.color }} />}
+                    </Link>
+                  )
+                })}
+              </>
+            )}
+
+            {/* Business / Métier items */}
+            {businessNavItems.length > 0 && (
+              <>
+                <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">
+                  {SECTOR_LABEL[secteur!] ?? secteur}
+                </p>
+                {businessNavItems.map(item => {
+                  const Icon = item.icon
+                  const active = isActive(item.href)
+                  const canEdit = isOwner || permissions[item.id]?.can_edit
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group"
+                      style={{ background: active ? `${item.color}18` : 'transparent' }}
+                    >
+                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? item.color : '#484F58' }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? item.color : '#8B949E' }}>
+                          {item.label}
+                        </div>
+                        <div className="text-[10px] text-[#484F58] truncate flex items-center gap-1">
+                          {item.sublabel}
+                          {!isOwner && !canEdit && <Lock size={8} className="text-[#30363D]" />}
+                        </div>
+                      </div>
+                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: item.color }} />}
+                    </Link>
+                  )
+                })}
+              </>
+            )}
+
             {sectorNav.length === 0 && (
               <p className="text-xs text-[#484F58] px-3 py-2">Aucun module assigné.</p>
             )}
-            {sectorNav.map(item => {
-              const Icon = item.icon
-              const active = isActive(item.href)
-              const canEdit = isOwner || permissions[item.id]?.can_edit
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group"
-                  style={{ background: active ? `${item.color}18` : 'transparent' }}
-                >
-                  <Icon
-                    size={15}
-                    className="shrink-0 transition-colors"
-                    style={{ color: active ? item.color : '#484F58' }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div
-                      className="text-sm font-medium leading-tight truncate"
-                      style={{ color: active ? item.color : '#8B949E' }}
-                    >
-                      {item.label}
-                    </div>
-                    <div className="text-[10px] text-[#484F58] truncate flex items-center gap-1">
-                      {item.sublabel}
-                      {/* Lecture seule : icône cadenas discret */}
-                      {!isOwner && !canEdit && (
-                        <Lock size={8} className="text-[#30363D]" />
-                      )}
-                    </div>
-                  </div>
-                  {active && (
-                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: item.color }} />
-                  )}
-                </Link>
-              )
-            })}
           </>
         )}
 
         {/* ── Navigation GÉNÉRIQUE (pas de secteur) ───────────────────────── */}
         {loaded && !sectorNav && (
           <>
-            {activeModules.length > 0 && (
+            {/* Core ERP modules */}
+            {coreActiveModules.length > 0 && (
               <>
-                <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
-                {activeModules.map(mod => {
+                <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">{CORE_SECTION_LABEL}</p>
+                {coreActiveModules.map(mod => {
                   const Icon = mod.icon
                   const active = isActive(mod.href)
                   return (
@@ -482,9 +520,7 @@ export default function Sidebar() {
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                        active
-                          ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium'
-                          : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+                        active ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium' : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
                       }`}
                     >
                       <Icon size={15} className="shrink-0" />
@@ -495,6 +531,33 @@ export default function Sidebar() {
                 })}
               </>
             )}
+
+            {/* Business modules */}
+            {businessActiveModules.length > 0 && (
+              <>
+                <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
+                {businessActiveModules.map(mod => {
+                  const Icon = mod.icon
+                  const active = isActive(mod.href)
+                  return (
+                    <Link
+                      key={mod.id}
+                      href={mod.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+                        active ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium' : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+                      }`}
+                    >
+                      <Icon size={15} className="shrink-0" />
+                      <span className="truncate">{mod.label}</span>
+                      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F0A30A]" />}
+                    </Link>
+                  )
+                })}
+              </>
+            )}
+
+            {/* Inactive modules (owner only) */}
             {isOwner && inactiveModules.length > 0 && (
               <>
                 <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.inactive')}</p>
