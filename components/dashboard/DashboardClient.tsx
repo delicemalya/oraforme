@@ -31,6 +31,7 @@ export interface DashboardData {
   ecoleKpis?:   { nbEtudiants: number; nbActifs: number; nbSuspendus: number; nbAbsences: number } | null
   daacKpis?:    { sessionsEnCours: number; diplomesEnAttente: number; nbSoutenances: number } | null
   rhKpis?:      { nbActifs: number; nbConges: number } | null
+  ecoleFinancials?: { revenusMois: number; nbPaiementsMois: number; nbImpayesDossiers: number; montantImpayeTotal: number } | null
 }
 
 function fmt(n: number) {
@@ -453,7 +454,8 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   const ecoleRole   = data.ecoleRole ?? null
   const ecoleKpis   = data.ecoleKpis ?? null
   const daacKpis    = data.daacKpis ?? null
-  const rhKpis      = data.rhKpis ?? null
+  const rhKpis          = data.rhKpis ?? null
+  const ecoleFinancials = data.ecoleFinancials ?? null
 
   // Estimate solde from revenue minus alerts amount
   const soldeTresorerie = kpis.revenuMois - alerts.pendingAmount * 0.3
@@ -527,6 +529,44 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       gradient: 'linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 50%, #3B82F6 100%)',
       href: '/dashboard/ecole/rh',
       i: 2,
+    },
+  ] : isFinancial && secteur === 'ecole' && ecoleKpis ? [
+    {
+      label: 'Étudiants inscrits',
+      value: ecoleKpis.nbEtudiants,
+      sub: `${ecoleKpis.nbActifs} actifs · ${ecoleKpis.nbSuspendus} suspendus`,
+      icon: GraduationCap,
+      gradient: 'linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)',
+      href: '/dashboard/ecole/scolarite',
+      i: 0,
+    },
+    {
+      label: 'Revenus scolaires',
+      value: `${fmt(ecoleFinancials?.revenusMois ?? 0)} FCFA`,
+      sub: `${ecoleFinancials?.nbPaiementsMois ?? 0} paiements ce mois`,
+      icon: TrendingUp,
+      gradient: 'linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 50%, #3B82F6 100%)',
+      href: '/dashboard/ecole/scolarite',
+      i: 1,
+    },
+    {
+      label: 'Impayés scolarité',
+      value: ecoleFinancials?.nbImpayesDossiers ?? 0,
+      sub: `${fmt(ecoleFinancials?.montantImpayeTotal ?? 0)} FCFA en attente`,
+      icon: AlertTriangle,
+      gradient: (ecoleFinancials?.nbImpayesDossiers ?? 0) > 0
+        ? 'linear-gradient(135deg, #7C1D1D 0%, #B91C1C 50%, #EF4444 100%)'
+        : 'linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)',
+      href: '/dashboard/ecole/scolarite',
+      i: 2,
+    },
+    {
+      label: 'Absences totales',
+      value: ecoleKpis.nbAbsences,
+      sub: 'Relevés d\'absences',
+      icon: CalendarOff,
+      gradient: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #8B5CF6 100%)',
+      i: 3,
     },
   ] : secteur === 'ecole' && ecoleKpis ? [
     {

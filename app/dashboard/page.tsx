@@ -161,8 +161,12 @@ export default async function DashboardPage() {
   let ecoleKpis: { nbEtudiants: number; nbActifs: number; nbSuspendus: number; nbAbsences: number } | null = null
   let daacKpis:  { sessionsEnCours: number; diplomesEnAttente: number; nbSoutenances: number } | null = null
   let rhKpis:    { nbActifs: number; nbConges: number } | null = null
+  let ecoleFinancials: { revenusMois: number; nbPaiementsMois: number; nbImpayesDossiers: number; montantImpayeTotal: number } | null = null
 
   if (secteur === 'ecole') {
+    const moisCourant = now.getMonth() + 1
+    const anneeCourante = now.getFullYear()
+
     const [etuRes, etuActifRes, etuSusp, absRes, sesRes, dipRes, defRes, empActifRes, empCongeRes] =
       await Promise.all([
         supabase.from('etudiants').select('id', { count: 'exact', head: true }).eq('tenant_id', tid),
@@ -190,6 +194,22 @@ export default async function DashboardPage() {
       nbActifs: empActifRes.count ?? 0,
       nbConges: empCongeRes.count ?? 0,
     }
+
+    // Données financières scolaires (uniquement pour les rôles financiers)
+    if (isFinancial) {
+      const [paieRes, impayesRes] = await Promise.all([
+        supabase.from('paiements_scolaires').select('montant')
+          .eq('tenant_id', tid).eq('mois', moisCourant).eq('annee', anneeCourante),
+        supabase.from('paiements_scolaires').select('montant')
+          .eq('tenant_id', tid).eq('statut', 'en_attente'),
+      ])
+      ecoleFinancials = {
+        revenusMois:         paieRes.data?.reduce((s, p) => s + Number(p.montant ?? 0), 0) ?? 0,
+        nbPaiementsMois:     paieRes.data?.length ?? 0,
+        nbImpayesDossiers:   impayesRes.data?.length ?? 0,
+        montantImpayeTotal:  impayesRes.data?.reduce((s, p) => s + Number(p.montant ?? 0), 0) ?? 0,
+      }
+    }
   }
 
   return (
@@ -211,6 +231,7 @@ export default async function DashboardPage() {
         ecoleKpis,
         daacKpis,
         rhKpis,
+        ecoleFinancials,
       }}
     />
   )
