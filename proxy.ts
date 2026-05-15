@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const SUPER_ADMIN_EMAIL = 'adjidongui@gmail.com'
+const SUPER_ADMIN_EMAILS = ['adjidongui@gmail.com', 'adjigordon@gmail.com']
 
 // École routes that require specific roles (beyond basic authentication)
 // Key = route segment, Value = allowed ecole_role_name values
@@ -66,7 +66,7 @@ export async function proxy(request: NextRequest) {
 
   // ── ADMIN ROUTES ──────────────────────────────────────────────────────────
   if (pathname.startsWith('/admin')) {
-    if (!user || user.email !== SUPER_ADMIN_EMAIL) {
+    if (!user || !SUPER_ADMIN_EMAILS.includes(user.email ?? '')) {
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       return NextResponse.redirect(url)

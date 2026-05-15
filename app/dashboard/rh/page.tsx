@@ -27,6 +27,9 @@ interface Employe {
   contrat: Contrat
   statut: Statut
   cnss: string
+  agent_code: string | null
+  matricule: string | null
+  ville: string | null
   date_embauche: string | null
   date_naissance: string | null
   date_fin_contrat: string | null
@@ -131,7 +134,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
     salaire_base: '', contrat: 'cdi' as Contrat,
     statut: 'actif' as Statut, cnss: '',
     date_embauche: '', date_naissance: '',
-    date_fin_contrat: '', notes: '',
+    date_fin_contrat: '', notes: '', ville: 'PNR',
   })
 
   const displayed = filterStatut === 'tous'
@@ -141,20 +144,23 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   async function handleSave() {
     if (!form.nom.trim()) return
     setSaving(true)
-    await supabase.from('employes').insert({
-      tenant_id: tenantId,
-      nom: form.nom, poste: form.poste,
-      email: form.email, telephone: form.telephone,
-      salaire_base: Number(form.salaire_base) || 0,
-      contrat: form.contrat, statut: form.statut, cnss: form.cnss,
-      date_embauche: form.date_embauche || null,
-      date_naissance: form.date_naissance || null,
-      date_fin_contrat: form.date_fin_contrat || null,
-      solde_conges: 26, notes: form.notes,
+    await fetch('/api/hr/employees', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nom: form.nom, poste: form.poste,
+        email: form.email, telephone: form.telephone,
+        salaire_base: Number(form.salaire_base) || 0,
+        contrat: form.contrat, statut: form.statut, cnss: form.cnss,
+        date_embauche: form.date_embauche || null,
+        date_naissance: form.date_naissance || null,
+        date_fin_contrat: form.date_fin_contrat || null,
+        notes: form.notes, ville: form.ville,
+      }),
     })
     setSaving(false)
     setShowForm(false)
-    setForm({ nom:'',poste:'',email:'',telephone:'',salaire_base:'',contrat:'cdi',statut:'actif',cnss:'',date_embauche:'',date_naissance:'',date_fin_contrat:'',notes:'' })
+    setForm({ nom:'',poste:'',email:'',telephone:'',salaire_base:'',contrat:'cdi',statut:'actif',cnss:'',date_embauche:'',date_naissance:'',date_fin_contrat:'',notes:'',ville:'PNR' })
     onRefresh()
   }
 
@@ -242,7 +248,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#21262D]">
-                  {['Employé','Poste','Contrat','Statut','Brut mensuel','Net estimé',''].map(h => (
+                  {['Employé','Code agent','Poste','Contrat','Statut','Brut mensuel','Net estimé',''].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-[#484F58] uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -266,6 +272,11 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                           </div>
                           <span className="text-sm font-semibold text-[#E6EDF3]">{e.nom}</span>
                         </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-mono text-[10px] text-[#F0A30A] bg-[#F0A30A]/10 px-2 py-0.5 rounded">
+                          {e.agent_code ?? '—'}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-[#8B949E]">{e.poste || '—'}</td>
                       <td className="px-4 py-3"><ContratBadge contrat={e.contrat} /></td>
@@ -353,6 +364,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 {/* Info grid */}
                 <div className="space-y-2">
                   {[
+                    ['Code agent', selected.agent_code ?? '—'],
+                    ['Matricule', selected.matricule ?? '—'],
                     ['Email', selected.email || '—'],
                     ['Téléphone', selected.telephone || '—'],
                     ['N° CNSS', selected.cnss || '—'],
@@ -516,6 +529,16 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                       className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/40" />
                   </div>
                 ) : null}
+
+                <div>
+                  <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Ville de travail</label>
+                  <select value={form.ville} onChange={e => setForm(p => ({ ...p, ville: e.target.value }))}
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/40">
+                    <option value="PNR">Pointe-Noire</option>
+                    <option value="BZV">Brazzaville</option>
+                  </select>
+                  <p className="text-[10px] text-[#484F58] mt-1">Le code agent sera généré automatiquement (ex : ORA-{new Date().getFullYear()}-{form.ville}-0001)</p>
+                </div>
 
                 <div>
                   <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Notes internes</label>

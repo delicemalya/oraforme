@@ -65,7 +65,7 @@ function HeroCard({ label, value, sub, icon: Icon, gradient, trend, href, i }: H
       {...fadeUp(i)}
       whileHover={{ y: -3, scale: 1.015 }}
       transition={{ duration: 0.2 }}
-      className="relative rounded-2xl p-5 overflow-hidden cursor-default select-none h-[158px] flex flex-col justify-between"
+      className="relative rounded-2xl p-4 sm:p-5 overflow-hidden cursor-default select-none min-h-[120px] sm:h-[158px] flex flex-col justify-between"
       style={{ background: gradient }}
     >
       {/* Subtle radial shine */}
@@ -637,7 +637,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   ]
 
   return (
-    <div className="space-y-5 pb-10">
+    <div className="space-y-4 sm:space-y-5 pb-6">
 
       {/* ── Role banner ─────────────────────────────────────────────────── */}
       {secteur === 'ecole' && ecoleRole && ecoleRole !== 'DIRECTION_GENERALE' && (() => {
@@ -709,12 +709,12 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       </motion.div>
 
       {/* ── Hero KPI Cards ───────────────────────────────────────────────── */}
-      <div className={`grid gap-4 auto-rows-[158px] ${heroCards.length === 4 ? 'grid-cols-2 xl:grid-cols-4' : 'grid-cols-2 xl:grid-cols-3'}`}>
+      <div className={`grid gap-3 sm:gap-4 ${heroCards.length === 4 ? 'grid-cols-2 xl:grid-cols-4' : 'grid-cols-2 xl:grid-cols-3'}`}>
         {heroCards.map(card => <HeroCard key={card.label} {...card} />)}
       </div>
 
       {/* ── Main content + right panel ───────────────────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 sm:gap-4">
 
         {/* Left: charts (2/3) */}
         <div className="xl:col-span-2 space-y-4">
@@ -756,20 +756,22 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
               {t('dash.viewAll')}
             </Link>
           </div>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#21262D]" style={{ background: 'rgba(255,255,255,0.01)' }}>
-                <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.name')}</th>
-                <th className="text-right px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.amount')}</th>
-                <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.status')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentActivity.map((item, i) => (
-                <TransactionRow key={item.id} item={item} i={i} />
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[#21262D]" style={{ background: 'rgba(255,255,255,0.01)' }}>
+                  <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.name')}</th>
+                  <th className="text-right px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.amount')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.status')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentActivity.map((item, i) => (
+                  <TransactionRow key={item.id} item={item} i={i} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </motion.div>
       )}
 

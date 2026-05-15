@@ -40,6 +40,11 @@ export default async function DashboardPage() {
   const secteur   = tenant?.secteur_activite ?? null
   const ecoleRole = (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null
 
+  // Non-owner users with an école-specific role go straight to the école dashboard
+  if (ecoleRole !== null && profile.role !== 'owner') {
+    redirect('/dashboard/ecole')
+  }
+
   // ── Résoudre isFinancial depuis le rôle dynamique ─────────────────────────
   let isFinancial = profile.role === 'owner' // owner voit tout par défaut
 

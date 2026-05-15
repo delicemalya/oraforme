@@ -155,6 +155,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
           <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
             <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Derniers paiements</p>
           </div>
+          <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Étudiant', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
             <tbody>
@@ -172,6 +173,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
@@ -248,19 +250,21 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
           <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
             <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Historique</p>
           </div>
-          <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
-            <tbody>
-              {paiements.slice(0, 50).map(p => (
-                <tr key={p.id} className="border-t border-white/[0.04]">
-                  <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
-                  <td className="px-4 py-2.5 text-white">{p.libelle}</td>
-                  <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                  <td className="px-4 py-2.5 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+              <tbody>
+                {paiements.slice(0, 50).map(p => (
+                  <tr key={p.id} className="border-t border-white/[0.04]">
+                    <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-2.5 text-white">{p.libelle}</td>
+                    <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
@@ -438,29 +442,31 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
         <div className="text-center py-12 text-[#8B949E] text-xs">Aucune bourse accordée.</div>
       ) : (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-          <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Étudiant', 'Libellé', 'Montant', 'Date'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
-            <tbody>
-              {bourses.map(b => {
-                const etu = etudiants.find(e => e.id === b.etudiant_id)
-                return (
-                  <tr key={b.id} className="border-t border-white/[0.04]">
-                    <td className="px-4 py-2.5">
-                      {etu ? (
-                        <div className="flex items-center gap-2">
-                          <Avatar nom={etu.nom} prenom={etu.prenom} photoUrl={etu.photo_url} size={24} />
-                          <span className="text-white">{etu.prenom} {etu.nom}</span>
-                        </div>
-                      ) : <span className="text-[#484F58]">—</span>}
-                    </td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{b.libelle}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#8B5CF6]">{fmt(b.montant)} FCFA</td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{new Date(b.created_at).toLocaleDateString('fr-FR')}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Étudiant', 'Libellé', 'Montant', 'Date'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+              <tbody>
+                {bourses.map(b => {
+                  const etu = etudiants.find(e => e.id === b.etudiant_id)
+                  return (
+                    <tr key={b.id} className="border-t border-white/[0.04]">
+                      <td className="px-4 py-2.5">
+                        {etu ? (
+                          <div className="flex items-center gap-2">
+                            <Avatar nom={etu.nom} prenom={etu.prenom} photoUrl={etu.photo_url} size={24} />
+                            <span className="text-white">{etu.prenom} {etu.nom}</span>
+                          </div>
+                        ) : <span className="text-[#484F58]">—</span>}
+                      </td>
+                      <td className="px-4 py-2.5 text-[#8B949E]">{b.libelle}</td>
+                      <td className="px-4 py-2.5 font-semibold text-[#8B5CF6]">{fmt(b.montant)} FCFA</td>
+                      <td className="px-4 py-2.5 text-[#8B949E]">{new Date(b.created_at).toLocaleDateString('fr-FR')}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -98,7 +98,7 @@ function AlertPill({ text, type }: { text: string; type: 'warn' | 'info' | 'ok' 
 function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   const tauxPresence = pct(k.nbActifs - k.nbAbsencesJour, k.nbActifs)
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <motion.div {...fade(0)} className="flex items-center justify-between">
         <div>
@@ -167,7 +167,7 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
 function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">RAF — Finances & Trésorerie</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
@@ -213,7 +213,7 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 function ScolariteView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   const tauxPresence = pct(k.nbActifs - k.nbAbsencesJour, k.nbActifs)
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">Service Scolarité</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
@@ -251,7 +251,7 @@ function ScolariteView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
 function RhView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">RH & Paie</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
@@ -288,7 +288,7 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
     : 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">Mon espace Formateur</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
@@ -339,7 +339,7 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
     : '#F85149'
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">Mon espace Étudiant</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
@@ -383,7 +383,7 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
 function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">Espace Parent</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
@@ -422,7 +422,7 @@ function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
 function DtiView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">DTI — Technologies</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
@@ -447,7 +447,7 @@ function DtiView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
 function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
         <h1 className="text-xl font-bold text-[#E6EDF3]">DAAC — Affaires Académiques</h1>
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>

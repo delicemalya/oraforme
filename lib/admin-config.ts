@@ -1,4 +1,5 @@
-export const SUPER_ADMIN_EMAIL = 'adjidongui@gmail.com'
+export const SUPER_ADMIN_EMAILS = ['adjidongui@gmail.com', 'adjigordon@gmail.com']
+export const SUPER_ADMIN_EMAIL = SUPER_ADMIN_EMAILS[0]
 
 export const MODULE_PRICES: Record<string, number> = {
   facturation:  5000,

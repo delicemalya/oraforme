@@ -32,6 +32,39 @@ export async function createTenantAndProfile(data: {
 
   if (existingProfile?.tenant_id) return { success: true, alreadyExists: true }
 
+  // ── Check for a pending team invitation ──────────────────────────────────────
+  // If an existing tenant invited this user by email, join that tenant instead of
+  // creating a new one. The invite must not have been accepted yet.
+  const { data: invite } = await supabaseAdmin
+    .from('team_invites')
+    .select('tenant_id, role')
+    .eq('email', user.email ?? '')
+    .eq('accepted', false)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle()
+
+  if (invite) {
+    const { error: profileErr } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        tenant_id: invite.tenant_id,
+        user_id:   user.id,
+        role:      invite.role || 'membre',
+        nom:       user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? '',
+        prenom:    '',
+      })
+
+    if (!profileErr) {
+      await supabaseAdmin
+        .from('team_invites')
+        .update({ accepted: true })
+        .eq('email', user.email ?? '')
+        .eq('accepted', false)
+
+      return { success: true }
+    }
+  }
+
   // Validate & merge modules: use client selection if provided, else fall back to sector defaults
   // Server-side validation: only accept known MODULE_META keys (never arbitrary strings)
   let modules: string[]

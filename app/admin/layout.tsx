@@ -1,13 +1,13 @@
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { redirect } from 'next/navigation'
 import AdminSidebar from '@/components/admin/AdminSidebar'
-import { SUPER_ADMIN_EMAIL } from '@/lib/admin-config'
+import { SUPER_ADMIN_EMAILS } from '@/lib/admin-config'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== SUPER_ADMIN_EMAIL) {
+  if (!user || !SUPER_ADMIN_EMAILS.includes(user.email ?? '')) {
     redirect('/dashboard')
   }
 
@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <div className="w-7 h-7 rounded-full bg-[#F85149]/20 border border-[#F85149]/30 flex items-center justify-center">
               <span className="text-[#F85149] text-xs font-bold">A</span>
             </div>
-            <span className="text-sm text-[#8B949E] hidden sm:block">{SUPER_ADMIN_EMAIL}</span>
+            <span className="text-sm text-[#8B949E] hidden sm:block">{user.email}</span>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto">

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   const {
     nom, poste, email, telephone, salaire_base, contrat, statut, cnss,
     date_embauche, date_naissance, date_fin_contrat, notes,
-    nationalite, adresse, departement_id, manager_id, agent_code,
+    nationalite, adresse, departement_id, manager_id, agent_code, ville,
   } = body
 
   if (!nom?.trim()) {
@@ -54,7 +54,8 @@ export async function POST(req: NextRequest) {
     .insert({
       tenant_id:       auth.tenantId,
       matricule:       matricule ?? null,
-      agent_code:      agent_code?.trim() || null,
+      agent_code:      agent_code?.trim() || null,   // trigger fills this if null
+      ville:           ville?.trim() || 'PNR',
       nom:             nom.trim(),
       poste:           poste?.trim() || null,
       email:           email?.trim() || null,

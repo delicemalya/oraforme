@@ -137,6 +137,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
 
       <div className="flex gap-4">
         <div className="flex-1 min-w-0 rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
@@ -170,6 +171,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
         <AnimatePresence>

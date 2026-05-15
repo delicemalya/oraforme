@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { CORE_MODULE_IDS, CORE_SECTION_LABEL } from '@/lib/erp-core'
 import { useState, useEffect } from 'react'
-import { SUPER_ADMIN_EMAIL } from '@/lib/admin-config'
+import { SUPER_ADMIN_EMAILS } from '@/lib/admin-config'
 import type { LucideIcon } from 'lucide-react'
 import type { UserRole, ModulePermission } from '@/lib/hooks/usePermissions'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -311,7 +311,7 @@ export default function Sidebar() {
   }, [])
 
   const isOwner  = role === 'owner'
-  const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL
+  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(userEmail ?? '')
 
   function isActive(href: string, exact = false) {
     return exact ? pathname === href : pathname.startsWith(href)
