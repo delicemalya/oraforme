@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { fmt, KpiCard } from '../_lib/shared'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -628,6 +629,7 @@ function SectionMouvements({ movements, wallets }: {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function EcoleTresoreriePage() {
+  useRoleGuard(['DIRECTION_GENERALE', 'RAF'])
   const { tenantId } = useTenant()
 
   const [tab,       setTab]       = useState<TabId>('vue')

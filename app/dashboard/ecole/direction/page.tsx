@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import {
   type Etudiant, type PaiementScolaire, type ClasseEcole, type Enseignant, type PlanningEcole,
   type TypeEvent, TYPE_EVENT, fmt, generateCode, KpiCard, Avatar, FI,
@@ -632,6 +633,7 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DirectionPage() {
+  useRoleGuard(['DIRECTION_GENERALE'])
   const { tenantId, loading: tenantLoading } = useTenant()
   const [subTab,     setSubTab]     = useState<SubTab>('vue')
   const [etudiants,  setEtudiants]  = useState<Etudiant[]>([])

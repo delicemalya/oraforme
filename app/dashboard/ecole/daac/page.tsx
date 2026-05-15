@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Layers, RefreshCw, GraduationCap, BookOpen, FileText, Award, Swords, BookOpenCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import {
   type Etudiant, type Enseignant, type ClasseEcole,
   type Diploma, type Defense, type SessionEcole,
@@ -31,6 +32,7 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DaacPage() {
+  useRoleGuard(['DIRECTION_GENERALE', 'DAAC'])
   const { tenantId } = useTenant()
 
   const [tab,          setTab]          = useState<TabId>('sessions')

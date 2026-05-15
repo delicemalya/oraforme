@@ -4,6 +4,21 @@ import type { NextRequest } from 'next/server'
 
 const SUPER_ADMIN_EMAIL = 'adjidongui@gmail.com'
 
+// École routes that require specific roles (beyond basic authentication)
+// Key = route segment, Value = allowed ecole_role_name values
+const ECOLE_ROUTE_ROLES: Record<string, string[]> = {
+  'direction':              ['DIRECTION_GENERALE'],
+  'comptabilite':           ['DIRECTION_GENERALE', 'RAF'],
+  'tresorerie':             ['DIRECTION_GENERALE', 'RAF'],
+  'rh':                     ['DIRECTION_GENERALE', 'RAF', 'RH_PAIE'],
+  'daac':                   ['DIRECTION_GENERALE', 'DAAC'],
+  'scolarite':              ['DIRECTION_GENERALE', 'SCOLARITE', 'DAAC'],
+  'espace-formateur':       ['FORMATEUR', 'DIRECTION_GENERALE', 'DAAC', 'RH_PAIE'],
+  'espace-etudiant':        ['ETUDIANT'],
+  'espace-parent':          ['PARENT'],
+  'parametres-academiques': ['DIRECTION_GENERALE', 'DAAC'],
+}
+
 export async function proxy(request: NextRequest) {
   // Build a mutable response so Supabase can rotate session cookies
   let supabaseResponse = NextResponse.next({ request })
@@ -55,6 +70,36 @@ export async function proxy(request: NextRequest) {
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       return NextResponse.redirect(url)
+    }
+  }
+
+  // ── ÉCOLE ROLE-BASED ROUTE PROTECTION ────────────────────────────────────
+  // For /dashboard/ecole/<segment> routes, validate the user's ecole role.
+  // Owners bypass this check — they always have full access.
+  if (user && pathname.startsWith('/dashboard/ecole/')) {
+    // Extract the route segment after /dashboard/ecole/
+    const segment = pathname.replace('/dashboard/ecole/', '').split('/')[0]
+    const allowedRoles = ECOLE_ROUTE_ROLES[segment]
+
+    // Only enforce role check for explicitly restricted routes
+    if (allowedRoles && allowedRoles.length > 0) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, ecole_role_name')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      // Owners always pass
+      if (profile && profile.role !== 'owner') {
+        const ecoleRole = profile.ecole_role_name as string | null
+        if (!ecoleRole || !allowedRoles.includes(ecoleRole)) {
+          // Redirect to école dashboard with access denied signal
+          const url = request.nextUrl.clone()
+          url.pathname = '/dashboard/ecole'
+          url.searchParams.set('access_denied', segment)
+          return NextResponse.redirect(url)
+        }
+      }
     }
   }
 

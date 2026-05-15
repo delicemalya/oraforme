@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import {
   type Etudiant, type Note, type PaiementScolaire, type Absence,
   NIVEAUX, PERIODES, fmt, calcMoyenne, getMention, MENTIONS,
@@ -272,6 +273,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function EspaceParentPage() {
+  useRoleGuard(['PARENT'])
   const { tenantId, loading: tenantLoading } = useTenant()
   const [ecoleRole,  setEcoleRole]  = useState<string | null>(null)
   const [userEmail,  setUserEmail]  = useState<string | null>(null)

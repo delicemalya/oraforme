@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Loader2, RefreshCw, Download, BookOpen, TrendingUp, BarChart2, Check, Wallet, ArrowUpCircle, ArrowDownCircle, Sparkles, AlertTriangle, TrendingDown, CheckCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { fmt, KpiCard, FI } from '../_lib/shared'
 
 type SubTab = 'journal' | 'grandlivre' | 'bilan' | 'tresorerie' | 'previsions'
@@ -827,6 +828,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function ComptabilitePage() {
+  useRoleGuard(['DIRECTION_GENERALE', 'RAF'])
   const { tenantId, loading: tenantLoading } = useTenant()
   const [subTab,   setSubTab]   = useState<SubTab>('journal')
   const [nomEcole, setNomEcole] = useState('Mon École')

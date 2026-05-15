@@ -1,8 +1,15 @@
+import { createSupabaseServerClient } from '@/lib/supabase-client-server'
+import { redirect } from 'next/navigation'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 import AiAssistant from '@/components/ui/AiAssistant'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Server-side auth guard — defense-in-depth (proxy.ts is the primary guard)
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
   return (
     <div id="dashboard-shell" className="flex h-screen bg-[#0D1117] overflow-hidden">
       <Sidebar />

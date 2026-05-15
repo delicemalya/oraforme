@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { type Enseignant, type StatutEnseignant, STATUT_ENS, fmt, Avatar, FI, KpiCard } from '../_lib/shared'
 
 type SubTab = 'enseignants' | 'staff' | 'conges' | 'paie' | 'recrutement' | 'heures'
@@ -727,6 +728,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function RhPage() {
+  useRoleGuard(['DIRECTION_GENERALE', 'RAF', 'RH_PAIE'])
   const { tenantId, loading: tenantLoading } = useTenant()
   const [subTab,     setSubTab]     = useState<SubTab>('enseignants')
   const [enseignants,setEnseignants]= useState<Enseignant[]>([])
