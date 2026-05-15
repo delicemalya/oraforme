@@ -54,12 +54,6 @@ export default async function DashboardPage() {
     isFinancial = roleData?.is_financial ?? false
   }
 
-  // Redirect limited école roles to the école-specific dashboard.
-  // DIRECTION_GENERALE and owners stay on the main dashboard (full access).
-  const LIMITED_ECOLE_ROLES = ['ETUDIANT', 'PARENT', 'FORMATEUR', 'SCOLARITE', 'RH_PAIE', 'RAF', 'DAAC']
-  if (ecoleRole !== null && profile.role !== 'owner' && LIMITED_ECOLE_ROLES.includes(ecoleRole)) {
-    redirect('/dashboard/ecole')
-  }
 
   // ── Modules actifs ────────────────────────────────────────────────────────
   const { data: tmRows } = await supabase

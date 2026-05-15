@@ -401,12 +401,10 @@ export default function Sidebar() {
         {/* Direction Générale — s'adapte au secteur */}
         {(() => {
           const hasSector = loaded && !!sectorNav
-          const href  = hasSector && secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
+          const href  = '/dashboard'
           const label = t('nav.dashboard')
           const sub   = hasSector ? t('nav.directionSub') : null
-          const active = href === '/dashboard/ecole'
-            ? isActive('/dashboard/ecole', true)
-            : isActive('/dashboard', true)
+          const active = isActive('/dashboard', true)
           return (
             <Link
               href={href}
