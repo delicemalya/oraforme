@@ -40,13 +40,10 @@ export default async function DashboardPage() {
   const secteur   = tenant?.secteur_activite ?? null
   const ecoleRole = (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null
 
-  // Non-owner users with an école-specific role go straight to the école dashboard
-  if (ecoleRole !== null && profile.role !== 'owner') {
-    redirect('/dashboard/ecole')
-  }
-
   // ── Résoudre isFinancial depuis le rôle dynamique ─────────────────────────
-  let isFinancial = profile.role === 'owner' // owner voit tout par défaut
+  // DIRECTION_GENERALE is treated as financial — same full access as owner
+  const isDirectionGenerale = ecoleRole === 'DIRECTION_GENERALE'
+  let isFinancial = profile.role === 'owner' || isDirectionGenerale
 
   if (!isFinancial && profile.dynamic_role_id) {
     const { data: roleData } = await supabase
@@ -55,6 +52,13 @@ export default async function DashboardPage() {
       .eq('id', profile.dynamic_role_id)
       .maybeSingle()
     isFinancial = roleData?.is_financial ?? false
+  }
+
+  // Redirect limited école roles to the école-specific dashboard.
+  // DIRECTION_GENERALE and owners stay on the main dashboard (full access).
+  const LIMITED_ECOLE_ROLES = ['ETUDIANT', 'PARENT', 'FORMATEUR', 'SCOLARITE', 'RH_PAIE', 'RAF', 'DAAC']
+  if (ecoleRole !== null && profile.role !== 'owner' && LIMITED_ECOLE_ROLES.includes(ecoleRole)) {
+    redirect('/dashboard/ecole')
   }
 
   // ── Modules actifs ────────────────────────────────────────────────────────
