@@ -5,17 +5,17 @@ import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import {
   LayoutDashboard, Building2, Package, TrendingUp,
-  Bot, Settings, LogOut, Menu, X, ShieldAlert,
-  BarChart2, Users,
+  Bot, LogOut, Menu, X, Activity,
 } from 'lucide-react'
 import { useState } from 'react'
 
 const NAV = [
-  { href: '/admin',         label: 'Vue globale',   icon: LayoutDashboard, exact: true },
-  { href: '/admin/clients', label: 'Clients',        icon: Building2 },
-  { href: '/admin/modules', label: 'Modules',        icon: Package },
-  { href: '/admin/revenus', label: 'Revenus & MRR',  icon: TrendingUp },
-  { href: '/admin/miaa',    label: 'MIAA+ Stats',    icon: Bot },
+  { href: '/admin',          label: 'Vue globale',  icon: LayoutDashboard, exact: true },
+  { href: '/admin/activite', label: 'Activité',      icon: Activity },
+  { href: '/admin/clients',  label: 'Clients',       icon: Building2 },
+  { href: '/admin/modules',  label: 'Modules',       icon: Package },
+  { href: '/admin/revenus',  label: 'Revenus & MRR', icon: TrendingUp },
+  { href: '/admin/miaa',     label: 'MIAA+ Stats',   icon: Bot },
 ]
 
 export default function AdminSidebar() {
