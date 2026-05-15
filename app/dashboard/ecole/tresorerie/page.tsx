@@ -666,8 +666,7 @@ export default function EcoleTresoreriePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D1117] p-4 sm:p-6">
-      <div className="max-w-4xl mx-auto space-y-5">
+    <div className="space-y-5">
 
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-xl font-bold text-[#E6EDF3]">Trésorerie</h1>
@@ -705,7 +704,6 @@ export default function EcoleTresoreriePage() {
             {tabContent[tab]}
           </motion.div>
         )}
-      </div>
     </div>
   )
 }

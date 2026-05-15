@@ -76,8 +76,7 @@ export default function DaacPage() {
   const actifs         = etudiants.filter(e => e.statut === 'actif').length
 
   return (
-    <div className="min-h-screen bg-[#0D1117] p-4 sm:p-6">
-      <div className="max-w-5xl mx-auto space-y-5">
+    <div className="space-y-5">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
@@ -134,7 +133,6 @@ export default function DaacPage() {
             {tab === 'soutenances'  && <SectionSoutenances  tenantId={tenantId} etudiants={etudiants} />}
           </motion.div>
         ) : null}
-      </div>
     </div>
   )
 }

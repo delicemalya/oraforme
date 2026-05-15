@@ -504,8 +504,7 @@ export default function ParametresAcademiquesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D1117] p-4 sm:p-6">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="space-y-6">
 
         {/* Header */}
         <motion.div
@@ -595,7 +594,6 @@ export default function ParametresAcademiquesPage() {
             Enregistrer les paramètres
           </button>
         </div>
-      </div>
     </div>
   )
 }
