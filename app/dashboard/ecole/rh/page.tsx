@@ -6,23 +6,158 @@ import {
   Users2, Plus, Trash2, Check, Search, Phone, Mail,
   FileText, CalendarOff, Loader2, RefreshCw, DollarSign,
   UserPlus, AlertCircle, Camera, Upload, Smartphone,
-  Building2, CreditCard, Shield, Clock, X,
+  Building2, CreditCard, Shield, Clock, X, Printer,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { type Enseignant, type StatutEnseignant, STATUT_ENS, fmt, Avatar, FI, KpiCard } from '../_lib/shared'
+import { CreateEmployeeWizard } from './_components/CreateEmployeeWizard'
 
-type SubTab = 'enseignants' | 'staff' | 'conges' | 'paie' | 'recrutement' | 'heures'
+type SubTab = 'employes' | 'enseignants' | 'staff' | 'conges' | 'paie' | 'recrutement' | 'heures'
 
 const SUB_TABS = [
+  { id: 'employes'     as SubTab, label: 'Employés',          icon: UserPlus   },
   { id: 'enseignants'  as SubTab, label: 'Enseignants',       icon: Users2     },
-  { id: 'staff'        as SubTab, label: 'Staff',             icon: UserPlus   },
+  { id: 'staff'        as SubTab, label: 'Staff',             icon: AlertCircle},
   { id: 'conges'       as SubTab, label: 'Congés',            icon: CalendarOff},
   { id: 'paie'         as SubTab, label: 'Paie',              icon: DollarSign },
-  { id: 'heures'       as SubTab, label: 'Heures Formateurs', icon: AlertCircle},
+  { id: 'heures'       as SubTab, label: 'Heures Formateurs', icon: Clock      },
   { id: 'recrutement'  as SubTab, label: 'Recrutement',       icon: FileText   },
 ]
+
+// ── Employés (dossier RH complet) ────────────────────────────────────────────
+
+type Employe = {
+  id: string; nom: string; postnom: string | null; prenom: string
+  poste: string; departement: string | null; type_employe: string; statut: string
+  salaire_base: number; prime_logement: number; prime_transport: number
+  prime_risque: number; prime_rendement: number
+  photo_url: string | null; email_pro: string | null; telephone: string | null
+  date_debut_contrat: string | null; created_at: string
+}
+
+function SectionEmployes({ tenantId }: { tenantId: string }) {
+  const [employes,   setEmployes]   = useState<Employe[]>([])
+  const [loading,    setLoading]    = useState(false)
+  const [search,     setSearch]     = useState('')
+  const [showWizard, setShowWizard] = useState(false)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    const { data } = await supabase.from('employes').select('*').eq('tenant_id', tenantId).order('nom')
+    setEmployes((data ?? []) as Employe[])
+    setLoading(false)
+  }, [tenantId])
+
+  useEffect(() => { load() }, [load])
+
+  const displayed = employes.filter(e => {
+    const q = search.toLowerCase()
+    return !q || (e.nom + ' ' + (e.postnom ?? '') + ' ' + e.prenom + ' ' + e.poste).toLowerCase().includes(q)
+  })
+
+  const kpis = [
+    { label: 'Total',       value: employes.length,                                              color: '#388BFD' },
+    { label: 'Actifs',      value: employes.filter(e => e.statut === 'actif').length,            color: '#2EA043' },
+    { label: 'Formateurs',  value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#8B5CF6' },
+    { label: 'Temporaires', value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#F0A30A' },
+  ]
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-4 gap-3">
+        {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
+      </div>
+
+      <div className="flex items-center gap-2 justify-between">
+        <div className="relative">
+          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+          <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-52"
+            placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <button onClick={() => setShowWizard(true)}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold"
+          style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
+          <Plus size={13} /> Nouvel employé
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
+      ) : displayed.length === 0 ? (
+        <div className="text-center py-16 text-[#8B949E] text-xs space-y-2">
+          <Users2 size={32} className="mx-auto opacity-20" />
+          <p className="font-medium">Aucun employé enregistré</p>
+          <p className="text-[#484F58]">Créez un dossier complet avec le formulaire intelligent multi-étapes.</p>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                {['Employé', 'Poste', 'Type', 'Salaire brut', 'Statut', 'Contrat'].map(h => (
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {displayed.map(e => {
+                const brut = (e.salaire_base || 0) + (e.prime_logement || 0) + (e.prime_transport || 0) + (e.prime_risque || 0) + (e.prime_rendement || 0)
+                const sc = e.statut === 'actif'
+                  ? { color: '#2EA043', bg: '#2EA04318', label: 'Actif' }
+                  : e.statut === 'suspendu'
+                  ? { color: '#F0A30A', bg: '#F0A30A18', label: 'Suspendu' }
+                  : { color: '#8B949E', bg: '#8B949E18', label: e.statut }
+                return (
+                  <tr key={e.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                          {e.photo_url
+                            ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
+                            : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={32} />}
+                        </div>
+                        <div>
+                          <p className="font-medium text-white whitespace-nowrap">
+                            {e.prenom} {e.postnom ? e.postnom + ' ' : ''}{e.nom}
+                          </p>
+                          {e.email_pro && <p className="text-[10px] text-[#484F58]">{e.email_pro}</p>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-white">{e.poste}</p>
+                      {e.departement && <p className="text-[10px] text-[#484F58]">{e.departement}</p>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] font-medium capitalize text-[#8B949E]">{e.type_employe}</span>
+                    </td>
+                    <td className="px-4 py-3 font-semibold" style={{ color: '#2EA043' }}>{fmt(brut)} F</td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
+                    </td>
+                    <td className="px-4 py-3 text-[#484F58]">
+                      {e.date_debut_contrat
+                        ? new Date(e.date_debut_contrat + 'T00:00:00').toLocaleDateString('fr-FR')
+                        : '—'}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {showWizard && (
+          <CreateEmployeeWizard tenantId={tenantId} onClose={() => setShowWizard(false)} onSuccess={load} />
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 // ── Info item helper ─────────────────────────────────────────────────────────
 
@@ -384,90 +519,333 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
 
 // ── Staff ─────────────────────────────────────────────────────────────────────
 
+type StaffAgent = {
+  id: string; nom: string; prenom: string; poste: string
+  telephone: string | null; email: string | null; salaire: number
+  statut: string; created_at: string
+  photo_url: string | null
+  mobile_money_type: string | null; mobile_money_numero: string | null
+  banque: string | null; rib: string | null; numero_cnss: string | null
+}
+
+const EMPTY_STAFF = {
+  prenom: '', nom: '', poste: '', telephone: '', email: '', salaire: '', statut: 'actif',
+  mobile_money_type: '', mobile_money_numero: '', banque: '', rib: '', numero_cnss: '',
+}
+
 function SectionStaff({ tenantId }: { tenantId: string }) {
-  const [staff, setStaff] = useState<{ id: string; nom: string; prenom: string; poste: string; telephone: string | null; salaire: number; statut: string; created_at: string }[]>([])
-  const [showForm, setShowForm] = useState(false)
-  const [saving,   setSaving]   = useState(false)
-  const [form, setForm] = useState({ nom: '', prenom: '', poste: '', telephone: '', salaire: '', statut: 'actif' })
+  const [staff,        setStaff]        = useState<StaffAgent[]>([])
+  const [showForm,     setShowForm]     = useState(false)
+  const [saving,       setSaving]       = useState(false)
+  const [search,       setSearch]       = useState('')
+  const [selected,     setSelected]     = useState<StaffAgent | null>(null)
+  const [photoFile,    setPhotoFile]    = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [form,         setForm]         = useState(EMPTY_STAFF)
+
+  const POSTES = ['Gardien', 'Secrétaire', 'Comptable', 'Agent de nettoyage', 'Informaticien', 'Bibliothécaire', 'Infirmier(ère)', 'Cuisinier(ère)', 'Chauffeur', 'Autre']
+  const SEL = 'w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none'
+  const SEC = 'text-[10px] font-semibold text-[#484F58] uppercase tracking-wider mb-2 mt-1'
 
   const load = useCallback(async () => {
     const { data } = await supabase.from('staff_ecole').select('*').eq('tenant_id', tenantId).order('nom')
-    setStaff((data ?? []) as typeof staff)
+    setStaff((data ?? []) as StaffAgent[])
   }, [tenantId])
 
   useEffect(() => { load() }, [load])
 
-  async function add() {
-    if (!form.nom || !form.poste) return
+  function handlePhotoChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const file = ev.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
+
+  async function uploadStaffPhoto(file: File, id: string): Promise<string | null> {
+    try {
+      const ext  = file.name.split('.').pop() ?? 'jpg'
+      const path = `staff/${id}.${ext}`
+      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      if (error) return null
+      return supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl
+    } catch { return null }
+  }
+
+  async function save() {
+    if (!form.nom.trim() || !form.poste) return
     setSaving(true)
-    await supabase.from('staff_ecole').insert({ tenant_id: tenantId, nom: form.nom, prenom: form.prenom, poste: form.poste, telephone: form.telephone || null, salaire: Number(form.salaire) || 0, statut: form.statut })
-    setForm({ nom: '', prenom: '', poste: '', telephone: '', salaire: '', statut: 'actif' })
-    setShowForm(false); load(); setSaving(false)
+    const { data: ins } = await supabase.from('staff_ecole').insert({
+      tenant_id: tenantId,
+      nom: form.nom.trim(), prenom: form.prenom.trim(),
+      poste: form.poste,
+      telephone:           form.telephone            || null,
+      email:               form.email                || null,
+      salaire:             Number(form.salaire)      || 0,
+      statut:              form.statut,
+      mobile_money_type:   form.mobile_money_type    || null,
+      mobile_money_numero: form.mobile_money_numero  || null,
+      banque:              form.banque               || null,
+      rib:                 form.rib                  || null,
+      numero_cnss:         form.numero_cnss          || null,
+    }).select().single()
+
+    if (photoFile && ins) {
+      const url = await uploadStaffPhoto(photoFile, ins.id)
+      if (url) await supabase.from('staff_ecole').update({ photo_url: url }).eq('id', ins.id)
+    }
+
+    load(); setShowForm(false); setForm(EMPTY_STAFF)
+    setPhotoFile(null); setPhotoPreview(null); setSaving(false)
   }
 
   async function del(id: string) {
-    await supabase.from('staff_ecole').delete().eq('id', id); load()
+    await supabase.from('staff_ecole').delete().eq('id', id)
+    if (selected?.id === id) setSelected(null)
+    load()
   }
 
-  const POSTES = ['Gardien', 'Secrétaire', 'Comptable', 'Agent de nettoyage', 'Informaticien', 'Bibliothécaire', 'Infirmier(ère)', 'Cuisinier(ère)', 'Chauffeur', 'Autre']
+  const displayed = staff.filter(s => {
+    const q = search.toLowerCase()
+    return !q || (s.nom + ' ' + s.prenom + ' ' + s.poste).toLowerCase().includes(q)
+  })
+
+  const kpis = [
+    { label: 'Total',    value: staff.length,                                    color: '#388BFD' },
+    { label: 'Actifs',   value: staff.filter(s => s.statut === 'actif').length,  color: '#2EA043' },
+    { label: 'Inactifs', value: staff.filter(s => s.statut === 'inactif').length,color: '#8B949E' },
+  ]
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="grid grid-cols-3 gap-3">
+        {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
+      </div>
+
+      <div className="flex items-center gap-2 justify-between">
+        <div className="relative">
+          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+          <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-52" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
           <Plus size={13} /> Ajouter un agent
         </button>
       </div>
+
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#2EA043]/30 p-4 space-y-3" style={{ background: 'rgba(46,160,67,0.04)' }}>
-            <div className="grid grid-cols-2 gap-3">
-              <FI label="Prénom" value={form.prenom} onChange={v => setForm(p => ({ ...p, prenom: v }))} />
-              <FI label="Nom *"  value={form.nom}    onChange={v => setForm(p => ({ ...p, nom: v }))} />
-              <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Poste *</label>
-                <select value={form.poste} onChange={e => setForm(p => ({ ...p, poste: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
-                  <option value="">— Choisir —</option>
-                  {POSTES.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            className="rounded-xl border border-[#2EA043]/30 p-5 space-y-4"
+            style={{ background: 'rgba(46,160,67,0.04)' }}>
+
+            <p className="text-sm font-bold text-[#2EA043]">Nouvel agent</p>
+
+            {/* Photo */}
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.08] bg-white/[0.04] flex items-center justify-center shrink-0">
+                {photoPreview
+                  ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
+                  : <Camera size={22} className="text-[#484F58]" />}
               </div>
-              <FI label="Téléphone" value={form.telephone} onChange={v => setForm(p => ({ ...p, telephone: v }))} />
-              <FI label="Salaire (FCFA)" value={form.salaire} onChange={v => setForm(p => ({ ...p, salaire: v }))} type="number" />
+              <div>
+                <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[#8B949E] hover:text-white hover:border-white/[0.15] transition-all">
+                  <Upload size={12} />
+                  {photoPreview ? 'Changer' : 'Ajouter une photo'}
+                  <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+                </label>
+                <p className="text-[10px] text-[#484F58] mt-1">JPG, PNG · max 2 Mo</p>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.nom || !form.poste} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#2EA043', color: '#fff' }}>
+
+            {/* Identité */}
+            <div>
+              <p className={SEC}>Identité</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Prénom" value={form.prenom} onChange={v => setForm(p => ({ ...p, prenom: v }))} />
+                <FI label="Nom *"  value={form.nom}    onChange={v => setForm(p => ({ ...p, nom: v }))} />
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Poste *</label>
+                  <select value={form.poste} onChange={e => setForm(p => ({ ...p, poste: e.target.value }))} className={SEL}>
+                    <option value="">— Choisir —</option>
+                    {POSTES.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Statut</label>
+                  <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value }))} className={SEL}>
+                    <option value="actif">Actif</option>
+                    <option value="inactif">Inactif</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <p className={SEC}>Contact</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Téléphone" value={form.telephone} onChange={v => setForm(p => ({ ...p, telephone: v }))} />
+                <FI label="Email"     value={form.email}     onChange={v => setForm(p => ({ ...p, email: v }))} />
+              </div>
+            </div>
+
+            {/* Rémunération — salaire mensuel uniquement (pas de taux horaire pour le staff) */}
+            <div>
+              <p className={SEC}>Rémunération</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Salaire mensuel (FCFA)" value={form.salaire} onChange={v => setForm(p => ({ ...p, salaire: v }))} type="number" placeholder="0" />
+              </div>
+            </div>
+
+            {/* Mobile Money */}
+            <div>
+              <p className={SEC}>Mobile Money</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Opérateur</label>
+                  <select value={form.mobile_money_type} onChange={e => setForm(p => ({ ...p, mobile_money_type: e.target.value }))} className={SEL}>
+                    <option value="">— Aucun —</option>
+                    {MOBILE_MONEY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <FI label="Numéro" value={form.mobile_money_numero} onChange={v => setForm(p => ({ ...p, mobile_money_numero: v }))} placeholder="06XXXXXXXX" />
+              </div>
+            </div>
+
+            {/* Banque & RIB */}
+            <div>
+              <p className={SEC}>Informations bancaires</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Banque</label>
+                  <select value={form.banque} onChange={e => setForm(p => ({ ...p, banque: e.target.value }))} className={SEL}>
+                    <option value="">— Aucune —</option>
+                    {BANQUES.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
+                <FI label="RIB" value={form.rib} onChange={v => setForm(p => ({ ...p, rib: v }))} placeholder="00000 00000 0000000000 00" />
+              </div>
+            </div>
+
+            {/* CNSS */}
+            <div>
+              <p className={SEC}>Protection sociale</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Numéro CNSS" value={form.numero_cnss} onChange={v => setForm(p => ({ ...p, numero_cnss: v }))} placeholder="XXXXXXXXXX" />
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <button onClick={save} disabled={saving || !form.nom || !form.poste} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#2EA043', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => { setShowForm(false); setForm(EMPTY_STAFF); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      {staff.length === 0 ? (
+
+      {/* Table */}
+      {displayed.length === 0 ? (
         <div className="text-center py-12 text-[#8B949E] text-xs">Aucun agent enregistré.</div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+        <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
           <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Agent', 'Poste', 'Contact', 'Salaire', ''].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+            <thead>
+              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                {['Agent', 'Poste', 'Contact & Mobile Money', 'Salaire', 'Statut', ''].map(h => (
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody>
-              {staff.map(s => (
-                <tr key={s.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]">
-                  <td className="px-4 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <Avatar nom={s.nom} prenom={s.prenom || '?'} photoUrl={null} size={28} />
-                      <p className="font-medium text-white">{s.prenom} {s.nom}</p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2.5 text-[#8B949E]">{s.poste}</td>
-                  <td className="px-4 py-2.5 text-[#8B949E]">{s.telephone ?? '—'}</td>
-                  <td className="px-4 py-2.5 font-semibold text-[#2EA043]">{fmt(s.salaire)} FCFA</td>
-                  <td className="px-4 py-2.5"><button onClick={() => del(s.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={11} /></button></td>
-                </tr>
-              ))}
+              {displayed.map(s => {
+                const sel = selected?.id === s.id
+                const sc = s.statut === 'actif'
+                  ? { color: '#2EA043', bg: '#2EA04318', label: 'Actif' }
+                  : { color: '#8B949E', bg: '#8B949E18', label: 'Inactif' }
+                return (
+                  <tr key={s.id} onClick={() => setSelected(sel ? null : s)}
+                    className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
+                    style={sel ? { background: 'rgba(46,160,67,0.06)' } : {}}>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                          {s.photo_url
+                            ? <img src={s.photo_url} alt="" className="w-full h-full object-cover" />
+                            : <Avatar nom={s.nom} prenom={s.prenom || '?'} photoUrl={null} size={32} />}
+                        </div>
+                        <p className="font-medium text-white whitespace-nowrap">{s.prenom} {s.nom}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-[#8B949E]">{s.poste}</td>
+                    <td className="px-4 py-3">
+                      <div className="space-y-0.5">
+                        {s.telephone && <p className="text-[#8B949E] flex items-center gap-1"><Phone size={10} /> {s.telephone}</p>}
+                        {s.mobile_money_type && s.mobile_money_numero && (
+                          <p className="flex items-center gap-1 text-[10px]" style={{ color: '#F97316' }}>
+                            <Smartphone size={10} /> {s.mobile_money_type} · {s.mobile_money_numero}
+                          </p>
+                        )}
+                        {!s.telephone && !s.mobile_money_numero && <span className="text-[#484F58]">—</span>}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-semibold" style={{ color: '#2EA043' }}>{fmt(s.salaire)} F/mois</td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button onClick={ev => { ev.stopPropagation(); del(s.id) }} className="text-[#484F58] hover:text-red-400 transition-colors">
+                        <Trash2 size={11} />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
       )}
+
+      {/* Detail panel */}
+      <AnimatePresence>
+        {selected && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+            className="rounded-xl border border-white/[0.08] p-5"
+            style={{ background: 'rgba(255,255,255,0.015)' }}>
+            <div className="flex items-start gap-4 mb-5">
+              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/[0.08] shrink-0">
+                {selected.photo_url
+                  ? <img src={selected.photo_url} alt="" className="w-full h-full object-cover" />
+                  : <Avatar nom={selected.nom} prenom={selected.prenom || '?'} photoUrl={null} size={56} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-base font-bold text-white">{selected.prenom} {selected.nom}</p>
+                <p className="text-xs text-[#8B949E]">{selected.poste}</p>
+                <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={selected.statut === 'actif'
+                    ? { color: '#2EA043', background: '#2EA04318' }
+                    : { color: '#8B949E', background: '#8B949E18' }}>
+                  {selected.statut === 'actif' ? 'Actif' : 'Inactif'}
+                </span>
+              </div>
+              <button onClick={() => setSelected(null)} className="text-[#484F58] hover:text-white transition-colors p-1">
+                <X size={14} />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {selected.telephone         && <InfoItem icon={Phone}      label="Téléphone"      value={selected.telephone} />}
+              {selected.email             && <InfoItem icon={Mail}       label="Email"           value={selected.email} />}
+              {selected.salaire           ?  <InfoItem icon={DollarSign} label="Salaire mensuel" value={`${fmt(selected.salaire)} FCFA`} color="#2EA043" /> : null}
+              {selected.mobile_money_type && selected.mobile_money_numero && (
+                <InfoItem icon={Smartphone} label={selected.mobile_money_type} value={selected.mobile_money_numero} color="#F97316" />
+              )}
+              {selected.banque            && <InfoItem icon={Building2}  label="Banque"          value={selected.banque} />}
+              {selected.rib               && <InfoItem icon={CreditCard} label="RIB"             value={selected.rib} />}
+              {selected.numero_cnss       && <InfoItem icon={Shield}     label="N° CNSS"         value={selected.numero_cnss} color="#8B5CF6" />}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -583,13 +961,137 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
   )
 }
 
+// ── Bulletin HTML generator ───────────────────────────────────────────────────
+
+function buildBulletinHTML(opts: {
+  employe: string; poste: string; cnss: string; periode: string
+  salaire_base: number; primes: number; retenues: number; net: number
+  nomEcole: string; logoUrl: string
+}) {
+  const { employe, poste, cnss, periode, salaire_base, primes, retenues, net, nomEcole, logoUrl } = opts
+  const fmtN = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
+  const brut  = salaire_base + primes
+  const cnssS = retenues > 0 ? Math.round(retenues * 0.55) : 0
+  const impot = retenues > 0 ? retenues - cnssS : 0
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<title>Bulletin — ${employe} — ${periode}</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Barlow Condensed',sans-serif;color:#2B2B2B;background:#fff;font-size:13px}
+.page{width:210mm;min-height:280mm;margin:0 auto;padding:10mm 12mm}
+.hdr{background:#2B2B2B;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:4px 4px 0 0}
+.hdr-l{display:flex;align-items:center;gap:12px}
+.logo{width:54px;height:54px;background:rgba(255,255,255,.1);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:9px;color:rgba(255,255,255,.4);text-align:center;line-height:1.2;padding:4px}
+.logo img{width:100%;height:100%;object-fit:contain}
+.co-name{font-size:18px;font-weight:800;letter-spacing:.5px}
+.co-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+.hdr-r{text-align:right}
+.bul-title{font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.bul-period{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px;letter-spacing:1px}
+.band{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #ddd;border-top:none}
+.band-cell{padding:8px 12px;border-right:1px solid #ddd}.band-cell:last-child{border-right:none}
+.bc-label{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:2px}
+.bc-value{font-size:13px;font-weight:700}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+thead tr{background:#2B2B2B;color:#fff}
+thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;text-align:left}
+thead th:last-child{text-align:right}
+.sec-row td{background:#F5F5F5;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#777;padding:5px 12px;border-top:2px solid #E0E0E0}
+tbody tr td{padding:7px 12px;border-bottom:1px solid #F0F0F0}
+tbody tr td:last-child{text-align:right;font-weight:600}
+.neg{color:#C53030}.pos{color:#276749}
+.subtotal td{font-weight:700;background:#FAFAFA;border-top:1px solid #DDD}
+.totals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.tot-box{border:1px solid #ddd;padding:10px 14px;border-radius:3px}
+.tot-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888}
+.tot-val{font-size:20px;font-weight:800;margin-top:2px}
+.net-box{border:2px solid #F16A1B;padding:12px 18px;margin-top:10px;border-radius:3px;background:#FFF5EF;display:flex;align-items:center;justify-content:space-between}
+.net-lbl{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#F16A1B}
+.net-val{font-size:28px;font-weight:800;color:#F16A1B}
+.ftr{margin-top:28px}
+.ftr-date{font-size:11px;color:#666;margin-bottom:22px}
+.sigs{display:grid;grid-template-columns:1fr 1fr;gap:50px}
+.sig{text-align:center}
+.sig-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #2B2B2B;padding-bottom:3px;margin-bottom:44px}
+.sig-name{font-size:10px;color:#666}
+@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.page{width:100%;padding:6mm}}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="logo">${logoUrl ? `<img src="${logoUrl}" alt="logo"/>` : 'LOGO'}</div>
+    <div><div class="co-name">${nomEcole}</div><div class="co-sub">Bulletin de rémunération officiel</div></div>
+  </div>
+  <div class="hdr-r">
+    <div class="bul-title">Bulletin de Salaire</div>
+    <div class="bul-period">${periode}</div>
+  </div>
+</div>
+<div class="band">
+  <div class="band-cell"><div class="bc-label">Nom complet</div><div class="bc-value">${employe}</div></div>
+  <div class="band-cell"><div class="bc-label">Poste</div><div class="bc-value">${poste || '—'}</div></div>
+  <div class="band-cell"><div class="bc-label">N° CNSS</div><div class="bc-value">${cnss || '—'}</div></div>
+</div>
+<div class="band" style="border-top:none">
+  <div class="band-cell"><div class="bc-label">Période</div><div class="bc-value">${periode}</div></div>
+  <div class="band-cell"><div class="bc-label">Date d'émission</div><div class="bc-value">${new Date().toLocaleDateString('fr-FR')}</div></div>
+  <div class="band-cell"><div class="bc-label">Établissement</div><div class="bc-value">${nomEcole}</div></div>
+</div>
+<table>
+  <thead><tr><th>Désignation</th><th>Montant (FCFA)</th></tr></thead>
+  <tbody>
+    <tr class="sec-row"><td colspan="2">Rémunérations</td></tr>
+    <tr><td>Salaire de base</td><td class="pos">${fmtN(salaire_base)}</td></tr>
+    ${primes > 0 ? `<tr><td>Primes et indemnités</td><td class="pos">${fmtN(primes)}</td></tr>` : ''}
+    <tr class="subtotal"><td>Salaire brut</td><td>${fmtN(brut)}</td></tr>
+    ${retenues > 0 ? `
+    <tr class="sec-row"><td colspan="2">Cotisations sociales</td></tr>
+    <tr><td>CNSS — part salarié (8%)</td><td class="neg">- ${fmtN(cnssS)}</td></tr>
+    <tr class="sec-row"><td colspan="2">Cotisations fiscales</td></tr>
+    <tr><td>Impôt sur le revenu (IRPP)</td><td class="neg">- ${fmtN(impot)}</td></tr>
+    <tr class="subtotal"><td>Total des retenues</td><td class="neg">- ${fmtN(retenues)}</td></tr>
+    ` : ''}
+  </tbody>
+</table>
+<div class="totals">
+  <div class="tot-box"><div class="tot-lbl">Salaire brut</div><div class="tot-val">${fmtN(brut)} <span style="font-size:12px;font-weight:600">FCFA</span></div></div>
+  <div class="tot-box"><div class="tot-lbl">Total retenues</div><div class="tot-val" style="color:#C53030">- ${fmtN(retenues)} <span style="font-size:12px;font-weight:600">FCFA</span></div></div>
+</div>
+<div class="net-box">
+  <div class="net-lbl">Net à Payer</div>
+  <div class="net-val">${fmtN(net)} <span style="font-size:14px;font-weight:700">FCFA</span></div>
+</div>
+<div class="ftr">
+  <div class="ftr-date">Fait à _________________________, le ${new Date().toLocaleDateString('fr-FR')}</div>
+  <div class="sigs">
+    <div class="sig"><div class="sig-title">Signature de l'employeur</div><div class="sig-name">Cachet &amp; signature</div></div>
+    <div class="sig"><div class="sig-title">Signature de l'employé(e)</div><div class="sig-name">${employe}</div></div>
+  </div>
+</div>
+</div>
+</body>
+</html>`
+}
+
 // ── Paie ──────────────────────────────────────────────────────────────────────
 
-function SectionPaie({ tenantId, enseignants }: { tenantId: string; enseignants: Enseignant[] }) {
+function SectionPaie({ tenantId, enseignants, nomEcole }: { tenantId: string; enseignants: Enseignant[]; nomEcole: string }) {
   const [paies, setPaies] = useState<{ id: string; employe_id: string; mois: number; annee: number; salaire_base: number; primes: number; retenues: number; net: number; statut: string; created_at: string }[]>([])
-  const [showForm, setShowForm] = useState(false)
-  const [saving,   setSaving]   = useState(false)
+  const [showForm,  setShowForm]  = useState(false)
+  const [saving,    setSaving]    = useState(false)
+  const [showLogo,  setShowLogo]  = useState(false)
+  const [logoUrl,   setLogoUrl]   = useState('')
+  const [logoInput, setLogoInput] = useState('')
   const [form, setForm] = useState({ employe_id: '', mois: new Date().getMonth() + 1, annee: new Date().getFullYear(), salaire_base: '', primes: '0', retenues: '0' })
+
+  const MOIS = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 
   const load = useCallback(async () => {
     const { data } = await supabase.from('paie_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
@@ -597,6 +1099,17 @@ function SectionPaie({ tenantId, enseignants }: { tenantId: string; enseignants:
   }, [tenantId])
 
   useEffect(() => { load() }, [load])
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`logo_${tenantId}`)
+    if (saved) { setLogoUrl(saved); setLogoInput(saved) }
+  }, [tenantId])
+
+  function saveLogo() {
+    setLogoUrl(logoInput)
+    localStorage.setItem(`logo_${tenantId}`, logoInput)
+    setShowLogo(false)
+  }
 
   async function add() {
     if (!form.employe_id || !form.salaire_base) return
@@ -609,17 +1122,55 @@ function SectionPaie({ tenantId, enseignants }: { tenantId: string; enseignants:
     setShowForm(false); load(); setSaving(false)
   }
 
+  function printBulletin(p: typeof paies[0]) {
+    const ens = enseignants.find(e => e.id === p.employe_id)
+    const html = buildBulletinHTML({
+      employe:      ens ? `${ens.prenom} ${ens.nom}` : '—',
+      poste:        ens?.matiere ?? '—',
+      cnss:         ens?.numero_cnss ?? '',
+      periode:      `${MOIS[p.mois]} ${p.annee}`,
+      salaire_base: p.salaire_base,
+      primes:       p.primes,
+      retenues:     p.retenues,
+      net:          p.net,
+      nomEcole,
+      logoUrl,
+    })
+    const w = window.open('', '_blank')
+    if (!w) return
+    w.document.write(html)
+    w.document.close()
+    setTimeout(() => { w.focus(); w.print() }, 800)
+  }
+
   const totalNet = paies.reduce((s, p) => s + p.net, 0)
-  const MOIS = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <KpiCard label="Total salaires payés" value={fmt(totalNet) + ' FCFA'} color="#2EA043" />
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
-          <Plus size={13} /> Générer bulletin
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowLogo(!showLogo)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors">
+            <Upload size={12} /> Logo société
+          </button>
+          <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
+            <Plus size={13} /> Générer bulletin
+          </button>
+        </div>
       </div>
+
+      {showLogo && (
+        <div className="flex items-end gap-2 p-3 rounded-xl border border-white/[0.08]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="flex-1">
+            <label className="block text-xs text-[#8B949E] mb-1">URL du logo (apparaîtra sur les bulletins)</label>
+            <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-[#484F58] focus:outline-none" placeholder="https://…" value={logoInput} onChange={e => setLogoInput(e.target.value)} />
+          </div>
+          <button onClick={saveLogo} className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1" style={{ background: '#2EA043', color: '#fff' }}>
+            <Check size={12} /> Appliquer
+          </button>
+        </div>
+      )}
+
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#2EA043]/30 p-4 space-y-3" style={{ background: 'rgba(46,160,67,0.04)' }}>
@@ -641,8 +1192,8 @@ function SectionPaie({ tenantId, enseignants }: { tenantId: string; enseignants:
                 <FI label="Année" value={form.annee.toString()} onChange={v => setForm(p => ({ ...p, annee: Number(v) }))} type="number" />
               </div>
               <FI label="Salaire de base (FCFA) *" value={form.salaire_base} onChange={v => setForm(p => ({ ...p, salaire_base: v }))} type="number" />
-              <FI label="Primes (FCFA)"    value={form.primes}    onChange={v => setForm(p => ({ ...p, primes: v }))}    type="number" />
-              <FI label="Retenues (FCFA)"  value={form.retenues}  onChange={v => setForm(p => ({ ...p, retenues: v }))}  type="number" />
+              <FI label="Primes (FCFA)"   value={form.primes}   onChange={v => setForm(p => ({ ...p, primes: v }))}   type="number" />
+              <FI label="Retenues (FCFA)" value={form.retenues} onChange={v => setForm(p => ({ ...p, retenues: v }))} type="number" />
               <div className="flex items-end pb-1">
                 <p className="text-sm font-bold" style={{ color: '#2EA043' }}>
                   Net : {fmt((Number(form.salaire_base) || 0) + (Number(form.primes) || 0) - (Number(form.retenues) || 0))} FCFA
@@ -658,17 +1209,18 @@ function SectionPaie({ tenantId, enseignants }: { tenantId: string; enseignants:
           </motion.div>
         )}
       </AnimatePresence>
+
       {paies.length === 0 ? (
         <div className="text-center py-12 text-[#8B949E] text-xs">Aucun bulletin de paie généré.</div>
       ) : (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Employé', 'Période', 'Base', 'Primes', 'Retenues', 'Net', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Employé', 'Période', 'Base', 'Primes', 'Retenues', 'Net', 'Statut', ''].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
             <tbody>
               {paies.map(p => {
                 const ens = enseignants.find(e => e.id === p.employe_id)
                 return (
-                  <tr key={p.id} className="border-t border-white/[0.04]">
+                  <tr key={p.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]">
                     <td className="px-4 py-2.5 text-white">{ens ? `${ens.prenom} ${ens.nom}` : '—'}</td>
                     <td className="px-4 py-2.5 text-[#8B949E]">{MOIS[p.mois]} {p.annee}</td>
                     <td className="px-4 py-2.5 text-[#8B949E]">{fmt(p.salaire_base)}</td>
@@ -676,6 +1228,12 @@ function SectionPaie({ tenantId, enseignants }: { tenantId: string; enseignants:
                     <td className="px-4 py-2.5 text-[#F85149]">-{fmt(p.retenues)}</td>
                     <td className="px-4 py-2.5 font-bold text-white">{fmt(p.net)} FCFA</td>
                     <td className="px-4 py-2.5"><span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#2EA04318] text-[#2EA043]">Payé</span></td>
+                    <td className="px-4 py-2.5">
+                      <button onClick={() => printBulletin(p)} title="Imprimer le bulletin"
+                        className="p-1.5 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white hover:border-white/[0.15] transition-all">
+                        <Printer size={11} />
+                      </button>
+                    </td>
                   </tr>
                 )
               })}
@@ -967,7 +1525,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
 export default function RhPage() {
   useRoleGuard(['DIRECTION_GENERALE', 'RAF', 'RH_PAIE'])
   const { tenantId, loading: tenantLoading } = useTenant()
-  const [subTab,     setSubTab]     = useState<SubTab>('enseignants')
+  const [subTab,     setSubTab]     = useState<SubTab>('employes')
   const [enseignants,setEnseignants]= useState<Enseignant[]>([])
   const [loading,    setLoading]    = useState(true)
   const [nomEcole,   setNomEcole]   = useState('Mon École')
@@ -1017,10 +1575,11 @@ export default function RhPage() {
 
       <AnimatePresence mode="wait">
         <motion.div key={subTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}>
+          {subTab === 'employes'    && tenantId && <SectionEmployes           tenantId={tenantId} />}
           {subTab === 'enseignants' && tenantId && <SectionEnseignants       tenantId={tenantId} enseignants={enseignants} onRefresh={load} />}
           {subTab === 'staff'       && tenantId && <SectionStaff             tenantId={tenantId} />}
           {subTab === 'conges'      && tenantId && <SectionConges            tenantId={tenantId} enseignants={enseignants} />}
-          {subTab === 'paie'        && tenantId && <SectionPaie              tenantId={tenantId} enseignants={enseignants} />}
+          {subTab === 'paie'        && tenantId && <SectionPaie              tenantId={tenantId} enseignants={enseignants} nomEcole={nomEcole} />}
           {subTab === 'heures'      && tenantId && <SectionHeuresFormateurs  tenantId={tenantId} enseignants={enseignants} />}
           {subTab === 'recrutement' && tenantId && <SectionRecrutement       tenantId={tenantId} />}
         </motion.div>
