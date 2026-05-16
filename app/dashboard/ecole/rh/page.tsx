@@ -1095,59 +1095,173 @@ tbody tr td:last-child{text-align:right;font-weight:600}
 
 // ── Paie ──────────────────────────────────────────────────────────────────────
 
-function SectionPaie({ tenantId, enseignants, nomEcole }: { tenantId: string; enseignants: Enseignant[]; nomEcole: string }) {
-  const [paies, setPaies] = useState<{ id: string; employe_id: string; mois: number; annee: number; salaire_base: number; primes: number; retenues: number; net: number; statut: string; created_at: string }[]>([])
-  const [showForm,  setShowForm]  = useState(false)
-  const [saving,    setSaving]    = useState(false)
-  const [showLogo,  setShowLogo]  = useState(false)
-  const [logoUrl,   setLogoUrl]   = useState('')
-  const [logoInput, setLogoInput] = useState('')
-  const [form, setForm] = useState({ employe_id: '', mois: new Date().getMonth() + 1, annee: new Date().getFullYear(), salaire_base: '', primes: '0', retenues: '0' })
+type AgentPaie = {
+  id: string; nom: string; prenom: string; postnom: string | null
+  poste: string; type_agent: 'employe' | 'staff'
+  salaire_base: number; prime_logement: number; prime_transport: number
+  prime_risque: number; prime_rendement: number
+  mode_paiement: string; banque: string | null; rib: string | null
+  mobile_money_type: string | null; mobile_money_numero: string | null
+  numero_cnss: string | null; email: string | null
+}
 
-  const MOIS = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+type PaieRecord = {
+  id: string; employe_id: string; mois: number; annee: number
+  salaire_base: number; primes: number; retenues: number; net: number
+  statut: string; mode_paiement: string | null; type_agent: string | null; created_at: string
+}
+
+function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: string }) {
+  const [agents,     setAgents]     = useState<AgentPaie[]>([])
+  const [paies, setPaies] = useState<PaieRecord[]>([])
+  const [loading,    setLoading]    = useState(false)
+  const [agent,      setAgent]      = useState<AgentPaie | null>(null)
+  const [paying,     setPaying]     = useState(false)
+  const [toast,      setToast]      = useState<{ msg: string; ok: boolean } | null>(null)
+  const [justPaidId, setJustPaidId] = useState<string | null>(null)
+  const [showLogo,   setShowLogo]   = useState(false)
+  const [logoUrl,    setLogoUrl]    = useState('')
+  const [logoInput,  setLogoInput]  = useState('')
+  const [form, setForm] = useState({
+    mois: new Date().getMonth() + 1,
+    annee: new Date().getFullYear(),
+    salaire_base: 0, prime_logement: 0, prime_transport: 0,
+    prime_risque: 0, prime_rendement: 0,
+  })
+
+  const MOIS = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+
+  const MODES_PAIE = [
+    { id: 'virement'     as const, label: 'Virement',     icon: Building2  },
+    { id: 'cheque'       as const, label: 'Chèque',       icon: CreditCard },
+    { id: 'mobile_money' as const, label: 'Mobile Money', icon: Smartphone },
+    { id: 'especes'      as const, label: 'Espèces',      icon: DollarSign },
+  ]
+
+  const showToast = (msg: string, ok = true) => {
+    setToast({ msg, ok })
+    setTimeout(() => setToast(null), 4000)
+  }
 
   const load = useCallback(async () => {
-    const { data } = await supabase.from('paie_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
-    setPaies((data ?? []) as typeof paies)
+    setLoading(true)
+    const [{ data: emp }, { data: stf }, { data: pai }] = await Promise.all([
+      supabase.from('employes').select('*').eq('tenant_id', tenantId).eq('statut', 'actif').order('nom'),
+      supabase.from('staff_ecole').select('*').eq('tenant_id', tenantId).eq('statut', 'actif').order('nom'),
+      supabase.from('paie_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
+    ])
+    const empA: AgentPaie[] = (emp ?? []).map((e: any) => ({
+      id: e.id, nom: e.nom, prenom: e.prenom, postnom: e.postnom ?? null,
+      poste: e.poste, type_agent: 'employe' as const,
+      salaire_base: e.salaire_base ?? 0, prime_logement: e.prime_logement ?? 0,
+      prime_transport: e.prime_transport ?? 0, prime_risque: e.prime_risque ?? 0,
+      prime_rendement: e.prime_rendement ?? 0,
+      mode_paiement: e.mode_paiement ?? 'banque', banque: e.banque, rib: e.rib,
+      mobile_money_type: e.mobile_money_type, mobile_money_numero: e.mobile_money_numero,
+      numero_cnss: e.numero_cnss, email: e.email_pro,
+    }))
+    const stfA: AgentPaie[] = (stf ?? []).map((s: any) => ({
+      id: s.id, nom: s.nom, prenom: s.prenom, postnom: null,
+      poste: s.poste, type_agent: 'staff' as const,
+      salaire_base: s.salaire ?? 0, prime_logement: 0, prime_transport: 0,
+      prime_risque: 0, prime_rendement: 0,
+      mode_paiement: s.banque ? 'banque' : s.mobile_money_type ? 'mobile_money' : 'especes',
+      banque: s.banque, rib: s.rib,
+      mobile_money_type: s.mobile_money_type, mobile_money_numero: s.mobile_money_numero,
+      numero_cnss: s.numero_cnss, email: s.email,
+    }))
+    setAgents([...empA, ...stfA])
+    setPaies((pai ?? []) as PaieRecord[])
+    setLoading(false)
   }, [tenantId])
 
   useEffect(() => { load() }, [load])
-
   useEffect(() => {
     const saved = localStorage.getItem(`logo_${tenantId}`)
     if (saved) { setLogoUrl(saved); setLogoInput(saved) }
   }, [tenantId])
 
-  function saveLogo() {
-    setLogoUrl(logoInput)
-    localStorage.setItem(`logo_${tenantId}`, logoInput)
-    setShowLogo(false)
+  function handleAgentSelect(id: string) {
+    const a = agents.find(x => x.id === id) ?? null
+    setAgent(a)
+    setJustPaidId(null)
+    if (a) {
+      setForm(f => ({
+        ...f,
+        salaire_base:    a.salaire_base,
+        prime_logement:  a.prime_logement,
+        prime_transport: a.prime_transport,
+        prime_risque:    a.prime_risque,
+        prime_rendement: a.prime_rendement,
+      }))
+    }
   }
 
-  async function add() {
-    if (!form.employe_id || !form.salaire_base) return
-    setSaving(true)
-    const base = Number(form.salaire_base), primes = Number(form.primes), retenues = Number(form.retenues)
-    const net = base + primes - retenues
-    await supabase.from('paie_ecole').insert({ tenant_id: tenantId, employe_id: form.employe_id, mois: form.mois, annee: form.annee, salaire_base: base, primes, retenues, net, statut: 'paye' })
-    await supabase.from('transactions').insert({ tenant_id: tenantId, type: 'sortie', categorie: 'Salaires', description: `Salaire ${form.mois}/${form.annee}`, montant: net, date: new Date().toISOString().split('T')[0] })
-    setForm(p => ({ ...p, employe_id: '', salaire_base: '', primes: '0', retenues: '0' }))
-    setShowForm(false); load(); setSaving(false)
+  async function payer(mode: 'virement' | 'cheque' | 'mobile_money' | 'especes') {
+    if (!agent) return
+    setPaying(true)
+    try {
+      const primes   = form.prime_logement + form.prime_transport + form.prime_risque + form.prime_rendement
+      const brut     = form.salaire_base + primes
+      const retenues = Math.round(brut * 0.08)
+      const net      = brut - retenues
+      const today    = new Date().toISOString().split('T')[0]
+      const nomC     = `${agent.prenom}${agent.postnom ? ' ' + agent.postnom : ''} ${agent.nom}`
+
+      const { data: paie, error } = await supabase.from('paie_ecole').insert({
+        tenant_id: tenantId, employe_id: agent.id,
+        mois: form.mois, annee: form.annee,
+        salaire_base: form.salaire_base, primes, retenues, net,
+        statut: 'paye', mode_paiement: mode, type_agent: agent.type_agent,
+      }).select().single()
+
+      if (error) { showToast(error.message, false); setPaying(false); return }
+
+      await Promise.allSettled([
+        supabase.from('transactions').insert({
+          tenant_id: tenantId, type: 'sortie', categorie: 'Salaires',
+          description: `Salaire ${MOIS[form.mois]} ${form.annee} — ${nomC}`,
+          montant: net, date: today, mode_paiement: mode,
+        }),
+        supabase.from('journal_comptable').insert({
+          tenant_id: tenantId, date: today,
+          libelle: `Salaire ${MOIS[form.mois]} ${form.annee} — ${nomC}`,
+          type: 'charge', montant_ht: brut, tva: 0, ca: 0, montant_ttc: net,
+          categorie: '641 — Rémunérations du personnel',
+        }),
+        supabase.from('notifications').insert([
+          { tenant_id: tenantId, type: 'salaire_paye', titre: 'Salaire versé',
+            message: `${nomC} — Net: ${fmt(net)} FCFA (${mode})`,
+            destinataire_role: 'RH_PAIE', read: false },
+          { tenant_id: tenantId, type: 'salaire_paye', titre: 'Salaire versé',
+            message: `${nomC} — Net: ${fmt(net)} FCFA`,
+            destinataire_role: 'DIRECTION_GENERALE', read: false },
+          { tenant_id: tenantId, type: 'salaire_paye',
+            titre: 'Votre salaire est disponible',
+            message: `Salaire de ${MOIS[form.mois]} ${form.annee} : ${fmt(net)} FCFA versé par ${mode}.`,
+            destinataire_role: 'EMPLOYE', read: false },
+        ]),
+      ])
+
+      setJustPaidId(paie.id)
+      showToast(`Salaire de ${nomC} versé — ${fmt(net)} FCFA`)
+      setAgent(null)
+      load()
+    } catch (e: any) {
+      showToast(e?.message ?? 'Erreur', false)
+    }
+    setPaying(false)
   }
 
-  function printBulletin(p: typeof paies[0]) {
-    const ens = enseignants.find(e => e.id === p.employe_id)
+  function downloadBulletin(p: PaieRecord) {
+    const a   = agents.find(x => x.id === p.employe_id)
+    const nom = a ? `${a.prenom}${a.postnom ? ' ' + a.postnom : ''} ${a.nom}` : '—'
     const html = buildBulletinHTML({
-      employe:      ens ? `${ens.prenom} ${ens.nom}` : '—',
-      poste:        ens?.matiere ?? '—',
-      cnss:         ens?.numero_cnss ?? '',
-      periode:      `${MOIS[p.mois]} ${p.annee}`,
-      salaire_base: p.salaire_base,
-      primes:       p.primes,
-      retenues:     p.retenues,
-      net:          p.net,
-      nomEcole,
-      logoUrl,
+      employe: nom, poste: a?.poste ?? '—', cnss: a?.numero_cnss ?? '',
+      periode: `${MOIS[p.mois]} ${p.annee}`,
+      salaire_base: p.salaire_base, primes: p.primes, retenues: p.retenues, net: p.net,
+      nomEcole, logoUrl,
     })
     const w = window.open('', '_blank')
     if (!w) return
@@ -1156,104 +1270,216 @@ function SectionPaie({ tenantId, enseignants, nomEcole }: { tenantId: string; en
     setTimeout(() => { w.focus(); w.print() }, 800)
   }
 
+  const brut     = form.salaire_base + form.prime_logement + form.prime_transport + form.prime_risque + form.prime_rendement
+  const retenues = Math.round(brut * 0.08)
+  const net      = brut - retenues
   const totalNet = paies.reduce((s, p) => s + p.net, 0)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+
+      {/* KPIs + logo */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <KpiCard label="Total salaires payés" value={fmt(totalNet) + ' FCFA'} color="#2EA043" />
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowLogo(!showLogo)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors">
-            <Upload size={12} /> Logo société
-          </button>
-          <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
-            <Plus size={13} /> Générer bulletin
-          </button>
+        <div className="flex gap-3 flex-wrap">
+          <KpiCard label="Total salaires payés" value={fmt(totalNet) + ' FCFA'} color="#2EA043" />
+          <KpiCard label="Bulletins émis" value={paies.length} color="#388BFD" />
         </div>
+        <button onClick={() => setShowLogo(!showLogo)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors">
+          <Upload size={12} /> Logo bulletin
+        </button>
       </div>
 
       {showLogo && (
         <div className="flex items-end gap-2 p-3 rounded-xl border border-white/[0.08]" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <div className="flex-1">
-            <label className="block text-xs text-[#8B949E] mb-1">URL du logo (apparaîtra sur les bulletins)</label>
-            <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-[#484F58] focus:outline-none" placeholder="https://…" value={logoInput} onChange={e => setLogoInput(e.target.value)} />
+            <label className="block text-xs text-[#8B949E] mb-1">URL du logo (bulletins de paie)</label>
+            <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-[#484F58] focus:outline-none"
+              placeholder="https://…" value={logoInput} onChange={e => setLogoInput(e.target.value)} />
           </div>
-          <button onClick={saveLogo} className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1" style={{ background: '#2EA043', color: '#fff' }}>
-            <Check size={12} /> Appliquer
+          <button onClick={() => { setLogoUrl(logoInput); localStorage.setItem(`logo_${tenantId}`, logoInput); setShowLogo(false) }}
+            className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1" style={{ background: '#2EA043', color: '#fff' }}>
+            <Check size={12} /> OK
           </button>
         </div>
       )}
 
-      <AnimatePresence>
-        {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#2EA043]/30 p-4 space-y-3" style={{ background: 'rgba(46,160,67,0.04)' }}>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Employé *</label>
-                <select value={form.employe_id} onChange={e => setForm(p => ({ ...p, employe_id: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
-                  <option value="">— Choisir —</option>
-                  {enseignants.map(e => <option key={e.id} value={e.id}>{e.prenom} {e.nom}</option>)}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Mois</label>
-                  <select value={form.mois} onChange={e => setForm(p => ({ ...p, mois: Number(e.target.value) }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
-                    {MOIS.slice(1).map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
-                  </select>
+      {/* ── PANNEAU DE PAIE ─────────────────────────────────────────── */}
+      <div className="rounded-xl border border-white/[0.08] p-5 space-y-5" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <p className="text-sm font-bold text-white">Payer un agent</p>
+
+        {/* Sélection agent + période */}
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs text-[#8B949E] mb-1">Agent *</label>
+            <select value={agent?.id ?? ''} onChange={e => handleAgentSelect(e.target.value)}
+              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none">
+              <option value="">— Sélectionner —</option>
+              {agents.map(a => (
+                <option key={a.id} value={a.id}>
+                  {a.prenom}{a.postnom ? ' ' + a.postnom : ''} {a.nom} · {a.poste}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-[#8B949E] mb-1">Mois</label>
+            <select value={form.mois} onChange={e => setForm(p => ({ ...p, mois: Number(e.target.value) }))}
+              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none">
+              {MOIS.slice(1).map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
+            </select>
+          </div>
+          <FI label="Année" value={form.annee.toString()} onChange={v => setForm(p => ({ ...p, annee: Number(v) }))} type="number" />
+        </div>
+
+        {/* Fiche agent sélectionné */}
+        <AnimatePresence>
+          {agent && (
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+
+              {/* Identité */}
+              <div className="flex items-center gap-3 p-3 rounded-xl"
+                style={{ background: 'rgba(244,180,0,0.05)', border: '1px solid rgba(244,180,0,0.15)' }}>
+                <Avatar nom={agent.nom} prenom={agent.prenom} photoUrl={null} size={40} />
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-white">
+                    {agent.prenom}{agent.postnom ? ' ' + agent.postnom : ''} {agent.nom}
+                  </p>
+                  <p className="text-[10px] text-[#8B949E]">
+                    {agent.poste} · {agent.type_agent === 'employe' ? 'Employé' : 'Staff'}
+                  </p>
                 </div>
-                <FI label="Année" value={form.annee.toString()} onChange={v => setForm(p => ({ ...p, annee: Number(v) }))} type="number" />
+                <div className="text-right text-[10px] text-[#484F58]">
+                  {agent.banque && <p>{agent.banque} — {agent.rib ?? '—'}</p>}
+                  {!agent.banque && agent.mobile_money_type && (
+                    <p style={{ color: '#F97316' }}>{agent.mobile_money_type} · {agent.mobile_money_numero}</p>
+                  )}
+                  {agent.numero_cnss && <p className="mt-0.5">CNSS: {agent.numero_cnss}</p>}
+                </div>
               </div>
-              <FI label="Salaire de base (FCFA) *" value={form.salaire_base} onChange={v => setForm(p => ({ ...p, salaire_base: v }))} type="number" />
-              <FI label="Primes (FCFA)"   value={form.primes}   onChange={v => setForm(p => ({ ...p, primes: v }))}   type="number" />
-              <FI label="Retenues (FCFA)" value={form.retenues} onChange={v => setForm(p => ({ ...p, retenues: v }))} type="number" />
-              <div className="flex items-end pb-1">
-                <p className="text-sm font-bold" style={{ color: '#2EA043' }}>
-                  Net : {fmt((Number(form.salaire_base) || 0) + (Number(form.primes) || 0) - (Number(form.retenues) || 0))} FCFA
-                </p>
+
+              {/* Rémunération modifiable */}
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Salaire de base (FCFA)" value={form.salaire_base.toString()}
+                  onChange={v => setForm(p => ({ ...p, salaire_base: Number(v) || 0 }))} type="number" />
+                {agent.type_agent === 'employe' && <>
+                  <FI label="Prime logement (FCFA)" value={form.prime_logement.toString()}
+                    onChange={v => setForm(p => ({ ...p, prime_logement: Number(v) || 0 }))} type="number" />
+                  <FI label="Prime transport (FCFA)" value={form.prime_transport.toString()}
+                    onChange={v => setForm(p => ({ ...p, prime_transport: Number(v) || 0 }))} type="number" />
+                  <FI label="Prime risque (FCFA)" value={form.prime_risque.toString()}
+                    onChange={v => setForm(p => ({ ...p, prime_risque: Number(v) || 0 }))} type="number" />
+                  <FI label="Prime rendement (FCFA)" value={form.prime_rendement.toString()}
+                    onChange={v => setForm(p => ({ ...p, prime_rendement: Number(v) || 0 }))} type="number" />
+                </>}
               </div>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.employe_id || !form.salaire_base} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#2EA043', color: '#fff' }}>
-                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Payer
-              </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
-            </div>
+
+              {/* Récapitulatif calcul */}
+              <div className="rounded-xl overflow-hidden border border-white/[0.06] grid grid-cols-3 divide-x divide-white/[0.06]">
+                <div className="p-3 text-center">
+                  <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">Salaire brut</p>
+                  <p className="text-base font-bold text-white mt-0.5">{fmt(brut)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
+                </div>
+                <div className="p-3 text-center">
+                  <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">CNSS 8%</p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#F85149' }}>−{fmt(retenues)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
+                </div>
+                <div className="p-3 text-center" style={{ background: 'rgba(46,160,67,0.06)' }}>
+                  <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">Net à payer</p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#2EA043' }}>{fmt(net)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
+                </div>
+              </div>
+
+              {/* Boutons de paiement */}
+              <div>
+                <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-2">Payer via</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {MODES_PAIE.map(m => {
+                    const Icon = m.icon
+                    return (
+                      <button key={m.id} onClick={() => payer(m.id)} disabled={paying}
+                        className="flex flex-col items-center gap-1.5 py-4 rounded-xl border font-semibold transition-all disabled:opacity-40 text-[11px]"
+                        style={{ background: 'rgba(46,160,67,0.08)', borderColor: 'rgba(46,160,67,0.3)', color: '#2EA043' }}>
+                        {paying ? <Loader2 size={16} className="animate-spin" /> : <Icon size={16} />}
+                        {m.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!agent && (
+          <div className="text-center py-8 text-[#484F58] text-xs">
+            Sélectionnez un agent pour accéder à sa fiche de paie
+          </div>
+        )}
+      </div>
+
+      {/* ── Historique ──────────────────────────────────────────────── */}
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Historique des paiements</p>
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[#8B949E]" size={16} /></div>
+        ) : paies.length === 0 ? (
+          <div className="text-center py-10 text-[#8B949E] text-xs">Aucun bulletin émis.</div>
+        ) : (
+          <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  {['Agent', 'Période', 'Brut', 'Retenues', 'Net', 'Mode', 'Statut', ''].map(h => (
+                    <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {paies.map(p => {
+                  const a    = agents.find(x => x.id === p.employe_id)
+                  const nom  = a ? `${a.prenom}${a.postnom ? ' ' + a.postnom : ''} ${a.nom}` : '—'
+                  const isJ  = p.id === justPaidId
+                  return (
+                    <tr key={p.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]"
+                      style={isJ ? { background: 'rgba(46,160,67,0.05)' } : {}}>
+                      <td className="px-4 py-2.5">
+                        <p className="text-white font-medium">{nom}</p>
+                        {a && <p className="text-[9px] text-[#484F58]">{a.poste}</p>}
+                      </td>
+                      <td className="px-4 py-2.5 text-[#8B949E]">{MOIS[p.mois]} {p.annee}</td>
+                      <td className="px-4 py-2.5 text-[#8B949E]">{fmt(p.salaire_base + p.primes)}</td>
+                      <td className="px-4 py-2.5 text-[#F85149]">−{fmt(p.retenues)}</td>
+                      <td className="px-4 py-2.5 font-bold text-white">{fmt(p.net)} FCFA</td>
+                      <td className="px-4 py-2.5 text-[#484F58] capitalize">{(p.mode_paiement ?? '—').replace('_', ' ')}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: '#2EA043', background: '#2EA04318' }}>Payé</span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <button onClick={() => downloadBulletin(p)} title="Télécharger bulletin"
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white transition-all text-[10px]">
+                          <Printer size={10} /> Bulletin
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
+            style={{ background: toast.ok ? 'linear-gradient(135deg,#065F46,#059669)' : 'linear-gradient(135deg,#7f1d1d,#dc2626)' }}>
+            {toast.ok ? <Check size={14} /> : <AlertCircle size={14} />} {toast.msg}
           </motion.div>
         )}
       </AnimatePresence>
-
-      {paies.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucun bulletin de paie généré.</div>
-      ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-          <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Employé', 'Période', 'Base', 'Primes', 'Retenues', 'Net', 'Statut', ''].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
-            <tbody>
-              {paies.map(p => {
-                const ens = enseignants.find(e => e.id === p.employe_id)
-                return (
-                  <tr key={p.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]">
-                    <td className="px-4 py-2.5 text-white">{ens ? `${ens.prenom} ${ens.nom}` : '—'}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{MOIS[p.mois]} {p.annee}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{fmt(p.salaire_base)}</td>
-                    <td className="px-4 py-2.5 text-[#2EA043]">+{fmt(p.primes)}</td>
-                    <td className="px-4 py-2.5 text-[#F85149]">-{fmt(p.retenues)}</td>
-                    <td className="px-4 py-2.5 font-bold text-white">{fmt(p.net)} FCFA</td>
-                    <td className="px-4 py-2.5"><span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#2EA04318] text-[#2EA043]">Payé</span></td>
-                    <td className="px-4 py-2.5">
-                      <button onClick={() => printBulletin(p)} title="Imprimer le bulletin"
-                        className="p-1.5 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white hover:border-white/[0.15] transition-all">
-                        <Printer size={11} />
-                      </button>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   )
 }
@@ -1401,49 +1627,58 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
   async function marquerPaye(h: TeacherHour) {
     if (h.statut !== 'validated') return
     setSaving(h.id)
-    await supabase.from('teacher_hours').update({ statut: 'paye' }).eq('id', h.id)
-    const ens = enseignants.find(e => e.id === h.enseignant_id)
-    const today = new Date().toISOString().split('T')[0]
+    const ens      = enseignants.find(e => e.id === h.enseignant_id)
+    const taux     = ens?.taux_horaire ?? 5000
+    const montant  = h.heures * taux
+    const today    = new Date().toISOString().split('T')[0]
+    const nomEns   = ens ? `${ens.prenom} ${ens.nom}` : 'Formateur'
+    const fmtN     = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
 
-    // Sync to trésorerie
+    await supabase.from('teacher_hours').update({ statut: 'paye' }).eq('id', h.id)
+
+    // Trésorerie (sortie d'argent)
     try {
       await supabase.from('transactions').insert({
-        tenant_id: tenantId,
-        type: 'sortie',
+        tenant_id: tenantId, type: 'sortie',
         categorie: 'Émoluments Formateurs',
-        description: `Paiement heures — ${ens ? `${ens.prenom} ${ens.nom}` : 'Formateur'} (${h.heures}h · ${h.matiere ?? ''})`,
-        montant: h.heures * 5000,
-        date: today,
-        mode_paiement: 'virement',
-        source: 'teacher_hours',
-        source_id: h.id,
+        description: `Paiement heures — ${nomEns} (${h.heures}h · ${h.matiere ?? ''} · ${fmtN(taux)} FCFA/h)`,
+        montant, date: today, mode_paiement: 'virement', source: 'teacher_hours', source_id: h.id,
       })
     } catch {}
 
-    // Sync to journal comptable
+    // Comptabilité (journal)
     try {
       await supabase.from('journal_comptable').insert({
         tenant_id: tenantId, date: today,
-        libelle: `Émoluments formateur — ${ens ? `${ens.prenom} ${ens.nom}` : ''} ${h.heures}h`,
-        type: 'charge', montant_ht: h.heures * 5000, tva: 0, ca: 0,
-        montant_ttc: h.heures * 5000, categorie: '641 — Rémunérations du personnel',
+        libelle: `Émoluments formateur — ${nomEns} — ${h.heures}h`,
+        type: 'charge', montant_ht: montant, tva: 0, ca: 0, montant_ttc: montant,
+        categorie: '641 — Rémunérations du personnel',
       })
     } catch {}
 
-    // Notify formateur of payment
+    // Notifications : Formateur + RH + Direction + Comptabilité
     try {
-      await supabase.from('notifications').insert({
-        tenant_id: tenantId,
-        type: 'heures_payees',
-        titre: "Paiement d'heures effectué",
-        message: `Vos ${h.heures}h (${h.matiere ?? ''}) ont été payées.`,
-        destinataire_role: 'FORMATEUR',
-        enseignant_id: h.enseignant_id,
-        read: false,
-      })
+      await supabase.from('notifications').insert([
+        { tenant_id: tenantId, type: 'heures_payees',
+          titre: "Paiement d'heures effectué",
+          message: `Vos ${h.heures}h (${h.matiere ?? ''}) ont été payées — ${fmtN(montant)} FCFA.`,
+          destinataire_role: 'FORMATEUR', enseignant_id: h.enseignant_id, read: false },
+        { tenant_id: tenantId, type: 'heures_payees',
+          titre: 'Émoluments formateur versés',
+          message: `${nomEns} — ${h.heures}h · ${fmtN(montant)} FCFA sortis de trésorerie.`,
+          destinataire_role: 'RH_PAIE', read: false },
+        { tenant_id: tenantId, type: 'heures_payees',
+          titre: 'Émoluments formateur versés',
+          message: `${nomEns} — ${h.heures}h · ${fmtN(montant)} FCFA.`,
+          destinataire_role: 'DIRECTION_GENERALE', read: false },
+        { tenant_id: tenantId, type: 'heures_payees',
+          titre: 'Écriture comptable générée',
+          message: `Charge 641 — ${nomEns} — ${fmtN(montant)} FCFA.`,
+          destinataire_role: 'RAF', read: false },
+      ])
     } catch {}
 
-    showToast('Marqué payé — trésorerie mise à jour')
+    showToast(`Payé — ${fmtN(montant)} FCFA · trésorerie & comptabilité mises à jour`)
     setSaving(null); load()
   }
 
@@ -1499,6 +1734,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
                   <p className="text-[10px] text-[#8B949E]">
                     {h.heures}h · {h.matiere ?? '—'} · {new Date(h.date_declaration).toLocaleDateString('fr-FR')}
                     {h.periode ? ` · ${h.periode}` : ''}
+                    {' · '}<span style={{ color: '#2EA043' }}>{new Intl.NumberFormat('fr-FR').format(h.heures * (ens?.taux_horaire ?? 5000))} FCFA</span>
                   </p>
                 </div>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: cfg.color, background: cfg.bg }}>{cfg.label}</span>
@@ -1592,7 +1828,7 @@ export default function RhPage() {
           {subTab === 'enseignants' && tenantId && <SectionEnseignants       tenantId={tenantId} enseignants={enseignants} onRefresh={load} />}
           {subTab === 'staff'       && tenantId && <SectionStaff             tenantId={tenantId} />}
           {subTab === 'conges'      && tenantId && <SectionConges            tenantId={tenantId} enseignants={enseignants} />}
-          {subTab === 'paie'        && tenantId && <SectionPaie              tenantId={tenantId} enseignants={enseignants} nomEcole={nomEcole} />}
+          {subTab === 'paie'        && tenantId && <SectionPaie              tenantId={tenantId} nomEcole={nomEcole} />}
           {subTab === 'heures'      && tenantId && <SectionHeuresFormateurs  tenantId={tenantId} enseignants={enseignants} />}
           {subTab === 'recrutement' && tenantId && <SectionRecrutement       tenantId={tenantId} />}
         </motion.div>
