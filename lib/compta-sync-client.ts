@@ -71,6 +71,44 @@ export function resolveOhadaAccounts(
 }
 
 /**
+ * Mapping catégorie métier → code OHADA "CODE — Label"
+ * pour stockage dans journal_comptable.categorie.
+ * La partie CODE (3 chiffres) est extraite par le Grand Livre pour regrouper les écritures.
+ */
+const CATEGORIE_OHADA_MAP: Record<string, string> = {
+  // ── Dépenses ──────────────────────────────────────────────────────────────
+  'Salaires':                   '641 — Rémunérations du personnel',
+  'Charges de personnel':       '641 — Rémunérations du personnel',
+  'Paiement prestataire':       '621 — Sous-traitance / Honoraires',
+  'CNSS':                       '644 — Charges sociales patronales',
+  'Loyer':                      '651 — Charges locatives',
+  'Achats / Fournisseur':       '601 — Achats de marchandises',
+  'Carburant / Transport':      '625 — Déplacements, missions, réceptions',
+  'Impôts / Taxes':             '631 — Impôts, taxes et versements assimilés',
+  'Charges diverses':           '628 — Autres charges diverses',
+  'Frais bancaires':            '627 — Frais bancaires',
+  'Remboursement client':       '419 — Clients — avoirs',
+  'Autre dépense':              '628 — Autres charges diverses',
+  // ── Recettes ──────────────────────────────────────────────────────────────
+  "Vente / Chiffre d'affaires": '701 — Ventes de marchandises — Scolarité',
+  'Vente':                      '701 — Ventes de marchandises — Scolarité',
+  'Frais de scolarité':         '706 — Prestations de services',
+  'Facture payée':              '411 — Clients — étudiants',
+  'Prestation de services':     '706 — Prestations de services',
+  'Prestation':                 '706 — Prestations de services',
+  'Avance client':              '411 — Clients — étudiants',
+  'Virement reçu':              '521 — Banques',
+  'Remboursement':              '409 — Fournisseurs — avoirs',
+  'Subvention / Don':           '773 — Subventions et dons',
+  'Autre recette':              '709 — Autres produits',
+}
+
+/** Convertit une catégorie métier en format "CODE — Label" attendu par le Grand Livre. */
+function toOhadaCategorie(cat: string): string {
+  return CATEGORIE_OHADA_MAP[cat] ?? cat
+}
+
+/**
  * Mode de paiement → compte trésorerie OHADA
  */
 export function modeToAccount(mode: string): string {
@@ -106,7 +144,7 @@ export async function writeComptaEntry(input: ComptaEntryInput): Promise<{ ok: b
       tva:           0,
       ca:            0,
       montant_ttc:   input.montant,
-      categorie:     input.categorie,
+      categorie:     toOhadaCategorie(input.categorie),
       debit_account: input.debitAccount,
       credit_account:input.creditAccount,
       source:        input.source,

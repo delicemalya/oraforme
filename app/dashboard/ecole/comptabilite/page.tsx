@@ -26,19 +26,33 @@ interface JournalEntry {
 
 // Comptes OHADA pour l'éducation
 const COMPTES_OHADA = [
+  // Produits
   { code: '701', label: 'Ventes de marchandises — Scolarité' },
   { code: '706', label: 'Prestations de services' },
-  { code: '621', label: 'Rémunérations du personnel' },
-  { code: '625', label: 'Déplacements, missions, réceptions' },
-  { code: '628', label: 'Divers' },
-  { code: '631', label: 'Impôts, taxes et versements assimilés' },
+  { code: '709', label: 'Autres produits' },
+  { code: '773', label: 'Subventions et dons' },
+  // Charges de personnel
+  { code: '621', label: 'Sous-traitance / Honoraires' },
+  { code: '641', label: 'Rémunérations du personnel' },
   { code: '642', label: 'Charges sociales' },
+  { code: '644', label: 'Charges sociales patronales' },
+  // Autres charges
   { code: '601', label: 'Achats de marchandises' },
-  { code: '241', label: 'Matériel et mobilier de bureau' },
+  { code: '625', label: 'Déplacements, missions, réceptions' },
+  { code: '627', label: 'Frais bancaires' },
+  { code: '628', label: 'Autres charges diverses' },
+  { code: '631', label: 'Impôts, taxes et versements assimilés' },
+  { code: '651', label: 'Charges locatives' },
+  // Tiers
   { code: '411', label: 'Clients — étudiants' },
+  { code: '419', label: 'Clients — avoirs' },
   { code: '401', label: 'Fournisseurs' },
+  { code: '409', label: 'Fournisseurs — avoirs' },
+  // Trésorerie
   { code: '521', label: 'Banques' },
   { code: '571', label: 'Caisse' },
+  // Immobilisations
+  { code: '241', label: 'Matériel et mobilier de bureau' },
 ]
 
 // ── Journal ───────────────────────────────────────────────────────────────────
