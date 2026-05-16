@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import type { Enseignant, Etudiant } from '../../_lib/shared'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -38,505 +37,398 @@ export type ProfilPerson =
   | { type: 'etudiant';   data: Etudiant    }
   | { type: 'staff';      data: StaffFull   }
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
+// ── Tokens ────────────────────────────────────────────────────────────────────
 
-const C = {
-  bg:     '#080E1A',
-  card:   'rgba(255,255,255,0.03)',
-  hover:  'rgba(255,255,255,0.055)',
-  border: 'rgba(255,255,255,0.07)',
-  gold:   '#F4B400',
-  goldDim:'rgba(244,180,0,0.18)',
-  goldBdr:'rgba(244,180,0,0.30)',
-  t1:     '#F0F4FF',
-  t2:     '#8E9AB8',
-  t3:     '#4A5572',
-  green:  '#22C55E',
-  red:    '#EF4444',
-  blue:   '#3B82F6',
-  purple: '#A855F7',
-}
+const G  = '#F4B400'
+const BG = '#080E1A'
+const CARD    = 'rgba(255,255,255,0.03)'
+const BORDER  = 'rgba(255,255,255,0.07)'
+const GOLD_DIM = 'rgba(244,180,0,0.15)'
+const GOLD_BDR = 'rgba(244,180,0,0.28)'
+const T1 = '#F0F4FF'
+const T2 = '#8E9AB8'
+const T3 = '#4A5572'
+const GREEN  = '#22C55E'
+const RED    = '#EF4444'
+const BLUE   = '#3B82F6'
+const PURPLE = '#A855F7'
 
-const fmtN = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
-const fmtDate = (d: string | null) =>
-  d ? new Date(d + (d.includes('T') ? '' : 'T00:00')).toLocaleDateString('fr-FR') : '—'
+const fmtN   = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
+const fmtD   = (d: string | null | undefined) =>
+  d ? new Date(d.includes('T') ? d : d + 'T00:00').toLocaleDateString('fr-FR') : '—'
 
-// ── Shared micro-components ───────────────────────────────────────────────────
+// ── Micro components ──────────────────────────────────────────────────────────
 
-function AvatarCircle({ name, size = 72 }: { name: string; size?: number }) {
+function Avatar({ name, size = 78 }: { name: string; size?: number }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
       background: 'linear-gradient(135deg,#F4B400,#E07800)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size / 2.6, fontWeight: 800, color: '#000',
-      boxShadow: '0 0 0 4px rgba(244,180,0,0.2),0 0 30px rgba(244,180,0,0.12)',
+      fontSize: size / 2.5, fontWeight: 800, color: '#000',
+      boxShadow: '0 0 0 4px rgba(244,180,0,0.22),0 0 32px rgba(244,180,0,0.14)',
     }}>
       {name.charAt(0).toUpperCase()}
     </div>
   )
 }
 
-function SCard({ title, children }: { title: string; children: React.ReactNode }) {
+function StatChip({
+  label, value, sub, color = G, icon,
+}: { label: string; value: string | number; sub?: string; color?: string; icon?: string }) {
   return (
-    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '16px 18px' }}>
-      <p style={{ fontSize: 9.5, fontWeight: 700, color: C.t3, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>{title}</p>
+    <div style={{
+      background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14,
+      padding: '14px 16px', transition: 'border-color .2s',
+    }}>
+      <p style={{ fontSize: 9, color: T3, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 7 }}>
+        {icon && <span style={{ marginRight: 4 }}>{icon}</span>}{label}
+      </p>
+      <p style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{value}</p>
+      {sub && <p style={{ fontSize: 10, color: T3, marginTop: 4 }}>{sub}</p>}
+    </div>
+  )
+}
+
+function Card({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
+  return (
+    <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: '18px 20px' }}>
+      <p style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: T1, marginBottom: 14 }}>
+        <span style={{ width: 26, height: 26, borderRadius: 7, background: GOLD_DIM, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>{icon}</span>
+        {title}
+      </p>
       {children}
     </div>
   )
 }
 
-function IField({ label, value }: { label: string; value: string | number | null | undefined }) {
+function InfoRow({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
-    <div>
-      <p style={{ fontSize: 9.5, color: C.t3, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 3 }}>{label}</p>
-      <p style={{ fontSize: 13, fontWeight: 600, color: value != null && value !== '' ? C.t1 : C.t3 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '7px 0', borderBottom: `1px solid ${BORDER}`, gap: 12 }}>
+      <span style={{ fontSize: 11, color: T3, flexShrink: 0 }}>{label}</span>
+      <span style={{ fontSize: 11, fontWeight: 600, color: value != null && value !== '' ? T1 : T3, textAlign: 'right' }}>
         {value != null && value !== '' ? String(value) : '—'}
-      </p>
+      </span>
     </div>
   )
 }
 
-function Chip({ label, value, sub, color = C.gold }: { label: string; value: string | number; sub?: string; color?: string }) {
+function PayRow({ label, value, color = T2, mono = false }: { label: string; value: string; color?: string; mono?: boolean }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '13px 14px' }}>
-      <p style={{ fontSize: 9.5, color: C.t3, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 5 }}>{label}</p>
-      <p style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1 }}>{value}</p>
-      {sub && <p style={{ fontSize: 10, color: C.t3, marginTop: 3 }}>{sub}</p>}
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: `1px solid ${BORDER}` }}>
+      <span style={{ fontSize: 12, color: T2 }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 700, color, fontFamily: mono ? "'JetBrains Mono',monospace" : 'inherit' }}>{value}</span>
     </div>
   )
 }
 
-function Timeline({ items }: { items: { color: string; icon: string; text: string; time: string }[] }) {
+function TlItem({ color, icon, text, time, last = false }: { color: string; icon: string; text: string; time: string; last?: boolean }) {
   return (
-    <SCard title="Historique">
-      <div>
-        {items.map((it, i) => (
-          <div key={i} style={{ display: 'flex', gap: 12, padding: '8px 0', position: 'relative' }}>
-            {i < items.length - 1 && (
-              <div style={{ position: 'absolute', left: 10, top: 26, bottom: -8, width: 1, background: C.border }} />
-            )}
-            <div style={{ width: 22, height: 22, borderRadius: '50%', background: `${it.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0, zIndex: 1 }}>
-              {it.icon}
-            </div>
-            <div>
-              <p style={{ fontSize: 12, color: C.t1 }}>{it.text}</p>
-              <p style={{ fontSize: 10, color: C.t3, marginTop: 2 }}>{it.time}</p>
-            </div>
-          </div>
-        ))}
+    <div style={{ display: 'flex', gap: 12, padding: '9px 0', position: 'relative' }}>
+      {!last && <div style={{ position: 'absolute', left: 10, top: 28, bottom: -9, width: 1, background: BORDER }} />}
+      <div style={{ width: 22, height: 22, borderRadius: '50%', background: `${color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0, zIndex: 1, color }}>
+        {icon}
       </div>
-    </SCard>
-  )
-}
-
-function PayLine({ label, value, color = C.t2 }: { label: string; value: string; color?: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: `1px solid ${C.border}`, fontSize: 12 }}>
-      <span style={{ color: C.t2 }}>{label}</span>
-      <span style={{ fontWeight: 700, color, fontFamily: 'monospace' }}>{value}</span>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize: 12, color: T1, lineHeight: 1.4 }}>{text}</p>
+        <p style={{ fontSize: 10, color: T3, marginTop: 2 }}>{time}</p>
+      </div>
     </div>
   )
 }
 
-function BrutBox({ label, value }: { label: string; value: number }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'linear-gradient(135deg,rgba(244,180,0,0.12),rgba(244,180,0,0.04))', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 8 }}>
-      <span style={{ fontWeight: 700, fontSize: 13, color: C.t1 }}>{label}</span>
-      <span style={{ fontWeight: 800, fontSize: 16, color: C.gold }}>{fmtN(value)} FCFA</span>
-    </div>
-  )
-}
-
-// ── Tab contents ──────────────────────────────────────────────────────────────
-
-function TabGeneral({ person }: { person: ProfilPerson }) {
-  if (person.type === 'employe') {
-    const d = person.data
-    const brut = (d.salaire_base || 0) + (d.prime_logement || 0) + (d.prime_transport || 0) + (d.prime_risque || 0) + (d.prime_rendement || 0)
-    const since = d.date_recrutement
-      ? Math.floor((Date.now() - new Date(d.date_recrutement).getTime()) / (365.25 * 24 * 3600 * 1000))
-      : null
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
-          <Chip label="Salaire brut" value={fmtN(brut)} sub="FCFA/mois" color={C.gold} />
-          <Chip label="Type" value={d.type_employe} sub="contrat" color={C.purple} />
-          {since !== null
-            ? <Chip label="Ancienneté" value={`${since} an${since !== 1 ? 's' : ''}`} color={C.blue} />
-            : <Chip label="Statut" value={d.statut} color={d.statut === 'actif' ? C.green : C.gold} />}
-        </div>
-        <Timeline items={[
-          { color: C.green,  icon: '✓', text: `Dossier enregistré — ${d.prenom} ${d.nom}`, time: fmtDate(d.created_at) },
-          { color: C.gold,   icon: '💼', text: `${d.poste}${d.departement ? ` · ${d.departement}` : ''}`, time: d.date_debut_contrat ? `Début contrat ${fmtDate(d.date_debut_contrat)}` : 'Date contrat non renseignée' },
-          { color: C.blue,   icon: '💰', text: `Base : ${fmtN(d.salaire_base)} FCFA — Mode : ${(d.mode_paiement || '—').replace('_', ' ')}`, time: 'Mensuel' },
-        ]} />
-      </div>
-    )
-  }
-
-  if (person.type === 'enseignant') {
-    const d = person.data
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
-          <Chip label="Salaire mensuel" value={d.salaire_mensuel ? fmtN(d.salaire_mensuel) : '—'} sub="FCFA" />
-          <Chip label="Taux horaire" value={d.taux_horaire ? fmtN(d.taux_horaire) : '—'} sub="FCFA/h" color={C.blue} />
-          <Chip label="Statut" value={d.statut} color={d.statut === 'actif' ? C.green : C.gold} />
-        </div>
-        <Timeline items={[
-          { color: C.green,  icon: '✓', text: `Formateur ${d.prenom} ${d.nom} — actif`, time: fmtDate(d.created_at) },
-          { color: C.gold,   icon: '📚', text: `Matière : ${d.matiere ?? 'Non définie'}`, time: 'Affectation actuelle' },
-          { color: C.blue,   icon: '💳', text: `Rémunération configurée`, time: d.banque ? `Banque : ${d.banque}` : d.mobile_money_type ? `MM : ${d.mobile_money_type}` : 'Mode de paiement non renseigné' },
-        ]} />
-      </div>
-    )
-  }
-
-  if (person.type === 'etudiant') {
-    const d = person.data
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
-          <Chip label="Niveau" value={d.niveau} color={C.blue} />
-          <Chip label="Classe" value={d.classe ?? '—'} />
-          <Chip label="Statut" value={d.statut} color={d.statut === 'actif' ? C.green : C.red} />
-        </div>
-        <Timeline items={[
-          { color: C.green, icon: '🎓', text: `Inscription ${d.prenom} ${d.nom}`, time: fmtDate(d.created_at) },
-          { color: C.gold,  icon: '🏫', text: `${d.classe ?? 'Classe non affectée'} — ${d.niveau}`, time: d.annee_scolaire },
-          { color: C.blue,  icon: '👨‍👩‍👦', text: `Parent : ${[d.nom_pere, d.nom_mere].filter(Boolean).join(' / ') || 'Non renseigné'}`, time: d.tel_parent ?? '—' },
-        ]} />
-      </div>
-    )
-  }
-
-  // staff
-  const d = person.data
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
-        <Chip label="Salaire" value={fmtN(d.salaire)} sub="FCFA/mois" />
-        <Chip label="Poste" value={d.poste} color={C.purple} />
-        <Chip label="Statut" value={d.statut} color={d.statut === 'actif' ? C.green : C.gold} />
-      </div>
-      <Timeline items={[
-        { color: C.green, icon: '✓', text: `Agent ${d.prenom} ${d.nom} enregistré`, time: fmtDate(d.created_at) },
-        { color: C.gold,  icon: '💼', text: `Poste : ${d.poste}`, time: 'Actuel' },
-      ]} />
-    </div>
-  )
-}
-
-function TabInfos({ person }: { person: ProfilPerson }) {
-  if (person.type === 'employe') {
-    const d = person.data
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <SCard title="Identité civile">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Prénom" value={d.prenom} />
-            <IField label="Nom" value={d.nom} />
-            <IField label="Postnom" value={d.postnom} />
-            <IField label="Sexe" value={d.sexe} />
-            <IField label="Date de naissance" value={fmtDate(d.date_naissance)} />
-            <IField label="Nationalité" value={d.nationalite} />
-            <IField label="Situation matrimoniale" value={d.situation_matrimoniale} />
-            <IField label="Nb enfants" value={d.nb_enfants} />
-          </div>
-        </SCard>
-        <SCard title="Coordonnées">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Téléphone" value={d.telephone} />
-            <IField label="Téléphone 2" value={d.telephone2} />
-            <IField label="Email professionnel" value={d.email_pro} />
-            <IField label="Adresse" value={d.adresse} />
-            <IField label="Ville" value={d.ville} />
-            <IField label="Pays" value={d.pays} />
-          </div>
-        </SCard>
-        <SCard title="Poste & Contrat">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Poste" value={d.poste} />
-            <IField label="Département" value={d.departement} />
-            <IField label="Type employé" value={d.type_employe} />
-            <IField label="Statut" value={d.statut} />
-            <IField label="Date recrutement" value={fmtDate(d.date_recrutement)} />
-            <IField label="Début contrat" value={fmtDate(d.date_debut_contrat)} />
-            <IField label="Fin contrat" value={fmtDate(d.date_fin_contrat)} />
-            <IField label="N° CNSS" value={d.numero_cnss} />
-            <IField label="N° Fiscal NIF" value={d.numero_fiscal} />
-          </div>
-        </SCard>
-      </div>
-    )
-  }
-
-  if (person.type === 'enseignant') {
-    const d = person.data
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <SCard title="Identité & Contact">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Prénom" value={d.prenom} />
-            <IField label="Nom" value={d.nom} />
-            <IField label="Téléphone" value={d.telephone} />
-            <IField label="Email" value={d.email} />
-            <IField label="Matière" value={d.matiere} />
-            <IField label="Statut" value={d.statut} />
-            <IField label="N° CNSS" value={d.numero_cnss} />
-          </div>
-        </SCard>
-        <SCard title="Coordonnées bancaires">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Banque" value={d.banque} />
-            <IField label="RIB" value={d.rib} />
-            <IField label="Mobile Money" value={d.mobile_money_type} />
-            <IField label="Numéro MM" value={d.mobile_money_numero} />
-          </div>
-        </SCard>
-      </div>
-    )
-  }
-
-  if (person.type === 'etudiant') {
-    const d = person.data
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <SCard title="Identité">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Prénom" value={d.prenom} />
-            <IField label="Nom" value={d.nom} />
-            <IField label="Date de naissance" value={fmtDate(d.date_naissance)} />
-            <IField label="Lieu de naissance" value={d.lieu_naissance} />
-            <IField label="Nationalité" value={d.nationalite} />
-            <IField label="Adresse" value={d.adresse} />
-          </div>
-        </SCard>
-        <SCard title="Scolarité">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="N° étudiant" value={d.numero_id} />
-            <IField label="Niveau" value={d.niveau} />
-            <IField label="Classe" value={d.classe} />
-            <IField label="Année scolaire" value={d.annee_scolaire} />
-            <IField label="Statut" value={d.statut} />
-          </div>
-        </SCard>
-        <SCard title="Parents & Tuteur">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Père" value={d.nom_pere} />
-            <IField label="Mère" value={d.nom_mere} />
-            <IField label="Tél. parent" value={d.tel_parent} />
-            <IField label="Email parent" value={d.email_parent} />
-            <IField label="Profession" value={d.profession_parent} />
-            <IField label="Tuteur" value={d.nom_tuteur} />
-            <IField label="Tél. tuteur" value={d.tel_tuteur} />
-            <IField label="Lien tuteur" value={d.lien_tuteur} />
-          </div>
-        </SCard>
-      </div>
-    )
-  }
-
-  const d = person.data
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <SCard title="Identité & Contact">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <IField label="Prénom" value={d.prenom} />
-          <IField label="Nom" value={d.nom} />
-          <IField label="Poste" value={d.poste} />
-          <IField label="Téléphone" value={d.telephone} />
-          <IField label="Email" value={d.email} />
-          <IField label="N° CNSS" value={d.numero_cnss} />
-        </div>
-      </SCard>
-      <SCard title="Coordonnées bancaires">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <IField label="Banque" value={d.banque} />
-          <IField label="RIB" value={d.rib} />
-          <IField label="Mobile Money" value={d.mobile_money_type} />
-          <IField label="Numéro MM" value={d.mobile_money_numero} />
-        </div>
-      </SCard>
-    </div>
-  )
-}
-
-function TabFinances({ person }: { person: ProfilPerson }) {
-  if (person.type === 'employe') {
-    const d = person.data
-    const brut = (d.salaire_base || 0) + (d.prime_logement || 0) + (d.prime_transport || 0) + (d.prime_risque || 0) + (d.prime_rendement || 0)
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <SCard title="Détail rémunération">
-          <div>
-            {d.salaire_base > 0   && <PayLine label="Salaire de base"  value={`${fmtN(d.salaire_base)} FCFA`}  color={C.t1} />}
-            {d.prime_logement > 0 && <PayLine label="Prime logement"   value={`+${fmtN(d.prime_logement)} FCFA`}  color={C.green} />}
-            {d.prime_transport> 0 && <PayLine label="Prime transport"  value={`+${fmtN(d.prime_transport)} FCFA`} color={C.green} />}
-            {d.prime_risque > 0   && <PayLine label="Prime de risque"  value={`+${fmtN(d.prime_risque)} FCFA`}   color={C.green} />}
-            {d.prime_rendement> 0 && <PayLine label="Prime rendement"  value={`+${fmtN(d.prime_rendement)} FCFA`} color={C.green} />}
-            {d.taux_horaire && d.taux_horaire > 0 && <PayLine label="Taux horaire" value={`${fmtN(d.taux_horaire)} FCFA/h`} color={C.blue} />}
-            <BrutBox label="SALAIRE BRUT" value={brut} />
-          </div>
-        </SCard>
-        <SCard title="Mode de paiement">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Mode" value={(d.mode_paiement || '—').replace('_', ' ')} />
-            <IField label="Banque" value={d.banque} />
-            <IField label="RIB" value={d.rib} />
-            <IField label="Mobile Money" value={d.mobile_money_type ? `${d.mobile_money_type} — ${d.mobile_money_numero ?? ''}` : null} />
-          </div>
-        </SCard>
-      </div>
-    )
-  }
-
-  if (person.type === 'enseignant') {
-    const d = person.data
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <SCard title="Rémunération">
-          <div>
-            {d.salaire_mensuel != null && <PayLine label="Salaire mensuel" value={`${fmtN(d.salaire_mensuel)} FCFA`} color={C.gold} />}
-            {d.taux_horaire    != null && <PayLine label="Taux horaire"    value={`${fmtN(d.taux_horaire)} FCFA/h`}  color={C.blue} />}
-            {d.salaire_mensuel != null && <BrutBox label="TOTAL MENSUEL" value={d.salaire_mensuel} />}
-          </div>
-        </SCard>
-        <SCard title="Coordonnées bancaires">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <IField label="Banque" value={d.banque} />
-            <IField label="RIB" value={d.rib} />
-            <IField label="Mobile Money" value={d.mobile_money_type} />
-            <IField label="Numéro MM" value={d.mobile_money_numero} />
-          </div>
-        </SCard>
-      </div>
-    )
-  }
-
-  if (person.type === 'etudiant') {
-    return (
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 24, textAlign: 'center' }}>
-        <div style={{ fontSize: 36, marginBottom: 12 }}>💳</div>
-        <p style={{ fontSize: 13, fontWeight: 600, color: C.t1, marginBottom: 6 }}>Finances scolaires</p>
-        <p style={{ fontSize: 11, color: C.t2 }}>Consultez la section Scolarité → Paiements pour l'historique complet des frais.</p>
-      </div>
-    )
-  }
-
-  const d = person.data
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <SCard title="Salaire mensuel">
-        <BrutBox label="SALAIRE MENSUEL" value={d.salaire} />
-      </SCard>
-      <SCard title="Coordonnées bancaires">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <IField label="Banque" value={d.banque} />
-          <IField label="RIB" value={d.rib} />
-          <IField label="Mobile Money" value={d.mobile_money_type} />
-          <IField label="Numéro MM" value={d.mobile_money_numero} />
-        </div>
-      </SCard>
-    </div>
-  )
-}
-
-function TabDocuments() {
-  const docs = [
-    { icon: '📄', label: "Pièce d'identité", hint: 'CNI ou passeport · PDF / image', color: C.red },
-    { icon: '📋', label: 'Contrat signé',    hint: 'Document PDF signé',             color: C.blue },
-    { icon: '🎓', label: 'Diplôme(s)',        hint: 'PDF ou scan',                   color: C.purple },
-    { icon: '📊', label: 'Attestations',      hint: 'Formations, habilitations',     color: C.green },
-  ]
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <p style={{ fontSize: 11, color: C.t3, marginBottom: 4 }}>Documents attachés au dossier.</p>
-      {docs.map(d => (
-        <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', background: 'rgba(255,255,255,0.025)', border: `1px solid ${C.border}`, borderRadius: 10, cursor: 'pointer' }}>
-          <div style={{ width: 36, height: 36, borderRadius: 8, background: `${d.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{d.icon}</div>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: C.t1 }}>{d.label}</p>
-            <p style={{ fontSize: 10, color: C.t3, marginTop: 2 }}>{d.hint}</p>
-          </div>
-          <span style={{ fontSize: 11, color: C.t3 }}>+ Ajouter</span>
-        </div>
-      ))}
-      <p style={{ fontSize: 10, color: C.t3, marginTop: 4 }}>Stockage de documents disponible dans une prochaine mise à jour.</p>
-    </div>
-  )
-}
-
-function TabPresence() {
-  return (
-    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 32, textAlign: 'center' }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>📊</div>
-      <p style={{ fontSize: 13, fontWeight: 600, color: C.t1, marginBottom: 6 }}>Module de présence</p>
-      <p style={{ fontSize: 11, color: C.t2 }}>Les données de présence seront synchronisées depuis le pointage biométrique ou manuel.</p>
-    </div>
-  )
-}
-
-// ── Main ProfilDrawer ─────────────────────────────────────────────────────────
-
-type TabId = 'general' | 'infos' | 'finances' | 'documents' | 'presence'
-
-const TABS: { id: TabId; icon: string; label: string }[] = [
-  { id: 'general',   icon: '👤', label: 'Vue générale' },
-  { id: 'infos',     icon: '📋', label: 'Informations' },
-  { id: 'finances',  icon: '💰', label: 'Finances'     },
-  { id: 'documents', icon: '📁', label: 'Documents'    },
-  { id: 'presence',  icon: '📊', label: 'Présence'     },
+const DOCS = [
+  { icon: '📄', label: "Pièce d'identité", hint: 'CNI ou passeport · PDF / image',  color: RED    },
+  { icon: '📋', label: 'Contrat signé',    hint: 'Document PDF signé',               color: BLUE   },
+  { icon: '🎓', label: 'Diplôme(s)',        hint: 'PDF ou scans',                    color: PURPLE },
+  { icon: '📊', label: 'Attestations',      hint: 'Formations, habilitations',       color: GREEN  },
 ]
 
+function DocList() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {DOCS.map(d => (
+        <div key={d.label} style={{
+          display: 'flex', alignItems: 'center', gap: 12, padding: '9px 12px',
+          background: 'rgba(255,255,255,0.02)', border: `1px solid ${BORDER}`,
+          borderRadius: 10, cursor: 'pointer',
+        }}>
+          <div style={{ width: 34, height: 34, borderRadius: 8, background: `${d.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{d.icon}</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: T1 }}>{d.label}</p>
+            <p style={{ fontSize: 10, color: T3, marginTop: 2 }}>{d.hint}</p>
+          </div>
+          <span style={{ fontSize: 11, color: T3 }}>+ Ajouter</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Profil Employé ────────────────────────────────────────────────────────────
+
+function ProfilEmploye({ d }: { d: EmployeFull }) {
+  const brut = (d.salaire_base || 0) + (d.prime_logement || 0) + (d.prime_transport || 0) + (d.prime_risque || 0) + (d.prime_rendement || 0)
+  const since = d.date_recrutement
+    ? Math.floor((Date.now() - new Date(d.date_recrutement).getTime()) / (365.25 * 24 * 3600e3))
+    : null
+
+  return (
+    <>
+      {/* KPI chips */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+        <StatChip label="Salaire brut"  value={fmtN(brut)} sub="FCFA / mois"  color={G}      icon="💰" />
+        <StatChip label="Type contrat"  value={d.type_employe}                 color={PURPLE} icon="📋" />
+        <StatChip label="Ancienneté"    value={since != null ? `${since} an${since !== 1 ? 's' : ''}` : '—'} color={BLUE} icon="📅" />
+        <StatChip label="Statut"        value={d.statut}  color={d.statut === 'actif' ? GREEN : G} icon="✦" />
+      </div>
+
+      {/* Rémunération détaillée */}
+      <Card title="Rémunération" icon="💰">
+        <div>
+          {d.salaire_base    > 0 && <PayRow label="Salaire de base"  value={`${fmtN(d.salaire_base)} FCFA`}    color={T1}   mono />}
+          {d.prime_logement  > 0 && <PayRow label="Prime logement"   value={`+${fmtN(d.prime_logement)} FCFA`}  color={GREEN} mono />}
+          {d.prime_transport > 0 && <PayRow label="Prime transport"  value={`+${fmtN(d.prime_transport)} FCFA`} color={GREEN} mono />}
+          {d.prime_risque    > 0 && <PayRow label="Prime de risque"  value={`+${fmtN(d.prime_risque)} FCFA`}    color={GREEN} mono />}
+          {d.prime_rendement > 0 && <PayRow label="Prime rendement"  value={`+${fmtN(d.prime_rendement)} FCFA`} color={GREEN} mono />}
+          {d.taux_horaire && d.taux_horaire > 0 && <PayRow label="Taux horaire" value={`${fmtN(d.taux_horaire)} FCFA/h`} color={BLUE} mono />}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'linear-gradient(135deg,rgba(244,180,0,0.12),rgba(244,180,0,0.04))', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
+          <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE BRUT</span>
+          <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(brut)} FCFA</span>
+        </div>
+        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <InfoRow label="Mode paiement"  value={(d.mode_paiement || '').replace('_', ' ')} />
+          <InfoRow label="Banque"         value={d.banque} />
+          <InfoRow label="RIB"            value={d.rib} />
+          <InfoRow label="Mobile Money"   value={d.mobile_money_type ? `${d.mobile_money_type} — ${d.mobile_money_numero ?? ''}` : null} />
+          <InfoRow label="N° CNSS"        value={d.numero_cnss} />
+          <InfoRow label="N° Fiscal NIF"  value={d.numero_fiscal} />
+        </div>
+      </Card>
+
+      {/* Identité & Contrat */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <Card title="Identité civile" icon="👤">
+          <InfoRow label="Sexe"                  value={d.sexe} />
+          <InfoRow label="Date de naissance"     value={fmtD(d.date_naissance)} />
+          <InfoRow label="Nationalité"           value={d.nationalite} />
+          <InfoRow label="Situation mat."        value={d.situation_matrimoniale} />
+          <InfoRow label="Nb enfants"            value={d.nb_enfants} />
+          <InfoRow label="Adresse"               value={d.adresse} />
+          <InfoRow label="Ville"                 value={d.ville} />
+          <InfoRow label="Pays"                  value={d.pays} />
+        </Card>
+        <Card title="Contrat" icon="📋">
+          <InfoRow label="Poste"           value={d.poste} />
+          <InfoRow label="Département"     value={d.departement} />
+          <InfoRow label="Type employé"    value={d.type_employe} />
+          <InfoRow label="Date recrutement" value={fmtD(d.date_recrutement)} />
+          <InfoRow label="Début contrat"   value={fmtD(d.date_debut_contrat)} />
+          <InfoRow label="Fin contrat"     value={fmtD(d.date_fin_contrat)} />
+          <InfoRow label="Téléphone 2"     value={d.telephone2} />
+          <InfoRow label="Email pro"       value={d.email_pro} />
+        </Card>
+      </div>
+
+      {/* Documents */}
+      <Card title="Documents" icon="📁">
+        <DocList />
+      </Card>
+
+      {/* Timeline */}
+      <Card title="Historique" icon="⚡">
+        <TlItem color={GREEN}  icon="✓" text={`Dossier enregistré — ${d.prenom} ${d.nom}`} time={fmtD(d.created_at)} />
+        <TlItem color={G}      icon="💼" text={`${d.poste}${d.departement ? ` · ${d.departement}` : ''}`} time={fmtD(d.date_debut_contrat)} />
+        <TlItem color={BLUE}   icon="💰" text={`Base salariale configurée : ${fmtN(d.salaire_base)} FCFA`} time="Mensuel" />
+        <TlItem color={PURPLE} icon="📋" text={`Mode de paiement : ${(d.mode_paiement || '').replace('_', ' ')}`} time={d.banque ?? d.mobile_money_type ?? 'Non renseigné'} last />
+      </Card>
+    </>
+  )
+}
+
+// ── Profil Enseignant ─────────────────────────────────────────────────────────
+
+function ProfilEnseignant({ d }: { d: Enseignant }) {
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+        <StatChip label="Salaire mensuel" value={d.salaire_mensuel ? fmtN(d.salaire_mensuel) : '—'} sub="FCFA"    color={G}      icon="💰" />
+        <StatChip label="Taux horaire"    value={d.taux_horaire    ? fmtN(d.taux_horaire)    : '—'} sub="FCFA/h"  color={BLUE}   icon="⏱" />
+        <StatChip label="Matière"         value={d.matiere ?? '—'}                                   color={PURPLE} icon="📚" />
+        <StatChip label="Statut"          value={d.statut} color={d.statut === 'actif' ? GREEN : G}              icon="✦" />
+      </div>
+
+      <Card title="Rémunération & Paiement" icon="💰">
+        <div>
+          {d.salaire_mensuel != null && <PayRow label="Salaire mensuel" value={`${fmtN(d.salaire_mensuel)} FCFA`} color={G}    mono />}
+          {d.taux_horaire    != null && <PayRow label="Taux horaire"    value={`${fmtN(d.taux_horaire)} FCFA/h`}  color={BLUE} mono />}
+        </div>
+        {d.salaire_mensuel != null && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'linear-gradient(135deg,rgba(244,180,0,0.12),rgba(244,180,0,0.04))', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
+            <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>TOTAL MENSUEL</span>
+            <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire_mensuel)} FCFA</span>
+          </div>
+        )}
+        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <InfoRow label="Banque"       value={d.banque} />
+          <InfoRow label="RIB"          value={d.rib} />
+          <InfoRow label="Mobile Money" value={d.mobile_money_type} />
+          <InfoRow label="Numéro MM"    value={d.mobile_money_numero} />
+          <InfoRow label="N° CNSS"      value={d.numero_cnss} />
+        </div>
+      </Card>
+
+      <Card title="Informations" icon="👤">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+          <InfoRow label="Prénom"     value={d.prenom} />
+          <InfoRow label="Nom"        value={d.nom} />
+          <InfoRow label="Téléphone"  value={d.telephone} />
+          <InfoRow label="Email"      value={d.email} />
+          <InfoRow label="Matière"    value={d.matiere} />
+          <InfoRow label="Statut"     value={d.statut} />
+        </div>
+      </Card>
+
+      <Card title="Documents" icon="📁">
+        <DocList />
+      </Card>
+
+      <Card title="Historique" icon="⚡">
+        <TlItem color={GREEN} icon="✓" text={`Formateur ${d.prenom} ${d.nom} enregistré`} time={fmtD(d.created_at)} />
+        <TlItem color={G}     icon="📚" text={`Matière : ${d.matiere ?? 'Non définie'}`}   time="Affectation actuelle" />
+        <TlItem color={BLUE}  icon="💳" text={`Rémunération configurée`} time={d.banque ? `Banque : ${d.banque}` : d.mobile_money_type ? `MM : ${d.mobile_money_type}` : 'Mode de paiement non renseigné'} last />
+      </Card>
+    </>
+  )
+}
+
+// ── Profil Étudiant ───────────────────────────────────────────────────────────
+
+function ProfilEtudiant({ d }: { d: Etudiant }) {
+  const statusColor = d.statut === 'actif' ? GREEN : d.statut === 'diplome' ? PURPLE : RED
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+        <StatChip label="Niveau"      value={d.niveau}         color={BLUE}   icon="🏫" />
+        <StatChip label="Classe"      value={d.classe ?? '—'}  color={G}      icon="📖" />
+        <StatChip label="Année"       value={d.annee_scolaire} color={PURPLE} icon="📅" />
+        <StatChip label="Statut"      value={d.statut}         color={statusColor} icon="✦" />
+      </div>
+
+      <Card title="Identité" icon="👤">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+          <InfoRow label="Prénom"            value={d.prenom} />
+          <InfoRow label="Nom"               value={d.nom} />
+          <InfoRow label="N° étudiant"       value={d.numero_id} />
+          <InfoRow label="Date de naissance" value={fmtD(d.date_naissance)} />
+          <InfoRow label="Lieu de naissance" value={d.lieu_naissance} />
+          <InfoRow label="Nationalité"       value={d.nationalite} />
+          <InfoRow label="Adresse"           value={d.adresse} />
+          <InfoRow label="Niveau"            value={d.niveau} />
+          <InfoRow label="Classe"            value={d.classe} />
+          <InfoRow label="Année scolaire"    value={d.annee_scolaire} />
+        </div>
+      </Card>
+
+      <Card title="Parents & Tuteur" icon="👨‍👩‍👦">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+          <InfoRow label="Père"              value={d.nom_pere} />
+          <InfoRow label="Mère"              value={d.nom_mere} />
+          <InfoRow label="Téléphone parent"  value={d.tel_parent} />
+          <InfoRow label="Email parent"      value={d.email_parent} />
+          <InfoRow label="Profession"        value={d.profession_parent} />
+          <InfoRow label="Tuteur"            value={d.nom_tuteur} />
+          <InfoRow label="Tél. tuteur"       value={d.tel_tuteur} />
+          <InfoRow label="Lien tuteur"       value={d.lien_tuteur} />
+        </div>
+      </Card>
+
+      <Card title="Documents" icon="📁">
+        <DocList />
+      </Card>
+
+      <Card title="Historique" icon="⚡">
+        <TlItem color={GREEN}  icon="🎓" text={`Inscription : ${d.prenom} ${d.nom}`} time={fmtD(d.created_at)} />
+        <TlItem color={G}      icon="🏫" text={`Classe : ${d.classe ?? 'Non affectée'} — ${d.niveau}`} time={d.annee_scolaire} />
+        <TlItem color={BLUE}   icon="👨‍👩‍👦" text={`Parent : ${[d.nom_pere, d.nom_mere].filter(Boolean).join(' / ') || 'Non renseigné'}`} time={d.tel_parent ?? '—'} last />
+      </Card>
+    </>
+  )
+}
+
+// ── Profil Staff ──────────────────────────────────────────────────────────────
+
+function ProfilStaff({ d }: { d: StaffFull }) {
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+        <StatChip label="Salaire mensuel" value={fmtN(d.salaire)} sub="FCFA / mois"  color={G}      icon="💰" />
+        <StatChip label="Poste"           value={d.poste}                             color={PURPLE} icon="💼" />
+        <StatChip label="Statut"          value={d.statut} color={d.statut === 'actif' ? GREEN : G} icon="✦" />
+      </div>
+
+      <Card title="Informations & Contact" icon="👤">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+          <InfoRow label="Prénom"     value={d.prenom} />
+          <InfoRow label="Nom"        value={d.nom} />
+          <InfoRow label="Poste"      value={d.poste} />
+          <InfoRow label="Téléphone"  value={d.telephone} />
+          <InfoRow label="Email"      value={d.email} />
+          <InfoRow label="N° CNSS"    value={d.numero_cnss} />
+        </div>
+      </Card>
+
+      <Card title="Paiement" icon="💳">
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'linear-gradient(135deg,rgba(244,180,0,0.12),rgba(244,180,0,0.04))', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginBottom: 12 }}>
+          <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE MENSUEL</span>
+          <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire)} FCFA</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+          <InfoRow label="Banque"       value={d.banque} />
+          <InfoRow label="RIB"          value={d.rib} />
+          <InfoRow label="Mobile Money" value={d.mobile_money_type} />
+          <InfoRow label="Numéro MM"    value={d.mobile_money_numero} />
+        </div>
+      </Card>
+
+      <Card title="Documents" icon="📁">
+        <DocList />
+      </Card>
+
+      <Card title="Historique" icon="⚡">
+        <TlItem color={GREEN} icon="✓" text={`Agent ${d.prenom} ${d.nom} enregistré`} time={fmtD(d.created_at)} />
+        <TlItem color={G}     icon="💼" text={`Poste : ${d.poste}`} time="Actuel" last />
+      </Card>
+    </>
+  )
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
 const TYPE_LABEL: Record<ProfilPerson['type'], string> = {
-  employe:    'Employé',
-  enseignant: 'Formateur',
-  etudiant:   'Étudiant',
-  staff:      'Staff',
+  employe: 'Employé', enseignant: 'Formateur', etudiant: 'Étudiant', staff: 'Agent',
 }
 
 export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClose: () => void }) {
-  const [tab, setTab] = useState<TabId>('general')
-
+  // Extract header info per type
   const { nom, prenom, roleTag, statusColor, phone, email } = (() => {
     switch (person.type) {
       case 'employe': {
         const d = person.data
-        return {
-          nom: d.nom, prenom: d.prenom,
-          roleTag: `${d.poste}${d.departement ? ` · ${d.departement}` : ''}`,
-          statusColor: d.statut === 'actif' ? C.green : C.gold,
-          phone: d.telephone, email: d.email_pro,
-        }
+        return { nom: d.nom, prenom: d.prenom, roleTag: `${d.poste}${d.departement ? ` · ${d.departement}` : ''}`, statusColor: d.statut === 'actif' ? GREEN : G, phone: d.telephone, email: d.email_pro }
       }
       case 'enseignant': {
         const d = person.data
-        return {
-          nom: d.nom, prenom: d.prenom,
-          roleTag: d.matiere ?? 'Formateur',
-          statusColor: d.statut === 'actif' ? C.green : C.gold,
-          phone: d.telephone, email: d.email,
-        }
+        return { nom: d.nom, prenom: d.prenom, roleTag: d.matiere ?? 'Formateur', statusColor: d.statut === 'actif' ? GREEN : G, phone: d.telephone, email: d.email }
       }
       case 'etudiant': {
         const d = person.data
-        return {
-          nom: d.nom, prenom: d.prenom,
-          roleTag: `${d.niveau}${d.classe ? ` · ${d.classe}` : ''}`,
-          statusColor: d.statut === 'actif' ? C.green : C.red,
-          phone: d.tel_parent, email: d.email_parent,
-        }
+        return { nom: d.nom, prenom: d.prenom, roleTag: `${d.niveau}${d.classe ? ` · ${d.classe}` : ''}`, statusColor: d.statut === 'actif' ? GREEN : RED, phone: d.tel_parent, email: d.email_parent }
       }
       case 'staff': {
         const d = person.data
-        return {
-          nom: d.nom, prenom: d.prenom,
-          roleTag: d.poste,
-          statusColor: d.statut === 'actif' ? C.green : C.gold,
-          phone: d.telephone, email: d.email,
-        }
+        return { nom: d.nom, prenom: d.prenom, roleTag: d.poste, statusColor: d.statut === 'actif' ? GREEN : G, phone: d.telephone, email: d.email }
       }
     }
   })()
@@ -547,129 +439,99 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)' }}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(5px)' }}
       />
 
-      {/* Panel */}
+      {/* Drawer panel */}
       <motion.div
         initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         style={{
-          position: 'relative', width: 680, maxWidth: '96vw', height: '100%',
-          background: C.bg, borderLeft: `1px solid ${C.border}`,
-          display: 'flex', flexDirection: 'column',
+          position: 'relative', width: 720, maxWidth: '96vw', height: '100%',
+          background: BG, borderLeft: `1px solid ${BORDER}`,
+          display: 'flex', flexDirection: 'column', overflowY: 'auto',
           fontFamily: "'Sora',system-ui,-apple-system,sans-serif",
-          overflowY: 'auto',
         }}>
 
-        {/* Gold accent line */}
-        <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(244,180,0,0.45),transparent)', flexShrink: 0 }} />
+        {/* Gold accent line top */}
+        <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(244,180,0,0.5),transparent)', flexShrink: 0 }} />
 
-        {/* Sticky header */}
-        <div style={{ padding: '18px 22px 0', flexShrink: 0, background: C.bg, position: 'sticky', top: 0, zIndex: 2 }}>
+        {/* ── Profile header ─────────────────────────────────────────────── */}
+        <div style={{
+          padding: '22px 26px 20px',
+          background: BG, flexShrink: 0,
+          borderBottom: `1px solid ${BORDER}`,
+          position: 'relative', overflow: 'hidden',
+        }}>
+          {/* Radial glow */}
+          <div style={{ position: 'absolute', top: -60, right: 80, width: 220, height: 220, background: 'radial-gradient(circle,rgba(244,180,0,0.06) 0%,transparent 70%)', pointerEvents: 'none' }} />
 
-          {/* Type badge + status + close */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+          {/* Close + type badge */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{
-                fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-                background: C.goldDim, border: `1px solid ${C.goldBdr}`, color: C.gold, letterSpacing: 0.5,
-              }}>
-                {TYPE_LABEL[person.type]}
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: GOLD_DIM, border: `1px solid ${GOLD_BDR}`, color: G, letterSpacing: 0.6 }}>
+                {TYPE_LABEL[person.type].toUpperCase()}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: statusColor }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor, display: 'inline-block' }} />
                 Actif
               </span>
             </div>
-            <button onClick={onClose} style={{
-              width: 30, height: 30, borderRadius: 8, cursor: 'pointer',
-              background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`,
-              color: C.t2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
-            }}>✕</button>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: `1px solid ${BORDER}`, color: T2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
+              ✕
+            </button>
           </div>
 
-          {/* Profile header card */}
-          <div style={{
-            background: C.card, border: `1px solid ${C.border}`, borderRadius: 16,
-            padding: '18px 20px', display: 'flex', gap: 18, alignItems: 'center',
-            marginBottom: 16, position: 'relative', overflow: 'hidden',
-          }}>
-            {/* Gold glow */}
-            <div style={{ position: 'absolute', top: -50, right: 60, width: 160, height: 160, background: 'radial-gradient(circle,rgba(244,180,0,0.05) 0%,transparent 70%)', pointerEvents: 'none' }} />
-
-            {/* Avatar */}
+          {/* Avatar + identity */}
+          <div style={{ display: 'flex', gap: 22, alignItems: 'center' }}>
             <div style={{ position: 'relative', flexShrink: 0 }}>
-              <AvatarCircle name={prenom} size={68} />
-              <div style={{ position: 'absolute', bottom: 2, right: 2, width: 13, height: 13, borderRadius: '50%', background: statusColor, border: `2.5px solid ${C.bg}` }} />
+              <Avatar name={prenom} size={78} />
+              <div style={{ position: 'absolute', bottom: 3, right: 3, width: 15, height: 15, borderRadius: '50%', background: statusColor, border: `3px solid ${BG}` }} />
             </div>
 
-            {/* Identity */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: C.t1, letterSpacing: -0.3, marginBottom: 5, lineHeight: 1.2 }}>
-                {prenom} <span style={{ color: C.gold }}>{nom.toUpperCase()}</span>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: T1, letterSpacing: -0.4, lineHeight: 1.1, marginBottom: 8 }}>
+                {prenom} <span style={{ color: G }}>{nom.toUpperCase()}</span>
               </h2>
-              <div style={{ marginBottom: 10 }}>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  background: C.goldDim, border: `1px solid ${C.goldBdr}`,
-                  color: C.gold, fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-                }}>
+              <div style={{ marginBottom: 12 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: GOLD_DIM, border: `1px solid ${GOLD_BDR}`, color: G, fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>
                   {roleTag}
                 </span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
+              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                 {phone && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: C.t2 }}>
-                    <span style={{ width: 20, height: 20, borderRadius: 5, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, flexShrink: 0 }}>📱</span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{phone}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: T2 }}>
+                    <span style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>📱</span>
+                    {phone}
                   </div>
                 )}
                 {email && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: C.t2 }}>
-                    <span style={{ width: 20, height: 20, borderRadius: 5, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, flexShrink: 0 }}>📧</span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{email}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: T2 }}>
+                    <span style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>📧</span>
+                    {email}
                   </div>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Tab bar */}
-          <div style={{
-            display: 'flex', gap: 3,
-            background: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}`,
-            borderRadius: 10, padding: 3, marginBottom: 18,
-          }}>
-            {TABS.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{
-                flex: 1, padding: '7px 4px', borderRadius: 7,
-                fontSize: 10.5, fontWeight: 600, border: 'none', cursor: 'pointer',
-                transition: 'all 0.2s',
-                background: tab === t.id ? C.gold : 'transparent',
-                color: tab === t.id ? '#000' : C.t2,
-              }}>
-                {t.icon} {t.label}
+            {/* Modifier button */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
+              <button style={{ padding: '8px 16px', borderRadius: 9, background: 'linear-gradient(135deg,#F4B400,#E07800)', color: '#000', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(244,180,0,0.25)' }}>
+                ✏️ Modifier
               </button>
-            ))}
+              <button style={{ padding: '7px 16px', borderRadius: 9, background: CARD, color: T2, fontWeight: 600, fontSize: 12, border: `1px solid ${BORDER}`, cursor: 'pointer' }}>
+                📥 Exporter
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Scrollable content */}
-        <div style={{ flex: 1, padding: '0 22px 28px' }}>
-          <AnimatePresence mode="wait">
-            <motion.div key={tab}
-              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.14 }}>
-
-              {tab === 'general'   && <TabGeneral  person={person} />}
-              {tab === 'infos'     && <TabInfos    person={person} />}
-              {tab === 'finances'  && <TabFinances person={person} />}
-              {tab === 'documents' && <TabDocuments />}
-              {tab === 'presence'  && <TabPresence />}
-
-            </motion.div>
-          </AnimatePresence>
+        {/* ── Scrollable content ──────────────────────────────────────────── */}
+        <div style={{ flex: 1, padding: '22px 26px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {person.type === 'employe'    && <ProfilEmploye   d={person.data} />}
+          {person.type === 'enseignant' && <ProfilEnseignant d={person.data} />}
+          {person.type === 'etudiant'   && <ProfilEtudiant   d={person.data} />}
+          {person.type === 'staff'      && <ProfilStaff      d={person.data} />}
         </div>
 
       </motion.div>
