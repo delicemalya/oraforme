@@ -979,115 +979,248 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
 function buildBulletinHTML(opts: {
   employe: string; poste: string; cnss: string; periode: string
   salaire_base: number; primes: number; retenues: number; net: number
+  prime_logement?: number; prime_transport?: number
+  prime_risque?: number; prime_rendement?: number
   nomEcole: string; logoUrl: string
+  mode_paiement?: string; date_recrutement?: string
 }) {
-  const { employe, poste, cnss, periode, salaire_base, primes, retenues, net, nomEcole, logoUrl } = opts
-  const fmtN = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
+  const {
+    employe, poste, cnss, periode, salaire_base, primes, retenues, net,
+    prime_logement = 0, prime_transport = 0, prime_risque = 0, prime_rendement = 0,
+    nomEcole, logoUrl, mode_paiement = 'virement', date_recrutement,
+  } = opts
+  const fmtN  = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
   const brut  = salaire_base + primes
-  const cnssS = retenues > 0 ? Math.round(retenues * 0.55) : 0
-  const impot = retenues > 0 ? retenues - cnssS : 0
+  const cnss_sal   = Math.round(brut * 0.04)
+  const irpp       = retenues - cnss_sal > 0 ? retenues - cnss_sal : 0
+  const cnss_pf    = Math.round(brut * 0.08)
+  const cnss_at    = Math.round(brut * 0.1228)
+  const tus        = Math.round(brut * 0.075)
+  const tol        = 1000
+  const pat_total  = cnss_pf + cnss_at + tus + tol
+  const today      = new Date().toLocaleDateString('fr-FR')
+  const modeLabel  = mode_paiement.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+
+  let rowIdx = 2
+  const primeRows = [
+    prime_logement  > 0 ? `<tr><td>${String(rowIdx++).padStart(2,'0')}</td><td>Prime de logement</td><td>—</td><td class="gain">${fmtN(prime_logement)}</td><td>—</td></tr>`  : '',
+    prime_transport > 0 ? `<tr><td>${String(rowIdx++).padStart(2,'0')}</td><td>Prime de transport</td><td>Forfait mensuel</td><td class="gain">${fmtN(prime_transport)}</td><td>—</td></tr>` : '',
+    prime_risque    > 0 ? `<tr><td>${String(rowIdx++).padStart(2,'0')}</td><td>Prime de risque</td><td>—</td><td class="gain">${fmtN(prime_risque)}</td><td>—</td></tr>`    : '',
+    prime_rendement > 0 ? `<tr><td>${String(rowIdx++).padStart(2,'0')}</td><td>Prime de rendement</td><td>—</td><td class="gain">${fmtN(prime_rendement)}</td><td>—</td></tr>` : '',
+  ].join('')
+  const cnssRowN = String(rowIdx++).padStart(2,'0')
 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"/>
-<title>Bulletin — ${employe} — ${periode}</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulletin de Paie — ${employe} — ${periode}</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Barlow Condensed',sans-serif;color:#2B2B2B;background:#fff;font-size:13px}
-.page{width:210mm;min-height:280mm;margin:0 auto;padding:10mm 12mm}
-.hdr{background:#2B2B2B;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:4px 4px 0 0}
-.hdr-l{display:flex;align-items:center;gap:12px}
-.logo{width:54px;height:54px;background:rgba(255,255,255,.1);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:9px;color:rgba(255,255,255,.4);text-align:center;line-height:1.2;padding:4px}
-.logo img{width:100%;height:100%;object-fit:contain}
-.co-name{font-size:18px;font-weight:800;letter-spacing:.5px}
-.co-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
-.hdr-r{text-align:right}
-.bul-title{font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.bul-period{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px;letter-spacing:1px}
-.band{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #ddd;border-top:none}
-.band-cell{padding:8px 12px;border-right:1px solid #ddd}.band-cell:last-child{border-right:none}
-.bc-label{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:2px}
-.bc-value{font-size:13px;font-weight:700}
-table{width:100%;border-collapse:collapse;margin-top:14px}
-thead tr{background:#2B2B2B;color:#fff}
-thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;text-align:left}
-thead th:last-child{text-align:right}
-.sec-row td{background:#F5F5F5;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#777;padding:5px 12px;border-top:2px solid #E0E0E0}
-tbody tr td{padding:7px 12px;border-bottom:1px solid #F0F0F0}
-tbody tr td:last-child{text-align:right;font-weight:600}
-.neg{color:#C53030}.pos{color:#276749}
-.subtotal td{font-weight:700;background:#FAFAFA;border-top:1px solid #DDD}
-.totals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.tot-box{border:1px solid #ddd;padding:10px 14px;border-radius:3px}
-.tot-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888}
-.tot-val{font-size:20px;font-weight:800;margin-top:2px}
-.net-box{border:2px solid #F16A1B;padding:12px 18px;margin-top:10px;border-radius:3px;background:#FFF5EF;display:flex;align-items:center;justify-content:space-between}
-.net-lbl{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#F16A1B}
-.net-val{font-size:28px;font-weight:800;color:#F16A1B}
-.ftr{margin-top:28px}
-.ftr-date{font-size:11px;color:#666;margin-bottom:22px}
-.sigs{display:grid;grid-template-columns:1fr 1fr;gap:50px}
-.sig{text-align:center}
-.sig-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #2B2B2B;padding-bottom:3px;margin-bottom:44px}
-.sig-name{font-size:10px;color:#666}
-@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.page{width:100%;padding:6mm}}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--orange:#F16A1B;--dark:#2B2B2B;--mid:#3D3D3D;--light:#F5F5F5;--white:#FFFFFF;--stripe:#F9E8DA}
+  body{background:#D0D0D0;font-family:'Barlow',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:32px 16px}
+  .page{width:794px;background:var(--white);box-shadow:0 8px 40px rgba(0,0,0,0.28);overflow:hidden}
+  .header{display:grid;grid-template-columns:260px 1fr;min-height:130px}
+  .header-left{background:var(--dark);padding:28px 28px 22px;display:flex;flex-direction:column;justify-content:center}
+  .doc-type{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;color:var(--white);letter-spacing:1px;line-height:1}
+  .doc-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--orange);letter-spacing:3px;margin-top:4px;text-transform:uppercase}
+  .header-meta{margin-top:14px;display:flex;flex-direction:column;gap:3px}
+  .header-meta span{font-size:10.5px;color:#AAAAAA;font-weight:400}
+  .header-meta span b{color:var(--white);font-weight:600}
+  .header-right{background:var(--white);padding:22px 28px;display:flex;justify-content:space-between;align-items:flex-start}
+  .company-contact{display:flex;flex-direction:column;gap:4px}
+  .company-contact .item{display:flex;align-items:center;gap:8px;font-size:10.5px;color:#555}
+  .company-contact .item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot-orange{background:var(--orange)}.dot-dark{background:var(--dark)}.dot-mid{background:#888}
+  .company-brand{text-align:right}
+  .logo-box{width:46px;height:46px;background:var(--orange);display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px;position:relative;overflow:hidden}
+  .logo-box::after{content:'';position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:var(--dark)}
+  .logo-inner{width:24px;height:24px;border:3px solid var(--white);position:relative;z-index:1}
+  .brand-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;color:var(--dark);letter-spacing:1px;display:block}
+  .brand-tag{font-size:9px;color:#999;letter-spacing:2px;text-transform:uppercase}
+  .employee-band{display:grid;grid-template-columns:260px 1fr}
+  .emp-label{background:var(--orange);padding:9px 28px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--white);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center}
+  .emp-info{background:var(--dark);padding:9px 28px;display:flex;gap:32px;align-items:center;flex-wrap:wrap}
+  .emp-field{display:flex;flex-direction:column}
+  .emp-field label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1.5px}
+  .emp-field span{font-size:12px;color:var(--white);font-weight:600;margin-top:1px}
+  .name-row{display:grid;grid-template-columns:260px 1fr}
+  .name-left{background:var(--light);padding:18px 28px;border-right:3px solid var(--orange)}
+  .name-left .label-sm{font-size:9px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:2px}
+  .name-left .name-big{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--dark);line-height:1.1;margin-top:4px}
+  .name-left .name-sub{font-size:11px;color:#666;margin-top:2px}
+  .name-right{background:var(--white);padding:18px 28px;display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+  .info-chip{display:flex;flex-direction:column}
+  .info-chip label{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:1.5px}
+  .info-chip span{font-size:13px;font-weight:600;color:var(--dark);margin-top:2px}
+  table{width:100%;border-collapse:collapse}
+  thead tr{background:var(--dark)}
+  thead th{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:700;color:var(--white);letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;text-align:left}
+  thead th:nth-child(3),thead th:nth-child(4),thead th:nth-child(5){text-align:right}
+  thead th:nth-child(3){background:var(--orange)}
+  tbody tr:nth-child(odd){background:var(--white)}
+  tbody tr:nth-child(even){background:var(--stripe)}
+  tbody tr.section-header td{background:var(--mid);color:var(--orange);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 14px}
+  tbody td{font-size:11.5px;color:var(--dark);padding:8px 14px}
+  tbody td:nth-child(3),tbody td:nth-child(4),tbody td:nth-child(5){text-align:right;font-weight:500;font-family:'Barlow Condensed',sans-serif;font-size:13px}
+  td.gain{color:#1a7a3c;font-weight:700}
+  td.ret{color:#b83c2a;font-weight:700}
+  td.pat{color:#555;font-weight:600}
+  tr.brut td{background:var(--dark)!important;color:var(--white)!important;font-weight:700;border-top:2px solid var(--orange)}
+  tr.brut td:nth-child(3){background:var(--orange)!important;color:var(--white)!important}
+  .totals-area{display:grid;grid-template-columns:1fr 220px;border-top:3px solid var(--orange)}
+  .payment-info{background:var(--dark);padding:22px 28px}
+  .payment-info h4{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+  .payment-info p{font-size:10.5px;color:#ccc;line-height:1.7}
+  .payment-info p b{color:var(--white)}
+  .totals-box{background:var(--light)}
+  .total-row{display:flex;justify-content:space-between;align-items:center;padding:9px 20px;border-bottom:1px solid #e0e0e0;font-size:11.5px;color:var(--dark)}
+  .total-row .lbl{color:#666;font-size:10.5px;text-transform:uppercase;letter-spacing:1px}
+  .total-row .val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700}
+  .total-row.gain-row .val{color:#1a7a3c}
+  .total-row.ret-row .val{color:#b83c2a}
+  .net-row{background:var(--orange);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px}
+  .net-row .net-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:2px;text-transform:uppercase}
+  .net-row .net-value{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;color:var(--white);letter-spacing:1px}
+  .net-row .net-currency{font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px}
+  .footer-band{display:grid;grid-template-columns:260px 1fr}
+  .footer-left{background:var(--dark);padding:18px 28px}
+  .footer-left h4{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+  .footer-left p{font-size:9.5px;color:#aaa;line-height:1.7}
+  .footer-right{background:var(--white);padding:18px 28px;display:flex;justify-content:space-between;align-items:flex-end}
+  .sig-block{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .sig-line{width:130px;height:1px;background:var(--dark);margin-top:28px}
+  .sig-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1.5px}
+  .thank-you{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase}
+  @media print{body{background:white;padding:0}.page{box-shadow:none;width:100%}print-color-adjust:exact;-webkit-print-color-adjust:exact}
 </style>
 </head>
 <body>
 <div class="page">
-<div class="hdr">
-  <div class="hdr-l">
-    <div class="logo">${logoUrl ? `<img src="${logoUrl}" alt="logo"/>` : 'LOGO'}</div>
-    <div><div class="co-name">${nomEcole}</div><div class="co-sub">Bulletin de rémunération officiel</div></div>
+
+  <div class="header">
+    <div class="header-left">
+      <div class="doc-type">BULLETIN</div>
+      <div class="doc-sub">DE SALAIRE</div>
+      <div class="header-meta">
+        <span>Période : <b>${periode}</b></span>
+        <span>Payé le : <b>${today}</b></span>
+        <span>Mode : <b>${modeLabel}</b></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="company-contact">
+        <div class="item"><span class="dot dot-orange"></span> ${nomEcole}</div>
+        <div class="item"><span class="dot dot-dark"></span> Bulletin officiel de rémunération</div>
+        <div class="item"><span class="dot dot-mid"></span> Émis le ${today}</div>
+      </div>
+      <div class="company-brand">
+        ${logoUrl
+          ? `<div class="logo-box" style="background:transparent;border:2px solid var(--orange);"><img src="${logoUrl}" style="width:100%;height:100%;object-fit:contain;position:relative;z-index:2;" /></div><br>`
+          : `<div class="logo-box"><div class="logo-inner"></div></div><br>`}
+        <span class="brand-name">${nomEcole}</span>
+        <span class="brand-tag">Établissement d'enseignement</span>
+      </div>
+    </div>
   </div>
-  <div class="hdr-r">
-    <div class="bul-title">Bulletin de Salaire</div>
-    <div class="bul-period">${periode}</div>
+
+  <div class="employee-band">
+    <div class="emp-label">Informations Employé</div>
+    <div class="emp-info">
+      <div class="emp-field"><label>Emploi / Poste</label><span>${poste}</span></div>
+      <div class="emp-field"><label>N° CNSS</label><span>${cnss || '—'}</span></div>
+      <div class="emp-field"><label>Période</label><span>${periode}</span></div>
+      <div class="emp-field"><label>Date d'émission</label><span>${today}</span></div>
+    </div>
   </div>
-</div>
-<div class="band">
-  <div class="band-cell"><div class="bc-label">Nom complet</div><div class="bc-value">${employe}</div></div>
-  <div class="band-cell"><div class="bc-label">Poste</div><div class="bc-value">${poste || '—'}</div></div>
-  <div class="band-cell"><div class="bc-label">N° CNSS</div><div class="bc-value">${cnss || '—'}</div></div>
-</div>
-<div class="band" style="border-top:none">
-  <div class="band-cell"><div class="bc-label">Période</div><div class="bc-value">${periode}</div></div>
-  <div class="band-cell"><div class="bc-label">Date d'émission</div><div class="bc-value">${new Date().toLocaleDateString('fr-FR')}</div></div>
-  <div class="band-cell"><div class="bc-label">Établissement</div><div class="bc-value">${nomEcole}</div></div>
-</div>
-<table>
-  <thead><tr><th>Désignation</th><th>Montant (FCFA)</th></tr></thead>
-  <tbody>
-    <tr class="sec-row"><td colspan="2">Rémunérations</td></tr>
-    <tr><td>Salaire de base</td><td class="pos">${fmtN(salaire_base)}</td></tr>
-    ${primes > 0 ? `<tr><td>Primes et indemnités</td><td class="pos">${fmtN(primes)}</td></tr>` : ''}
-    <tr class="subtotal"><td>Salaire brut</td><td>${fmtN(brut)}</td></tr>
-    ${retenues > 0 ? `
-    <tr class="sec-row"><td colspan="2">Cotisations sociales</td></tr>
-    <tr><td>CNSS — part salarié (8%)</td><td class="neg">- ${fmtN(cnssS)}</td></tr>
-    <tr class="sec-row"><td colspan="2">Cotisations fiscales</td></tr>
-    <tr><td>Impôt sur le revenu (IRPP)</td><td class="neg">- ${fmtN(impot)}</td></tr>
-    <tr class="subtotal"><td>Total des retenues</td><td class="neg">- ${fmtN(retenues)}</td></tr>
-    ` : ''}
-  </tbody>
-</table>
-<div class="totals">
-  <div class="tot-box"><div class="tot-lbl">Salaire brut</div><div class="tot-val">${fmtN(brut)} <span style="font-size:12px;font-weight:600">FCFA</span></div></div>
-  <div class="tot-box"><div class="tot-lbl">Total retenues</div><div class="tot-val" style="color:#C53030">- ${fmtN(retenues)} <span style="font-size:12px;font-weight:600">FCFA</span></div></div>
-</div>
-<div class="net-box">
-  <div class="net-lbl">Net à Payer</div>
-  <div class="net-val">${fmtN(net)} <span style="font-size:14px;font-weight:700">FCFA</span></div>
-</div>
-<div class="ftr">
-  <div class="ftr-date">Fait à _________________________, le ${new Date().toLocaleDateString('fr-FR')}</div>
-  <div class="sigs">
-    <div class="sig"><div class="sig-title">Signature de l'employeur</div><div class="sig-name">Cachet &amp; signature</div></div>
-    <div class="sig"><div class="sig-title">Signature de l'employé(e)</div><div class="sig-name">${employe}</div></div>
+
+  <div class="name-row">
+    <div class="name-left">
+      <div class="label-sm">Nom &amp; Prénom</div>
+      <div class="name-big">${employe}</div>
+      <div class="name-sub">${poste} · ${nomEcole}</div>
+    </div>
+    <div class="name-right">
+      <div class="info-chip"><label>N° CNSS</label><span>${cnss || '—'}</span></div>
+      <div class="info-chip"><label>Date de recrutement</label><span>${date_recrutement || '—'}</span></div>
+      <div class="info-chip"><label>Mode de règlement</label><span>${modeLabel}</span></div>
+      <div class="info-chip"><label>Salaire brut</label><span>${fmtN(brut)} XAF</span></div>
+    </div>
   </div>
-</div>
+
+  <div class="table-section">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34px">N°</th>
+          <th>Libellé</th>
+          <th style="width:120px">Base / Taux</th>
+          <th style="width:120px">Gains (XAF)</th>
+          <th style="width:130px">Retenues (XAF)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="section-header"><td colspan="5">Rémunérations</td></tr>
+        <tr><td>01</td><td>Salaire de base</td><td>Mensuel</td><td class="gain">${fmtN(salaire_base)}</td><td>—</td></tr>
+        ${primeRows}
+        <tr class="brut">
+          <td colspan="3" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">Brut Imposable</td>
+          <td style="font-size:15px;color:var(--white);font-weight:800;text-align:right;">${fmtN(brut)}</td>
+          <td style="text-align:right;">—</td>
+        </tr>
+        <tr class="section-header"><td colspan="5">Cotisations sociales</td></tr>
+        <tr><td>${cnssRowN}</td><td>Retenue CNSS salariale</td><td style="text-align:right">${fmtN(brut)} × 4 %</td><td>—</td><td class="ret">${fmtN(cnss_sal)}</td></tr>
+        <tr><td></td><td>CNSS patronale — Prestations familiales</td><td style="text-align:right">${fmtN(brut)} × 8 %</td><td>—</td><td class="pat">${fmtN(cnss_pf)} *</td></tr>
+        <tr><td></td><td>CNSS patronale — Accidents du travail</td><td style="text-align:right">${fmtN(brut)} × 12,28 %</td><td>—</td><td class="pat">${fmtN(cnss_at)} *</td></tr>
+        <tr class="section-header"><td colspan="5">Cotisations fiscales</td></tr>
+        <tr><td></td><td>IRPP (Impôt sur le Revenu des Personnes Physiques)</td><td style="text-align:right">Barème progressif</td><td>—</td><td class="ret">${fmtN(irpp)}</td></tr>
+        <tr><td></td><td>TUS (Taxe Unique sur les Salaires)</td><td style="text-align:right">${fmtN(brut)} × 7,5 %</td><td>—</td><td class="pat">${fmtN(tus)} *</td></tr>
+        <tr><td></td><td>TOL à usage d'habitation</td><td style="text-align:right">Forfait</td><td>—</td><td class="pat">${fmtN(tol)} *</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="totals-area">
+    <div class="payment-info">
+      <h4>Récapitulatif</h4>
+      <p>
+        <b>Total brut mensuel :</b> ${fmtN(brut)} XAF<br>
+        <b>Salaire de base :</b> ${fmtN(salaire_base)} XAF<br>
+        <b>Total primes :</b> ${fmtN(primes)} XAF<br><br>
+        <b>Retenues salariales :</b> ${fmtN(retenues)} XAF<br>
+        <b>Charges patronales :</b> ${fmtN(pat_total)} XAF<br><br>
+        <b>Mode de règlement :</b> ${modeLabel}<br>
+        <span style="font-size:9px;color:#888;">* Charges à la charge de l'employeur.</span>
+      </p>
+    </div>
+    <div class="totals-box">
+      <div class="total-row gain-row"><span class="lbl">Total gains</span><span class="val">${fmtN(brut)}</span></div>
+      <div class="total-row ret-row"><span class="lbl">Retenues salariales</span><span class="val">${fmtN(retenues)}</span></div>
+      <div class="total-row"><span class="lbl">Charges patronales</span><span class="val" style="color:#555;">${fmtN(pat_total)}</span></div>
+      <div class="net-row">
+        <div class="net-label">Net à Payer</div>
+        <div class="net-value">${fmtN(net)}</div>
+        <div class="net-currency">Francs CFA (XAF)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-band">
+    <div class="footer-left">
+      <h4>Mentions légales</h4>
+      <p>Ce bulletin de paie est à conserver<br>sans limitation de durée.<br><br>En cas de rupture du contrat, la remise<br>de ce bulletin est obligatoire.</p>
+    </div>
+    <div class="footer-right">
+      <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Signature de l'employé</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div class="thank-you">Merci pour votre travail</div>
+      </div>
+      <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Signature de l'employeur</div></div>
+    </div>
+  </div>
+
 </div>
 </body>
 </html>`
@@ -1261,6 +1394,11 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       employe: nom, poste: a?.poste ?? '—', cnss: a?.numero_cnss ?? '',
       periode: `${MOIS[p.mois]} ${p.annee}`,
       salaire_base: p.salaire_base, primes: p.primes, retenues: p.retenues, net: p.net,
+      prime_logement:  a?.prime_logement  ?? 0,
+      prime_transport: a?.prime_transport ?? 0,
+      prime_risque:    a?.prime_risque    ?? 0,
+      prime_rendement: a?.prime_rendement ?? 0,
+      mode_paiement: p.mode_paiement ?? 'virement',
       nomEcole, logoUrl,
     })
     const w = window.open('', '_blank')
