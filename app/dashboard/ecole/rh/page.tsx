@@ -11,6 +11,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
+import { writeComptaEntry, modeToAccount } from '@/lib/compta-sync-client'
 import { type Enseignant, type StatutEnseignant, STATUT_ENS, fmt, Avatar, FI, KpiCard } from '../_lib/shared'
 import { CreateEmployeeWizard } from './_components/CreateEmployeeWizard'
 import { ProfilDrawer, type ProfilPerson, type EmployeFull, type StaffFull } from './_components/ProfilDrawer'
@@ -1387,29 +1388,51 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
 
       if (error) { showToast(error.message, false); setPaying(false); return }
 
+      const creditAccount = modeToAccount(mode)
+      const libelleCompta = `Salaire ${MOIS[form.mois]} ${form.annee} — ${nomC}`
+
       await Promise.allSettled([
+        // Trésorerie
         supabase.from('transactions').insert({
           tenant_id: tenantId, type: 'sortie', categorie: 'Salaires',
-          description: `Salaire ${MOIS[form.mois]} ${form.annee} — ${nomC}`,
-          montant: net, date: today, mode_paiement: mode,
+          description: libelleCompta, montant: net,
+          date: today, mode_paiement: mode,
+          source: 'paie', source_id: paie.id,
+          debit_account: '641000', credit_account: creditAccount,
         }),
-        supabase.from('journal_comptable').insert({
-          tenant_id: tenantId, date: today,
-          libelle: `Salaire ${MOIS[form.mois]} ${form.annee} — ${nomC}`,
-          type: 'charge', montant_ht: brut, tva: 0, ca: 0, montant_ttc: net,
-          categorie: '641 — Rémunérations du personnel',
+
+        // Comptabilité — journal_comptable + journal_entries (via utility)
+        writeComptaEntry({
+          tenantId, date: today, libelle: libelleCompta,
+          type: 'depense', montant: net, categorie: 'Salaires',
+          debitAccount: '641000',   // Charges de personnel
+          creditAccount: creditAccount,
+          source: 'paie', sourceId: paie.id,
         }),
+
+        // Charges CNSS patronales (8%) → écriture distincte
+        writeComptaEntry({
+          tenantId, date: today,
+          libelle: `CNSS patronale ${MOIS[form.mois]} ${form.annee} — ${nomC}`,
+          type: 'depense', montant: Math.round(brut * 0.08),
+          categorie: 'CNSS',
+          debitAccount: '644000',   // Charges sociales
+          creditAccount: '431000',  // Organismes sociaux
+          source: 'paie', sourceId: paie.id,
+        }),
+
+        // Notifications
         supabase.from('notifications').insert([
-          { tenant_id: tenantId, type: 'salaire_paye', titre: 'Salaire versé',
-            message: `${nomC} — Net: ${fmt(net)} FCFA (${mode})`,
-            destinataire_role: 'RH_PAIE', read: false },
-          { tenant_id: tenantId, type: 'salaire_paye', titre: 'Salaire versé',
-            message: `${nomC} — Net: ${fmt(net)} FCFA`,
-            destinataire_role: 'DIRECTION_GENERALE', read: false },
-          { tenant_id: tenantId, type: 'salaire_paye',
-            titre: 'Votre salaire est disponible',
-            message: `Salaire de ${MOIS[form.mois]} ${form.annee} : ${fmt(net)} FCFA versé par ${mode}.`,
-            destinataire_role: 'EMPLOYE', read: false },
+          { tenant_id: tenantId, role: 'RH_PAIE',
+            title: 'Salaire versé', body: `${nomC} — Net: ${fmt(net)} FCFA (${mode})`,
+            link: '/dashboard/ecole/rh', lu: false },
+          { tenant_id: tenantId, role: 'DIRECTION_GENERALE',
+            title: 'Salaire versé', body: `${nomC} — Net: ${fmt(net)} FCFA`,
+            link: '/dashboard/ecole/rh', lu: false },
+          { tenant_id: tenantId, role: 'COMPTABILITE',
+            title: `Écriture paie — ${nomC}`,
+            body: `D:641000 / C:${creditAccount} — ${fmt(net)} FCFA`,
+            link: '/dashboard/comptabilite', lu: false },
         ]),
       ])
 

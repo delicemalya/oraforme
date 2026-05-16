@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
 import { resolveAccounts } from '@/lib/accounting-engine'
+import { writeComptaEntry, modeToAccount } from '@/lib/compta-sync-client'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -267,14 +268,21 @@ export default function TresoreriePage() {
       const [debit, credit] = resolveAccounts('entree', fEnc.categorie)
       const { data: { user } } = await supabase.auth.getUser()
 
-      await supabase.from('transactions').insert({
+      const { data: tx } = await supabase.from('transactions').insert({
         tenant_id: tenantId, type: 'entree', categorie: fEnc.categorie,
         description: fEnc.description, montant, date: fEnc.date,
         mode_paiement: fEnc.mode, source: 'tresorerie',
         debit_account: debit, credit_account: credit, created_by: user?.id,
+      }).select('id').single()
+
+      // Sync comptabilité (journal_comptable + journal_entries)
+      await writeComptaEntry({
+        tenantId, date: fEnc.date, libelle: fEnc.description,
+        type: 'recette', montant, categorie: fEnc.categorie,
+        debitAccount: debit, creditAccount: credit,
+        source: 'tresorerie', sourceId: tx?.id, createdBy: user?.id,
       })
 
-      // Notif Direction
       await sendNotif(tenantId, 'DIRECTION_GENERALE',
         `Encaissement — ${fmtFCFA(montant)}`,
         `${fEnc.categorie} · ${fEnc.description} · ${modeLabel(fEnc.mode)}`,
@@ -298,14 +306,21 @@ export default function TresoreriePage() {
       const [debit, credit] = resolveAccounts('sortie', fDec.categorie)
       const { data: { user } } = await supabase.auth.getUser()
 
-      await supabase.from('transactions').insert({
+      const { data: tx } = await supabase.from('transactions').insert({
         tenant_id: tenantId, type: 'sortie', categorie: fDec.categorie,
         description: fDec.description, montant, date: fDec.date,
         mode_paiement: fDec.mode, source: 'tresorerie',
         debit_account: debit, credit_account: credit, created_by: user?.id,
+      }).select('id').single()
+
+      // Sync comptabilité
+      await writeComptaEntry({
+        tenantId, date: fDec.date, libelle: fDec.description,
+        type: 'depense', montant, categorie: fDec.categorie,
+        debitAccount: debit, creditAccount: credit,
+        source: 'tresorerie', sourceId: tx?.id, createdBy: user?.id,
       })
 
-      // Notifs
       await Promise.all([
         sendNotif(tenantId, 'DIRECTION_GENERALE',
           `Décaissement — ${fmtFCFA(montant)}`,
@@ -314,6 +329,11 @@ export default function TresoreriePage() {
         sendNotif(tenantId, 'RAF',
           `Sortie trésorerie — ${fmtFCFA(montant)}`,
           `${fDec.categorie} · ${fDec.description}`,
+        ),
+        sendNotif(tenantId, 'COMPTABILITE',
+          `Écriture comptable — ${fmtFCFA(montant)}`,
+          `D:${debit} / C:${credit} — ${fDec.description}`,
+          '/dashboard/comptabilite',
         ),
       ])
 
@@ -328,32 +348,44 @@ export default function TresoreriePage() {
   // ── Save Prestataire ───────────────────────────────────────────────────────
 
   async function savePrestataire() {
-    const nom    = selPresta ? `${selPresta.prenom} ${selPresta.nom}` : fPresta.nom
-    const montant = parseInt(selPresta ? fPresta.montant : fPresta.montant)
+    const nom     = selPresta ? `${selPresta.prenom} ${selPresta.nom}` : fPresta.nom
+    const montant = parseInt(fPresta.montant)
     if (!tenantId || !nom || !montant || !fPresta.motif) return
     setSaving(true)
     try {
-      const [debit, credit] = resolveAccounts('sortie', 'Prestataire')
+      const creditAccount = modeToAccount(fPresta.mode)
       const { data: { user } } = await supabase.auth.getUser()
+      const libelle = `${nom} — ${fPresta.motif}`
 
-      await supabase.from('transactions').insert({
+      const { data: tx } = await supabase.from('transactions').insert({
         tenant_id: tenantId, type: 'sortie',
-        categorie: 'Paiement prestataire',
-        description: `${nom} — ${fPresta.motif}`,
+        categorie: 'Paiement prestataire', description: libelle,
         montant, date: fPresta.date, mode_paiement: fPresta.mode,
         source: 'prestataire', reference: selPresta?.id ?? null,
-        debit_account: debit, credit_account: credit, created_by: user?.id,
-      })
+        debit_account: '621000', credit_account: creditAccount,
+        created_by: user?.id,
+      }).select('id').single()
 
-      // 4 notifications
+      // Sync comptabilité — 2 écritures OHADA
       await Promise.all([
+        // Charge prestataire (621 — Honoraires)
+        writeComptaEntry({
+          tenantId, date: fPresta.date, libelle,
+          type: 'depense', montant, categorie: 'Paiement prestataire',
+          debitAccount: '621000',    // Honoraires et commissions
+          creditAccount: creditAccount,
+          source: 'prestataire', sourceId: tx?.id, createdBy: user?.id,
+        }),
+
+        // 4 notifications
         sendNotif(tenantId, 'DIRECTION_GENERALE',
           `Paiement prestataire — ${fmtFCFA(montant)}`,
           `${nom} · ${fPresta.motif} · ${modeLabel(fPresta.mode)}`,
         ),
         sendNotif(tenantId, 'COMPTABILITE',
-          `Sortie trésorerie prestataire — ${fmtFCFA(montant)}`,
-          `${nom} · ${fPresta.motif} · Mode: ${modeLabel(fPresta.mode)}`,
+          `Écriture prestataire — ${fmtFCFA(montant)}`,
+          `D:621000 / C:${creditAccount} · ${nom} · ${fPresta.motif}`,
+          '/dashboard/comptabilite',
         ),
         sendNotif(tenantId, 'RH_PAIE',
           `Prestataire payé — ${nom}`,
