@@ -989,7 +989,8 @@ function buildBulletinHTML(opts: {
     prime_logement = 0, prime_transport = 0, prime_risque = 0, prime_rendement = 0,
     nomEcole, logoUrl, mode_paiement = 'virement', date_recrutement,
   } = opts
-  const fmtN  = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
+  const fmtN    = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
+  const pdfName = `bulletin_${employe.replace(/\s+/g, '_')}_${periode.replace(/\s+/g, '_')}.pdf`
   const brut  = salaire_base + primes
   const cnss_sal   = Math.round(brut * 0.04)
   const irpp       = retenues - cnss_sal > 0 ? retenues - cnss_sal : 0
@@ -1101,11 +1102,33 @@ function buildBulletinHTML(opts: {
     .no-print{display:none!important}
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadPDF() {
+  var btn = document.getElementById('pdf-btn');
+  btn.textContent = 'Génération…';
+  btn.disabled = true;
+  var element = document.querySelector('.page');
+  html2pdf().set({
+    margin: 0,
+    filename: '${pdfName}',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+    jsPDF: { unit: 'px', format: [794, 1200], orientation: 'portrait', hotfixes: ['px_scaling'] }
+  }).from(element).save().then(function() {
+    btn.textContent = '⬇ Télécharger PDF';
+    btn.disabled = false;
+  });
+}
+</script>
 </head>
 <body>
 <div class="no-print" style="position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;">
-  <button onclick="window.print()" style="background:#F16A1B;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 12px rgba(241,106,27,0.4);">
-    🖨 IMPRIMER / PDF
+  <button id="pdf-btn" onclick="downloadPDF()" style="background:#F16A1B;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 12px rgba(241,106,27,0.4);">
+    ⬇ Télécharger PDF
+  </button>
+  <button onclick="window.print()" style="background:#3D3D3D;color:#ccc;border:none;padding:10px 16px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+    🖨 Imprimer
   </button>
   <button onclick="window.close()" style="background:#2B2B2B;color:#aaa;border:1px solid #444;padding:10px 16px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
     ✕ Fermer
