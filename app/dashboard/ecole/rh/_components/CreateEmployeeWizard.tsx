@@ -99,9 +99,10 @@ export function CreateEmployeeWizard({
 }: {
   tenantId: string; onClose: () => void; onSuccess: () => void
 }) {
-  const [step,  setStep]  = useState(1)
+  const [step,   setStep]   = useState(1)
   const [saving, setSaving] = useState(false)
   const [done,   setDone]   = useState(false)
+  const [errMsg, setErrMsg] = useState<string | null>(null)
 
   // Photo (kept outside form to avoid File serialisation issues)
   const [photoFile,    setPhotoFile]    = useState<File | null>(null)
@@ -133,6 +134,7 @@ export function CreateEmployeeWizard({
   async function submit() {
     if (!id_.nom || !id_.prenom || !post_.poste) return
     setSaving(true)
+    setErrMsg(null)
 
     // Upload photo
     let photoUrl: string | null = null
@@ -144,7 +146,7 @@ export function CreateEmployeeWizard({
     }
 
     // Insert employee
-    const { data: emp } = await supabase.from('employes').insert({
+    const { data: emp, error: empErr } = await supabase.from('employes').insert({
       tenant_id:              tenantId,
       nom:                    id_.nom.trim(),
       postnom:                id_.postnom.trim()   || null,
@@ -190,7 +192,11 @@ export function CreateEmployeeWizard({
       mobile_money_numero:    sal_.mobile_money_numero || null,
     }).select().single()
 
-    if (!emp) { setSaving(false); return }
+    if (empErr || !emp) {
+      setSaving(false)
+      setErrMsg(empErr?.message ?? 'Erreur lors de la création. Vérifiez que la migration 038 a été exécutée dans Supabase.')
+      return
+    }
 
     const today = new Date().toISOString().split('T')[0]
 
@@ -634,7 +640,13 @@ export function CreateEmployeeWizard({
 
         {/* ── Footer ─────────────────────────────────────────────────────────── */}
         {!done && (
-          <div className="shrink-0 px-6 py-4 border-t border-white/[0.06] flex items-center justify-between">
+          <div className="shrink-0 px-6 py-4 border-t border-white/[0.06]">
+            {errMsg && (
+              <div className="mb-3 px-4 py-3 rounded-xl text-xs font-medium" style={{ background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.25)', color: '#F85149' }}>
+                ⚠ {errMsg}
+              </div>
+            )}
+          <div className="flex items-center justify-between">
             <button onClick={() => step > 1 ? setStep(s => s - 1) : onClose()}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.08] hover:text-white transition-colors">
               <ChevronLeft size={13} /> {step > 1 ? 'Précédent' : 'Annuler'}
@@ -656,6 +668,7 @@ export function CreateEmployeeWizard({
                 {saving ? 'Création en cours…' : "Créer l'employé"}
               </button>
             )}
+          </div>
           </div>
         )}
       </motion.div>
