@@ -13,6 +13,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { type Enseignant, type StatutEnseignant, STATUT_ENS, fmt, Avatar, FI, KpiCard } from '../_lib/shared'
 import { CreateEmployeeWizard } from './_components/CreateEmployeeWizard'
+import { ProfilDrawer, type ProfilPerson, type EmployeFull, type StaffFull } from './_components/ProfilDrawer'
 
 type SubTab = 'employes' | 'enseignants' | 'staff' | 'conges' | 'paie' | 'recrutement' | 'heures'
 
@@ -42,6 +43,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
   const [loading,    setLoading]    = useState(false)
   const [search,     setSearch]     = useState('')
   const [showWizard, setShowWizard] = useState(false)
+  const [profil,     setProfil]     = useState<ProfilPerson | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -110,7 +112,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
                   ? { color: '#F0A30A', bg: '#F0A30A18', label: 'Suspendu' }
                   : { color: '#8B949E', bg: '#8B949E18', label: e.statut }
                 return (
-                  <tr key={e.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]">
+                  <tr key={e.id} className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer" onClick={() => setProfil({ type: 'employe', data: e as unknown as EmployeFull })}>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
@@ -154,6 +156,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
         {showWizard && (
           <CreateEmployeeWizard tenantId={tenantId} onClose={() => setShowWizard(false)} onSuccess={load} />
         )}
+        {profil && <ProfilDrawer person={profil} onClose={() => setProfil(null)} />}
       </AnimatePresence>
     </div>
   )
@@ -200,6 +203,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
   const [form,         setForm]         = useState(EMPTY_ENS_FORM)
   const [photoFile,    setPhotoFile]    = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [profil,       setProfil]       = useState<ProfilPerson | null>(null)
 
   const displayed = enseignants.filter(e => {
     const q = search.toLowerCase()
@@ -421,7 +425,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                 const s   = STATUT_ENS[e.statut] ?? STATUT_ENS.actif
                 const sel = selected?.id === e.id
                 return (
-                  <tr key={e.id} onClick={() => setSelected(sel ? null : e)}
+                  <tr key={e.id} onClick={() => { setSelected(sel ? null : e); if (!sel) setProfil({ type: 'enseignant', data: e }) }}
                     className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
                     style={sel ? { background: 'rgba(46,160,67,0.06)' } : {}}>
                     <td className="px-4 py-3">
@@ -513,6 +517,10 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {profil && <ProfilDrawer person={profil} onClose={() => { setProfil(null); setSelected(null) }} />}
+      </AnimatePresence>
     </div>
   )
 }
@@ -542,6 +550,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
   const [photoFile,    setPhotoFile]    = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [form,         setForm]         = useState(EMPTY_STAFF)
+  const [profil,       setProfil]       = useState<ProfilPerson | null>(null)
 
   const POSTES = ['Gardien', 'Secrétaire', 'Comptable', 'Agent de nettoyage', 'Informaticien', 'Bibliothécaire', 'Infirmier(ère)', 'Cuisinier(ère)', 'Chauffeur', 'Autre']
   const SEL = 'w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none'
@@ -764,7 +773,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                   ? { color: '#2EA043', bg: '#2EA04318', label: 'Actif' }
                   : { color: '#8B949E', bg: '#8B949E18', label: 'Inactif' }
                 return (
-                  <tr key={s.id} onClick={() => setSelected(sel ? null : s)}
+                  <tr key={s.id} onClick={() => { setSelected(sel ? null : s); if (!sel) setProfil({ type: 'staff', data: s as unknown as StaffFull }) }}
                     className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
                     style={sel ? { background: 'rgba(46,160,67,0.06)' } : {}}>
                     <td className="px-4 py-3">
@@ -845,6 +854,10 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
             </div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {profil && <ProfilDrawer person={profil} onClose={() => { setProfil(null); setSelected(null) }} />}
       </AnimatePresence>
     </div>
   )
