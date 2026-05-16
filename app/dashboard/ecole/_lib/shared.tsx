@@ -34,6 +34,14 @@ export interface Enseignant {
   id: string; tenant_id: string; nom: string; prenom: string
   matiere: string | null; telephone: string | null; email: string | null
   statut: StatutEnseignant; created_at: string
+  photo_url:            string | null
+  salaire_mensuel:      number | null
+  taux_horaire:         number | null
+  mobile_money_type:    string | null
+  mobile_money_numero:  string | null
+  banque:               string | null
+  rib:                  string | null
+  numero_cnss:          string | null
 }
 export interface ClasseEcole {
   id: string; tenant_id: string; nom: string; niveau: string

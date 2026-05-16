@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Users2, Plus, Trash2, Check, Search, Phone, Mail,
   FileText, CalendarOff, Loader2, RefreshCw, DollarSign,
-  UserPlus, AlertCircle,
+  UserPlus, AlertCircle, Camera, Upload, Smartphone,
+  Building2, CreditCard, Shield, Clock, X,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -23,35 +24,106 @@ const SUB_TABS = [
   { id: 'recrutement'  as SubTab, label: 'Recrutement',       icon: FileText   },
 ]
 
+// ── Info item helper ─────────────────────────────────────────────────────────
+
+function InfoItem({ icon: Icon, label, value, color = '#8B949E' }: { icon: React.ElementType; label: string; value: string; color?: string }) {
+  return (
+    <div className="flex items-start gap-2">
+      <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ background: `${color}18` }}>
+        <Icon size={11} style={{ color }} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] text-[#484F58] uppercase tracking-wider">{label}</p>
+        <p className="text-xs font-medium text-white mt-0.5 break-all">{value}</p>
+      </div>
+    </div>
+  )
+}
+
 // ── Enseignants ───────────────────────────────────────────────────────────────
+
+const TAUX_HORAIRES = [1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000]
+const MOBILE_MONEY_TYPES = ['MTN Money', 'Airtel Money', 'Moov Money']
+const BANQUES = ['BGFI Bank', 'LCB Bank', 'Banque Postale', 'UCB', 'Crédit du Congo', 'Ecobank Congo', 'Société Générale Congo', 'Autre']
+
+const EMPTY_ENS_FORM = {
+  prenom: '', nom: '', matiere: '', telephone: '', email: '',
+  statut: 'actif' as StatutEnseignant,
+  salaire: '', taux_horaire: '',
+  mobile_money_type: '', mobile_money_numero: '',
+  banque: '', rib: '',
+  numero_cnss: '',
+}
 
 function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
   tenantId: string; enseignants: Enseignant[]; onRefresh: () => void
 }) {
-  const [showForm, setShowForm] = useState(false)
-  const [saving,   setSaving]   = useState(false)
-  const [search,   setSearch]   = useState('')
-  const [form, setForm] = useState({ prenom: '', nom: '', matiere: '', telephone: '', email: '', statut: 'actif' as StatutEnseignant, salaire: '' })
+  const [showForm,     setShowForm]     = useState(false)
+  const [saving,       setSaving]       = useState(false)
+  const [search,       setSearch]       = useState('')
+  const [selected,     setSelected]     = useState<Enseignant | null>(null)
+  const [form,         setForm]         = useState(EMPTY_ENS_FORM)
+  const [photoFile,    setPhotoFile]    = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   const displayed = enseignants.filter(e => {
     const q = search.toLowerCase()
     return !q || (e.nom + ' ' + e.prenom + ' ' + (e.matiere ?? '')).toLowerCase().includes(q)
   })
 
+  function handlePhotoChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const file = ev.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
+
+  async function uploadPhoto(file: File, id: string): Promise<string | null> {
+    try {
+      const ext  = file.name.split('.').pop() ?? 'jpg'
+      const path = `enseignants/${id}.${ext}`
+      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      if (error) return null
+      return supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl
+    } catch { return null }
+  }
+
   async function save() {
+    if (!form.nom.trim() || !form.prenom.trim()) return
     setSaving(true)
-    await supabase.from('enseignants').insert({
-      tenant_id: tenantId, nom: form.nom.trim(), prenom: form.prenom.trim(),
-      matiere: form.matiere || null, telephone: form.telephone || null,
-      email: form.email || null, statut: form.statut,
-    })
-    onRefresh(); setShowForm(false)
-    setForm({ prenom: '', nom: '', matiere: '', telephone: '', email: '', statut: 'actif', salaire: '' })
+    const { data: ins } = await supabase.from('enseignants').insert({
+      tenant_id: tenantId,
+      nom: form.nom.trim(), prenom: form.prenom.trim(),
+      matiere: form.matiere || null,
+      telephone: form.telephone || null,
+      email: form.email || null,
+      statut: form.statut,
+      salaire_mensuel:     form.salaire           ? Number(form.salaire)          : null,
+      taux_horaire:        form.taux_horaire       ? Number(form.taux_horaire)     : null,
+      mobile_money_type:   form.mobile_money_type  || null,
+      mobile_money_numero: form.mobile_money_numero|| null,
+      banque:              form.banque             || null,
+      rib:                 form.rib                || null,
+      numero_cnss:         form.numero_cnss        || null,
+    }).select().single()
+
+    if (photoFile && ins) {
+      const url = await uploadPhoto(photoFile, ins.id)
+      if (url) await supabase.from('enseignants').update({ photo_url: url }).eq('id', ins.id)
+    }
+
+    onRefresh()
+    setShowForm(false)
+    setForm(EMPTY_ENS_FORM)
+    setPhotoFile(null)
+    setPhotoPreview(null)
     setSaving(false)
   }
 
   async function del(id: string) {
-    await supabase.from('enseignants').delete().eq('id', id); onRefresh()
+    await supabase.from('enseignants').delete().eq('id', id)
+    if (selected?.id === id) setSelected(null)
+    onRefresh()
   }
 
   const kpis = [
@@ -60,6 +132,9 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
     { label: 'En congé', value: enseignants.filter(e => e.statut === 'conge').length,  color: '#F0A30A' },
     { label: 'Inactifs', value: enseignants.filter(e => e.statut === 'inactif').length,color: '#8B949E' },
   ]
+
+  const SEL = 'w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none'
+  const SEC = 'text-[10px] font-semibold text-[#484F58] uppercase tracking-wider mb-2 mt-1'
 
   return (
     <div className="space-y-4">
@@ -77,63 +152,184 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
         </button>
       </div>
 
+      {/* ── Form ───────────────────────────────────────────────────────────── */}
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#2EA043]/30 p-4 space-y-3" style={{ background: 'rgba(46,160,67,0.04)' }}>
-            <p className="text-xs font-bold text-[#2EA043]">Nouvel enseignant</p>
-            <div className="grid grid-cols-2 gap-3">
-              <FI label="Prénom *" value={form.prenom} onChange={v => setForm(p => ({ ...p, prenom: v }))} />
-              <FI label="Nom *"    value={form.nom}    onChange={v => setForm(p => ({ ...p, nom: v }))} />
-              <FI label="Matière enseignée" value={form.matiere} onChange={v => setForm(p => ({ ...p, matiere: v }))} placeholder="Mathématiques…" />
-              <FI label="Téléphone" value={form.telephone} onChange={v => setForm(p => ({ ...p, telephone: v }))} />
-              <FI label="Email"     value={form.email}     onChange={v => setForm(p => ({ ...p, email: v }))} />
-              <FI label="Salaire mensuel (FCFA)" value={form.salaire} onChange={v => setForm(p => ({ ...p, salaire: v }))} type="number" />
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            className="rounded-xl border border-[#2EA043]/30 p-5 space-y-4"
+            style={{ background: 'rgba(46,160,67,0.04)' }}>
+
+            <p className="text-sm font-bold text-[#2EA043]">Nouvel enseignant</p>
+
+            {/* Photo */}
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.08] bg-white/[0.04] flex items-center justify-center shrink-0">
+                {photoPreview
+                  ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
+                  : <Camera size={22} className="text-[#484F58]" />}
+              </div>
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Statut</label>
-                <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as StatutEnseignant }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
-                  <option value="actif">Actif</option><option value="conge">En congé</option><option value="inactif">Inactif</option>
-                </select>
+                <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[#8B949E] hover:text-white hover:border-white/[0.15] transition-all">
+                  <Upload size={12} />
+                  {photoPreview ? 'Changer' : 'Ajouter une photo'}
+                  <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+                </label>
+                <p className="text-[10px] text-[#484F58] mt-1">JPG, PNG · max 2 Mo</p>
               </div>
             </div>
-            <div className="flex gap-2">
+
+            {/* Identité */}
+            <div>
+              <p className={SEC}>Identité</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Prénom *"          value={form.prenom}  onChange={v => setForm(p => ({ ...p, prenom: v }))} />
+                <FI label="Nom *"             value={form.nom}     onChange={v => setForm(p => ({ ...p, nom: v }))} />
+                <FI label="Matière enseignée" value={form.matiere} onChange={v => setForm(p => ({ ...p, matiere: v }))} placeholder="Mathématiques…" />
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Statut</label>
+                  <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as StatutEnseignant }))} className={SEL}>
+                    <option value="actif">Actif</option>
+                    <option value="conge">En congé</option>
+                    <option value="inactif">Inactif</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <p className={SEC}>Contact</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Téléphone" value={form.telephone} onChange={v => setForm(p => ({ ...p, telephone: v }))} />
+                <FI label="Email"     value={form.email}     onChange={v => setForm(p => ({ ...p, email: v }))} />
+              </div>
+            </div>
+
+            {/* Rémunération */}
+            <div>
+              <p className={SEC}>Rémunération</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Salaire mensuel (FCFA)" value={form.salaire} onChange={v => setForm(p => ({ ...p, salaire: v }))} type="number" placeholder="0" />
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Taux horaire (FCFA/h)</label>
+                  <select value={form.taux_horaire} onChange={e => setForm(p => ({ ...p, taux_horaire: e.target.value }))} className={SEL}>
+                    <option value="">— Non rémunéré à l&apos;heure —</option>
+                    {TAUX_HORAIRES.map(t => <option key={t} value={t}>{new Intl.NumberFormat('fr-FR').format(t)} FCFA/h</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Money */}
+            <div>
+              <p className={SEC}>Mobile Money</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Opérateur</label>
+                  <select value={form.mobile_money_type} onChange={e => setForm(p => ({ ...p, mobile_money_type: e.target.value }))} className={SEL}>
+                    <option value="">— Aucun —</option>
+                    {MOBILE_MONEY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <FI label="Numéro" value={form.mobile_money_numero} onChange={v => setForm(p => ({ ...p, mobile_money_numero: v }))} placeholder="06XXXXXXXX" />
+              </div>
+            </div>
+
+            {/* Banque & RIB */}
+            <div>
+              <p className={SEC}>Informations bancaires</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-[#8B949E] mb-1">Banque</label>
+                  <select value={form.banque} onChange={e => setForm(p => ({ ...p, banque: e.target.value }))} className={SEL}>
+                    <option value="">— Aucune —</option>
+                    {BANQUES.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
+                <FI label="RIB" value={form.rib} onChange={v => setForm(p => ({ ...p, rib: v }))} placeholder="00000 00000 0000000000 00" />
+              </div>
+            </div>
+
+            {/* CNSS */}
+            <div>
+              <p className={SEC}>Protection sociale</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FI label="Numéro CNSS" value={form.numero_cnss} onChange={v => setForm(p => ({ ...p, numero_cnss: v }))} placeholder="XXXXXXXXXX" />
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
               <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#2EA043', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => { setShowForm(false); setForm(EMPTY_ENS_FORM); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* ── Table ─────────────────────────────────────────────────────────── */}
       {displayed.length === 0 ? (
         <div className="text-center py-12 text-[#8B949E] text-xs">Aucun enseignant enregistré.</div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+        <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
           <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Enseignant', 'Matière', 'Contact', 'Statut', ''].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+            <thead>
+              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                {['Enseignant', 'Matière', 'Contact & Mobile Money', 'Rémunération', 'Statut', ''].map(h => (
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody>
               {displayed.map(e => {
-                const s = STATUT_ENS[e.statut] ?? STATUT_ENS.actif
+                const s   = STATUT_ENS[e.statut] ?? STATUT_ENS.actif
+                const sel = selected?.id === e.id
                 return (
-                  <tr key={e.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]">
-                    <td className="px-4 py-2.5">
+                  <tr key={e.id} onClick={() => setSelected(sel ? null : e)}
+                    className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
+                    style={sel ? { background: 'rgba(46,160,67,0.06)' } : {}}>
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={28} />
-                        <p className="font-medium text-white">{e.prenom} {e.nom}</p>
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                          {e.photo_url
+                            ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
+                            : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={32} />}
+                        </div>
+                        <p className="font-medium text-white whitespace-nowrap">{e.prenom} {e.nom}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{e.matiere ?? '—'}</td>
-                    <td className="px-4 py-2.5">
+                    <td className="px-4 py-3 text-[#8B949E]">{e.matiere ?? '—'}</td>
+                    <td className="px-4 py-3">
                       <div className="space-y-0.5">
                         {e.telephone && <p className="text-[#8B949E] flex items-center gap-1"><Phone size={10} /> {e.telephone}</p>}
-                        {e.email     && <p className="text-[#8B949E] flex items-center gap-1"><Mail  size={10} /> {e.email}</p>}
-                        {!e.telephone && !e.email && <span className="text-[#484F58]">—</span>}
+                        {e.mobile_money_type && e.mobile_money_numero && (
+                          <p className="flex items-center gap-1 text-[10px]" style={{ color: '#F97316' }}>
+                            <Smartphone size={10} /> {e.mobile_money_type} · {e.mobile_money_numero}
+                          </p>
+                        )}
+                        {!e.telephone && !e.mobile_money_numero && <span className="text-[#484F58]">—</span>}
                       </div>
                     </td>
-                    <td className="px-4 py-2.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: s.color, background: s.bg }}>{s.label}</span>
+                    <td className="px-4 py-3">
+                      <div className="space-y-0.5">
+                        {e.salaire_mensuel ? <p className="text-[#2EA043] font-semibold text-[10px]">{fmt(e.salaire_mensuel)} F/mois</p> : null}
+                        {e.taux_horaire ? (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: '#388BFD18', color: '#388BFD' }}>
+                            <Clock size={8} /> {new Intl.NumberFormat('fr-FR').format(e.taux_horaire)} F/h
+                          </span>
+                        ) : null}
+                        {!e.salaire_mensuel && !e.taux_horaire && <span className="text-[#484F58]">—</span>}
+                      </div>
                     </td>
-                    <td className="px-4 py-2.5"><button onClick={() => del(e.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={11} /></button></td>
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style={{ color: s.color, background: s.bg }}>{s.label}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button onClick={ev => { ev.stopPropagation(); del(e.id) }} className="text-[#484F58] hover:text-red-400 transition-colors">
+                        <Trash2 size={11} />
+                      </button>
+                    </td>
                   </tr>
                 )
               })}
@@ -141,6 +337,47 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
           </table>
         </div>
       )}
+
+      {/* ── Detail panel ──────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {selected && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+            className="rounded-xl border border-white/[0.08] p-5"
+            style={{ background: 'rgba(255,255,255,0.015)' }}>
+            <div className="flex items-start gap-4 mb-5">
+              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/[0.08] shrink-0">
+                {selected.photo_url
+                  ? <img src={selected.photo_url} alt="" className="w-full h-full object-cover" />
+                  : <Avatar nom={selected.nom} prenom={selected.prenom} photoUrl={null} size={56} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-base font-bold text-white">{selected.prenom} {selected.nom}</p>
+                <p className="text-xs text-[#8B949E]">{selected.matiere ?? 'Matière non définie'}</p>
+                <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={{ color: (STATUT_ENS[selected.statut] ?? STATUT_ENS.actif).color, background: (STATUT_ENS[selected.statut] ?? STATUT_ENS.actif).bg }}>
+                  {(STATUT_ENS[selected.statut] ?? STATUT_ENS.actif).label}
+                </span>
+              </div>
+              <button onClick={() => setSelected(null)} className="text-[#484F58] hover:text-white transition-colors p-1">
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {selected.telephone        && <InfoItem icon={Phone}      label="Téléphone"       value={selected.telephone} />}
+              {selected.email            && <InfoItem icon={Mail}       label="Email"            value={selected.email} />}
+              {selected.salaire_mensuel  ? <InfoItem icon={DollarSign}  label="Salaire mensuel"  value={`${fmt(selected.salaire_mensuel)} FCFA`} color="#2EA043" /> : null}
+              {selected.taux_horaire     ? <InfoItem icon={Clock}       label="Taux horaire"     value={`${new Intl.NumberFormat('fr-FR').format(selected.taux_horaire)} FCFA/h`} color="#388BFD" /> : null}
+              {selected.mobile_money_type && selected.mobile_money_numero && (
+                <InfoItem icon={Smartphone} label={selected.mobile_money_type} value={selected.mobile_money_numero} color="#F97316" />
+              )}
+              {selected.banque           && <InfoItem icon={Building2}  label="Banque"           value={selected.banque} />}
+              {selected.rib              && <InfoItem icon={CreditCard}  label="RIB"              value={selected.rib} />}
+              {selected.numero_cnss      && <InfoItem icon={Shield}      label="N° CNSS"          value={selected.numero_cnss} color="#8B5CF6" />}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
