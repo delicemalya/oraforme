@@ -1094,10 +1094,23 @@ function buildBulletinHTML(opts: {
   .sig-line{width:130px;height:1px;background:var(--dark);margin-top:28px}
   .sig-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1.5px}
   .thank-you{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase}
-  @media print{body{background:white;padding:0}.page{box-shadow:none;width:100%}print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+    body{background:white!important;padding:0;margin:0}
+    .page{box-shadow:none;width:794px;margin:0 auto}
+    .no-print{display:none!important}
+  }
 </style>
 </head>
 <body>
+<div class="no-print" style="position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;">
+  <button onclick="window.print()" style="background:#F16A1B;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 12px rgba(241,106,27,0.4);">
+    🖨 IMPRIMER / PDF
+  </button>
+  <button onclick="window.close()" style="background:#2B2B2B;color:#aaa;border:1px solid #444;padding:10px 16px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+    ✕ Fermer
+  </button>
+</div>
 <div class="page">
 
   <div class="header">
@@ -1405,7 +1418,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
     if (!w) return
     w.document.write(html)
     w.document.close()
-    setTimeout(() => { w.focus(); w.print() }, 800)
+    w.focus()
   }
 
   const brut     = form.salaire_base + form.prime_logement + form.prime_transport + form.prime_risque + form.prime_rendement
