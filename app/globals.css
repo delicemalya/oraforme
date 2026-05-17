@@ -10,15 +10,16 @@ body {
   font-family: var(--font-geist), Arial, sans-serif;
 }
 
-/* ── Light mode: invert the dashboard shell colours ── */
-html[data-theme="light"] #dashboard-shell {
-  filter: invert(1);
+/* ── Light mode: invert only the main content — sidebar stays dark ── */
+html[data-theme="light"] #main-content {
+  filter: invert(1) hue-rotate(180deg);
+  background: #F6F8FA;
 }
-/* Re-invert images/videos so they stay natural */
-html[data-theme="light"] #dashboard-shell img,
-html[data-theme="light"] #dashboard-shell video,
-html[data-theme="light"] #dashboard-shell canvas {
-  filter: invert(1);
+/* Re-invert images/videos/canvas so they stay natural inside main content */
+html[data-theme="light"] #main-content img,
+html[data-theme="light"] #main-content video,
+html[data-theme="light"] #main-content canvas {
+  filter: invert(1) hue-rotate(180deg);
 }
 /* Pages outside the dashboard (login, onboarding…) */
 html[data-theme="light"] body {

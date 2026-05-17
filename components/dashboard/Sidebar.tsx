@@ -11,7 +11,7 @@ import {
   Wallet, BookOpen, ShoppingCart,
   Receipt, BarChart2, Truck,
   BookMarked, Calculator, HeartHandshake, Users, UsersRound,
-  Layers, CreditCard, Activity,
+  Layers, CreditCard, Activity, Home,
 } from 'lucide-react'
 import { CORE_MODULE_IDS, CORE_SECTION_LABEL } from '@/lib/erp-core'
 import { useState, useEffect } from 'react'
@@ -49,12 +49,14 @@ type NavItem = {
   icon: LucideIcon
   href: string
   color: string
+  exact?: boolean
 }
 
 // ── Visibilité par rôle école ─────────────────────────────────────────────────
 // Clé = id de l'item, valeur = rôles autorisés (tableau vide = tout le monde)
 
 const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
+  'overview':               [], // visible à tous
   'direction':              ['DIRECTION_GENERALE'],
   'daac':                   ['DIRECTION_GENERALE', 'DAAC'],
   'rh':                     ['DIRECTION_GENERALE', 'RAF', 'RH_PAIE'],
@@ -70,6 +72,7 @@ const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
 
 const SECTOR_NAV: Record<string, NavItem[]> = {
   ecole: [
+    { id: 'overview',               label: 'Vue d\'ensemble',        sublabel: 'Tableau de bord complet', icon: Home,           href: '/dashboard/ecole',                        color: '#F0A30A', exact: true },
     { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F0A30A' },
     { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#EF4444' },
     { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#8B5CF6' },
@@ -434,7 +437,7 @@ export default function Sidebar() {
                 </p>
                 {coreNavItems.map(item => {
                   const Icon = item.icon
-                  const active = isActive(item.href)
+                  const active = isActive(item.href, item.exact)
                   const canEdit = isOwner || permissions[item.id]?.can_edit
                   return (
                     <Link
@@ -469,7 +472,7 @@ export default function Sidebar() {
                 </p>
                 {businessNavItems.map(item => {
                   const Icon = item.icon
-                  const active = isActive(item.href)
+                  const active = isActive(item.href, item.exact)
                   const canEdit = isOwner || permissions[item.id]?.can_edit
                   return (
                     <Link
