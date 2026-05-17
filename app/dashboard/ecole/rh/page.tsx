@@ -199,9 +199,13 @@ const TAUX_HORAIRES = [1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,
 const MOBILE_MONEY_TYPES = ['MTN Money', 'Airtel Money', 'Moov Money']
 const BANQUES = ['BGFI Bank', 'LCB Bank', 'Banque Postale', 'UCB', 'Crédit du Congo', 'Ecobank Congo', 'Société Générale Congo', 'Autre']
 
+const CONTRATS_ENS = ['CDI', 'CDD', 'vacataire', 'stagiaire']
+
 const EMPTY_ENS_FORM = {
   prenom: '', nom: '', matiere: '', telephone: '', email: '',
   statut: 'actif' as StatutEnseignant,
+  type_enseignant: 'employe' as 'employe' | 'prestataire',
+  type_contrat: '' as string,
   salaire: '', taux_horaire: '',
   mobile_money_type: '', mobile_money_numero: '',
   banque: '', rib: '',
@@ -214,6 +218,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
   const [showForm,     setShowForm]     = useState(false)
   const [saving,       setSaving]       = useState(false)
   const [search,       setSearch]       = useState('')
+  const [filterType,   setFilterType]   = useState<'tous' | 'employe' | 'prestataire'>('tous')
   const [selected,     setSelected]     = useState<Enseignant | null>(null)
   const [form,         setForm]         = useState(EMPTY_ENS_FORM)
   const [photoFile,    setPhotoFile]    = useState<File | null>(null)
@@ -222,7 +227,10 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
 
   const displayed = enseignants.filter(e => {
     const q = search.toLowerCase()
-    return !q || (e.nom + ' ' + e.prenom + ' ' + (e.matiere ?? '')).toLowerCase().includes(q)
+    const matchSearch = !q || (e.nom + ' ' + e.prenom + ' ' + (e.matiere ?? '')).toLowerCase().includes(q)
+    const te = (e as any).type_enseignant ?? 'employe'
+    const matchType = filterType === 'tous' || te === filterType
+    return matchSearch && matchType
   })
 
   function handlePhotoChange(ev: React.ChangeEvent<HTMLInputElement>) {
@@ -244,6 +252,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
 
   async function save() {
     if (!form.nom.trim() || !form.prenom.trim()) return
+    if (form.type_enseignant === 'prestataire' && !form.taux_horaire) return
     setSaving(true)
     const { data: ins } = await supabase.from('enseignants').insert({
       tenant_id: tenantId,
@@ -252,13 +261,15 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
       telephone: form.telephone || null,
       email: form.email || null,
       statut: form.statut,
-      salaire_mensuel:     form.salaire           ? Number(form.salaire)          : null,
-      taux_horaire:        form.taux_horaire       ? Number(form.taux_horaire)     : null,
+      type_enseignant: form.type_enseignant,
+      type_contrat:    form.type_enseignant === 'employe' ? (form.type_contrat || null) : null,
+      salaire_mensuel: form.type_enseignant === 'employe' && form.salaire ? Number(form.salaire) : null,
+      taux_horaire:    form.taux_horaire ? Number(form.taux_horaire) : null,
       mobile_money_type:   form.mobile_money_type  || null,
-      mobile_money_numero: form.mobile_money_numero|| null,
-      banque:              form.banque             || null,
-      rib:                 form.rib                || null,
-      numero_cnss:         form.numero_cnss        || null,
+      mobile_money_numero: form.mobile_money_numero || null,
+      banque:              form.banque              || null,
+      rib:                 form.rib                 || null,
+      numero_cnss:         form.numero_cnss         || null,
     }).select().single()
 
     if (photoFile && ins) {
@@ -281,10 +292,10 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
   }
 
   const kpis = [
-    { label: 'Total',    value: enseignants.length,                                    color: '#388BFD' },
-    { label: 'Actifs',   value: enseignants.filter(e => e.statut === 'actif').length,  color: '#2EA043' },
-    { label: 'En congé', value: enseignants.filter(e => e.statut === 'conge').length,  color: '#F0A30A' },
-    { label: 'Inactifs', value: enseignants.filter(e => e.statut === 'inactif').length,color: '#8B949E' },
+    { label: 'Total',        value: enseignants.length,                                                                  color: '#388BFD' },
+    { label: 'Employés',     value: enseignants.filter(e => ((e as any).type_enseignant ?? 'employe') === 'employe').length,  color: '#2EA043' },
+    { label: 'Prestataires', value: enseignants.filter(e => (e as any).type_enseignant === 'prestataire').length,        color: '#F97316' },
+    { label: 'En congé',     value: enseignants.filter(e => e.statut === 'conge').length,                               color: '#F0A30A' },
   ]
 
   const SEL = 'w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none'
@@ -296,10 +307,22 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
         {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
       </div>
 
-      <div className="flex items-center gap-2 justify-between">
-        <div className="relative">
-          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
-          <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-52" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="flex flex-wrap items-center gap-2 justify-between">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1">
+            {([['tous', 'Tous'], ['employe', 'Employés'], ['prestataire', 'Prestataires']] as const).map(([k, l]) => (
+              <button key={k} onClick={() => setFilterType(k)}
+                className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+                style={{ background: filterType === k ? (k === 'prestataire' ? '#F97316' : '#2EA043') : 'transparent',
+                         color: filterType === k ? '#fff' : '#8B949E' }}>
+                {l}
+              </button>
+            ))}
+          </div>
+          <div className="relative">
+            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+            <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
+          </div>
         </div>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
           <Plus size={13} /> Ajouter
@@ -313,7 +336,24 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
             className="rounded-xl border border-[#2EA043]/30 p-5 space-y-4"
             style={{ background: 'rgba(46,160,67,0.04)' }}>
 
-            <p className="text-sm font-bold text-[#2EA043]">Nouvel enseignant</p>
+            <p className="text-sm font-bold text-[#2EA043]">Nouvel enseignant / formateur</p>
+
+            {/* Type : Employé ou Prestataire */}
+            <div>
+              <p className={SEC}>Type de relation</p>
+              <div className="flex gap-2">
+                {([['employe', 'Enseignant Employé', 'CDI/CDD/Vacataire/Stagiaire — paie mensuelle', '#2EA043'],
+                   ['prestataire', 'Prestataire', 'Payé à l\'heure via Trésorerie', '#F97316']] as const).map(([val, label, desc, color]) => (
+                  <button key={val} type="button" onClick={() => setForm(p => ({ ...p, type_enseignant: val, type_contrat: '', salaire: '' }))}
+                    className="flex-1 rounded-xl border p-3 text-left transition-all"
+                    style={{ borderColor: form.type_enseignant === val ? color : 'rgba(255,255,255,0.08)',
+                             background: form.type_enseignant === val ? `${color}12` : 'transparent' }}>
+                    <p className="text-xs font-bold" style={{ color: form.type_enseignant === val ? color : '#8B949E' }}>{label}</p>
+                    <p className="text-[10px] text-[#484F58] mt-0.5">{desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Photo */}
             <div className="flex items-center gap-4">
@@ -359,19 +399,43 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
               </div>
             </div>
 
-            {/* Rémunération */}
+            {/* Rémunération — varie selon le type */}
             <div>
               <p className={SEC}>Rémunération</p>
-              <div className="grid grid-cols-2 gap-3">
-                <FI label="Salaire mensuel (FCFA)" value={form.salaire} onChange={v => setForm(p => ({ ...p, salaire: v }))} type="number" placeholder="0" />
-                <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Taux horaire (FCFA/h)</label>
-                  <select value={form.taux_horaire} onChange={e => setForm(p => ({ ...p, taux_horaire: e.target.value }))} className={SEL}>
-                    <option value="">— Non rémunéré à l&apos;heure —</option>
-                    {TAUX_HORAIRES.map(t => <option key={t} value={t}>{new Intl.NumberFormat('fr-FR').format(t)} FCFA/h</option>)}
-                  </select>
+              {form.type_enseignant === 'employe' ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-[#8B949E] mb-1">Type de contrat</label>
+                    <select value={form.type_contrat} onChange={e => setForm(p => ({ ...p, type_contrat: e.target.value }))} className={SEL}>
+                      <option value="">— Choisir —</option>
+                      {CONTRATS_ENS.map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+                    </select>
+                  </div>
+                  <FI label="Salaire mensuel (FCFA)" value={form.salaire} onChange={v => setForm(p => ({ ...p, salaire: v }))} type="number" placeholder="0" />
+                  <div>
+                    <label className="block text-xs text-[#8B949E] mb-1">Taux horaire (optionnel)</label>
+                    <select value={form.taux_horaire} onChange={e => setForm(p => ({ ...p, taux_horaire: e.target.value }))} className={SEL}>
+                      <option value="">— Non rémunéré à l&apos;heure —</option>
+                      {TAUX_HORAIRES.map(t => <option key={t} value={t}>{new Intl.NumberFormat('fr-FR').format(t)} FCFA/h</option>)}
+                    </select>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-[#8B949E] mb-1">Taux horaire (FCFA/h) *</label>
+                    <select value={form.taux_horaire} onChange={e => setForm(p => ({ ...p, taux_horaire: e.target.value }))} className={SEL}>
+                      <option value="">— Obligatoire —</option>
+                      {TAUX_HORAIRES.map(t => <option key={t} value={t}>{new Intl.NumberFormat('fr-FR').format(t)} FCFA/h</option>)}
+                    </select>
+                  </div>
+                  <div className="flex items-end pb-1">
+                    <p className="text-[11px] text-[#F97316] bg-[#F97316]/10 rounded-lg px-3 py-2">
+                      Payé via Trésorerie → Prestataire
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Mobile Money */}
@@ -429,18 +493,33 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {displayed.map(e => {
             const s = STATUT_ENS[e.statut] ?? STATUT_ENS.actif
+            const te = (e as any).type_enseignant ?? 'employe'
+            const isPresta = te === 'prestataire'
+            const tc = (e as any).type_contrat as string | null
             return (
               <motion.div key={e.id} layout
-                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
-                style={{ background: 'rgba(255,255,255,0.025)' }}>
+                className="rounded-xl border p-5 relative flex flex-col gap-3 transition-all"
+                style={{
+                  background: isPresta ? 'rgba(249,115,22,0.04)' : 'rgba(255,255,255,0.025)',
+                  borderColor: isPresta ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.07)',
+                }}>
+
+                {/* Type badge */}
+                <span className="absolute top-3 left-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
+                  style={isPresta
+                    ? { color: '#F97316', background: 'rgba(249,115,22,0.15)' }
+                    : { color: '#388BFD', background: 'rgba(56,139,253,0.12)' }}>
+                  {isPresta ? 'Prestataire' : tc ? tc.toUpperCase() : 'Employé'}
+                </span>
 
                 {/* Status badge */}
                 <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
                   style={{ color: s.color, background: s.bg }}>{s.label}</span>
 
                 {/* Avatar + Nom */}
-                <div className="flex flex-col items-center text-center pt-1">
-                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.1] mb-2 shrink-0">
+                <div className="flex flex-col items-center text-center pt-4">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 mb-2 shrink-0"
+                    style={{ borderColor: isPresta ? 'rgba(249,115,22,0.3)' : 'rgba(255,255,255,0.1)' }}>
                     {e.photo_url
                       ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
                       : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={64} />}
@@ -451,18 +530,29 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
 
                 {/* Rémunération */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
-                  <div>
-                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Mensuel</p>
-                    <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#2EA043' }}>
-                      {e.salaire_mensuel ? `${fmt(e.salaire_mensuel)} F` : '—'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Horaire</p>
-                    <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#388BFD' }}>
-                      {e.taux_horaire ? `${fmt(e.taux_horaire)} F/h` : '—'}
-                    </p>
-                  </div>
+                  {isPresta ? (
+                    <div className="col-span-2">
+                      <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Taux horaire</p>
+                      <p className="text-sm mt-0.5 font-bold" style={{ color: '#F97316' }}>
+                        {e.taux_horaire ? `${fmt(e.taux_horaire)} FCFA/h` : '—'}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Mensuel</p>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#2EA043' }}>
+                          {e.salaire_mensuel ? `${fmt(e.salaire_mensuel)} F` : '—'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Horaire</p>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#388BFD' }}>
+                          {e.taux_horaire ? `${fmt(e.taux_horaire)} F/h` : '—'}
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Contact */}
@@ -537,7 +627,21 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
   const [form,         setForm]         = useState(EMPTY_STAFF)
   const [profil,       setProfil]       = useState<ProfilPerson | null>(null)
 
-  const POSTES = ['Gardien', 'Secrétaire', 'Comptable', 'Agent de nettoyage', 'Informaticien', 'Bibliothécaire', 'Infirmier(ère)', 'Cuisinier(ère)', 'Chauffeur', 'Autre']
+  const POSTES = [
+    'Promoteur / Fondateur',
+    'Directeur Général',
+    'Directeur Général Adjoint',
+    'RAF — Responsable Administratif et Financier',
+    'DAAC — Dir. des Affaires Académiques et Culturelles',
+    'Directeur Pédagogique',
+    'Directeur des Études',
+    'Secrétaire Général',
+    'Secrétaire de Direction',
+    'Responsable RH',
+    'Comptable',
+    'Agent Administratif',
+    'Autre',
+  ]
   const SEL = 'w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none'
   const SEC = 'text-[10px] font-semibold text-[#484F58] uppercase tracking-wider mb-2 mt-1'
 
@@ -1221,7 +1325,7 @@ function downloadPDF() {
 
 type AgentPaie = {
   id: string; nom: string; prenom: string; postnom: string | null
-  poste: string; type_agent: 'employe' | 'staff'
+  poste: string; type_agent: 'employe' | 'staff' | 'enseignant'
   salaire_base: number; prime_logement: number; prime_transport: number
   prime_risque: number; prime_rendement: number
   mode_paiement: string; banque: string | null; rib: string | null
@@ -1270,8 +1374,9 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
 
   const load = useCallback(async () => {
     setLoading(true)
-    const [{ data: emp }, { data: stf }, { data: pai }] = await Promise.all([
+    const [{ data: emp }, { data: ens }, { data: stf }, { data: pai }] = await Promise.all([
       supabase.from('employes').select('*').eq('tenant_id', tenantId).eq('statut', 'actif').order('nom'),
+      supabase.from('enseignants').select('*').eq('tenant_id', tenantId).eq('statut', 'actif').eq('type_enseignant', 'employe').order('nom'),
       supabase.from('staff_ecole').select('*').eq('tenant_id', tenantId).eq('statut', 'actif').order('nom'),
       supabase.from('paie_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
     ])
@@ -1285,6 +1390,17 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       mobile_money_type: e.mobile_money_type, mobile_money_numero: e.mobile_money_numero,
       numero_cnss: e.numero_cnss, email: e.email_pro,
     }))
+    const ensA: AgentPaie[] = (ens ?? []).map((e: any) => ({
+      id: e.id, nom: e.nom, prenom: e.prenom, postnom: null,
+      poste: e.matiere ? `Enseignant — ${e.matiere}` : 'Enseignant',
+      type_agent: 'enseignant' as const,
+      salaire_base: e.salaire_mensuel ?? 0, prime_logement: 0, prime_transport: 0,
+      prime_risque: 0, prime_rendement: 0,
+      mode_paiement: e.banque ? 'banque' : e.mobile_money_type ? 'mobile_money' : 'especes',
+      banque: e.banque, rib: e.rib,
+      mobile_money_type: e.mobile_money_type, mobile_money_numero: e.mobile_money_numero,
+      numero_cnss: e.numero_cnss, email: e.email,
+    }))
     const stfA: AgentPaie[] = (stf ?? []).map((s: any) => ({
       id: s.id, nom: s.nom, prenom: s.prenom, postnom: null,
       poste: s.poste, type_agent: 'staff' as const,
@@ -1295,7 +1411,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       mobile_money_type: s.mobile_money_type, mobile_money_numero: s.mobile_money_numero,
       numero_cnss: s.numero_cnss, email: s.email,
     }))
-    setAgents([...empA, ...stfA])
+    setAgents([...empA, ...ensA, ...stfA])
     setPaies((pai ?? []) as PaieRecord[])
     setLoading(false)
   }, [tenantId])

@@ -194,15 +194,16 @@ export default function TresoreriePage() {
       .maybeSingle()
     setOpeningBal(ob?.solde_ouverture ?? 0)
 
-    // Fetch prestataires (enseignants + staff externe)
+    // Fetch prestataires — uniquement enseignants avec type_enseignant = 'prestataire'
     const { data: ens } = await supabase
       .from('enseignants')
       .select('id, nom, prenom, matiere, taux_horaire, telephone, email')
       .eq('tenant_id', tenantId)
       .eq('statut', 'actif')
+      .eq('type_enseignant', 'prestataire')
     const mapped: Prestataire[] = (ens ?? []).map((e: any) => ({
       id: e.id, nom: e.nom, prenom: e.prenom,
-      type: 'formateur', taux_horaire: e.taux_horaire,
+      type: 'prestataire', taux_horaire: e.taux_horaire,
       telephone: e.telephone, email: e.email,
     }))
     setPrestataires(mapped)
