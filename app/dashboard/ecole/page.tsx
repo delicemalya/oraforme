@@ -347,7 +347,7 @@ export default function EcoleOverviewPage() {
               <Tooltip
                 contentStyle={{ background: '#161B22', border: '1px solid #21262D', borderRadius: 8, fontSize: 12 }}
                 labelStyle={{ color: '#8B949E' }}
-                formatter={(value: number) => [`${fmt(value)} FCFA`, 'Recettes']}
+                formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, 'Recettes']}
               />
               <Area
                 type="monotone"
