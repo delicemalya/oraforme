@@ -10,46 +10,122 @@ body {
   font-family: var(--font-geist), Arial, sans-serif;
 }
 
-/* ── Light mode: invert only the main content — sidebar stays dark ── */
-html[data-theme="light"] #main-content {
-  filter: invert(1) hue-rotate(180deg);
-  background: #F6F8FA;
-}
-/* Re-invert images/videos/canvas so they stay natural inside main content */
-html[data-theme="light"] #main-content img,
-html[data-theme="light"] #main-content video,
-html[data-theme="light"] #main-content canvas {
-  filter: invert(1) hue-rotate(180deg);
-}
-/* Pages outside the dashboard (login, onboarding…) */
-html[data-theme="light"] body {
-  background: #F6F8FA !important;
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT MODE  —  sidebar stays dark always; only #main-content switches
+   Approche : overrides CSS directs sur les classes Tailwind utilisées dans
+   le codebase. Pas de filter: invert() qui déforme couleurs et charts.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper principal ── */
+html[data-theme="light"] #dashboard-shell { background: #EDF0F4; }
+html[data-theme="light"] #main-content    { background: #EDF0F4; color: #1F2328; }
+
+/* ── Fonds neutres (correspondance dark → light) ── */
+html[data-theme="light"] #main-content .bg-\[#0D1117\]   { background-color: #EDF0F4 !important; }
+html[data-theme="light"] #main-content .bg-\[#161B22\]   { background-color: #FFFFFF !important; }
+html[data-theme="light"] #main-content .bg-\[#21262D\]   { background-color: #F0F2F5 !important; }
+html[data-theme="light"] #main-content .bg-\[#30363D\]   { background-color: #CBD4DC !important; }
+
+/* Overlays semi-transparents blancs → équivalents solides clairs */
+html[data-theme="light"] #main-content .bg-white\/\[0\.02\] { background-color: #F8F9FB !important; }
+html[data-theme="light"] #main-content .bg-white\/\[0\.03\] { background-color: #F5F6F8 !important; }
+html[data-theme="light"] #main-content .bg-white\/\[0\.04\] { background-color: #F2F4F7 !important; }
+html[data-theme="light"] #main-content .bg-white\/\[0\.05\] { background-color: #EDEEF2 !important; }
+html[data-theme="light"] #main-content .bg-white\/\[0\.06\] { background-color: #EAECF0 !important; }
+html[data-theme="light"] #main-content .bg-white\/\[0\.08\] { background-color: #E6E9EE !important; }
+
+/* Hover states */
+html[data-theme="light"] #main-content .hover\:bg-\[#21262D\]:hover   { background-color: #E5E8EE !important; }
+html[data-theme="light"] #main-content .hover\:border-\[#30363D\]:hover { border-color: #B0BBC5 !important; }
+
+/* ── Texte ── */
+html[data-theme="light"] #main-content .text-\[#E6EDF3\]   { color: #1F2328 !important; }
+html[data-theme="light"] #main-content .text-white          { color: #1F2328 !important; }
+html[data-theme="light"] #main-content .text-\[#8B949E\]   { color: #57606A !important; }
+html[data-theme="light"] #main-content .text-\[#484F58\]   { color: #8C959F !important; }
+html[data-theme="light"] #main-content .text-\[#30363D\]   { color: #B0BEC5 !important; }
+
+/* Exception : texte blanc sur gradients colorés (hero cards, boutons…) */
+html[data-theme="light"] #main-content [style*="linear-gradient"] .text-white  { color: #FFFFFF !important; }
+html[data-theme="light"] #main-content [style*="linear-gradient"] *             { color: inherit; }
+html[data-theme="light"] #main-content [style*="background: #F0A30A"] .text-white,
+html[data-theme="light"] #main-content [style*="background: #388BFD"] .text-white,
+html[data-theme="light"] #main-content [style*="background: #2EA043"] .text-white,
+html[data-theme="light"] #main-content [style*="background: #8B5CF6"] .text-white,
+html[data-theme="light"] #main-content [style*="background: #EC4899"] .text-white,
+html[data-theme="light"] #main-content [style*="background: #F85149"] .text-white { color: #FFFFFF !important; }
+
+/* Hover texte */
+html[data-theme="light"] #main-content .hover\:text-\[#E6EDF3\]:hover               { color: #1F2328 !important; }
+html[data-theme="light"] #main-content .group:hover .group-hover\:text-\[#E6EDF3\]  { color: #1F2328 !important; }
+html[data-theme="light"] #main-content .group:hover .group-hover\:text-\[#8B949E\]  { color: #57606A !important; }
+html[data-theme="light"] #main-content .hover\:text-red-400:hover                   { color: #DC2626 !important; }
+
+/* ── Bordures ── */
+html[data-theme="light"] #main-content .border-\[#30363D\]       { border-color: #CBD4DC !important; }
+html[data-theme="light"] #main-content .border-\[#21262D\]       { border-color: #DDE3EB !important; }
+html[data-theme="light"] #main-content .border-white\/\[0\.04\]  { border-color: #E5EAF0 !important; }
+html[data-theme="light"] #main-content .border-white\/\[0\.06\]  { border-color: #DDE3EB !important; }
+html[data-theme="light"] #main-content .border-white\/\[0\.08\]  { border-color: #D3DCE6 !important; }
+html[data-theme="light"] #main-content .border-white\/\[0\.1\]   { border-color: #C9D3DF !important; }
+html[data-theme="light"] #main-content .border-white\/\[0\.12\]  { border-color: #C2CDD9 !important; }
+
+/* ── Inputs / Selects / Textareas ── */
+html[data-theme="light"] #main-content input,
+html[data-theme="light"] #main-content textarea,
+html[data-theme="light"] #main-content select {
+  background-color: #FFFFFF !important;
+  border-color: #C9D3DC !important;
   color: #1F2328 !important;
 }
-
-::selection {
-  background: #F0A30A33;
+html[data-theme="light"] #main-content input::placeholder,
+html[data-theme="light"] #main-content textarea::placeholder { color: #8C959F !important; }
+html[data-theme="light"] #main-content select option          { background: #FFFFFF !important; color: #1F2328 !important; }
+html[data-theme="light"] #main-content input:focus,
+html[data-theme="light"] #main-content textarea:focus,
+html[data-theme="light"] #main-content select:focus {
+  border-color: #F0A30A !important;
+  box-shadow: 0 0 0 2px rgba(240,163,10,0.18) !important;
 }
+html[data-theme="light"] #main-content input:-webkit-autofill,
+html[data-theme="light"] #main-content input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1F2328 !important;
+  -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
+  caret-color: #1F2328 !important;
+}
+
+/* ── Ombres (cartes) ── */
+html[data-theme="light"] #main-content .shadow-xl  { box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important; }
+html[data-theme="light"] #main-content .shadow-2xl { box-shadow: 0 8px 40px rgba(0,0,0,0.12) !important; }
+
+/* ── Scrollbar ── */
+html[data-theme="light"] ::-webkit-scrollbar-track { background: #EDF0F4 !important; }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: #C0CBDA !important; }
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #8C959F !important; }
+
+/* ── Pages hors dashboard (login, onboarding…) ── */
+html[data-theme="light"] body { background: #EDF0F4 !important; color: #1F2328 !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE (défaut) — styles de base
+════════════════════════════════════════════════════════════════════════════ */
+
+::selection { background: #F0A30A33; }
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #161B22; }
 ::-webkit-scrollbar-thumb { background: #30363D; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #8B949E; }
 
-/* ── Form elements — always readable on dark background ── */
+/* Form elements — lisibles sur fond sombre */
 input, textarea, select {
   color: #E6EDF3;
   background-color: #21262D;
   border-color: #30363D;
 }
-input::placeholder, textarea::placeholder {
-  color: #484F58;
-}
-select option {
-  background-color: #21262D;
-  color: #E6EDF3;
-}
-/* autofill override (Chrome/Edge dark mode) */
+input::placeholder, textarea::placeholder { color: #484F58; }
+select option { background-color: #21262D; color: #E6EDF3; }
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
@@ -57,7 +133,7 @@ input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px #21262D inset;
   caret-color: #E6EDF3;
 }
-/* focus ring on all form elements */
+
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: #F0A30A;
