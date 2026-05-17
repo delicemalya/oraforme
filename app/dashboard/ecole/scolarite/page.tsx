@@ -135,102 +135,147 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <div className="flex-1 min-w-0 rounded-xl border border-white/[0.06] overflow-hidden">
-          <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                {['Étudiant', 'ID', 'Niveau', 'Statut', ''].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {displayed.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-12 text-[#8B949E] text-sm">Aucun étudiant trouvé.</td></tr>
-              ) : displayed.map((e, i) => (
-                <motion.tr key={e.id} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.02 }}
-                  onClick={() => setSelected(e)}
-                  className={`border-b border-white/[0.04] cursor-pointer transition-colors ${selected?.id === e.id ? 'bg-[#F0A30A]/5' : 'hover:bg-white/[0.02]'}`}
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2.5">
-                      <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={30} />
-                      <div>
-                        <p className="text-xs font-semibold text-white">{e.prenom} {e.nom}</p>
-                        <p className="text-[10px] text-[#8B949E]">{e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-[10px] font-mono text-[#8B949E]">{e.numero_id}</td>
-                  <td className="px-4 py-3 text-xs text-[#8B949E]">{NIVEAUX.find(n => n.value === e.niveau)?.label}</td>
-                  <td className="px-4 py-3"><StatutBadge statut={e.statut} /></td>
-                  <td className="px-4 py-3"><ChevronRight size={14} className="text-[#484F58]" /></td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-          </div>
+      {/* ── Grille de cartes Étudiants ───────────────────────────────────── */}
+      {displayed.length === 0 ? (
+        <div className="text-center py-16 text-[#8B949E] text-xs space-y-2">
+          <Users2 size={32} className="mx-auto opacity-20" />
+          <p className="font-medium">Aucun étudiant trouvé.</p>
         </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {displayed.map((e, i) => {
+            const sc = STATUT_ETU[e.statut as StatutEtu] ?? STATUT_ETU.actif
+            return (
+              <motion.div key={e.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
+                style={{ background: 'rgba(255,255,255,0.025)' }}>
 
-        <AnimatePresence>
-          {selected && (
-            <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 290, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
-              className="rounded-xl border border-white/[0.06] overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.02)' }}>
-              <div className="p-4 space-y-4 min-w-[290px]">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <Avatar nom={selected.nom} prenom={selected.prenom} photoUrl={selected.photo_url} size={38} />
-                    <div>
-                      <p className="text-sm font-bold text-white">{selected.prenom} {selected.nom}</p>
-                      <p className="text-[10px] font-mono text-[#8B949E]">{selected.numero_id}</p>
+                {/* Status badge */}
+                <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
+                  style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
+
+                {/* Avatar + Nom */}
+                <div className="flex flex-col items-center text-center pt-1">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.1] mb-2 shrink-0">
+                    <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={64} />
+                  </div>
+                  <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.nom}</p>
+                  <p className="text-[10px] font-mono text-[#8B5CF6] mt-0.5 bg-[#8B5CF6]/10 px-2 py-0.5 rounded-full">{e.numero_id}</p>
+                </div>
+
+                {/* Niveau + Classe */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
+                  <div>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Niveau</p>
+                    <p className="text-[10px] text-white mt-0.5">{NIVEAUX.find(n => n.value === e.niveau)?.label ?? e.niveau}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Classe</p>
+                    <p className="text-[10px] text-white mt-0.5 truncate">{e.classe ?? '—'}</p>
+                  </div>
+                </div>
+
+                {/* Contact parent */}
+                <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+                  {e.tel_parent && (
+                    <div className="flex items-center gap-2">
+                      <Phone size={11} className="text-[#484F58] shrink-0" />
+                      <p className="text-[11px] text-[#8B949E]">{e.tel_parent}</p>
                     </div>
-                  </div>
-                  <button onClick={() => setSelected(null)} className="text-[#8B949E] hover:text-white"><X size={14} /></button>
+                  )}
+                  {e.email_parent && (
+                    <div className="flex items-center gap-2">
+                      <Mail size={11} className="text-[#484F58] shrink-0" />
+                      <p className="text-[11px] text-[#8B949E] truncate">{e.email_parent}</p>
+                    </div>
+                  )}
+                  {!e.tel_parent && !e.email_parent && (
+                    <p className="text-[11px] text-[#484F58]">Aucun contact parent</p>
+                  )}
                 </div>
-                <div className="space-y-1.5 text-xs">
-                  <StatutBadge statut={selected.statut} />
-                  {selected.date_naissance && <p className="text-[#8B949E]">Né(e) le : <span className="text-white">{new Date(selected.date_naissance).toLocaleDateString('fr-FR')}</span></p>}
-                  {selected.adresse && <p className="text-[#8B949E]">Adresse : <span className="text-white">{selected.adresse}</span></p>}
-                  {selected.tel_parent && <p className="text-[#8B949E]">Parent : <span className="text-white">{selected.tel_parent}</span></p>}
+
+                {/* Boutons */}
+                <div className="flex gap-2 pt-1 mt-auto">
+                  <button onClick={() => del(e.id)}
+                    className="p-2 rounded-lg border border-white/[0.06] text-[#484F58] hover:text-red-400 hover:border-red-400/30 transition-all"
+                    title="Supprimer">
+                    <Trash2 size={12} />
+                  </button>
+                  <button onClick={() => setSelected(selected?.id === e.id ? null : e)}
+                    className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
+                    style={{ background: selected?.id === e.id ? '#F0A30A' : 'linear-gradient(135deg,#388BFD,#1a6fd4)' }}>
+                    {selected?.id === e.id ? 'Fermer' : 'Gérer'}
+                  </button>
                 </div>
-                <div>
-                  <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1.5">Modifier le statut</p>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {(['actif', 'suspendu', 'banni', 'diplome'] as const).map(s => {
-                      const cfg = STATUT_ETU[s]
-                      return (
-                        <button key={s} onClick={() => changeStatut(selected.id, s)} className="py-1.5 rounded-lg text-[10px] font-semibold transition-all"
-                          style={{ background: selected.statut === s ? cfg.bg : 'rgba(255,255,255,0.04)', color: selected.statut === s ? cfg.color : '#8B949E', border: `1px solid ${selected.statut === s ? cfg.color + '40' : 'transparent'}` }}>
-                          {cfg.label}
-                        </button>
-                      )
-                    })}
+              </motion.div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* ── Panneau de gestion flottant ─────────────────────────────────── */}
+      <AnimatePresence>
+        {selected && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
+            className="fixed bottom-6 right-6 z-40 w-80 rounded-2xl border border-white/[0.1] shadow-2xl overflow-hidden"
+            style={{ background: '#161B22' }}>
+            <div className="p-4 space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Avatar nom={selected.nom} prenom={selected.prenom} photoUrl={selected.photo_url} size={40} />
+                  <div>
+                    <p className="text-sm font-bold text-white">{selected.prenom} {selected.nom}</p>
+                    <p className="text-[10px] font-mono text-[#8B5CF6]">{selected.numero_id} · {selected.classe ?? selected.niveau}</p>
                   </div>
                 </div>
-                {selected.statut === 'suspendu' && (
-                  <div className="bg-[#F0A30A]/08 border border-[#F0A30A]/20 rounded-lg p-3">
-                    {selected.code_deblocage ? (
-                      <>
-                        <p className="text-[10px] text-[#8B949E] mb-1">Code de déblocage :</p>
-                        <p className="text-lg font-mono font-bold text-[#F0A30A] tracking-widest">{selected.code_deblocage}</p>
-                      </>
-                    ) : (
-                      <button onClick={() => handleGenCode(selected.id)} disabled={genCode} className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#F0A30A]/15 text-[#F0A30A] text-xs font-semibold">
-                        {genCode ? <Loader2 className="animate-spin" size={12} /> : <Unlock size={12} />} Générer code déblocage
-                      </button>
-                    )}
-                  </div>
-                )}
-                <button onClick={() => del(selected.id)} className="w-full py-2 rounded-lg text-xs font-medium border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-1">
-                  <Trash2 size={11} /> Supprimer
-                </button>
+                <button onClick={() => setSelected(null)} className="text-[#8B949E] hover:text-white"><X size={15} /></button>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+
+              <div className="space-y-1 text-xs text-[#8B949E]">
+                {selected.date_naissance && <p>Né(e) le : <span className="text-white">{new Date(selected.date_naissance).toLocaleDateString('fr-FR')}</span></p>}
+                {selected.adresse && <p>Adresse : <span className="text-white">{selected.adresse}</span></p>}
+                {selected.tel_parent && <p>Parent : <span className="text-white">{selected.tel_parent}</span></p>}
+                {selected.nom_pere && <p>Père : <span className="text-white">{selected.nom_pere}</span></p>}
+                {selected.nom_mere && <p>Mère : <span className="text-white">{selected.nom_mere}</span></p>}
+              </div>
+
+              <div>
+                <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1.5">Modifier le statut</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(['actif', 'suspendu', 'banni', 'diplome'] as const).map(s => {
+                    const cfg = STATUT_ETU[s]
+                    return (
+                      <button key={s} onClick={() => changeStatut(selected.id, s)} className="py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                        style={{ background: selected.statut === s ? cfg.bg : 'rgba(255,255,255,0.04)', color: selected.statut === s ? cfg.color : '#8B949E', border: `1px solid ${selected.statut === s ? cfg.color + '40' : 'transparent'}` }}>
+                        {cfg.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {selected.statut === 'suspendu' && (
+                <div className="border border-[#F0A30A]/20 rounded-lg p-3" style={{ background: 'rgba(240,163,10,0.06)' }}>
+                  {selected.code_deblocage ? (
+                    <>
+                      <p className="text-[10px] text-[#8B949E] mb-1">Code de déblocage :</p>
+                      <p className="text-xl font-mono font-bold text-[#F0A30A] tracking-widest">{selected.code_deblocage}</p>
+                    </>
+                  ) : (
+                    <button onClick={() => handleGenCode(selected.id)} disabled={genCode} className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#F0A30A]/15 text-[#F0A30A] text-xs font-semibold">
+                      {genCode ? <Loader2 className="animate-spin" size={12} /> : <Unlock size={12} />} Générer code déblocage
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <button onClick={() => del(selected.id)} className="w-full py-2 rounded-lg text-xs font-medium border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-1">
+                <Trash2 size={11} /> Supprimer
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showForm && (

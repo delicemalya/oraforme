@@ -95,61 +95,75 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
           <p className="text-[#484F58]">Créez un dossier complet avec le formulaire intelligent multi-étapes.</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                {['Employé', 'Poste', 'Type', 'Salaire brut', 'Statut', 'Contrat'].map(h => (
-                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {displayed.map(e => {
-                const brut = (e.salaire_base || 0) + (e.prime_logement || 0) + (e.prime_transport || 0) + (e.prime_risque || 0) + (e.prime_rendement || 0)
-                const sc = e.statut === 'actif'
-                  ? { color: '#2EA043', bg: '#2EA04318', label: 'Actif' }
-                  : e.statut === 'suspendu'
-                  ? { color: '#F0A30A', bg: '#F0A30A18', label: 'Suspendu' }
-                  : { color: '#8B949E', bg: '#8B949E18', label: e.statut }
-                return (
-                  <tr key={e.id} className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer" onClick={() => setProfil({ type: 'employe', data: e as unknown as EmployeFull })}>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-                          {e.photo_url
-                            ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
-                            : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={32} />}
-                        </div>
-                        <div>
-                          <p className="font-medium text-white whitespace-nowrap">
-                            {e.prenom} {e.postnom ? e.postnom + ' ' : ''}{e.nom}
-                          </p>
-                          {e.email_pro && <p className="text-[10px] text-[#484F58]">{e.email_pro}</p>}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-white">{e.poste}</p>
-                      {e.departement && <p className="text-[10px] text-[#484F58]">{e.departement}</p>}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-[10px] font-medium capitalize text-[#8B949E]">{e.type_employe}</span>
-                    </td>
-                    <td className="px-4 py-3 font-semibold" style={{ color: '#2EA043' }}>{fmt(brut)} F</td>
-                    <td className="px-4 py-3">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
-                    </td>
-                    <td className="px-4 py-3 text-[#484F58]">
-                      {e.date_debut_contrat
-                        ? new Date(e.date_debut_contrat + 'T00:00:00').toLocaleDateString('fr-FR')
-                        : '—'}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {displayed.map(e => {
+            const brut = (e.salaire_base || 0) + (e.prime_logement || 0) + (e.prime_transport || 0) + (e.prime_risque || 0) + (e.prime_rendement || 0)
+            const sc = e.statut === 'actif'
+              ? { color: '#2EA043', bg: '#2EA04318', label: 'ACTIF' }
+              : e.statut === 'suspendu'
+              ? { color: '#F0A30A', bg: '#F0A30A18', label: 'SUSPENDU' }
+              : { color: '#8B949E', bg: '#8B949E18', label: (e.statut ?? 'INACTIF').toUpperCase() }
+            return (
+              <motion.div key={e.id} layout
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
+                style={{ background: 'rgba(255,255,255,0.025)' }}>
+
+                {/* Status */}
+                <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide"
+                  style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
+
+                {/* Avatar + Nom */}
+                <div className="flex flex-col items-center text-center pt-1">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.1] mb-2 shrink-0">
+                    {e.photo_url
+                      ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
+                      : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={64} />}
+                  </div>
+                  <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.postnom ? e.postnom + ' ' : ''}{e.nom}</p>
+                  <p className="text-[11px] text-[#8B949E] mt-0.5 capitalize">{e.poste}</p>
+                </div>
+
+                {/* Département + Contrat */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
+                  <div>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Département</p>
+                    <p className="text-[10px] text-white mt-0.5 truncate">{e.departement ?? '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Depuis</p>
+                    <p className="text-[10px] text-white mt-0.5">
+                      {e.date_debut_contrat ? new Date(e.date_debut_contrat + 'T00:00:00').toLocaleDateString('fr-FR') : '—'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Contact + Salaire */}
+                <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+                  {e.email_pro && (
+                    <div className="flex items-center gap-2">
+                      <Mail size={11} className="text-[#484F58] shrink-0" />
+                      <p className="text-[11px] text-[#8B949E] truncate">{e.email_pro}</p>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <DollarSign size={11} className="text-[#2EA043] shrink-0" />
+                    <p className="text-[11px] font-semibold" style={{ color: '#2EA043' }}>{fmt(brut)} FCFA/mois</p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-1 mt-auto">
+                  <span className="text-[9px] font-medium capitalize px-2 py-1 rounded-lg border border-white/[0.06] text-[#8B949E]">{e.type_employe}</span>
+                  <button
+                    onClick={() => setProfil({ type: 'employe', data: e as unknown as EmployeFull })}
+                    className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg, #388BFD, #1a6fd4)' }}>
+                    Voir le profil
+                  </button>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       )}
 
@@ -408,116 +422,86 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
         )}
       </AnimatePresence>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
+      {/* ── Grille de cartes Enseignants ──────────────────────────────────── */}
       {displayed.length === 0 ? (
         <div className="text-center py-12 text-[#8B949E] text-xs">Aucun enseignant enregistré.</div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                {['Enseignant', 'Matière', 'Contact & Mobile Money', 'Rémunération', 'Statut', ''].map(h => (
-                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {displayed.map(e => {
-                const s   = STATUT_ENS[e.statut] ?? STATUT_ENS.actif
-                const sel = selected?.id === e.id
-                return (
-                  <tr key={e.id} onClick={() => { setSelected(sel ? null : e); if (!sel) setProfil({ type: 'enseignant', data: e }) }}
-                    className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
-                    style={sel ? { background: 'rgba(46,160,67,0.06)' } : {}}>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-                          {e.photo_url
-                            ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
-                            : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={32} />}
-                        </div>
-                        <p className="font-medium text-white whitespace-nowrap">{e.prenom} {e.nom}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-[#8B949E]">{e.matiere ?? '—'}</td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-0.5">
-                        {e.telephone && <p className="text-[#8B949E] flex items-center gap-1"><Phone size={10} /> {e.telephone}</p>}
-                        {e.mobile_money_type && e.mobile_money_numero && (
-                          <p className="flex items-center gap-1 text-[10px]" style={{ color: '#F97316' }}>
-                            <Smartphone size={10} /> {e.mobile_money_type} · {e.mobile_money_numero}
-                          </p>
-                        )}
-                        {!e.telephone && !e.mobile_money_numero && <span className="text-[#484F58]">—</span>}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-0.5">
-                        {e.salaire_mensuel ? <p className="text-[#2EA043] font-semibold text-[10px]">{fmt(e.salaire_mensuel)} F/mois</p> : null}
-                        {e.taux_horaire ? (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: '#388BFD18', color: '#388BFD' }}>
-                            <Clock size={8} /> {new Intl.NumberFormat('fr-FR').format(e.taux_horaire)} F/h
-                          </span>
-                        ) : null}
-                        {!e.salaire_mensuel && !e.taux_horaire && <span className="text-[#484F58]">—</span>}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style={{ color: s.color, background: s.bg }}>{s.label}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <button onClick={ev => { ev.stopPropagation(); del(e.id) }} className="text-[#484F58] hover:text-red-400 transition-colors">
-                        <Trash2 size={11} />
-                      </button>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {displayed.map(e => {
+            const s = STATUT_ENS[e.statut] ?? STATUT_ENS.actif
+            return (
+              <motion.div key={e.id} layout
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
+                style={{ background: 'rgba(255,255,255,0.025)' }}>
+
+                {/* Status badge */}
+                <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
+                  style={{ color: s.color, background: s.bg }}>{s.label}</span>
+
+                {/* Avatar + Nom */}
+                <div className="flex flex-col items-center text-center pt-1">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.1] mb-2 shrink-0">
+                    {e.photo_url
+                      ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
+                      : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={64} />}
+                  </div>
+                  <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.nom}</p>
+                  <p className="text-[11px] text-[#8B949E] mt-0.5">{e.matiere ?? 'Matière non définie'}</p>
+                </div>
+
+                {/* Rémunération */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
+                  <div>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Mensuel</p>
+                    <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#2EA043' }}>
+                      {e.salaire_mensuel ? `${fmt(e.salaire_mensuel)} F` : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Horaire</p>
+                    <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#388BFD' }}>
+                      {e.taux_horaire ? `${fmt(e.taux_horaire)} F/h` : '—'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Contact */}
+                <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <Mail size={11} className="text-[#484F58] shrink-0" />
+                    <p className="text-[11px] text-[#8B949E] truncate">{e.email ?? '—'}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone size={11} className="text-[#484F58] shrink-0" />
+                    <p className="text-[11px] text-[#8B949E]">{e.telephone ?? '—'}</p>
+                  </div>
+                  {e.mobile_money_type && e.mobile_money_numero && (
+                    <div className="flex items-center gap-2">
+                      <Smartphone size={11} className="shrink-0" style={{ color: '#F97316' }} />
+                      <p className="text-[11px] truncate" style={{ color: '#F97316' }}>{e.mobile_money_type} · {e.mobile_money_numero}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-1 mt-auto">
+                  <button onClick={() => del(e.id)}
+                    className="p-2 rounded-lg border border-white/[0.06] text-[#484F58] hover:text-red-400 hover:border-red-400/30 transition-all"
+                    title="Supprimer">
+                    <Trash2 size={12} />
+                  </button>
+                  <button
+                    onClick={() => setProfil({ type: 'enseignant', data: e })}
+                    className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg, #388BFD, #1a6fd4)' }}>
+                    Voir le profil
+                  </button>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       )}
-
-      {/* ── Detail panel ──────────────────────────────────────────────────── */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-            className="rounded-xl border border-white/[0.08] p-5"
-            style={{ background: 'rgba(255,255,255,0.015)' }}>
-            <div className="flex items-start gap-4 mb-5">
-              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/[0.08] shrink-0">
-                {selected.photo_url
-                  ? <img src={selected.photo_url} alt="" className="w-full h-full object-cover" />
-                  : <Avatar nom={selected.nom} prenom={selected.prenom} photoUrl={null} size={56} />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-base font-bold text-white">{selected.prenom} {selected.nom}</p>
-                <p className="text-xs text-[#8B949E]">{selected.matiere ?? 'Matière non définie'}</p>
-                <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
-                  style={{ color: (STATUT_ENS[selected.statut] ?? STATUT_ENS.actif).color, background: (STATUT_ENS[selected.statut] ?? STATUT_ENS.actif).bg }}>
-                  {(STATUT_ENS[selected.statut] ?? STATUT_ENS.actif).label}
-                </span>
-              </div>
-              <button onClick={() => setSelected(null)} className="text-[#484F58] hover:text-white transition-colors p-1">
-                <X size={14} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {selected.telephone        && <InfoItem icon={Phone}      label="Téléphone"       value={selected.telephone} />}
-              {selected.email            && <InfoItem icon={Mail}       label="Email"            value={selected.email} />}
-              {selected.salaire_mensuel  ? <InfoItem icon={DollarSign}  label="Salaire mensuel"  value={`${fmt(selected.salaire_mensuel)} FCFA`} color="#2EA043" /> : null}
-              {selected.taux_horaire     ? <InfoItem icon={Clock}       label="Taux horaire"     value={`${new Intl.NumberFormat('fr-FR').format(selected.taux_horaire)} FCFA/h`} color="#388BFD" /> : null}
-              {selected.mobile_money_type && selected.mobile_money_numero && (
-                <InfoItem icon={Smartphone} label={selected.mobile_money_type} value={selected.mobile_money_numero} color="#F97316" />
-              )}
-              {selected.banque           && <InfoItem icon={Building2}  label="Banque"           value={selected.banque} />}
-              {selected.rib              && <InfoItem icon={CreditCard}  label="RIB"              value={selected.rib} />}
-              {selected.numero_cnss      && <InfoItem icon={Shield}      label="N° CNSS"          value={selected.numero_cnss} color="#8B5CF6" />}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {profil && <ProfilDrawer person={profil} onClose={() => { setProfil(null); setSelected(null) }} />}
@@ -754,108 +738,78 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
         )}
       </AnimatePresence>
 
-      {/* Table */}
+      {/* ── Grille de cartes Staff ────────────────────────────────────────── */}
       {displayed.length === 0 ? (
         <div className="text-center py-12 text-[#8B949E] text-xs">Aucun agent enregistré.</div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                {['Agent', 'Poste', 'Contact & Mobile Money', 'Salaire', 'Statut', ''].map(h => (
-                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {displayed.map(s => {
-                const sel = selected?.id === s.id
-                const sc = s.statut === 'actif'
-                  ? { color: '#2EA043', bg: '#2EA04318', label: 'Actif' }
-                  : { color: '#8B949E', bg: '#8B949E18', label: 'Inactif' }
-                return (
-                  <tr key={s.id} onClick={() => { setSelected(sel ? null : s); if (!sel) setProfil({ type: 'staff', data: s as unknown as StaffFull }) }}
-                    className="border-t border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
-                    style={sel ? { background: 'rgba(46,160,67,0.06)' } : {}}>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-                          {s.photo_url
-                            ? <img src={s.photo_url} alt="" className="w-full h-full object-cover" />
-                            : <Avatar nom={s.nom} prenom={s.prenom || '?'} photoUrl={null} size={32} />}
-                        </div>
-                        <p className="font-medium text-white whitespace-nowrap">{s.prenom} {s.nom}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-[#8B949E]">{s.poste}</td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-0.5">
-                        {s.telephone && <p className="text-[#8B949E] flex items-center gap-1"><Phone size={10} /> {s.telephone}</p>}
-                        {s.mobile_money_type && s.mobile_money_numero && (
-                          <p className="flex items-center gap-1 text-[10px]" style={{ color: '#F97316' }}>
-                            <Smartphone size={10} /> {s.mobile_money_type} · {s.mobile_money_numero}
-                          </p>
-                        )}
-                        {!s.telephone && !s.mobile_money_numero && <span className="text-[#484F58]">—</span>}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 font-semibold" style={{ color: '#2EA043' }}>{fmt(s.salaire)} F/mois</td>
-                    <td className="px-4 py-3">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <button onClick={ev => { ev.stopPropagation(); del(s.id) }} className="text-[#484F58] hover:text-red-400 transition-colors">
-                        <Trash2 size={11} />
-                      </button>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {displayed.map(s => {
+            const sc = s.statut === 'actif'
+              ? { color: '#2EA043', bg: '#2EA04318', label: 'ACTIF' }
+              : { color: '#8B949E', bg: '#8B949E18', label: 'INACTIF' }
+            return (
+              <motion.div key={s.id} layout
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
+                style={{ background: 'rgba(255,255,255,0.025)' }}>
+
+                {/* Status badge */}
+                <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide"
+                  style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
+
+                {/* Avatar + Nom */}
+                <div className="flex flex-col items-center text-center pt-1">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.1] mb-2 shrink-0">
+                    {s.photo_url
+                      ? <img src={s.photo_url} alt="" className="w-full h-full object-cover" />
+                      : <Avatar nom={s.nom} prenom={s.prenom || '?'} photoUrl={null} size={64} />}
+                  </div>
+                  <p className="text-sm font-bold text-white leading-tight">{s.prenom} {s.nom}</p>
+                  <p className="text-[11px] text-[#8B949E] mt-0.5">{s.poste}</p>
+                </div>
+
+                {/* Salaire */}
+                <div className="pt-2 border-t border-white/[0.06] text-center">
+                  <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Salaire mensuel</p>
+                  <p className="text-sm font-bold mt-0.5" style={{ color: '#2EA043' }}>{fmt(s.salaire)} FCFA</p>
+                </div>
+
+                {/* Contact */}
+                <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <Mail size={11} className="text-[#484F58] shrink-0" />
+                    <p className="text-[11px] text-[#8B949E] truncate">{s.email ?? '—'}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone size={11} className="text-[#484F58] shrink-0" />
+                    <p className="text-[11px] text-[#8B949E]">{s.telephone ?? '—'}</p>
+                  </div>
+                  {s.mobile_money_type && s.mobile_money_numero && (
+                    <div className="flex items-center gap-2">
+                      <Smartphone size={11} className="shrink-0" style={{ color: '#F97316' }} />
+                      <p className="text-[11px] truncate" style={{ color: '#F97316' }}>{s.mobile_money_type} · {s.mobile_money_numero}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-1 mt-auto">
+                  <button onClick={() => del(s.id)}
+                    className="p-2 rounded-lg border border-white/[0.06] text-[#484F58] hover:text-red-400 hover:border-red-400/30 transition-all"
+                    title="Supprimer">
+                    <Trash2 size={12} />
+                  </button>
+                  <button
+                    onClick={() => setProfil({ type: 'staff', data: s as unknown as StaffFull })}
+                    className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg, #388BFD, #1a6fd4)' }}>
+                    Voir le profil
+                  </button>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       )}
-
-      {/* Detail panel */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-            className="rounded-xl border border-white/[0.08] p-5"
-            style={{ background: 'rgba(255,255,255,0.015)' }}>
-            <div className="flex items-start gap-4 mb-5">
-              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/[0.08] shrink-0">
-                {selected.photo_url
-                  ? <img src={selected.photo_url} alt="" className="w-full h-full object-cover" />
-                  : <Avatar nom={selected.nom} prenom={selected.prenom || '?'} photoUrl={null} size={56} />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-base font-bold text-white">{selected.prenom} {selected.nom}</p>
-                <p className="text-xs text-[#8B949E]">{selected.poste}</p>
-                <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
-                  style={selected.statut === 'actif'
-                    ? { color: '#2EA043', background: '#2EA04318' }
-                    : { color: '#8B949E', background: '#8B949E18' }}>
-                  {selected.statut === 'actif' ? 'Actif' : 'Inactif'}
-                </span>
-              </div>
-              <button onClick={() => setSelected(null)} className="text-[#484F58] hover:text-white transition-colors p-1">
-                <X size={14} />
-              </button>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {selected.telephone         && <InfoItem icon={Phone}      label="Téléphone"      value={selected.telephone} />}
-              {selected.email             && <InfoItem icon={Mail}       label="Email"           value={selected.email} />}
-              {selected.salaire           ?  <InfoItem icon={DollarSign} label="Salaire mensuel" value={`${fmt(selected.salaire)} FCFA`} color="#2EA043" /> : null}
-              {selected.mobile_money_type && selected.mobile_money_numero && (
-                <InfoItem icon={Smartphone} label={selected.mobile_money_type} value={selected.mobile_money_numero} color="#F97316" />
-              )}
-              {selected.banque            && <InfoItem icon={Building2}  label="Banque"          value={selected.banque} />}
-              {selected.rib               && <InfoItem icon={CreditCard} label="RIB"             value={selected.rib} />}
-              {selected.numero_cnss       && <InfoItem icon={Shield}     label="N° CNSS"         value={selected.numero_cnss} color="#8B5CF6" />}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {profil && <ProfilDrawer person={profil} onClose={() => { setProfil(null); setSelected(null) }} />}
