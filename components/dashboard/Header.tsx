@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, Globe, ChevronDown, LogOut, Sun, Moon } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useTenantContext } from '@/lib/contexts/TenantContext'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
 import {
   type Locale,
@@ -16,14 +16,17 @@ import {
 const DISPLAY_LOCALES: Locale[] = ['fr', 'en', 'ln', 'pt']
 
 export default function Header() {
-  const router = useRouter()
-  const [userName, setUserName] = useState('')
-  const [initials, setInitials] = useState('U')
-  const [nomEntreprise, setNomEntreprise] = useState<string | null>(null)
+  const { tenant } = useTenantContext()
+
+  const [userName,     setUserName]     = useState('')
+  const [initials,     setInitials]     = useState('U')
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [langOpen, setLangOpen] = useState(false)
-  const [locale, setLocale] = useState<Locale>('fr')
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [langOpen,     setLangOpen]     = useState(false)
+  const [locale,       setLocale]       = useState<Locale>('fr')
+  const [theme,        setTheme]        = useState<'dark' | 'light'>('dark')
+
+  // Company name comes from TenantContext — always in sync with current session
+  const nomEntreprise = tenant?.nomEntreprise ?? null
 
   useEffect(() => {
     setLocale(getStoredLocale())
@@ -32,6 +35,7 @@ export default function Header() {
     document.documentElement.setAttribute('data-theme', stored)
   }, [])
 
+  // User display name — derived from auth profile (display only, not tenant-sensitive)
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
@@ -39,24 +43,24 @@ export default function Header() {
       setInitials(email.charAt(0).toUpperCase())
       const { data } = await supabase
         .from('profiles')
-        .select('prenom, nom, tenants(nom_entreprise)')
+        .select('prenom, nom')
         .eq('user_id', user.id)
         .maybeSingle()
       if (data) {
         const name = [data.prenom, data.nom].filter(Boolean).join(' ')
         setUserName(name || email.split('@')[0])
         setInitials((name || email).charAt(0).toUpperCase())
-        const tenant = data.tenants as unknown as { nom_entreprise?: string } | null
-        setNomEntreprise(tenant?.nom_entreprise ?? null)
       } else {
         setUserName(email.split('@')[0])
       }
     })
-  }, [])
+  }, [tenant?.userId]) // re-run when the logged-in user changes
 
   async function handleLogout() {
     await supabase.auth.signOut()
-    router.push('/login')
+    // TenantContext's onAuthStateChange(SIGNED_OUT) triggers window.location.replace('/login').
+    // Hard-navigate here as a safety net in case the context fires late.
+    window.location.href = '/login'
   }
 
   function handleLocaleChange(l: Locale) {
@@ -88,7 +92,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Badge entreprise */}
+      {/* Badge entreprise — affiché depuis TenantContext, toujours cohérent avec la session active */}
       {nomEntreprise && (
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0">
           <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0">
@@ -170,6 +174,9 @@ export default function Header() {
               <div className="absolute right-0 top-full mt-1 w-44 bg-[#161B22] border border-[#30363D] rounded-lg shadow-xl z-20 py-1">
                 <div className="px-3 py-2 border-b border-[#21262D]">
                   <p className="text-xs font-medium text-[#E6EDF3] truncate">{userName}</p>
+                  {nomEntreprise && (
+                    <p className="text-[10px] text-[#484F58] truncate">{nomEntreprise}</p>
+                  )}
                 </div>
                 <button
                   onClick={handleLogout}

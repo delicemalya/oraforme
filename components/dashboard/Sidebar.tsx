@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   LayoutDashboard, FileText, Package, UserCheck,
   ChefHat, GraduationCap, Hotel, Bot,
-  LogOut, Menu, X, Building2, Lock,
+  LogOut, Menu, X, Lock,
   Settings, ShieldAlert, ShieldCheck, Store,
   Wallet, BookOpen, ShoppingCart,
   Receipt, BarChart2, Truck,
@@ -17,7 +18,7 @@ import { CORE_MODULE_IDS, CORE_SECTION_LABEL } from '@/lib/erp-core'
 import { useState, useEffect } from 'react'
 import { SUPER_ADMIN_EMAILS } from '@/lib/admin-config'
 import type { LucideIcon } from 'lucide-react'
-import type { UserRole, ModulePermission } from '@/lib/hooks/usePermissions'
+import type { ModulePermission } from '@/lib/hooks/usePermissions'
 import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Generic modules (tenants sans secteur défini) ─────────────────────────────
@@ -37,7 +38,6 @@ const ALL_MODULES = [
   { id: 'hotel',        label: 'Hôtel & Hébergement',  icon: Hotel,         href: '/dashboard/hotel' },
   { id: 'transport',    label: 'Transport VTC',        icon: Truck,         href: '/dashboard/transport' },
   { id: 'bizbot',       label: 'MIAA+ Assistant',      icon: Bot,           href: '/dashboard/miaa' },
-  // mobilemoney removed — intégré comme mode de paiement dans Trésorerie
 ]
 
 // ── Navigation par secteur métier ─────────────────────────────────────────────
@@ -53,7 +53,6 @@ type NavItem = {
 }
 
 // ── Visibilité par rôle école ─────────────────────────────────────────────────
-// Clé = id de l'item, valeur = rôles autorisés (tableau vide = tout le monde)
 
 const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
   'direction':              ['DIRECTION_GENERALE'],
@@ -225,94 +224,98 @@ const SECTOR_LABEL: Record<string, string> = {
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const router   = useRouter()
   const { t }    = useLocale()
 
-  const [mobileOpen,    setMobileOpen]    = useState(false)
-  const [nomEntreprise, setNomEntreprise] = useState<string | null>(null)
-  const [secteur,       setSecteur]       = useState<string | null>(null)
-  const [role,          setRole]          = useState<UserRole | null>(null)
-  const [ecoleRole,     setEcoleRole]     = useState<string | null>(null)
+  // ── Tenant data from context (reactive to auth changes) ────────────────────
+  const { tenant, loading: tenantLoading } = useTenantContext()
+
+  const nomEntreprise = tenant?.nomEntreprise ?? null
+  const secteur       = tenant?.secteur       ?? null
+  const role          = tenant?.role          ?? null
+  const ecoleRole     = tenant?.ecoleRole     ?? null
+  const isSuperAdmin  = tenant?.isSuperAdmin  ?? false
+
+  // ── Local sidebar-only state ───────────────────────────────────────────────
+  const [mobileOpen,  setMobileOpen]  = useState(false)
   const [modulesActifs, setModulesActifs] = useState<string[]>([])
   const [permissions,   setPermissions]   = useState<Record<string, ModulePermission>>({})
-  const [loaded,        setLoaded]        = useState(false)
-  const [userEmail,     setUserEmail]     = useState<string | null>(null)
+  const [permsLoaded,   setPermsLoaded]   = useState(false)
 
+  // ── Permissions & modules — reload whenever the logged-in user changes ──────
+  // Depending on tenant.userId means this re-runs automatically when
+  // TenantContext detects a session change (cross-tab or sequential login).
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) { setLoaded(true); return }
-      setUserEmail(user.email ?? null)
+    if (!tenant) {
+      // No session — reset sidebar permissions state
+      setModulesActifs([])
+      setPermissions({})
+      setPermsLoaded(true)
+      return
+    }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id, role, tenant_id, ecole_role_name, tenants(nom_entreprise, modules_actifs, secteur_activite)')
-        .eq('user_id', user.id)
-        .maybeSingle()
+    if (tenant.role === 'owner') {
+      // Owners see all modules, no permission table needed
+      setModulesActifs(ALL_MODULES.map(m => m.id))
+      setPermissions({})
+      setPermsLoaded(true)
+      return
+    }
 
-      if (!profile) { setLoaded(true); return }
+    // Non-owner: fetch tenant_modules + user_permissions for this specific user
+    let cancelled = false
 
-      const t = profile.tenants as unknown as {
-        nom_entreprise:   string
-        modules_actifs:   string[]
-        secteur_activite: string | null
-      } | null
+    async function loadPerms() {
+      setPermsLoaded(false)
 
-      setNomEntreprise(t?.nom_entreprise ?? null)
-      setSecteur(t?.secteur_activite ?? null)
-      setRole(profile.role as UserRole)
+      // Modules (only relevant for non-sector tenants; sector nav is fixed)
+      if (!tenant!.secteur) {
+        const { data: tmRows } = await supabase
+          .from('tenant_modules')
+          .select('module_key')
+          .eq('tenant_id', tenant!.tenantId)
+          .eq('enabled', true)
 
-      // Pour le secteur école : résoudre le rôle école
-      if (t?.secteur_activite === 'ecole') {
-        if (profile.role === 'owner') {
-          setEcoleRole('DIRECTION_GENERALE')
-        } else {
-          setEcoleRole((profile as unknown as { ecole_role_name?: string }).ecole_role_name ?? null)
-        }
-      }
-
-      // Pour les tenants sans secteur : l'owner voit tout, les autres voient leur tenant_modules
-      if (!t?.secteur_activite) {
-        if (profile.role === 'owner') {
-          setModulesActifs(ALL_MODULES.map(m => m.id))
-        } else {
-          const { data: tmRows } = await supabase
-            .from('tenant_modules')
-            .select('module_key')
-            .eq('tenant_id', profile.tenant_id)
-            .eq('enabled', true)
-
+        if (!cancelled) {
           setModulesActifs(
             tmRows && tmRows.length > 0
               ? tmRows.map((r: { module_key: string }) => r.module_key)
-              : (t?.modules_actifs ?? [])
+              : tenant!.modulesActifs,
           )
         }
       }
 
-      // Charger les permissions pour admin / membre
-      if (profile.role !== 'owner') {
-        const { data: perms } = await supabase
-          .from('user_permissions')
-          .select('module_key, can_view, can_edit, can_delete')
-          .eq('profile_id', profile.id)
+      // Permissions
+      const { data: perms } = await supabase
+        .from('user_permissions')
+        .select('module_key, can_view, can_edit, can_delete')
+        .eq('profile_id', tenant!.profileId)
 
-        const map: Record<string, ModulePermission> = {}
-        for (const p of perms ?? []) {
-          map[p.module_key] = {
-            can_view:   p.can_view,
-            can_edit:   p.can_edit,
-            can_delete: p.can_delete,
-          }
+      if (cancelled) return
+
+      const permMap: Record<string, ModulePermission> = {}
+      for (const p of perms ?? []) {
+        permMap[p.module_key] = {
+          can_view:   p.can_view,
+          can_edit:   p.can_edit,
+          can_delete: p.can_delete,
         }
-        setPermissions(map)
       }
+      setPermissions(permMap)
+      setPermsLoaded(true)
+    }
 
-      setLoaded(true)
-    })
-  }, [])
+    loadPerms()
+    return () => { cancelled = true }
+  }, [
+    tenant?.userId,
+    tenant?.tenantId,
+    tenant?.role,
+    tenant?.secteur,
+    tenant?.profileId,
+  ]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isOwner  = role === 'owner'
-  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(userEmail ?? '')
+  const loaded    = !tenantLoading && permsLoaded
+  const isOwner   = role === 'owner'
 
   function isActive(href: string, exact = false) {
     return exact ? pathname === href : pathname.startsWith(href)
@@ -320,35 +323,34 @@ export default function Sidebar() {
 
   async function handleLogout() {
     await supabase.auth.signOut()
-    router.push('/login')
+    // TenantContext fires onAuthStateChange(SIGNED_OUT) → window.location.replace('/login')
+    // Hard-navigate here as immediate safety net.
+    window.location.href = '/login'
   }
 
   // ── Résolution de la navigation selon secteur + permissions ────────────────
 
   const rawSectorItems = secteur ? (SECTOR_NAV[secteur] ?? null) : null
 
-  // Filtrer : owner voit tout, secteur école → rôle école, autres → user_permissions
   const sectorNav = rawSectorItems
     ? rawSectorItems.filter(item => {
         if (isOwner) return true
         if (secteur === 'ecole') {
           const allowed = ECOLE_ROLE_VISIBILITY[item.id]
-          if (!allowed || allowed.length === 0) return true // visible à tous
+          if (!allowed || allowed.length === 0) return true
           return ecoleRole ? allowed.includes(ecoleRole) : false
         }
         return permissions[item.id]?.can_view === true
       })
     : null
 
-  // ── Split sector nav: Core ERP vs Métier ────────────────────────────────────
-  const coreNavItems     = sectorNav ? sectorNav.filter(item => CORE_MODULE_IDS.has(item.id))     : []
-  const businessNavItems = sectorNav ? sectorNav.filter(item => !CORE_MODULE_IDS.has(item.id))    : []
+  const coreNavItems     = sectorNav ? sectorNav.filter(item =>  CORE_MODULE_IDS.has(item.id)) : []
+  const businessNavItems = sectorNav ? sectorNav.filter(item => !CORE_MODULE_IDS.has(item.id)) : []
 
-  // Modules actifs pour les tenants sans secteur (filtrage identique)
   const allActiveModules  = ALL_MODULES.filter(m =>
-    modulesActifs.includes(m.id) && (isOwner || permissions[m.id]?.can_view !== false)
+    modulesActifs.includes(m.id) && (isOwner || permissions[m.id]?.can_view !== false),
   )
-  const coreActiveModules     = allActiveModules.filter(m => CORE_MODULE_IDS.has(m.id))
+  const coreActiveModules     = allActiveModules.filter(m =>  CORE_MODULE_IDS.has(m.id))
   const businessActiveModules = allActiveModules.filter(m => !CORE_MODULE_IDS.has(m.id))
   const inactiveModules       = ALL_MODULES.filter(m => !modulesActifs.includes(m.id))
 
@@ -408,7 +410,6 @@ export default function Sidebar() {
         {/* ── Navigation SECTEUR ───────────────────────────────────────────── */}
         {loaded && sectorNav && (
           <>
-            {/* Core ERP items */}
             {coreNavItems.length > 0 && (
               <>
                 <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">
@@ -443,7 +444,6 @@ export default function Sidebar() {
               </>
             )}
 
-            {/* Business / Métier items */}
             {businessNavItems.length > 0 && (
               <>
                 <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">
@@ -487,7 +487,6 @@ export default function Sidebar() {
         {/* ── Navigation GÉNÉRIQUE (pas de secteur) ───────────────────────── */}
         {loaded && !sectorNav && (
           <>
-            {/* Core ERP modules */}
             {coreActiveModules.length > 0 && (
               <>
                 <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">{CORE_SECTION_LABEL}</p>
@@ -512,7 +511,6 @@ export default function Sidebar() {
               </>
             )}
 
-            {/* Business modules */}
             {businessActiveModules.length > 0 && (
               <>
                 <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
@@ -537,7 +535,6 @@ export default function Sidebar() {
               </>
             )}
 
-            {/* Inactive modules (owner only) */}
             {isOwner && inactiveModules.length > 0 && (
               <>
                 <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.inactive')}</p>
@@ -576,7 +573,6 @@ export default function Sidebar() {
       {/* Bas */}
       <div className="px-2 py-3 border-t border-[#30363D] shrink-0 space-y-0.5">
 
-        {/* Équipe — owner + Direction Générale école */}
         {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
           <Link
             href="/dashboard/equipe"
@@ -592,7 +588,6 @@ export default function Sidebar() {
           </Link>
         )}
 
-        {/* Rôles — owner + Direction Générale école */}
         {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
           <Link
             href="/dashboard/roles"
@@ -608,7 +603,6 @@ export default function Sidebar() {
           </Link>
         )}
 
-        {/* Modules store — uniquement pour les tenants sans secteur */}
         {isOwner && !secteur && (
           <Link
             href="/dashboard/modules"
@@ -624,7 +618,6 @@ export default function Sidebar() {
           </Link>
         )}
 
-        {/* Analytics BI — owner + Direction Générale */}
         {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
           <Link
             href="/dashboard/analytics"
