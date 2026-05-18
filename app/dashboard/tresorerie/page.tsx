@@ -6,13 +6,14 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
+  Tooltip, ResponsiveContainer,
 } from 'recharts'
 import {
   Plus, Minus, TrendingUp, TrendingDown, Wallet, X, Loader2,
-  Settings2, Smartphone, CreditCard, Banknote, Building2,
-  UserCheck, Search, CheckCircle, AlertCircle, FileText,
-  ArrowUpCircle, ArrowDownCircle, Users, RefreshCw,
+  Smartphone, Banknote, Building2, CheckCircle, AlertCircle, FileText,
+  ArrowUpCircle, ArrowDownCircle, RefreshCw,
+  LayoutDashboard, Landmark, Archive, Upload, GitMerge,
+  BarChart3, Eye, ListOrdered, Lock, Sliders, PiggyBank,
 } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
 import { resolveAccounts } from '@/lib/accounting-engine'
@@ -33,42 +34,52 @@ type Transaction = {
   created_at: string
 }
 
-type Prestataire = {
+type Caisse = {
   id: string
   nom: string
-  prenom: string
-  type: string   // 'enseignant' | 'formateur' | 'ouvrier' | 'autre'
-  taux_horaire?: number | null
-  telephone?: string | null
-  email?: string | null
+  numero_compte: string
+  solde: number
+  actif: boolean
 }
 
-type ModalType = 'encaisser' | 'decaisser' | 'prestataire' | null
+type CompteBancaire = {
+  id: string
+  banque: string
+  intitule: string
+  numero_compte: string
+  solde: number
+  actif: boolean
+}
+
+type CaisseOp = {
+  id: string
+  caisse_id: string
+  type: 'depense' | 'approvisionnement'
+  montant: number
+  motif: string | null
+  beneficiaire: string | null
+  reference_piece: string | null
+  date: string
+  cloture_date: string | null
+  created_at: string
+}
+
+type MainTab = 'overview' | 'banque' | 'caisse' | 'import' | 'rapprochement' | 'previsions'
+type CaisseTab = 'apercu' | 'operations' | 'journal' | 'cloture' | 'parametrage'
+type ModalType = 'encaisser' | 'decaisser' | 'addBanque' | null
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
 const CATS_ENTREE = [
-  'Vente / Chiffre d\'affaires',
-  'Frais de scolarité',
-  'Facture payée',
-  'Prestation de services',
-  'Avance client',
-  'Virement reçu',
-  'Remboursement',
-  'Subvention / Don',
-  'Autre recette',
+  "Vente / Chiffre d'affaires", 'Frais de scolarité', 'Facture payée',
+  'Prestation de services', 'Avance client', 'Virement reçu',
+  'Remboursement', 'Subvention / Don', 'Autre recette',
 ]
 
 const CATS_SORTIE = [
-  'Achats / Fournisseur',
-  'Loyer',
-  'Carburant / Transport',
-  'Charges diverses',
-  'Impôts / Taxes',
-  'CNSS',
-  'Frais bancaires',
-  'Remboursement client',
-  'Autre dépense',
+  'Achats / Fournisseur', 'Loyer', 'Carburant / Transport',
+  'Charges diverses', 'Impôts / Taxes', 'CNSS', 'Frais bancaires',
+  'Remboursement client', 'Autre dépense',
 ]
 
 const MODES = [
@@ -79,31 +90,39 @@ const MODES = [
   { value: 'mtn_momo',     label: 'MTN MoMo',     icon: Smartphone, color: '#F0A30A' },
 ]
 
-const PERIODES = [
-  { label: 'Aujourd\'hui', days: 0 },
-  { label: 'Semaine',      days: 7 },
-  { label: 'Mois',         days: 30 },
-  { label: 'Tout',         days: 365 },
+const BANQUES_CONGO = [
+  'BGFI Bank', 'Ecobank', 'Rawbank', 'Equity BCDC', 'TMB',
+  'Afriland First Bank', 'UBA Congo', 'Citibank', 'Autre',
 ]
 
-const MM_MODES = ['airtel_money', 'mtn_momo', 'Mobile Money']
+const MAIN_TABS = [
+  { id: 'overview' as MainTab,        label: 'Vue d\'ensemble',  icon: LayoutDashboard },
+  { id: 'banque' as MainTab,          label: 'Comptes bancaires', icon: Landmark },
+  { id: 'caisse' as MainTab,          label: 'Caisse',            icon: Archive },
+  { id: 'import' as MainTab,          label: 'Import relevés',    icon: Upload },
+  { id: 'rapprochement' as MainTab,   label: 'Rapprochement',     icon: GitMerge },
+  { id: 'previsions' as MainTab,      label: 'Prévisions',        icon: BarChart3 },
+]
+
+const CAISSE_TABS = [
+  { id: 'apercu' as CaisseTab,       label: 'Aperçu',       icon: Eye },
+  { id: 'operations' as CaisseTab,   label: 'Opérations',   icon: ListOrdered },
+  { id: 'journal' as CaisseTab,      label: 'Journal',      icon: FileText },
+  { id: 'cloture' as CaisseTab,      label: 'Clôture',      icon: Lock },
+  { id: 'parametrage' as CaisseTab,  label: 'Paramétrage',  icon: Sliders },
+]
+
+const CATS_DEPENSE = [
+  'Fournitures', 'Carburant', 'Repas / Représentation', 'Transport',
+  'Petit matériel', 'Réparations', 'Charges diverses', 'Autre',
+]
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function modeLabel(m: string) {
-  return MODES.find(x => x.value === m)?.label ?? m
-}
+function today() { return new Date().toISOString().split('T')[0] }
 
-async function sendNotif(
-  tenantId: string,
-  role: string,
-  title: string,
-  body: string,
-  link = '/dashboard/tresorerie',
-) {
-  await supabase.from('notifications').insert({
-    tenant_id: tenantId, role, title, body, link, lu: false,
-  })
+function fmtDate(d: string) {
+  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -111,136 +130,127 @@ async function sendNotif(
 export default function TresoreriePage() {
   const { tenantId, loading: tLoading } = useTenant()
 
-  const [transactions,  setTransactions]  = useState<Transaction[]>([])
-  const [prestataires,  setPrestataires]  = useState<Prestataire[]>([])
-  const [loading,       setLoading]       = useState(true)
-  const [periode,       setPeriode]       = useState(30)
-  const [modal,         setModal]         = useState<ModalType>(null)
-  const [saving,        setSaving]        = useState(false)
-  const [toast,         setToast]         = useState<{ msg: string; ok: boolean } | null>(null)
-  const [filterType,    setFilterType]    = useState<'tout' | 'entree' | 'sortie' | 'prestataire'>('tout')
-  const [secteur,       setSecteur]       = useState<string | null>(null)
-  const [nomEntreprise, setNomEntreprise] = useState('Mon entreprise')
-  const [openingBal,    setOpeningBal]    = useState(0)
-  const [showOB,        setShowOB]        = useState(false)
-  const [savingOB,      setSavingOB]      = useState(false)
+  // ── Global state ──────────────────────────────────────────────────────────
+  const [mainTab,     setMainTab]    = useState<MainTab>('overview')
+  const [caisseTab,   setCaisseTab]  = useState<CaisseTab>('apercu')
+  const [modal,       setModal]      = useState<ModalType>(null)
+  const [toast,       setToast]      = useState<{ msg: string; ok: boolean } | null>(null)
+  const [saving,      setSaving]     = useState(false)
+  const [loading,     setLoading]    = useState(true)
 
-  // Encaisser form
+  // ── Data ──────────────────────────────────────────────────────────────────
+  const [transactions,    setTransactions]   = useState<Transaction[]>([])
+  const [caisses,         setCaisses]        = useState<Caisse[]>([])
+  const [comptesBancaires, setComptesBancaires] = useState<CompteBancaire[]>([])
+  const [caisseOps,       setCaisseOps]      = useState<CaisseOp[]>([])
+  const [selectedCaisse,  setSelectedCaisse] = useState<Caisse | null>(null)
+  const [openingBal,      setOpeningBal]     = useState(0)
+
+  // ── Encaisser form ────────────────────────────────────────────────────────
   const [fEnc, setFEnc] = useState({
-    categorie: 'Vente / Chiffre d\'affaires',
-    description: '',
-    montant: '',
-    date: today(),
-    mode: 'especes',
+    categorie: "Vente / Chiffre d'affaires", description: '',
+    montant: '', date: today(), mode: 'especes',
   })
 
-  // Décaisser form
+  // ── Décaisser form ────────────────────────────────────────────────────────
   const [fDec, setFDec] = useState({
-    categorie: 'Achats / Fournisseur',
-    description: '',
-    montant: '',
-    date: today(),
-    mode: 'especes',
+    categorie: 'Achats / Fournisseur', description: '',
+    montant: '', date: today(), mode: 'especes',
   })
 
-  // Prestataire form
-  const [selPresta,      setSelPresta]      = useState<Prestataire | null>(null)
-  const [searchPresta,   setSearchPresta]   = useState('')
-  const [fPresta, setFPresta] = useState({
-    nom: '', type: 'formateur', montant: '', date: today(), mode: 'especes', motif: '',
+  // ── Banque form ───────────────────────────────────────────────────────────
+  const [fBanque, setFBanque] = useState({
+    banque: 'BGFI Bank', intitule: '', numero_compte: '', solde: '',
   })
 
-  function today() { return new Date().toISOString().split('T')[0] }
+  // ── Caisse opération form ─────────────────────────────────────────────────
+  const [opType,        setOpType]        = useState<'depense' | 'approvisionnement'>('depense')
+  const [fOp, setFOp] = useState({
+    montant: '', motif: '', beneficiaire: '',
+    categorie: 'Fournitures', reference_piece: '', date: today(),
+  })
+
+  // ── New caisse form ───────────────────────────────────────────────────────
+  const [fCaisse, setFCaisse] = useState({ nom: 'Caisse principale', numero_compte: '571000' })
+  const [savingCaisse, setSavingCaisse] = useState(false)
+
+  // ── Clôture ───────────────────────────────────────────────────────────────
+  const [clotureSolde,   setClotureSolde]   = useState('')
+  const [clotureDate,    setClotureDate]    = useState(today())
+  const [savingCloture,  setSavingCloture]  = useState(false)
 
   function showToast(msg: string, ok = true) {
     setToast({ msg, ok })
     setTimeout(() => setToast(null), 3500)
   }
 
-  // ── Load ───────────────────────────────────────────────────────────────────
+  // ── Load all data ─────────────────────────────────────────────────────────
 
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
 
-    // Fetch tenant info
-    const { data: tenant } = await supabase
-      .from('tenants')
-      .select('nom_entreprise, secteur_activite')
-      .eq('id', tenantId)
-      .maybeSingle()
-    if (tenant) {
-      setSecteur(tenant.secteur_activite ?? null)
-      setNomEntreprise(tenant.nom_entreprise ?? 'Mon entreprise')
-    }
-
-    // Fetch transactions (1 an)
     const cutoff = new Date()
     cutoff.setFullYear(cutoff.getFullYear() - 1)
-    const { data: txs } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .gte('date', cutoff.toISOString().split('T')[0])
-      .order('date', { ascending: false })
-    setTransactions((txs ?? []) as Transaction[])
+    const cutoffStr = cutoff.toISOString().split('T')[0]
 
-    // Fetch opening balance
-    const { data: ob } = await supabase
-      .from('opening_balances')
-      .select('solde_ouverture')
-      .eq('tenant_id', tenantId)
-      .eq('annee', new Date().getFullYear())
-      .maybeSingle()
-    setOpeningBal(ob?.solde_ouverture ?? 0)
+    const [txRes, caisseRes, banqueRes, obRes] = await Promise.all([
+      supabase.from('transactions').select('*').eq('tenant_id', tenantId)
+        .gte('date', cutoffStr).order('date', { ascending: false }),
+      supabase.from('caisses').select('*').eq('tenant_id', tenantId).eq('actif', true),
+      supabase.from('comptes_bancaires').select('*').eq('tenant_id', tenantId).eq('actif', true),
+      supabase.from('opening_balances').select('solde_ouverture')
+        .eq('tenant_id', tenantId).eq('annee', new Date().getFullYear()).maybeSingle(),
+    ])
 
-    // Fetch prestataires — uniquement enseignants avec type_enseignant = 'prestataire'
-    const { data: ens } = await supabase
-      .from('enseignants')
-      .select('id, nom, prenom, matiere, taux_horaire, telephone, email')
-      .eq('tenant_id', tenantId)
-      .eq('statut', 'actif')
-      .eq('type_enseignant', 'prestataire')
-    const mapped: Prestataire[] = (ens ?? []).map((e: any) => ({
-      id: e.id, nom: e.nom, prenom: e.prenom,
-      type: 'prestataire', taux_horaire: e.taux_horaire,
-      telephone: e.telephone, email: e.email,
-    }))
-    setPrestataires(mapped)
+    setTransactions((txRes.data ?? []) as Transaction[])
+    const caisseList = (caisseRes.data ?? []) as Caisse[]
+    setCaisses(caisseList)
+    setComptesBancaires((banqueRes.data ?? []) as CompteBancaire[])
+    setOpeningBal(obRes.data?.solde_ouverture ?? 0)
+
+    // Auto-select first caisse
+    if (caisseList.length > 0 && !selectedCaisse) {
+      setSelectedCaisse(caisseList[0])
+      loadCaisseOps(caisseList[0].id)
+    }
 
     setLoading(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId])
+
+  async function loadCaisseOps(caisseId: string) {
+    const { data } = await supabase
+      .from('caisse_operations')
+      .select('*')
+      .eq('caisse_id', caisseId)
+      .order('date', { ascending: false })
+      .limit(100)
+    setCaisseOps((data ?? []) as CaisseOp[])
+  }
 
   useEffect(() => {
     if (!tLoading && tenantId) load()
   }, [tLoading, tenantId, load])
 
-  // ── Computed ───────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (selectedCaisse) loadCaisseOps(selectedCaisse.id)
+  }, [selectedCaisse])
 
-  const cutoffStr = (() => {
-    if (periode === 365) return ''
-    if (periode === 0) return today()
-    const d = new Date()
-    d.setDate(d.getDate() - periode)
-    return d.toISOString().split('T')[0]
-  })()
+  // ── KPI computed ──────────────────────────────────────────────────────────
 
-  const filtered = transactions.filter(t => {
-    const inPeriode = periode === 365 ? true : t.date >= cutoffStr
-    const inType =
-      filterType === 'tout'         ? true :
-      filterType === 'prestataire'  ? t.source === 'prestataire' :
-      t.type === filterType
-    return inPeriode && inType
-  })
+  const thisMonth = new Date().toISOString().slice(0, 7)
+  const monthTx = transactions.filter(t => t.date.startsWith(thisMonth))
+  const encaissementsMois  = monthTx.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
+  const decaissementsMois  = monthTx.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
+  const totalEntrees       = transactions.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
+  const totalSorties       = transactions.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
+  const soldeGlobal        = openingBal + totalEntrees - totalSorties
+  const totalBanque        = comptesBancaires.reduce((s, c) => s + c.solde, 0)
+  const totalCaisse        = caisses.reduce((s, c) => s + c.solde, 0)
+  const tresorerieGlobale  = totalBanque + totalCaisse
 
-  const totalEntrees  = transactions.filter(t => periode === 365 ? true : t.date >= cutoffStr).filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-  const totalSorties  = transactions.filter(t => periode === 365 ? true : t.date >= cutoffStr).filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
-  const solde         = openingBal + totalEntrees - totalSorties
-
-  const mmIn  = filtered.filter(t => t.type === 'entree' && MM_MODES.includes(t.mode_paiement)).reduce((s, t) => s + t.montant, 0)
-  const mmOut = filtered.filter(t => t.type === 'sortie' && MM_MODES.includes(t.mode_paiement)).reduce((s, t) => s + t.montant, 0)
-  const mmCount = filtered.filter(t => MM_MODES.includes(t.mode_paiement)).length
+  // ── Chart ─────────────────────────────────────────────────────────────────
 
   const chartData = Array.from({ length: 30 }, (_, i) => {
     const d = new Date()
@@ -251,15 +261,9 @@ export default function TresoreriePage() {
     return { day: i % 5 === 0 ? `${d.getDate()}/${d.getMonth() + 1}` : '', entrées: e, sorties: s }
   })
   let cumul = openingBal
-  const chartWithCumul = chartData.map(d => { cumul += d.entrées - d.sorties; return { ...d, solde: cumul } })
+  const chartFull = chartData.map(d => { cumul += d.entrées - d.sorties; return { ...d, solde: cumul } })
 
-  const prestasFiltered = prestataires.filter(p => {
-    if (!searchPresta) return true
-    const q = searchPresta.toLowerCase()
-    return (p.nom + ' ' + p.prenom).toLowerCase().includes(q)
-  })
-
-  // ── Save Encaisser ─────────────────────────────────────────────────────────
+  // ── Save encaisser ────────────────────────────────────────────────────────
 
   async function saveEncaisser() {
     if (!tenantId || !fEnc.description || !fEnc.montant) return
@@ -268,36 +272,32 @@ export default function TresoreriePage() {
       const montant = parseInt(fEnc.montant)
       const [debit, credit] = resolveAccounts('entree', fEnc.categorie)
       const { data: { user } } = await supabase.auth.getUser()
-
       const { data: tx } = await supabase.from('transactions').insert({
         tenant_id: tenantId, type: 'entree', categorie: fEnc.categorie,
         description: fEnc.description, montant, date: fEnc.date,
         mode_paiement: fEnc.mode, source: 'tresorerie',
         debit_account: debit, credit_account: credit, created_by: user?.id,
       }).select('id').single()
-
-      // Sync comptabilité (journal_comptable + journal_entries)
       await writeComptaEntry({
         tenantId, date: fEnc.date, libelle: fEnc.description,
         type: 'recette', montant, categorie: fEnc.categorie,
         debitAccount: debit, creditAccount: credit,
         source: 'tresorerie', sourceId: tx?.id, createdBy: user?.id,
       })
-
-      await sendNotif(tenantId, 'DIRECTION_GENERALE',
-        `Encaissement — ${fmtFCFA(montant)}`,
-        `${fEnc.categorie} · ${fEnc.description} · ${modeLabel(fEnc.mode)}`,
-      )
-
+      await supabase.from('notifications').insert({
+        tenant_id: tenantId, role: 'DIRECTION_GENERALE',
+        title: `Encaissement — ${fmtFCFA(montant)}`,
+        body: `${fEnc.categorie} · ${fEnc.description}`, link: '/dashboard/tresorerie', lu: false,
+      })
       showToast(`Encaissement de ${fmtFCFA(montant)} enregistré`)
       setModal(null)
-      setFEnc({ categorie: 'Vente / Chiffre d\'affaires', description: '', montant: '', date: today(), mode: 'especes' })
+      setFEnc({ categorie: "Vente / Chiffre d'affaires", description: '', montant: '', date: today(), mode: 'especes' })
       load()
     } catch (e: any) { showToast(e?.message ?? 'Erreur', false) }
     setSaving(false)
   }
 
-  // ── Save Décaisser ─────────────────────────────────────────────────────────
+  // ── Save décaisser ────────────────────────────────────────────────────────
 
   async function saveDecaisser() {
     if (!tenantId || !fDec.description || !fDec.montant) return
@@ -306,38 +306,18 @@ export default function TresoreriePage() {
       const montant = parseInt(fDec.montant)
       const [debit, credit] = resolveAccounts('sortie', fDec.categorie)
       const { data: { user } } = await supabase.auth.getUser()
-
       const { data: tx } = await supabase.from('transactions').insert({
         tenant_id: tenantId, type: 'sortie', categorie: fDec.categorie,
         description: fDec.description, montant, date: fDec.date,
         mode_paiement: fDec.mode, source: 'tresorerie',
         debit_account: debit, credit_account: credit, created_by: user?.id,
       }).select('id').single()
-
-      // Sync comptabilité
       await writeComptaEntry({
         tenantId, date: fDec.date, libelle: fDec.description,
         type: 'depense', montant, categorie: fDec.categorie,
         debitAccount: debit, creditAccount: credit,
         source: 'tresorerie', sourceId: tx?.id, createdBy: user?.id,
       })
-
-      await Promise.all([
-        sendNotif(tenantId, 'DIRECTION_GENERALE',
-          `Décaissement — ${fmtFCFA(montant)}`,
-          `${fDec.categorie} · ${fDec.description} · ${modeLabel(fDec.mode)}`,
-        ),
-        sendNotif(tenantId, 'RAF',
-          `Sortie trésorerie — ${fmtFCFA(montant)}`,
-          `${fDec.categorie} · ${fDec.description}`,
-        ),
-        sendNotif(tenantId, 'COMPTABILITE',
-          `Écriture comptable — ${fmtFCFA(montant)}`,
-          `D:${debit} / C:${credit} — ${fDec.description}`,
-          '/dashboard/comptabilite',
-        ),
-      ])
-
       showToast(`Décaissement de ${fmtFCFA(montant)} enregistré`)
       setModal(null)
       setFDec({ categorie: 'Achats / Fournisseur', description: '', montant: '', date: today(), mode: 'especes' })
@@ -346,82 +326,91 @@ export default function TresoreriePage() {
     setSaving(false)
   }
 
-  // ── Save Prestataire ───────────────────────────────────────────────────────
+  // ── Save compte bancaire ──────────────────────────────────────────────────
 
-  async function savePrestataire() {
-    const nom     = selPresta ? `${selPresta.prenom} ${selPresta.nom}` : fPresta.nom
-    const montant = parseInt(fPresta.montant)
-    if (!tenantId || !nom || !montant || !fPresta.motif) return
+  async function saveBanque() {
+    if (!tenantId || !fBanque.intitule) return
     setSaving(true)
-    try {
-      const creditAccount = modeToAccount(fPresta.mode)
-      const { data: { user } } = await supabase.auth.getUser()
-      const libelle = `${nom} — ${fPresta.motif}`
-
-      const { data: tx } = await supabase.from('transactions').insert({
-        tenant_id: tenantId, type: 'sortie',
-        categorie: 'Paiement prestataire', description: libelle,
-        montant, date: fPresta.date, mode_paiement: fPresta.mode,
-        source: 'prestataire', reference: selPresta?.id ?? null,
-        debit_account: '621000', credit_account: creditAccount,
-        created_by: user?.id,
-      }).select('id').single()
-
-      // Sync comptabilité — 2 écritures OHADA
-      await Promise.all([
-        // Charge prestataire (621 — Honoraires)
-        writeComptaEntry({
-          tenantId, date: fPresta.date, libelle,
-          type: 'depense', montant, categorie: 'Paiement prestataire',
-          debitAccount: '621000',    // Honoraires et commissions
-          creditAccount: creditAccount,
-          source: 'prestataire', sourceId: tx?.id, createdBy: user?.id,
-        }),
-
-        // 4 notifications
-        sendNotif(tenantId, 'DIRECTION_GENERALE',
-          `Paiement prestataire — ${fmtFCFA(montant)}`,
-          `${nom} · ${fPresta.motif} · ${modeLabel(fPresta.mode)}`,
-        ),
-        sendNotif(tenantId, 'COMPTABILITE',
-          `Écriture prestataire — ${fmtFCFA(montant)}`,
-          `D:621000 / C:${creditAccount} · ${nom} · ${fPresta.motif}`,
-          '/dashboard/comptabilite',
-        ),
-        sendNotif(tenantId, 'RH_PAIE',
-          `Prestataire payé — ${nom}`,
-          `Montant: ${fmtFCFA(montant)} · ${fPresta.motif}`,
-        ),
-        sendNotif(tenantId, 'RAF',
-          `Décaissement prestataire — ${fmtFCFA(montant)}`,
-          `${nom} · ${modeLabel(fPresta.mode)}`,
-        ),
-      ])
-
-      showToast(`${nom} payé — ${fmtFCFA(montant)}`)
-      setModal(null)
-      setSelPresta(null)
-      setSearchPresta('')
-      setFPresta({ nom: '', type: 'formateur', montant: '', date: today(), mode: 'especes', motif: '' })
-      load()
-    } catch (e: any) { showToast(e?.message ?? 'Erreur', false) }
+    const { error } = await supabase.from('comptes_bancaires').insert({
+      tenant_id: tenantId, banque: fBanque.banque, intitule: fBanque.intitule,
+      numero_compte: fBanque.numero_compte, solde: parseFloat(fBanque.solde) || 0,
+    })
+    if (error) showToast(error.message, false)
+    else { showToast('Compte bancaire ajouté'); setModal(null); setFBanque({ banque: 'BGFI Bank', intitule: '', numero_compte: '', solde: '' }); load() }
     setSaving(false)
   }
 
-  // ── Save Opening Balance ───────────────────────────────────────────────────
+  // ── Save caisse ───────────────────────────────────────────────────────────
 
-  async function saveOpeningBalance() {
-    if (!tenantId) return
-    setSavingOB(true)
-    await supabase.from('opening_balances').upsert({
-      tenant_id: tenantId, annee: new Date().getFullYear(), solde_ouverture: openingBal,
-    }, { onConflict: 'tenant_id,annee' })
-    setSavingOB(false)
-    setShowOB(false)
+  async function saveCaisse() {
+    if (!tenantId || !fCaisse.nom) return
+    setSavingCaisse(true)
+    const { data, error } = await supabase.from('caisses').insert({
+      tenant_id: tenantId, nom: fCaisse.nom, numero_compte: fCaisse.numero_compte,
+    }).select('*').single()
+    if (error) showToast(error.message, false)
+    else {
+      showToast('Caisse créée')
+      setFCaisse({ nom: 'Caisse principale', numero_compte: '571000' })
+      load()
+      if (data) setSelectedCaisse(data as Caisse)
+    }
+    setSavingCaisse(false)
+  }
+
+  // ── Save caisse opération ─────────────────────────────────────────────────
+
+  async function saveCaisseOp() {
+    if (!tenantId || !selectedCaisse || !fOp.montant) return
+    const montant = parseFloat(fOp.montant)
+    if (montant <= 0) return
+    if (opType === 'depense' && montant > selectedCaisse.solde) {
+      showToast('Solde insuffisant dans la caisse', false); return
+    }
+    setSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    const { error } = await supabase.from('caisse_operations').insert({
+      caisse_id: selectedCaisse.id, tenant_id: tenantId,
+      type: opType, montant, motif: fOp.motif || null,
+      beneficiaire: fOp.beneficiaire || null,
+      compte_charge: opType === 'depense' ? '571000' : '521000',
+      compte_source: opType === 'depense' ? '521000' : '571000',
+      reference_piece: fOp.reference_piece || null,
+      date: fOp.date, created_by: user?.id,
+    })
+    if (error) { showToast(error.message, false) }
+    else {
+      showToast(opType === 'depense'
+        ? `Dépense de ${fmtFCFA(montant)} enregistrée`
+        : `Approvisionnement de ${fmtFCFA(montant)} enregistré`)
+      setFOp({ montant: '', motif: '', beneficiaire: '', categorie: 'Fournitures', reference_piece: '', date: today() })
+      load()
+    }
+    setSaving(false)
+  }
+
+  // ── Clôture de caisse ─────────────────────────────────────────────────────
+
+  async function saveCloture() {
+    if (!selectedCaisse || !clotureDate) return
+    setSavingCloture(true)
+    await supabase.from('caisse_operations')
+      .update({ cloture_date: clotureDate })
+      .eq('caisse_id', selectedCaisse.id)
+      .is('cloture_date', null)
+      .eq('date', clotureDate)
+    if (clotureSolde !== '') {
+      await supabase.from('caisses').update({ solde: parseFloat(clotureSolde) }).eq('id', selectedCaisse.id)
+    }
+    showToast(`Caisse clôturée pour le ${fmtDate(clotureDate)}`)
+    setClotureSolde('')
+    setSavingCloture(false)
     load()
   }
 
-  // ── UI ─────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────
 
   if (tLoading || loading) {
     return (
@@ -432,7 +421,7 @@ export default function TresoreriePage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-0">
 
       {/* Toast */}
       <AnimatePresence>
@@ -446,255 +435,665 @@ export default function TresoreriePage() {
         )}
       </AnimatePresence>
 
-      {/* ── KPI Cards ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Solde */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}
-          className="relative rounded-2xl p-5 overflow-hidden"
-          style={{ background: solde >= 0 ? 'linear-gradient(135deg,#1a4731 0%,#166534 50%,#15803d 100%)' : 'linear-gradient(135deg,#450a0a 0%,#7f1d1d 50%,#991b1b 100%)' }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.1) 0%,transparent 60%)' }} />
-          <div className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-            <Wallet size={16} className="text-white" />
-          </div>
-          <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-2">Solde actuel</p>
-          <p className="text-white text-3xl font-bold leading-none mb-1">{fmtFCFA(solde)}</p>
-          {openingBal !== 0 && <p className="text-white/40 text-[10px]">Report N-1 : {fmtFCFA(openingBal)}</p>}
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 mt-1">
-            {solde >= 0 ? <TrendingUp size={10} className="text-white" /> : <TrendingDown size={10} className="text-white" />}
-            <span className="text-white text-[10px] font-bold">{solde >= 0 ? 'Positif' : 'Déficit'}</span>
-          </div>
-        </motion.div>
-
-        {/* Entrées */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
-          className="relative rounded-2xl p-5 overflow-hidden"
-          style={{ background: 'linear-gradient(135deg,#14532d 0%,#166534 50%,#16a34a 100%)' }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.1) 0%,transparent 60%)' }} />
-          <div className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-            <ArrowUpCircle size={16} className="text-white" />
-          </div>
-          <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-2">Entrées</p>
-          <p className="text-white text-2xl font-bold leading-none mb-1">{fmtFCFA(totalEntrees)}</p>
-          <p className="text-white/50 text-[10px]">{transactions.filter(t => (periode === 365 ? true : t.date >= cutoffStr) && t.type === 'entree').length} opérations</p>
-        </motion.div>
-
-        {/* Sorties */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
-          className="relative rounded-2xl p-5 overflow-hidden"
-          style={{ background: 'linear-gradient(135deg,#450a0a 0%,#7f1d1d 50%,#b91c1c 100%)' }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.1) 0%,transparent 60%)' }} />
-          <div className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-            <ArrowDownCircle size={16} className="text-white" />
-          </div>
-          <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-2">Sorties</p>
-          <p className="text-white text-2xl font-bold leading-none mb-1">{fmtFCFA(totalSorties)}</p>
-          <p className="text-white/50 text-[10px]">{transactions.filter(t => (periode === 365 ? true : t.date >= cutoffStr) && t.type === 'sortie').length} opérations</p>
-        </motion.div>
+      {/* ── Page header ───────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-lg font-bold text-[#E6EDF3]">Trésorerie</h1>
+          <p className="text-xs text-[#484F58]">Gestion des flux financiers</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => setModal('encaisser')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 transition-colors">
+            <ArrowUpCircle size={13} /> Encaisser
+          </button>
+          <button onClick={() => setModal('decaisser')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F85149]/15 text-[#F85149] border border-[#F85149]/30 hover:bg-[#F85149]/25 transition-colors">
+            <ArrowDownCircle size={13} /> Décaisser
+          </button>
+          <button onClick={load}
+            className="p-1.5 rounded-lg text-[#484F58] hover:text-[#8B949E] hover:bg-[#21262D] transition-colors">
+            <RefreshCw size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* ── Mobile Money Summary ───────────────────────────────────────────── */}
-      {mmCount > 0 && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-[#161B22] border border-[#F97316]/20 rounded-xl">
-          <div className="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center shrink-0">
-            <Smartphone size={15} className="text-[#F97316]" />
+      {/* ── Main tab nav ──────────────────────────────────────────────────── */}
+      <div className="flex gap-1 overflow-x-auto pb-1 mb-5 border-b border-[#21262D]">
+        {MAIN_TABS.map(tab => {
+          const Icon = tab.icon
+          const active = mainTab === tab.id
+          return (
+            <button key={tab.id} onClick={() => setMainTab(tab.id)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-t-lg text-xs font-medium whitespace-nowrap transition-colors relative ${
+                active
+                  ? 'text-[#F0A30A] bg-[#F0A30A]/5'
+                  : 'text-[#484F58] hover:text-[#8B949E] hover:bg-[#21262D]'
+              }`}>
+              <Icon size={13} />
+              {tab.label}
+              {active && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#F0A30A] rounded-full" />
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: VUE D'ENSEMBLE                                                   */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {mainTab === 'overview' && (
+        <div className="space-y-5">
+
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Trésorerie globale */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}
+              className="relative rounded-2xl p-4 overflow-hidden"
+              style={{ background: 'linear-gradient(135deg,#0a1a2e 0%,#0d2347 50%,#1a3a6b 100%)' }}>
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
+              <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
+                <PiggyBank size={14} className="text-white" />
+              </div>
+              <p className="text-white/50 text-[9px] font-bold uppercase tracking-widest mb-1">Trésorerie globale</p>
+              <p className="text-white text-xl font-bold leading-none mb-1">{fmtFCFA(tresorerieGlobale)}</p>
+              <p className="text-white/40 text-[9px]">Banque + Caisse</p>
+            </motion.div>
+
+            {/* Encaissements ce mois */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+              className="relative rounded-2xl p-4 overflow-hidden"
+              style={{ background: 'linear-gradient(135deg,#0a2318 0%,#0e3320 50%,#166534 100%)' }}>
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
+              <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
+                <TrendingUp size={14} className="text-white" />
+              </div>
+              <p className="text-white/50 text-[9px] font-bold uppercase tracking-widest mb-1">Encaissements</p>
+              <p className="text-white text-xl font-bold leading-none mb-1">{fmtFCFA(encaissementsMois)}</p>
+              <p className="text-white/40 text-[9px]">Ce mois · {monthTx.filter(t => t.type === 'entree').length} op.</p>
+            </motion.div>
+
+            {/* Décaissements ce mois */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="relative rounded-2xl p-4 overflow-hidden"
+              style={{ background: 'linear-gradient(135deg,#2d0a0a 0%,#4a1010 50%,#7f1d1d 100%)' }}>
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
+              <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
+                <TrendingDown size={14} className="text-white" />
+              </div>
+              <p className="text-white/50 text-[9px] font-bold uppercase tracking-widest mb-1">Décaissements</p>
+              <p className="text-white text-xl font-bold leading-none mb-1">{fmtFCFA(decaissementsMois)}</p>
+              <p className="text-white/40 text-[9px]">Ce mois · {monthTx.filter(t => t.type === 'sortie').length} op.</p>
+            </motion.div>
+
+            {/* Solde net */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+              className="relative rounded-2xl p-4 overflow-hidden"
+              style={{ background: soldeGlobal >= 0 ? 'linear-gradient(135deg,#0e1a10 0%,#1a3020 50%,#2EA043 100%)' : 'linear-gradient(135deg,#1a0d0d 0%,#2d0a0a 50%,#7f1d1d 100%)' }}>
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
+              <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
+                <Wallet size={14} className="text-white" />
+              </div>
+              <p className="text-white/50 text-[9px] font-bold uppercase tracking-widest mb-1">Solde net</p>
+              <p className="text-white text-xl font-bold leading-none mb-1">{fmtFCFA(soldeGlobal)}</p>
+              <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/15">
+                {soldeGlobal >= 0 ? <TrendingUp size={9} className="text-white" /> : <TrendingDown size={9} className="text-white" />}
+                <span className="text-white text-[9px] font-bold">{soldeGlobal >= 0 ? 'Positif' : 'Déficit'}</span>
+              </div>
+            </motion.div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#E6EDF3]">Mobile Money</p>
-            <p className="text-[10px] text-[#484F58]">{mmCount} transaction{mmCount > 1 ? 's' : ''} via Airtel Money / MTN MoMo</p>
+
+          {/* Répartition rapide Banque / Caisse */}
+          {(comptesBancaires.length > 0 || caisses.length > 0) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Landmark size={14} className="text-[#388BFD]" />
+                  <span className="text-xs font-semibold text-[#E6EDF3]">Comptes bancaires</span>
+                  <span className="ml-auto text-xs font-bold text-[#388BFD]">{fmtFCFA(totalBanque)}</span>
+                </div>
+                {comptesBancaires.length === 0 ? (
+                  <p className="text-[10px] text-[#484F58]">Aucun compte configuré</p>
+                ) : comptesBancaires.map(c => (
+                  <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-[#21262D] last:border-0">
+                    <div>
+                      <p className="text-xs text-[#E6EDF3]">{c.intitule}</p>
+                      <p className="text-[10px] text-[#484F58]">{c.banque}</p>
+                    </div>
+                    <span className={`text-xs font-bold ${c.solde >= 0 ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>{fmtFCFA(c.solde)}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Archive size={14} className="text-[#F0A30A]" />
+                  <span className="text-xs font-semibold text-[#E6EDF3]">Caisses</span>
+                  <span className="ml-auto text-xs font-bold text-[#F0A30A]">{fmtFCFA(totalCaisse)}</span>
+                </div>
+                {caisses.length === 0 ? (
+                  <p className="text-[10px] text-[#484F58]">Aucune caisse configurée</p>
+                ) : caisses.map(c => (
+                  <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-[#21262D] last:border-0">
+                    <div>
+                      <p className="text-xs text-[#E6EDF3]">{c.nom}</p>
+                      <p className="text-[10px] text-[#484F58]">Cpte {c.numero_compte}</p>
+                    </div>
+                    <span className={`text-xs font-bold ${c.solde >= 0 ? 'text-[#F0A30A]' : 'text-[#F85149]'}`}>{fmtFCFA(c.solde)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Chart */}
+          <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+            <h2 className="text-xs font-semibold text-[#E6EDF3] mb-4">Flux de trésorerie — 30 jours</h2>
+            <ResponsiveContainer width="100%" height={180}>
+              <ComposedChart data={chartFull} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
+                <XAxis dataKey="day" tick={{ fill: '#8B949E', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#8B949E', fontSize: 9 }} axisLine={false} tickLine={false} width={36}
+                  tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />
+                <Tooltip contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
+                  formatter={(v: any, n: any) => [fmtFCFA(Number(v ?? 0)), n]} />
+                <Bar dataKey="entrées" fill="#2EA043" radius={[2, 2, 0, 0]} maxBarSize={12} />
+                <Bar dataKey="sorties" fill="#F85149" radius={[2, 2, 0, 0]} maxBarSize={12} />
+                <Line type="monotone" dataKey="solde" name="Solde cumulé" stroke="#388BFD" strokeWidth={2} dot={false} />
+              </ComposedChart>
+            </ResponsiveContainer>
           </div>
-          <div className="flex gap-4 text-xs">
-            {mmIn  > 0 && <span className="text-[#2EA043] font-semibold">+{fmtFCFA(mmIn)}</span>}
-            {mmOut > 0 && <span className="text-[#F85149] font-semibold">-{fmtFCFA(mmOut)}</span>}
+
+          {/* Recent transactions */}
+          <div className="bg-[#161B22] border border-[#30363D] rounded-xl">
+            <div className="px-5 py-3 border-b border-[#30363D]">
+              <h2 className="text-xs font-semibold text-[#E6EDF3]">Transactions récentes</h2>
+            </div>
+            {transactions.length === 0 ? (
+              <div className="p-10 text-center">
+                <Wallet size={24} className="mx-auto mb-2 text-[#30363D]" />
+                <p className="text-[#484F58] text-sm">Aucune transaction</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#21262D]">
+                {transactions.slice(0, 20).map(t => (
+                  <div key={t.id} className="flex items-center gap-3 px-5 py-2.5 hover:bg-[#21262D]/30 transition-colors">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${t.type === 'entree' ? 'bg-[#2EA043]/10' : 'bg-[#F85149]/10'}`}>
+                      {t.type === 'entree'
+                        ? <ArrowUpCircle size={13} className="text-[#2EA043]" />
+                        : <ArrowDownCircle size={13} className="text-[#F85149]" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-[#E6EDF3] truncate">{t.description}</p>
+                      <p className="text-[10px] text-[#484F58]">{t.categorie}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className={`text-xs font-bold ${t.type === 'entree' ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>
+                        {t.type === 'entree' ? '+' : '−'}{fmtFCFA(t.montant)}
+                      </p>
+                      <p className="text-[10px] text-[#484F58]">{fmtDate(t.date)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* ── Actions principales ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {/* Encaisser */}
-        <button onClick={() => setModal('encaisser')}
-          className="group relative flex flex-col items-center gap-2 py-5 rounded-2xl border transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg,#0d2818,#14532d)', borderColor: '#2EA043' }}>
-          <div className="w-12 h-12 rounded-xl bg-[#2EA043]/20 flex items-center justify-center">
-            <Plus size={22} className="text-[#2EA043]" />
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: COMPTES BANCAIRES                                                */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {mainTab === 'banque' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-[#8B949E]">
+              {comptesBancaires.length} compte{comptesBancaires.length !== 1 ? 's' : ''} · Total{' '}
+              <span className="text-[#388BFD] font-bold">{fmtFCFA(totalBanque)}</span>
+            </p>
+            <button onClick={() => setModal('addBanque')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30 hover:bg-[#388BFD]/25 transition-colors">
+              <Plus size={12} /> Ajouter un compte
+            </button>
           </div>
-          <span className="text-[#2EA043] font-bold text-sm">Encaisser</span>
-          <span className="text-[#2EA043]/50 text-[10px]">Entrée d'argent</span>
-        </button>
 
-        {/* Décaisser */}
-        <button onClick={() => setModal('decaisser')}
-          className="group relative flex flex-col items-center gap-2 py-5 rounded-2xl border transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg,#2d0a0a,#7f1d1d)', borderColor: '#F85149' }}>
-          <div className="w-12 h-12 rounded-xl bg-[#F85149]/20 flex items-center justify-center">
-            <Minus size={22} className="text-[#F85149]" />
-          </div>
-          <span className="text-[#F85149] font-bold text-sm">Décaisser</span>
-          <span className="text-[#F85149]/50 text-[10px]">Sortie d'argent</span>
-        </button>
-
-        {/* Payer prestataire */}
-        <button onClick={() => setModal('prestataire')}
-          className="group relative flex flex-col items-center gap-2 py-5 rounded-2xl border transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg,#1c1007,#78350f)', borderColor: '#F97316' }}>
-          <div className="w-12 h-12 rounded-xl bg-[#F97316]/20 flex items-center justify-center">
-            <UserCheck size={22} className="text-[#F97316]" />
-          </div>
-          <span className="text-[#F97316] font-bold text-sm">Prestataire</span>
-          <span className="text-[#F97316]/50 text-[10px]">Formateur / Ouvrier</span>
-        </button>
-
-        {/* Solde N-1 */}
-        <button onClick={() => setShowOB(v => !v)}
-          className="group relative flex flex-col items-center gap-2 py-5 rounded-2xl border border-[#30363D] bg-[#161B22] transition-all hover:border-[#8B949E] hover:scale-[1.02] active:scale-[0.98]">
-          <div className="w-12 h-12 rounded-xl bg-[#21262D] flex items-center justify-center">
-            <Settings2 size={22} className="text-[#8B949E]" />
-          </div>
-          <span className="text-[#8B949E] font-bold text-sm">Solde N-1</span>
-          <span className="text-[#484F58] text-[10px]">
-            {openingBal ? fmtFCFA(openingBal) : 'Non défini'}
-          </span>
-        </button>
-      </div>
-
-      {/* Opening balance panel */}
-      <AnimatePresence>
-        {showOB && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="bg-[#161B22] border border-[#F0A30A]/30 rounded-xl p-5 overflow-hidden">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-[#E6EDF3]">Solde d'ouverture — {new Date().getFullYear()}</h3>
-              <button onClick={() => setShowOB(false)} className="text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
-            </div>
-            <p className="text-xs text-[#8B949E] mb-4">Report de trésorerie de l'exercice précédent (N-1). Ce montant s'ajoute aux flux pour calculer le solde réel.</p>
-            <div className="flex gap-3 items-end">
-              <div className="flex-1">
-                <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
-                <input type="number" value={openingBal}
-                  onChange={e => setOpeningBal(parseInt(e.target.value) || 0)}
-                  className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
-              </div>
-              <button onClick={saveOpeningBalance} disabled={savingOB}
-                className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#F0A30A] text-[#0D1117] disabled:opacity-50 flex items-center gap-2">
-                {savingOB && <Loader2 size={13} className="animate-spin" />}
-                Enregistrer
+          {comptesBancaires.length === 0 ? (
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+              <Landmark size={28} className="mx-auto mb-3 text-[#30363D]" />
+              <p className="text-[#484F58] text-sm">Aucun compte bancaire</p>
+              <p className="text-[#30363D] text-xs mt-1">Ajoutez vos comptes pour suivre vos soldes.</p>
+              <button onClick={() => setModal('addBanque')}
+                className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30">
+                <Plus size={12} className="inline mr-1" />Ajouter un compte
               </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Graphique ─────────────────────────────────────────────────────── */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-[#E6EDF3]">Flux de trésorerie — 30 jours</h2>
-          <button onClick={load} className="text-[#484F58] hover:text-[#8B949E] transition-colors">
-            <RefreshCw size={14} />
-          </button>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {comptesBancaires.map((c, i) => {
+                const colors = ['#388BFD', '#2EA043', '#8B5CF6', '#F0A30A', '#F97316']
+                const col = colors[i % colors.length]
+                return (
+                  <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 hover:border-[#484F58] transition-colors">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${col}20` }}>
+                        <Landmark size={18} style={{ color: col }} />
+                      </div>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border" style={{ color: col, borderColor: `${col}40`, background: `${col}10` }}>
+                        ACTIF
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold text-[#E6EDF3] mb-0.5">{c.intitule}</p>
+                    <p className="text-[10px] text-[#484F58] mb-4">{c.banque}{c.numero_compte ? ` · ${c.numero_compte}` : ''}</p>
+                    <p className="text-2xl font-bold" style={{ color: col }}>{fmtFCFA(c.solde)}</p>
+                    <p className="text-[9px] text-[#484F58] mt-1">Solde actuel</p>
+                  </motion.div>
+                )
+              })}
+            </div>
+          )}
         </div>
-        <ResponsiveContainer width="100%" height={200}>
-          <ComposedChart data={chartWithCumul} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
-            <XAxis dataKey="day" tick={{ fill: '#8B949E', fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: '#8B949E', fontSize: 10 }} axisLine={false} tickLine={false} width={40}
-              tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />
-            <Tooltip contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
-              formatter={(v: any, n: any) => [fmtFCFA(Number(v ?? 0)), n]} />
-            <Legend wrapperStyle={{ fontSize: 11, color: '#8B949E' }} />
-            <Bar dataKey="entrées" fill="#2EA043" radius={[2, 2, 0, 0]} maxBarSize={14} />
-            <Bar dataKey="sorties" fill="#F85149" radius={[2, 2, 0, 0]} maxBarSize={14} />
-            <Line type="monotone" dataKey="solde" name="Solde cumulé" stroke="#388BFD" strokeWidth={2} dot={false} />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+      )}
 
-      {/* ── Transactions ──────────────────────────────────────────────────── */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl">
-        {/* Header + filtres */}
-        <div className="px-5 py-4 border-b border-[#30363D] flex flex-wrap items-center gap-3 justify-between">
-          <h2 className="text-sm font-semibold text-[#E6EDF3]">Transactions</h2>
-          <div className="flex gap-1 flex-wrap">
-            {([
-              { id: 'tout',        label: 'Tout'         },
-              { id: 'entree',      label: 'Entrées'      },
-              { id: 'sortie',      label: 'Sorties'      },
-              { id: 'prestataire', label: 'Prestataires' },
-            ] as const).map(f => (
-              <button key={f.id} onClick={() => setFilterType(f.id)}
-                className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-colors ${
-                  filterType === f.id
-                    ? 'bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30'
-                    : 'text-[#484F58] hover:text-[#8B949E]'
-                }`}>
-                {f.label}
-              </button>
-            ))}
-            <div className="ml-2 flex gap-1">
-              {PERIODES.map(p => (
-                <button key={p.days} onClick={() => setPeriode(p.days)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] transition-colors ${
-                    periode === p.days
-                      ? 'bg-[#F0A30A]/10 text-[#F0A30A] border border-[#F0A30A]/30'
-                      : 'text-[#484F58] hover:text-[#8B949E]'
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: CAISSE                                                           */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {mainTab === 'caisse' && (
+        <div className="space-y-4">
+
+          {/* Caisse selector */}
+          {caisses.length > 1 && (
+            <div className="flex gap-2 flex-wrap">
+              {caisses.map(c => (
+                <button key={c.id} onClick={() => setSelectedCaisse(c)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    selectedCaisse?.id === c.id
+                      ? 'bg-[#F0A30A]/15 text-[#F0A30A] border-[#F0A30A]/40'
+                      : 'text-[#8B949E] border-[#30363D] hover:border-[#484F58]'
                   }`}>
-                  {p.label}
+                  <Archive size={12} />
+                  {c.nom}
+                  <span className="font-bold">{fmtFCFA(c.solde)}</span>
                 </button>
               ))}
             </div>
-          </div>
-          <span className="text-[10px] text-[#484F58]">{filtered.length} opération{filtered.length !== 1 ? 's' : ''}</span>
-        </div>
+          )}
 
-        {filtered.length === 0 ? (
-          <div className="p-12 text-center">
-            <Wallet size={28} className="mx-auto mb-3 text-[#30363D]" />
-            <p className="text-[#484F58] text-sm">Aucune transaction</p>
-            <p className="text-[#30363D] text-xs mt-1">Utilisez les boutons ci-dessus pour enregistrer des mouvements.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-[#21262D]">
-            {filtered.slice(0, 60).map(t => {
-              const isPresta = t.source === 'prestataire'
-              const icon = t.type === 'entree'
-                ? <ArrowUpCircle size={15} className="text-[#2EA043]" />
-                : isPresta
-                  ? <Users size={15} className="text-[#F97316]" />
-                  : <ArrowDownCircle size={15} className="text-[#F85149]" />
-              const bg = t.type === 'entree' ? 'bg-[#2EA043]/10' : isPresta ? 'bg-[#F97316]/10' : 'bg-[#F85149]/10'
-              const col = t.type === 'entree' ? 'text-[#2EA043]' : 'text-[#F85149]'
-              return (
-                <div key={t.id} className="flex items-start gap-3 px-5 py-3 hover:bg-[#21262D]/30 transition-colors">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${bg}`}>
-                    {icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#E6EDF3] truncate">{t.description}</p>
-                    <div className="flex flex-wrap gap-2 items-center mt-0.5">
-                      <span className="text-[10px] text-[#484F58]">{t.categorie}</span>
-                      <span className="text-[10px] text-[#484F58]">·</span>
-                      <span className="text-[10px] text-[#484F58]">{modeLabel(t.mode_paiement)}</span>
-                      {isPresta && (
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#F97316]/10 text-[#F97316]">Prestataire</span>
-                      )}
-                      {t.source && t.source !== 'tresorerie' && t.source !== 'prestataire' && (
-                        <span className="text-[10px] text-[#388BFD]">{t.source}</span>
-                      )}
+          {caisses.length === 0 ? (
+            /* No caisse yet — prompt to create one in Paramétrage */
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+              <Archive size={28} className="mx-auto mb-3 text-[#30363D]" />
+              <p className="text-[#484F58] text-sm">Aucune caisse configurée</p>
+              <p className="text-[#30363D] text-xs mt-1">Créez votre première caisse dans Paramétrage.</p>
+              <button onClick={() => setCaisseTab('parametrage')}
+                className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F0A30A]/15 text-[#F0A30A] border border-[#F0A30A]/30">
+                Aller au Paramétrage
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Caisse sub-tab nav */}
+              <div className="flex gap-1 border-b border-[#21262D]">
+                {CAISSE_TABS.map(tab => {
+                  const Icon = tab.icon
+                  const active = caisseTab === tab.id
+                  return (
+                    <button key={tab.id} onClick={() => setCaisseTab(tab.id)}
+                      className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors relative ${
+                        active ? 'text-[#F0A30A]' : 'text-[#484F58] hover:text-[#8B949E]'
+                      }`}>
+                      <Icon size={12} />
+                      {tab.label}
+                      {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#F0A30A] rounded-full" />}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* ── Caisse: Aperçu ── */}
+              {caisseTab === 'apercu' && selectedCaisse && (
+                <div className="space-y-4">
+                  {/* Solde card */}
+                  <div className="relative rounded-2xl p-6 overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg,#1a1200 0%,#2a1e00 50%,#3d2c00 100%)' }}>
+                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(240,163,10,0.15) 0%,transparent 60%)' }} />
+                    <div className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
+                      <Archive size={18} className="text-[#F0A30A]" />
                     </div>
+                    <p className="text-[#F0A30A]/60 text-[10px] font-bold uppercase tracking-widest mb-2">{selectedCaisse.nom}</p>
+                    <p className="text-white text-4xl font-bold mb-1">{fmtFCFA(selectedCaisse.solde)}</p>
+                    <p className="text-[#F0A30A]/40 text-[10px]">Compte {selectedCaisse.numero_compte}</p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className={`text-sm font-bold ${col}`}>
-                      {t.type === 'entree' ? '+' : '−'}{fmtFCFA(t.montant)}
-                    </p>
-                    <p className="text-[10px] text-[#484F58]">
-                      {new Date(t.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
-                    </p>
+
+                  {/* Today's ops */}
+                  {(() => {
+                    const todayOps = caisseOps.filter(o => o.date === today())
+                    const depenseAujourdhui = todayOps.filter(o => o.type === 'depense').reduce((s, o) => s + o.montant, 0)
+                    const approvAujourdhui  = todayOps.filter(o => o.type === 'approvisionnement').reduce((s, o) => s + o.montant, 0)
+                    return (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-[#161B22] border border-[#F85149]/20 rounded-xl p-4">
+                          <p className="text-[10px] text-[#484F58] mb-1">Dépenses aujourd'hui</p>
+                          <p className="text-[#F85149] text-lg font-bold">−{fmtFCFA(depenseAujourdhui)}</p>
+                          <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'depense').length} opération(s)</p>
+                        </div>
+                        <div className="bg-[#161B22] border border-[#2EA043]/20 rounded-xl p-4">
+                          <p className="text-[10px] text-[#484F58] mb-1">Approvisionnements</p>
+                          <p className="text-[#2EA043] text-lg font-bold">+{fmtFCFA(approvAujourdhui)}</p>
+                          <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'approvisionnement').length} opération(s)</p>
+                        </div>
+                      </div>
+                    )
+                  })()}
+
+                  {/* Quick actions */}
+                  <div className="flex gap-2">
+                    <button onClick={() => { setOpType('depense'); setCaisseTab('operations') }}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#F85149]/30 bg-[#F85149]/10 text-[#F85149] text-sm font-semibold transition-colors hover:bg-[#F85149]/20">
+                      <Minus size={15} /> Dépense
+                    </button>
+                    <button onClick={() => { setOpType('approvisionnement'); setCaisseTab('operations') }}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#2EA043]/30 bg-[#2EA043]/10 text-[#2EA043] text-sm font-semibold transition-colors hover:bg-[#2EA043]/20">
+                      <Plus size={15} /> Approvisionnement
+                    </button>
                   </div>
                 </div>
-              )
-            })}
+              )}
+
+              {/* ── Caisse: Opérations ── */}
+              {caisseTab === 'operations' && selectedCaisse && (
+                <div className="space-y-4">
+
+                  {/* Type toggle */}
+                  <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
+                    <button onClick={() => setOpType('depense')}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                        opType === 'depense' ? 'bg-[#F85149] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                      }`}>
+                      <Minus size={14} /> Dépense en espèces
+                    </button>
+                    <button onClick={() => setOpType('approvisionnement')}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                        opType === 'approvisionnement' ? 'bg-[#2EA043] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                      }`}>
+                      <Plus size={14} /> Approvisionnement
+                    </button>
+                  </div>
+
+                  <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
+                    {opType === 'depense' && (
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
+                        <select value={fOp.categorie} onChange={e => setFOp(f => ({ ...f, categorie: e.target.value }))}
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F85149]/50">
+                          {CATS_DEPENSE.map(c => <option key={c}>{c}</option>)}
+                        </select>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
+                      <input value={fOp.motif} onChange={e => setFOp(f => ({ ...f, motif: e.target.value }))}
+                        placeholder={opType === 'depense' ? 'Ex: Achat carburant générateur…' : 'Ex: Virement depuis compte BGFI…'}
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                    </div>
+
+                    {opType === 'depense' && (
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Bénéficiaire</label>
+                        <input value={fOp.beneficiaire} onChange={e => setFOp(f => ({ ...f, beneficiaire: e.target.value }))}
+                          placeholder="Ex: Pharmacie SIKA…"
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
+                        <input type="number" value={fOp.montant} onChange={e => setFOp(f => ({ ...f, montant: e.target.value }))}
+                          placeholder="0"
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
+                        <input type="date" value={fOp.date} onChange={e => setFOp(f => ({ ...f, date: e.target.value }))}
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">N° pièce / référence</label>
+                      <input value={fOp.reference_piece} onChange={e => setFOp(f => ({ ...f, reference_piece: e.target.value }))}
+                        placeholder="Ex: RECU-2026-001"
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                    </div>
+
+                    {/* Solde preview */}
+                    {fOp.montant && parseFloat(fOp.montant) > 0 && (
+                      <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                        opType === 'depense' ? 'bg-[#F85149]/10 border-[#F85149]/20' : 'bg-[#2EA043]/10 border-[#2EA043]/20'
+                      }`}>
+                        <span className="text-xs text-[#8B949E]">Solde après opération</span>
+                        <span className={`text-sm font-bold ${opType === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}`}>
+                          {fmtFCFA(opType === 'depense'
+                            ? selectedCaisse.solde - parseFloat(fOp.montant)
+                            : selectedCaisse.solde + parseFloat(fOp.montant))}
+                        </span>
+                      </div>
+                    )}
+
+                    <button onClick={saveCaisseOp} disabled={saving || !fOp.montant}
+                      className={`w-full py-3 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 text-white ${
+                        opType === 'depense' ? 'bg-[#F85149]' : 'bg-[#2EA043]'
+                      }`}>
+                      {saving && <Loader2 size={13} className="animate-spin" />}
+                      {opType === 'depense' ? 'Enregistrer la dépense' : 'Enregistrer l\'approvisionnement'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Caisse: Journal ── */}
+              {caisseTab === 'journal' && selectedCaisse && (
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                  <div className="px-5 py-3 border-b border-[#30363D] flex items-center justify-between">
+                    <h3 className="text-xs font-semibold text-[#E6EDF3]">Journal de caisse — {selectedCaisse.nom}</h3>
+                    <span className="text-[10px] text-[#484F58]">{caisseOps.length} opération(s)</span>
+                  </div>
+                  {caisseOps.length === 0 ? (
+                    <div className="p-10 text-center">
+                      <FileText size={24} className="mx-auto mb-2 text-[#30363D]" />
+                      <p className="text-[#484F58] text-sm">Aucune opération</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-[#21262D]">
+                            {['Date', 'Type', 'Motif', 'Bénéficiaire', 'Réf.', 'Montant', 'Statut'].map(h => (
+                              <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#21262D]">
+                          {caisseOps.map(op => (
+                            <tr key={op.id} className="hover:bg-[#21262D]/30 transition-colors">
+                              <td className="px-4 py-2.5 text-[#8B949E]">{fmtDate(op.date)}</td>
+                              <td className="px-4 py-2.5">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                  op.type === 'depense'
+                                    ? 'bg-[#F85149]/10 text-[#F85149]'
+                                    : 'bg-[#2EA043]/10 text-[#2EA043]'
+                                }`}>
+                                  {op.type === 'depense' ? 'Dépense' : 'Approv.'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[140px] truncate">{op.motif ?? '—'}</td>
+                              <td className="px-4 py-2.5 text-[#8B949E]">{op.beneficiaire ?? '—'}</td>
+                              <td className="px-4 py-2.5 text-[#484F58]">{op.reference_piece ?? '—'}</td>
+                              <td className={`px-4 py-2.5 font-bold ${op.type === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}`}>
+                                {op.type === 'depense' ? '−' : '+'}{fmtFCFA(op.montant)}
+                              </td>
+                              <td className="px-4 py-2.5">
+                                {op.cloture_date ? (
+                                  <span className="text-[10px] text-[#484F58]">Clôturé</span>
+                                ) : (
+                                  <span className="text-[10px] text-[#F0A30A]">En cours</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── Caisse: Clôture ── */}
+              {caisseTab === 'cloture' && selectedCaisse && (
+                <div className="space-y-4">
+                  <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
+                        <Lock size={18} className="text-[#F0A30A]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#E6EDF3]">Clôture de caisse</p>
+                        <p className="text-[10px] text-[#484F58]">Arrêter les opérations d'une journée</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Date à clôturer</label>
+                        <input type="date" value={clotureDate} onChange={e => setClotureDate(e.target.value)}
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Solde physique constaté (optionnel)</label>
+                        <input type="number" value={clotureSolde} onChange={e => setClotureSolde(e.target.value)}
+                          placeholder={String(selectedCaisse.solde)}
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                        <p className="text-[10px] text-[#484F58] mt-1">
+                          Solde comptable : {fmtFCFA(selectedCaisse.solde)}
+                          {clotureSolde && (
+                            <span className={` · Écart : ${parseFloat(clotureSolde) - selectedCaisse.solde >= 0 ? '+' : ''}${fmtFCFA(parseFloat(clotureSolde) - selectedCaisse.solde)}`} />
+                          )}
+                        </p>
+                      </div>
+
+                      {/* Preview ops to close */}
+                      {(() => {
+                        const toClose = caisseOps.filter(o => o.date === clotureDate && !o.cloture_date)
+                        return toClose.length > 0 ? (
+                          <div className="bg-[#0D1117] border border-[#F0A30A]/20 rounded-xl p-3">
+                            <p className="text-[10px] font-bold text-[#F0A30A] mb-2">{toClose.length} opération(s) à clôturer</p>
+                            {toClose.map(o => (
+                              <div key={o.id} className="flex justify-between text-[10px] py-0.5">
+                                <span className="text-[#8B949E]">{o.motif ?? o.type}</span>
+                                <span className={o.type === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}>
+                                  {o.type === 'depense' ? '−' : '+'}{fmtFCFA(o.montant)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[10px] text-[#484F58]">Aucune opération non clôturée pour cette date.</p>
+                        )
+                      })()}
+
+                      <button onClick={saveCloture} disabled={savingCloture}
+                        className="w-full py-3 rounded-xl text-sm font-semibold bg-[#F0A30A] text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2">
+                        {savingCloture && <Loader2 size={13} className="animate-spin" />}
+                        Clôturer la caisse
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Caisse: Paramétrage ── */}
+              {caisseTab === 'parametrage' && (
+                <div className="space-y-4">
+                  {/* Existing caisses */}
+                  {caisses.length > 0 && (
+                    <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                      <div className="px-5 py-3 border-b border-[#30363D]">
+                        <p className="text-xs font-semibold text-[#E6EDF3]">Caisses existantes</p>
+                      </div>
+                      {caisses.map(c => (
+                        <div key={c.id} className="flex items-center gap-3 px-5 py-3 border-b border-[#21262D] last:border-0">
+                          <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/10 flex items-center justify-center">
+                            <Archive size={14} className="text-[#F0A30A]" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs font-medium text-[#E6EDF3]">{c.nom}</p>
+                            <p className="text-[10px] text-[#484F58]">Compte {c.numero_compte} · {fmtFCFA(c.solde)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Create new caisse */}
+                  <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+                    <p className="text-xs font-semibold text-[#E6EDF3] mb-4">Créer une nouvelle caisse</p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Nom de la caisse</label>
+                        <input value={fCaisse.nom} onChange={e => setFCaisse(f => ({ ...f, nom: e.target.value }))}
+                          placeholder="Ex: Caisse principale, Caisse annexe…"
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-[#8B949E] mb-1 block">Compte OHADA</label>
+                        <select value={fCaisse.numero_compte} onChange={e => setFCaisse(f => ({ ...f, numero_compte: e.target.value }))}
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+                          <option value="571000">571000 — Caisse principale</option>
+                          <option value="571100">571100 — Caisse annexe</option>
+                          <option value="572000">572000 — Caisse devises</option>
+                        </select>
+                      </div>
+                      <button onClick={saveCaisse} disabled={savingCaisse || !fCaisse.nom}
+                        className="w-full py-2.5 rounded-xl text-sm font-semibold bg-[#F0A30A] text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2">
+                        {savingCaisse && <Loader2 size={13} className="animate-spin" />}
+                        Créer la caisse
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* PLACEHOLDER TABS                                                      */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {(mainTab === 'import' || mainTab === 'rapprochement' || mainTab === 'previsions') && (
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-[#F0A30A]/10 border border-[#F0A30A]/20 flex items-center justify-center">
+            {mainTab === 'import'
+              ? <Upload size={24} className="text-[#F0A30A]" />
+              : mainTab === 'rapprochement'
+                ? <GitMerge size={24} className="text-[#F0A30A]" />
+                : <BarChart3 size={24} className="text-[#F0A30A]" />}
           </div>
-        )}
-      </div>
+          <div className="text-center">
+            <p className="text-sm font-semibold text-[#E6EDF3] mb-1">
+              {mainTab === 'import' ? 'Import de relevés bancaires'
+                : mainTab === 'rapprochement' ? 'Rapprochement bancaire'
+                : 'Prévisions de trésorerie'}
+            </p>
+            <p className="text-xs text-[#484F58]">Cette fonctionnalité sera disponible prochainement.</p>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-[#F0A30A]/10 text-[#F0A30A] text-[10px] font-bold border border-[#F0A30A]/20">
+            Bientôt disponible
+          </span>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* MODAL ENCAISSER                                                       */}
@@ -718,7 +1117,6 @@ export default function TresoreriePage() {
               </div>
 
               <div className="space-y-4">
-                {/* Mode de paiement — boutons visuels */}
                 <div>
                   <label className="text-xs text-[#8B949E] mb-2 block font-medium">Mode de réception</label>
                   <div className="grid grid-cols-5 gap-2">
@@ -728,19 +1126,13 @@ export default function TresoreriePage() {
                       return (
                         <button key={m.value} onClick={() => setFEnc(f => ({ ...f, mode: m.value }))}
                           className="flex flex-col items-center gap-1 py-2.5 rounded-xl border text-[10px] font-medium transition-all"
-                          style={{
-                            borderColor: sel ? m.color : '#30363D',
-                            background: sel ? `${m.color}18` : '#0D1117',
-                            color: sel ? m.color : '#484F58',
-                          }}>
-                          <Icon size={16} />
-                          {m.label.split(' ')[0]}
+                          style={{ borderColor: sel ? m.color : '#30363D', background: sel ? `${m.color}18` : '#0D1117', color: sel ? m.color : '#484F58' }}>
+                          <Icon size={16} />{m.label.split(' ')[0]}
                         </button>
                       )
                     })}
                   </div>
                 </div>
-
                 <div>
                   <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
                   <select value={fEnc.categorie} onChange={e => setFEnc(f => ({ ...f, categorie: e.target.value }))}
@@ -748,14 +1140,12 @@ export default function TresoreriePage() {
                     {CATS_ENTREE.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
-
                 <div>
                   <label className="text-xs text-[#8B949E] mb-1 block">Description</label>
                   <input value={fEnc.description} onChange={e => setFEnc(f => ({ ...f, description: e.target.value }))}
-                    placeholder="Ex: Paiement frais Jonathan KALALA…"
+                    placeholder="Ex: Paiement client KALALA…"
                     className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#2EA043]/50" />
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
@@ -769,27 +1159,21 @@ export default function TresoreriePage() {
                       className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#2EA043]/50" />
                   </div>
                 </div>
-
-                {/* Preview montant */}
                 {fEnc.montant && parseInt(fEnc.montant) > 0 && (
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#2EA043]/10 border border-[#2EA043]/20">
                     <ArrowUpCircle size={14} className="text-[#2EA043]" />
                     <span className="text-[#2EA043] text-sm font-bold">+ {fmtFCFA(parseInt(fEnc.montant))}</span>
-                    <span className="text-[#2EA043]/60 text-xs ml-auto">{MODES.find(m => m.value === fEnc.mode)?.label}</span>
                   </div>
                 )}
               </div>
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">
-                  Annuler
-                </button>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                 <button onClick={saveEncaisser} disabled={saving || !fEnc.description || !fEnc.montant}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ background: '#2EA043', color: '#fff' }}>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#2EA043] text-white">
                   {saving && <Loader2 size={13} className="animate-spin" />}
-                  Enregistrer l'entrée
+                  Enregistrer
                 </button>
               </div>
             </motion.div>
@@ -819,7 +1203,6 @@ export default function TresoreriePage() {
               </div>
 
               <div className="space-y-4">
-                {/* Mode */}
                 <div>
                   <label className="text-xs text-[#8B949E] mb-2 block font-medium">Mode de paiement</label>
                   <div className="grid grid-cols-5 gap-2">
@@ -829,19 +1212,13 @@ export default function TresoreriePage() {
                       return (
                         <button key={m.value} onClick={() => setFDec(f => ({ ...f, mode: m.value }))}
                           className="flex flex-col items-center gap-1 py-2.5 rounded-xl border text-[10px] font-medium transition-all"
-                          style={{
-                            borderColor: sel ? m.color : '#30363D',
-                            background: sel ? `${m.color}18` : '#0D1117',
-                            color: sel ? m.color : '#484F58',
-                          }}>
-                          <Icon size={16} />
-                          {m.label.split(' ')[0]}
+                          style={{ borderColor: sel ? m.color : '#30363D', background: sel ? `${m.color}18` : '#0D1117', color: sel ? m.color : '#484F58' }}>
+                          <Icon size={16} />{m.label.split(' ')[0]}
                         </button>
                       )
                     })}
                   </div>
                 </div>
-
                 <div>
                   <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
                   <select value={fDec.categorie} onChange={e => setFDec(f => ({ ...f, categorie: e.target.value }))}
@@ -849,14 +1226,12 @@ export default function TresoreriePage() {
                     {CATS_SORTIE.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
-
                 <div>
                   <label className="text-xs text-[#8B949E] mb-1 block">Description</label>
                   <input value={fDec.description} onChange={e => setFDec(f => ({ ...f, description: e.target.value }))}
                     placeholder="Ex: Loyer bureau janvier…"
                     className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F85149]/50" />
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
@@ -870,26 +1245,21 @@ export default function TresoreriePage() {
                       className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F85149]/50" />
                   </div>
                 </div>
-
                 {fDec.montant && parseInt(fDec.montant) > 0 && (
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F85149]/10 border border-[#F85149]/20">
                     <ArrowDownCircle size={14} className="text-[#F85149]" />
                     <span className="text-[#F85149] text-sm font-bold">− {fmtFCFA(parseInt(fDec.montant))}</span>
-                    <span className="text-[#F85149]/60 text-xs ml-auto">{MODES.find(m => m.value === fDec.mode)?.label}</span>
                   </div>
                 )}
               </div>
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">
-                  Annuler
-                </button>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                 <button onClick={saveDecaisser} disabled={saving || !fDec.description || !fDec.montant}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ background: '#F85149', color: '#fff' }}>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#F85149] text-white">
                   {saving && <Loader2 size={13} className="animate-spin" />}
-                  Enregistrer la sortie
+                  Enregistrer
                 </button>
               </div>
             </motion.div>
@@ -898,167 +1268,61 @@ export default function TresoreriePage() {
       </AnimatePresence>
 
       {/* ══════════════════════════════════════════════════════════════════════ */}
-      {/* MODAL PAYER PRESTATAIRE                                               */}
+      {/* MODAL AJOUTER COMPTE BANCAIRE                                         */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {modal === 'prestataire' && (
+        {modal === 'addBanque' && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/70" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#161B22] border border-[#F97316]/30 rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+              className="relative bg-[#161B22] border border-[#388BFD]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-[#F97316]/20 flex items-center justify-center">
-                  <UserCheck size={20} className="text-[#F97316]" />
+                <div className="w-10 h-10 rounded-xl bg-[#388BFD]/20 flex items-center justify-center">
+                  <Landmark size={20} className="text-[#388BFD]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#E6EDF3]">Payer un prestataire</h3>
-                  <p className="text-[11px] text-[#484F58]">Formateur · Ouvrier · Consultant · Intervenant</p>
+                  <h3 className="text-base font-bold text-[#E6EDF3]">Ajouter un compte</h3>
+                  <p className="text-[11px] text-[#484F58]">Compte bancaire de l'entreprise</p>
                 </div>
                 <button onClick={() => setModal(null)} className="ml-auto text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
               </div>
 
-              {/* Sélection prestataire */}
-              {!selPresta ? (
-                <div className="space-y-3">
-                  {prestataires.length > 0 && (
-                    <>
-                      <div className="relative">
-                        <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#484F58]" />
-                        <input value={searchPresta} onChange={e => setSearchPresta(e.target.value)}
-                          placeholder="Rechercher un prestataire enregistré…"
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg pl-8 pr-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F97316]/50" />
-                      </div>
-                      <div className="max-h-52 overflow-y-auto divide-y divide-[#21262D] rounded-xl border border-[#30363D] bg-[#0D1117]">
-                        {prestasFiltered.map(p => (
-                          <button key={p.id} onClick={() => {
-                            setSelPresta(p)
-                            if (p.taux_horaire) setFPresta(f => ({ ...f, montant: String(p.taux_horaire) }))
-                          }}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#21262D] transition-colors text-left">
-                            <div className="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center shrink-0">
-                              <UserCheck size={14} className="text-[#F97316]" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-[#E6EDF3] font-medium">{p.prenom} {p.nom}</p>
-                              <p className="text-[10px] text-[#484F58]">{p.type}{p.taux_horaire ? ` · ${fmtFCFA(p.taux_horaire)}/h` : ''}</p>
-                            </div>
-                          </button>
-                        ))}
-                        {prestasFiltered.length === 0 && (
-                          <p className="text-center py-6 text-[10px] text-[#484F58]">Aucun résultat</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-px bg-[#30363D]" />
-                        <span className="text-[10px] text-[#484F58]">ou saisie manuelle</span>
-                        <div className="flex-1 h-px bg-[#30363D]" />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Saisie manuelle */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs text-[#8B949E] mb-1 block">Nom complet</label>
-                      <input value={fPresta.nom} onChange={e => setFPresta(f => ({ ...f, nom: e.target.value }))}
-                        placeholder="Ex: Jean MOBUTU"
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F97316]/50" />
-                    </div>
-                    <div>
-                      <label className="text-xs text-[#8B949E] mb-1 block">Type</label>
-                      <select value={fPresta.type} onChange={e => setFPresta(f => ({ ...f, type: e.target.value }))}
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
-                        <option value="formateur">Formateur</option>
-                        <option value="enseignant">Enseignant</option>
-                        <option value="ouvrier">Ouvrier</option>
-                        <option value="consultant">Consultant</option>
-                        <option value="autre">Autre</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* Prestataire sélectionné — badge */
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F97316]/10 border border-[#F97316]/30 mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-[#F97316]/20 flex items-center justify-center">
-                    <UserCheck size={16} className="text-[#F97316]" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#E6EDF3]">{selPresta.prenom} {selPresta.nom}</p>
-                    <p className="text-[10px] text-[#F97316]">{selPresta.type}{selPresta.taux_horaire ? ` · Taux: ${fmtFCFA(selPresta.taux_horaire)}/h` : ''}</p>
-                  </div>
-                  <button onClick={() => { setSelPresta(null); setFPresta(f => ({ ...f, montant: '' })) }}
-                    className="text-[#484F58] hover:text-[#8B949E]"><X size={14} /></button>
-                </div>
-              )}
-
-              {/* Champs communs */}
-              <div className="space-y-4 mt-4">
+              <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-1 block">Motif / Prestation</label>
-                  <input value={fPresta.motif} onChange={e => setFPresta(f => ({ ...f, motif: e.target.value }))}
-                    placeholder="Ex: Cours Mathématiques — Mai 2026…"
-                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F97316]/50" />
+                  <label className="text-xs text-[#8B949E] mb-1 block">Banque</label>
+                  <select value={fBanque.banque} onChange={e => setFBanque(f => ({ ...f, banque: e.target.value }))}
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#388BFD]/50">
+                    {BANQUES_CONGO.map(b => <option key={b}>{b}</option>)}
+                  </select>
                 </div>
-
-                {/* Mode paiement */}
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-2 block font-medium">Mode de paiement</label>
-                  <div className="grid grid-cols-5 gap-2">
-                    {MODES.map(m => {
-                      const Icon = m.icon
-                      const sel = fPresta.mode === m.value
-                      return (
-                        <button key={m.value} onClick={() => setFPresta(f => ({ ...f, mode: m.value }))}
-                          className="flex flex-col items-center gap-1 py-2.5 rounded-xl border text-[10px] font-medium transition-all"
-                          style={{
-                            borderColor: sel ? m.color : '#30363D',
-                            background: sel ? `${m.color}18` : '#0D1117',
-                            color: sel ? m.color : '#484F58',
-                          }}>
-                          <Icon size={16} />
-                          {m.label.split(' ')[0]}
-                        </button>
-                      )
-                    })}
-                  </div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Intitulé du compte</label>
+                  <input value={fBanque.intitule} onChange={e => setFBanque(f => ({ ...f, intitule: e.target.value }))}
+                    placeholder="Ex: Compte courant entreprise"
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
                 </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
-                    <input type="number" value={fPresta.montant} onChange={e => setFPresta(f => ({ ...f, montant: e.target.value }))}
-                      placeholder="0"
-                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F97316]/50" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
-                    <input type="date" value={fPresta.date} onChange={e => setFPresta(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F97316]/50" />
-                  </div>
+                <div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Numéro de compte</label>
+                  <input value={fBanque.numero_compte} onChange={e => setFBanque(f => ({ ...f, numero_compte: e.target.value }))}
+                    placeholder="Ex: 001-12345678-01"
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
                 </div>
-
-                {fPresta.montant && parseInt(fPresta.montant) > 0 && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F97316]/10 border border-[#F97316]/20">
-                    <UserCheck size={14} className="text-[#F97316]" />
-                    <span className="text-[#F97316] text-sm font-bold">{fmtFCFA(parseInt(fPresta.montant))}</span>
-                    <span className="text-[#F97316]/50 text-[10px] ml-auto">4 notifications envoyées</span>
-                  </div>
-                )}
+                <div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Solde initial (FCFA)</label>
+                  <input type="number" value={fBanque.solde} onChange={e => setFBanque(f => ({ ...f, solde: e.target.value }))}
+                    placeholder="0"
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
+                </div>
               </div>
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">
-                  Annuler
-                </button>
-                <button onClick={savePrestataire}
-                  disabled={saving || (!selPresta && !fPresta.nom) || !fPresta.montant || !fPresta.motif}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ background: '#F97316', color: '#fff' }}>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
+                <button onClick={saveBanque} disabled={saving || !fBanque.intitule}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#388BFD] text-white">
                   {saving && <Loader2 size={13} className="animate-spin" />}
-                  Payer le prestataire
+                  Ajouter le compte
                 </button>
               </div>
             </motion.div>
