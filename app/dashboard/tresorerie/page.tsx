@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -14,6 +14,7 @@ import {
   ArrowUpCircle, ArrowDownCircle, RefreshCw,
   LayoutDashboard, Landmark, Archive, Upload, GitMerge,
   BarChart3, Eye, ListOrdered, Lock, Sliders, PiggyBank,
+  Send, CheckCheck, Clock, XCircle, Link2, AlertTriangle,
 } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
 import { resolveAccounts } from '@/lib/accounting-engine'
@@ -66,7 +67,28 @@ type CaisseOp = {
 
 type MainTab = 'overview' | 'banque' | 'caisse' | 'import' | 'rapprochement' | 'previsions'
 type CaisseTab = 'apercu' | 'operations' | 'journal' | 'cloture' | 'parametrage'
+type BanqueTab = 'comptes' | 'cheques' | 'virements'
 type ModalType = 'encaisser' | 'decaisser' | 'addBanque' | null
+
+type Cheque = {
+  id: string; compte_bancaire_id: string | null; type: 'emis' | 'recu'
+  numero: string; montant: number; beneficiaire: string | null; emetteur: string | null
+  banque_tiree: string | null; date_emission: string; date_echeance: string | null
+  date_encaissement: string | null; motif: string | null
+  statut: 'en_attente' | 'encaisse' | 'rejete' | 'annule'; created_at: string
+}
+type Virement = {
+  id: string; compte_source_id: string | null; compte_source_label: string | null
+  compte_dest_label: string; montant: number; motif: string | null
+  date: string; statut: 'en_attente' | 'execute' | 'rejete' | 'annule'
+  reference: string | null; created_at: string
+}
+type ReleveLigne = {
+  id: string; compte_bancaire_id: string | null; date: string; libelle: string
+  montant: number; type: 'credit' | 'debit'; reference: string | null
+  statut: 'non_rapproche' | 'rapproche' | 'ignore'; transaction_id: string | null
+}
+type CsvRow = { date: string; libelle: string; montant: number; type: 'credit' | 'debit' }
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
@@ -112,6 +134,12 @@ const CAISSE_TABS = [
   { id: 'parametrage' as CaisseTab,  label: 'Paramétrage',  icon: Sliders },
 ]
 
+const BANQUE_TABS = [
+  { id: 'comptes' as BanqueTab,   label: 'Comptes',   icon: Landmark },
+  { id: 'cheques' as BanqueTab,   label: 'Chèques',   icon: FileText },
+  { id: 'virements' as BanqueTab, label: 'Virements', icon: Send },
+]
+
 const CATS_DEPENSE = [
   'Fournitures', 'Carburant', 'Repas / Représentation', 'Transport',
   'Petit matériel', 'Réparations', 'Charges diverses', 'Autre',
@@ -133,6 +161,7 @@ export default function TresoreriePage() {
   // ── Global state ──────────────────────────────────────────────────────────
   const [mainTab,     setMainTab]    = useState<MainTab>('overview')
   const [caisseTab,   setCaisseTab]  = useState<CaisseTab>('apercu')
+  const [banqueTab,   setBanqueTab]  = useState<BanqueTab>('comptes')
   const [modal,       setModal]      = useState<ModalType>(null)
   const [toast,       setToast]      = useState<{ msg: string; ok: boolean } | null>(null)
   const [saving,      setSaving]     = useState(false)
@@ -145,6 +174,40 @@ export default function TresoreriePage() {
   const [caisseOps,       setCaisseOps]      = useState<CaisseOp[]>([])
   const [selectedCaisse,  setSelectedCaisse] = useState<Caisse | null>(null)
   const [openingBal,      setOpeningBal]     = useState(0)
+
+  // ── Chèques ───────────────────────────────────────────────────────────────
+  const [cheques,         setCheques]        = useState<Cheque[]>([])
+  const [chequeType,      setChequeType]     = useState<'emis' | 'recu'>('emis')
+  const [showChequeForm,  setShowChequeForm] = useState(false)
+  const [fCheque, setFCheque] = useState({
+    numero: '', montant: '', beneficiaire: '', emetteur: '',
+    banque_tiree: 'BGFI Bank', date_emission: today(), date_echeance: '',
+    motif: '', compte_bancaire_id: '',
+  })
+
+  // ── Virements ─────────────────────────────────────────────────────────────
+  const [virements,         setVirements]       = useState<Virement[]>([])
+  const [showVirementForm,  setShowVirementForm] = useState(false)
+  const [fVirement, setFVirement] = useState({
+    compte_source_id: '', compte_dest_label: '', montant: '',
+    motif: '', date: today(), reference: '',
+  })
+
+  // ── Import relevé ─────────────────────────────────────────────────────────
+  const csvInputRef = useRef<HTMLInputElement>(null)
+  const [csvRows,         setCsvRows]         = useState<CsvRow[]>([])
+  const [csvCompte,       setCsvCompte]       = useState('')
+  const [importingSaving, setImportingSaving] = useState(false)
+
+  // ── Rapprochement ─────────────────────────────────────────────────────────
+  const [releveLignes,    setReleveLignes]   = useState<ReleveLigne[]>([])
+  const [rapprochCompte,  setRapprochCompte] = useState('')
+  const [rapprochLigne,   setRapprochLigne]  = useState<ReleveLigne | null>(null)
+  const [rapprochTx,      setRapprochTx]     = useState<Transaction | null>(null)
+  const [rapprochSaving,  setRapprochSaving] = useState(false)
+
+  // ── Prévisions ────────────────────────────────────────────────────────────
+  const [previsionDays,   setPrevisionDays]  = useState(30)
 
   // ── Encaisser form ────────────────────────────────────────────────────────
   const [fEnc, setFEnc] = useState({
@@ -408,6 +471,233 @@ export default function TresoreriePage() {
     load()
   }
 
+  // ── Load chèques / virements / relevés ───────────────────────────────────
+
+  async function loadCheques() {
+    if (!tenantId) return
+    const { data } = await supabase.from('cheques').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
+    setCheques((data ?? []) as Cheque[])
+  }
+
+  async function loadVirements() {
+    if (!tenantId) return
+    const { data } = await supabase.from('virements').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
+    setVirements((data ?? []) as Virement[])
+  }
+
+  async function loadReleves(compteId: string) {
+    const { data } = await supabase.from('releve_lignes').select('*')
+      .eq('tenant_id', tenantId!).eq('compte_bancaire_id', compteId)
+      .order('date', { ascending: false })
+    setReleveLignes((data ?? []) as ReleveLigne[])
+  }
+
+  useEffect(() => { if (!tLoading && tenantId) { loadCheques(); loadVirements() } }, [tLoading, tenantId])
+  useEffect(() => { if (rapprochCompte) loadReleves(rapprochCompte) }, [rapprochCompte])
+
+  // ── Save chèque ───────────────────────────────────────────────────────────
+
+  async function saveCheque() {
+    if (!tenantId || !fCheque.numero || !fCheque.montant) return
+    setSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    const { error } = await supabase.from('cheques').insert({
+      tenant_id: tenantId, type: chequeType,
+      numero: fCheque.numero, montant: parseFloat(fCheque.montant),
+      beneficiaire: chequeType === 'emis' ? fCheque.beneficiaire || null : null,
+      emetteur: chequeType === 'recu' ? fCheque.emetteur || null : null,
+      banque_tiree: fCheque.banque_tiree || null,
+      date_emission: fCheque.date_emission,
+      date_echeance: fCheque.date_echeance || null,
+      motif: fCheque.motif || null,
+      compte_bancaire_id: fCheque.compte_bancaire_id || null,
+      statut: 'en_attente', created_by: user?.id,
+    })
+    if (error) showToast(error.message, false)
+    else {
+      showToast(chequeType === 'emis' ? 'Chèque émis enregistré' : 'Chèque reçu enregistré')
+      setFCheque({ numero: '', montant: '', beneficiaire: '', emetteur: '', banque_tiree: 'BGFI Bank', date_emission: today(), date_echeance: '', motif: '', compte_bancaire_id: '' })
+      setShowChequeForm(false)
+      loadCheques()
+    }
+    setSaving(false)
+  }
+
+  async function encaisserCheque(cheque: Cheque) {
+    if (!tenantId) return
+    setSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('cheques').update({ statut: 'encaisse', date_encaissement: today() }).eq('id', cheque.id)
+    if (cheque.type === 'recu') {
+      const txRes = await supabase.from('transactions').insert({
+        tenant_id: tenantId, type: 'entree', categorie: 'Virement reçu',
+        description: `Encaissement chèque n°${cheque.numero}${cheque.emetteur ? ' de ' + cheque.emetteur : ''}`,
+        montant: cheque.montant, date: today(), mode_paiement: 'cheque',
+        source: 'tresorerie', created_by: user?.id,
+      }).select('id').single()
+      if (txRes.data?.id) {
+        await supabase.from('releve_lignes').update({ transaction_id: txRes.data.id }).eq('id', cheque.id)
+      }
+    }
+    showToast(`Chèque de ${fmtFCFA(cheque.montant)} encaissé`)
+    loadCheques(); load()
+    setSaving(false)
+  }
+
+  async function updateChequeStatut(id: string, statut: Cheque['statut']) {
+    await supabase.from('cheques').update({ statut }).eq('id', id)
+    loadCheques()
+    showToast(statut === 'annule' ? 'Chèque annulé' : statut === 'rejete' ? 'Chèque rejeté' : 'Statut mis à jour')
+  }
+
+  // ── Save virement ─────────────────────────────────────────────────────────
+
+  async function saveVirement() {
+    if (!tenantId || !fVirement.compte_dest_label || !fVirement.montant) return
+    setSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    const sourceCompte = comptesBancaires.find(c => c.id === fVirement.compte_source_id)
+    const { error } = await supabase.from('virements').insert({
+      tenant_id: tenantId, compte_source_id: fVirement.compte_source_id || null,
+      compte_source_label: sourceCompte?.intitule ?? null,
+      compte_dest_label: fVirement.compte_dest_label,
+      montant: parseFloat(fVirement.montant), motif: fVirement.motif || null,
+      date: fVirement.date, reference: fVirement.reference || null,
+      statut: 'en_attente', created_by: user?.id,
+    })
+    if (error) showToast(error.message, false)
+    else {
+      showToast('Virement enregistré')
+      setFVirement({ compte_source_id: '', compte_dest_label: '', montant: '', motif: '', date: today(), reference: '' })
+      setShowVirementForm(false)
+      loadVirements()
+    }
+    setSaving(false)
+  }
+
+  async function updateVirementStatut(id: string, statut: Virement['statut']) {
+    const { data: { user } } = await supabase.auth.getUser()
+    const v = virements.find(x => x.id === id)
+    await supabase.from('virements').update({ statut }).eq('id', id)
+    if (statut === 'execute' && v && tenantId) {
+      await supabase.from('transactions').insert({
+        tenant_id: tenantId, type: 'sortie', categorie: 'Charges diverses',
+        description: `Virement vers ${v.compte_dest_label}${v.motif ? ' — ' + v.motif : ''}`,
+        montant: v.montant, date: v.date, mode_paiement: 'virement',
+        source: 'tresorerie', created_by: user?.id,
+      })
+      load()
+    }
+    loadVirements()
+    showToast(statut === 'execute' ? 'Virement exécuté' : 'Virement annulé')
+  }
+
+  // ── CSV Parser ────────────────────────────────────────────────────────────
+
+  function handleCSVFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string
+      setCsvRows(parseCSV(text))
+    }
+    reader.readAsText(file, 'latin1')
+  }
+
+  function parseCSV(text: string): CsvRow[] {
+    const lines = text.trim().split(/\r?\n/)
+    if (lines.length < 2) return []
+    const sep = lines[0].includes(';') ? ';' : ','
+    const headers = lines[0].split(sep).map(h => h.trim().toLowerCase().replace(/["\r]/g, ''))
+    const idx = (keys: string[]) => headers.findIndex(h => keys.some(k => h.includes(k)))
+    const dateIdx    = idx(['date'])
+    const libelIdx   = idx(['libel', 'descr', 'motif', 'opéra', 'label'])
+    const debitIdx   = idx(['débit', 'debit', 'sortie', 'retrait', 'debet'])
+    const creditIdx  = idx(['crédit', 'credit', 'entrée', 'versem', 'credit'])
+    const montantIdx = idx(['montant', 'amount', 'solde'])
+    if (dateIdx === -1 || libelIdx === -1) return []
+    const parseAmt = (s: string) => parseFloat(s.replace(/\s/g, '').replace(',', '.')) || 0
+    const rows: CsvRow[] = []
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(sep).map(c => c.trim().replace(/["\r]/g, ''))
+      const rawDate = cols[dateIdx] ?? ''
+      const libelle = cols[libelIdx] ?? ''
+      if (!rawDate || !libelle) continue
+      const dm = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+      const date = dm ? `${dm[3]}-${dm[2].padStart(2,'0')}-${dm[1].padStart(2,'0')}` : rawDate
+      let montant = 0; let type: 'credit' | 'debit' = 'credit'
+      if (debitIdx !== -1 && creditIdx !== -1) {
+        const d = parseAmt(cols[debitIdx]); const c = parseAmt(cols[creditIdx])
+        if (d > 0) { montant = d; type = 'debit' } else if (c > 0) { montant = c; type = 'credit' } else continue
+      } else if (montantIdx !== -1) {
+        const raw = parseAmt(cols[montantIdx]); montant = Math.abs(raw); type = raw >= 0 ? 'credit' : 'debit'
+      } else continue
+      if (montant === 0) continue
+      rows.push({ date, libelle, montant, type })
+    }
+    return rows
+  }
+
+  async function importReleve() {
+    if (!tenantId || !csvCompte || csvRows.length === 0) return
+    setImportingSaving(true)
+    const rows = csvRows.map(r => ({
+      tenant_id: tenantId, compte_bancaire_id: csvCompte,
+      date: r.date, libelle: r.libelle, montant: r.montant,
+      type: r.type, statut: 'non_rapproche',
+    }))
+    const { error } = await supabase.from('releve_lignes').insert(rows)
+    if (error) showToast(error.message, false)
+    else {
+      showToast(`${rows.length} lignes importées`)
+      setCsvRows([])
+      if (csvInputRef.current) csvInputRef.current.value = ''
+      setRapprochCompte(csvCompte)
+      setMainTab('rapprochement')
+      loadReleves(csvCompte)
+    }
+    setImportingSaving(false)
+  }
+
+  // ── Rapprochement ─────────────────────────────────────────────────────────
+
+  async function rapprocher(ligne: ReleveLigne, tx: Transaction) {
+    setRapprochSaving(true)
+    await supabase.from('releve_lignes').update({ statut: 'rapproche', transaction_id: tx.id }).eq('id', ligne.id)
+    showToast('Rapprochement effectué')
+    setRapprochLigne(null); setRapprochTx(null)
+    loadReleves(rapprochCompte)
+    setRapprochSaving(false)
+  }
+
+  async function ignorerLigne(id: string) {
+    await supabase.from('releve_lignes').update({ statut: 'ignore' }).eq('id', id)
+    setRapprochLigne(null)
+    loadReleves(rapprochCompte)
+  }
+
+  async function autoRapprocher() {
+    setRapprochSaving(true)
+    let matched = 0
+    const pending = releveLignes.filter(l => l.statut === 'non_rapproche')
+    for (const ligne of pending) {
+      const txType = ligne.type === 'credit' ? 'entree' : 'sortie'
+      const match = transactions.find(tx =>
+        tx.type === txType &&
+        Math.abs(tx.montant - ligne.montant) < 1 &&
+        Math.abs(new Date(tx.date).getTime() - new Date(ligne.date).getTime()) <= 5 * 86400000
+      )
+      if (match) {
+        await supabase.from('releve_lignes').update({ statut: 'rapproche', transaction_id: match.id }).eq('id', ligne.id)
+        matched++
+      }
+    }
+    showToast(`${matched} rapprochement(s) automatique(s)`)
+    loadReleves(rapprochCompte)
+    setRapprochSaving(false)
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER
   // ─────────────────────────────────────────────────────────────────────────
@@ -646,50 +936,315 @@ export default function TresoreriePage() {
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {mainTab === 'banque' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-[#8B949E]">
-              {comptesBancaires.length} compte{comptesBancaires.length !== 1 ? 's' : ''} · Total{' '}
-              <span className="text-[#388BFD] font-bold">{fmtFCFA(totalBanque)}</span>
-            </p>
-            <button onClick={() => setModal('addBanque')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30 hover:bg-[#388BFD]/25 transition-colors">
-              <Plus size={12} /> Ajouter un compte
-            </button>
-          </div>
-
-          {comptesBancaires.length === 0 ? (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
-              <Landmark size={28} className="mx-auto mb-3 text-[#30363D]" />
-              <p className="text-[#484F58] text-sm">Aucun compte bancaire</p>
-              <p className="text-[#30363D] text-xs mt-1">Ajoutez vos comptes pour suivre vos soldes.</p>
+          {/* Sous-onglets banque */}
+          <div className="flex gap-1 border-b border-[#21262D]">
+            {BANQUE_TABS.map(tab => {
+              const Icon = tab.icon
+              const active = banqueTab === tab.id
+              return (
+                <button key={tab.id} onClick={() => setBanqueTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors relative ${active ? 'text-[#388BFD]' : 'text-[#484F58] hover:text-[#8B949E]'}`}>
+                  <Icon size={12} />{tab.label}
+                  {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#388BFD] rounded-full" />}
+                </button>
+              )
+            })}
+            <div className="ml-auto flex items-center">
               <button onClick={() => setModal('addBanque')}
-                className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30">
-                <Plus size={12} className="inline mr-1" />Ajouter un compte
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30 hover:bg-[#388BFD]/25 transition-colors">
+                <Plus size={12} /> Compte
               </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {comptesBancaires.map((c, i) => {
-                const colors = ['#388BFD', '#2EA043', '#8B5CF6', '#F0A30A', '#F97316']
-                const col = colors[i % colors.length]
-                return (
-                  <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                    className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 hover:border-[#484F58] transition-colors">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${col}20` }}>
-                        <Landmark size={18} style={{ color: col }} />
+          </div>
+
+          {/* ── Comptes ── */}
+          {banqueTab === 'comptes' && (
+            comptesBancaires.length === 0 ? (
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+                <Landmark size={28} className="mx-auto mb-3 text-[#30363D]" />
+                <p className="text-[#484F58] text-sm">Aucun compte bancaire</p>
+                <p className="text-[#30363D] text-xs mt-1">Ajoutez vos comptes pour suivre vos soldes.</p>
+                <button onClick={() => setModal('addBanque')} className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30">
+                  <Plus size={12} className="inline mr-1" />Ajouter un compte
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {comptesBancaires.map((c, i) => {
+                  const colors = ['#388BFD', '#2EA043', '#8B5CF6', '#F0A30A', '#F97316']
+                  const col = colors[i % colors.length]
+                  return (
+                    <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                      className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 hover:border-[#484F58] transition-colors">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${col}20` }}>
+                          <Landmark size={18} style={{ color: col }} />
+                        </div>
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border" style={{ color: col, borderColor: `${col}40`, background: `${col}10` }}>ACTIF</span>
                       </div>
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border" style={{ color: col, borderColor: `${col}40`, background: `${col}10` }}>
-                        ACTIF
-                      </span>
+                      <p className="text-sm font-bold text-[#E6EDF3] mb-0.5">{c.intitule}</p>
+                      <p className="text-[10px] text-[#484F58] mb-4">{c.banque}{c.numero_compte ? ` · ${c.numero_compte}` : ''}</p>
+                      <p className="text-2xl font-bold" style={{ color: col }}>{fmtFCFA(c.solde)}</p>
+                      <p className="text-[9px] text-[#484F58] mt-1">Solde actuel</p>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            )
+          )}
+
+          {/* ── Chèques ── */}
+          {banqueTab === 'cheques' && (
+            <div className="space-y-4">
+              {/* Toggle émis / reçus */}
+              <div className="flex gap-2 items-center flex-wrap">
+                <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
+                  {(['emis', 'recu'] as const).map(t => (
+                    <button key={t} onClick={() => setChequeType(t)}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${chequeType === t ? 'bg-[#8B5CF6] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'}`}>
+                      {t === 'emis' ? 'Chèques émis' : 'Chèques reçus'}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => setShowChequeForm(f => !f)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#8B5CF6]/15 text-[#8B5CF6] border border-[#8B5CF6]/30 hover:bg-[#8B5CF6]/25 transition-colors">
+                  <Plus size={12} /> {chequeType === 'emis' ? 'Émettre un chèque' : 'Enregistrer un chèque reçu'}
+                </button>
+              </div>
+
+              {/* Formulaire chèque */}
+              {showChequeForm && (
+                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                  className="bg-[#161B22] border border-[#8B5CF6]/30 rounded-2xl p-5 space-y-3">
+                  <p className="text-xs font-bold text-[#E6EDF3]">{chequeType === 'emis' ? 'Nouveau chèque émis' : 'Chèque reçu à encaisser'}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">N° chèque *</label>
+                      <input value={fCheque.numero} onChange={e => setFCheque(f => ({ ...f, numero: e.target.value }))}
+                        placeholder="Ex: 0012345" className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B5CF6]/50" />
                     </div>
-                    <p className="text-sm font-bold text-[#E6EDF3] mb-0.5">{c.intitule}</p>
-                    <p className="text-[10px] text-[#484F58] mb-4">{c.banque}{c.numero_compte ? ` · ${c.numero_compte}` : ''}</p>
-                    <p className="text-2xl font-bold" style={{ color: col }}>{fmtFCFA(c.solde)}</p>
-                    <p className="text-[9px] text-[#484F58] mt-1">Solde actuel</p>
-                  </motion.div>
-                )
-              })}
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA) *</label>
+                      <input type="number" value={fCheque.montant} onChange={e => setFCheque(f => ({ ...f, montant: e.target.value }))}
+                        placeholder="0" className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B5CF6]/50" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">{chequeType === 'emis' ? 'Bénéficiaire' : 'Émetteur'}</label>
+                      <input value={chequeType === 'emis' ? fCheque.beneficiaire : fCheque.emetteur}
+                        onChange={e => setFCheque(f => chequeType === 'emis' ? { ...f, beneficiaire: e.target.value } : { ...f, emetteur: e.target.value })}
+                        placeholder="Nom..." className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B5CF6]/50" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Banque tirée</label>
+                      <select value={fCheque.banque_tiree} onChange={e => setFCheque(f => ({ ...f, banque_tiree: e.target.value }))}
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+                        {BANQUES_CONGO.map(b => <option key={b}>{b}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Date d'émission</label>
+                      <input type="date" value={fCheque.date_emission} onChange={e => setFCheque(f => ({ ...f, date_emission: e.target.value }))}
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Compte bancaire</label>
+                      <select value={fCheque.compte_bancaire_id} onChange={e => setFCheque(f => ({ ...f, compte_bancaire_id: e.target.value }))}
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+                        <option value="">— Aucun —</option>
+                        {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule} · {c.banque}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
+                    <input value={fCheque.motif} onChange={e => setFCheque(f => ({ ...f, motif: e.target.value }))}
+                      placeholder="Objet du chèque..." className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowChequeForm(false)} className="flex-1 py-2 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
+                    <button onClick={saveCheque} disabled={saving || !fCheque.numero || !fCheque.montant}
+                      className="flex-1 py-2 rounded-xl text-sm font-semibold bg-[#8B5CF6] text-white disabled:opacity-50 flex items-center justify-center gap-2">
+                      {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Liste des chèques */}
+              {cheques.filter(c => c.type === chequeType).length === 0 ? (
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-10 text-center">
+                  <FileText size={24} className="mx-auto mb-2 text-[#30363D]" />
+                  <p className="text-[#484F58] text-sm">Aucun chèque {chequeType === 'emis' ? 'émis' : 'reçu'}</p>
+                </div>
+              ) : (
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-[#21262D]">
+                          {['N° chèque', chequeType === 'emis' ? 'Bénéficiaire' : 'Émetteur', 'Banque', 'Montant', 'Date', 'Statut', 'Actions'].map(h => (
+                            <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#21262D]">
+                        {cheques.filter(c => c.type === chequeType).map(ch => (
+                          <tr key={ch.id} className="hover:bg-[#21262D]/30 transition-colors">
+                            <td className="px-4 py-2.5 font-mono text-[#E6EDF3]">{ch.numero}</td>
+                            <td className="px-4 py-2.5 text-[#8B949E]">{(chequeType === 'emis' ? ch.beneficiaire : ch.emetteur) ?? '—'}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{ch.banque_tiree ?? '—'}</td>
+                            <td className="px-4 py-2.5 font-bold text-[#8B5CF6]">{fmtFCFA(ch.montant)}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{fmtDate(ch.date_emission)}</td>
+                            <td className="px-4 py-2.5">
+                              {ch.statut === 'en_attente' && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F0A30A]/10 text-[#F0A30A] font-semibold flex items-center gap-1 w-fit"><Clock size={9} />En attente</span>}
+                              {ch.statut === 'encaisse'   && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#2EA043]/10 text-[#2EA043] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Encaissé</span>}
+                              {ch.statut === 'rejete'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F85149]/10 text-[#F85149] font-semibold flex items-center gap-1 w-fit"><AlertTriangle size={9} />Rejeté</span>}
+                              {ch.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#484F58] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
+                            </td>
+                            <td className="px-4 py-2.5">
+                              {ch.statut === 'en_attente' && (
+                                <div className="flex gap-1">
+                                  {chequeType === 'recu' && (
+                                    <button onClick={() => encaisserCheque(ch)} disabled={saving}
+                                      className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 disabled:opacity-50">
+                                      Encaisser
+                                    </button>
+                                  )}
+                                  <button onClick={() => updateChequeStatut(ch.id, 'rejete')}
+                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#F85149]/15 text-[#F85149] border border-[#F85149]/30 hover:bg-[#F85149]/25">
+                                    Rejeter
+                                  </button>
+                                  <button onClick={() => updateChequeStatut(ch.id, 'annule')}
+                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#21262D] text-[#484F58] border border-[#30363D]">
+                                    Annuler
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Virements ── */}
+          {banqueTab === 'virements' && (
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <button onClick={() => setShowVirementForm(f => !f)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#388BFD]/15 text-[#388BFD] border border-[#388BFD]/30 hover:bg-[#388BFD]/25 transition-colors">
+                  <Plus size={12} /> Nouveau virement
+                </button>
+              </div>
+
+              {showVirementForm && (
+                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                  className="bg-[#161B22] border border-[#388BFD]/30 rounded-2xl p-5 space-y-3">
+                  <p className="text-xs font-bold text-[#E6EDF3]">Ordre de virement</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Compte source</label>
+                      <select value={fVirement.compte_source_id} onChange={e => setFVirement(f => ({ ...f, compte_source_id: e.target.value }))}
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+                        <option value="">— Aucun —</option>
+                        {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Destination *</label>
+                      <input value={fVirement.compte_dest_label} onChange={e => setFVirement(f => ({ ...f, compte_dest_label: e.target.value }))}
+                        placeholder="Ex: Fournisseur MAKALA, BGFI 0012…"
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA) *</label>
+                      <input type="number" value={fVirement.montant} onChange={e => setFVirement(f => ({ ...f, montant: e.target.value }))}
+                        placeholder="0" className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#388BFD]/50" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
+                      <input type="date" value={fVirement.date} onChange={e => setFVirement(f => ({ ...f, date: e.target.value }))}
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
+                      <input value={fVirement.motif} onChange={e => setFVirement(f => ({ ...f, motif: e.target.value }))}
+                        placeholder="Objet du virement…"
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Référence bancaire</label>
+                      <input value={fVirement.reference} onChange={e => setFVirement(f => ({ ...f, reference: e.target.value }))}
+                        placeholder="Ex: VIR-2026-001"
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowVirementForm(false)} className="flex-1 py-2 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
+                    <button onClick={saveVirement} disabled={saving || !fVirement.compte_dest_label || !fVirement.montant}
+                      className="flex-1 py-2 rounded-xl text-sm font-semibold bg-[#388BFD] text-white disabled:opacity-50 flex items-center justify-center gap-2">
+                      {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {virements.length === 0 ? (
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-10 text-center">
+                  <Send size={24} className="mx-auto mb-2 text-[#30363D]" />
+                  <p className="text-[#484F58] text-sm">Aucun virement</p>
+                </div>
+              ) : (
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-[#21262D]">
+                          {['Date', 'Source', 'Destination', 'Montant', 'Motif', 'Réf.', 'Statut', 'Actions'].map(h => (
+                            <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#21262D]">
+                        {virements.map(v => (
+                          <tr key={v.id} className="hover:bg-[#21262D]/30 transition-colors">
+                            <td className="px-4 py-2.5 text-[#8B949E]">{fmtDate(v.date)}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{v.compte_source_label ?? '—'}</td>
+                            <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[120px] truncate">{v.compte_dest_label}</td>
+                            <td className="px-4 py-2.5 font-bold text-[#388BFD]">{fmtFCFA(v.montant)}</td>
+                            <td className="px-4 py-2.5 text-[#8B949E] max-w-[100px] truncate">{v.motif ?? '—'}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{v.reference ?? '—'}</td>
+                            <td className="px-4 py-2.5">
+                              {v.statut === 'en_attente' && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F0A30A]/10 text-[#F0A30A] font-semibold flex items-center gap-1 w-fit"><Clock size={9} />En attente</span>}
+                              {v.statut === 'execute'    && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#2EA043]/10 text-[#2EA043] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Exécuté</span>}
+                              {v.statut === 'rejete'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F85149]/10 text-[#F85149] font-semibold flex items-center gap-1 w-fit"><AlertTriangle size={9} />Rejeté</span>}
+                              {v.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#484F58] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
+                            </td>
+                            <td className="px-4 py-2.5">
+                              {v.statut === 'en_attente' && (
+                                <div className="flex gap-1">
+                                  <button onClick={() => updateVirementStatut(v.id, 'execute')} disabled={saving}
+                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 disabled:opacity-50">
+                                    Exécuter
+                                  </button>
+                                  <button onClick={() => updateVirementStatut(v.id, 'annule')}
+                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#21262D] text-[#484F58] border border-[#30363D]">
+                                    Annuler
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1039,28 +1594,344 @@ export default function TresoreriePage() {
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* PLACEHOLDER TABS                                                      */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
-      {(mainTab === 'import' || mainTab === 'rapprochement' || mainTab === 'previsions') && (
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-[#F0A30A]/10 border border-[#F0A30A]/20 flex items-center justify-center">
-            {mainTab === 'import'
-              ? <Upload size={24} className="text-[#F0A30A]" />
-              : mainTab === 'rapprochement'
-                ? <GitMerge size={24} className="text-[#F0A30A]" />
-                : <BarChart3 size={24} className="text-[#F0A30A]" />}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: IMPORT RELEVÉS                                                   */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {mainTab === 'import' && (
+        <div className="space-y-5">
+          <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-9 h-9 rounded-xl bg-[#388BFD]/10 flex items-center justify-center"><Upload size={16} className="text-[#388BFD]" /></div>
+              <div>
+                <p className="text-sm font-bold text-[#E6EDF3]">Importer un relevé bancaire</p>
+                <p className="text-[10px] text-[#484F58]">Fichier CSV — formats BGFI, Ecobank, Rawbank supportés</p>
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-[#8B949E] mb-1 block">Compte bancaire associé</label>
+              {comptesBancaires.length === 0 ? (
+                <p className="text-xs text-[#F85149]">Aucun compte bancaire — ajoutez-en un dans l'onglet Banque.</p>
+              ) : (
+                <select value={csvCompte} onChange={e => setCsvCompte(e.target.value)}
+                  className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#388BFD]/50">
+                  <option value="">— Sélectionner un compte —</option>
+                  {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule} · {c.banque}</option>)}
+                </select>
+              )}
+            </div>
+            <div>
+              <label className="text-xs text-[#8B949E] mb-1 block">Fichier CSV</label>
+              <div className="flex items-center gap-3">
+                <input ref={csvInputRef} type="file" accept=".csv,.txt" onChange={handleCSVFile} className="hidden" />
+                <button onClick={() => csvInputRef.current?.click()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#388BFD]/40 bg-[#388BFD]/10 text-[#388BFD] text-xs font-semibold hover:bg-[#388BFD]/20 transition-colors">
+                  <Upload size={13} /> Choisir un fichier CSV
+                </button>
+                {csvRows.length > 0 && <span className="text-xs text-[#2EA043] font-semibold">{csvRows.length} lignes détectées</span>}
+              </div>
+              <p className="text-[10px] text-[#484F58] mt-1">Colonnes attendues : Date, Libellé, Débit, Crédit (ou Montant). Séparateur ; ou ,</p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-sm font-semibold text-[#E6EDF3] mb-1">
-              {mainTab === 'import' ? 'Import de relevés bancaires'
-                : mainTab === 'rapprochement' ? 'Rapprochement bancaire'
-                : 'Prévisions de trésorerie'}
-            </p>
-            <p className="text-xs text-[#484F58]">Cette fonctionnalité sera disponible prochainement.</p>
-          </div>
-          <span className="px-3 py-1 rounded-full bg-[#F0A30A]/10 text-[#F0A30A] text-[10px] font-bold border border-[#F0A30A]/20">
-            Bientôt disponible
-          </span>
+
+          {csvRows.length > 0 && (
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#30363D] flex items-center justify-between">
+                <h3 className="text-xs font-semibold text-[#E6EDF3]">Aperçu — {csvRows.length} lignes</h3>
+                <button onClick={importReleve} disabled={importingSaving || !csvCompte}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 disabled:opacity-50 transition-colors">
+                  {importingSaving ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
+                  Importer {csvRows.length} lignes
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-[#21262D]">
+                      {['Date', 'Libellé', 'Type', 'Montant'].map(h => (
+                        <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#21262D]">
+                    {csvRows.slice(0, 50).map((r, i) => (
+                      <tr key={i} className="hover:bg-[#21262D]/30">
+                        <td className="px-4 py-2 text-[#8B949E]">{fmtDate(r.date)}</td>
+                        <td className="px-4 py-2 text-[#E6EDF3] max-w-[200px] truncate">{r.libelle}</td>
+                        <td className="px-4 py-2">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.type === 'credit' ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'bg-[#F85149]/10 text-[#F85149]'}`}>
+                            {r.type === 'credit' ? 'Crédit' : 'Débit'}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-2 font-bold ${r.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>
+                          {r.type === 'credit' ? '+' : '−'}{fmtFCFA(r.montant)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {csvRows.length > 50 && <p className="px-4 py-2 text-[10px] text-[#484F58]">… et {csvRows.length - 50} lignes supplémentaires</p>}
+              </div>
+            </div>
+          )}
         </div>
       )}
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: RAPPROCHEMENT                                                    */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {mainTab === 'rapprochement' && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <select value={rapprochCompte} onChange={e => setRapprochCompte(e.target.value)}
+              className="bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#388BFD]/50">
+              <option value="">— Sélectionner un compte —</option>
+              {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule} · {c.banque}</option>)}
+            </select>
+            {rapprochCompte && releveLignes.filter(l => l.statut === 'non_rapproche').length > 0 && (
+              <button onClick={autoRapprocher} disabled={rapprochSaving}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F0A30A]/15 text-[#F0A30A] border border-[#F0A30A]/30 hover:bg-[#F0A30A]/25 disabled:opacity-50 transition-colors">
+                {rapprochSaving ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
+                Auto-rapprocher
+              </button>
+            )}
+            <div className="ml-auto text-xs text-[#484F58]">
+              {releveLignes.filter(l => l.statut === 'non_rapproche').length} en attente ·{' '}
+              <span className="text-[#2EA043]">{releveLignes.filter(l => l.statut === 'rapproche').length} rapprochés</span>
+            </div>
+          </div>
+
+          {!rapprochCompte ? (
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+              <GitMerge size={28} className="mx-auto mb-3 text-[#30363D]" />
+              <p className="text-[#484F58] text-sm">Sélectionnez un compte pour commencer</p>
+              <p className="text-[#30363D] text-xs mt-1">Importez d'abord un relevé dans l'onglet "Import relevés"</p>
+            </div>
+          ) : releveLignes.filter(l => l.statut === 'non_rapproche').length === 0 ? (
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+              <CheckCheck size={28} className="mx-auto mb-3 text-[#2EA043]" />
+              <p className="text-[#2EA043] text-sm font-semibold">Tout est rapproché !</p>
+              <p className="text-[#484F58] text-xs mt-1">Aucune ligne en attente pour ce compte.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Lignes de relevé */}
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#30363D]">
+                  <p className="text-xs font-semibold text-[#E6EDF3]">Relevé bancaire</p>
+                  <p className="text-[10px] text-[#484F58]">Cliquer pour sélectionner une ligne</p>
+                </div>
+                <div className="divide-y divide-[#21262D] max-h-96 overflow-y-auto">
+                  {releveLignes.filter(l => l.statut === 'non_rapproche').map(ligne => (
+                    <div key={ligne.id} onClick={() => setRapprochLigne(l => l?.id === ligne.id ? null : ligne)}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${rapprochLigne?.id === ligne.id ? 'bg-[#388BFD]/10 border-l-2 border-[#388BFD]' : 'hover:bg-[#21262D]/50'}`}>
+                      <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${ligne.type === 'credit' ? 'bg-[#2EA043]/10' : 'bg-[#F85149]/10'}`}>
+                        {ligne.type === 'credit' ? <ArrowUpCircle size={12} className="text-[#2EA043]" /> : <ArrowDownCircle size={12} className="text-[#F85149]" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-[#E6EDF3] truncate">{ligne.libelle}</p>
+                        <p className="text-[10px] text-[#484F58]">{fmtDate(ligne.date)}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>
+                          {ligne.type === 'credit' ? '+' : '−'}{fmtFCFA(ligne.montant)}
+                        </p>
+                        <button onClick={e => { e.stopPropagation(); ignorerLigne(ligne.id) }}
+                          className="text-[10px] text-[#484F58] hover:text-[#F85149] transition-colors">Ignorer</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Transactions correspondantes */}
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#30363D]">
+                  <p className="text-xs font-semibold text-[#E6EDF3]">Transactions Oraforme</p>
+                  <p className="text-[10px] text-[#484F58]">
+                    {rapprochLigne ? `Sélectionné: ${fmtFCFA(rapprochLigne.montant)} · ${fmtDate(rapprochLigne.date)}` : 'Sélectionnez une ligne du relevé'}
+                  </p>
+                </div>
+                {!rapprochLigne ? (
+                  <div className="p-10 text-center">
+                    <Link2 size={24} className="mx-auto mb-2 text-[#30363D]" />
+                    <p className="text-[#484F58] text-xs">Cliquez sur une ligne du relevé à gauche</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#21262D] max-h-96 overflow-y-auto">
+                    {(() => {
+                      const txType = rapprochLigne.type === 'credit' ? 'entree' : 'sortie'
+                      const ligneDate = new Date(rapprochLigne.date).getTime()
+                      const suggestions = transactions.filter(tx =>
+                        tx.type === txType &&
+                        Math.abs(tx.montant - rapprochLigne.montant) / rapprochLigne.montant < 0.05 &&
+                        Math.abs(new Date(tx.date).getTime() - ligneDate) <= 7 * 86400000
+                      )
+                      const others = transactions.filter(tx => tx.type === txType && !suggestions.find(s => s.id === tx.id)).slice(0, 10)
+                      const list = [...suggestions, ...others]
+                      if (list.length === 0) return (
+                        <div className="p-8 text-center">
+                          <p className="text-[#484F58] text-xs">Aucune transaction correspondante</p>
+                        </div>
+                      )
+                      return list.map(tx => {
+                        const isSuggestion = suggestions.find(s => s.id === tx.id)
+                        const isSelected = rapprochTx?.id === tx.id
+                        return (
+                          <div key={tx.id} onClick={() => setRapprochTx(t => t?.id === tx.id ? null : tx)}
+                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isSelected ? 'bg-[#2EA043]/10 border-l-2 border-[#2EA043]' : 'hover:bg-[#21262D]/50'}`}>
+                            {isSuggestion && <span className="w-1.5 h-1.5 rounded-full bg-[#F0A30A] shrink-0" title="Suggestion" />}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-[#E6EDF3] truncate">{tx.description}</p>
+                              <p className="text-[10px] text-[#484F58]">{tx.categorie} · {fmtDate(tx.date)}</p>
+                            </div>
+                            <p className={`text-xs font-bold shrink-0 ${tx.type === 'entree' ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>{fmtFCFA(tx.montant)}</p>
+                          </div>
+                        )
+                      })
+                    })()}
+                  </div>
+                )}
+                {rapprochLigne && rapprochTx && (
+                  <div className="px-4 py-3 border-t border-[#30363D]">
+                    <button onClick={() => rapprocher(rapprochLigne, rapprochTx)} disabled={rapprochSaving}
+                      className="w-full py-2.5 rounded-xl text-sm font-semibold bg-[#2EA043] text-white disabled:opacity-50 flex items-center justify-center gap-2">
+                      {rapprochSaving ? <Loader2 size={13} className="animate-spin" /> : <Link2 size={13} />}
+                      Rapprocher ces deux éléments
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Lignes rapprochées */}
+          {releveLignes.filter(l => l.statut === 'rapproche').length > 0 && (
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#30363D]">
+                <p className="text-xs font-semibold text-[#2EA043]">Lignes rapprochées — {releveLignes.filter(l => l.statut === 'rapproche').length}</p>
+              </div>
+              <div className="divide-y divide-[#21262D]">
+                {releveLignes.filter(l => l.statut === 'rapproche').slice(0, 20).map(ligne => (
+                  <div key={ligne.id} className="flex items-center gap-3 px-4 py-2.5">
+                    <CheckCheck size={14} className="text-[#2EA043] shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-[#8B949E] truncate">{ligne.libelle}</p>
+                      <p className="text-[10px] text-[#484F58]">{fmtDate(ligne.date)}</p>
+                    </div>
+                    <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>{ligne.type === 'credit' ? '+' : '−'}{fmtFCFA(ligne.montant)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: PRÉVISIONS                                                       */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {mainTab === 'previsions' && (() => {
+        const last90Start = new Date(); last90Start.setDate(last90Start.getDate() - 90)
+        const last90Str = last90Start.toISOString().split('T')[0]
+        const last90 = transactions.filter(t => t.date >= last90Str)
+        const dailyE = last90.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0) / 90
+        const dailyS = last90.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0) / 90
+        let cumul = tresorerieGlobale
+        const forecast = Array.from({ length: previsionDays }, (_, i) => {
+          const d = new Date(); d.setDate(d.getDate() + i + 1)
+          cumul += dailyE - dailyS
+          return {
+            day: (i === 0 || i === Math.floor(previsionDays / 4) || i === Math.floor(previsionDays / 2) || i === Math.floor(3 * previsionDays / 4) || i === previsionDays - 1)
+              ? `J+${i + 1}` : '',
+            entrees: Math.round(dailyE),
+            sorties: Math.round(dailyS),
+            solde: Math.round(cumul),
+          }
+        })
+        const endSolde = forecast[forecast.length - 1]?.solde ?? tresorerieGlobale
+        const trend = endSolde - tresorerieGlobale
+
+        return (
+          <div className="space-y-5">
+            {/* Sélecteur de période */}
+            <div className="flex items-center gap-3">
+              <p className="text-xs text-[#8B949E]">Horizon de prévision :</p>
+              <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
+                {[30, 60, 90].map(d => (
+                  <button key={d} onClick={() => setPrevisionDays(d)}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${previsionDays === d ? 'bg-[#388BFD] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'}`}>
+                    {d} jours
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* KPI Prévisions */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Solde actuel</p>
+                <p className="text-lg font-bold text-[#E6EDF3]">{fmtFCFA(tresorerieGlobale)}</p>
+              </div>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Solde prévu J+{previsionDays}</p>
+                <p className={`text-lg font-bold ${endSolde >= 0 ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>{fmtFCFA(endSolde)}</p>
+              </div>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Entrées/jour (moy.)</p>
+                <p className="text-lg font-bold text-[#2EA043]">{fmtFCFA(Math.round(dailyE))}</p>
+              </div>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Sorties/jour (moy.)</p>
+                <p className="text-lg font-bold text-[#F85149]">{fmtFCFA(Math.round(dailyS))}</p>
+              </div>
+            </div>
+
+            {/* Alerte si tendance négative */}
+            {trend < 0 && (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F85149]/10 border border-[#F85149]/20">
+                <AlertTriangle size={16} className="text-[#F85149] shrink-0" />
+                <p className="text-xs text-[#F85149]">
+                  Tendance négative — votre trésorerie devrait baisser de <strong>{fmtFCFA(Math.abs(trend))}</strong> sur {previsionDays} jours au rythme actuel.
+                </p>
+              </div>
+            )}
+            {trend > 0 && (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#2EA043]/10 border border-[#2EA043]/20">
+                <TrendingUp size={16} className="text-[#2EA043] shrink-0" />
+                <p className="text-xs text-[#2EA043]">
+                  Tendance positive — votre trésorerie devrait augmenter de <strong>{fmtFCFA(trend)}</strong> sur {previsionDays} jours.
+                </p>
+              </div>
+            )}
+
+            {/* Graphique prévisionnel */}
+            <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+              <h2 className="text-xs font-semibold text-[#E6EDF3] mb-1">Solde prévisionnel — {previsionDays} jours</h2>
+              <p className="text-[10px] text-[#484F58] mb-4">Basé sur la moyenne des 90 derniers jours d'activité</p>
+              <ResponsiveContainer width="100%" height={200}>
+                <ComposedChart data={forecast} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
+                  <XAxis dataKey="day" tick={{ fill: '#8B949E', fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: '#8B949E', fontSize: 9 }} axisLine={false} tickLine={false} width={40}
+                    tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
+                  <Tooltip contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
+                    formatter={(v: any, n: any) => [fmtFCFA(Number(v ?? 0)), n]} />
+                  <Bar dataKey="entrees" name="Entrées" fill="#2EA04340" radius={[2,2,0,0]} maxBarSize={8} />
+                  <Bar dataKey="sorties" name="Sorties" fill="#F8514940" radius={[2,2,0,0]} maxBarSize={8} />
+                  <Line type="monotone" dataKey="solde" name="Solde prévu" stroke="#388BFD" strokeWidth={2}
+                    strokeDasharray="6 3" dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            {last90.length === 0 && (
+              <div className="bg-[#161B22] border border-[#F0A30A]/20 rounded-xl p-4">
+                <p className="text-xs text-[#F0A30A]">Aucune transaction des 90 derniers jours — les prévisions sont basées sur des données insuffisantes.</p>
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* MODAL ENCAISSER                                                       */}
