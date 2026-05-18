@@ -58,8 +58,8 @@ export default async function AdminMIAAPage() {
     <div className="space-y-6">
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 flex items-center justify-center">
-          <Bot size={18} className="text-[#8B5CF6]" />
+        <div className="w-10 h-10 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center">
+          <Bot size={18} className="text-[#8B0073]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#E6EDF3]">MIAA+ Stats</h1>
@@ -70,8 +70,8 @@ export default async function AdminMIAAPage() {
       </div>
 
       {/* Note about estimations */}
-      <div className="bg-[#8B5CF6]/5 border border-[#8B5CF6]/20 rounded-xl p-4 text-xs text-[#8B949E]">
-        <span className="text-[#8B5CF6] font-medium">Note : </span>
+      <div className="bg-[#8B0073]/5 border border-[#8B0073]/20 rounded-xl p-4 text-xs text-[#8B949E]">
+        <span className="text-[#8B0073] font-medium">Note : </span>
         Les métriques de conversations sont des estimations basées sur les moyennes d&apos;usage.
         Pour des statistiques réelles, ajoute une table <code className="bg-[#21262D] px-1 py-0.5 rounded">miaa_conversations</code> pour logger les échanges.
       </div>
@@ -79,10 +79,10 @@ export default async function AdminMIAAPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: Bot,           label: 'Clients actifs',     value: nbTenantsWithMIAA.toString(),             color: '#8B5CF6', sub: 'module bizbot actif' },
-          { icon: MessageSquare, label: 'Convs/mois (est.)',  value: monthlyConversations.toLocaleString('fr'), color: '#388BFD', sub: `${dailyConversations} /jour` },
+          { icon: Bot,           label: 'Clients actifs',     value: nbTenantsWithMIAA.toString(),             color: '#8B0073', sub: 'module bizbot actif' },
+          { icon: MessageSquare, label: 'Convs/mois (est.)',  value: monthlyConversations.toLocaleString('fr'), color: '#F07900', sub: `${dailyConversations} /jour` },
           { icon: Zap,           label: 'Tokens/mois (est.)', value: `${Math.round((monthlyInputTokens + monthlyOutputTokens) / 1_000_000)}M`, color: '#F0A30A', sub: 'Claude Haiku 4.5' },
-          { icon: DollarSign,    label: 'Coût API/mois',      value: `$${monthlyCostUSD.toFixed(2)}`,          color: '#F85149', sub: fmtFCFA(monthlyCostFCFA) },
+          { icon: DollarSign,    label: 'Coût API/mois',      value: `$${monthlyCostUSD.toFixed(2)}`,          color: '#F01F38', sub: fmtFCFA(monthlyCostFCFA) },
         ].map(k => (
           <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
             <div className="flex items-center justify-between mb-3">
@@ -102,14 +102,14 @@ export default async function AdminMIAAPage() {
         {/* Financial analysis */}
         <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4 flex items-center gap-2">
-            <TrendingUp size={14} className="text-[#8B5CF6]" />
+            <TrendingUp size={14} className="text-[#8B0073]" />
             Analyse financière MIAA+
           </h2>
           <div className="space-y-3">
             {[
               { label: 'MRR MIAA+', value: fmtFCFA(mrrMIAA), color: '#2EA043', note: `${nbTenantsWithMIAA} × 6 000 FCFA` },
-              { label: 'Coût API estimé', value: fmtFCFA(monthlyCostFCFA), color: '#F85149', note: `$${monthlyCostUSD.toFixed(2)} × 600 FCFA/$` },
-              { label: 'Marge brute', value: fmtFCFA(Math.max(margeIA, 0)), color: margeIA >= 0 ? '#2EA043' : '#F85149', note: `${mrrMIAA > 0 ? Math.round((margeIA / mrrMIAA) * 100) : 0}% de marge` },
+              { label: 'Coût API estimé', value: fmtFCFA(monthlyCostFCFA), color: '#F01F38', note: `$${monthlyCostUSD.toFixed(2)} × 600 FCFA/$` },
+              { label: 'Marge brute', value: fmtFCFA(Math.max(margeIA, 0)), color: margeIA >= 0 ? '#2EA043' : '#F01F38', note: `${mrrMIAA > 0 ? Math.round((margeIA / mrrMIAA) * 100) : 0}% de marge` },
             ].map(r => (
               <div key={r.label} className="flex items-center justify-between px-3 py-2.5 bg-[#0D1117] rounded-lg border border-[#21262D]">
                 <div>
@@ -133,7 +133,7 @@ export default async function AdminMIAAPage() {
                   <span className="text-[#E6EDF3] font-medium">{c.pct}%</span>
                 </div>
                 <div className="h-1.5 bg-[#21262D] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: `${c.pct}%` }} />
+                  <div className="h-full bg-[#8B0073] rounded-full" style={{ width: `${c.pct}%` }} />
                 </div>
               </div>
             ))}
@@ -152,8 +152,8 @@ export default async function AdminMIAAPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {tenantsWithMIAA.map(t => (
               <div key={t.id} className="flex items-center gap-3 px-3 py-3 bg-[#0D1117] border border-[#21262D] rounded-lg">
-                <div className="w-8 h-8 rounded-lg bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 flex items-center justify-center shrink-0">
-                  <span className="text-[#8B5CF6] text-sm font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[#8B0073]/20 border border-[#8B0073]/30 flex items-center justify-center shrink-0">
+                  <span className="text-[#8B0073] text-sm font-bold">
                     {t.nom_entreprise.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -172,8 +172,8 @@ export default async function AdminMIAAPage() {
         <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4">Configuration technique</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: 'Modèle', value: 'Claude Haiku 4.5', color: '#8B5CF6' },
-            { label: 'Max tokens', value: '1 024 out', color: '#388BFD' },
+            { label: 'Modèle', value: 'Claude Haiku 4.5', color: '#8B0073' },
+            { label: 'Max tokens', value: '1 024 out', color: '#F07900' },
             { label: 'Historique', value: '10 messages', color: '#F0A30A' },
             { label: 'Context', value: 'Congo fiscal', color: '#2EA043' },
           ].map(c => (

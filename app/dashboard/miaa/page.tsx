@@ -16,10 +16,10 @@ interface Message { role: 'user' | 'bot'; text: string; ts?: number }
 
 const CAPABILITIES = [
   { icon: Calculator, label: 'Calculs fiscaux',       desc: 'TVA 18%, CA 5%, CNSS, IRPP Congo',       color: '#F0A30A' },
-  { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#388BFD' },
+  { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#F07900' },
   { icon: FileText,   label: 'Génération documents',  desc: 'Factures, bulletins de paie, rapports',   color: '#2EA043' },
-  { icon: Bell,       label: 'Alertes intelligentes', desc: 'Impayés, stock bas, échéances',            color: '#F85149' },
-  { icon: Cog,        label: 'Automatisation',        desc: 'Workflows, relances, rappels',             color: '#8B5CF6' },
+  { icon: Bell,       label: 'Alertes intelligentes', desc: 'Impayés, stock bas, échéances',            color: '#F01F38' },
+  { icon: Cog,        label: 'Automatisation',        desc: 'Workflows, relances, rappels',             color: '#8B0073' },
   { icon: Globe,      label: 'Multilingue',           desc: 'Français, English, Lingala',              color: '#06B6D4' },
 ]
 

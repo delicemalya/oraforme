@@ -4,7 +4,7 @@ import { Activity, TrendingDown, ArrowUpRight, ArrowDownRight, AlertTriangle, Ch
 
 const TYPE_STYLE = {
   entree: { label: 'Entrée', color: '#2EA043', bg: '#2EA04310', border: '#2EA04330', icon: ArrowUpRight },
-  sortie: { label: 'Sortie', color: '#F85149', bg: '#F8514910', border: '#F8514930', icon: ArrowDownRight },
+  sortie: { label: 'Sortie', color: '#F01F38', bg: '#F01F3810', border: '#F01F3830', icon: ArrowDownRight },
 }
 
 function timeAgo(dateStr: string) {
@@ -111,8 +111,8 @@ export default async function AdminActivitePage() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#388BFD]/10 border border-[#388BFD]/20 flex items-center justify-center">
-          <Activity size={18} className="text-[#388BFD]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F07900]/10 border border-[#F07900]/20 flex items-center justify-center">
+          <Activity size={18} className="text-[#F07900]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#E6EDF3]">Activité en temps réel</h1>
@@ -129,7 +129,7 @@ export default async function AdminActivitePage() {
         </div>
         <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
           <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-3">Sorties aujourd'hui</p>
-          <p className="text-2xl font-bold text-[#F85149]">{fmtFCFA(todayOut)}</p>
+          <p className="text-2xl font-bold text-[#F01F38]">{fmtFCFA(todayOut)}</p>
           <p className="text-xs text-[#484F58] mt-1">{todayTx.filter(t => t.type === 'sortie').length} transactions</p>
         </div>
         <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
@@ -218,7 +218,7 @@ export default async function AdminActivitePage() {
               const RISK = {
                 ok:     { color: '#2EA043', icon: CheckCircle2, label: 'Actif' },
                 warn:   { color: '#F0A30A', icon: AlertTriangle, label: '+7j sans activité' },
-                danger: { color: '#F85149', icon: TrendingDown,  label: t.lastDate ? '+21j inactif' : 'Jamais utilisé' },
+                danger: { color: '#F01F38', icon: TrendingDown,  label: t.lastDate ? '+21j inactif' : 'Jamais utilisé' },
               }
               const r = RISK[t.risk]
               const RIcon = r.icon
@@ -270,7 +270,7 @@ export default async function AdminActivitePage() {
                 const RISK_BADGE = {
                   ok:     'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30',
                   warn:   'text-[#F0A30A] bg-[#F0A30A]/10 border-[#F0A30A]/30',
-                  danger: 'text-[#F85149] bg-[#F85149]/10 border-[#F85149]/30',
+                  danger: 'text-[#F01F38] bg-[#F01F38]/10 border-[#F01F38]/30',
                 }
                 const RISK_LABEL = {
                   ok: 'Actif',

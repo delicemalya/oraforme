@@ -23,8 +23,8 @@ export default async function AdminModulesPage() {
     <div className="space-y-6">
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#388BFD]/10 border border-[#388BFD]/20 flex items-center justify-center">
-          <Package size={18} className="text-[#388BFD]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F07900]/10 border border-[#F07900]/20 flex items-center justify-center">
+          <Package size={18} className="text-[#F07900]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#E6EDF3]">Gestion des modules</h1>
@@ -61,11 +61,11 @@ export default async function AdminModulesPage() {
                   <p className="text-[10px] text-[#484F58]">clients</p>
                 </div>
                 <div className="bg-[#0D1117] rounded-lg p-2 text-center">
-                  <p className="text-lg font-bold text-[#F85149]">{fmtFCFA(m.mrr).replace(' FCFA', '')}</p>
+                  <p className="text-lg font-bold text-[#F01F38]">{fmtFCFA(m.mrr).replace(' FCFA', '')}</p>
                   <p className="text-[10px] text-[#484F58]">MRR</p>
                 </div>
                 <div className="bg-[#0D1117] rounded-lg p-2 text-center">
-                  <p className="text-lg font-bold text-[#388BFD]">{m.penetration}%</p>
+                  <p className="text-lg font-bold text-[#F07900]">{m.penetration}%</p>
                   <p className="text-[10px] text-[#484F58]">pénétr.</p>
                 </div>
               </div>
@@ -73,7 +73,7 @@ export default async function AdminModulesPage() {
               {/* Penetration bar */}
               <div className="h-1.5 bg-[#21262D] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#388BFD] rounded-full transition-all"
+                  className="h-full bg-[#F07900] rounded-full transition-all"
                   style={{ width: `${m.penetration}%` }}
                 />
               </div>
@@ -113,7 +113,7 @@ export default async function AdminModulesPage() {
               ))}
               <tr className="border-t-2 border-[#30363D]">
                 <td className="py-2.5 px-3 font-bold text-[#E6EDF3]" colSpan={3}>Total MRR</td>
-                <td className="py-2.5 px-3 text-right font-bold text-[#F85149]">{fmtFCFA(totalMRR)}</td>
+                <td className="py-2.5 px-3 text-right font-bold text-[#F01F38]">{fmtFCFA(totalMRR)}</td>
                 <td className="py-2.5 px-3 text-right font-bold text-[#E6EDF3]">100%</td>
               </tr>
             </tbody>

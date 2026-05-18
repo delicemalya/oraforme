@@ -36,9 +36,9 @@ const NEXT_STATUS: Partial<Record<StatutCmd, StatutCmd>> = {
 
 const STATUS_CONFIG: Partial<Record<StatutCmd, { label: string; color: string; bg: string; border: string }>> = {
   en_attente:    { label: 'En attente',     color: '#F0A30A', bg: '#F0A30A18', border: '#F0A30A40' },
-  en_preparation:{ label: 'En préparation', color: '#388BFD', bg: '#388BFD18', border: '#388BFD40' },
+  en_preparation:{ label: 'En préparation', color: '#F07900', bg: '#F0790018', border: '#F0790040' },
   pret:          { label: 'Prêt à servir',  color: '#2EA043', bg: '#2EA04318', border: '#2EA04340' },
-  livre:         { label: 'Livré',          color: '#8B5CF6', bg: '#8B5CF618', border: '#8B5CF640' },
+  livre:         { label: 'Livré',          color: '#8B0073', bg: '#8B007318', border: '#8B007340' },
 }
 
 export default function CuisinePage() {

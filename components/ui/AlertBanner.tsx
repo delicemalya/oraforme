@@ -43,7 +43,7 @@ export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount
 
   const COLORS = {
     warning: { text: '#F0A30A', bg: '#F0A30A0C', border: '#F0A30A28' },
-    danger:  { text: '#F85149', bg: '#F851490C', border: '#F8514928' },
+    danger:  { text: '#F01F38', bg: '#F01F380C', border: '#F01F3828' },
   }
 
   return (

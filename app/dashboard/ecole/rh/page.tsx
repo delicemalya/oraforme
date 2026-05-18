@@ -61,9 +61,9 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
   })
 
   const kpis = [
-    { label: 'Total',       value: employes.length,                                              color: '#388BFD' },
+    { label: 'Total',       value: employes.length,                                              color: '#F07900' },
     { label: 'Actifs',      value: employes.filter(e => e.statut === 'actif').length,            color: '#2EA043' },
-    { label: 'Formateurs',  value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#8B5CF6' },
+    { label: 'Formateurs',  value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#8B0073' },
     { label: 'Temporaires', value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#F0A30A' },
   ]
 
@@ -157,7 +157,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
                   <button
                     onClick={() => setProfil({ type: 'employe', data: e as unknown as EmployeFull })}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, #388BFD, #1a6fd4)' }}>
+                    style={{ background: 'linear-gradient(135deg, #F07900, #1a6fd4)' }}>
                     Voir le profil
                   </button>
                 </div>
@@ -292,7 +292,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
   }
 
   const kpis = [
-    { label: 'Total',        value: enseignants.length,                                                                  color: '#388BFD' },
+    { label: 'Total',        value: enseignants.length,                                                                  color: '#F07900' },
     { label: 'Employés',     value: enseignants.filter(e => ((e as any).type_enseignant ?? 'employe') === 'employe').length,  color: '#2EA043' },
     { label: 'Prestataires', value: enseignants.filter(e => (e as any).type_enseignant === 'prestataire').length,        color: '#F97316' },
     { label: 'En congé',     value: enseignants.filter(e => e.statut === 'conge').length,                               color: '#F0A30A' },
@@ -508,7 +508,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                 <span className="absolute top-3 left-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
                   style={isPresta
                     ? { color: '#F97316', background: 'rgba(249,115,22,0.15)' }
-                    : { color: '#388BFD', background: 'rgba(56,139,253,0.12)' }}>
+                    : { color: '#F07900', background: 'rgba(56,139,253,0.12)' }}>
                   {isPresta ? 'Prestataire' : tc ? tc.toUpperCase() : 'Employé'}
                 </span>
 
@@ -547,7 +547,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                       </div>
                       <div>
                         <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Horaire</p>
-                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#388BFD' }}>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F07900' }}>
                           {e.taux_horaire ? `${fmt(e.taux_horaire)} F/h` : '—'}
                         </p>
                       </div>
@@ -583,7 +583,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                   <button
                     onClick={() => setProfil({ type: 'enseignant', data: e })}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, #388BFD, #1a6fd4)' }}>
+                    style={{ background: 'linear-gradient(135deg, #F07900, #1a6fd4)' }}>
                     Voir le profil
                   </button>
                 </div>
@@ -708,7 +708,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
   })
 
   const kpis = [
-    { label: 'Total',    value: staff.length,                                    color: '#388BFD' },
+    { label: 'Total',    value: staff.length,                                    color: '#F07900' },
     { label: 'Actifs',   value: staff.filter(s => s.statut === 'actif').length,  color: '#2EA043' },
     { label: 'Inactifs', value: staff.filter(s => s.statut === 'inactif').length,color: '#8B949E' },
   ]
@@ -905,7 +905,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                   <button
                     onClick={() => setProfil({ type: 'staff', data: s as unknown as StaffFull })}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, #388BFD, #1a6fd4)' }}>
+                    style={{ background: 'linear-gradient(135deg, #F07900, #1a6fd4)' }}>
                     Voir le profil
                   </button>
                 </div>
@@ -953,7 +953,7 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
   const STATUT_COLORS: Record<string, { color: string; bg: string }> = {
     en_attente: { color: '#F0A30A', bg: '#F0A30A18' },
     approuve:   { color: '#2EA043', bg: '#2EA04318' },
-    refuse:     { color: '#F85149', bg: '#F8514918' },
+    refuse:     { color: '#F01F38', bg: '#F01F3818' },
   }
 
   return (
@@ -1018,7 +1018,7 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
                       {c.statut === 'en_attente' && (
                         <div className="flex gap-1">
                           <button onClick={() => updateStatut(c.id, 'approuve')} className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: '#2EA04318', color: '#2EA043' }}>Approuver</button>
-                          <button onClick={() => updateStatut(c.id, 'refuse')}   className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: '#F8514918', color: '#F85149' }}>Refuser</button>
+                          <button onClick={() => updateStatut(c.id, 'refuse')}   className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: '#F01F3818', color: '#F01F38' }}>Refuser</button>
                         </div>
                       )}
                     </td>
@@ -1549,7 +1549,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex gap-3 flex-wrap">
           <KpiCard label="Total salaires payés" value={fmt(totalNet) + ' FCFA'} color="#2EA043" />
-          <KpiCard label="Bulletins émis" value={paies.length} color="#388BFD" />
+          <KpiCard label="Bulletins émis" value={paies.length} color="#F07900" />
         </div>
         <button onClick={() => setShowLogo(!showLogo)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors">
@@ -1649,7 +1649,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                 </div>
                 <div className="p-3 text-center">
                   <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">CNSS 8%</p>
-                  <p className="text-base font-bold mt-0.5" style={{ color: '#F85149' }}>−{fmt(retenues)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#F01F38' }}>−{fmt(retenues)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
                 </div>
                 <div className="p-3 text-center" style={{ background: 'rgba(46,160,67,0.06)' }}>
                   <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">Net à payer</p>
@@ -1716,7 +1716,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                       </td>
                       <td className="px-4 py-2.5 text-[#8B949E]">{MOIS[p.mois]} {p.annee}</td>
                       <td className="px-4 py-2.5 text-[#8B949E]">{fmt(p.salaire_base + p.primes)}</td>
-                      <td className="px-4 py-2.5 text-[#F85149]">−{fmt(p.retenues)}</td>
+                      <td className="px-4 py-2.5 text-[#F01F38]">−{fmt(p.retenues)}</td>
                       <td className="px-4 py-2.5 font-bold text-white">{fmt(p.net)} FCFA</td>
                       <td className="px-4 py-2.5 text-[#484F58] capitalize">{(p.mode_paiement ?? '—').replace('_', ' ')}</td>
                       <td className="px-4 py-2.5">
@@ -1787,13 +1787,13 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
           <KpiCard label="Postes ouverts" value={postes.filter(p => p.statut === 'ouvert').length} color="#2EA043" />
           <KpiCard label="Postes fermés"  value={postes.filter(p => p.statut === 'ferme').length}  color="#8B949E" />
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#388BFD,#1a6fd4)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#F07900,#1a6fd4)', color: '#fff' }}>
           <Plus size={13} /> Ouvrir un poste
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#388BFD]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F07900]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre du poste *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} placeholder="Prof de Mathématiques…" />
               <div>
@@ -1808,7 +1808,7 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.titre} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#388BFD', color: '#fff' }}>
+              <button onClick={add} disabled={saving || !form.titre} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F07900', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Créer
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -1952,15 +1952,15 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
   const displayed = filter === 'tous' ? heures : heures.filter(h => h.statut === filter)
   const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
     declare:   { label: 'Déclaré',  color: '#F0A30A', bg: '#F0A30A18' },
-    validated: { label: 'Validé',   color: '#388BFD', bg: '#388BFD18' },
+    validated: { label: 'Validé',   color: '#F07900', bg: '#F0790018' },
     paye:      { label: 'Payé',     color: '#2EA043', bg: '#2EA04318' },
   }
 
   const kpis = [
     { label: 'En attente', value: heures.filter(h => h.statut === 'declare').length,   color: '#F0A30A' },
-    { label: 'Validées',   value: heures.filter(h => h.statut === 'validated').length, color: '#388BFD' },
+    { label: 'Validées',   value: heures.filter(h => h.statut === 'validated').length, color: '#F07900' },
     { label: 'Payées',     value: heures.filter(h => h.statut === 'paye').length,      color: '#2EA043' },
-    { label: 'Total heures', value: heures.reduce((s, h) => s + h.heures, 0),          color: '#8B5CF6' },
+    { label: 'Total heures', value: heures.reduce((s, h) => s + h.heures, 0),          color: '#8B0073' },
   ]
 
   return (

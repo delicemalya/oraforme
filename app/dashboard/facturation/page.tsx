@@ -48,9 +48,9 @@ interface EntrepriseConfig {
 
 const STATUT_CONFIG: Record<StatutFac, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   brouillon: { label: 'Brouillon',  color: '#8B949E', bg: '#8B949E18', icon: Clock },
-  envoyee:   { label: 'Envoyée',    color: '#388BFD', bg: '#388BFD18', icon: Send },
+  envoyee:   { label: 'Envoyée',    color: '#F07900', bg: '#F0790018', icon: Send },
   payee:     { label: 'Payée',      color: '#2EA043', bg: '#2EA04318', icon: CheckCircle },
-  retard:    { label: 'En retard',  color: '#F85149', bg: '#F8514918', icon: AlertTriangle },
+  retard:    { label: 'En retard',  color: '#F01F38', bg: '#F01F3818', icon: AlertTriangle },
   annulee:   { label: 'Annulée',   color: '#484F58', bg: '#48495818', icon: XCircle },
 }
 
@@ -421,10 +421,10 @@ export default function FacturationPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#388BFD"  icon={FileText} />
+        <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#F07900"  icon={FileText} />
         <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#2EA043"  icon={CheckCircle} />
         <KpiCard label="En attente"      value={fmt(totalEnAttente)} color="#F0A30A"  icon={Clock} />
-        <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#F85149"  icon={AlertTriangle} />
+        <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#F01F38"  icon={AlertTriangle} />
       </div>
 
       {/* Filters + Search */}
@@ -522,13 +522,13 @@ export default function FacturationPage() {
                           <ActionBtn title="Aperçu plein écran" onClick={() => router.push(`/dashboard/factures/${f.id}/preview`)}                                 icon={<ExternalLink size={13} />} hoverClass="hover:text-[#F0A30A]" />
                           <ActionBtn title="Modifier"        onClick={() => openEdit(f)}                                                                           icon={<Edit3 size={13} />} />
                           {f.client_phone && <ActionBtn title="WhatsApp" onClick={() => sendWhatsApp(f)}                                                           icon={<MessageCircle size={13} />} hoverClass="hover:text-[#25D366]" />}
-                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#388BFD]" />}
+                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#F07900]" />}
                           <ActionBtn
                             title="Télécharger PDF"
                             onClick={() => downloadPDF(f.id, f.invoice_number ?? f.id.slice(0, 8))}
                             disabled={dlLoading === f.id}
                             icon={dlLoading === f.id ? <Loader2 className="animate-spin" size={13} /> : <Download size={13} />}
-                            hoverClass="hover:text-[#388BFD]"
+                            hoverClass="hover:text-[#F07900]"
                           />
                           <ActionBtn title="Supprimer" onClick={() => del(f.id)} icon={<Trash2 size={13} />} hoverClass="hover:text-red-400" />
                         </div>
@@ -714,7 +714,7 @@ export default function FacturationPage() {
                     <button
                       onClick={() => downloadPDF(viewedFac.id, viewedFac.invoice_number ?? viewedFac.id.slice(0, 8))}
                       disabled={dlLoading === viewedFac.id}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#388BFD]/15 border border-[#388BFD]/30 text-[#388BFD] text-xs font-semibold hover:bg-[#388BFD]/25 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F07900]/15 border border-[#F07900]/30 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/25 transition-colors disabled:opacity-50"
                     >
                       {dlLoading === viewedFac.id ? <Loader2 className="animate-spin" size={12} /> : <Download size={12} />} PDF
                     </button>
@@ -862,7 +862,7 @@ export default function FacturationPage() {
                     {viewedFac.client_email && (
                       <button
                         onClick={() => sendEmail(viewedFac)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#388BFD]/30 text-[#388BFD] text-xs font-semibold hover:bg-[#388BFD]/10 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#F07900]/30 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/10 transition-colors"
                       >
                         <Mail size={13} /> Email
                       </button>

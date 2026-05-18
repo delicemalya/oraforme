@@ -45,10 +45,10 @@ const STATUTS_CHAUFFEUR: Record<string, { label: string; color: string; bg: stri
 }
 
 const STATUTS_COURSE: Record<string, { label: string; color: string; bg: string }> = {
-  en_attente: { label: 'En attente', color: '#388BFD', bg: '#388BFD18' },
+  en_attente: { label: 'En attente', color: '#F07900', bg: '#F0790018' },
   en_cours:   { label: 'En cours',   color: '#F0A30A', bg: '#F0A30A18' },
   terminee:   { label: 'Terminée',   color: '#2EA043', bg: '#2EA04318' },
-  annulee:    { label: 'Annulée',    color: '#F85149', bg: '#F8514918' },
+  annulee:    { label: 'Annulée',    color: '#F01F38', bg: '#F01F3818' },
 }
 
 const TABS = ['Courses', 'Chauffeurs', 'Statistiques']
@@ -215,7 +215,7 @@ export default function TransportPage() {
           { label: 'Total courses', value: totalCourses, icon: Navigation, grad: 'linear-gradient(135deg,#065F46,#059669,#10B981)', i: 0 },
           { label: 'Terminées', value: coursesTerminees, icon: CheckCircle, grad: 'linear-gradient(135deg,#1E3A5F,#1D4ED8,#3B82F6)', i: 1 },
           { label: "Chiffre d'affaires", value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: 'linear-gradient(135deg,#78350F,#D97706,#F59E0B)', i: 2 },
-          { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: 'linear-gradient(135deg,#4C1D95,#7C3AED,#8B5CF6)', i: 3 },
+          { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: 'linear-gradient(135deg,#4C1D95,#7C3AED,#8B0073)', i: 3 },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -314,7 +314,7 @@ export default function TransportPage() {
                             <MapPin size={10} className="text-[#2EA043]" /> {c.depart}
                           </div>
                           <div className="flex items-center gap-1 text-[11px] text-[#8B949E]">
-                            <MapPin size={10} className="text-[#F85149]" /> {c.arrivee}
+                            <MapPin size={10} className="text-[#F01F38]" /> {c.arrivee}
                           </div>
                           {c.distance_km > 0 && <p className="text-[10px] text-[#484F58]">{c.distance_km} km</p>}
                         </td>
@@ -353,7 +353,7 @@ export default function TransportPage() {
                             {(c.statut === 'en_attente' || c.statut === 'en_cours') && (
                               <button
                                 onClick={() => updateStatutCourse(c.id, 'annulee', c.chauffeur_id)}
-                                className="text-[10px] px-2 py-1 rounded-lg bg-[#F85149]/10 text-[#F85149] hover:bg-[#F85149]/20 transition-all"
+                                className="text-[10px] px-2 py-1 rounded-lg bg-[#F01F38]/10 text-[#F01F38] hover:bg-[#F01F38]/20 transition-all"
                               >
                                 Annuler
                               </button>
@@ -443,8 +443,8 @@ export default function TransportPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {[
               { label: 'Taux de réussite', value: totalCourses > 0 ? `${Math.round((coursesTerminees / totalCourses) * 100)}%` : '—', icon: TrendingUp, color: '#2EA043' },
-              { label: 'Courses en attente', value: courses.filter(c => c.statut === 'en_attente').length, icon: Clock, color: '#388BFD' },
-              { label: 'Courses annulées', value: courses.filter(c => c.statut === 'annulee').length, icon: AlertCircle, color: '#F85149' },
+              { label: 'Courses en attente', value: courses.filter(c => c.statut === 'en_attente').length, icon: Clock, color: '#F07900' },
+              { label: 'Courses annulées', value: courses.filter(c => c.statut === 'annulee').length, icon: AlertCircle, color: '#F01F38' },
             ].map((s, i) => {
               const Icon = s.icon
               return (

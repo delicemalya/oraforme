@@ -120,8 +120,8 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <SectionTitle title="Académique" sub="Données en temps réel" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits"  value={k.nbEtudiants}    sub={`${k.nbActifs} actifs`}        color="#F0A30A" href="/dashboard/ecole/scolarite" />
-          <StatCard i={2} icon={Users}          label="Enseignants"         value={k.nbEnseignants}  sub="Personnel pédagogique"         color="#388BFD" href="/dashboard/ecole/rh" />
-          <StatCard i={3} icon={UserX}          label="Absences aujourd'hui"value={k.nbAbsencesJour} sub={`Taux présence ${tauxPresence}%`} color="#F85149" href="/dashboard/ecole/scolarite" />
+          <StatCard i={2} icon={Users}          label="Enseignants"         value={k.nbEnseignants}  sub="Personnel pédagogique"         color="#F07900" href="/dashboard/ecole/rh" />
+          <StatCard i={3} icon={UserX}          label="Absences aujourd'hui"value={k.nbAbsencesJour} sub={`Taux présence ${tauxPresence}%`} color="#F01F38" href="/dashboard/ecole/scolarite" />
           <StatCard i={4} icon={BookOpen}        label="Examens à venir"    value={k.nbExamensAvenir}sub="Sessions programmées"          color="#2EA043" href="/dashboard/ecole/scolarite" />
         </div>
       </div>
@@ -132,8 +132,8 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard i={5} icon={TrendingUp} label="Recettes du mois"     value={`${fmt(k.revenuMois)} F`}     sub="Paiements scolaires"    color="#2EA043" href="/dashboard/ecole/comptabilite" />
           <StatCard i={6} icon={AlertTriangle} label="Impayés en attente" value={`${fmt(k.montantImpayes)} F`} sub={`${k.nbPaiementsEnAttente} dossiers`} color="#F0A30A" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={7} icon={Wallet}      label="Solde trésorerie"    value={`${fmt(k.soldeTresorerie)} F`} sub="Cumul du mois"          color="#388BFD" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={8} icon={Users}       label="Employés"            value={k.nbEmployes}                  sub={`${k.nbHeurePending} heures à valider`} color="#8B5CF6" href="/dashboard/ecole/rh" />
+          <StatCard i={7} icon={Wallet}      label="Solde trésorerie"    value={`${fmt(k.soldeTresorerie)} F`} sub="Cumul du mois"          color="#F07900" href="/dashboard/ecole/comptabilite" />
+          <StatCard i={8} icon={Users}       label="Employés"            value={k.nbEmployes}                  sub={`${k.nbHeurePending} heures à valider`} color="#8B0073" href="/dashboard/ecole/rh" />
         </div>
       </div>
 
@@ -154,9 +154,9 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
           <QuickAction icon={Plus}          label="Ajouter un étudiant"    href="/dashboard/ecole/scolarite"                    color="#F0A30A" />
-          <QuickAction icon={Users}         label="Ajouter un enseignant"  href="/dashboard/ecole/rh"                           color="#388BFD" />
+          <QuickAction icon={Users}         label="Ajouter un enseignant"  href="/dashboard/ecole/rh"                           color="#F07900" />
           <QuickAction icon={CalendarCheck} label="Marquer les présences"  href="/dashboard/ecole/scolarite"                    color="#2EA043" />
-          <QuickAction icon={Award}         label="Valider un diplôme"     href="/dashboard/ecole/direction"                    color="#8B5CF6" />
+          <QuickAction icon={Award}         label="Valider un diplôme"     href="/dashboard/ecole/direction"                    color="#8B0073" />
           <QuickAction icon={FileText}      label="Générer un bulletin"    href="/dashboard/ecole/scolarite"                    color="#06B6D4" />
           <QuickAction icon={Settings2}     label="Paramètres académiques" href="/dashboard/ecole/parametres-academiques"       color="#EF4444" />
         </div>
@@ -178,8 +178,8 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard i={1} icon={TrendingUp}    label="Recettes du mois"    value={`${fmt(k.revenuMois)} F`}     color="#2EA043" href="/dashboard/ecole/comptabilite" />
           <StatCard i={2} icon={AlertTriangle} label="Impayés en attente"  value={`${fmt(k.montantImpayes)} F`} color="#F0A30A" sub={`${k.nbPaiementsEnAttente} dossiers`} href="/dashboard/ecole/comptabilite" />
-          <StatCard i={3} icon={Wallet}        label="Solde trésorerie"    value={`${fmt(k.soldeTresorerie)} F`} color="#388BFD" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={4} icon={CheckCircle}   label="Heures à valider"    value={k.nbHeurePending}              color="#8B5CF6" sub="Déclarations formateurs" href="/dashboard/ecole/rh" />
+          <StatCard i={3} icon={Wallet}        label="Solde trésorerie"    value={`${fmt(k.soldeTresorerie)} F`} color="#F07900" href="/dashboard/ecole/comptabilite" />
+          <StatCard i={4} icon={CheckCircle}   label="Heures à valider"    value={k.nbHeurePending}              color="#8B0073" sub="Déclarations formateurs" href="/dashboard/ecole/rh" />
         </div>
       </div>
 
@@ -187,7 +187,7 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <SectionTitle title="RH & Paie" />
         <div className="grid grid-cols-2 gap-3">
           <StatCard i={5} icon={Users}  label="Total employés" value={k.nbEmployes}  color="#F0A30A" href="/dashboard/ecole/rh" />
-          <StatCard i={6} icon={Clock}  label="Heures à payer" value={k.nbHeurePending} sub="En attente de validation" color="#F85149" href="/dashboard/ecole/rh" />
+          <StatCard i={6} icon={Clock}  label="Heures à payer" value={k.nbHeurePending} sub="En attente de validation" color="#F01F38" href="/dashboard/ecole/rh" />
         </div>
       </div>
 
@@ -200,9 +200,9 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(8)}>
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 gap-2">
-          <QuickAction icon={Wallet}    label="Trésorerie"           href="/dashboard/ecole/comptabilite" color="#388BFD" />
+          <QuickAction icon={Wallet}    label="Trésorerie"           href="/dashboard/ecole/comptabilite" color="#F07900" />
           <QuickAction icon={CheckCircle} label="Valider heures"     href="/dashboard/ecole/rh"           color="#2EA043" />
-          <QuickAction icon={Download}  label="Export paie"          href="/dashboard/ecole/rh"           color="#8B5CF6" />
+          <QuickAction icon={Download}  label="Export paie"          href="/dashboard/ecole/rh"           color="#8B0073" />
           <QuickAction icon={FileText}  label="Journal comptable"    href="/dashboard/ecole/comptabilite" color="#F0A30A" />
         </div>
       </motion.div>
@@ -221,9 +221,9 @@ function ScolariteView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard i={1} icon={GraduationCap} label="Étudiants actifs"     value={k.nbActifs}          color="#F0A30A" href="/dashboard/ecole/scolarite" />
-        <StatCard i={2} icon={UserX}         label="Absences aujourd'hui" value={k.nbAbsencesJour}    color="#F85149" sub={`Présence ${tauxPresence}%`} href="/dashboard/ecole/scolarite" />
+        <StatCard i={2} icon={UserX}         label="Absences aujourd'hui" value={k.nbAbsencesJour}    color="#F01F38" sub={`Présence ${tauxPresence}%`} href="/dashboard/ecole/scolarite" />
         <StatCard i={3} icon={BookOpen}      label="Examens à venir"      value={k.nbExamensAvenir}   color="#2EA043" href="/dashboard/ecole/scolarite" />
-        <StatCard i={4} icon={Users}         label="Total inscrits"        value={k.nbEtudiants}       color="#388BFD" href="/dashboard/ecole/scolarite" />
+        <StatCard i={4} icon={Users}         label="Total inscrits"        value={k.nbEtudiants}       color="#F07900" href="/dashboard/ecole/scolarite" />
       </div>
 
       {/* Alertes du jour */}
@@ -239,8 +239,8 @@ function ScolariteView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
           <QuickAction icon={CalendarCheck} label="Marquer les présences"  href="/dashboard/ecole/scolarite" color="#F0A30A" />
           <QuickAction icon={Plus}          label="Ajouter un étudiant"    href="/dashboard/ecole/scolarite" color="#2EA043" />
-          <QuickAction icon={FileText}      label="Générer un bulletin"    href="/dashboard/ecole/scolarite" color="#388BFD" />
-          <QuickAction icon={BookOpen}      label="Créer un examen"        href="/dashboard/ecole/scolarite" color="#8B5CF6" />
+          <QuickAction icon={FileText}      label="Générer un bulletin"    href="/dashboard/ecole/scolarite" color="#F07900" />
+          <QuickAction icon={BookOpen}      label="Créer un examen"        href="/dashboard/ecole/scolarite" color="#8B0073" />
           <QuickAction icon={Award}         label="Attestations"           href="/dashboard/ecole/scolarite" color="#06B6D4" />
           <QuickAction icon={BarChart2}     label="Rapports absences"      href="/dashboard/ecole/scolarite" color="#F97316" />
         </div>
@@ -259,8 +259,8 @@ function RhView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <StatCard i={1} icon={Users}   label="Total employés"        value={k.nbEmployes}      color="#F0A30A" href="/dashboard/ecole/rh" />
-        <StatCard i={2} icon={Users}   label="Enseignants"           value={k.nbEnseignants}   color="#388BFD" href="/dashboard/ecole/rh" />
-        <StatCard i={3} icon={Clock}   label="Heures à valider"      value={k.nbHeurePending}  color="#F85149" sub="Déclarations en attente" href="/dashboard/ecole/rh" />
+        <StatCard i={2} icon={Users}   label="Enseignants"           value={k.nbEnseignants}   color="#F07900" href="/dashboard/ecole/rh" />
+        <StatCard i={3} icon={Clock}   label="Heures à valider"      value={k.nbHeurePending}  color="#F01F38" sub="Déclarations en attente" href="/dashboard/ecole/rh" />
       </div>
 
       {k.nbHeurePending > 0 && (
@@ -274,8 +274,8 @@ function RhView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <div className="grid grid-cols-2 gap-2">
           <QuickAction icon={CheckCircle} label="Valider heures formateurs" href="/dashboard/ecole/rh"     color="#2EA043" />
           <QuickAction icon={Plus}        label="Ajouter un employé"         href="/dashboard/ecole/rh"     color="#F0A30A" />
-          <QuickAction icon={FileText}    label="Bulletin de paie"           href="/dashboard/ecole/rh"     color="#388BFD" />
-          <QuickAction icon={Download}    label="Exporter le livre de paie"  href="/dashboard/ecole/rh"     color="#8B5CF6" />
+          <QuickAction icon={FileText}    label="Bulletin de paie"           href="/dashboard/ecole/rh"     color="#F07900" />
+          <QuickAction icon={Download}    label="Exporter le livre de paie"  href="/dashboard/ecole/rh"     color="#8B0073" />
         </div>
       </motion.div>
     </div>
@@ -297,7 +297,7 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <StatCard i={1} icon={Clock}        label="Heures déclarées"   value={k.myHeuresTotales}  color="#F0A30A" />
         <StatCard i={2} icon={CheckCircle}  label="Heures validées"    value={k.myHeuresValidees} color="#2EA043" sub={`${pctValidees}% validées`} />
-        <StatCard i={3} icon={BookOpen}     label="Examens à venir"    value={k.nbExamensAvenir}  color="#388BFD" href="/dashboard/ecole/scolarite" />
+        <StatCard i={3} icon={BookOpen}     label="Examens à venir"    value={k.nbExamensAvenir}  color="#F07900" href="/dashboard/ecole/scolarite" />
       </div>
 
       {/* Progress bar heures */}
@@ -323,9 +323,9 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 gap-2">
           <QuickAction icon={Plus}      label="Déclarer des heures"   href="/dashboard/ecole/rh"         color="#F0A30A" />
-          <QuickAction icon={BookOpen}  label="Mes cours"             href="/dashboard/ecole/scolarite"  color="#388BFD" />
+          <QuickAction icon={BookOpen}  label="Mes cours"             href="/dashboard/ecole/scolarite"  color="#F07900" />
           <QuickAction icon={FileText}  label="Créer un examen"       href="/dashboard/ecole/scolarite"  color="#2EA043" />
-          <QuickAction icon={Download}  label="Mes paiements"         href="/dashboard/ecole/rh"         color="#8B5CF6" />
+          <QuickAction icon={Download}  label="Mes paiements"         href="/dashboard/ecole/rh"         color="#8B0073" />
         </div>
       </motion.div>
     </div>
@@ -336,7 +336,7 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   const moyenneColor = k.myNotesMoyenne === null ? '#8B949E'
     : k.myNotesMoyenne >= 14 ? '#2EA043'
     : k.myNotesMoyenne >= 10 ? '#F0A30A'
-    : '#F85149'
+    : '#F01F38'
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -352,8 +352,8 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
           value={k.myNotesMoyenne !== null ? `${k.myNotesMoyenne.toFixed(2)}/20` : 'N/A'}
           color={moyenneColor}
         />
-        <StatCard i={2} icon={UserX}       label="Mes absences"      value={k.myAbsences}     color="#F85149" />
-        <StatCard i={3} icon={BookOpen}    label="Examens à venir"   value={k.nbExamensAvenir} color="#388BFD" href="/dashboard/ecole/espace-etudiant" />
+        <StatCard i={2} icon={UserX}       label="Mes absences"      value={k.myAbsences}     color="#F01F38" />
+        <StatCard i={3} icon={BookOpen}    label="Examens à venir"   value={k.nbExamensAvenir} color="#F07900" href="/dashboard/ecole/espace-etudiant" />
         <StatCard i={4}
           icon={k.myPaiementOk ? CheckCircle : AlertTriangle}
           label="Scolarité"
@@ -372,9 +372,9 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <SectionTitle title="Accès rapide" />
         <div className="grid grid-cols-2 gap-2">
           <QuickAction icon={FileText}  label="Mes bulletins"       href="/dashboard/ecole/espace-etudiant" color="#F0A30A" />
-          <QuickAction icon={BookOpen}  label="Mes cours"           href="/dashboard/ecole/espace-etudiant" color="#388BFD" />
+          <QuickAction icon={BookOpen}  label="Mes cours"           href="/dashboard/ecole/espace-etudiant" color="#F07900" />
           <QuickAction icon={CalendarCheck} label="Mon planning"   href="/dashboard/ecole/espace-etudiant" color="#2EA043" />
-          <QuickAction icon={Download}  label="Mon attestation"    href="/dashboard/ecole/espace-etudiant" color="#8B5CF6" />
+          <QuickAction icon={Download}  label="Mon attestation"    href="/dashboard/ecole/espace-etudiant" color="#8B0073" />
         </div>
       </motion.div>
     </div>
@@ -411,8 +411,8 @@ function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <SectionTitle title="Accès rapide" />
         <div className="grid grid-cols-2 gap-2">
           <QuickAction icon={UserX}        label="Présences & absences"  href="/dashboard/ecole/espace-parent" color="#F0A30A" />
-          <QuickAction icon={FileText}     label="Bulletins de notes"    href="/dashboard/ecole/espace-parent" color="#388BFD" />
-          <QuickAction icon={AlertTriangle}label="Alertes"               href="/dashboard/ecole/espace-parent" color="#F85149" />
+          <QuickAction icon={FileText}     label="Bulletins de notes"    href="/dashboard/ecole/espace-parent" color="#F07900" />
+          <QuickAction icon={AlertTriangle}label="Alertes"               href="/dashboard/ecole/espace-parent" color="#F01F38" />
           <QuickAction icon={CalendarCheck}label="Emploi du temps"       href="/dashboard/ecole/espace-parent" color="#2EA043" />
         </div>
       </motion.div>
@@ -437,8 +437,8 @@ function DtiView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <div className="grid grid-cols-2 gap-2">
           <QuickAction icon={ShieldCheck} label="Gérer les rôles"    href="/dashboard/roles"           color="#84CC16" />
           <QuickAction icon={Users}       label="Équipe & comptes"   href="/dashboard/equipe"          color="#F0A30A" />
-          <QuickAction icon={Bell}        label="Notifications"      href="/dashboard/parametres"      color="#388BFD" />
-          <QuickAction icon={Activity}    label="Paramètres système" href="/dashboard/parametres"      color="#8B5CF6" />
+          <QuickAction icon={Bell}        label="Notifications"      href="/dashboard/parametres"      color="#F07900" />
+          <QuickAction icon={Activity}    label="Paramètres système" href="/dashboard/parametres"      color="#8B0073" />
         </div>
       </motion.div>
     </div>
@@ -455,16 +455,16 @@ function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits" value={k.nbEtudiants}    color="#EF4444" href="/dashboard/ecole/scolarite" />
         <StatCard i={2} icon={Users}         label="Enseignants"        value={k.nbEnseignants}  color="#F0A30A" href="/dashboard/ecole/rh" />
-        <StatCard i={3} icon={BookOpen}      label="Examens à venir"    value={k.nbExamensAvenir}color="#388BFD" href="/dashboard/ecole/scolarite" />
-        <StatCard i={4} icon={Award}         label="Diplômes en attente"value="—"               color="#8B5CF6" href="/dashboard/ecole/direction" />
+        <StatCard i={3} icon={BookOpen}      label="Examens à venir"    value={k.nbExamensAvenir}color="#F07900" href="/dashboard/ecole/scolarite" />
+        <StatCard i={4} icon={Award}         label="Diplômes en attente"value="—"               color="#8B0073" href="/dashboard/ecole/direction" />
       </div>
       <motion.div {...fade(5)}>
         <SectionTitle title="Actions académiques" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
           <QuickAction icon={Award}         label="Diplômes & soutenances"  href="/dashboard/ecole/direction"                  color="#EF4444" />
-          <QuickAction icon={BookOpen}      label="Programmes & sessions"   href="/dashboard/ecole/scolarite"                  color="#388BFD" />
+          <QuickAction icon={BookOpen}      label="Programmes & sessions"   href="/dashboard/ecole/scolarite"                  color="#F07900" />
           <QuickAction icon={FileText}      label="Attestations"            href="/dashboard/ecole/scolarite"                  color="#2EA043" />
-          <QuickAction icon={BarChart2}     label="Statistiques académiques" href="/dashboard/ecole/direction"                 color="#8B5CF6" />
+          <QuickAction icon={BarChart2}     label="Statistiques académiques" href="/dashboard/ecole/direction"                 color="#8B0073" />
           <QuickAction icon={GraduationCap} label="Étudiants"               href="/dashboard/ecole/scolarite"                 color="#F0A30A" />
           <QuickAction icon={Settings2}     label="Paramètres académiques"  href="/dashboard/ecole/parametres-academiques"    color="#06B6D4" />
         </div>
@@ -477,9 +477,9 @@ function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
 const ROLE_BADGE: Record<EcoleRole, { label: string; color: string }> = {
   DIRECTION_GENERALE: { label: 'Direction Générale', color: '#F0A30A' },
-  RAF:                { label: 'RAF',                 color: '#388BFD' },
+  RAF:                { label: 'RAF',                 color: '#F07900' },
   SCOLARITE:          { label: 'Scolarité',           color: '#2EA043' },
-  RH_PAIE:            { label: 'RH & Paie',          color: '#8B5CF6' },
+  RH_PAIE:            { label: 'RH & Paie',          color: '#8B0073' },
   FORMATEUR:          { label: 'Formateur',           color: '#06B6D4' },
   ETUDIANT:           { label: 'Étudiant',            color: '#EC4899' },
   PARENT:             { label: 'Parent',              color: '#F97316' },

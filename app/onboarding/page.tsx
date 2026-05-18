@@ -301,7 +301,7 @@ export default function OnboardingPage() {
                     {selectedMods.length} module{selectedMods.length !== 1 ? 's' : ''} sélectionné{selectedMods.length !== 1 ? 's' : ''}
                   </span>
                   {selectedMods.length === 0 && (
-                    <div className="flex items-center gap-1 text-[10px] text-[#F85149] mt-0.5">
+                    <div className="flex items-center gap-1 text-[10px] text-[#F01F38] mt-0.5">
                       <X size={9} /> Sélectionnez au moins un module
                     </div>
                   )}

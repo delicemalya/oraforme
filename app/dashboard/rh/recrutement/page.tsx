@@ -49,7 +49,7 @@ interface Candidat {
 function scoreColor(s: number) {
   if (s >= 70) return '#2EA043'
   if (s >= 50) return '#F0A30A'
-  return '#F85149'
+  return '#F01F38'
 }
 
 function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
@@ -95,9 +95,9 @@ function ScoreBadge({ score }: { score: number }) {
 
 function StatutBadge({ statut }: { statut: string }) {
   const map: Record<string, { label: string; color: string }> = {
-    nouveau:  { label: 'Nouveau',  color: '#388BFD' },
+    nouveau:  { label: 'Nouveau',  color: '#F07900' },
     retenu:   { label: 'Retenu',   color: '#2EA043' },
-    rejete:   { label: 'Rejeté',  color: '#F85149' },
+    rejete:   { label: 'Rejeté',  color: '#F01F38' },
     entretien:{ label: 'Entretien',color: '#F0A30A' },
   }
   const s = map[statut] ?? map.nouveau
@@ -313,7 +313,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
                     </span>
                   ) : null}
                   {o.criteres?.langues?.slice(0, 2).map(l => (
-                    <span key={l} className="text-[10px] text-[#388BFD] border border-[#388BFD]/20 rounded px-1.5 py-0.5">{l}</span>
+                    <span key={l} className="text-[10px] text-[#F07900] border border-[#F07900]/20 rounded px-1.5 py-0.5">{l}</span>
                   ))}
                 </div>
               </div>
@@ -615,11 +615,11 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 )}
                 {c.points_faibles.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-bold text-[#F85149] mb-1.5">❌ Points faibles</p>
+                    <p className="text-[10px] font-bold text-[#F01F38] mb-1.5">❌ Points faibles</p>
                     <ul className="space-y-0.5">
                       {c.points_faibles.slice(0, 4).map((p, j) => (
                         <li key={j} className="text-xs text-[#8B949E] flex items-start gap-1.5">
-                          <span className="text-[#F85149] mt-0.5 shrink-0">·</span>{p}
+                          <span className="text-[#F01F38] mt-0.5 shrink-0">·</span>{p}
                         </li>
                       ))}
                     </ul>
@@ -642,7 +642,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 {c.email && (
                   <a
                     href={`mailto:${c.email}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#388BFD]/10 border border-[#388BFD]/20 text-[#388BFD] rounded-lg text-xs font-semibold hover:bg-[#388BFD]/20 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F07900]/10 border border-[#F07900]/20 text-[#F07900] rounded-lg text-xs font-semibold hover:bg-[#F07900]/20 transition-colors"
                   >
                     <Mail size={12} /> Contacter
                   </a>
@@ -666,7 +666,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 <button
                   onClick={() => updateStatut(c.id, 'rejete')}
                   disabled={c.statut === 'rejete'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F85149]/10 border border-[#F85149]/20 text-[#F85149] rounded-lg text-xs font-semibold hover:bg-[#F85149]/20 transition-colors disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F01F38]/10 border border-[#F01F38]/20 text-[#F01F38] rounded-lg text-xs font-semibold hover:bg-[#F01F38]/20 transition-colors disabled:opacity-40"
                 >
                   <X size={12} /> Rejeter
                 </button>

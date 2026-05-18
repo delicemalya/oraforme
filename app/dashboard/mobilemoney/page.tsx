@@ -21,7 +21,7 @@ type MobileTx = {
 
 const FRAIS: Record<string, number> = { airtel: 0.01, mtn: 0.012, wave: 0.008, orange: 0.011 }
 const OP_LABELS: Record<string, string> = { airtel: 'Airtel Money', mtn: 'MTN MoMo', wave: 'Wave', orange: 'Orange Money' }
-const OP_COLORS: Record<string, string> = { airtel: '#F85149', mtn: '#F0A30A', wave: '#388BFD', orange: '#F97316' }
+const OP_COLORS: Record<string, string> = { airtel: '#F01F38', mtn: '#F0A30A', wave: '#F07900', orange: '#F97316' }
 
 export default function MobileMoneyPage() {
   const [txs, setTxs] = useState<MobileTx[]>([])
@@ -127,7 +127,7 @@ export default function MobileMoneyPage() {
               </div>
               <span className="text-xs text-[#484F58]">{w.num}</span>
             </div>
-            <p className={`text-2xl font-bold ${w.solde >= 0 ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>
+            <p className={`text-2xl font-bold ${w.solde >= 0 ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
               {fmtFCFA(w.solde)}
             </p>
             <p className="text-xs text-[#484F58] mt-1">Solde estimé</p>
@@ -139,7 +139,7 @@ export default function MobileMoneyPage() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'Total reçu', value: fmtFCFA(totalRecu), color: '#2EA043' },
-          { label: 'Total envoyé', value: fmtFCFA(totalEnvoi), color: '#F85149' },
+          { label: 'Total envoyé', value: fmtFCFA(totalEnvoi), color: '#F01F38' },
           { label: 'Frais payés', value: fmtFCFA(totalFrais), color: '#8B949E' },
         ].map(k => (
           <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4 text-center">
@@ -156,7 +156,7 @@ export default function MobileMoneyPage() {
           <ArrowDownLeft size={15} /> Recevoir paiement
         </button>
         <button onClick={() => { setForm(f => ({ ...f, type: 'envoi' })); setModal('envoyer') }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F85149]/10 border border-[#F85149]/30 text-[#F85149] text-sm font-medium hover:bg-[#F85149]/20 transition-colors">
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F01F38]/10 border border-[#F01F38]/30 text-[#F01F38] text-sm font-medium hover:bg-[#F01F38]/20 transition-colors">
           <ArrowUpRight size={15} /> Envoyer de l&apos;argent
         </button>
       </div>
@@ -184,7 +184,7 @@ export default function MobileMoneyPage() {
                   <p className="text-xs text-[#484F58]">{OP_LABELS[t.operateur]} · {t.reference}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className={`text-sm font-semibold ${t.type === 'reception' ? 'text-[#2EA043]' : 'text-[#F85149]'}`}>
+                  <p className={`text-sm font-semibold ${t.type === 'reception' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
                     {t.type === 'reception' ? '+' : '-'}{fmtFCFA(t.montant)}
                   </p>
                   {t.frais > 0 && <p className="text-xs text-[#484F58]">Frais : {fmtFCFA(t.frais)}</p>}

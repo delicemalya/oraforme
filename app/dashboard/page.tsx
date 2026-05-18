@@ -13,7 +13,7 @@ const MODULE_LABELS: Record<string, string> = {
 }
 
 const MODULE_COLORS = [
-  '#F0A30A', '#388BFD', '#2EA043', '#8B5CF6',
+  '#F0A30A', '#F07900', '#2EA043', '#8B0073',
   '#EC4899', '#06B6D4', '#F59E0B', '#EF4444', '#84CC16', '#F97316',
 ]
 
@@ -121,9 +121,9 @@ export default async function DashboardPage() {
     moduleBreakdown = totalInvoices > 0
       ? ([
           { name: 'Payées',     value: counts.payee,    color: '#2EA043' },
-          { name: 'Envoyées',   value: counts.envoyee,  color: '#388BFD' },
+          { name: 'Envoyées',   value: counts.envoyee,  color: '#F07900' },
           { name: 'Brouillons', value: counts.brouillon,color: '#484F58' },
-          { name: 'Annulées',   value: counts.annulee,  color: '#F85149' },
+          { name: 'Annulées',   value: counts.annulee,  color: '#F01F38' },
         ] as { name: string; value: number; color: string }[]).filter(d => d.value > 0)
       : modulesActifs.map((m, i) => ({ name: MODULE_LABELS[m] ?? m, value: 1, color: MODULE_COLORS[i % MODULE_COLORS.length] }))
 

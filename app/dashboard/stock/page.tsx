@@ -332,7 +332,7 @@ export default function StockPage() {
           { label: 'Valeur du stock', value: fmtFCFA(valeurTotale),      gradient: 'linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)', Icon: TrendingUp },
           { label: 'Produits',         value: products.length.toString(), gradient: 'linear-gradient(135deg,#1E3A5F 0%,#1D4ED8 50%,#3B82F6 100%)', Icon: Package },
           { label: 'En alerte',        value: alertes.length.toString(),  gradient: alertes.length > 0 ? 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)' : 'linear-gradient(135deg,#065F46 0%,#059669 50%,#10B981 100%)', Icon: AlertTriangle },
-          { label: 'Fournisseurs',     value: suppliers.length.toString(),gradient: 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 50%,#8B5CF6 100%)', Icon: Users2 },
+          { label: 'Fournisseurs',     value: suppliers.length.toString(),gradient: 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 50%,#8B0073 100%)', Icon: Users2 },
         ].map(k => (
           <div key={k.label} className="relative rounded-xl p-4 overflow-hidden" style={{ background: k.gradient }}>
             <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.10) 0%, transparent 60%)' }} />
@@ -439,7 +439,7 @@ export default function StockPage() {
                                   Ajuster
                                 </button>
                                 <button onClick={() => { setMEdit(p); setEditForm({ nom: p.nom, categorie: p.categorie ?? '', sku: p.sku ?? '', unite: p.unite, prix_achat: String(p.prix_achat), prix_vente: String(p.prix_vente), seuil_alerte: String(p.seuil_alerte) }) }}
-                                  className="text-[#484F58] hover:text-[#388BFD] transition-colors">
+                                  className="text-[#484F58] hover:text-[#F07900] transition-colors">
                                   <Pencil size={13} />
                                 </button>
                                 <button onClick={() => deleteProduct(p.id)} className="text-[#484F58] hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
@@ -528,8 +528,8 @@ export default function StockPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {warehouses.map(w => (
                 <div key={w.id} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 flex items-center justify-center shrink-0">
-                    <Warehouse size={15} className="text-[#8B5CF6]" />
+                  <div className="w-9 h-9 rounded-lg bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center shrink-0">
+                    <Warehouse size={15} className="text-[#8B0073]" />
                   </div>
                   <div>
                     <p className="font-semibold text-[#E6EDF3]">{w.nom}</p>

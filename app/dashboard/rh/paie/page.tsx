@@ -233,7 +233,7 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
 function StatutBulletin({ statut }: { statut: string }) {
   const MAP: Record<string, { label: string; color: string; bg: string }> = {
     generee: { label: 'Générée',  color: '#F0A30A', bg: '#F0A30A18' },
-    validee: { label: 'Validée',  color: '#388BFD', bg: '#388BFD18' },
+    validee: { label: 'Validée',  color: '#F07900', bg: '#F0790018' },
     payee:   { label: 'Payée',    color: '#2EA043', bg: '#2EA04318' },
   }
   const s = MAP[statut] ?? MAP.generee
@@ -257,7 +257,7 @@ function NumInput({ value, onChange, disabled }: {
       onChange={e => onChange(Number(e.target.value) || 0)}
       disabled={disabled}
       className="w-24 bg-white/[0.06] border border-white/10 rounded-md px-2 py-1 text-xs text-white text-right
-                 focus:outline-none focus:border-[#388BFD]/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                 focus:outline-none focus:border-[#F07900]/60 disabled:opacity-40 disabled:cursor-not-allowed"
     />
   )
 }
@@ -484,7 +484,7 @@ export default function PaiePage() {
             <ChevronLeft size={14} />
           </button>
           <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5">
-            <Calendar size={13} className="text-[#388BFD]" />
+            <Calendar size={13} className="text-[#F07900]" />
             <select
               value={mois}
               onChange={e => setMois(Number(e.target.value))}
@@ -545,7 +545,7 @@ export default function PaiePage() {
           label="Masse salariale brute"
           value={`${fmt(totalBrut)} FCFA`}
           sub={`${rows.length} employés actifs`}
-          color="#388BFD"
+          color="#F07900"
           icon={DollarSign}
         />
         <KpiCard
@@ -566,7 +566,7 @@ export default function PaiePage() {
           label="Coût total employeur"
           value={`${fmt(totalCout)} FCFA`}
           sub={`IRPP total : ${fmt(totalIRPP)} FCFA`}
-          color="#F85149"
+          color="#F01F38"
           icon={Users}
         />
       </div>
@@ -582,10 +582,10 @@ export default function PaiePage() {
           style={{
             background: saved
               ? 'linear-gradient(135deg, #2EA043, #238636)'
-              : 'linear-gradient(135deg, #388BFD, #1a6fd8)',
+              : 'linear-gradient(135deg, #F07900, #1a6fd8)',
             boxShadow: saved
               ? '0 0 20px #2EA04340'
-              : '0 0 20px #388BFD40',
+              : '0 0 20px #F0790040',
           }}
         >
           {saving ? (
@@ -692,7 +692,7 @@ export default function PaiePage() {
                     </td>
 
                     {/* CNSS salarié */}
-                    <td className="px-3 py-3 text-right text-xs text-[#F85149]">
+                    <td className="px-3 py-3 text-right text-xs text-[#F01F38]">
                       −{fmt(row.cnss_salarie)}
                     </td>
 
@@ -718,11 +718,11 @@ export default function PaiePage() {
                         onChange={e => updateStatut(row.employe_id, e.target.value as 'generee' | 'validee' | 'payee')}
                         className="bg-transparent text-[10px] focus:outline-none cursor-pointer"
                         style={{
-                          color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#388BFD' : '#F0A30A',
+                          color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#F07900' : '#F0A30A',
                         }}
                       >
                         <option value="generee"  className="bg-[#161B22] text-[#F0A30A]">Générée</option>
-                        <option value="validee"  className="bg-[#161B22] text-[#388BFD]">Validée</option>
+                        <option value="validee"  className="bg-[#161B22] text-[#F07900]">Validée</option>
                         <option value="payee"    className="bg-[#161B22] text-[#2EA043]">Payée</option>
                       </select>
                     </td>
@@ -760,7 +760,7 @@ export default function PaiePage() {
                   <td className="px-3 py-3 text-right text-xs font-bold text-white">
                     {fmt(totalBrut)}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F85149]">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F01F38]">
                     −{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))}
                   </td>
                   <td className="px-3 py-3 text-right text-xs font-bold text-[#F0A30A]">
@@ -800,7 +800,7 @@ export default function PaiePage() {
               </div>
               <div>
                 <p className="text-[10px] text-[#8B949E]">CNSS salarié total</p>
-                <p className="font-bold text-[#F85149]">{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))} FCFA</p>
+                <p className="font-bold text-[#F01F38]">{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))} FCFA</p>
               </div>
               <div>
                 <p className="text-[10px] text-[#8B949E]">IRPP total</p>

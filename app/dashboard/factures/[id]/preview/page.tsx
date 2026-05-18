@@ -58,10 +58,10 @@ interface Config {
 
 const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
   brouillon: { label: 'BROUILLON', color: '#8B949E', bg: '#8B949E20' },
-  envoyee:   { label: 'ENVOYÉE',   color: '#388BFD', bg: '#388BFD20' },
-  envoye:    { label: 'ENVOYÉE',   color: '#388BFD', bg: '#388BFD20' },
+  envoyee:   { label: 'ENVOYÉE',   color: '#F07900', bg: '#F0790020' },
+  envoye:    { label: 'ENVOYÉE',   color: '#F07900', bg: '#F0790020' },
   payee:     { label: 'PAYÉE',     color: '#2EA043', bg: '#2EA04320' },
-  retard:    { label: 'EN RETARD', color: '#F85149', bg: '#F8514920' },
+  retard:    { label: 'EN RETARD', color: '#F01F38', bg: '#F01F3820' },
   annulee:   { label: 'ANNULÉE',  color: '#484F58', bg: '#48495820' },
 }
 
@@ -244,7 +244,7 @@ export default function InvoicePreviewPage() {
           {/* Send */}
           <motion.button onClick={handleSend} disabled={sending || sent} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-60 shrink-0"
-            style={{ background: sent ? '#2EA04320' : '#388BFD15', color: sent ? '#2EA043' : '#388BFD', border: `1px solid ${sent ? '#2EA04340' : '#388BFD30'}` }}
+            style={{ background: sent ? '#2EA04320' : '#F0790015', color: sent ? '#2EA043' : '#F07900', border: `1px solid ${sent ? '#2EA04340' : '#F0790030'}` }}
           >
             {sending ? <Loader2 className="animate-spin" size={13} /> : sent ? <Check size={13} /> : <Send size={13} />}
             {sent ? 'Envoyée !' : 'Envoyer'}

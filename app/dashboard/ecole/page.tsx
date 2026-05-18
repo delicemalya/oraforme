@@ -371,7 +371,7 @@ export default function EcoleOverviewPage() {
           label="Formateurs (Enseignants)"
           value={d.nbEnseignants}
           sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`}
-          gradient="linear-gradient(135deg, #5B21B6, #8B5CF6)"
+          gradient="linear-gradient(135deg, #5B21B6, #8B0073)"
           href="/dashboard/ecole/rh"
           badge="Actifs"
           badgeVariant="up"
@@ -485,7 +485,7 @@ export default function EcoleOverviewPage() {
         <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-3">Raccourcis</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
           {[
-            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,   color: '#8B5CF6', sub: 'Journal OHADA' },
+            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,   color: '#8B0073', sub: 'Journal OHADA' },
             { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,        color: '#3B82F6', sub: 'Personnel & salaires' },
             { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,  color: '#F97316', sub: 'Permissions' },
             { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap,color: '#10B981', sub: 'Inscriptions & frais' },

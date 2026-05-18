@@ -310,7 +310,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
               trend={parseFloat(tauxSuspension) > 10 ? 'warn' : 'up'}
             />
             <InsightCard
-              icon={BookOpen} label="Moy. générale" color="#8B5CF6"
+              icon={BookOpen} label="Moy. générale" color="#8B0073"
               value={moyenneNotes === '—' ? '—' : `${moyenneNotes}/20`}
               sub={`${ctx.notes.length} notes saisies`}
               trend={parseFloat(moyenneNotes) >= 10 ? 'up' : 'down'}

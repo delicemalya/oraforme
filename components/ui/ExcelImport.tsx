@@ -192,7 +192,7 @@ export default function ExcelImport({ title, description, columns, onImport, tem
                   <tr className="bg-[#21262D]">
                     {columns.map(c => (
                       <th key={c.key} className="px-3 py-2 text-left text-[#8B949E] font-semibold whitespace-nowrap">
-                        {c.label}{c.required && <span className="text-[#F85149] ml-0.5">*</span>}
+                        {c.label}{c.required && <span className="text-[#F01F38] ml-0.5">*</span>}
                       </th>
                     ))}
                   </tr>
@@ -240,15 +240,15 @@ export default function ExcelImport({ title, description, columns, onImport, tem
               <div>
                 <p className="text-sm font-bold text-[#E6EDF3]">{result.success} lignes importées avec succès</p>
                 {result.errors.length > 0 && (
-                  <p className="text-xs text-[#F85149] mt-0.5">{result.errors.length} erreur(s) ignorée(s)</p>
+                  <p className="text-xs text-[#F01F38] mt-0.5">{result.errors.length} erreur(s) ignorée(s)</p>
                 )}
               </div>
             </div>
             {result.errors.length > 0 && (
-              <div className="bg-[#F8514910] border border-[#F8514930] rounded-xl p-4 space-y-1">
-                <p className="text-xs font-semibold text-[#F85149] mb-2">Détails des erreurs :</p>
+              <div className="bg-[#F01F3810] border border-[#F01F3830] rounded-xl p-4 space-y-1">
+                <p className="text-xs font-semibold text-[#F01F38] mb-2">Détails des erreurs :</p>
                 {result.errors.slice(0, 5).map((e, i) => (
-                  <p key={i} className="text-xs text-[#F85149]">Ligne {e.row} : {e.message}</p>
+                  <p key={i} className="text-xs text-[#F01F38]">Ligne {e.row} : {e.message}</p>
                 ))}
                 {result.errors.length > 5 && (
                   <p className="text-xs text-[#484F58]">... et {result.errors.length - 5} autres</p>

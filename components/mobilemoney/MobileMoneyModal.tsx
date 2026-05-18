@@ -147,7 +147,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                     </div>
 
                     {/* Info */}
-                    <div className="flex items-start gap-2 p-3 rounded-xl bg-[#388BFD10] border border-[#388BFD20] text-xs text-[#388BFD]">
+                    <div className="flex items-start gap-2 p-3 rounded-xl bg-[#F0790010] border border-[#F0790020] text-xs text-[#F07900]">
                       <AlertCircle size={13} className="shrink-0 mt-0.5" />
                       <span>Un lien de paiement sécurisé sera généré et peut être envoyé par SMS/WhatsApp au client.</span>
                     </div>

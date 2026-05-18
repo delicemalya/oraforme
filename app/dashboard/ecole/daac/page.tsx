@@ -91,8 +91,8 @@ export default function DaacPage() {
           className="grid grid-cols-2 lg:grid-cols-4 gap-3"
         >
           <KpiCard label="Étudiants actifs"    value={actifs}         color="#F0A30A" />
-          <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#388BFD" />
-          <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#8B5CF6" />
+          <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#F07900" />
+          <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#8B0073" />
           <KpiCard label="Soutenances planif." value={souPlanifie}    color="#2EA043" />
         </motion.div>
 

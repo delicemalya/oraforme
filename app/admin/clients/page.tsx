@@ -27,8 +27,8 @@ export default async function AdminClientsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F85149]/10 border border-[#F85149]/20 flex items-center justify-center">
-          <Building2 size={18} className="text-[#F85149]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F01F38]/10 border border-[#F01F38]/20 flex items-center justify-center">
+          <Building2 size={18} className="text-[#F01F38]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#E6EDF3]">Clients</h1>

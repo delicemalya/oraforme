@@ -24,9 +24,9 @@ function timeAgo(d: string) {
 
 const STATUT: Record<string, { label: string; color: string; Icon: React.ElementType; action: string }> = {
   brouillon: { label: 'Brouillon',  color: '#8B949E', Icon: Clock,        action: 'créé un brouillon' },
-  envoyee:   { label: 'Envoyée',   color: '#388BFD', Icon: Send,         action: 'envoyé une facture' },
+  envoyee:   { label: 'Envoyée',   color: '#F07900', Icon: Send,         action: 'envoyé une facture' },
   payee:     { label: 'Payée',     color: '#2EA043', Icon: CheckCircle,  action: 'reçu un paiement' },
-  annulee:   { label: 'Annulée',  color: '#F85149', Icon: FileText,     action: 'annulé une facture' },
+  annulee:   { label: 'Annulée',  color: '#F01F38', Icon: FileText,     action: 'annulé une facture' },
 }
 
 function fmt(n: number) {

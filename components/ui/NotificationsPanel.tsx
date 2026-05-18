@@ -17,10 +17,10 @@ interface Notification {
 }
 
 const TYPE_CONFIG = {
-  info:    { icon: Info,          color: '#388BFD', bg: '#388BFD15' },
+  info:    { icon: Info,          color: '#F07900', bg: '#F0790015' },
   warning: { icon: AlertTriangle, color: '#F0A30A', bg: '#F0A30A15' },
   success: { icon: CheckCircle,   color: '#2EA043', bg: '#2EA04315' },
-  error:   { icon: XCircle,       color: '#F85149', bg: '#F8514915' },
+  error:   { icon: XCircle,       color: '#F01F38', bg: '#F01F3815' },
 }
 
 function timeAgo(date: string): string {
@@ -92,7 +92,7 @@ export default function NotificationsPanel() {
       >
         <Bell size={15} />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F85149] rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F01F38] rounded-full text-[9px] font-bold text-white flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -112,7 +112,7 @@ export default function NotificationsPanel() {
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-[#E6EDF3]">Notifications</h3>
                 {unread > 0 && (
-                  <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#F85149] text-white rounded-full">{unread}</span>
+                  <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#F01F38] text-white rounded-full">{unread}</span>
                 )}
               </div>
               <div className="flex items-center gap-2">

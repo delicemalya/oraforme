@@ -70,7 +70,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           {isAdmin && onToggleBlock && (
             <button onClick={onToggleBlock} disabled={blocking}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
-              style={etudiant.statut === 'suspendu' ? { background: '#2EA043', color: '#fff' } : { background: '#F85149', color: '#fff' }}>
+              style={etudiant.statut === 'suspendu' ? { background: '#2EA043', color: '#fff' } : { background: '#F01F38', color: '#fff' }}>
               {blocking ? <Loader2 size={12} className="animate-spin" /> : etudiant.statut === 'suspendu' ? <><Unlock size={12} /> Débloquer</> : <><Lock size={12} /> Suspendre</>}
             </button>
           )}
@@ -84,10 +84,10 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
 
       {/* Warning */}
       {etudiant.statut === 'suspendu' && (
-        <div className="rounded-xl border border-[#F85149]/30 p-4 flex items-start gap-3" style={{ background: 'rgba(248,81,73,0.06)' }}>
-          <AlertCircle size={16} className="text-[#F85149] shrink-0 mt-0.5" />
+        <div className="rounded-xl border border-[#F01F38]/30 p-4 flex items-start gap-3" style={{ background: 'rgba(248,81,73,0.06)' }}>
+          <AlertCircle size={16} className="text-[#F01F38] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-[#F85149]">Accès suspendu</p>
+            <p className="text-sm font-bold text-[#F01F38]">Accès suspendu</p>
             <p className="text-xs text-[#8B949E] mt-0.5">Un solde impayé a été détecté. Régularisez votre situation auprès de l&apos;administration.</p>
           </div>
         </div>
@@ -97,7 +97,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       <div className="grid grid-cols-4 gap-3">
         <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#2EA043" />
         <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
-        <KpiCard label="Absences"         value={totalAbs}                               color="#F85149" sub={`${justifiedAbs} justifiées`} />
+        <KpiCard label="Absences"         value={totalAbs}                               color="#F01F38" sub={`${justifiedAbs} justifiées`} />
         <KpiCard label="Alertes"          value={nbAlerts}                               color="#F0A30A" sub="non lues" />
       </div>
 
@@ -212,7 +212,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
                     <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
                     <td className="px-4 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                     <td className="px-4 py-2.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04318' } : { color: '#F85149', background: '#F8514918' }}>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04318' } : { color: '#F01F38', background: '#F01F3818' }}>
                         {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                       </span>
                     </td>
@@ -439,7 +439,7 @@ export default function EspaceEtudiantPage() {
             </button>
           </div>
           {idError && (
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-xs text-[#F85149] flex items-center gap-1.5">
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-xs text-[#F01F38] flex items-center gap-1.5">
               <AlertCircle size={12} /> {idError}
             </motion.p>
           )}

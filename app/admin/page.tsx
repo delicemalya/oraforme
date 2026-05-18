@@ -97,8 +97,8 @@ export default async function AdminPage() {
 
       {/* Page header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F85149]/10 border border-[#F85149]/20 flex items-center justify-center">
-          <ShieldAlert size={18} className="text-[#F85149]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F01F38]/10 border border-[#F01F38]/20 flex items-center justify-center">
+          <ShieldAlert size={18} className="text-[#F01F38]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#E6EDF3]">Vue globale</h1>
@@ -109,7 +109,7 @@ export default async function AdminPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          icon={Building2} label="Clients actifs" color="#F85149"
+          icon={Building2} label="Clients actifs" color="#F01F38"
           value={nbClients.toString()}
           sub={newClientsThisMonth > 0 ? `+${newClientsThisMonth} ce mois` : 'Aucun nouveau ce mois'}
         />
@@ -119,7 +119,7 @@ export default async function AdminPage() {
           sub={`CA total généré: ${fmtFCFA(totalCA)}`}
         />
         <KpiCard
-          icon={Package} label="Modules vendus" color="#388BFD"
+          icon={Package} label="Modules vendus" color="#F07900"
           value={totalModulesSold.toString()}
           sub={`Top: ${moduleRevData[0]?.module ?? '—'}`}
         />
@@ -160,7 +160,7 @@ export default async function AdminPage() {
             <div key={m.module} className="bg-[#0D1117] border border-[#21262D] rounded-lg p-3">
               <p className="text-xs text-[#8B949E] truncate mb-1">{m.module}</p>
               <p className="text-sm font-bold text-[#E6EDF3]">{m.clients} client{m.clients > 1 ? 's' : ''}</p>
-              <p className="text-xs text-[#F85149] font-medium mt-0.5">{fmtFCFA(m.mrr)}/mois</p>
+              <p className="text-xs text-[#F01F38] font-medium mt-0.5">{fmtFCFA(m.mrr)}/mois</p>
             </div>
           ))}
         </div>

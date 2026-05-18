@@ -62,10 +62,10 @@ export default async function AdminRevenusPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'MRR', value: fmtFCFA(totalMRR), sub: 'Revenus récurrents mensuels', color: '#F85149' },
+          { label: 'MRR', value: fmtFCFA(totalMRR), sub: 'Revenus récurrents mensuels', color: '#F01F38' },
           { label: 'ARR', value: fmtFCFA(totalARR), sub: 'Revenus annuels récurrents', color: '#F0A30A' },
           { label: 'CA Clients', value: fmtFCFA(caClients), sub: 'Facturé par les clients', color: '#2EA043' },
-          { label: 'ARPU', value: fmtFCFA(tenants.length > 0 ? totalMRR / tenants.length : 0), sub: 'Revenu moyen/client/mois', color: '#388BFD' },
+          { label: 'ARPU', value: fmtFCFA(tenants.length > 0 ? totalMRR / tenants.length : 0), sub: 'Revenu moyen/client/mois', color: '#F07900' },
         ].map(k => (
           <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
             <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-2">{k.label}</p>
@@ -93,7 +93,7 @@ export default async function AdminRevenusPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { plan: 'starter', color: '#8B949E', label: 'Starter' },
-            { plan: 'business', color: '#388BFD', label: 'Business' },
+            { plan: 'business', color: '#F07900', label: 'Business' },
             { plan: 'premium', color: '#F0A30A', label: 'Premium' },
           ].map(p => {
             const nb = tenants.filter(t => t.plan === p.plan).length
@@ -132,7 +132,7 @@ export default async function AdminRevenusPage() {
               <p className="text-sm text-[#8B949E] w-28 shrink-0">{m.module}</p>
               <div className="flex-1 h-2 bg-[#21262D] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#F85149] rounded-full"
+                  className="h-full bg-[#F01F38] rounded-full"
                   style={{ width: `${totalMRR > 0 ? (m.mrr / totalMRR) * 100 : 0}%` }}
                 />
               </div>

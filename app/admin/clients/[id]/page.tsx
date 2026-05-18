@@ -29,9 +29,9 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
   const STATUT_COLORS: Record<string, string> = {
     payee: 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30',
-    envoyee: 'text-[#388BFD] bg-[#388BFD]/10 border-[#388BFD]/30',
+    envoyee: 'text-[#F07900] bg-[#F07900]/10 border-[#F07900]/30',
     brouillon: 'text-[#8B949E] bg-[#21262D] border-[#30363D]',
-    annulee: 'text-[#F85149] bg-[#F85149]/10 border-[#F85149]/30',
+    annulee: 'text-[#F01F38] bg-[#F01F38]/10 border-[#F01F38]/30',
   }
 
   return (
@@ -59,9 +59,9 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: Building2, label: 'Plan', value: tenant.plan ?? '—', color: '#F0A30A' },
-          { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#388BFD' },
+          { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#F07900' },
           { icon: FileText, label: 'CA généré', value: fmtFCFA(caGenere), color: '#2EA043' },
-          { icon: Users, label: 'MRR estimé', value: fmtFCFA(mrr), color: '#F85149' },
+          { icon: Users, label: 'MRR estimé', value: fmtFCFA(mrr), color: '#F01F38' },
         ].map(c => (
           <div key={c.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
             <p className="text-xs text-[#484F58] uppercase tracking-wider mb-2">{c.label}</p>
@@ -78,7 +78,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         {/* Modules actifs */}
         <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4 flex items-center gap-2">
-            <Package size={14} className="text-[#F85149]" />
+            <Package size={14} className="text-[#F01F38]" />
             Modules actifs
           </h2>
           <div className="space-y-2">
@@ -97,7 +97,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         {/* Utilisateurs */}
         <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4 flex items-center gap-2">
-            <Users size={14} className="text-[#F85149]" />
+            <Users size={14} className="text-[#F01F38]" />
             Utilisateurs ({profiles.length})
           </h2>
           <div className="space-y-2">
@@ -122,7 +122,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       {/* Factures récentes */}
       <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
         <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4 flex items-center gap-2">
-          <FileText size={14} className="text-[#F85149]" />
+          <FileText size={14} className="text-[#F01F38]" />
           Factures récentes ({factures.length})
         </h2>
         <div className="overflow-x-auto">

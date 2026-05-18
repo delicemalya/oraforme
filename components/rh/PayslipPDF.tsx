@@ -41,7 +41,7 @@ const GRAY  = '#6B7280'
 const LGRAY = '#F9FAFB'
 const WHITE = '#FFFFFF'
 const MGRAY = '#374151'
-const BLUE  = '#388BFD'
+const BLUE  = '#F07900'
 
 const s = StyleSheet.create({
   page: { padding: 40, backgroundColor: WHITE, fontFamily: 'Helvetica', fontSize: 9, color: BLACK },
@@ -69,7 +69,7 @@ const s = StyleSheet.create({
   tdLabel: { flex: 1, fontSize: 9, color: BLACK },
   tdBase: { width: 90, fontSize: 8, color: GRAY, textAlign: 'right' },
   tdMontant: { width: 90, fontSize: 9, fontFamily: 'Helvetica-Bold', color: BLACK, textAlign: 'right' },
-  tdMontantNeg: { width: 90, fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#F85149', textAlign: 'right' },
+  tdMontantNeg: { width: 90, fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#F01F38', textAlign: 'right' },
   // Totals
   totalSection: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 },
   totalsBox: { width: 250, backgroundColor: LGRAY, borderRadius: 6, padding: 12 },
@@ -231,7 +231,7 @@ export function PayslipPDF({ data }: { data: PayslipData }) {
             </View>
             <View style={s.totalRow}>
               <Text style={s.totalLabel}>Total cotisations</Text>
-              <Text style={[s.totalValue, { color: '#F85149' }]}>- {fmt(totalDed)}</Text>
+              <Text style={[s.totalValue, { color: '#F01F38' }]}>- {fmt(totalDed)}</Text>
             </View>
             <View style={s.netRow}>
               <Text style={s.netLabel}>NET À PAYER</Text>

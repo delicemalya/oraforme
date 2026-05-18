@@ -37,9 +37,9 @@ type ModuleDef = { key: string; label: string; sublabel: string; icon: LucideIco
 
 const ECOLE_MODULES: ModuleDef[] = [
   { key: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,    color: '#F0A30A' },
-  { key: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,     color: '#388BFD' },
+  { key: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,     color: '#F07900' },
   { key: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,         color: '#2EA043' },
-  { key: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA & Trésorerie',   icon: Calculator,    color: '#8B5CF6' },
+  { key: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA & Trésorerie',   icon: Calculator,    color: '#8B0073' },
   { key: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap, color: '#06B6D4' },
   { key: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake,color: '#EC4899' },
   { key: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,           color: '#F97316' },
@@ -48,9 +48,9 @@ const ECOLE_MODULES: ModuleDef[] = [
 const GENERIC_MODULES: ModuleDef[] = [
   { key: 'facturation',  label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  color: '#F0A30A' },
   { key: 'stock',        label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   color: '#2EA043' },
-  { key: 'rh',           label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     color: '#388BFD' },
-  { key: 'tresorerie',   label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    color: '#8B5CF6' },
-  { key: 'comptabilite', label: 'Comptabilité', sublabel: 'OHADA',             icon: BookOpen,  color: '#8B5CF6' },
+  { key: 'rh',           label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     color: '#F07900' },
+  { key: 'tresorerie',   label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    color: '#8B0073' },
+  { key: 'comptabilite', label: 'Comptabilité', sublabel: 'OHADA',             icon: BookOpen,  color: '#8B0073' },
   { key: 'restaurant',   label: 'Caisse POS',   sublabel: 'Ventes',            icon: ChefHat,   color: '#F0A30A' },
   { key: 'transport',    label: 'Transport',    sublabel: 'Flotte',            icon: Truck,     color: '#F97316' },
   { key: 'hotel',        label: 'Hôtel',        sublabel: 'Hébergement',       icon: Hotel,     color: '#06B6D4' },
@@ -59,8 +59,8 @@ const GENERIC_MODULES: ModuleDef[] = [
 
 // Couleurs proposées pour les rôles
 const ROLE_COLORS = [
-  '#388BFD', '#2EA043', '#8B5CF6', '#F0A30A',
-  '#EC4899', '#06B6D4', '#F97316', '#F85149', '#84CC16',
+  '#F07900', '#2EA043', '#8B0073', '#F0A30A',
+  '#EC4899', '#06B6D4', '#F97316', '#F01F38', '#84CC16',
 ]
 
 // ── Toggle ────────────────────────────────────────────────────────────────────

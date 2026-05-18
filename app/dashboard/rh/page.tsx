@@ -56,16 +56,16 @@ interface Conge {
 
 const CONTRAT_STYLES: Record<Contrat, { label: string; color: string; bg: string }> = {
   cdi:       { label: 'CDI',       color: '#2EA043', bg: '#2EA04318' },
-  cdd:       { label: 'CDD',       color: '#388BFD', bg: '#388BFD18' },
+  cdd:       { label: 'CDD',       color: '#F07900', bg: '#F0790018' },
   stage:     { label: 'Stage',     color: '#F0A30A', bg: '#F0A30A18' },
-  freelance: { label: 'Freelance', color: '#8B5CF6', bg: '#8B5CF618' },
+  freelance: { label: 'Freelance', color: '#8B0073', bg: '#8B007318' },
 }
 
 const STATUT_STYLES: Record<Statut, { label: string; color: string; bg: string }> = {
   actif:    { label: 'Actif',     color: '#2EA043', bg: '#2EA04318' },
-  conge:    { label: 'En congé',  color: '#388BFD', bg: '#388BFD18' },
+  conge:    { label: 'En congé',  color: '#F07900', bg: '#F0790018' },
   malade:   { label: 'Malade',    color: '#F0A30A', bg: '#F0A30A18' },
-  licencie: { label: 'Licencié', color: '#F85149', bg: '#F8514918' },
+  licencie: { label: 'Licencié', color: '#F01F38', bg: '#F01F3818' },
   retraite: { label: 'Retraité', color: '#8B949E', bg: '#8B949E18' },
 }
 
@@ -267,7 +267,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-[#8B5CF6]/15 flex items-center justify-center text-[10px] font-bold text-[#8B5CF6] shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-[#8B0073]/15 flex items-center justify-center text-[10px] font-bold text-[#8B0073] shrink-0">
                             {e.nom.charAt(0).toUpperCase()}
                           </div>
                           <span className="text-sm font-semibold text-[#E6EDF3]">{e.nom}</span>
@@ -319,7 +319,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 {/* Header */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#8B5CF6]/15 flex items-center justify-center text-lg font-bold text-[#8B5CF6]">
+                    <div className="w-12 h-12 rounded-xl bg-[#8B0073]/15 flex items-center justify-center text-lg font-bold text-[#8B0073]">
                       {selected.nom.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -623,7 +623,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
   const STATUT_CONGE: Record<string, { label: string; color: string }> = {
     en_attente: { label: 'En attente', color: '#F0A30A' },
     approuve:   { label: 'Approuvé',  color: '#2EA043' },
-    refuse:     { label: 'Refusé',   color: '#F85149' },
+    refuse:     { label: 'Refusé',   color: '#F01F38' },
   }
 
   const TYPE_LABELS: Record<string, string> = {
@@ -712,7 +712,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
             return (
               <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                 className="bg-[#161B22] border border-[#30363D] rounded-xl p-4 flex items-center gap-4">
-                <div className="w-9 h-9 rounded-full bg-[#8B5CF6]/15 flex items-center justify-center text-xs font-bold text-[#8B5CF6] shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#8B0073]/15 flex items-center justify-center text-xs font-bold text-[#8B0073] shrink-0">
                   {emp?.nom?.charAt(0) ?? 'E'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -772,9 +772,9 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
   })
 
   const COLORS = {
-    danger:  { text: '#F85149', bg: '#F8514910', border: '#F8514925' },
+    danger:  { text: '#F01F38', bg: '#F01F3810', border: '#F01F3825' },
     warning: { text: '#F0A30A', bg: '#F0A30A10', border: '#F0A30A25' },
-    info:    { text: '#388BFD', bg: '#388BFD10', border: '#388BFD25' },
+    info:    { text: '#F07900', bg: '#F0790010', border: '#F0790025' },
   }
 
   return (
@@ -833,9 +833,9 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
         {[
           { label: 'Masse salariale brute',    val: `${fmt(masseBrute)} FCFA`,  color: '#F0A30A', sub: 'employés actifs' },
           { label: 'Masse salariale nette',     val: `${fmt(masseNette)} FCFA`,  color: '#2EA043', sub: 'après CNSS + IRPP' },
-          { label: 'Charges patronales CNSS',   val: `${fmt(massePatro)} FCFA`,  color: '#F85149', sub: '14,16% plafonné' },
-          { label: 'Coût total employeur',      val: `${fmt(masseBrute + massePatro)} FCFA`, color: '#8B5CF6', sub: 'brut + charges' },
-          { label: 'Congés pris (période)',     val: `${totalJoursConges} jours`,color: '#388BFD', sub: `${congesApprouves.length} demande(s)` },
+          { label: 'Charges patronales CNSS',   val: `${fmt(massePatro)} FCFA`,  color: '#F01F38', sub: '14,16% plafonné' },
+          { label: 'Coût total employeur',      val: `${fmt(masseBrute + massePatro)} FCFA`, color: '#8B0073', sub: 'brut + charges' },
+          { label: 'Congés pris (période)',     val: `${totalJoursConges} jours`,color: '#F07900', sub: `${congesApprouves.length} demande(s)` },
           { label: 'Effectif total',            val: employes.length,            color: '#E6EDF3', sub: `${actifs.length} actifs` },
         ].map(k => (
           <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
@@ -874,8 +874,8 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
           <div className="w-9 h-9 rounded-lg bg-[#F0A30A]/15 flex items-center justify-center"><FileText size={16} className="text-[#F0A30A]" /></div>
           <div><p className="text-sm font-semibold text-[#E6EDF3]">Traitement de la paie</p><p className="text-xs text-[#484F58]">Générer les bulletins</p></div>
         </Link>
-        <Link href="/dashboard/rh/recrutement" className="flex items-center gap-3 p-4 bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#388BFD]/40 transition-colors">
-          <div className="w-9 h-9 rounded-lg bg-[#388BFD]/15 flex items-center justify-center"><Briefcase size={16} className="text-[#388BFD]" /></div>
+        <Link href="/dashboard/rh/recrutement" className="flex items-center gap-3 p-4 bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#F07900]/40 transition-colors">
+          <div className="w-9 h-9 rounded-lg bg-[#F07900]/15 flex items-center justify-center"><Briefcase size={16} className="text-[#F07900]" /></div>
           <div><p className="text-sm font-semibold text-[#E6EDF3]">Recrutement IA</p><p className="text-xs text-[#484F58]">Analyser les CVs</p></div>
         </Link>
       </div>
@@ -944,7 +944,7 @@ export default function RHPage() {
           <Link href="/dashboard/rh/paie" className="flex items-center gap-1.5 px-3 py-2 border border-[#30363D] text-[#8B949E] rounded-lg text-xs font-semibold hover:border-[#F0A30A]/40 hover:text-[#F0A30A] transition-colors">
             <FileText size={13} /> Paie
           </Link>
-          <Link href="/dashboard/rh/recrutement" className="flex items-center gap-1.5 px-3 py-2 border border-[#30363D] text-[#8B949E] rounded-lg text-xs font-semibold hover:border-[#388BFD]/40 hover:text-[#388BFD] transition-colors">
+          <Link href="/dashboard/rh/recrutement" className="flex items-center gap-1.5 px-3 py-2 border border-[#30363D] text-[#8B949E] rounded-lg text-xs font-semibold hover:border-[#F07900]/40 hover:text-[#F07900] transition-colors">
             <Briefcase size={13} /> Recrutement
           </Link>
         </div>
@@ -965,7 +965,7 @@ export default function RHPage() {
               <Icon size={13} />
               <span className="hidden sm:inline">{tab.label}</span>
               {tab.id === 'alertes' && nbAlertes > 0 && (
-                <span className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center ${activeTab === 'alertes' ? 'bg-[#0D1117] text-[#F0A30A]' : 'bg-[#F85149] text-white'}`}>
+                <span className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center ${activeTab === 'alertes' ? 'bg-[#0D1117] text-[#F0A30A]' : 'bg-[#F01F38] text-white'}`}>
                   {nbAlertes}
                 </span>
               )}

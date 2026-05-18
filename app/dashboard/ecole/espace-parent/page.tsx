@@ -97,10 +97,10 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
 
       {/* Suspended warning */}
       {etudiant.statut === 'suspendu' && (
-        <div className="rounded-xl border border-[#F85149]/30 p-4" style={{ background: 'rgba(248,81,73,0.06)' }}>
+        <div className="rounded-xl border border-[#F01F38]/30 p-4" style={{ background: 'rgba(248,81,73,0.06)' }}>
           <div className="flex items-center gap-2">
-            <AlertCircle size={16} className="text-[#F85149]" />
-            <p className="text-sm font-bold text-[#F85149]">Accès suspendu — solde impayé détecté</p>
+            <AlertCircle size={16} className="text-[#F01F38]" />
+            <p className="text-sm font-bold text-[#F01F38]">Accès suspendu — solde impayé détecté</p>
           </div>
           <p className="text-xs text-[#8B949E] mt-1 ml-6">Veuillez vous rapprocher de l&apos;administration pour régulariser la situation.</p>
         </div>
@@ -114,7 +114,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
           <div className="grid grid-cols-4 gap-3">
             <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#2EA043" />
             <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
-            <KpiCard label="Absences"         value={totalAbs}                            color="#F85149" sub={`${justifiedAbs} justifiées`} />
+            <KpiCard label="Absences"         value={totalAbs}                            color="#F01F38" sub={`${justifiedAbs} justifiées`} />
             <KpiCard label="Alertes"          value={nbAlerts}                            color="#F0A30A" sub="non lues" />
           </div>
 
@@ -228,7 +228,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
                         <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
                         <td className="px-4 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04318' } : { color: '#F85149', background: '#F8514918' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04318' } : { color: '#F01F38', background: '#F01F3818' }}>
                             {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                           </span>
                         </td>

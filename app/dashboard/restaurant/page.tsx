@@ -410,7 +410,7 @@ export default function RestaurantPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
             {[
               { label: "CA aujourd'hui",   val: fmtFCFA(caDuJour),           color: '#F0A30A', icon: DollarSign },
-              { label: 'Commandes',        val: cmdsDuJour.length,            color: '#388BFD', icon: ShoppingCart },
+              { label: 'Commandes',        val: cmdsDuJour.length,            color: '#F07900', icon: ShoppingCart },
               { label: 'En attente/prép',  val: enPrepa,                      color: enPrepa > 0 ? '#F0A30A' : '#2EA043', icon: Clock },
               { label: 'Plats au menu',    val: menu.filter(m=>m.disponible).length, color: '#2EA043', icon: ChefHat },
             ].map(k => {
@@ -464,7 +464,7 @@ export default function RestaurantPage() {
                       <p className="text-sm font-medium text-[#E6EDF3] leading-tight">{item.nom}</p>
                       <p className="text-xs font-bold text-[#F0A30A] mt-1">{fmtFCFA(item.prix)}</p>
                       {!item.disponible && (
-                        <span className="absolute top-2 right-2 text-[9px] bg-[#F85149]/15 text-[#F85149] px-1 py-0.5 rounded font-bold">INDISPO</span>
+                        <span className="absolute top-2 right-2 text-[9px] bg-[#F01F38]/15 text-[#F01F38] px-1 py-0.5 rounded font-bold">INDISPO</span>
                       )}
                     </button>
                   ))}
@@ -478,7 +478,7 @@ export default function RestaurantPage() {
                 <ShoppingCart size={16} className="text-[#F0A30A]" />
                 <h3 className="font-semibold text-[#E6EDF3] text-sm">Commande en cours</h3>
                 {panier.length > 0 && (
-                  <button onClick={() => setPanier([])} className="ml-auto text-[#484F58] hover:text-[#F85149] transition-colors">
+                  <button onClick={() => setPanier([])} className="ml-auto text-[#484F58] hover:text-[#F01F38] transition-colors">
                     <Trash2 size={13} />
                   </button>
                 )}
@@ -583,7 +583,7 @@ export default function RestaurantPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { key: ['en_attente', 'en_preparation'] as StatutCmd[], label: 'En préparation', color: '#388BFD', nextStatut: 'pret' as StatutCmd, btnLabel: 'Marquer prêt' },
+              { key: ['en_attente', 'en_preparation'] as StatutCmd[], label: 'En préparation', color: '#F07900', nextStatut: 'pret' as StatutCmd, btnLabel: 'Marquer prêt' },
               { key: ['pret'] as StatutCmd[], label: 'Prêt à servir', color: '#F0A30A', nextStatut: 'livre' as StatutCmd, btnLabel: 'Marquer livré' },
               { key: ['livre'] as StatutCmd[], label: 'Livré', color: '#2EA043', nextStatut: null, btnLabel: '' },
             ].map(col => {
@@ -796,7 +796,7 @@ export default function RestaurantPage() {
                         {copied ? <><Check size={12} className="text-[#2EA043]" /> Copié !</> : <><Copy size={12} /> Copier lien</>}
                       </button>
                       <a href={tableUrl} target="_blank" rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[#388BFD]/30 text-[#388BFD] hover:bg-[#388BFD]/10 text-xs transition-colors">
+                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[#F07900]/30 text-[#F07900] hover:bg-[#F07900]/10 text-xs transition-colors">
                         <ExternalLink size={12} /> Page client
                       </a>
                       <button onClick={() => deleteTable(t.id)}
@@ -1095,8 +1095,8 @@ export default function RestaurantPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: 'CA TTC', val: fmtFCFA(caDuJour), color: '#F0A30A' },
-              { label: 'CA HT', val: fmtFCFA(calculerTVACongo(caDuJour).ht), color: '#388BFD' },
-              { label: 'TVA collectée', val: fmtFCFA(calculerTVACongo(caDuJour).tva), color: '#8B5CF6' },
+              { label: 'CA HT', val: fmtFCFA(calculerTVACongo(caDuJour).ht), color: '#F07900' },
+              { label: 'TVA collectée', val: fmtFCFA(calculerTVACongo(caDuJour).tva), color: '#8B0073' },
               { label: 'Nb commandes', val: cmdsDuJour.length, color: '#2EA043' },
             ].map(k => (
               <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
@@ -1167,8 +1167,8 @@ export default function RestaurantPage() {
 
           {/* Alertes stock */}
           {stockArticles.some(a => a.quantite <= 0 || (a.seuil_alerte !== null && a.quantite <= a.seuil_alerte)) && (
-            <div className="bg-[#161B22] border border-[#F85149]/40 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-[#F85149] mb-3 flex items-center gap-2">
+            <div className="bg-[#161B22] border border-[#F01F38]/40 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-[#F01F38] mb-3 flex items-center gap-2">
                 <AlertTriangle size={15} /> Alertes stock
               </h3>
               <div className="space-y-2">
@@ -1178,7 +1178,7 @@ export default function RestaurantPage() {
                   .map(a => (
                     <div key={a.id} className="flex items-center justify-between text-xs">
                       <span className="text-[#E6EDF3] font-medium">{a.nom}</span>
-                      <span className={`font-bold ${a.quantite <= 0 ? 'text-[#F85149]' : 'text-[#F0A30A]'}`}>
+                      <span className={`font-bold ${a.quantite <= 0 ? 'text-[#F01F38]' : 'text-[#F0A30A]'}`}>
                         {a.quantite <= 0 ? 'RUPTURE' : `${a.quantite} ${a.unite} (seuil : ${a.seuil_alerte})`}
                       </span>
                     </div>

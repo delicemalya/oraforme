@@ -103,10 +103,10 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
   }
 
   const kpis = [
-    { label: 'Total',     value: etudiants.length,                                    color: '#388BFD' },
+    { label: 'Total',     value: etudiants.length,                                    color: '#F07900' },
     { label: 'Actifs',    value: etudiants.filter(e => e.statut === 'actif').length,   color: '#2EA043' },
     { label: 'Suspendus', value: etudiants.filter(e => e.statut === 'suspendu').length,color: '#F0A30A' },
-    { label: 'Diplômés',  value: etudiants.filter(e => e.statut === 'diplome').length, color: '#8B5CF6' },
+    { label: 'Diplômés',  value: etudiants.filter(e => e.statut === 'diplome').length, color: '#8B0073' },
   ]
 
   return (
@@ -160,7 +160,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                     <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={64} />
                   </div>
                   <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.nom}</p>
-                  <p className="text-[10px] font-mono text-[#8B5CF6] mt-0.5 bg-[#8B5CF6]/10 px-2 py-0.5 rounded-full">{e.numero_id}</p>
+                  <p className="text-[10px] font-mono text-[#8B0073] mt-0.5 bg-[#8B0073]/10 px-2 py-0.5 rounded-full">{e.numero_id}</p>
                 </div>
 
                 {/* Niveau + Classe */}
@@ -203,7 +203,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   </button>
                   <button onClick={() => setSelected(selected?.id === e.id ? null : e)}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
-                    style={{ background: selected?.id === e.id ? '#F0A30A' : 'linear-gradient(135deg,#388BFD,#1a6fd4)' }}>
+                    style={{ background: selected?.id === e.id ? '#F0A30A' : 'linear-gradient(135deg,#F07900,#1a6fd4)' }}>
                     {selected?.id === e.id ? 'Fermer' : 'Gérer'}
                   </button>
                 </div>
@@ -225,7 +225,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   <Avatar nom={selected.nom} prenom={selected.prenom} photoUrl={selected.photo_url} size={40} />
                   <div>
                     <p className="text-sm font-bold text-white">{selected.prenom} {selected.nom}</p>
-                    <p className="text-[10px] font-mono text-[#8B5CF6]">{selected.numero_id} · {selected.classe ?? selected.niveau}</p>
+                    <p className="text-[10px] font-mono text-[#8B0073]">{selected.numero_id} · {selected.classe ?? selected.niveau}</p>
                   </div>
                 </div>
                 <button onClick={() => setSelected(null)} className="text-[#8B949E] hover:text-white"><X size={15} /></button>
@@ -466,14 +466,14 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
               <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Frais configurés</p>
               <div className="flex gap-2">
                 {frais.length === 0 && <button onClick={initFrais} className="text-[10px] text-[#F0A30A] hover:underline">Initialiser frais par défaut</button>}
-                <button onClick={() => setShowNewFrais(p => !p)} className="text-[10px] text-[#388BFD] hover:underline flex items-center gap-1"><Plus size={10} /> Ajouter</button>
+                <button onClick={() => setShowNewFrais(p => !p)} className="text-[10px] text-[#F07900] hover:underline flex items-center gap-1"><Plus size={10} /> Ajouter</button>
               </div>
             </div>
             {showNewFrais && (
               <div className="flex gap-2 mb-3">
                 <input className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-1.5 text-xs text-white" placeholder="Libellé" value={fraisForm.libelle} onChange={e => setFraisForm(p => ({ ...p, libelle: e.target.value }))} />
                 <input type="number" className="w-24 bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-1.5 text-xs text-white text-right" placeholder="Montant" value={fraisForm.montant} onChange={e => setFraisForm(p => ({ ...p, montant: e.target.value }))} />
-                <button onClick={addFrais} disabled={saving} className="px-3 py-1.5 rounded-md bg-[#388BFD]/15 text-[#388BFD] text-xs font-semibold"><Check size={12} /></button>
+                <button onClick={addFrais} disabled={saving} className="px-3 py-1.5 rounded-md bg-[#F07900]/15 text-[#F07900] text-xs font-semibold"><Check size={12} /></button>
               </div>
             )}
             <div className="flex flex-wrap gap-2">
@@ -529,7 +529,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
                       <td className="px-3 py-2 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
                       <td className="px-3 py-2 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
                       <td className="px-3 py-2 flex items-center gap-1.5">
-                        <button onClick={() => selectedEtu && printReceipt(selectedEtu, p, nomEcole)} className="text-[#484F58] hover:text-[#388BFD]"><Printer size={11} /></button>
+                        <button onClick={() => selectedEtu && printReceipt(selectedEtu, p, nomEcole)} className="text-[#484F58] hover:text-[#F07900]"><Printer size={11} /></button>
                         <button onClick={() => delPaiement(p.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={11} /></button>
                       </td>
                     </tr>
@@ -611,7 +611,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-white">{moyenne.toFixed(2)} / 20</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ color: mention.color, background: mention.color + '20' }}>{mention.label}</span>
-                <button onClick={() => printBulletin(selectedEtu, notes, periode, nomEcole)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#388BFD]/15 border border-[#388BFD]/30 text-[#388BFD] text-xs font-semibold">
+                <button onClick={() => printBulletin(selectedEtu, notes, periode, nomEcole)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F07900]/15 border border-[#F07900]/30 text-[#F07900] text-xs font-semibold">
                   <Printer size={12} /> Bulletin PDF
                 </button>
               </div>
@@ -751,7 +751,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
                   <button onClick={() => del(c.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={12} /></button>
                 </div>
                 <div className="mt-3 text-right">
-                  <span className="text-[10px] font-semibold text-[#388BFD]">{c.nb_places} places</span>
+                  <span className="text-[10px] font-semibold text-[#F07900]">{c.nb_places} places</span>
                 </div>
               </div>
             )
@@ -792,9 +792,9 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total événements" value={planning.length} color="#388BFD" />
+        <KpiCard label="Total événements" value={planning.length} color="#F07900" />
         <KpiCard label="À venir" value={planning.filter(p => p.date_debut >= today).length} color="#2EA043" />
-        <KpiCard label="Examens" value={planning.filter(p => p.type === 'examen').length} color="#F85149" />
+        <KpiCard label="Examens" value={planning.filter(p => p.type === 'examen').length} color="#F01F38" />
       </div>
 
       <div className="flex items-center gap-2 justify-between flex-wrap">
@@ -964,9 +964,9 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
       ) : (
         <div className="flex-1 min-w-0 space-y-4">
           <div className="grid grid-cols-3 gap-3">
-            <KpiCard label="Total absences"  value={totalAbs}            color="#388BFD" />
+            <KpiCard label="Total absences"  value={totalAbs}            color="#F07900" />
             <KpiCard label="Justifiées"      value={justified}           color="#2EA043" />
-            <KpiCard label="Non justifiées"  value={totalAbs - justified} color="#F85149" />
+            <KpiCard label="Non justifiées"  value={totalAbs - justified} color="#F01F38" />
           </div>
 
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
@@ -1009,7 +1009,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
                       <td className="px-3 py-2.5 text-white">{a.matiere ?? '—'}</td>
                       <td className="px-3 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                       <td className="px-3 py-2.5">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04320' } : { color: '#F85149', background: '#F8514920' }}>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04320' } : { color: '#F01F38', background: '#F01F3820' }}>
                           {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                         </span>
                       </td>

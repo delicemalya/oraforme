@@ -43,7 +43,7 @@ export default function AdminSidebar() {
           <span className="text-base font-bold text-[#E6EDF3]">oraforme</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] bg-[#F85149]/20 text-[#F85149] border border-[#F85149]/30 rounded px-1.5 py-0.5 font-bold tracking-wider">
+          <span className="text-[10px] bg-[#F01F38]/20 text-[#F01F38] border border-[#F01F38]/30 rounded px-1.5 py-0.5 font-bold tracking-wider">
             SUPER ADMIN
           </span>
         </div>
@@ -62,13 +62,13 @@ export default function AdminSidebar() {
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 active
-                  ? 'bg-[#F85149]/10 text-[#F85149] font-medium'
+                  ? 'bg-[#F01F38]/10 text-[#F01F38] font-medium'
                   : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
               }`}
             >
               <Icon size={15} className="shrink-0" />
               <span className="truncate">{item.label}</span>
-              {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F85149]" />}
+              {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
             </Link>
           )
         })}

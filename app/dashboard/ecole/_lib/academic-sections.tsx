@@ -197,7 +197,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
           <KpiCard label="Sessions actives" value={sessions.filter(s => s.statut === 'en_cours').length} color="#2EA043" />
-          <KpiCard label="Total sessions" value={sessions.length} color="#388BFD" />
+          <KpiCard label="Total sessions" value={sessions.length} color="#F07900" />
         </div>
         <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#F0A30A] text-[#0D1117]">
           <Plus size={13} /> Nouvelle session
@@ -361,8 +361,8 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <KpiCard label="Épreuves créées" value={exams.length} color="#8B5CF6" />
-        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#8B5CF6] text-white">
+        <KpiCard label="Épreuves créées" value={exams.length} color="#8B0073" />
+        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#8B0073] text-white">
           <Plus size={13} /> Nouvelle épreuve
         </button>
       </div>
@@ -370,8 +370,8 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="rounded-xl border border-[#8B5CF6]/20 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
-            <p className="text-xs font-bold text-[#8B5CF6]">Nouvelle épreuve</p>
+            className="rounded-xl border border-[#8B0073]/20 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
+            <p className="text-xs font-bold text-[#8B0073]">Nouvelle épreuve</p>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Intitulé *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} placeholder="Composition de Mathématiques – T1" />
               <div>
@@ -406,7 +406,7 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
               <FI label="Coefficient" value={form.coefficient} onChange={v => setForm(p => ({ ...p, coefficient: v }))} type="number" />
             </div>
             <div className="flex gap-2">
-              <button onClick={saveExam} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#8B5CF6] text-white disabled:opacity-40">
+              <button onClick={saveExam} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#8B0073] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Créer
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -431,9 +431,9 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
               const isActive = activeExam?.id === ex.id
               return (
                 <button key={ex.id} onClick={() => openExam(ex)}
-                  className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${isActive ? 'border-[#8B5CF6]/40 bg-[#8B5CF6]/08' : 'border-white/[0.06] hover:border-white/[0.10]'}`}
+                  className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${isActive ? 'border-[#8B0073]/40 bg-[#8B0073]/08' : 'border-white/[0.06] hover:border-white/[0.10]'}`}
                   style={{ background: isActive ? 'rgba(139,92,246,0.08)' : 'rgba(255,255,255,0.02)' }}>
-                  <FlaskConical size={16} className="text-[#8B5CF6] shrink-0" />
+                  <FlaskConical size={16} className="text-[#8B0073] shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">{ex.nom}</p>
                     <p className="text-[10px] text-[#8B949E]">
@@ -453,8 +453,8 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
 
         {/* Saisie des notes */}
         {activeExam ? (
-          <div className="rounded-xl border border-[#8B5CF6]/20 overflow-hidden" style={{ background: 'rgba(139,92,246,0.04)' }}>
-            <div className="px-4 py-3 border-b border-[#8B5CF6]/15 flex items-center justify-between">
+          <div className="rounded-xl border border-[#8B0073]/20 overflow-hidden" style={{ background: 'rgba(139,92,246,0.04)' }}>
+            <div className="px-4 py-3 border-b border-[#8B0073]/15 flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-white">{activeExam.nom}</p>
                 <p className="text-[10px] text-[#8B949E]">Saisie des notes · /{activeExam.note_max}</p>
@@ -474,15 +474,15 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
                       value={gradeInputs[e.id] ?? ''}
                       onChange={ev => setGradeInputs(p => ({ ...p, [e.id]: ev.target.value }))}
                       placeholder="—"
-                      className="w-16 bg-white/[0.05] border border-white/[0.08] rounded-lg px-2 py-1.5 text-sm text-white text-center focus:outline-none focus:border-[#8B5CF6]/50"
+                      className="w-16 bg-white/[0.05] border border-white/[0.08] rounded-lg px-2 py-1.5 text-sm text-white text-center focus:outline-none focus:border-[#8B0073]/50"
                     />
                   </div>
                 ))
               )}
             </div>
             {classeEtudiants.length > 0 && (
-              <div className="px-4 py-3 border-t border-[#8B5CF6]/15">
-                <button onClick={saveGrades} disabled={savingGrades} className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold bg-[#8B5CF6] text-white disabled:opacity-40">
+              <div className="px-4 py-3 border-t border-[#8B0073]/15">
+                <button onClick={saveGrades} disabled={savingGrades} className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold bg-[#8B0073] text-white disabled:opacity-40">
                   {savingGrades ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                   Enregistrer les notes
                 </button>
@@ -536,7 +536,7 @@ function MoyennesSynthese({ tenantId, sessions, exams, etudiants }: {
       <button onClick={() => { setOpen(v => !v); if (!open) loadGrades(selSes) }}
         className="w-full flex items-center justify-between px-4 py-3 text-left">
         <span className="text-sm font-semibold text-white flex items-center gap-2">
-          <BarChart2 size={14} className="text-[#388BFD]" /> Synthèse des moyennes par session
+          <BarChart2 size={14} className="text-[#F07900]" /> Synthèse des moyennes par session
         </span>
         <ChevronDown size={14} className={`text-[#8B949E] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
@@ -755,10 +755,10 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
-          <KpiCard label="Diplômes émis" value={diplomas.filter(d => d.statut === 'delivre').length} color="#8B5CF6" />
+          <KpiCard label="Diplômes émis" value={diplomas.filter(d => d.statut === 'delivre').length} color="#8B0073" />
           <KpiCard label="En attente" value={diplomas.filter(d => d.statut === 'en_attente').length} color="#F0A30A" />
         </div>
-        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#8B5CF6] text-white">
+        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#8B0073] text-white">
           <Plus size={13} /> Créer un diplôme
         </button>
       </div>
@@ -766,8 +766,8 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="rounded-xl border border-[#8B5CF6]/20 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
-            <p className="text-xs font-bold text-[#8B5CF6]">Nouveau diplôme</p>
+            className="rounded-xl border border-[#8B0073]/20 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
+            <p className="text-xs font-bold text-[#8B0073]">Nouveau diplôme</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-[#8B949E] mb-1">Étudiant *</label>
@@ -790,7 +790,7 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving || !form.etudiant_id || !form.type_diplome} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#8B5CF6] text-white disabled:opacity-40">
+              <button onClick={save} disabled={saving || !form.etudiant_id || !form.type_diplome} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#8B0073] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <GraduationCap size={12} />} Créer
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -822,12 +822,12 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
                     <Td>
                       <div className="flex items-center gap-2">
                         {d.statut === 'en_attente' && (
-                          <button onClick={() => updateStatut(d.id, 'valide')} className="text-[10px] px-2 py-0.5 rounded border border-[#388BFD]/30 text-[#388BFD] hover:bg-[#388BFD]/10 transition-colors">Valider</button>
+                          <button onClick={() => updateStatut(d.id, 'valide')} className="text-[10px] px-2 py-0.5 rounded border border-[#F07900]/30 text-[#F07900] hover:bg-[#F07900]/10 transition-colors">Valider</button>
                         )}
                         {d.statut === 'valide' && (
                           <button onClick={() => updateStatut(d.id, 'delivre')} className="text-[10px] px-2 py-0.5 rounded border border-[#2EA043]/30 text-[#2EA043] hover:bg-[#2EA043]/10 transition-colors">Délivrer</button>
                         )}
-                        {e && <button onClick={() => printDiploma(e, d, nomEcole)} className="text-[#484F58] hover:text-[#8B5CF6] transition-colors" title="Imprimer"><Printer size={12} /></button>}
+                        {e && <button onClick={() => printDiploma(e, d, nomEcole)} className="text-[#484F58] hover:text-[#8B0073] transition-colors" title="Imprimer"><Printer size={12} /></button>}
                       </div>
                     </Td>
                   </tr>
@@ -900,10 +900,10 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
-          <KpiCard label="Soutenances à venir" value={upcoming.length} color="#388BFD" />
+          <KpiCard label="Soutenances à venir" value={upcoming.length} color="#F07900" />
           <KpiCard label="Passées" value={past.filter(d => d.statut === 'passe').length} color="#2EA043" />
         </div>
-        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#388BFD] text-white">
+        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#F07900] text-white">
           <Plus size={13} /> Planifier une soutenance
         </button>
       </div>
@@ -911,8 +911,8 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="rounded-xl border border-[#388BFD]/20 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
-            <p className="text-xs font-bold text-[#388BFD]">Planifier une soutenance</p>
+            className="rounded-xl border border-[#F07900]/20 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
+            <p className="text-xs font-bold text-[#F07900]">Planifier une soutenance</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-[#8B949E] mb-1">Étudiant *</label>
@@ -932,7 +932,7 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving || !form.etudiant_id || !form.titre_memoire || !form.date_soutenance} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#388BFD] text-white disabled:opacity-40">
+              <button onClick={save} disabled={saving || !form.etudiant_id || !form.titre_memoire || !form.date_soutenance} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#F07900] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Swords size={12} />} Planifier
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -958,7 +958,7 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
                 </select>
               </div>
               <div className="flex gap-2">
-                <button onClick={saveNote} className="flex-1 py-2 rounded-lg bg-[#388BFD] text-white text-xs font-semibold flex items-center justify-center gap-1"><Check size={12} /> Valider</button>
+                <button onClick={saveNote} className="flex-1 py-2 rounded-lg bg-[#F07900] text-white text-xs font-semibold flex items-center justify-center gap-1"><Check size={12} /> Valider</button>
                 <button onClick={() => setEditNote(null)} className="flex-1 py-2 rounded-lg border border-white/[0.08] text-[#8B949E] text-xs">Annuler</button>
               </div>
             </motion.div>

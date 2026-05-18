@@ -22,13 +22,13 @@ type CostCenter = { id: string; code: string; nom: string }
 
 const CATEGORIES = [
   { id: 'carburant',    label: '🚗 Carburant & Transport',       color: '#F97316' },
-  { id: 'loyer',        label: '🏠 Loyer & Charges locatives',    color: '#8B5CF6' },
+  { id: 'loyer',        label: '🏠 Loyer & Charges locatives',    color: '#8B0073' },
   { id: 'electricite',  label: '💡 Électricité & Eau',           color: '#F0A30A' },
-  { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#388BFD' },
+  { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#F07900' },
   { id: 'salaires',     label: '👥 Salaires & RH',               color: '#EC4899' },
   { id: 'fournitures',  label: '🛒 Achats & Fournitures',        color: '#2EA043' },
   { id: 'sante',        label: '🏥 Santé & Assurances',          color: '#06B6D4' },
-  { id: 'taxes',        label: '📊 Taxes & Impôts',              color: '#F85149' },
+  { id: 'taxes',        label: '📊 Taxes & Impôts',              color: '#F01F38' },
   { id: 'maintenance',  label: '🔧 Maintenance & Réparations',   color: '#84CC16' },
   { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#F59E0B' },
   { id: 'voyages',      label: '✈️ Voyages & Déplacements',      color: '#EF4444' },
@@ -278,7 +278,7 @@ export default function DepensesPage() {
                     <p className="text-xs text-[#484F58]">{cat?.label.split(' ').slice(1).join(' ') ?? d.categorie} · {d.mode_paiement}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-[#F85149]">-{fmtFCFA(d.montant)}</p>
+                    <p className="text-sm font-semibold text-[#F01F38]">-{fmtFCFA(d.montant)}</p>
                     <p className="text-xs text-[#484F58]">
                       {new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                     </p>
@@ -286,7 +286,7 @@ export default function DepensesPage() {
                   <button
                     onClick={() => deleteDepense(d.id)}
                     disabled={deleting === d.id}
-                    className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[#484F58] hover:text-[#F85149] hover:bg-[#F85149]/10 transition-all"
+                    className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[#484F58] hover:text-[#F01F38] hover:bg-[#F01F38]/10 transition-all"
                     title="Supprimer"
                   >
                     {deleting === d.id
@@ -376,9 +376,9 @@ export default function DepensesPage() {
                       <p className="text-[#2EA043] font-semibold">{form.debit_account}</p>
                       <p className="text-[#484F58] text-[9px] truncate">{accountLabel(form.debit_account)}</p>
                     </div>
-                    <div className="bg-[#0D1117] border border-[#F85149]/20 rounded-lg px-3 py-2">
+                    <div className="bg-[#0D1117] border border-[#F01F38]/20 rounded-lg px-3 py-2">
                       <p className="text-[#484F58] mb-0.5">Crédit</p>
-                      <p className="text-[#F85149] font-semibold">{form.credit_account}</p>
+                      <p className="text-[#F01F38] font-semibold">{form.credit_account}</p>
                       <p className="text-[#484F58] text-[9px] truncate">{accountLabel(form.credit_account)}</p>
                     </div>
                   </div>

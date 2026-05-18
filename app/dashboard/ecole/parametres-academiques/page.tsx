@@ -58,10 +58,10 @@ const DEFAULT: AcademicSettings = {
   conservation_meilleure_note: true,
   mentions: [
     { min: 16, label: 'Très Bien',  color: '#2EA043' },
-    { min: 14, label: 'Bien',        color: '#388BFD' },
-    { min: 12, label: 'Assez Bien', color: '#8B5CF6' },
+    { min: 14, label: 'Bien',        color: '#F07900' },
+    { min: 12, label: 'Assez Bien', color: '#8B0073' },
     { min: 10, label: 'Passable',   color: '#F0A30A' },
-    { min: 0,  label: 'Insuffisant',color: '#F85149' },
+    { min: 0,  label: 'Insuffisant',color: '#F01F38' },
   ],
 }
 
@@ -167,7 +167,7 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
               onClick={() => setS(p => ({ ...p, note_sur: n }))}
               className={`flex-1 py-3 rounded-xl border text-sm font-semibold transition-all ${
                 s.note_sur === n
-                  ? 'border-[#388BFD]/60 bg-[#388BFD]/10 text-[#388BFD]'
+                  ? 'border-[#F07900]/60 bg-[#F07900]/10 text-[#F07900]'
                   : 'border-[#21262D] bg-[#0D1117] text-[#484F58] hover:border-[#30363D]'
               }`}
             >
@@ -266,7 +266,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
             <button
               type="button"
               onClick={() => removeMention(i)}
-              className="shrink-0 p-1.5 rounded-lg text-[#484F58] hover:text-[#F85149] hover:bg-[#F85149]/10 transition-colors"
+              className="shrink-0 p-1.5 rounded-lg text-[#484F58] hover:text-[#F01F38] hover:bg-[#F01F38]/10 transition-colors"
             >
               <Trash2 size={14} />
             </button>
@@ -540,7 +540,7 @@ export default function ParametresAcademiquesPage() {
             className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm ${
               toast.ok
                 ? 'bg-[#2EA043]/10 border-[#2EA043]/25 text-[#2EA043]'
-                : 'bg-[#F85149]/10 border-[#F85149]/25 text-[#F85149]'
+                : 'bg-[#F01F38]/10 border-[#F01F38]/25 text-[#F01F38]'
             }`}
           >
             {toast.ok ? <CheckCircle size={15} /> : <AlertTriangle size={15} />}

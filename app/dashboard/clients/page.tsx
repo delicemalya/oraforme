@@ -18,7 +18,7 @@ interface Client {
   created_at: string
 }
 
-const AVATAR_COLORS = ['#F0A30A', '#388BFD', '#2EA043', '#8B5CF6', '#EC4899', '#F97316', '#06B6D4', '#EF4444']
+const AVATAR_COLORS = ['#F0A30A', '#F07900', '#2EA043', '#8B0073', '#EC4899', '#F97316', '#06B6D4', '#EF4444']
 function avatarColor(nom: string) { return AVATAR_COLORS[nom.charCodeAt(0) % AVATAR_COLORS.length] }
 function initials(nom: string) { return nom.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() }
 function fmtDate(d: string) { return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) }
@@ -158,9 +158,9 @@ export default function ClientsPage() {
 
       {/* KPI row */}
       <motion.div {...fadeUp(1)} className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <KpiCard label="Total clients"    value={clients.length}   sub="Dans votre base"         icon={Users}      color="#388BFD" />
+        <KpiCard label="Total clients"    value={clients.length}   sub="Dans votre base"         icon={Users}      color="#F07900" />
         <KpiCard label="Nouveaux ce mois" value={newThisMonth}     sub="Ajoutés en mai"          icon={TrendingUp} color="#2EA043" />
-        <KpiCard label="Avec email"       value={clients.filter(c => c.email).length} sub="Contactables par mail" icon={Mail} color="#8B5CF6" />
+        <KpiCard label="Avec email"       value={clients.filter(c => c.email).length} sub="Contactables par mail" icon={Mail} color="#8B0073" />
       </motion.div>
 
       {/* Search */}

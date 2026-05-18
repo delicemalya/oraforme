@@ -49,7 +49,7 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
         </div>
         <div className="flex gap-3 text-[10px]">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#2EA043] inline-block" />Entrées</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F85149] inline-block" />Sorties</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F01F38] inline-block" />Sorties</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F0A30A] inline-block" />Solde</span>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
             <YAxis tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="entrees" name="Entrées" fill="#2EA043" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
-            <Bar dataKey="sorties" name="Sorties" fill="#F85149" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
+            <Bar dataKey="sorties" name="Sorties" fill="#F01F38" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
             <Area type="monotone" dataKey="solde" name="Solde" stroke="#F0A30A" strokeWidth={2.5} fill="url(#gradSolde)" dot={false} activeDot={{ r: 5, fill: '#F0A30A' }} />
           </ComposedChart>
         </ResponsiveContainer>

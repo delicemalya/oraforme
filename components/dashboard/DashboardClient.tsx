@@ -140,14 +140,14 @@ function QuickLinksCard({ secteur, modules }: { secteur: string | null; modules:
   const { t } = useLocale()
   const links = secteur === 'ecole' ? [
     { label: 'Scolarité',     href: '/dashboard/ecole/scolarite',    color: '#F0A30A' },
-    { label: 'Comptabilité',  href: '/dashboard/ecole/comptabilite', color: '#388BFD' },
-    { label: 'RH & Paie',    href: '/dashboard/ecole/rh',           color: '#8B5CF6' },
+    { label: 'Comptabilité',  href: '/dashboard/ecole/comptabilite', color: '#F07900' },
+    { label: 'RH & Paie',    href: '/dashboard/ecole/rh',           color: '#8B0073' },
     { label: 'Direction',     href: '/dashboard/ecole/direction',    color: '#2EA043' },
     { label: 'MIAA',          href: '/dashboard/ecole/miaa',         color: '#EC4899' },
   ] : [
     { label: 'Facturation',  href: '/dashboard/facturation',  color: '#F0A30A' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie',   color: '#388BFD' },
-    { label: 'RH',           href: '/dashboard/rh',           color: '#8B5CF6' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie',   color: '#F07900' },
+    { label: 'RH',           href: '/dashboard/rh',           color: '#8B0073' },
     { label: 'Stock',        href: '/dashboard/stock',         color: '#2EA043' },
     { label: 'Comptabilité', href: '/dashboard/comptabilite', color: '#EC4899' },
   ]
@@ -180,7 +180,7 @@ function TopModulesCard({ data }: { data: { name: string; value: number; color: 
   return (
     <motion.div {...fadeUp(6)} className="bg-[#161B22] border border-[#21262D] rounded-2xl p-4">
       <div className="flex items-center gap-2 mb-3">
-        <BarChart2 size={14} className="text-[#388BFD]" />
+        <BarChart2 size={14} className="text-[#F07900]" />
         <p className="text-xs font-bold text-[#E6EDF3]">{t('dash.invoiceBreakdown')}</p>
       </div>
       {data.length === 0 ? (
@@ -224,59 +224,59 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
   ecole: [
     { label: 'Nouvelle inscription', href: '/dashboard/ecole/scolarite',         icon: GraduationCap,  color: '#059669', desc: 'Inscrire un étudiant' },
     { label: 'Espace Formateur',      href: '/dashboard/ecole/espace-formateur',  icon: BookOpen,       color: '#2EA043', desc: 'Cours & heures' },
-    { label: 'Direction Générale',    href: '/dashboard/ecole/direction',         icon: BarChart2,      color: '#388BFD', desc: 'Finances & pilotage' },
-    { label: 'RH & Paie',            href: '/dashboard/ecole/rh',                icon: Users,          color: '#8B5CF6', desc: 'Gestion du personnel' },
+    { label: 'Direction Générale',    href: '/dashboard/ecole/direction',         icon: BarChart2,      color: '#F07900', desc: 'Finances & pilotage' },
+    { label: 'RH & Paie',            href: '/dashboard/ecole/rh',                icon: Users,          color: '#8B0073', desc: 'Gestion du personnel' },
     { label: 'Comptabilité OHADA',    href: '/dashboard/ecole/comptabilite',      icon: Calculator,     color: '#EC4899', desc: 'Journal & bilan' },
     { label: 'MIAA+ IA',             href: '/dashboard/ecole/miaa',              icon: Bot,            color: '#F97316', desc: 'Assistant scolaire IA' },
   ],
   restaurant: [
     { label: 'Caisse POS',   href: '/dashboard/restaurant', icon: ChefHat,     color: '#F0A30A', desc: 'Ouvrir la caisse' },
     { label: 'Stock cuisine', href: '/dashboard/stock',      icon: Package,     color: '#2EA043', desc: 'Inventaire & alertes' },
-    { label: 'RH & Paie',    href: '/dashboard/rh',         icon: Users,       color: '#388BFD', desc: 'Gestion du personnel' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie', icon: Wallet,      color: '#8B5CF6', desc: 'Suivi des finances' },
+    { label: 'RH & Paie',    href: '/dashboard/rh',         icon: Users,       color: '#F07900', desc: 'Gestion du personnel' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie', icon: Wallet,      color: '#8B0073', desc: 'Suivi des finances' },
     { label: 'Dépenses',     href: '/dashboard/depenses',   icon: Receipt,     color: '#EC4899', desc: 'Charges & sorties' },
     { label: 'MIAA+',        href: '/dashboard/miaa',       icon: Bot,         color: '#F97316', desc: 'Assistant IA' },
   ],
   commerce: [
     { label: 'Facturation',  href: '/dashboard/facturation', icon: FileText,    color: '#F0A30A', desc: 'Devis & factures' },
     { label: 'Stock',        href: '/dashboard/stock',       icon: Package,     color: '#2EA043', desc: 'Inventaire' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#388BFD', desc: 'Finances' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#F07900', desc: 'Finances' },
     { label: 'Achats',       href: '/dashboard/achats',      icon: ShoppingCart,color: '#06B6D4', desc: 'Fournisseurs' },
-    { label: 'RH & Paie',    href: '/dashboard/rh',          icon: Users,       color: '#8B5CF6', desc: 'Personnel' },
+    { label: 'RH & Paie',    href: '/dashboard/rh',          icon: Users,       color: '#8B0073', desc: 'Personnel' },
     { label: 'Comptabilité', href: '/dashboard/comptabilite',icon: Calculator,  color: '#EC4899', desc: 'OHADA' },
   ],
   supermarche: [
     { label: 'Caisse',       href: '/dashboard/facturation', icon: FileText,    color: '#F0A30A', desc: 'Ventes' },
     { label: 'Rayons & Stock',href: '/dashboard/stock',      icon: Package,     color: '#2EA043', desc: 'Inventaire' },
     { label: 'Achats',       href: '/dashboard/achats',      icon: ShoppingCart,color: '#06B6D4', desc: 'Fournisseurs' },
-    { label: 'RH & Paie',    href: '/dashboard/rh',          icon: Users,       color: '#388BFD', desc: 'Personnel' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#8B5CF6', desc: 'Finances' },
+    { label: 'RH & Paie',    href: '/dashboard/rh',          icon: Users,       color: '#F07900', desc: 'Personnel' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#8B0073', desc: 'Finances' },
   ],
   transport: [
     { label: 'Flotte',       href: '/dashboard/transport',   icon: Truck,       color: '#F0A30A', desc: 'Véhicules & courses' },
-    { label: 'Facturation',  href: '/dashboard/facturation', icon: FileText,    color: '#388BFD', desc: 'Devis & factures' },
+    { label: 'Facturation',  href: '/dashboard/facturation', icon: FileText,    color: '#F07900', desc: 'Devis & factures' },
     { label: 'Chauffeurs',   href: '/dashboard/rh',          icon: Users,       color: '#2EA043', desc: 'RH & Paie' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#8B5CF6', desc: 'Finances' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#8B0073', desc: 'Finances' },
     { label: 'MIAA+',        href: '/dashboard/miaa',        icon: Bot,         color: '#F97316', desc: 'Assistant IA' },
   ],
   hotel: [
     { label: 'Réservations', href: '/dashboard/hotel',       icon: Hotel,       color: '#F0A30A', desc: 'Chambres & séjours' },
-    { label: 'Facturation',  href: '/dashboard/facturation', icon: FileText,    color: '#388BFD', desc: 'Factures & devis' },
+    { label: 'Facturation',  href: '/dashboard/facturation', icon: FileText,    color: '#F07900', desc: 'Factures & devis' },
     { label: 'RH & Paie',    href: '/dashboard/rh',          icon: Users,       color: '#2EA043', desc: 'Personnel' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#8B5CF6', desc: 'Finances' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#8B0073', desc: 'Finances' },
     { label: 'MIAA+',        href: '/dashboard/miaa',        icon: Bot,         color: '#F97316', desc: 'Assistant IA' },
   ],
   sante: [
     { label: 'Consultations', href: '/dashboard/facturation', icon: FileText,   color: '#F0A30A', desc: 'Ordonnances & actes' },
     { label: 'Pharmacie',     href: '/dashboard/stock',       icon: Package,    color: '#2EA043', desc: 'Médicaments' },
-    { label: 'RH médical',   href: '/dashboard/rh',           icon: Users,      color: '#388BFD', desc: 'Personnel soignant' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie',   icon: Wallet,     color: '#8B5CF6', desc: 'Finances' },
+    { label: 'RH médical',   href: '/dashboard/rh',           icon: Users,      color: '#F07900', desc: 'Personnel soignant' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie',   icon: Wallet,     color: '#8B0073', desc: 'Finances' },
     { label: 'MIAA+',        href: '/dashboard/miaa',         icon: Bot,        color: '#F97316', desc: 'Assistant IA' },
   ],
   _default: [
     { label: 'Facturation',  href: '/dashboard/facturation',  icon: FileText,   color: '#F0A30A', desc: 'Devis & factures' },
-    { label: 'Trésorerie',   href: '/dashboard/tresorerie',   icon: Wallet,     color: '#388BFD', desc: 'Suivi financier' },
-    { label: 'RH & Paie',    href: '/dashboard/rh',           icon: Users,      color: '#8B5CF6', desc: 'Personnel' },
+    { label: 'Trésorerie',   href: '/dashboard/tresorerie',   icon: Wallet,     color: '#F07900', desc: 'Suivi financier' },
+    { label: 'RH & Paie',    href: '/dashboard/rh',           icon: Users,      color: '#8B0073', desc: 'Personnel' },
     { label: 'Stock',        href: '/dashboard/stock',         icon: Package,   color: '#2EA043', desc: 'Inventaire' },
     { label: 'Comptabilité', href: '/dashboard/comptabilite', icon: Calculator, color: '#EC4899', desc: 'OHADA' },
     { label: 'MIAA+',        href: '/dashboard/miaa',         icon: Bot,        color: '#F97316', desc: 'Assistant IA' },
@@ -288,58 +288,58 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
 const ECOLE_ROLE_SHORTCUTS: Record<string, Shortcut[]> = {
   DAAC: [
     { label: 'Matières',      href: '/dashboard/ecole/daac',                    icon: BookOpen,      color: '#F0A30A', desc: 'Programmes & UE' },
-    { label: 'Sessions',      href: '/dashboard/ecole/daac',                    icon: Layers,        color: '#388BFD', desc: 'Sessions actives' },
-    { label: 'Examens',       href: '/dashboard/ecole/daac',                    icon: FileText,      color: '#8B5CF6', desc: 'Notes & résultats' },
+    { label: 'Sessions',      href: '/dashboard/ecole/daac',                    icon: Layers,        color: '#F07900', desc: 'Sessions actives' },
+    { label: 'Examens',       href: '/dashboard/ecole/daac',                    icon: FileText,      color: '#8B0073', desc: 'Notes & résultats' },
     { label: 'Diplômes',      href: '/dashboard/ecole/daac',                    icon: GraduationCap, color: '#2EA043', desc: 'En attente' },
     { label: 'Soutenances',   href: '/dashboard/ecole/daac',                    icon: Award,         color: '#EC4899', desc: 'Planifiées' },
     { label: 'Paramètres',   href: '/dashboard/ecole/parametres-academiques',  icon: Settings,      color: '#F97316', desc: 'Règles LMD' },
   ],
   RAF: [
     { label: 'Comptabilité',  href: '/dashboard/ecole/comptabilite',            icon: Calculator,    color: '#F0A30A', desc: 'Journal OHADA' },
-    { label: 'Trésorerie',   href: '/dashboard/ecole/tresorerie',              icon: Wallet,        color: '#388BFD', desc: 'Wallets & virements' },
+    { label: 'Trésorerie',   href: '/dashboard/ecole/tresorerie',              icon: Wallet,        color: '#F07900', desc: 'Wallets & virements' },
     { label: 'Budgets',       href: '/dashboard/ecole/comptabilite',            icon: BarChart2,     color: '#2EA043', desc: 'Suivi budgétaire' },
-    { label: 'Paie',          href: '/dashboard/ecole/rh',                      icon: Users,         color: '#8B5CF6', desc: 'Bulletins de paie' },
+    { label: 'Paie',          href: '/dashboard/ecole/rh',                      icon: Users,         color: '#8B0073', desc: 'Bulletins de paie' },
     { label: 'Dépenses',     href: '/dashboard/ecole/tresorerie',              icon: TrendingUp,    color: '#EC4899', desc: 'Sorties de fonds' },
     { label: 'MIAA+',         href: '/dashboard/ecole/miaa',                    icon: Bot,           color: '#F97316', desc: 'Assistant IA' },
   ],
   RH_PAIE: [
     { label: 'Employés',     href: '/dashboard/ecole/rh',                      icon: Users,         color: '#F0A30A', desc: 'Gestion du personnel' },
-    { label: 'Paie',          href: '/dashboard/ecole/rh',                      icon: Wallet,        color: '#388BFD', desc: 'Bulletins de paie' },
-    { label: 'Contrats',      href: '/dashboard/ecole/rh',                      icon: FileText,      color: '#8B5CF6', desc: 'CDD/CDI' },
+    { label: 'Paie',          href: '/dashboard/ecole/rh',                      icon: Wallet,        color: '#F07900', desc: 'Bulletins de paie' },
+    { label: 'Contrats',      href: '/dashboard/ecole/rh',                      icon: FileText,      color: '#8B0073', desc: 'CDD/CDI' },
     { label: 'Absences',      href: '/dashboard/ecole/rh',                      icon: CalendarOff,   color: '#EF4444', desc: 'Congés & absences' },
     { label: 'Départements', href: '/dashboard/ecole/rh',                      icon: BarChart2,     color: '#2EA043', desc: 'Organigramme' },
     { label: 'MIAA+',         href: '/dashboard/ecole/miaa',                    icon: Bot,           color: '#F97316', desc: 'Assistant IA' },
   ],
   SCOLARITE: [
     { label: 'Étudiants',    href: '/dashboard/ecole/scolarite',               icon: GraduationCap, color: '#F0A30A', desc: 'Gestion des étudiants' },
-    { label: 'Inscriptions',  href: '/dashboard/ecole/scolarite',               icon: FileText,      color: '#388BFD', desc: 'Nouvelles inscriptions' },
+    { label: 'Inscriptions',  href: '/dashboard/ecole/scolarite',               icon: FileText,      color: '#F07900', desc: 'Nouvelles inscriptions' },
     { label: 'Paiements',     href: '/dashboard/ecole/scolarite',               icon: Wallet,        color: '#2EA043', desc: 'Frais de scolarité' },
     { label: 'Absences',      href: '/dashboard/ecole/scolarite',               icon: CalendarOff,   color: '#EF4444', desc: 'Relevés d\'absences' },
-    { label: 'Classes',       href: '/dashboard/ecole/scolarite',               icon: BookOpen,      color: '#8B5CF6', desc: 'Gestion des classes' },
+    { label: 'Classes',       href: '/dashboard/ecole/scolarite',               icon: BookOpen,      color: '#8B0073', desc: 'Gestion des classes' },
     { label: 'MIAA+',         href: '/dashboard/ecole/miaa',                    icon: Bot,           color: '#F97316', desc: 'Assistant IA' },
   ],
   FORMATEUR: [
     { label: 'Mes cours',     href: '/dashboard/ecole/espace-formateur',        icon: BookOpen,      color: '#F0A30A', desc: 'Modules enseignés' },
     { label: 'Présences',    href: '/dashboard/ecole/espace-formateur',        icon: CheckCircle,   color: '#2EA043', desc: 'Appel & absences' },
-    { label: 'Notes',         href: '/dashboard/ecole/espace-formateur',        icon: Star,          color: '#388BFD', desc: 'Saisie des notes' },
-    { label: 'Classes',       href: '/dashboard/ecole/espace-formateur',        icon: GraduationCap, color: '#8B5CF6', desc: 'Mes classes' },
+    { label: 'Notes',         href: '/dashboard/ecole/espace-formateur',        icon: Star,          color: '#F07900', desc: 'Saisie des notes' },
+    { label: 'Classes',       href: '/dashboard/ecole/espace-formateur',        icon: GraduationCap, color: '#8B0073', desc: 'Mes classes' },
     { label: 'Examens',       href: '/dashboard/ecole/daac',                    icon: FileText,      color: '#EC4899', desc: 'Délibérations' },
     { label: 'MIAA+',         href: '/dashboard/ecole/miaa',                    icon: Bot,           color: '#F97316', desc: 'Assistant IA' },
   ],
   ETUDIANT: [
     { label: 'Mes notes',     href: '/dashboard/ecole/espace-etudiant',         icon: Star,          color: '#F0A30A', desc: 'Résultats & moyennes' },
-    { label: 'Bulletins',     href: '/dashboard/ecole/espace-etudiant',         icon: FileText,      color: '#388BFD', desc: 'Bulletins de note' },
+    { label: 'Bulletins',     href: '/dashboard/ecole/espace-etudiant',         icon: FileText,      color: '#F07900', desc: 'Bulletins de note' },
     { label: 'Paiements',     href: '/dashboard/ecole/espace-etudiant',         icon: Wallet,        color: '#2EA043', desc: 'Frais & quittances' },
     { label: 'Absences',      href: '/dashboard/ecole/espace-etudiant',         icon: CalendarOff,   color: '#EF4444', desc: 'Mes absences' },
-    { label: 'Planning',      href: '/dashboard/ecole/espace-etudiant',         icon: Clock,         color: '#8B5CF6', desc: 'Emploi du temps' },
+    { label: 'Planning',      href: '/dashboard/ecole/espace-etudiant',         icon: Clock,         color: '#8B0073', desc: 'Emploi du temps' },
     { label: 'MIAA+',         href: '/dashboard/ecole/miaa',                    icon: Bot,           color: '#F97316', desc: 'Assistant IA' },
   ],
   PARENT: [
     { label: 'Résultats',    href: '/dashboard/ecole/espace-parent',           icon: Star,          color: '#F0A30A', desc: 'Notes de mon enfant' },
-    { label: 'Bulletins',     href: '/dashboard/ecole/espace-parent',           icon: FileText,      color: '#388BFD', desc: 'Bulletins de note' },
+    { label: 'Bulletins',     href: '/dashboard/ecole/espace-parent',           icon: FileText,      color: '#F07900', desc: 'Bulletins de note' },
     { label: 'Paiements',     href: '/dashboard/ecole/espace-parent',           icon: Wallet,        color: '#2EA043', desc: 'Frais de scolarité' },
     { label: 'Absences',      href: '/dashboard/ecole/espace-parent',           icon: CalendarOff,   color: '#EF4444', desc: 'Relevés d\'absences' },
-    { label: 'Contact',       href: '/dashboard/ecole/espace-parent',           icon: HeartHandshake,color: '#8B5CF6', desc: 'Contacter l\'école' },
+    { label: 'Contact',       href: '/dashboard/ecole/espace-parent',           icon: HeartHandshake,color: '#8B0073', desc: 'Contacter l\'école' },
     { label: 'MIAA+',         href: '/dashboard/ecole/miaa',                    icon: Bot,           color: '#F97316', desc: 'Assistant IA' },
   ],
 }
@@ -396,9 +396,9 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
 
 const STATUT_CFG: Record<string, { label: string; bg: string; color: string; dot: string }> = {
   payee:     { label: 'PAYÉE',     bg: '#2EA04318', color: '#2EA043', dot: '#2EA043' },
-  envoyee:   { label: 'ENVOYÉE',   bg: '#388BFD18', color: '#388BFD', dot: '#388BFD' },
+  envoyee:   { label: 'ENVOYÉE',   bg: '#F0790018', color: '#F07900', dot: '#F07900' },
   brouillon: { label: 'BROUILLON', bg: '#F0A30A18', color: '#F0A30A', dot: '#F0A30A' },
-  annulee:   { label: 'ANNULÉE',  bg: '#F8514918', color: '#F85149', dot: '#F85149' },
+  annulee:   { label: 'ANNULÉE',  bg: '#F01F3818', color: '#F01F38', dot: '#F01F38' },
 }
 
 function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
@@ -409,7 +409,7 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
              : diff < 86400000 ? `${Math.floor(diff / 3600000)}h`
              : `${Math.floor(diff / 86400000)}j`
 
-  const colors = ['#F0A30A', '#388BFD', '#2EA043', '#8B5CF6', '#EC4899', '#F97316', '#06B6D4']
+  const colors = ['#F0A30A', '#F07900', '#2EA043', '#8B0073', '#EC4899', '#F97316', '#06B6D4']
   const avatarColor = colors[item.client_nom.charCodeAt(0) % colors.length]
 
   return (
@@ -565,7 +565,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       value: ecoleKpis.nbAbsences,
       sub: 'Relevés d\'absences',
       icon: CalendarOff,
-      gradient: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #8B5CF6 100%)',
+      gradient: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #8B0073 100%)',
       i: 3,
     },
   ] : secteur === 'ecole' && ecoleKpis ? [
@@ -603,7 +603,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       value: ecoleKpis.nbAbsences,
       sub: t('school.absences'),
       icon: CalendarOff,
-      gradient: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #8B5CF6 100%)',
+      gradient: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #8B0073 100%)',
       i: 3,
     },
   ] : isFinancial ? [
@@ -682,10 +682,10 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       {/* ── Role banner ─────────────────────────────────────────────────── */}
       {secteur === 'ecole' && ecoleRole && ecoleRole !== 'DIRECTION_GENERALE' && (() => {
         const ROLE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-          DAAC:       { label: 'Direction des Affaires Académiques', color: '#388BFD', bg: '#388BFD15' },
+          DAAC:       { label: 'Direction des Affaires Académiques', color: '#F07900', bg: '#F0790015' },
           SCOLARITE:  { label: 'Service Scolarité',                  color: '#2EA043', bg: '#2EA04315' },
           RAF:        { label: 'Responsable Administratif & Financier', color: '#F0A30A', bg: '#F0A30A15' },
-          RH_PAIE:    { label: 'Ressources Humaines & Paie',         color: '#8B5CF6', bg: '#8B5CF615' },
+          RH_PAIE:    { label: 'Ressources Humaines & Paie',         color: '#8B0073', bg: '#8B007315' },
           FORMATEUR:  { label: 'Espace Formateur',                   color: '#2EA043', bg: '#2EA04315' },
           ETUDIANT:   { label: 'Espace Étudiant',                   color: '#06B6D4', bg: '#06B6D415' },
           PARENT:     { label: 'Espace Parent',                      color: '#EC4899', bg: '#EC489915' },

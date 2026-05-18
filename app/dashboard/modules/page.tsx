@@ -190,7 +190,7 @@ export default function ModulesMarketplacePage() {
                   className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     confirm.action === 'activate'
                       ? 'bg-[#F0A30A] text-[#0D1117] hover:bg-[#F0A30A]/90'
-                      : 'bg-[#F85149]/10 border border-[#F85149]/30 text-[#F85149] hover:bg-[#F85149]/20'
+                      : 'bg-[#F01F38]/10 border border-[#F01F38]/30 text-[#F01F38] hover:bg-[#F01F38]/20'
                   }`}
                 >
                   {confirm.action === 'activate' ? 'Activer' : 'Désactiver'}
@@ -211,7 +211,7 @@ export default function ModulesMarketplacePage() {
             className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl text-sm font-medium shadow-xl border ${
               toast.ok
                 ? 'bg-[#2EA043]/10 border-[#2EA043]/30 text-[#2EA043]'
-                : 'bg-[#F85149]/10 border-[#F85149]/30 text-[#F85149]'
+                : 'bg-[#F01F38]/10 border-[#F01F38]/30 text-[#F01F38]'
             }`}
           >
             {toast.msg}
@@ -255,7 +255,7 @@ function ModuleCard({
         disabled={toggling}
         className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
           m.active
-            ? 'bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#F85149] hover:border-[#F85149]/30'
+            ? 'bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#F01F38] hover:border-[#F01F38]/30'
             : 'bg-[#F0A30A] text-[#0D1117] hover:bg-[#F0A30A]/90'
         }`}
       >

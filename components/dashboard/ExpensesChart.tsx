@@ -12,7 +12,7 @@ function fmtFull(n: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 }
 
-const COLORS = ['#F0A30A', '#388BFD', '#2EA043', '#8B5CF6', '#F97316', '#EC4899', '#06B6D4', '#84CC16']
+const COLORS = ['#F0A30A', '#F07900', '#2EA043', '#8B0073', '#F97316', '#EC4899', '#06B6D4', '#84CC16']
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null

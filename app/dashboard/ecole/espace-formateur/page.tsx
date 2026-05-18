@@ -57,7 +57,7 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 
 const STATUT_HEURE: Record<TeacherHour['statut'], { label: string; color: string; bg: string }> = {
   declare:   { label: 'Déclaré',  color: '#F0A30A', bg: '#F0A30A18' },
-  validated: { label: 'Validé',   color: '#388BFD', bg: '#388BFD18' },
+  validated: { label: 'Validé',   color: '#F07900', bg: '#F0790018' },
   paye:      { label: 'Payé',     color: '#2EA043', bg: '#2EA04318' },
 }
 
@@ -249,9 +249,9 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
   totalNet: number; nbCours: number; nbDevoirs: number; heures: TeacherHour[]
 }) {
   const kpis = [
-    { label: 'Heures déclarées', value: totalHeures,   color: '#388BFD', sub: `${valideeHeures}h validées` },
+    { label: 'Heures déclarées', value: totalHeures,   color: '#F07900', sub: `${valideeHeures}h validées` },
     { label: 'Heures payées',    value: payeeHeures,   color: '#2EA043', sub: `sur ${totalHeures}h total` },
-    { label: 'Cours publiés',    value: nbCours,       color: '#8B5CF6', sub: 'cours numériques' },
+    { label: 'Cours publiés',    value: nbCours,       color: '#8B0073', sub: 'cours numériques' },
     { label: 'Devoirs actifs',   value: nbDevoirs,     color: '#F0A30A', sub: 'en cours' },
     { label: 'Net cumulé',       value: `${fmt(totalNet)} FCFA`, color: '#EC4899', sub: 'tous bulletins' },
   ]
@@ -286,7 +286,7 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
         <div className="space-y-2">
           {[
             { label: 'Déclarées', value: heures.filter(h => h.statut === 'declare').reduce((s, h) => s + h.heures, 0), color: '#F0A30A' },
-            { label: 'Validées',  value: heures.filter(h => h.statut === 'validated').reduce((s, h) => s + h.heures, 0), color: '#388BFD' },
+            { label: 'Validées',  value: heures.filter(h => h.statut === 'validated').reduce((s, h) => s + h.heures, 0), color: '#F07900' },
             { label: 'Payées',    value: heures.filter(h => h.statut === 'paye').reduce((s, h) => s + h.heures, 0), color: '#2EA043' },
           ].map(row => (
             <div key={row.label} className="flex items-center gap-3">
@@ -352,7 +352,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="rounded-xl border border-[#388BFD]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.06)' }}>
+            className="rounded-xl border border-[#F07900]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.06)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre du cours *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <FI label="Matière" value={form.matiere} onChange={v => setForm(p => ({ ...p, matiere: v }))} />
@@ -362,7 +362,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
               <div>
                 <label className="block text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-1">Statut</label>
                 <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as 'brouillon'|'publie' }))}
-                  className="w-full bg-[#0D1117] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#388BFD]/50">
+                  className="w-full bg-[#0D1117] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#F07900]/50">
                   <option value="brouillon">Brouillon</option>
                   <option value="publie">Publié</option>
                 </select>
@@ -402,7 +402,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button onClick={() => toggleStatut(c)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[#8B949E] hover:text-white"><Check size={12} /></button>
-              <button onClick={() => del(c.id)} className="p-1.5 rounded-lg hover:bg-[#F85149]/10 text-[#8B949E] hover:text-[#F85149]"><Trash2 size={12} /></button>
+              <button onClick={() => del(c.id)} className="p-1.5 rounded-lg hover:bg-[#F01F38]/10 text-[#8B949E] hover:text-[#F01F38]"><Trash2 size={12} /></button>
             </div>
           </motion.div>
         ))}
@@ -509,7 +509,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               {d.statut === 'ouvert' && <button onClick={() => cloture(d.id)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[#8B949E] hover:text-white"><Check size={12} /></button>}
-              <button onClick={() => del(d.id)} className="p-1.5 rounded-lg hover:bg-[#F85149]/10 text-[#8B949E] hover:text-[#F85149]"><Trash2 size={12} /></button>
+              <button onClick={() => del(d.id)} className="p-1.5 rounded-lg hover:bg-[#F01F38]/10 text-[#8B949E] hover:text-[#F01F38]"><Trash2 size={12} /></button>
             </div>
           </motion.div>
         ))}
@@ -583,7 +583,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
         <button onClick={() => setSelectedEx(null)} className="flex items-center gap-1.5 text-xs text-[#8B949E] hover:text-white">
           <ChevronRight size={12} className="rotate-180" /> Retour aux examens
         </button>
-        <div className="rounded-xl border border-[#388BFD]/30 p-4" style={{ background: 'rgba(56,139,253,0.06)' }}>
+        <div className="rounded-xl border border-[#F07900]/30 p-4" style={{ background: 'rgba(56,139,253,0.06)' }}>
           <p className="text-sm font-bold text-white">{selectedEx.nom}</p>
           <p className="text-xs text-[#8B949E] mt-0.5">{TYPES_EXAM.find(t => t.value === selectedEx.type_exam)?.label} · /{ selectedEx.note_max} pts · Coeff. {selectedEx.coefficient}</p>
         </div>
@@ -606,7 +606,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
                   className="w-20 bg-[#0D1117] border border-white/[0.08] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none disabled:opacity-40"
                   placeholder="—"
                 />
-                <input type="checkbox" checked={g.absent} onChange={e => saveGrade(g.etudiant_id, g.absent ? null : g.note, e.target.checked)} className="w-4 h-4 accent-[#F85149]" />
+                <input type="checkbox" checked={g.absent} onChange={e => saveGrade(g.etudiant_id, g.absent ? null : g.note, e.target.checked)} className="w-4 h-4 accent-[#F01F38]" />
               </div>
             ))}
           </div>
@@ -627,7 +627,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="rounded-xl border border-[#8B5CF6]/30 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.06)' }}>
+            className="rounded-xl border border-[#8B0073]/30 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.06)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom de l'examen *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
@@ -739,7 +739,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'En attente',  value: `${byStatut.declare.reduce((s, h) => s + h.heures, 0)}h`,   color: '#F0A30A', count: byStatut.declare.length },
-          { label: 'Validées',   value: `${byStatut.validated.reduce((s, h) => s + h.heures, 0)}h`,  color: '#388BFD', count: byStatut.validated.length },
+          { label: 'Validées',   value: `${byStatut.validated.reduce((s, h) => s + h.heures, 0)}h`,  color: '#F07900', count: byStatut.validated.length },
           { label: 'Payées',     value: `${byStatut.paye.reduce((s, h) => s + h.heures, 0)}h`,       color: '#2EA043', count: byStatut.paye.length },
         ].map(k => <KpiCard key={k.label} label={k.label} value={k.value} sub={`${k.count} déclaration${k.count > 1 ? 's' : ''}`} color={k.color} />)}
       </div>
@@ -790,7 +790,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
             </div>
             <Badge statut={h.statut} />
             {h.statut === 'declare' && (
-              <button onClick={() => del(h.id)} className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-[#F85149]/10 text-[#8B949E] hover:text-[#F85149] transition-all">
+              <button onClick={() => del(h.id)} className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-[#F01F38]/10 text-[#8B949E] hover:text-[#F01F38] transition-all">
                 <Trash2 size={12} />
               </button>
             )}
@@ -814,8 +814,8 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
         <KpiCard label="Total net reçu"   value={`${fmt(totalNet)} FCFA`}  color="#2EA043" />
-        <KpiCard label="Total brut"       value={`${fmt(totalBrut)} FCFA`} color="#388BFD" />
-        <KpiCard label="Bulletins payés"  value={`${nbPayes}/${bulletins.length}`} color="#8B5CF6" />
+        <KpiCard label="Total brut"       value={`${fmt(totalBrut)} FCFA`} color="#F07900" />
+        <KpiCard label="Bulletins payés"  value={`${nbPayes}/${bulletins.length}`} color="#8B0073" />
       </div>
 
       <div className="space-y-2">
@@ -833,7 +833,7 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
               <p className="text-xs font-semibold text-white">{MOIS[b.mois - 1]} {b.annee}</p>
               <p className="text-[10px] text-[#8B949E]">Brut : {fmt(b.brut)} · Net : {fmt(b.net)} FCFA</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[#2EA043]/20 text-[#2EA043]' : b.statut === 'validee' ? 'bg-[#388BFD]/20 text-[#388BFD]' : 'bg-[#F0A30A]/20 text-[#F0A30A]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[#2EA043]/20 text-[#2EA043]' : b.statut === 'validee' ? 'bg-[#F07900]/20 text-[#F07900]' : 'bg-[#F0A30A]/20 text-[#F0A30A]'}`}>
               {b.statut === 'payee' ? 'Payé' : b.statut === 'validee' ? 'Validé' : 'Généré'}
             </span>
           </motion.div>

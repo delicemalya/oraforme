@@ -389,7 +389,7 @@ export default function ParametresPage() {
                   <span className="text-xs font-mono font-bold text-[#F0A30A] w-12 shrink-0">{cc.code}</span>
                   <span className="text-xs text-[#E6EDF3] flex-1 truncate">{cc.nom}</span>
                   <span className="text-[10px] text-[#484F58] shrink-0">{CC_TYPE_LABELS[cc.type] ?? cc.type}</span>
-                  <button onClick={() => deleteCostCenter(cc.id)} className="shrink-0 text-[#484F58] hover:text-[#F85149] transition-colors ml-1">
+                  <button onClick={() => deleteCostCenter(cc.id)} className="shrink-0 text-[#484F58] hover:text-[#F01F38] transition-colors ml-1">
                     <Trash2 size={12} />
                   </button>
                 </div>

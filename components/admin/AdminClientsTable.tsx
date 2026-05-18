@@ -18,7 +18,7 @@ type TenantRow = {
 
 const PLAN_COLORS: Record<string, string> = {
   starter: 'text-[#8B949E] bg-[#21262D] border-[#30363D]',
-  business: 'text-[#388BFD] bg-[#388BFD]/10 border-[#388BFD]/30',
+  business: 'text-[#F07900] bg-[#F07900]/10 border-[#F07900]/30',
   premium: 'text-[#F0A30A] bg-[#F0A30A]/10 border-[#F0A30A]/30',
 }
 
@@ -127,7 +127,7 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
                 <td className="px-3 py-3">
                   <Link
                     href={`/admin/clients/${t.id}`}
-                    className="flex items-center gap-1 text-xs text-[#8B949E] hover:text-[#F85149] transition-colors"
+                    className="flex items-center gap-1 text-xs text-[#8B949E] hover:text-[#F01F38] transition-colors"
                   >
                     <ExternalLink size={12} />
                     Voir

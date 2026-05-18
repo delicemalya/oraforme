@@ -9,10 +9,10 @@ import { fmtFCFA } from '@/lib/admin-config'
 type ModuleRevData = { module: string; clients: number; mrr: number }
 type GrowthData = { date: string; inscriptions: number }
 
-const RED = '#F85149'
+const RED = '#F01F38'
 const ORANGE = '#F0A30A'
 const GREEN = '#2EA043'
-const BLUE = '#388BFD'
+const BLUE = '#F07900'
 
 function CustomTooltip({ active, payload, label }: {
   active?: boolean
