@@ -86,6 +86,7 @@ export default function ParametresPage() {
   const [loading,       setLoading]       = useState(true)
   const [saving,        setSaving]        = useState(false)
   const [saved,         setSaved]         = useState(false)
+  const [saveError,     setSaveError]     = useState('')
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [uploadError,   setUploadError]   = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -151,6 +152,34 @@ export default function ParametresPage() {
     setCfg(p => ({ ...p, [key]: val }))
   }
 
+  // ── DB helper: UPDATE if row exists, INSERT otherwise ─────────────────────
+  // Avoids upsert which can silently fail with certain RLS configurations.
+
+  async function persistConfig(data: Record<string, unknown>): Promise<string | null> {
+    if (!tenantId) return 'Tenant non chargé'
+
+    const { data: existing, error: selErr } = await supabase
+      .from('entreprise_config')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .maybeSingle()
+
+    if (selErr) return selErr.message
+
+    if (existing) {
+      const { error } = await supabase
+        .from('entreprise_config')
+        .update(data)
+        .eq('tenant_id', tenantId)
+      return error?.message ?? null
+    } else {
+      const { error } = await supabase
+        .from('entreprise_config')
+        .insert({ tenant_id: tenantId, ...data })
+      return error?.message ?? null
+    }
+  }
+
   // ── Logo upload ────────────────────────────────────────────────────────────
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -178,27 +207,23 @@ export default function ParametresPage() {
       .upload(path, file, { upsert: true, contentType: file.type })
 
     if (upErr) {
-      setUploadError(`Upload échoué : ${upErr.message}. Créez un bucket "logos" public dans Supabase Storage.`)
+      setUploadError(`Upload échoué : ${upErr.message}`)
       setUploadingLogo(false)
       return
     }
 
     const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path)
 
-    // Persist logo_url immediately — don't wait for the "Enregistrer" button
-    const { error: dbErr } = await supabase
-      .from('entreprise_config')
-      .upsert({ tenant_id: tenantId, logo_url: publicUrl }, { onConflict: 'tenant_id' })
-
+    // Persist immediately so the logo survives page refresh
+    const dbErr = await persistConfig({ logo_url: publicUrl })
     if (dbErr) {
-      setUploadError(`Logo uploadé mais non sauvegardé : ${dbErr.message}`)
+      setUploadError(`Logo uploadé mais non sauvegardé : ${dbErr}`)
       setUploadingLogo(false)
       return
     }
 
     set('logo_url', publicUrl)
     setUploadingLogo(false)
-    // Notify Header right away
     window.dispatchEvent(new CustomEvent('oraforme:config-saved', { detail: { logo_url: publicUrl } }))
   }
 
@@ -207,12 +232,11 @@ export default function ParametresPage() {
   async function save() {
     if (!tenantId) return
     setSaving(true)
-    const { error: saveErr } = await supabase
-      .from('entreprise_config')
-      .upsert({ tenant_id: tenantId, ...cfg }, { onConflict: 'tenant_id' })
+    setSaveError('')
+    const errMsg = await persistConfig({ ...cfg })
     setSaving(false)
-    if (saveErr) {
-      setUploadError(`Erreur de sauvegarde : ${saveErr.message}`)
+    if (errMsg) {
+      setSaveError(errMsg)
       return
     }
     setSaved(true)
@@ -416,6 +440,13 @@ export default function ParametresPage() {
           </div>
         </div>
       </div>
+
+      {/* Save error */}
+      {saveError && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400 leading-relaxed">
+          Erreur de sauvegarde : {saveError}
+        </div>
+      )}
 
       {/* Bottom save */}
       <div className="flex justify-end pb-2">
