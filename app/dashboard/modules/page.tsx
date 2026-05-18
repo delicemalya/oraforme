@@ -92,8 +92,8 @@ export default function ModulesMarketplacePage() {
             <Store size={18} className="text-[#F0A30A]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#E6EDF3]">Modules</h1>
-            <p className="text-xs text-[#484F58]">
+            <h1 className="text-xl font-bold text-[#111827]">Modules</h1>
+            <p className="text-xs text-[#6B7280]">
               {activeList.length} actif{activeList.length > 1 ? 's' : ''} · {fmtFCFA(mrrTotal)}/mois
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function ModulesMarketplacePage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-40 bg-[#161B22] border border-[#30363D] rounded-xl animate-pulse" />
+            <div key={i} className="h-40 bg-white border border-[#E2E8F0] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -111,7 +111,7 @@ export default function ModulesMarketplacePage() {
           {/* Active modules */}
           {activeList.length > 0 && (
             <div>
-              <p className="text-xs text-[#484F58] uppercase tracking-wider mb-3 px-1">Modules actifs</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-3 px-1">Modules actifs</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {activeList.map(m => (
                   <ModuleCard
@@ -128,7 +128,7 @@ export default function ModulesMarketplacePage() {
           {/* Inactive modules */}
           {inactiveList.length > 0 && (
             <div>
-              <p className="text-xs text-[#484F58] uppercase tracking-wider mb-3 px-1">Modules disponibles</p>
+              <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-3 px-1">Modules disponibles</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {inactiveList.map(m => (
                   <ModuleCard
@@ -159,29 +159,29 @@ export default function ModulesMarketplacePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+              className="relative bg-white border border-[#E2E8F0] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
             >
-              <button onClick={() => setConfirm(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]">
+              <button onClick={() => setConfirm(null)} className="absolute top-4 right-4 text-[#6B7280] hover:text-[#4B5563]">
                 <X size={16} />
               </button>
               <div className="text-3xl mb-3">{MODULE_ICONS[confirm.id]}</div>
-              <h3 className="text-base font-bold text-[#E6EDF3] mb-1">
+              <h3 className="text-base font-bold text-[#111827] mb-1">
                 {confirm.action === 'activate' ? 'Activer' : 'Désactiver'} {MODULE_LABELS[confirm.id]} ?
               </h3>
               {confirm.action === 'activate' ? (
-                <p className="text-sm text-[#8B949E] mb-5">
+                <p className="text-sm text-[#4B5563] mb-5">
                   Ce module sera immédiatement accessible dans votre sidebar.
                   Tarif : <span className="text-[#F0A30A] font-medium">{fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois</span>
                 </p>
               ) : (
-                <p className="text-sm text-[#8B949E] mb-5">
+                <p className="text-sm text-[#4B5563] mb-5">
                   Le module sera retiré de votre sidebar. Vos données sont conservées.
                 </p>
               )}
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirm(null)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors"
                 >
                   Annuler
                 </button>
@@ -231,31 +231,31 @@ function ModuleCard({
   onAction: () => void
 }) {
   return (
-    <div className={`bg-[#161B22] border rounded-xl p-5 transition-all ${
-      m.active ? 'border-[#2EA043]/30' : 'border-[#30363D] hover:border-[#484F58]'
+    <div className={`bg-white border rounded-xl p-5 transition-all ${
+      m.active ? 'border-[#2EA043]/30' : 'border-[#E2E8F0] hover:border-[#8B0073]'
     }`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{m.icon}</span>
           <div>
-            <p className="text-sm font-semibold text-[#E6EDF3]">{m.label}</p>
+            <p className="text-sm font-semibold text-[#111827]">{m.label}</p>
             <p className="text-xs text-[#F0A30A] font-medium">{fmtFCFA(m.price)}/mois</p>
           </div>
         </div>
         {m.active
           ? <CheckCircle size={16} className="text-[#2EA043] shrink-0 mt-0.5" />
-          : <Lock size={14} className="text-[#484F58] shrink-0 mt-0.5" />
+          : <Lock size={14} className="text-[#6B7280] shrink-0 mt-0.5" />
         }
       </div>
 
-      <p className="text-xs text-[#8B949E] mb-4 leading-relaxed line-clamp-2">{m.desc}</p>
+      <p className="text-xs text-[#4B5563] mb-4 leading-relaxed line-clamp-2">{m.desc}</p>
 
       <button
         onClick={onAction}
         disabled={toggling}
         className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
           m.active
-            ? 'bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#F01F38] hover:border-[#F01F38]/30'
+            ? 'bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#F01F38] hover:border-[#F01F38]/30'
             : 'bg-[#F0A30A] text-[#0D1117] hover:bg-[#F0A30A]/90'
         }`}
       >

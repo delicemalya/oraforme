@@ -82,15 +82,15 @@ function Toggle({ value, onChange, label, sub }: {
     <button
       type="button"
       onClick={() => onChange(!value)}
-      className="flex items-center justify-between w-full p-3 bg-[#0D1117] border border-[#21262D] rounded-lg hover:border-[#30363D] transition-all"
+      className="flex items-center justify-between w-full p-3 bg-white border border-[#EEF2FF] rounded-lg hover:border-[#E2E8F0] transition-all"
     >
       <div className="text-left">
-        <div className="text-sm text-[#E6EDF3]">{label}</div>
-        {sub && <div className="text-xs text-[#484F58] mt-0.5">{sub}</div>}
+        <div className="text-sm text-[#111827]">{label}</div>
+        {sub && <div className="text-xs text-[#6B7280] mt-0.5">{sub}</div>}
       </div>
       {value
         ? <ToggleRight size={22} className="text-[#2EA043] shrink-0" />
-        : <ToggleLeft  size={22} className="text-[#484F58] shrink-0" />
+        : <ToggleLeft  size={22} className="text-[#6B7280] shrink-0" />
       }
     </button>
   )
@@ -102,20 +102,20 @@ function NumInput({ label, value, onChange, min = 0, max, step = 0.5, sub }: {
 }) {
   return (
     <div>
-      <label className="block text-xs text-[#8B949E] mb-1">{label}</label>
+      <label className="block text-xs text-[#4B5563] mb-1">{label}</label>
       <input
         type="number" min={min} max={max} step={step}
         value={value}
         onChange={e => onChange(parseFloat(e.target.value) || 0)}
-        className="w-full bg-[#0D1117] border border-[#21262D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50"
+        className="w-full bg-white border border-[#EEF2FF] rounded-lg px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#F0A30A]/60"
       />
-      {sub && <div className="text-[10px] text-[#484F58] mt-1">{sub}</div>}
+      {sub && <div className="text-[10px] text-[#6B7280] mt-1">{sub}</div>}
     </div>
   )
 }
 
 function SLabel({ text }: { text: string }) {
-  return <h3 className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3 mt-5 first:mt-0">{text}</h3>
+  return <h3 className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3 mt-5 first:mt-0">{text}</h3>
 }
 
 // ── Tab: Général ──────────────────────────────────────────────────────────────
@@ -140,7 +140,7 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
               className={`w-full flex items-start gap-3 p-3.5 rounded-xl border text-left transition-all ${
                 s.system_type === sys.value
                   ? 'border-[#F0A30A]/60 bg-[#F0A30A]/8'
-                  : 'border-[#21262D] bg-[#0D1117] hover:border-[#30363D]'
+                  : 'border-[#EEF2FF] bg-white hover:border-[#E2E8F0]'
               }`}
             >
               <div className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${
@@ -149,8 +149,8 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
                 {s.system_type === sys.value && <div className="w-2 h-2 rounded-full bg-[#F0A30A]" />}
               </div>
               <div>
-                <div className="text-sm font-semibold text-[#E6EDF3]">{sys.label}</div>
-                <div className="text-xs text-[#484F58] mt-0.5">{sys.desc}</div>
+                <div className="text-sm font-semibold text-[#111827]">{sys.label}</div>
+                <div className="text-xs text-[#6B7280] mt-0.5">{sys.desc}</div>
               </div>
             </button>
           ))}
@@ -167,15 +167,15 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
               onClick={() => setS(p => ({ ...p, note_sur: n }))}
               className={`flex-1 py-3 rounded-xl border text-sm font-semibold transition-all ${
                 s.note_sur === n
-                  ? 'border-[#F07900]/60 bg-[#F07900]/10 text-[#F07900]'
-                  : 'border-[#21262D] bg-[#0D1117] text-[#484F58] hover:border-[#30363D]'
+                  ? 'border-[#F07900]/60 bg-[#8B0073]/10 text-[#8B0073]'
+                  : 'border-[#EEF2FF] bg-white text-[#6B7280] hover:border-[#E2E8F0]'
               }`}
             >
               Sur {n}
             </button>
           ))}
         </div>
-        <p className="text-xs text-[#484F58] mt-2">
+        <p className="text-xs text-[#6B7280] mt-2">
           {s.note_sur === 100
             ? 'Les notes sont saisies sur 100. Les moyennes sont converties sur 20 pour les rapports.'
             : 'Notation standard sur 20 points.'}
@@ -211,13 +211,13 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-[#8B949E]">
+      <p className="text-xs text-[#4B5563]">
         Les mentions s&apos;appliquent automatiquement selon la moyenne générale. Elles sont triées du seuil le plus haut au plus bas.
       </p>
 
       <div className="space-y-2">
         {s.mentions.map((m, i) => (
-          <div key={i} className="flex items-center gap-2 p-3 bg-[#0D1117] border border-[#21262D] rounded-xl">
+          <div key={i} className="flex items-center gap-2 p-3 bg-white border border-[#EEF2FF] rounded-xl">
             {/* Color swatch */}
             <div className="relative shrink-0">
               <div
@@ -239,19 +239,19 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
               value={m.label}
               onChange={e => updateMention(i, 'label', e.target.value)}
               placeholder="Label"
-              className="flex-1 bg-transparent border border-[#21262D] rounded-lg px-2.5 py-1.5 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50"
+              className="flex-1 bg-transparent border border-[#EEF2FF] rounded-lg px-2.5 py-1.5 text-sm text-[#111827] focus:outline-none focus:border-[#F0A30A]/60"
             />
 
             {/* Seuil min */}
             <div className="flex items-center gap-1 shrink-0">
-              <span className="text-xs text-[#484F58]">≥</span>
+              <span className="text-xs text-[#6B7280]">≥</span>
               <input
                 type="number"
                 value={m.min}
                 min={0}
                 max={s.note_sur}
                 onChange={e => updateMention(i, 'min', parseFloat(e.target.value) || 0)}
-                className="w-16 bg-transparent border border-[#21262D] rounded-lg px-2 py-1.5 text-sm text-[#E6EDF3] text-center focus:outline-none focus:border-[#F0A30A]/50"
+                className="w-16 bg-transparent border border-[#EEF2FF] rounded-lg px-2 py-1.5 text-sm text-[#111827] text-center focus:outline-none focus:border-[#F0A30A]/60"
               />
             </div>
 
@@ -266,7 +266,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
             <button
               type="button"
               onClick={() => removeMention(i)}
-              className="shrink-0 p-1.5 rounded-lg text-[#484F58] hover:text-[#F01F38] hover:bg-[#F01F38]/10 transition-colors"
+              className="shrink-0 p-1.5 rounded-lg text-[#6B7280] hover:text-[#F01F38] hover:bg-[#F01F38]/10 transition-colors"
             >
               <Trash2 size={14} />
             </button>
@@ -277,15 +277,15 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
       <button
         type="button"
         onClick={addMention}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-[#30363D] text-[#8B949E] text-sm hover:border-[#F0A30A]/40 hover:text-[#F0A30A] transition-colors"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-[#E2E8F0] text-[#4B5563] text-sm hover:border-[#F0A30A]/40 hover:text-[#F0A30A] transition-colors"
       >
         <Plus size={14} />
         Ajouter une mention
       </button>
 
       {/* Aperçu trié */}
-      <div className="mt-4 p-3 bg-[#0D1117] border border-[#21262D] rounded-xl">
-        <div className="text-xs text-[#484F58] mb-2 font-semibold uppercase tracking-wider">Aperçu (ordre appliqué)</div>
+      <div className="mt-4 p-3 bg-white border border-[#EEF2FF] rounded-xl">
+        <div className="text-xs text-[#6B7280] mb-2 font-semibold uppercase tracking-wider">Aperçu (ordre appliqué)</div>
         <div className="flex flex-wrap gap-2">
           {sorted.map((m, i) => (
             <div
@@ -513,8 +513,8 @@ export default function ParametresAcademiquesPage() {
           className="flex items-center justify-between"
         >
           <div>
-            <h1 className="text-xl font-bold text-[#E6EDF3]">Paramètres académiques</h1>
-            <p className="text-sm text-[#8B949E] mt-0.5">
+            <h1 className="text-xl font-bold text-[#111827]">Paramètres académiques</h1>
+            <p className="text-sm text-[#4B5563] mt-0.5">
               Règles LMD, mentions, compensation & rattrapage
             </p>
           </div>
@@ -549,7 +549,7 @@ export default function ParametresAcademiquesPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-[#161B22] border border-[#21262D] rounded-xl overflow-x-auto">
+        <div className="flex gap-1 p-1 bg-white border border-[#EEF2FF] rounded-xl overflow-x-auto">
           {TABS.map(t => (
             <button
               key={t.id}
@@ -557,7 +557,7 @@ export default function ParametresAcademiquesPage() {
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
                 tab === t.id
                   ? 'bg-[#F0A30A] text-black'
-                  : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                  : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
               <t.icon size={13} />
@@ -569,7 +569,7 @@ export default function ParametresAcademiquesPage() {
         {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <RefreshCw size={20} className="animate-spin text-[#484F58]" />
+            <RefreshCw size={20} className="animate-spin text-[#6B7280]" />
           </div>
         ) : (
           <motion.div
@@ -577,7 +577,7 @@ export default function ParametresAcademiquesPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="p-5 bg-[#161B22] border border-[#21262D] rounded-xl"
+            className="p-5 bg-white border border-[#EEF2FF] rounded-xl"
           >
             {tabContent[tab]}
           </motion.div>

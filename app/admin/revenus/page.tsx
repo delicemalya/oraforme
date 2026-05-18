@@ -54,8 +54,8 @@ export default async function AdminRevenusPage() {
           <TrendingUp size={18} className="text-[#F0A30A]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Revenus & MRR</h1>
-          <p className="text-xs text-[#484F58]">Tableau de bord financier oraforme</p>
+          <h1 className="text-xl font-bold text-[#111827]">Revenus & MRR</h1>
+          <p className="text-xs text-[#6B7280]">Tableau de bord financier oraforme</p>
         </div>
       </div>
 
@@ -67,29 +67,29 @@ export default async function AdminRevenusPage() {
           { label: 'CA Clients', value: fmtFCFA(caClients), sub: 'Facturé par les clients', color: '#2EA043' },
           { label: 'ARPU', value: fmtFCFA(tenants.length > 0 ? totalMRR / tenants.length : 0), sub: 'Revenu moyen/client/mois', color: '#F07900' },
         ].map(k => (
-          <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-            <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-2">{k.label}</p>
+          <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+            <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2">{k.label}</p>
             <p className="text-xl font-bold" style={{ color: k.color }}>{k.value}</p>
-            <p className="text-xs text-[#484F58] mt-1">{k.sub}</p>
+            <p className="text-xs text-[#6B7280] mt-1">{k.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4">MRR par module</h2>
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-[#111827] mb-4">MRR par module</h2>
           <ModuleRevenueChart data={moduleRevData} />
         </div>
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4">Évolution clients (12 mois)</h2>
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-[#111827] mb-4">Évolution clients (12 mois)</h2>
           <GrowthChart data={monthlyData} />
         </div>
       </div>
 
       {/* MRR par plan */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4">MRR par plan tarifaire</h2>
+      <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+        <h2 className="text-sm font-semibold text-[#111827] mb-4">MRR par plan tarifaire</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { plan: 'starter', color: '#8B949E', label: 'Starter' },
@@ -99,16 +99,16 @@ export default async function AdminRevenusPage() {
             const nb = tenants.filter(t => t.plan === p.plan).length
             const mrr = mrrByPlan[p.plan] ?? 0
             return (
-              <div key={p.plan} className="bg-[#0D1117] border border-[#21262D] rounded-xl p-4">
+              <div key={p.plan} className="bg-white border border-[#EEF2FF] rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium" style={{ color: p.color }}>{p.label}</span>
-                  <span className="text-xs text-[#484F58]">{nb} client{nb > 1 ? 's' : ''}</span>
+                  <span className="text-xs text-[#6B7280]">{nb} client{nb > 1 ? 's' : ''}</span>
                 </div>
-                <p className="text-xl font-bold text-[#E6EDF3]">{fmtFCFA(mrr)}</p>
-                <p className="text-xs text-[#484F58] mt-1">
+                <p className="text-xl font-bold text-[#111827]">{fmtFCFA(mrr)}</p>
+                <p className="text-xs text-[#6B7280] mt-1">
                   {totalMRR > 0 ? Math.round((mrr / totalMRR) * 100) : 0}% du MRR total
                 </p>
-                <div className="h-1 bg-[#21262D] rounded-full mt-3 overflow-hidden">
+                <div className="h-1 bg-[#F0F4FF] rounded-full mt-3 overflow-hidden">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -124,20 +124,20 @@ export default async function AdminRevenusPage() {
       </div>
 
       {/* Module detail table */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4">Détail MRR par module</h2>
+      <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+        <h2 className="text-sm font-semibold text-[#111827] mb-4">Détail MRR par module</h2>
         <div className="space-y-2">
           {moduleRevData.map(m => (
             <div key={m.module} className="flex items-center gap-3">
-              <p className="text-sm text-[#8B949E] w-28 shrink-0">{m.module}</p>
-              <div className="flex-1 h-2 bg-[#21262D] rounded-full overflow-hidden">
+              <p className="text-sm text-[#4B5563] w-28 shrink-0">{m.module}</p>
+              <div className="flex-1 h-2 bg-[#F0F4FF] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#F01F38] rounded-full"
                   style={{ width: `${totalMRR > 0 ? (m.mrr / totalMRR) * 100 : 0}%` }}
                 />
               </div>
-              <p className="text-sm font-medium text-[#E6EDF3] w-32 text-right shrink-0">{fmtFCFA(m.mrr)}</p>
-              <p className="text-xs text-[#484F58] w-8 text-right shrink-0">
+              <p className="text-sm font-medium text-[#111827] w-32 text-right shrink-0">{fmtFCFA(m.mrr)}</p>
+              <p className="text-xs text-[#6B7280] w-8 text-right shrink-0">
                 {totalMRR > 0 ? Math.round((m.mrr / totalMRR) * 100) : 0}%
               </p>
             </div>

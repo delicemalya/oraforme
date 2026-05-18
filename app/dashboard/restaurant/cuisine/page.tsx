@@ -101,14 +101,14 @@ export default function CuisinePage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Écran Cuisine</h1>
-            <p className="text-xs text-[#8B949E]">
+            <p className="text-xs text-[#4B5563]">
               {commandes.length} commande(s) active(s) · Mise à jour auto toutes les 10s
             </p>
           </div>
         </div>
         <button
           onClick={load}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white hover:border-white/20 text-xs transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/[0.08] text-[#4B5563] hover:text-white hover:border-white/20 text-xs transition-colors"
         >
           <RefreshCw size={13} /> Actualiser
         </button>
@@ -116,7 +116,7 @@ export default function CuisinePage() {
 
       {/* Columns */}
       {commandes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-[#8B949E]">
+        <div className="flex flex-col items-center justify-center h-64 text-[#4B5563]">
           <ChefHat size={40} className="opacity-20 mb-3" />
           <p className="text-sm">Aucune commande en attente</p>
           <p className="text-xs mt-1 opacity-60">La liste s&apos;actualise automatiquement</p>
@@ -163,12 +163,12 @@ export default function CuisinePage() {
                               <p className="text-sm font-bold text-white">
                                 {cmd.table_num ? `Table ${cmd.table_num}` : (cmd.client_nom || 'Client')}
                               </p>
-                              <p className="text-xs text-[#8B949E] capitalize">
+                              <p className="text-xs text-[#4B5563] capitalize">
                                 {cmd.mode?.replace('_', ' ')}
                                 {cmd.source === 'en_ligne' && ' · 🌐 En ligne'}
                               </p>
                             </div>
-                            <div className="flex items-center gap-1 text-[#8B949E] text-xs">
+                            <div className="flex items-center gap-1 text-[#4B5563] text-xs">
                               <Clock size={11} />
                               <span>{timeAgo(cmd.created_at)}</span>
                             </div>
@@ -217,7 +217,7 @@ export default function CuisinePage() {
                   </AnimatePresence>
 
                   {cmds.length === 0 && (
-                    <div className="text-center py-8 text-[#484F58] text-xs border border-dashed border-white/[0.06] rounded-xl">
+                    <div className="text-center py-8 text-[#6B7280] text-xs border border-dashed border-white/[0.06] rounded-xl">
                       Aucune commande
                     </div>
                   )}

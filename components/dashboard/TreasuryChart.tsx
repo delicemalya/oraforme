@@ -24,13 +24,13 @@ function fmtFull(n: number) {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-3 shadow-2xl text-xs">
-      <p className="text-[#8B949E] font-semibold mb-2">{label}</p>
+    <div className="bg-white border border-[#E2E8F0] rounded-xl p-3 shadow-2xl text-xs">
+      <p className="text-[#4B5563] font-semibold mb-2">{label}</p>
       {payload.map((p: any) => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
           <div className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-          <span className="text-[#8B949E]">{p.name}:</span>
-          <span className="text-[#E6EDF3] font-bold">{fmtFull(p.value)}</span>
+          <span className="text-[#4B5563]">{p.name}:</span>
+          <span className="text-[#111827] font-bold">{fmtFull(p.value)}</span>
         </div>
       ))}
     </div>
@@ -41,11 +41,11 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
   const hasData = data.some(d => d.entrees > 0 || d.sorties > 0)
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-bold text-[#E6EDF3]">Trésorerie — 12 mois</h3>
-          <p className="text-[10px] text-[#484F58] mt-0.5">Entrées · Sorties · Solde cumulé</p>
+          <h3 className="text-sm font-bold text-[#111827]">Trésorerie — 12 mois</h3>
+          <p className="text-[10px] text-[#6B7280] mt-0.5">Entrées · Sorties · Solde cumulé</p>
         </div>
         <div className="flex gap-3 text-[10px]">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#2EA043] inline-block" />Entrées</span>
@@ -55,7 +55,7 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
       </div>
 
       {!hasData ? (
-        <div className="h-[220px] flex items-center justify-center text-xs text-[#484F58]">
+        <div className="h-[220px] flex items-center justify-center text-xs text-[#6B7280]">
           Aucune transaction enregistrée sur 12 mois
         </div>
       ) : (

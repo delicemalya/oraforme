@@ -80,8 +80,8 @@ export default function DaacPage() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">DAAC — Direction des Affaires Académiques</h1>
-          <p className="text-sm text-[#8B949E] mt-0.5">
+          <h1 className="text-xl font-bold text-[#111827]">DAAC — Direction des Affaires Académiques</h1>
+          <p className="text-sm text-[#4B5563] mt-0.5">
             Programmes, sessions, examens, délibérations, diplômes & soutenances
           </p>
         </motion.div>
@@ -97,13 +97,13 @@ export default function DaacPage() {
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-[#161B22] border border-[#21262D] rounded-xl overflow-x-auto">
+        <div className="flex gap-1 p-1 bg-white border border-[#EEF2FF] rounded-xl overflow-x-auto">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
-                tab === t.id ? 'bg-[#EF4444] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                tab === t.id ? 'bg-[#EF4444] text-white' : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
               <t.icon size={12} />
@@ -115,7 +115,7 @@ export default function DaacPage() {
         {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <RefreshCw size={20} className="animate-spin text-[#484F58]" />
+            <RefreshCw size={20} className="animate-spin text-[#6B7280]" />
           </div>
         ) : tenantId ? (
           <motion.div
@@ -123,7 +123,7 @@ export default function DaacPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="p-5 bg-[#161B22] border border-[#21262D] rounded-xl"
+            className="p-5 bg-white border border-[#EEF2FF] rounded-xl"
           >
             {tab === 'matieres'     && <SectionMatieres     tenantId={tenantId} enseignants={enseignants} />}
             {tab === 'sessions'     && <SectionSessions     tenantId={tenantId} />}

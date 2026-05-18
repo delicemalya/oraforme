@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className="h-full bg-[#0D1117] text-[#E6EDF3] antialiased">
+      <body className="h-full bg-white text-[#111827] antialiased">
         {children}
         <PWAInstall />
       </body>

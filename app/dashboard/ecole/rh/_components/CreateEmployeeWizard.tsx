@@ -20,12 +20,12 @@ function WFI({
 }) {
   return (
     <div className={className}>
-      <label className="block text-xs text-[#8B949E] mb-1">
+      <label className="block text-xs text-[#4B5563] mb-1">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       <input type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-white/[0.2] transition-colors" />
+        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#9CA3AF] focus:outline-none focus:border-white/[0.2] transition-colors" />
     </div>
   )
 }
@@ -38,7 +38,7 @@ function WSel({
 }) {
   return (
     <div className={className}>
-      <label className="block text-xs text-[#8B949E] mb-1">
+      <label className="block text-xs text-[#4B5563] mb-1">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       <select value={value} onChange={e => onChange(e.target.value)}
@@ -231,7 +231,7 @@ export function CreateEmployeeWizard({
     setTimeout(() => { onSuccess(); onClose() }, 2000)
   }
 
-  const SEC = 'text-[10px] font-semibold text-[#484F58] uppercase tracking-wider mb-3'
+  const SEC = 'text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider mb-3'
   const isFormateur = post_.type_employe === 'formateur' || post_.type_employe === 'vacation'
 
   return (
@@ -251,9 +251,9 @@ export function CreateEmployeeWizard({
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-base font-bold text-white">Créer un employé</h2>
-              <p className="text-xs text-[#8B949E] mt-0.5">Étape {step} / {STEPS.length} — {STEPS[step - 1].label}</p>
+              <p className="text-xs text-[#4B5563] mt-0.5">Étape {step} / {STEPS.length} — {STEPS[step - 1].label}</p>
             </div>
-            <button onClick={onClose} className="p-2 rounded-lg text-[#484F58] hover:text-white transition-colors">
+            <button onClick={onClose} className="p-2 rounded-lg text-[#6B7280] hover:text-white transition-colors">
               <X size={16} />
             </button>
           </div>
@@ -304,14 +304,14 @@ export function CreateEmployeeWizard({
                     <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 border-2 border-white/[0.08] bg-white/[0.04] flex items-center justify-center">
                       {photoPreview
                         ? <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-                        : <Camera size={24} className="text-[#484F58]" />}
+                        : <Camera size={24} className="text-[#6B7280]" />}
                     </div>
                     <div>
-                      <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[#8B949E] hover:text-white hover:border-white/[0.15] transition-all">
+                      <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[#4B5563] hover:text-white hover:border-white/[0.15] transition-all">
                         <Upload size={12} /> {photoPreview ? 'Changer la photo' : 'Ajouter une photo'}
                         <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
                       </label>
-                      <p className="text-[10px] text-[#484F58] mt-1">JPG, PNG · max 2 Mo</p>
+                      <p className="text-[10px] text-[#6B7280] mt-1">JPG, PNG · max 2 Mo</p>
                     </div>
                   </div>
 
@@ -417,7 +417,7 @@ export function CreateEmployeeWizard({
                     <WFI label="Email de connexion" value={acc_.email_connexion}
                       onChange={v => setAcc(p => ({ ...p, email_connexion: v }))}
                       type="email" placeholder="nom@organisation.com" />
-                    <p className="text-[10px] text-[#484F58] mt-1.5">Laissez vide si l'employé n'a pas accès au système.</p>
+                    <p className="text-[10px] text-[#6B7280] mt-1.5">Laissez vide si l'employé n'a pas accès au système.</p>
                   </div>
 
                   <div>
@@ -476,7 +476,7 @@ export function CreateEmployeeWizard({
                       <WFI label="Prime rendement (FCFA)" value={sal_.prime_rendement} onChange={v => setSal(p => ({ ...p, prime_rendement: v }))} type="number" />
                     </div>
                     <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(46,160,67,0.06)', border: '1px solid rgba(46,160,67,0.15)' }}>
-                      <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">Salaire brut estimé</p>
+                      <p className="text-[10px] text-[#4B5563] uppercase tracking-wider">Salaire brut estimé</p>
                       <p className="text-xl font-bold mt-1" style={{ color: '#2EA043' }}>
                         {fmtN(salaireBrut)} <span className="text-sm font-normal">FCFA</span>
                       </p>
@@ -525,7 +525,7 @@ export function CreateEmployeeWizard({
               {/* STEP 5 — Documents ────────────────────────────────────────── */}
               {step === 5 && (
                 <div className="space-y-3">
-                  <p className="text-xs text-[#8B949E]">Documents attachés au dossier et stockés de manière sécurisée.</p>
+                  <p className="text-xs text-[#4B5563]">Documents attachés au dossier et stockés de manière sécurisée.</p>
                   {[
                     { label: "Pièce d'identité", hint: 'CNI, carte de séjour · PDF ou image' },
                     { label: 'Passeport',         hint: 'Format PDF ou image'                 },
@@ -542,15 +542,15 @@ export function CreateEmployeeWizard({
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-white">{doc.label}</p>
-                        <p className="text-[10px] text-[#484F58] mt-0.5">{doc.hint}</p>
+                        <p className="text-[10px] text-[#6B7280] mt-0.5">{doc.hint}</p>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[#8B949E] group-hover:text-white transition-colors">
+                      <div className="flex items-center gap-1.5 text-[#4B5563] group-hover:text-white transition-colors">
                         <Upload size={13} /><span className="text-xs">Choisir</span>
                       </div>
                       <input type="file" accept=".pdf,image/*" className="hidden" />
                     </label>
                   ))}
-                  <p className="text-[10px] text-[#484F58]">Stockage de documents disponible dans une prochaine mise à jour.</p>
+                  <p className="text-[10px] text-[#6B7280]">Stockage de documents disponible dans une prochaine mise à jour.</p>
                 </div>
               )}
 
@@ -566,7 +566,7 @@ export function CreateEmployeeWizard({
                       </motion.div>
                       <div className="text-center">
                         <p className="text-base font-bold text-white">Employé créé avec succès !</p>
-                        <p className="text-xs text-[#8B949E] mt-1">Dossier RH · Journal comptable · Direction notifiée</p>
+                        <p className="text-xs text-[#4B5563] mt-1">Dossier RH · Journal comptable · Direction notifiée</p>
                       </div>
                     </div>
                   ) : (
@@ -578,13 +578,13 @@ export function CreateEmployeeWizard({
                           <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-white/[0.06] flex items-center justify-center">
                             {photoPreview
                               ? <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-                              : <User size={18} className="text-[#484F58]" />}
+                              : <User size={18} className="text-[#6B7280]" />}
                           </div>
                           <div className="flex-1">
                             <p className="text-sm font-bold text-white">
                               {[id_.prenom, id_.postnom, id_.nom].filter(Boolean).join(' ')}
                             </p>
-                            <p className="text-xs text-[#8B949E]">
+                            <p className="text-xs text-[#4B5563]">
                               {post_.poste}{post_.departement ? ` · ${post_.departement}` : ''}
                             </p>
                           </div>
@@ -611,7 +611,7 @@ export function CreateEmployeeWizard({
                         ].map(({ l, v }) => (
                           <div key={l} className="p-3 rounded-lg"
                             style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <p className="text-[9px] text-[#484F58] uppercase tracking-wider">{l}</p>
+                            <p className="text-[9px] text-[#6B7280] uppercase tracking-wider">{l}</p>
                             <p className="text-xs font-semibold text-white mt-0.5 truncate capitalize">{v}</p>
                           </div>
                         ))}
@@ -619,8 +619,8 @@ export function CreateEmployeeWizard({
 
                       <div className="rounded-xl p-4"
                         style={{ background: 'rgba(56,139,253,0.05)', border: '1px solid rgba(56,139,253,0.12)' }}>
-                        <p className="text-xs font-semibold text-[#F07900] mb-2">Workflow automatique à la création</p>
-                        <ul className="space-y-1 text-xs text-[#8B949E]">
+                        <p className="text-xs font-semibold text-[#8B0073] mb-2">Workflow automatique à la création</p>
+                        <ul className="space-y-1 text-xs text-[#4B5563]">
                           <li>✓ Dossier enregistré dans RH & Paie</li>
                           <li>✓ Compte tiers créé en Comptabilité (641 — Rémunérations du personnel)</li>
                           <li>✓ Notification envoyée à la Direction Générale</li>
@@ -648,11 +648,11 @@ export function CreateEmployeeWizard({
             )}
           <div className="flex items-center justify-between">
             <button onClick={() => step > 1 ? setStep(s => s - 1) : onClose()}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.08] hover:text-white transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs text-[#4B5563] border border-white/[0.08] hover:text-white transition-colors">
               <ChevronLeft size={13} /> {step > 1 ? 'Précédent' : 'Annuler'}
             </button>
 
-            <span className="text-[10px] text-[#484F58]">{step} / {STEPS.length}</span>
+            <span className="text-[10px] text-[#6B7280]">{step} / {STEPS.length}</span>
 
             {step < STEPS.length ? (
               <button onClick={() => setStep(s => s + 1)}

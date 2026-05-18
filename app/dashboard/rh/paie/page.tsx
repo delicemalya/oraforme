@@ -220,9 +220,9 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
         <Icon size={16} style={{ color }} />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] text-[#8B949E] mb-0.5">{label}</p>
+        <p className="text-[11px] text-[#4B5563] mb-0.5">{label}</p>
         <p className="text-lg font-bold text-white truncate">{value}</p>
-        {sub && <p className="text-[10px] text-[#8B949E] mt-0.5">{sub}</p>}
+        {sub && <p className="text-[10px] text-[#4B5563] mt-0.5">{sub}</p>}
       </div>
     </motion.div>
   )
@@ -257,7 +257,7 @@ function NumInput({ value, onChange, disabled }: {
       onChange={e => onChange(Number(e.target.value) || 0)}
       disabled={disabled}
       className="w-24 bg-white/[0.06] border border-white/10 rounded-md px-2 py-1 text-xs text-white text-right
-                 focus:outline-none focus:border-[#F07900]/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                 focus:outline-none focus:border-[#8B0073]/60 disabled:opacity-40 disabled:cursor-not-allowed"
     />
   )
 }
@@ -458,7 +458,7 @@ export default function PaiePage() {
 
   if (loadingTenant) {
     return (
-      <div className="flex items-center justify-center h-64 text-[#8B949E]">
+      <div className="flex items-center justify-center h-64 text-[#4B5563]">
         <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
       </div>
     )
@@ -470,7 +470,7 @@ export default function PaiePage() {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Gestion de la Paie</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">
+          <p className="text-xs text-[#4B5563] mt-0.5">
             Congo-Brazzaville · CNSS 5,04 % / 14,16 % · IRPP progressif
           </p>
         </div>
@@ -479,19 +479,19 @@ export default function PaiePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={prevMois}
-            className="p-1.5 rounded-md border border-white/10 text-[#8B949E] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-white/10 text-[#4B5563] hover:text-white hover:border-white/20 transition-colors"
           >
             <ChevronLeft size={14} />
           </button>
           <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5">
-            <Calendar size={13} className="text-[#F07900]" />
+            <Calendar size={13} className="text-[#8B0073]" />
             <select
               value={mois}
               onChange={e => setMois(Number(e.target.value))}
               className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
             >
               {MOIS_LABELS.slice(1).map((m, i) => (
-                <option key={i+1} value={i+1} className="bg-[#161B22]">{m}</option>
+                <option key={i+1} value={i+1} className="bg-white">{m}</option>
               ))}
             </select>
             <select
@@ -500,19 +500,19 @@ export default function PaiePage() {
               className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
             >
               {[2023, 2024, 2025, 2026].map(y => (
-                <option key={y} value={y} className="bg-[#161B22]">{y}</option>
+                <option key={y} value={y} className="bg-white">{y}</option>
               ))}
             </select>
           </div>
           <button
             onClick={nextMois}
-            className="p-1.5 rounded-md border border-white/10 text-[#8B949E] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-white/10 text-[#4B5563] hover:text-white hover:border-white/20 transition-colors"
           >
             <ChevronRight size={14} />
           </button>
           <button
             onClick={load}
-            className="p-1.5 rounded-md border border-white/10 text-[#8B949E] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-white/10 text-[#4B5563] hover:text-white hover:border-white/20 transition-colors"
           >
             <RefreshCw size={13} />
           </button>
@@ -600,11 +600,11 @@ export default function PaiePage() {
 
       {/* Tableau principal */}
       {loading ? (
-        <div className="flex items-center justify-center h-32 text-[#8B949E]">
+        <div className="flex items-center justify-center h-32 text-[#4B5563]">
           <Loader2 className="animate-spin mr-2" size={16} /> Chargement de la paie…
         </div>
       ) : rows.length === 0 ? (
-        <div className="text-center py-16 text-[#8B949E]">
+        <div className="text-center py-16 text-[#4B5563]">
           <Users size={32} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">Aucun employé actif trouvé.</p>
         </div>
@@ -614,17 +614,17 @@ export default function PaiePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Employé</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Base</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Primes</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider min-w-[160px]">Heures sup</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Brut</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">CNSS sal.</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">IRPP</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider text-[#2EA043]">Net</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Patro.</th>
-                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Statut</th>
-                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Actions</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Employé</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Base</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Primes</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider min-w-[160px]">Heures sup</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Brut</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">CNSS sal.</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">IRPP</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider text-[#2EA043]">Net</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Patro.</th>
+                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Statut</th>
+                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -650,13 +650,13 @@ export default function PaiePage() {
                         </div>
                         <div>
                           <p className="text-white text-xs font-medium leading-tight">{row.nom}</p>
-                          <p className="text-[#8B949E] text-[10px]">{row.poste}</p>
+                          <p className="text-[#4B5563] text-[10px]">{row.poste}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Base */}
-                    <td className="px-3 py-3 text-right text-xs text-[#8B949E]">
+                    <td className="px-3 py-3 text-right text-xs text-[#4B5563]">
                       {fmt(row.salaire_base)}
                     </td>
 
@@ -677,7 +677,7 @@ export default function PaiePage() {
                           onChange={v => updateRow(row.employe_id, 'heures_sup', v)}
                           disabled={row.statut === 'payee'}
                         />
-                        <span className="text-[10px] text-[#8B949E]">×</span>
+                        <span className="text-[10px] text-[#4B5563]">×</span>
                         <NumInput
                           value={row.taux_horaire}
                           onChange={v => updateRow(row.employe_id, 'taux_horaire', v)}
@@ -707,7 +707,7 @@ export default function PaiePage() {
                     </td>
 
                     {/* Patronal */}
-                    <td className="px-3 py-3 text-right text-xs text-[#8B949E]">
+                    <td className="px-3 py-3 text-right text-xs text-[#4B5563]">
                       {fmt(row.cnss_patronal)}
                     </td>
 
@@ -721,9 +721,9 @@ export default function PaiePage() {
                           color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#F07900' : '#F0A30A',
                         }}
                       >
-                        <option value="generee"  className="bg-[#161B22] text-[#F0A30A]">Générée</option>
-                        <option value="validee"  className="bg-[#161B22] text-[#F07900]">Validée</option>
-                        <option value="payee"    className="bg-[#161B22] text-[#2EA043]">Payée</option>
+                        <option value="generee"  className="bg-white text-[#F0A30A]">Générée</option>
+                        <option value="validee"  className="bg-white text-[#8B0073]">Validée</option>
+                        <option value="payee"    className="bg-white text-[#2EA043]">Payée</option>
                       </select>
                     </td>
 
@@ -733,7 +733,7 @@ export default function PaiePage() {
                         onClick={() => printBulletin(row, mois, annee, entreprise)}
                         title="Imprimer le bulletin"
                         className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium
-                                   bg-white/[0.06] hover:bg-white/[0.12] text-[#8B949E] hover:text-white
+                                   bg-white/[0.06] hover:bg-white/[0.12] text-[#4B5563] hover:text-white
                                    border border-white/10 transition-colors"
                       >
                         <Printer size={11} />
@@ -750,10 +750,10 @@ export default function PaiePage() {
                   <td className="px-4 py-3 text-xs font-bold text-white">
                     TOTAUX ({rows.length} employés)
                   </td>
-                  <td className="px-3 py-3 text-right text-xs text-[#8B949E] font-semibold">
+                  <td className="px-3 py-3 text-right text-xs text-[#4B5563] font-semibold">
                     {fmt(rows.reduce((s, r) => s + r.salaire_base, 0))}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs text-[#8B949E] font-semibold">
+                  <td className="px-3 py-3 text-right text-xs text-[#4B5563] font-semibold">
                     {fmt(rows.reduce((s, r) => s + r.primes, 0))}
                   </td>
                   <td />
@@ -769,7 +769,7 @@ export default function PaiePage() {
                   <td className="px-3 py-3 text-right text-xs font-bold text-[#2EA043]">
                     {fmt(totalNet)}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs font-bold text-[#8B949E]">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[#4B5563]">
                     {fmt(totalPatro)}
                   </td>
                   <td colSpan={2} />
@@ -790,24 +790,24 @@ export default function PaiePage() {
         >
           <div className="col-span-full md:col-span-2 rounded-xl border border-white/[0.06] p-4"
                style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-xs text-[#8B949E] mb-3 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-[#4B5563] mb-3 font-semibold uppercase tracking-wider">
               Récapitulatif — {MOIS_LABELS[mois]} {annee}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div>
-                <p className="text-[10px] text-[#8B949E]">Brut total</p>
+                <p className="text-[10px] text-[#4B5563]">Brut total</p>
                 <p className="font-bold text-white">{fmt(totalBrut)} FCFA</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#8B949E]">CNSS salarié total</p>
+                <p className="text-[10px] text-[#4B5563]">CNSS salarié total</p>
                 <p className="font-bold text-[#F01F38]">{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))} FCFA</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#8B949E]">IRPP total</p>
+                <p className="text-[10px] text-[#4B5563]">IRPP total</p>
                 <p className="font-bold text-[#F0A30A]">{fmt(totalIRPP)} FCFA</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#8B949E]">Net à payer</p>
+                <p className="text-[10px] text-[#4B5563]">Net à payer</p>
                 <p className="font-bold text-[#2EA043]">{fmt(totalNet)} FCFA</p>
               </div>
             </div>
@@ -815,10 +815,10 @@ export default function PaiePage() {
 
           <div className="rounded-xl border border-[#2EA043]/30 p-4 flex flex-col justify-between"
                style={{ background: 'rgba(46,160,67,0.06)' }}>
-            <p className="text-xs text-[#8B949E] font-semibold uppercase tracking-wider mb-2">Coût employeur total</p>
+            <p className="text-xs text-[#4B5563] font-semibold uppercase tracking-wider mb-2">Coût employeur total</p>
             <div>
               <p className="text-2xl font-bold text-white">{fmt(totalCout)}</p>
-              <p className="text-xs text-[#8B949E]">FCFA · dont CNSS patro {fmt(totalPatro)} FCFA</p>
+              <p className="text-xs text-[#4B5563]">FCFA · dont CNSS patro {fmt(totalPatro)} FCFA</p>
             </div>
             <button
               onClick={genererToutesPaies}

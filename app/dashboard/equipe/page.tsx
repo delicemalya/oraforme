@@ -343,7 +343,7 @@ export default function EquipePage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-[#161B22] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md"
+              className="bg-white border border-white/[0.08] rounded-2xl p-6 w-full max-w-md"
             >
               <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
                 <Send size={16} className="text-amber-400" />

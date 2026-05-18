@@ -86,7 +86,7 @@ function KpiCard({ label, value, color, icon: Icon }: { label: string; value: st
         <Icon size={16} style={{ color }} />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] text-[#8B949E] mb-0.5">{label}</p>
+        <p className="text-[11px] text-[#4B5563] mb-0.5">{label}</p>
         <p className="text-base font-bold text-white truncate">{value}</p>
       </div>
     </motion.div>
@@ -101,7 +101,7 @@ function ActionBtn({ icon, title, onClick, disabled, hoverClass = 'hover:text-wh
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`p-1.5 rounded hover:bg-white/[0.08] text-[#8B949E] ${hoverClass} transition-colors disabled:opacity-40`}
+      className={`p-1.5 rounded hover:bg-white/[0.08] text-[#4B5563] ${hoverClass} transition-colors disabled:opacity-40`}
     >
       {icon}
     </button>
@@ -113,13 +113,13 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
 }) {
   return (
     <div>
-      <label className="block text-xs text-[#8B949E] mb-1">{label}</label>
+      <label className="block text-xs text-[#4B5563] mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50"
+        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60"
       />
     </div>
   )
@@ -377,7 +377,7 @@ export default function FacturationPage() {
 
   if (tenantLoading || loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-[#8B949E]">
+      <div className="flex items-center justify-center h-64 text-[#4B5563]">
         <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
       </div>
     )
@@ -391,7 +391,7 @@ export default function FacturationPage() {
         {toast && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="fixed top-4 right-4 z-50 bg-[#161B22] border border-[#30363D] rounded-lg px-4 py-3 text-sm text-white shadow-xl"
+            className="fixed top-4 right-4 z-50 bg-white border border-[#E2E8F0] rounded-lg px-4 py-3 text-sm text-white shadow-xl"
           >
             {toast}
           </motion.div>
@@ -402,10 +402,10 @@ export default function FacturationPage() {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Facturation</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">TVA 18 % + CA 5 % · Congo-Brazzaville</p>
+          <p className="text-xs text-[#4B5563] mt-0.5">TVA 18 % + CA 5 % · Congo-Brazzaville</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/dashboard/parametres" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/10 text-[#8B949E] hover:text-white hover:border-white/20 text-xs font-medium transition-colors">
+          <Link href="/dashboard/parametres" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/10 text-[#4B5563] hover:text-white hover:border-white/20 text-xs font-medium transition-colors">
             <Settings size={13} /> Paramètres
           </Link>
           <motion.button
@@ -449,9 +449,9 @@ export default function FacturationPage() {
           ))}
         </div>
         <div className="relative">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4B5563]" />
           <input
-            className="pl-8 pr-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 w-52"
+            className="pl-8 pr-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs text-white placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60 w-52"
             placeholder="Rechercher client, N°…"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -461,7 +461,7 @@ export default function FacturationPage() {
 
       {/* Invoice Table */}
       {displayed.length === 0 ? (
-        <div className="text-center py-16 text-[#8B949E]">
+        <div className="text-center py-16 text-[#4B5563]">
           <FileText size={32} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">Aucune facture trouvée.</p>
         </div>
@@ -472,7 +472,7 @@ export default function FacturationPage() {
               <thead>
                 <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.025)' }}>
                   {['N° Facture', 'Client', 'Date', 'HT', 'TVA+CA', 'TTC', 'Statut', 'Actions'].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -495,13 +495,13 @@ export default function FacturationPage() {
                       </td>
                       <td className="px-4 py-3">
                         <p className="text-sm font-medium text-white">{f.client_name ?? f.client_nom}</p>
-                        {f.client_email && <p className="text-[10px] text-[#8B949E]">{f.client_email}</p>}
+                        {f.client_email && <p className="text-[10px] text-[#4B5563]">{f.client_email}</p>}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#8B949E] whitespace-nowrap">
+                      <td className="px-4 py-3 text-xs text-[#4B5563] whitespace-nowrap">
                         {fmtDate(f.date ?? f.created_at)}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#8B949E]">{fmt(ht)}</td>
-                      <td className="px-4 py-3 text-xs text-[#8B949E]">{fmt(tva + ca)}</td>
+                      <td className="px-4 py-3 text-xs text-[#4B5563]">{fmt(ht)}</td>
+                      <td className="px-4 py-3 text-xs text-[#4B5563]">{fmt(tva + ca)}</td>
                       <td className="px-4 py-3 text-sm font-bold text-[#F0A30A]">{fmt(ttc)}</td>
                       <td className="px-4 py-3">
                         {/* Controlled select — triggers confirmation dialog */}
@@ -512,7 +512,7 @@ export default function FacturationPage() {
                           style={{ color: STATUT_CONFIG[f.statut]?.color, background: STATUT_CONFIG[f.statut]?.bg }}
                         >
                           {Object.entries(STATUT_CONFIG).map(([k, v]) => (
-                            <option key={k} value={k} className="bg-[#161B22] text-white">{v.label}</option>
+                            <option key={k} value={k} className="bg-white text-white">{v.label}</option>
                           ))}
                         </select>
                       </td>
@@ -522,13 +522,13 @@ export default function FacturationPage() {
                           <ActionBtn title="Aperçu plein écran" onClick={() => router.push(`/dashboard/factures/${f.id}/preview`)}                                 icon={<ExternalLink size={13} />} hoverClass="hover:text-[#F0A30A]" />
                           <ActionBtn title="Modifier"        onClick={() => openEdit(f)}                                                                           icon={<Edit3 size={13} />} />
                           {f.client_phone && <ActionBtn title="WhatsApp" onClick={() => sendWhatsApp(f)}                                                           icon={<MessageCircle size={13} />} hoverClass="hover:text-[#25D366]" />}
-                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#F07900]" />}
+                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#8B0073]" />}
                           <ActionBtn
                             title="Télécharger PDF"
                             onClick={() => downloadPDF(f.id, f.invoice_number ?? f.id.slice(0, 8))}
                             disabled={dlLoading === f.id}
                             icon={dlLoading === f.id ? <Loader2 className="animate-spin" size={13} /> : <Download size={13} />}
-                            hoverClass="hover:text-[#F07900]"
+                            hoverClass="hover:text-[#8B0073]"
                           />
                           <ActionBtn title="Supprimer" onClick={() => del(f.id)} icon={<Trash2 size={13} />} hoverClass="hover:text-red-400" />
                         </div>
@@ -552,20 +552,20 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="relative w-full max-w-4xl bg-[#161B22] border border-white/[0.08] rounded-2xl shadow-2xl mb-10"
+                className="relative w-full max-w-4xl bg-white border border-white/[0.08] rounded-2xl shadow-2xl mb-10"
                 initial={{ scale: 0.96, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 20 }}
                 onClick={e => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
                   <h2 className="text-base font-bold text-white">{editId ? 'Modifier la facture' : 'Nouvelle facture'}</h2>
-                  <button onClick={() => setShowForm(false)} className="text-[#8B949E] hover:text-white transition-colors"><X size={18} /></button>
+                  <button onClick={() => setShowForm(false)} className="text-[#4B5563] hover:text-white transition-colors"><X size={18} /></button>
                 </div>
 
                 <div className="p-6 space-y-6">
                   {/* Client + Metadata */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Informations client</p>
+                      <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider">Informations client</p>
                       <FormInput label="Nom / Entreprise *" value={clientNom} onChange={setClientNom} placeholder="Entreprise ABC" />
                       <FormInput label="Adresse" value={clientAddress} onChange={setClientAddress} placeholder="123 Rue du Commerce, Brazzaville" />
                       <div className="grid grid-cols-2 gap-3">
@@ -574,16 +574,16 @@ export default function FacturationPage() {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Informations facture</p>
+                      <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider">Informations facture</p>
                       <FormInput label="N° Facture" value={invoiceNum} onChange={setInvoiceNum} placeholder="FAC-2025-0001" />
                       <div className="grid grid-cols-2 gap-3">
                         <FormInput label="Date" value={dateVal} onChange={setDateVal} type="date" />
                         <FormInput label="Date d'échéance" value={dueDate} onChange={setDueDate} type="date" />
                       </div>
                       <div>
-                        <label className="block text-xs text-[#8B949E] mb-1">Statut</label>
-                        <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F0A30A]/50">
-                          {Object.entries(STATUT_CONFIG).map(([k, v]) => <option key={k} value={k} className="bg-[#161B22]">{v.label}</option>)}
+                        <label className="block text-xs text-[#4B5563] mb-1">Statut</label>
+                        <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F0A30A]/60">
+                          {Object.entries(STATUT_CONFIG).map(([k, v]) => <option key={k} value={k} className="bg-white">{v.label}</option>)}
                         </select>
                       </div>
                     </div>
@@ -592,16 +592,16 @@ export default function FacturationPage() {
                   {/* Lines */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Lignes de facture</p>
+                      <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider">Lignes de facture</p>
                       <button onClick={() => setLignes(p => [...p, emptyLigne()])} className="text-xs text-[#F0A30A] hover:underline flex items-center gap-1">
                         <Plus size={11} /> Ajouter une ligne
                       </button>
                     </div>
                     <div className="grid grid-cols-12 gap-2 mb-1 px-1">
-                      <span className="col-span-5 text-[10px] text-[#8B949E] uppercase tracking-wider">Désignation</span>
-                      <span className="col-span-3 text-[10px] text-[#8B949E] uppercase tracking-wider">Prix unitaire</span>
-                      <span className="col-span-2 text-[10px] text-[#8B949E] uppercase tracking-wider">Qté</span>
-                      <span className="col-span-1 text-[10px] text-[#8B949E] uppercase tracking-wider text-right">Total</span>
+                      <span className="col-span-5 text-[10px] text-[#4B5563] uppercase tracking-wider">Désignation</span>
+                      <span className="col-span-3 text-[10px] text-[#4B5563] uppercase tracking-wider">Prix unitaire</span>
+                      <span className="col-span-2 text-[10px] text-[#4B5563] uppercase tracking-wider">Qté</span>
+                      <span className="col-span-1 text-[10px] text-[#4B5563] uppercase tracking-wider text-right">Total</span>
                       <span className="col-span-1" />
                     </div>
                     <div className="space-y-2">
@@ -612,20 +612,20 @@ export default function FacturationPage() {
                           className={`grid grid-cols-12 gap-2 items-center rounded-lg px-2 py-1.5 ${i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'}`}
                         >
                           <div className="col-span-5">
-                            <input className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/50" placeholder="Description du service…" value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
+                            <input className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/60" placeholder="Description du service…" value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
                           </div>
                           <div className="col-span-3">
-                            <input type="number" min="0" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/50 text-right" value={l.price || ''} onChange={e => updateLigne(i, 'price', e.target.value)} />
+                            <input type="number" min="0" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/60 text-right" value={l.price || ''} onChange={e => updateLigne(i, 'price', e.target.value)} />
                           </div>
                           <div className="col-span-2">
-                            <input type="number" min="1" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/50 text-center" value={l.quantity} onChange={e => updateLigne(i, 'quantity', e.target.value)} />
+                            <input type="number" min="1" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/60 text-center" value={l.quantity} onChange={e => updateLigne(i, 'quantity', e.target.value)} />
                           </div>
                           <div className="col-span-1 text-right">
                             <span className="text-xs font-semibold text-[#F0A30A]">{fmt(l.price * l.quantity)}</span>
                           </div>
                           <div className="col-span-1 flex justify-center">
                             {lignes.length > 1 && (
-                              <button onClick={() => setLignes(p => p.filter((_, idx) => idx !== i))} className="text-[#484F58] hover:text-red-400 transition-colors p-1">
+                              <button onClick={() => setLignes(p => p.filter((_, idx) => idx !== i))} className="text-[#6B7280] hover:text-red-400 transition-colors p-1">
                                 <Trash2 size={12} />
                               </button>
                             )}
@@ -638,12 +638,12 @@ export default function FacturationPage() {
                   {/* Fiscal Breakdown */}
                   <div className="border border-white/[0.08] rounded-xl overflow-hidden">
                     <div className="px-4 py-2 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                      <span className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Récapitulatif fiscal · Congo-Brazzaville</span>
+                      <span className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider">Récapitulatif fiscal · Congo-Brazzaville</span>
                     </div>
                     <div className="p-4 space-y-2">
-                      <div className="flex justify-between text-sm"><span className="text-[#8B949E]">Sous-total HT</span><span className="text-white font-medium">{fmt(subtotalLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[#8B949E]">TVA (18 %)</span><span className="text-white">{fmt(tvaLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[#8B949E]">CA (5 % de la TVA)</span><span className="text-white">{fmt(caLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[#4B5563]">Sous-total HT</span><span className="text-white font-medium">{fmt(subtotalLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[#4B5563]">TVA (18 %)</span><span className="text-white">{fmt(tvaLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[#4B5563]">CA (5 % de la TVA)</span><span className="text-white">{fmt(caLive)}</span></div>
                       <div className="border-t border-white/[0.08] pt-3 flex justify-between">
                         <span className="text-base font-bold text-white">TOTAL TTC</span>
                         <span className="text-xl font-bold text-[#F0A30A]">{fmt(ttcLive)}</span>
@@ -653,16 +653,16 @@ export default function FacturationPage() {
 
                   {/* Notes */}
                   <div>
-                    <label className="block text-xs text-[#8B949E] mb-1.5">Notes (optionnel)</label>
-                    <textarea rows={3} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 resize-none" placeholder="Conditions de paiement, remerciements…" value={notes} onChange={e => setNotes(e.target.value)} />
+                    <label className="block text-xs text-[#4B5563] mb-1.5">Notes (optionnel)</label>
+                    <textarea rows={3} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60 resize-none" placeholder="Conditions de paiement, remerciements…" value={notes} onChange={e => setNotes(e.target.value)} />
                   </div>
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-3 pt-2">
-                    <button onClick={() => setShowForm(false)} className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-[#8B949E] hover:text-white hover:border-white/20 text-sm font-medium transition-colors">
+                    <button onClick={() => setShowForm(false)} className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-[#4B5563] hover:text-white hover:border-white/20 text-sm font-medium transition-colors">
                       Annuler
                     </button>
-                    <button onClick={() => handleSave('brouillon')} disabled={saving || !clientNom} className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-[#8B949E] hover:text-white hover:border-white/20 text-sm font-medium transition-colors disabled:opacity-40">
+                    <button onClick={() => handleSave('brouillon')} disabled={saving || !clientNom} className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-[#4B5563] hover:text-white hover:border-white/20 text-sm font-medium transition-colors disabled:opacity-40">
                       {saving ? <Loader2 className="animate-spin" size={14} /> : 'Enregistrer brouillon'}
                     </button>
                     <button
@@ -691,7 +691,7 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="relative w-full max-w-2xl max-h-[90vh] bg-[#161B22] border border-white/[0.08] rounded-2xl shadow-2xl flex flex-col"
+                className="relative w-full max-w-2xl max-h-[90vh] bg-white border border-white/[0.08] rounded-2xl shadow-2xl flex flex-col"
                 initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
                 onClick={e => e.stopPropagation()}
               >
@@ -700,25 +700,25 @@ export default function FacturationPage() {
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="text-sm font-bold text-white">{viewedFac.invoice_number ?? '—'}</p>
-                      <p className="text-[10px] text-[#8B949E] mt-0.5">{viewedFac.client_name ?? viewedFac.client_nom}</p>
+                      <p className="text-[10px] text-[#4B5563] mt-0.5">{viewedFac.client_name ?? viewedFac.client_nom}</p>
                     </div>
                     <StatutBadge statut={viewedFac.statut} size="xs" />
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => router.push(`/dashboard/factures/${viewedFac.id}/preview`)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-[#8B949E] hover:text-white text-xs font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-[#4B5563] hover:text-white text-xs font-medium transition-colors"
                     >
                       <ExternalLink size={12} /> Aperçu
                     </button>
                     <button
                       onClick={() => downloadPDF(viewedFac.id, viewedFac.invoice_number ?? viewedFac.id.slice(0, 8))}
                       disabled={dlLoading === viewedFac.id}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F07900]/15 border border-[#F07900]/30 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/25 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8B0073]/10 border border-[#8B0073]/30 text-[#8B0073] text-xs font-semibold hover:bg-[#8B0073]/15 transition-colors disabled:opacity-50"
                     >
                       {dlLoading === viewedFac.id ? <Loader2 className="animate-spin" size={12} /> : <Download size={12} />} PDF
                     </button>
-                    <button onClick={() => setViewId(null)} className="text-[#8B949E] hover:text-white p-1 transition-colors"><X size={18} /></button>
+                    <button onClick={() => setViewId(null)} className="text-[#4B5563] hover:text-white p-1 transition-colors"><X size={18} /></button>
                   </div>
                 </div>
 
@@ -728,16 +728,16 @@ export default function FacturationPage() {
                   {/* Client + Dates */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-2">Client</p>
+                      <p className="text-[10px] text-[#4B5563] uppercase tracking-wider mb-2">Client</p>
                       <p className="font-semibold text-white text-sm">{viewedFac.client_name ?? viewedFac.client_nom}</p>
-                      {viewedFac.client_address && <p className="text-xs text-[#8B949E] mt-0.5">{viewedFac.client_address}</p>}
-                      {viewedFac.client_phone   && <p className="text-xs text-[#8B949E]">{viewedFac.client_phone}</p>}
-                      {viewedFac.client_email   && <p className="text-xs text-[#8B949E]">{viewedFac.client_email}</p>}
+                      {viewedFac.client_address && <p className="text-xs text-[#4B5563] mt-0.5">{viewedFac.client_address}</p>}
+                      {viewedFac.client_phone   && <p className="text-xs text-[#4B5563]">{viewedFac.client_phone}</p>}
+                      {viewedFac.client_email   && <p className="text-xs text-[#4B5563]">{viewedFac.client_email}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-2">Dates</p>
-                      <p className="text-xs text-[#8B949E]">Émise le <span className="text-white">{fmtDate(viewedFac.date ?? viewedFac.created_at)}</span></p>
-                      {viewedFac.due_date && <p className="text-xs text-[#8B949E] mt-1">Échéance <span className="text-white">{fmtDate(viewedFac.due_date)}</span></p>}
+                      <p className="text-[10px] text-[#4B5563] uppercase tracking-wider mb-2">Dates</p>
+                      <p className="text-xs text-[#4B5563]">Émise le <span className="text-white">{fmtDate(viewedFac.date ?? viewedFac.created_at)}</span></p>
+                      {viewedFac.due_date && <p className="text-xs text-[#4B5563] mt-1">Échéance <span className="text-white">{fmtDate(viewedFac.due_date)}</span></p>}
                     </div>
                   </div>
 
@@ -747,10 +747,10 @@ export default function FacturationPage() {
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(240,163,10,0.08)' }}>
-                            <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider">Désignation</th>
-                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider">Prix U.</th>
-                            <th className="text-center px-3 py-2 text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider">Qté</th>
-                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider">Total</th>
+                            <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#4B5563] uppercase tracking-wider">Désignation</th>
+                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#4B5563] uppercase tracking-wider">Prix U.</th>
+                            <th className="text-center px-3 py-2 text-[10px] font-semibold text-[#4B5563] uppercase tracking-wider">Qté</th>
+                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#4B5563] uppercase tracking-wider">Total</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -760,9 +760,9 @@ export default function FacturationPage() {
                               className={`border-b border-white/[0.04] ${i === viewLignes.length - 1 ? 'border-0' : ''}`}
                               style={{ background: i % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent' }}
                             >
-                              <td className="px-3 py-2 text-[#E6EDF3]">{l.description}</td>
-                              <td className="px-3 py-2 text-[#8B949E] text-right">{fmt(l.price)}</td>
-                              <td className="px-3 py-2 text-[#8B949E] text-center">{l.quantity}</td>
+                              <td className="px-3 py-2 text-[#111827]">{l.description}</td>
+                              <td className="px-3 py-2 text-[#4B5563] text-right">{fmt(l.price)}</td>
+                              <td className="px-3 py-2 text-[#4B5563] text-center">{l.quantity}</td>
                               <td className="px-3 py-2 text-[#F0A30A] font-semibold text-right">{fmt(l.price * l.quantity)}</td>
                             </tr>
                           ))}
@@ -777,9 +777,9 @@ export default function FacturationPage() {
                     const { tva, ca, ttc } = calculerTVACongo(ht)
                     return (
                       <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 space-y-2">
-                        <div className="flex justify-between text-sm"><span className="text-[#8B949E]">Sous-total HT</span><span className="text-white">{fmt(ht)}</span></div>
-                        <div className="flex justify-between text-sm"><span className="text-[#8B949E]">TVA 18 %</span><span className="text-white">{fmt(tva)}</span></div>
-                        <div className="flex justify-between text-sm"><span className="text-[#8B949E]">CA 5 %</span><span className="text-white">{fmt(ca)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-[#4B5563]">Sous-total HT</span><span className="text-white">{fmt(ht)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-[#4B5563]">TVA 18 %</span><span className="text-white">{fmt(tva)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-[#4B5563]">CA 5 %</span><span className="text-white">{fmt(ca)}</span></div>
                         <div className="border-t border-white/[0.08] pt-2 flex justify-between">
                           <span className="font-bold text-white">TOTAL TTC</span>
                           <span className="font-bold text-[#F0A30A] text-lg">{fmt(ttc)}</span>
@@ -790,7 +790,7 @@ export default function FacturationPage() {
 
                   {/* Changer statut */}
                   <div>
-                    <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-2">Changer le statut</p>
+                    <p className="text-[10px] text-[#4B5563] uppercase tracking-wider mb-2">Changer le statut</p>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(STATUT_CONFIG).map(([k, v]) => {
                         const Icon = v.icon
@@ -818,7 +818,7 @@ export default function FacturationPage() {
                   <div>
                     <button
                       onClick={() => setShowPdfPreview(p => !p)}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/[0.08] text-[#8B949E] hover:text-white hover:border-white/[0.16] text-sm font-medium transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/[0.08] text-[#4B5563] hover:text-white hover:border-white/[0.16] text-sm font-medium transition-colors"
                     >
                       <span className="flex items-center gap-2"><FileText size={14} /> {showPdfPreview ? 'Masquer' : 'Afficher'} l&apos;aperçu PDF</span>
                       <span>{showPdfPreview ? '▲' : '▼'}</span>
@@ -844,8 +844,8 @@ export default function FacturationPage() {
                   {/* Notes */}
                   {viewedFac.notes && (
                     <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
-                      <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1.5">Notes</p>
-                      <p className="text-sm text-[#E6EDF3]">{viewedFac.notes}</p>
+                      <p className="text-[10px] text-[#4B5563] uppercase tracking-wider mb-1.5">Notes</p>
+                      <p className="text-sm text-[#111827]">{viewedFac.notes}</p>
                     </div>
                   )}
 
@@ -862,14 +862,14 @@ export default function FacturationPage() {
                     {viewedFac.client_email && (
                       <button
                         onClick={() => sendEmail(viewedFac)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#F07900]/30 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/10 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#8B0073]/30 text-[#8B0073] text-xs font-semibold hover:bg-[#8B0073]/10 transition-colors"
                       >
                         <Mail size={13} /> Email
                       </button>
                     )}
                     <button
                       onClick={() => { setViewId(null); openEdit(viewedFac) }}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/[0.08] text-[#8B949E] hover:text-white text-xs font-medium transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/[0.08] text-[#4B5563] hover:text-white text-xs font-medium transition-colors"
                     >
                       <Edit3 size={13} /> Modifier
                     </button>
@@ -892,12 +892,12 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="w-full max-w-sm bg-[#161B22] border border-white/[0.08] rounded-2xl shadow-2xl p-6"
+                className="w-full max-w-sm bg-white border border-white/[0.08] rounded-2xl shadow-2xl p-6"
                 initial={{ scale: 0.92 }} animate={{ scale: 1 }} exit={{ scale: 0.92 }}
                 onClick={e => e.stopPropagation()}
               >
                 <h3 className="text-base font-bold text-white mb-2">Confirmer le changement ?</h3>
-                <p className="text-sm text-[#8B949E] mb-5">
+                <p className="text-sm text-[#4B5563] mb-5">
                   Passer de{' '}
                   <span className="font-semibold" style={{ color: STATUT_CONFIG[confirmStatut.current].color }}>
                     {STATUT_CONFIG[confirmStatut.current].label}
@@ -910,7 +910,7 @@ export default function FacturationPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setConfirmStatut(null)}
-                    className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-[#8B949E] hover:text-white text-sm font-medium transition-colors"
+                    className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-[#4B5563] hover:text-white text-sm font-medium transition-colors"
                   >
                     Annuler
                   </button>

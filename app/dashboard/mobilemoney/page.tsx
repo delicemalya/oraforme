@@ -107,8 +107,8 @@ export default function MobileMoneyPage() {
           <Smartphone size={18} className="text-[#2EA043]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Mobile Money</h1>
-          <p className="text-xs text-[#484F58]">Airtel Money · MTN MoMo · Wave · Orange Money</p>
+          <h1 className="text-xl font-bold text-[#111827]">Mobile Money</h1>
+          <p className="text-xs text-[#6B7280]">Airtel Money · MTN MoMo · Wave · Orange Money</p>
         </div>
       </div>
 
@@ -118,19 +118,19 @@ export default function MobileMoneyPage() {
           { op: 'airtel', solde: airtelSolde, num: '06 XXX XXX' },
           { op: 'mtn',    solde: mtnSolde,   num: '05 XXX XXX' },
         ].map(w => (
-          <div key={w.op} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5"
+          <div key={w.op} className="bg-white border border-[#E2E8F0] rounded-xl p-5"
             style={{ borderTop: `3px solid ${OP_COLORS[w.op]}` }}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Smartphone size={16} style={{ color: OP_COLORS[w.op] }} />
-                <span className="text-sm font-semibold text-[#E6EDF3]">{OP_LABELS[w.op]}</span>
+                <span className="text-sm font-semibold text-[#111827]">{OP_LABELS[w.op]}</span>
               </div>
-              <span className="text-xs text-[#484F58]">{w.num}</span>
+              <span className="text-xs text-[#6B7280]">{w.num}</span>
             </div>
             <p className={`text-2xl font-bold ${w.solde >= 0 ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
               {fmtFCFA(w.solde)}
             </p>
-            <p className="text-xs text-[#484F58] mt-1">Solde estimé</p>
+            <p className="text-xs text-[#6B7280] mt-1">Solde estimé</p>
           </div>
         ))}
       </div>
@@ -142,8 +142,8 @@ export default function MobileMoneyPage() {
           { label: 'Total envoyé', value: fmtFCFA(totalEnvoi), color: '#F01F38' },
           { label: 'Frais payés', value: fmtFCFA(totalFrais), color: '#8B949E' },
         ].map(k => (
-          <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4 text-center">
-            <p className="text-xs text-[#484F58] mb-1">{k.label}</p>
+          <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-xl p-4 text-center">
+            <p className="text-xs text-[#6B7280] mb-1">{k.label}</p>
             <p className="text-base font-bold" style={{ color: k.color }}>{k.value}</p>
           </div>
         ))}
@@ -162,36 +162,36 @@ export default function MobileMoneyPage() {
       </div>
 
       {/* Transactions */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#30363D] flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[#E6EDF3]">Historique transactions</h2>
-          <span className="text-xs text-[#484F58]">{txs.length} transaction{txs.length > 1 ? 's' : ''}</span>
+      <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-[#111827]">Historique transactions</h2>
+          <span className="text-xs text-[#6B7280]">{txs.length} transaction{txs.length > 1 ? 's' : ''}</span>
         </div>
         {loading ? (
-          <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[#484F58]" /></div>
+          <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[#6B7280]" /></div>
         ) : txs.length === 0 ? (
-          <div className="p-10 text-center text-[#484F58] text-sm">Aucune transaction Mobile Money</div>
+          <div className="p-10 text-center text-[#6B7280] text-sm">Aucune transaction Mobile Money</div>
         ) : (
-          <div className="divide-y divide-[#21262D]">
+          <div className="divide-y divide-[#EEF2FF]">
             {txs.slice(0, 50).map(t => (
-              <div key={t.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#21262D]/30">
+              <div key={t.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#F0F4FF]/80">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                   style={{ backgroundColor: OP_COLORS[t.operateur] + '20' }}>
                   <Smartphone size={13} style={{ color: OP_COLORS[t.operateur] }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#E6EDF3] truncate">{t.nom_destinataire || t.numero_destinataire || 'Transaction'}</p>
-                  <p className="text-xs text-[#484F58]">{OP_LABELS[t.operateur]} · {t.reference}</p>
+                  <p className="text-sm text-[#111827] truncate">{t.nom_destinataire || t.numero_destinataire || 'Transaction'}</p>
+                  <p className="text-xs text-[#6B7280]">{OP_LABELS[t.operateur]} · {t.reference}</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className={`text-sm font-semibold ${t.type === 'reception' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
                     {t.type === 'reception' ? '+' : '-'}{fmtFCFA(t.montant)}
                   </p>
-                  {t.frais > 0 && <p className="text-xs text-[#484F58]">Frais : {fmtFCFA(t.frais)}</p>}
+                  {t.frais > 0 && <p className="text-xs text-[#6B7280]">Frais : {fmtFCFA(t.frais)}</p>}
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded border ${
                   t.statut === 'confirme' ? 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30'
-                  : 'text-[#8B949E] bg-[#21262D] border-[#30363D]'
+                  : 'text-[#4B5563] bg-[#F0F4FF] border-[#E2E8F0]'
                 }`}>{t.statut}</span>
               </div>
             ))}
@@ -206,22 +206,22 @@ export default function MobileMoneyPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
-              <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#E6EDF3] mb-4">
+              className="relative bg-white border border-[#E2E8F0] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[#6B7280] hover:text-[#4B5563]"><X size={16} /></button>
+              <h3 className="text-base font-bold text-[#111827] mb-4">
                 {modal === 'recevoir' ? '📥 Recevoir un paiement' : '📤 Envoyer de l\'argent'}
               </h3>
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-1 block">Opérateur</label>
+                  <label className="text-xs text-[#4B5563] mb-1 block">Opérateur</label>
                   <div className="grid grid-cols-4 gap-2">
                     {(['airtel', 'mtn', 'wave', 'orange'] as const).map(op => (
                       <button key={op} onClick={() => setForm(f => ({ ...f, operateur: op }))}
                         className={`py-2 rounded-lg text-xs font-medium transition-colors border ${
                           form.operateur === op
                             ? 'border-current'
-                            : 'border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3]'
+                            : 'border-[#E2E8F0] text-[#4B5563] hover:text-[#111827]'
                         }`}
                         style={form.operateur === op ? { color: OP_COLORS[op], backgroundColor: OP_COLORS[op] + '15', borderColor: OP_COLORS[op] + '50' } : {}}>
                         {OP_LABELS[op].split(' ')[0]}
@@ -230,12 +230,12 @@ export default function MobileMoneyPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
+                  <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA)</label>
                   <input type="number" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#2EA043]/50" />
+                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#2EA043]/50" />
                   {form.type === 'envoi' && form.montant && (
-                    <p className="text-xs text-[#8B949E] mt-1">
+                    <p className="text-xs text-[#4B5563] mt-1">
                       Frais : {fmtFCFA(Math.round(parseInt(form.montant||'0') * (FRAIS[form.operateur] ?? 0.01)))}
                     </p>
                   )}
@@ -243,28 +243,28 @@ export default function MobileMoneyPage() {
                 {modal === 'envoyer' && (
                   <>
                     <div>
-                      <label className="text-xs text-[#8B949E] mb-1 block">Numéro destinataire</label>
+                      <label className="text-xs text-[#4B5563] mb-1 block">Numéro destinataire</label>
                       <input value={form.numero} onChange={e => setForm(f => ({ ...f, numero: e.target.value }))}
                         placeholder="0X XXX XXXX"
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
+                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#8B949E] mb-1 block">Nom destinataire</label>
+                      <label className="text-xs text-[#4B5563] mb-1 block">Nom destinataire</label>
                       <input value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))}
                         placeholder="Nom du bénéficiaire"
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
+                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none" />
                     </div>
                   </>
                 )}
                 {modal === 'recevoir' && form.montant && (
                   <div className="bg-[#2EA043]/5 border border-[#2EA043]/20 rounded-lg p-3">
-                    <p className="text-xs text-[#8B949E] mb-2">Partagez cette référence de paiement :</p>
+                    <p className="text-xs text-[#4B5563] mb-2">Partagez cette référence de paiement :</p>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 text-sm text-[#2EA043] font-mono bg-[#0D1117] rounded px-2 py-1">
+                      <code className="flex-1 text-sm text-[#2EA043] font-mono bg-white rounded px-2 py-1">
                         PAY-{form.operateur.toUpperCase()}-{form.montant}FCFA
                       </code>
                       <button onClick={() => copyToClipboard(`PAY-${form.operateur.toUpperCase()}-${form.montant}FCFA`)}
-                        className="p-1.5 text-[#8B949E] hover:text-[#2EA043] transition-colors">
+                        className="p-1.5 text-[#4B5563] hover:text-[#2EA043] transition-colors">
                         {copied ? <Check size={13} /> : <Copy size={13} />}
                       </button>
                     </div>
@@ -274,7 +274,7 @@ export default function MobileMoneyPage() {
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors">
                   Annuler
                 </button>
                 <button onClick={save} disabled={saving || !form.montant}

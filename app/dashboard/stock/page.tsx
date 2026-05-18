@@ -50,16 +50,16 @@ const UNITES = ['pièce', 'kg', 'litre', 'mètre', 'carton', 'sac', 'palette', '
 function FInput({ label, ...p }: React.InputHTMLAttributes<HTMLInputElement> & { label?: string }) {
   return (
     <div>
-      {label && <label className="block text-xs text-[#8B949E] mb-1.5">{label}</label>}
-      <input {...p} className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 transition-colors" />
+      {label && <label className="block text-xs text-[#4B5563] mb-1.5">{label}</label>}
+      <input {...p} className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60 transition-colors" />
     </div>
   )
 }
 function FSelect({ label, children, ...p }: React.SelectHTMLAttributes<HTMLSelectElement> & { label?: string }) {
   return (
     <div>
-      {label && <label className="block text-xs text-[#8B949E] mb-1.5">{label}</label>}
-      <select {...p} className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50 transition-colors">
+      {label && <label className="block text-xs text-[#4B5563] mb-1.5">{label}</label>}
+      <select {...p} className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#F0A30A]/60 transition-colors">
         {children}
       </select>
     </div>
@@ -69,10 +69,10 @@ function ModalShell({ title, children, onClose }: { title: string; children: Rea
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-[#E6EDF3]">{title}</h2>
-          <button onClick={onClose} className="text-[#484F58] hover:text-[#E6EDF3] transition-colors"><X size={16} /></button>
+          <h2 className="text-base font-semibold text-[#111827]">{title}</h2>
+          <button onClick={onClose} className="text-[#6B7280] hover:text-[#111827] transition-colors"><X size={16} /></button>
         </div>
         {children}
       </div>
@@ -82,7 +82,7 @@ function ModalShell({ title, children, onClose }: { title: string; children: Rea
 function ModalActions({ onCancel, onSave, saving, label }: { onCancel: () => void; onSave: () => void; saving: boolean; label: string }) {
   return (
     <div className="flex gap-3 pt-2">
-      <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-sm text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+      <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm text-[#4B5563] hover:text-[#111827] transition-colors">
         Annuler
       </button>
       <button onClick={onSave} disabled={saving}
@@ -309,7 +309,7 @@ export default function StockPage() {
 
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-[#0D1117] border-[#2EA043]/40 text-[#E6EDF3]' : 'bg-[#0D1117] border-red-500/40 text-red-300'}`}>
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-white border-[#2EA043]/40 text-[#111827]' : 'bg-white border-red-500/40 text-red-300'}`}>
           {toast.ok ? <Check size={14} className="text-[#2EA043]" /> : <X size={14} className="text-red-400" />}
           {toast.msg}
         </div>
@@ -321,8 +321,8 @@ export default function StockPage() {
           <Package size={18} className="text-[#F0A30A]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Stock & Inventaire</h1>
-          <p className="text-xs text-[#484F58]">{products.length} produits{alertes.length > 0 && <span className="ml-2 text-red-400">· {alertes.length} alerte{alertes.length > 1 ? 's' : ''}</span>}</p>
+          <h1 className="text-xl font-bold text-[#111827]">Stock & Inventaire</h1>
+          <p className="text-xs text-[#6B7280]">{products.length} produits{alertes.length > 0 && <span className="ml-2 text-red-400">· {alertes.length} alerte{alertes.length > 1 ? 's' : ''}</span>}</p>
         </div>
       </div>
 
@@ -350,13 +350,13 @@ export default function StockPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1">
+      <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1">
         {TABS.map(t => {
           const Icon = t.icon
           const active = tab === t.id
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium flex-1 justify-center transition-colors ${active ? 'bg-[#F0A30A] text-[#0D1117]' : 'text-[#484F58] hover:text-[#8B949E]'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium flex-1 justify-center transition-colors ${active ? 'bg-[#F0A30A] text-[#0D1117]' : 'text-[#6B7280] hover:text-[#4B5563]'}`}
             >
               <Icon size={13} /><span className="hidden sm:inline">{t.label}</span>
             </button>
@@ -369,20 +369,20 @@ export default function StockPage() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#484F58]" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280]" />
               <input placeholder="Rechercher par nom, SKU…" value={search} onChange={e => setSearch(e.target.value)}
-                className="w-full bg-[#161B22] border border-[#30363D] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/40" />
+                className="w-full bg-white border border-[#E2E8F0] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/40" />
             </div>
             <div className="flex gap-2 flex-wrap">
               {categories.map(c => (
                 <button key={c} onClick={() => setCatFilter(c)}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${catFilter === c ? 'bg-[#F0A30A]/10 text-[#F0A30A] border border-[#F0A30A]/30' : 'bg-[#161B22] border border-[#30363D] text-[#484F58] hover:text-[#E6EDF3]'}`}>
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${catFilter === c ? 'bg-[#F0A30A]/10 text-[#F0A30A] border border-[#F0A30A]/30' : 'bg-white border border-[#E2E8F0] text-[#6B7280] hover:text-[#111827]'}`}>
                   {c === 'tous' ? 'Tous' : c}
                 </button>
               ))}
               {alertes.length > 0 && (
                 <button onClick={() => setCatFilter(catFilter === 'alertes' ? 'tous' : 'alertes')}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${catFilter === 'alertes' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-[#161B22] border border-[#30363D] text-red-400/70 hover:text-red-400'}`}>
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${catFilter === 'alertes' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-white border border-[#E2E8F0] text-red-400/70 hover:text-red-400'}`}>
                   <AlertTriangle size={11} /> Alertes ({alertes.length})
                 </button>
               )}
@@ -394,19 +394,19 @@ export default function StockPage() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-[#484F58]">
+            <div className="text-center py-16 text-[#6B7280]">
               <Package size={32} className="mx-auto mb-3 opacity-30" />
               <p className="text-sm">{products.length === 0 ? 'Aucun produit — commencez par en ajouter un' : 'Aucun résultat'}</p>
             </div>
           ) : (
             <>
-              <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+              <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-[#30363D]">
+                      <tr className="border-b border-[#E2E8F0]">
                         {['Produit', 'Catégorie', 'Unité', 'P. Achat', 'P. Vente', 'Stock', 'Statut', ''].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-xs text-[#484F58] uppercase tracking-wider font-medium whitespace-nowrap">{h}</th>
+                          <th key={h} className="text-left px-4 py-3 text-xs text-[#6B7280] uppercase tracking-wider font-medium whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -414,18 +414,18 @@ export default function StockPage() {
                       {filtered.map((p, i) => {
                         const enAlerte = p.stock_actuel <= p.seuil_alerte
                         return (
-                          <tr key={p.id} className={`group ${i < filtered.length - 1 ? 'border-b border-[#21262D]' : ''} hover:bg-[#21262D]/50 transition-colors`}>
+                          <tr key={p.id} className={`group ${i < filtered.length - 1 ? 'border-b border-[#EEF2FF]' : ''} hover:bg-[#F0F4FF]/50 transition-colors`}>
                             <td className="px-4 py-3">
-                              <p className="font-medium text-[#E6EDF3]">{p.nom}</p>
-                              {p.sku && <p className="text-xs text-[#484F58]">SKU : {p.sku}</p>}
+                              <p className="font-medium text-[#111827]">{p.nom}</p>
+                              {p.sku && <p className="text-xs text-[#6B7280]">SKU : {p.sku}</p>}
                             </td>
-                            <td className="px-4 py-3 text-[#8B949E] whitespace-nowrap">{p.categorie || '—'}</td>
-                            <td className="px-4 py-3 text-[#8B949E]">{p.unite}</td>
-                            <td className="px-4 py-3 text-[#E6EDF3] whitespace-nowrap">{fmtFCFA(p.prix_achat)}</td>
-                            <td className="px-4 py-3 text-[#E6EDF3] whitespace-nowrap">{fmtFCFA(p.prix_vente)}</td>
+                            <td className="px-4 py-3 text-[#4B5563] whitespace-nowrap">{p.categorie || '—'}</td>
+                            <td className="px-4 py-3 text-[#4B5563]">{p.unite}</td>
+                            <td className="px-4 py-3 text-[#111827] whitespace-nowrap">{fmtFCFA(p.prix_achat)}</td>
+                            <td className="px-4 py-3 text-[#111827] whitespace-nowrap">{fmtFCFA(p.prix_vente)}</td>
                             <td className="px-4 py-3">
-                              <span className={`font-bold ${enAlerte ? 'text-red-400' : 'text-[#E6EDF3]'}`}>{p.stock_actuel}</span>
-                              <span className="text-xs text-[#484F58] ml-1">{p.unite}</span>
+                              <span className={`font-bold ${enAlerte ? 'text-red-400' : 'text-[#111827]'}`}>{p.stock_actuel}</span>
+                              <span className="text-xs text-[#6B7280] ml-1">{p.unite}</span>
                             </td>
                             <td className="px-4 py-3">
                               {enAlerte
@@ -439,10 +439,10 @@ export default function StockPage() {
                                   Ajuster
                                 </button>
                                 <button onClick={() => { setMEdit(p); setEditForm({ nom: p.nom, categorie: p.categorie ?? '', sku: p.sku ?? '', unite: p.unite, prix_achat: String(p.prix_achat), prix_vente: String(p.prix_vente), seuil_alerte: String(p.seuil_alerte) }) }}
-                                  className="text-[#484F58] hover:text-[#F07900] transition-colors">
+                                  className="text-[#6B7280] hover:text-[#8B0073] transition-colors">
                                   <Pencil size={13} />
                                 </button>
-                                <button onClick={() => deleteProduct(p.id)} className="text-[#484F58] hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
+                                <button onClick={() => deleteProduct(p.id)} className="text-[#6B7280] hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
                               </div>
                             </td>
                           </tr>
@@ -453,10 +453,10 @@ export default function StockPage() {
                 </div>
               </div>
 
-              <div className="bg-[#161B22] border border-[#30363D] rounded-xl px-5 py-4 flex items-center justify-between">
+              <div className="bg-white border border-[#E2E8F0] rounded-xl px-5 py-4 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Valeur totale du stock</p>
-                  <p className="text-xs text-[#484F58] mt-0.5">{products.length} produits · {products.reduce((s, p) => s + p.stock_actuel, 0)} unités</p>
+                  <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider">Valeur totale du stock</p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">{products.length} produits · {products.reduce((s, p) => s + p.stock_actuel, 0)} unités</p>
                 </div>
                 <p className="text-2xl font-bold text-[#F0A30A]">{fmtFCFA(valeurTotale)}</p>
               </div>
@@ -468,17 +468,17 @@ export default function StockPage() {
       {/* ──────────── MOUVEMENTS ──────────── */}
       {tab === 'mouvements' && (
         <div className="space-y-4">
-          <p className="text-sm text-[#8B949E]">{movements.length} mouvement{movements.length > 1 ? 's' : ''} récents</p>
+          <p className="text-sm text-[#4B5563]">{movements.length} mouvement{movements.length > 1 ? 's' : ''} récents</p>
           {movements.length === 0 ? (
-            <div className="text-center py-16 text-[#484F58]"><RotateCcw size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun mouvement — ajustez un produit pour commencer</p></div>
+            <div className="text-center py-16 text-[#6B7280]"><RotateCcw size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun mouvement — ajustez un produit pour commencer</p></div>
           ) : (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#30363D]">
+                    <tr className="border-b border-[#E2E8F0]">
                       {['Date & Heure', 'Produit', 'Type', 'Quantité', 'Référence', 'Note'].map(h => (
-                        <th key={h} className="text-left px-4 py-3 text-xs text-[#484F58] uppercase tracking-wider font-medium whitespace-nowrap">{h}</th>
+                        <th key={h} className="text-left px-4 py-3 text-xs text-[#6B7280] uppercase tracking-wider font-medium whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -487,12 +487,12 @@ export default function StockPage() {
                       const mt = MOV_META[m.type] ?? MOV_META.ADJUSTMENT
                       const MIcon = mt.Icon
                       return (
-                        <tr key={m.id} className={`${i < movements.length - 1 ? 'border-b border-[#21262D]' : ''}`}>
-                          <td className="px-4 py-3 text-xs text-[#484F58] whitespace-nowrap">
+                        <tr key={m.id} className={`${i < movements.length - 1 ? 'border-b border-[#EEF2FF]' : ''}`}>
+                          <td className="px-4 py-3 text-xs text-[#6B7280] whitespace-nowrap">
                             {new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                             {' '}{new Date(m.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                           </td>
-                          <td className="px-4 py-3 text-[#E6EDF3] font-medium">{(m.products as { nom: string } | null)?.nom ?? '—'}</td>
+                          <td className="px-4 py-3 text-[#111827] font-medium">{(m.products as { nom: string } | null)?.nom ?? '—'}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${mt.bg} ${mt.color}`}>
                               <MIcon size={9} />{mt.label}
@@ -501,8 +501,8 @@ export default function StockPage() {
                           <td className={`px-4 py-3 font-bold ${m.type === 'OUT' ? 'text-red-400' : 'text-emerald-400'}`}>
                             {m.type === 'OUT' ? '−' : '+'}{m.quantite}
                           </td>
-                          <td className="px-4 py-3 text-xs text-[#8B949E]">{m.reference || '—'}</td>
-                          <td className="px-4 py-3 text-xs text-[#484F58]">{m.note || '—'}</td>
+                          <td className="px-4 py-3 text-xs text-[#4B5563]">{m.reference || '—'}</td>
+                          <td className="px-4 py-3 text-xs text-[#6B7280]">{m.note || '—'}</td>
                         </tr>
                       )
                     })}
@@ -523,17 +523,17 @@ export default function StockPage() {
             </button>
           </div>
           {warehouses.length === 0 ? (
-            <div className="text-center py-16 text-[#484F58]"><Warehouse size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun entrepôt configuré</p></div>
+            <div className="text-center py-16 text-[#6B7280]"><Warehouse size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun entrepôt configuré</p></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {warehouses.map(w => (
-                <div key={w.id} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 flex items-start gap-3">
+                <div key={w.id} className="bg-white border border-[#E2E8F0] rounded-xl p-5 flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center shrink-0">
                     <Warehouse size={15} className="text-[#8B0073]" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#E6EDF3]">{w.nom}</p>
-                    <p className="text-xs text-[#484F58] mt-0.5">{w.localisation || 'Aucune localisation'}</p>
+                    <p className="font-semibold text-[#111827]">{w.nom}</p>
+                    <p className="text-xs text-[#6B7280] mt-0.5">{w.localisation || 'Aucune localisation'}</p>
                   </div>
                 </div>
               ))}
@@ -551,24 +551,24 @@ export default function StockPage() {
             </button>
           </div>
           {suppliers.length === 0 ? (
-            <div className="text-center py-16 text-[#484F58]"><Users2 size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun fournisseur enregistré</p></div>
+            <div className="text-center py-16 text-[#6B7280]"><Users2 size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun fournisseur enregistré</p></div>
           ) : (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#30363D]">
+                  <tr className="border-b border-[#E2E8F0]">
                     {['Nom', 'Téléphone', 'Email', 'Adresse'].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-xs text-[#484F58] uppercase tracking-wider font-medium">{h}</th>
+                      <th key={h} className="text-left px-4 py-3 text-xs text-[#6B7280] uppercase tracking-wider font-medium">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {suppliers.map((s, i) => (
-                    <tr key={s.id} className={`${i < suppliers.length - 1 ? 'border-b border-[#21262D]' : ''} hover:bg-[#21262D]/50 transition-colors`}>
-                      <td className="px-4 py-3 font-medium text-[#E6EDF3]">{s.nom}</td>
-                      <td className="px-4 py-3 text-[#8B949E]">{s.telephone || '—'}</td>
-                      <td className="px-4 py-3 text-[#8B949E]">{s.email || '—'}</td>
-                      <td className="px-4 py-3 text-[#8B949E]">{s.adresse || '—'}</td>
+                    <tr key={s.id} className={`${i < suppliers.length - 1 ? 'border-b border-[#EEF2FF]' : ''} hover:bg-[#F0F4FF]/50 transition-colors`}>
+                      <td className="px-4 py-3 font-medium text-[#111827]">{s.nom}</td>
+                      <td className="px-4 py-3 text-[#4B5563]">{s.telephone || '—'}</td>
+                      <td className="px-4 py-3 text-[#4B5563]">{s.email || '—'}</td>
+                      <td className="px-4 py-3 text-[#4B5563]">{s.adresse || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -587,24 +587,24 @@ export default function StockPage() {
             </button>
           </div>
           {purchases.length === 0 ? (
-            <div className="text-center py-16 text-[#484F58]"><ShoppingCart size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun achat enregistré</p></div>
+            <div className="text-center py-16 text-[#6B7280]"><ShoppingCart size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun achat enregistré</p></div>
           ) : (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#30363D]">
+                  <tr className="border-b border-[#E2E8F0]">
                     {['Date', 'Fournisseur', 'Montant total', 'Statut'].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-xs text-[#484F58] uppercase tracking-wider font-medium">{h}</th>
+                      <th key={h} className="text-left px-4 py-3 text-xs text-[#6B7280] uppercase tracking-wider font-medium">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {purchases.map((p, i) => (
-                    <tr key={p.id} className={`${i < purchases.length - 1 ? 'border-b border-[#21262D]' : ''} hover:bg-[#21262D]/50 transition-colors`}>
-                      <td className="px-4 py-3 text-xs text-[#8B949E] whitespace-nowrap">
+                    <tr key={p.id} className={`${i < purchases.length - 1 ? 'border-b border-[#EEF2FF]' : ''} hover:bg-[#F0F4FF]/50 transition-colors`}>
+                      <td className="px-4 py-3 text-xs text-[#4B5563] whitespace-nowrap">
                         {new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-4 py-3 text-[#E6EDF3]">{(p.suppliers as { nom: string } | null)?.nom ?? 'Sans fournisseur'}</td>
+                      <td className="px-4 py-3 text-[#111827]">{(p.suppliers as { nom: string } | null)?.nom ?? 'Sans fournisseur'}</td>
                       <td className="px-4 py-3 font-bold text-[#F0A30A]">{fmtFCFA(p.montant_total)}</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.statut === 'reçu' ? 'bg-emerald-500/10 text-emerald-400' : p.statut === 'commande' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>
@@ -675,23 +675,23 @@ export default function StockPage() {
         <ModalShell title={`Ajuster — ${mAdjust.nom}`} onClose={() => setMAdjust(null)}>
           <div className="space-y-4">
             <div>
-              <label className="block text-xs text-[#8B949E] mb-2">Type de mouvement</label>
+              <label className="block text-xs text-[#4B5563] mb-2">Type de mouvement</label>
               <div className="grid grid-cols-3 gap-2">
                 {(['IN', 'OUT', 'ADJUSTMENT'] as const).map(t => {
                   const mt = MOV_META[t]
                   const MIcon = mt.Icon
                   return (
                     <button key={t} onClick={() => setAdjForm(f => ({...f, type: t}))}
-                      className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-medium border transition-colors ${adjForm.type === t ? `${mt.bg} ${mt.color} border-current` : 'border-[#30363D] text-[#484F58] hover:text-[#8B949E]'}`}>
+                      className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-medium border transition-colors ${adjForm.type === t ? `${mt.bg} ${mt.color} border-current` : 'border-[#E2E8F0] text-[#6B7280] hover:text-[#4B5563]'}`}>
                       <MIcon size={11} />{mt.label}
                     </button>
                   )
                 })}
               </div>
             </div>
-            <div className="bg-[#0D1117] rounded-xl px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-[#484F58]">Stock actuel</span>
-              <span className="font-bold text-[#E6EDF3]">{mAdjust.stock_actuel} <span className="text-[#484F58] font-normal">{mAdjust.unite}</span></span>
+            <div className="bg-white rounded-xl px-4 py-3 flex items-center justify-between text-sm">
+              <span className="text-[#6B7280]">Stock actuel</span>
+              <span className="font-bold text-[#111827]">{mAdjust.stock_actuel} <span className="text-[#6B7280] font-normal">{mAdjust.unite}</span></span>
             </div>
             <FInput
               label={adjForm.type === 'ADJUSTMENT' ? 'Delta (+/−) en ' + mAdjust.unite : `Quantité (${mAdjust.unite})`}
@@ -757,7 +757,7 @@ export default function StockPage() {
             </div>
 
             <div>
-              <label className="block text-xs text-[#8B949E] mb-2">Articles commandés</label>
+              <label className="block text-xs text-[#4B5563] mb-2">Articles commandés</label>
               <div className="space-y-2">
                 {purchForm.items.map((item, idx) => (
                   <div key={idx} className="grid grid-cols-[1fr_72px_96px_20px] gap-2 items-end">
@@ -767,23 +767,23 @@ export default function StockPage() {
                     </FSelect>
                     <input type="number" min="0" placeholder="Qté" value={item.quantite}
                       onChange={e => setPurchForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? {...it, quantite: e.target.value} : it) }))}
-                      className="bg-[#0D1117] border border-[#30363D] rounded-lg px-2 py-2 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50 w-full" />
+                      className="bg-white border border-[#E2E8F0] rounded-lg px-2 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#F0A30A]/60 w-full" />
                     <input type="number" min="0" placeholder="Prix" value={item.prix}
                       onChange={e => setPurchForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? {...it, prix: e.target.value} : it) }))}
-                      className="bg-[#0D1117] border border-[#30363D] rounded-lg px-2 py-2 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50 w-full" />
+                      className="bg-white border border-[#E2E8F0] rounded-lg px-2 py-2 text-sm text-[#111827] focus:outline-none focus:border-[#F0A30A]/60 w-full" />
                     <button onClick={() => setPurchForm(f => ({ ...f, items: f.items.filter((_, i) => i !== idx) }))}
-                      className="text-[#484F58] hover:text-red-400 transition-colors pb-2 self-end"><X size={13} /></button>
+                      className="text-[#6B7280] hover:text-red-400 transition-colors pb-2 self-end"><X size={13} /></button>
                   </div>
                 ))}
                 <button onClick={() => setPurchForm(f => ({ ...f, items: [...f.items, { product_id: '', quantite: '', prix: '' }] }))}
-                  className="flex items-center gap-1.5 text-xs text-[#484F58] hover:text-[#F0A30A] transition-colors mt-1">
+                  className="flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#F0A30A] transition-colors mt-1">
                   <Plus size={12} /> Ajouter un article
                 </button>
               </div>
             </div>
 
-            <div className="bg-[#0D1117] rounded-xl px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-[#8B949E]">Total commande</span>
+            <div className="bg-white rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-[#4B5563]">Total commande</span>
               <span className="font-bold text-[#F0A30A]">{fmtFCFA(purchForm.items.reduce((s, i) => s + (Number(i.quantite) || 0) * (Number(i.prix) || 0), 0))}</span>
             </div>
             <ModalActions onCancel={() => setMPurchase(false)} onSave={savePurchase} saving={saving} label="Valider et mettre à jour le stock" />

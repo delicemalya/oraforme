@@ -92,22 +92,22 @@ function Section({ title, rows, total, totalLabel, totalColor = '#F0A30A' }: {
   totalColor?: string
 }) {
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 border-b border-[#30363D] bg-[#0D1117]/50">
-        <h3 className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">{title}</h3>
+    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-[#E2E8F0] bg-white/50">
+        <h3 className="text-xs font-bold text-[#111827] uppercase tracking-wider">{title}</h3>
       </div>
-      <div className="divide-y divide-[#21262D]">
+      <div className="divide-y divide-[#EEF2FF]">
         {rows.map((r, i) => (
           <div key={i} className={`flex justify-between items-center px-5 py-2.5 ${r.indent ? 'pl-8' : ''}`}>
-            <span className="text-sm text-[#8B949E]">{r.label}</span>
+            <span className="text-sm text-[#4B5563]">{r.label}</span>
             <span className="text-sm font-semibold" style={{ color: r.color ?? '#E6EDF3' }}>
               {fmtFCFA(r.value)}
             </span>
           </div>
         ))}
       </div>
-      <div className="px-5 py-3 border-t border-[#30363D] bg-[#0D1117]/50 flex justify-between items-center">
-        <span className="text-sm font-bold text-[#E6EDF3]">{totalLabel}</span>
+      <div className="px-5 py-3 border-t border-[#E2E8F0] bg-white/50 flex justify-between items-center">
+        <span className="text-sm font-bold text-[#111827]">{totalLabel}</span>
         <span className="text-base font-bold" style={{ color: totalColor }}>{fmtFCFA(total)}</span>
       </div>
     </div>
@@ -237,29 +237,29 @@ export default function RapportsPage() {
             <BarChart2 size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#E6EDF3]">Rapports Financiers</h1>
-            <p className="text-xs text-[#484F58]">ERP · {nomEntreprise} · {moisLabel}</p>
+            <h1 className="text-xl font-bold text-[#111827]">Rapports Financiers</h1>
+            <p className="text-xs text-[#6B7280]">ERP · {nomEntreprise} · {moisLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <select value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))}
-            className="bg-[#161B22] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+            className="bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <button onClick={load} className="p-2 rounded-lg bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+          <button onClick={load} className="p-2 rounded-lg bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors">
             <RefreshCw size={14} />
           </button>
         </div>
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1 overflow-x-auto">
         {TABS.map((t, i) => {
           const Icon = TAB_ICONS[i]
           return (
             <button key={i} onClick={() => setTab(i)}
               className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === i ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                tab === i ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'text-[#4B5563] hover:text-[#111827]'
               }`}>
               <Icon size={11} />{t}
             </button>
@@ -268,7 +268,7 @@ export default function RapportsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-[#8B949E]">
+        <div className="flex items-center justify-center py-20 text-[#4B5563]">
           <Loader2 size={22} className="animate-spin mr-2" /> Chargement des données…
         </div>
       ) : data ? (
@@ -290,8 +290,8 @@ export default function RapportsPage() {
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <div className="xl:col-span-2 bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
-                  <h2 className="text-sm font-bold text-[#E6EDF3] mb-4 flex items-center gap-2">
+                <div className="xl:col-span-2 bg-white border border-[#EEF2FF] rounded-2xl p-5">
+                  <h2 className="text-sm font-bold text-[#111827] mb-4 flex items-center gap-2">
                     <FileText size={14} className="text-[#F0A30A]" /> Détail financier — {data.annee}
                   </h2>
                   <div className="space-y-3">
@@ -304,24 +304,24 @@ export default function RapportsPage() {
                     ].map(row => (
                       <div key={row.label}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-[#8B949E]">{row.label}</span>
+                          <span className="text-xs text-[#4B5563]">{row.label}</span>
                           <span className="text-xs font-bold" style={{ color: row.color }}>{fmtFCFA(row.val)}</span>
                         </div>
-                        <div className="h-1.5 bg-[#21262D] rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-[#F0F4FF] rounded-full overflow-hidden">
                           <motion.div className="h-full rounded-full" style={{ background: row.color }}
                             initial={{ width: 0 }} animate={{ width: `${Math.min(row.pct, 100)}%` }} transition={{ duration: 0.8 }} />
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[#21262D]">
+                  <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[#EEF2FF]">
                     {[
                       { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#2EA043' : '#F0A30A' },
                       { label: 'Employés', val: data.nbEmployes.toString(), color: '#F07900' },
                       { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#2EA043' : marge >= 10 ? '#F0A30A' : '#F01F38' },
                     ].map(s => (
-                      <div key={s.label} className="bg-[#0D1117] border border-[#21262D] rounded-xl p-3 text-center">
-                        <p className="text-[10px] text-[#484F58] mb-1 uppercase tracking-wide">{s.label}</p>
+                      <div key={s.label} className="bg-white border border-[#EEF2FF] rounded-xl p-3 text-center">
+                        <p className="text-[10px] text-[#6B7280] mb-1 uppercase tracking-wide">{s.label}</p>
                         <p className="text-base font-bold" style={{ color: s.color }}>{s.val}</p>
                       </div>
                     ))}
@@ -329,30 +329,30 @@ export default function RapportsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
+                  <div className="bg-white border border-[#EEF2FF] rounded-2xl p-5">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#1E3A5F,#1D4ED8)' }}>
                         <Users size={14} className="text-white" />
                       </div>
-                      <p className="text-sm font-bold text-[#E6EDF3]">Ressources Humaines</p>
+                      <p className="text-sm font-bold text-[#111827]">Ressources Humaines</p>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between py-2 border-b border-[#21262D]">
-                        <span className="text-xs text-[#8B949E]">Effectif</span>
-                        <span className="text-sm font-bold text-[#F07900]">{data.nbEmployes}</span>
+                      <div className="flex justify-between py-2 border-b border-[#EEF2FF]">
+                        <span className="text-xs text-[#4B5563]">Effectif</span>
+                        <span className="text-sm font-bold text-[#8B0073]">{data.nbEmployes}</span>
                       </div>
-                      <div className="flex justify-between py-2 border-b border-[#21262D]">
-                        <span className="text-xs text-[#8B949E]">Masse salariale</span>
+                      <div className="flex justify-between py-2 border-b border-[#EEF2FF]">
+                        <span className="text-xs text-[#4B5563]">Masse salariale</span>
                         <span className="text-sm font-bold text-[#8B0073]">{fmtFCFA(data.salairesTotal)}</span>
                       </div>
                       <div className="flex justify-between py-2">
-                        <span className="text-xs text-[#8B949E]">Charges CNSS</span>
+                        <span className="text-xs text-[#4B5563]">Charges CNSS</span>
                         <span className="text-sm font-bold text-[#F97316]">{fmtFCFA(data.cnssTotal)}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
-                    <p className="text-xs font-bold text-[#E6EDF3] mb-3 uppercase tracking-wide">Exports</p>
+                  <div className="bg-white border border-[#EEF2FF] rounded-2xl p-5">
+                    <p className="text-xs font-bold text-[#111827] mb-3 uppercase tracking-wide">Exports</p>
                     <div className="space-y-2">
                       {[
                         { label: 'Rapport PDF', note: 'À venir' },
@@ -360,12 +360,12 @@ export default function RapportsPage() {
                         { label: 'Rapport TVA Congo', note: 'Onglet TVA' },
                       ].map(e => (
                         <button key={e.label} onClick={() => e.note === 'Onglet TVA' ? setTab(4) : undefined}
-                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#21262D] hover:border-[#30363D] hover:bg-[#21262D] transition-all group text-left">
+                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#EEF2FF] hover:border-[#E2E8F0] hover:bg-[#F0F4FF] transition-all group text-left">
                           <div className="flex items-center gap-2">
-                            <Download size={12} className="text-[#484F58] group-hover:text-[#F0A30A] transition-colors" />
-                            <span className="text-xs text-[#8B949E] group-hover:text-[#E6EDF3] transition-colors">{e.label}</span>
+                            <Download size={12} className="text-[#6B7280] group-hover:text-[#F0A30A] transition-colors" />
+                            <span className="text-xs text-[#4B5563] group-hover:text-[#111827] transition-colors">{e.label}</span>
                           </div>
-                          <span className="text-[10px] text-[#484F58]">{e.note}</span>
+                          <span className="text-[10px] text-[#6B7280]">{e.note}</span>
                         </button>
                       ))}
                     </div>
@@ -376,8 +376,8 @@ export default function RapportsPage() {
               {data.caResto > 0 && (() => {
                 const fiscal = calculerTVACongo(data.caResto)
                 return (
-                  <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
-                    <h2 className="text-sm font-bold text-[#E6EDF3] mb-4 flex items-center gap-2">
+                  <div className="bg-white border border-[#EEF2FF] rounded-2xl p-5">
+                    <h2 className="text-sm font-bold text-[#111827] mb-4 flex items-center gap-2">
                       <ChefHat size={14} className="text-[#F0A30A]" /> Restaurant — {data.annee}
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -387,8 +387,8 @@ export default function RapportsPage() {
                         { label: 'TVA collectée (18%)',val: fmtFCFA(fiscal.tva),     color: '#8B0073' },
                         { label: 'CA (5% TVA)',         val: fmtFCFA(fiscal.ca),      color: '#F01F38' },
                       ].map(k => (
-                        <div key={k.label} className="bg-[#0D1117] border border-[#21262D] rounded-xl p-4">
-                          <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-2">{k.label}</p>
+                        <div key={k.label} className="bg-white border border-[#EEF2FF] rounded-xl p-4">
+                          <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mb-2">{k.label}</p>
                           <p className="text-base font-bold" style={{ color: k.color }}>{k.val}</p>
                         </div>
                       ))}
@@ -402,7 +402,7 @@ export default function RapportsPage() {
           {/* ── TAB 1 : Compte de résultat ── */}
           {tab === 1 && (
             <div className="space-y-4">
-              <p className="text-xs text-[#484F58]">Exercice {data.annee} · OHADA / Plan comptable congolais</p>
+              <p className="text-xs text-[#6B7280]">Exercice {data.annee} · OHADA / Plan comptable congolais</p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Section
                   title="PRODUITS D'EXPLOITATION"
@@ -436,7 +436,7 @@ export default function RapportsPage() {
               <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#2EA043]/40 bg-[#2EA043]/5' : 'border-[#F01F38]/40 bg-[#F01F38]/5'}`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-[#8B949E]">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#4B5563]">
                       {resultatNet >= 0 ? 'BÉNÉFICE NET' : 'PERTE NETTE'} — EXERCICE {data.annee}
                     </p>
                     <p className="text-3xl font-bold mt-1" style={{ color: resultatNet >= 0 ? '#2EA043' : '#F01F38' }}>
@@ -444,7 +444,7 @@ export default function RapportsPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-[#484F58]">Marge nette</p>
+                    <p className="text-xs text-[#6B7280]">Marge nette</p>
                     <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#2EA043' : marge >= 10 ? '#F0A30A' : '#F01F38' }}>
                       {marge}%
                     </p>
@@ -456,8 +456,8 @@ export default function RapportsPage() {
                     { label: 'Charges',  value: fmtFCFA(totalCharges),  color: '#F01F38' },
                     { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#F07900' : '#F01F38' },
                   ].map(r => (
-                    <div key={r.label} className="bg-[#0D1117]/60 rounded-xl p-3 text-center">
-                      <p className="text-[10px] text-[#484F58] mb-1">{r.label}</p>
+                    <div key={r.label} className="bg-white/60 rounded-xl p-3 text-center">
+                      <p className="text-[10px] text-[#6B7280] mb-1">{r.label}</p>
                       <p className="text-sm font-bold" style={{ color: r.color }}>{r.value}</p>
                     </div>
                   ))}
@@ -469,7 +469,7 @@ export default function RapportsPage() {
           {/* ── TAB 2 : Bilan ── */}
           {tab === 2 && (
             <div className="space-y-4">
-              <p className="text-xs text-[#484F58]">Bilan simplifié au 31/12/{data.annee} — OHADA</p>
+              <p className="text-xs text-[#6B7280]">Bilan simplifié au 31/12/{data.annee} — OHADA</p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Section
                   title="ACTIF"
@@ -507,15 +507,15 @@ export default function RapportsPage() {
               </div>
 
               {/* Équilibre */}
-              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+              <div className="bg-white border border-[#E2E8F0] rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Scale size={16} className="text-[#F0A30A]" />
-                    <span className="text-sm font-bold text-[#E6EDF3]">Vérification équilibre</span>
+                    <span className="text-sm font-bold text-[#111827]">Vérification équilibre</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-[#484F58]">Actif — Passif</p>
-                    <p className="text-sm font-bold text-[#8B949E]">
+                    <p className="text-xs text-[#6B7280]">Actif — Passif</p>
+                    <p className="text-sm font-bold text-[#4B5563]">
                       (bilan simplifié — hors immobilisations)
                     </p>
                   </div>
@@ -527,7 +527,7 @@ export default function RapportsPage() {
           {/* ── TAB 3 : Flux de trésorerie ── */}
           {tab === 3 && (
             <div className="space-y-4">
-              <p className="text-xs text-[#484F58]">Flux de trésorerie — Exercice {data.annee}</p>
+              <p className="text-xs text-[#6B7280]">Flux de trésorerie — Exercice {data.annee}</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
@@ -535,12 +535,12 @@ export default function RapportsPage() {
                   { label: 'Variation nette', value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#2EA043' : '#F01F38', icon: Activity },
                   { label: 'Solde clôture',  value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#F07900' : '#F01F38', icon: Wallet },
                 ].map((k, i) => (
-                  <motion.div key={k.label} {...fadeUp(i)} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 flex items-center gap-4">
+                  <motion.div key={k.label} {...fadeUp(i)} className="bg-white border border-[#E2E8F0] rounded-xl p-5 flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: k.color + '20' }}>
                       <k.icon size={18} style={{ color: k.color }} />
                     </div>
                     <div>
-                      <p className="text-xs text-[#484F58] mb-0.5">{k.label}</p>
+                      <p className="text-xs text-[#6B7280] mb-0.5">{k.label}</p>
                       <p className="text-lg font-bold" style={{ color: k.color }}>{fmtFCFA(k.value)}</p>
                     </div>
                   </motion.div>
@@ -561,13 +561,13 @@ export default function RapportsPage() {
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-                  <h3 className="text-xs font-bold text-[#484F58] uppercase tracking-wider mb-3">FLUX D'INVESTISSEMENT</h3>
-                  <p className="text-sm text-[#484F58] text-center py-4">Non suivi dans cet exercice</p>
+                <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+                  <h3 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">FLUX D'INVESTISSEMENT</h3>
+                  <p className="text-sm text-[#6B7280] text-center py-4">Non suivi dans cet exercice</p>
                 </div>
-                <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-                  <h3 className="text-xs font-bold text-[#484F58] uppercase tracking-wider mb-3">FLUX DE FINANCEMENT</h3>
-                  <p className="text-sm text-[#484F58] text-center py-4">Non suivi dans cet exercice</p>
+                <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+                  <h3 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">FLUX DE FINANCEMENT</h3>
+                  <p className="text-sm text-[#6B7280] text-center py-4">Non suivi dans cet exercice</p>
                 </div>
               </div>
             </div>
@@ -581,7 +581,7 @@ export default function RapportsPage() {
             const fiscalResto = data.caResto > 0 ? calculerTVACongo(data.caResto) : null
             return (
               <div className="space-y-4">
-                <p className="text-xs text-[#484F58]">Rapport TVA Congo DRC — Exercice {data.annee}</p>
+                <p className="text-xs text-[#6B7280]">Rapport TVA Congo DRC — Exercice {data.annee}</p>
 
                 <Section
                   title="TVA COLLECTÉE — Sur factures"
@@ -623,13 +623,13 @@ export default function RapportsPage() {
                       { label: "Contribution d'Appui (CA)",    value: caTotal + (fiscalResto?.ca ?? 0) },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#F0A30A]/10 last:border-0">
-                        <span className="text-sm text-[#8B949E]">{r.label}</span>
+                        <span className="text-sm text-[#4B5563]">{r.label}</span>
                         <span className="text-sm font-bold text-[#F0A30A]">{fmtFCFA(r.value)}</span>
                       </div>
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t border-[#F0A30A]/30 flex justify-between items-center">
-                    <span className="text-base font-bold text-[#E6EDF3]">TOTAL À PAYER À LA DGI</span>
+                    <span className="text-base font-bold text-[#111827]">TOTAL À PAYER À LA DGI</span>
                     <span className="text-xl font-bold text-[#F01F38]">
                       {fmtFCFA(totalDGI + (fiscalResto?.tva ?? 0) + (fiscalResto?.ca ?? 0))}
                     </span>
@@ -641,7 +641,7 @@ export default function RapportsPage() {
 
           {/* ── TAB 5 : Analyse MIAA+ ── */}
           {tab === 5 && (
-            <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5 overflow-hidden relative">
+            <div className="bg-white border border-[#EEF2FF] rounded-2xl p-5 overflow-hidden relative">
               <div className="absolute top-0 right-0 w-48 h-48 opacity-5 pointer-events-none"
                 style={{ background: 'radial-gradient(circle, #F0A30A 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
               <div className="relative">
@@ -651,8 +651,8 @@ export default function RapportsPage() {
                       <Sparkles size={16} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#E6EDF3]">Analyse MIAA+</p>
-                      <p className="text-[10px] text-[#484F58]">Powered by Claude · {nomEntreprise} · {data.annee}</p>
+                      <p className="text-sm font-bold text-[#111827]">Analyse MIAA+</p>
+                      <p className="text-[10px] text-[#6B7280]">Powered by Claude · {nomEntreprise} · {data.annee}</p>
                     </div>
                   </div>
                   <button onClick={genererAnalyse} disabled={aiLoading}
@@ -663,20 +663,20 @@ export default function RapportsPage() {
                   </button>
                 </div>
                 {!aiText && !aiLoading && (
-                  <div className="border border-dashed border-[#30363D] rounded-xl p-8 text-center">
+                  <div className="border border-dashed border-[#E2E8F0] rounded-xl p-8 text-center">
                     <Sparkles size={24} className="mx-auto mb-3 text-[#F0A30A] opacity-40" />
-                    <p className="text-sm text-[#8B949E]">MIAA+ analyse vos données et génère une analyse financière complète</p>
-                    <p className="text-xs text-[#484F58] mt-1">Compte de résultat · Trésorerie · Créances · Recommandations</p>
+                    <p className="text-sm text-[#4B5563]">MIAA+ analyse vos données et génère une analyse financière complète</p>
+                    <p className="text-xs text-[#6B7280] mt-1">Compte de résultat · Trésorerie · Créances · Recommandations</p>
                   </div>
                 )}
                 {aiLoading && (
-                  <div className="flex items-center gap-3 text-[#8B949E] py-6 px-2">
+                  <div className="flex items-center gap-3 text-[#4B5563] py-6 px-2">
                     <Loader2 size={16} className="animate-spin text-[#F0A30A]" />
                     <span className="text-sm">MIAA+ rédige votre analyse financière complète…</span>
                   </div>
                 )}
                 {aiText && !aiLoading && (
-                  <div className="bg-[#0D1117] border-l-2 border-[#F0A30A]/60 rounded-r-xl p-5 text-sm text-[#E6EDF3] leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-white border-l-2 border-[#F0A30A]/60 rounded-r-xl p-5 text-sm text-[#111827] leading-relaxed whitespace-pre-wrap">
                     {aiText}
                   </div>
                 )}

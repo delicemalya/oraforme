@@ -272,7 +272,7 @@ export default function EcoleOverviewPage() {
   useEffect(() => { if (tenantId) load() }, [tenantId, load])
 
   if (tenantLoading || loading) return (
-    <div className="flex items-center justify-center h-64 text-[#8B949E]">
+    <div className="flex items-center justify-center h-64 text-[#4B5563]">
       <Loader2 className="animate-spin mr-2" size={18} /> Chargement du tableau de bord…
     </div>
   )
@@ -411,10 +411,10 @@ export default function EcoleOverviewPage() {
         <motion.div {...fade(6)} className="xl:col-span-2 border border-white/[0.07] rounded-2xl p-5" style={{ background: '#111827' }}>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-sm font-extrabold text-[#E6EDF3]">Analyse des Flux Financiers</p>
-              <p className="text-[11px] text-[#8B949E] mt-0.5">Paiements scolaires — 8 derniers mois</p>
+              <p className="text-sm font-extrabold text-[#111827]">Analyse des Flux Financiers</p>
+              <p className="text-[11px] text-[#4B5563] mt-0.5">Paiements scolaires — 8 derniers mois</p>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-[#8B949E]">
+            <div className="flex items-center gap-1.5 text-[11px] text-[#4B5563]">
               <div className="w-2 h-2 rounded-full bg-[#F0A30A]" />
               Revenus encaissés
             </div>
@@ -482,7 +482,7 @@ export default function EcoleOverviewPage() {
 
       {/* ── Raccourcis rapides (5 items) ─────────────────────────────────────── */}
       <motion.div {...fade(8)}>
-        <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-3">Raccourcis</p>
+        <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-3">Raccourcis</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
           {[
             { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,   color: '#8B0073', sub: 'Journal OHADA' },
@@ -492,15 +492,15 @@ export default function EcoleOverviewPage() {
             { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,   color: '#EF4444', sub: 'Direction & rapports' },
           ].map(({ label, href, color, icon: Icon, sub }) => (
             <Link key={href} href={href}
-              className="flex items-center gap-3 p-3.5 rounded-xl border border-[#21262D] bg-[#161B22] hover:border-[#30363D] hover:bg-[#21262D] transition-all group">
+              className="flex items-center gap-3 p-3.5 rounded-xl border border-[#EEF2FF] bg-white hover:border-[#E2E8F0] hover:bg-[#F0F4FF] transition-all group">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
                 <Icon size={16} style={{ color }} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#E6EDF3] group-hover:text-white transition-colors truncate">{label}</p>
-                <p className="text-[10px] text-[#484F58] truncate">{sub}</p>
+                <p className="text-xs font-bold text-[#111827] group-hover:text-white transition-colors truncate">{label}</p>
+                <p className="text-[10px] text-[#6B7280] truncate">{sub}</p>
               </div>
-              <ChevronRight size={12} className="text-[#484F58] shrink-0" />
+              <ChevronRight size={12} className="text-[#6B7280] shrink-0" />
             </Link>
           ))}
         </div>
@@ -510,8 +510,8 @@ export default function EcoleOverviewPage() {
       <motion.div {...fade(9)} className="border border-white/[0.07] rounded-2xl overflow-hidden" style={{ background: '#111827' }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <div>
-            <p className="text-sm font-extrabold text-[#E6EDF3]">Transactions Récentes</p>
-            <p className="text-[10px] text-[#484F58] mt-0.5">Derniers paiements scolaires enregistrés</p>
+            <p className="text-sm font-extrabold text-[#111827]">Transactions Récentes</p>
+            <p className="text-[10px] text-[#6B7280] mt-0.5">Derniers paiements scolaires enregistrés</p>
           </div>
           <Link href="/dashboard/ecole/direction" className="text-xs text-[#F0A30A]/80 hover:text-[#F0A30A] font-semibold transition-colors">
             Voir tout l&apos;historique →
@@ -520,8 +520,8 @@ export default function EcoleOverviewPage() {
 
         {d.recentPaie.length === 0 ? (
           <div className="py-12 text-center">
-            <DollarSign size={28} className="text-[#30363D] mx-auto mb-2" />
-            <p className="text-sm text-[#484F58]">Aucune transaction pour le moment.</p>
+            <DollarSign size={28} className="text-[#9CA3AF] mx-auto mb-2" />
+            <p className="text-sm text-[#6B7280]">Aucune transaction pour le moment.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -529,7 +529,7 @@ export default function EcoleOverviewPage() {
               <thead>
                 <tr className="border-b border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.01)' }}>
                   {['Description', 'Date', 'Montant', 'Mode'].map(h => (
-                    <th key={h} className="text-left px-4 py-2.5 text-[9.5px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                    <th key={h} className="text-left px-4 py-2.5 text-[9.5px] font-bold text-[#6B7280] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -542,14 +542,14 @@ export default function EcoleOverviewPage() {
                           <DollarSign size={13} className="text-[#F0A30A]" />
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-[#E6EDF3] truncate max-w-[180px]">
+                          <p className="text-xs font-semibold text-[#111827] truncate max-w-[180px]">
                             {p.libelle || 'Paiement scolarité'}
                           </p>
-                          <p className="text-[10px] text-[#8B949E] mt-0.5">Scolarité</p>
+                          <p className="text-[10px] text-[#4B5563] mt-0.5">Scolarité</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-[11px] text-[#8B949E] font-mono whitespace-nowrap">
+                    <td className="px-4 py-3 text-[11px] text-[#4B5563] font-mono whitespace-nowrap">
                       {new Date(p.created_at).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-4 py-3">
@@ -576,7 +576,7 @@ export default function EcoleOverviewPage() {
           style={{ background: 'rgba(245,158,11,0.08)' }}>
           <AlertTriangle size={17} className="text-[#F59E0B] shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm font-bold text-[#E6EDF3]">Impayés en attente</p>
+            <p className="text-sm font-bold text-[#111827]">Impayés en attente</p>
             <p className="text-[11px] text-white/45 mt-1">
               {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA à recouvrer.{' '}
               <Link href="/dashboard/ecole/scolarite" className="text-[#F0A30A] hover:underline">Traiter →</Link>

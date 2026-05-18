@@ -19,8 +19,8 @@ export default function Button({
 
   const variants = {
     primary: 'bg-[#F0A30A] text-[#0D1117] hover:bg-[#D4900A] active:scale-[0.98]',
-    secondary: 'bg-[#21262D] text-[#E6EDF3] border border-[#30363D] hover:border-[#F0A30A] hover:text-[#F0A30A]',
-    ghost: 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]',
+    secondary: 'bg-[#F0F4FF] text-[#111827] border border-[#E2E8F0] hover:border-[#F0A30A] hover:text-[#F0A30A]',
+    ghost: 'text-[#4B5563] hover:text-[#111827] hover:bg-[#F0F4FF]',
   }
 
   return (

@@ -235,7 +235,7 @@ export default function RolesPage() {
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-[#161B22] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md space-y-4"
+              className="bg-white border border-white/[0.08] rounded-2xl p-6 w-full max-w-md space-y-4"
             >
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <Shield size={16} className="text-amber-400" />

@@ -21,13 +21,13 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
   const hasData = data.some(d => d.montant > 0)
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 h-full">
+    <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-[#E6EDF3]">Revenus — 7 derniers jours</h3>
-          <p className="text-[10px] text-[#484F58] mt-0.5">Factures payées par jour</p>
+          <h3 className="text-sm font-semibold text-[#111827]">Revenus — 7 derniers jours</h3>
+          <p className="text-[10px] text-[#6B7280] mt-0.5">Factures payées par jour</p>
         </div>
-        <span className="text-[10px] font-semibold text-[#484F58] border border-[#21262D] rounded-lg px-2 py-1">FCFA</span>
+        <span className="text-[10px] font-semibold text-[#6B7280] border border-[#EEF2FF] rounded-lg px-2 py-1">FCFA</span>
       </div>
 
       <ResponsiveContainer width="100%" height={180}>
@@ -79,7 +79,7 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
       </ResponsiveContainer>
 
       {!hasData && (
-        <p className="text-xs text-[#484F58] text-center -mt-4">
+        <p className="text-xs text-[#6B7280] text-center -mt-4">
           Aucun revenu enregistré sur 7 jours
         </p>
       )}

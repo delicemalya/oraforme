@@ -43,12 +43,12 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="w-full max-w-md text-center">
-          <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-10">
+          <div className="bg-white border border-[#E2E8F0] rounded-xl p-10">
             <div className="w-14 h-14 rounded-full bg-[#2EA043]/10 flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={28} className="text-[#2EA043]" />
             </div>
-            <h2 className="text-lg font-bold text-[#E6EDF3] mb-2">Mot de passe mis à jour</h2>
-            <p className="text-sm text-[#8B949E]">Vous allez être redirigé vers votre tableau de bord...</p>
+            <h2 className="text-lg font-bold text-[#111827] mb-2">Mot de passe mis à jour</h2>
+            <p className="text-sm text-[#4B5563]">Vous allez être redirigé vers votre tableau de bord...</p>
           </div>
         </div>
       </div>
@@ -61,16 +61,16 @@ export default function ResetPasswordPage() {
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="oraforme" className="w-8 h-8 mx-auto mb-2" />
-          <span className="text-xl font-bold text-[#E6EDF3]">oraforme</span>
+          <span className="text-xl font-bold text-[#111827]">oraforme</span>
         </div>
 
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-8">
-          <h1 className="text-base font-semibold text-[#E6EDF3] mb-1">Nouveau mot de passe</h1>
-          <p className="text-sm text-[#8B949E] mb-6">Choisissez un mot de passe sécurisé d&apos;au moins 8 caractères.</p>
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-8">
+          <h1 className="text-base font-semibold text-[#111827] mb-1">Nouveau mot de passe</h1>
+          <p className="text-sm text-[#4B5563] mb-6">Choisissez un mot de passe sécurisé d&apos;au moins 8 caractères.</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-[#8B949E]">Nouveau mot de passe</label>
+              <label className="text-sm font-medium text-[#4B5563]">Nouveau mot de passe</label>
               <input
                 type="password"
                 placeholder="Min. 8 caractères"
@@ -78,11 +78,11 @@ export default function ResetPasswordPage() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#21262D] border border-[#30363D] text-[#E6EDF3] text-sm focus:outline-none focus:border-[#F0A30A] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#F0F4FF] border border-[#E2E8F0] text-[#111827] text-sm focus:outline-none focus:border-[#F0A30A] placeholder-[#9CA3AF] transition-colors"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-[#8B949E]">Confirmer le mot de passe</label>
+              <label className="text-sm font-medium text-[#4B5563]">Confirmer le mot de passe</label>
               <input
                 type="password"
                 placeholder="••••••••"
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#21262D] border border-[#30363D] text-[#E6EDF3] text-sm focus:outline-none focus:border-[#F0A30A] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#F0F4FF] border border-[#E2E8F0] text-[#111827] text-sm focus:outline-none focus:border-[#F0A30A] placeholder-[#9CA3AF] transition-colors"
               />
             </div>
 

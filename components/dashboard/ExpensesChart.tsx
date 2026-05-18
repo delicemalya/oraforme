@@ -18,12 +18,12 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null
   const { name, value, payload: d } = payload[0]
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-3 shadow-2xl text-xs">
+    <div className="bg-white border border-[#E2E8F0] rounded-xl p-3 shadow-2xl text-xs">
       <div className="flex items-center gap-2 mb-1">
         <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-        <span className="text-[#E6EDF3] font-semibold">{name}</span>
+        <span className="text-[#111827] font-semibold">{name}</span>
       </div>
-      <span className="text-[#8B949E]">{fmtFull(value)}</span>
+      <span className="text-[#4B5563]">{fmtFull(value)}</span>
     </div>
   )
 }
@@ -35,10 +35,10 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
 
   if (!hasData) {
     return (
-      <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
-        <h3 className="text-sm font-bold text-[#E6EDF3] mb-1">Répartition des dépenses</h3>
-        <p className="text-[10px] text-[#484F58] mb-6">Par catégorie ce mois</p>
-        <div className="h-[180px] flex items-center justify-center text-xs text-[#484F58]">
+      <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5">
+        <h3 className="text-sm font-bold text-[#111827] mb-1">Répartition des dépenses</h3>
+        <p className="text-[10px] text-[#6B7280] mb-6">Par catégorie ce mois</p>
+        <div className="h-[180px] flex items-center justify-center text-xs text-[#6B7280]">
           Aucune dépense enregistrée
         </div>
       </div>
@@ -46,11 +46,11 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
   }
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-bold text-[#E6EDF3]">Répartition des dépenses</h3>
-          <p className="text-[10px] text-[#484F58] mt-0.5">Par catégorie ce mois · {fmtFull(total)}</p>
+          <h3 className="text-sm font-bold text-[#111827]">Répartition des dépenses</h3>
+          <p className="text-[10px] text-[#6B7280] mt-0.5">Par catégorie ce mois · {fmtFull(total)}</p>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={180}>
@@ -76,11 +76,11 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
           <div key={i} className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full shrink-0" style={{ background: item.color }} />
-              <span className="text-[#8B949E] truncate max-w-[120px]">{item.name}</span>
+              <span className="text-[#4B5563] truncate max-w-[120px]">{item.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[#E6EDF3] font-semibold">{fmtFull(item.value)}</span>
-              <span className="text-[#484F58] w-8 text-right">{total > 0 ? Math.round((item.value / total) * 100) : 0}%</span>
+              <span className="text-[#111827] font-semibold">{fmtFull(item.value)}</span>
+              <span className="text-[#6B7280] w-8 text-right">{total > 0 ? Math.round((item.value / total) * 100) : 0}%</span>
             </div>
           </div>
         ))}

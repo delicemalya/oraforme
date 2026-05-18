@@ -37,10 +37,10 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 gap-2">
-        <div className="w-10 h-10 rounded-full bg-[#21262D] flex items-center justify-center">
-          <FileText size={18} className="text-[#484F58]" />
+        <div className="w-10 h-10 rounded-full bg-[#F0F4FF] flex items-center justify-center">
+          <FileText size={18} className="text-[#6B7280]" />
         </div>
-        <p className="text-xs text-[#484F58]">Aucune activité récente</p>
+        <p className="text-xs text-[#6B7280]">Aucune activité récente</p>
         <Link href="/dashboard/facturation" className="text-xs text-[#F0A30A] hover:underline mt-1">
           Créer une facture →
         </Link>
@@ -62,7 +62,7 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.38, delay: i * 0.06, ease: [0.23, 1, 0.32, 1] }}
-            className="flex items-start gap-3 py-3 border-b border-[#21262D] last:border-0 hover:bg-[#21262D]/30 px-1 -mx-1 rounded-lg transition-colors"
+            className="flex items-start gap-3 py-3 border-b border-[#EEF2FF] last:border-0 hover:bg-[#F0F4FF]/80 px-1 -mx-1 rounded-lg transition-colors"
           >
             {/* Colored avatar */}
             <div
@@ -73,16 +73,16 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-[#E6EDF3] font-semibold truncate">{item.client_nom}</p>
+              <p className="text-xs text-[#111827] font-semibold truncate">{item.client_nom}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Icon size={10} style={{ color: st.color }} className="shrink-0" />
                 <span className="text-[10px]" style={{ color: st.color }}>{st.action}</span>
-                <span className="text-[10px] text-[#30363D]">·</span>
-                <span className="text-[10px] font-semibold text-[#8B949E]">{fmt(item.total)} FCFA</span>
+                <span className="text-[10px] text-[#9CA3AF]">·</span>
+                <span className="text-[10px] font-semibold text-[#4B5563]">{fmt(item.total)} FCFA</span>
               </div>
             </div>
 
-            <span className="text-[10px] text-[#484F58] shrink-0 mt-0.5 whitespace-nowrap">
+            <span className="text-[10px] text-[#6B7280] shrink-0 mt-0.5 whitespace-nowrap">
               {timeAgo(item.created_at)}
             </span>
           </motion.div>
