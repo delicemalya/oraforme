@@ -40,6 +40,9 @@ export default async function DashboardPage() {
   const secteur   = tenant?.secteur_activite ?? null
   const ecoleRole = (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null
 
+  // École sector → single dashboard, avoid duplicate experience
+  if (secteur === 'ecole') redirect('/dashboard/ecole')
+
   // ── Résoudre isFinancial depuis le rôle dynamique ─────────────────────────
   // DIRECTION_GENERALE is treated as financial — same full access as owner
   const isDirectionGenerale = ecoleRole === 'DIRECTION_GENERALE'

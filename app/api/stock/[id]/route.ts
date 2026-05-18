@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { requireTenant, assertResourceOwnership } from '@/lib/tenant-guard'
 
 export async function GET(
   _req: NextRequest,
@@ -9,17 +8,15 @@ export async function GET(
 ) {
   const { id } = await params
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } }
-  )
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+  const { ctx, error } = await requireTenant()
+  if (error) return error
 
-  const { data: stock, error } = await supabaseAdmin.rpc('get_product_stock', { p_id: id })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  // Verify the product belongs to the authenticated user's tenant
+  const ownershipError = await assertResourceOwnership('stock_articles', id, ctx.tenantId)
+  if (ownershipError) return ownershipError
+
+  const { data: stock, error: rpcError } = await supabaseAdmin.rpc('get_product_stock', { p_id: id })
+  if (rpcError) return NextResponse.json({ error: rpcError.message }, { status: 500 })
 
   return NextResponse.json({ stock: stock ?? 0 })
 }

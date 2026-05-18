@@ -11,7 +11,7 @@ import {
   Wallet, BookOpen, ShoppingCart,
   Receipt, BarChart2, Truck,
   BookMarked, Calculator, HeartHandshake, Users, UsersRound,
-  Layers, CreditCard, Activity, Home,
+  Layers, CreditCard, Activity,
 } from 'lucide-react'
 import { CORE_MODULE_IDS, CORE_SECTION_LABEL } from '@/lib/erp-core'
 import { useState, useEffect } from 'react'
@@ -56,7 +56,6 @@ type NavItem = {
 // Clé = id de l'item, valeur = rôles autorisés (tableau vide = tout le monde)
 
 const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
-  'overview':               [], // visible à tous
   'direction':              ['DIRECTION_GENERALE'],
   'daac':                   ['DIRECTION_GENERALE', 'DAAC'],
   'rh':                     ['DIRECTION_GENERALE', 'RAF', 'RH_PAIE'],
@@ -72,7 +71,6 @@ const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
 
 const SECTOR_NAV: Record<string, NavItem[]> = {
   ecole: [
-    { id: 'overview',               label: 'Vue d\'ensemble',        sublabel: 'Tableau de bord complet', icon: Home,           href: '/dashboard/ecole',                        color: '#F0A30A', exact: true },
     { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F0A30A' },
     { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#EF4444' },
     { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#8B5CF6' },
@@ -404,10 +402,10 @@ export default function Sidebar() {
         {/* Direction Générale — s'adapte au secteur */}
         {(() => {
           const hasSector = loaded && !!sectorNav
-          const href  = '/dashboard'
+          const href  = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
           const label = t('nav.dashboard')
           const sub   = hasSector ? t('nav.directionSub') : null
-          const active = isActive('/dashboard', true)
+          const active = isActive(href, true)
           return (
             <Link
               href={href}

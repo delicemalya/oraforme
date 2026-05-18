@@ -1,22 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { requireTenant, assertResourceOwnership } from '@/lib/tenant-guard'
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
-
-  const { data: profile } = await supabaseAdmin
-    .from('profiles').select('tenant_id').eq('user_id', user.id).maybeSingle()
-  if (!profile?.tenant_id) return NextResponse.json({ error: 'Profil introuvable' }, { status: 403 })
+  const { ctx, error } = await requireTenant()
+  if (error) return error
 
   const { product_id, warehouse_id, type, quantite, reference, note } = await req.json()
 
@@ -27,6 +15,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Type de mouvement invalide' }, { status: 400 })
   }
 
+  // Verify the product belongs to the authenticated user's tenant
+  const ownershipError = await assertResourceOwnership('stock_articles', product_id, ctx.tenantId)
+  if (ownershipError) return ownershipError
+
   // Prevent negative stock on OUT movements
   if (type === 'OUT') {
     const { data: currentStock } = await supabaseAdmin.rpc('get_product_stock', { p_id: product_id })
@@ -36,10 +28,10 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error: insertError } = await supabaseAdmin
     .from('stock_movements')
     .insert({
-      tenant_id:    profile.tenant_id,
+      tenant_id:    ctx.tenantId,
       product_id,
       warehouse_id: warehouse_id ?? null,
       type,
@@ -50,6 +42,6 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 })
   return NextResponse.json({ success: true, data })
 }

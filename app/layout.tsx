@@ -9,6 +9,14 @@ export const metadata: Metadata = {
   title: "Oraforme — Gestion d'entreprise tout-en-un",
   description: 'Facturation, stock, RH, restaurant — tout en un.',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    shortcut: '/icon-192.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

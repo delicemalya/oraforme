@@ -94,8 +94,9 @@ export async function proxy(request: NextRequest) {
         const ecoleRole = profile.ecole_role_name as string | null
         if (!ecoleRole || !allowedRoles.includes(ecoleRole)) {
           // Redirect to école dashboard with access denied signal
+          // École users land on /dashboard/ecole (not /dashboard) to avoid double-redirect
           const url = request.nextUrl.clone()
-          url.pathname = '/dashboard'
+          url.pathname = '/dashboard/ecole'
           url.searchParams.set('access_denied', segment)
           return NextResponse.redirect(url)
         }
