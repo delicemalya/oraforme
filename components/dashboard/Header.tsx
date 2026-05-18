@@ -20,6 +20,7 @@ export default function Header() {
 
   const [userName,     setUserName]     = useState('')
   const [initials,     setInitials]     = useState('U')
+  const [logoUrl,      setLogoUrl]      = useState<string | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [langOpen,     setLangOpen]     = useState(false)
   const [locale,       setLocale]       = useState<Locale>('fr')
@@ -34,6 +35,17 @@ export default function Header() {
     setTheme(stored)
     document.documentElement.setAttribute('data-theme', stored)
   }, [])
+
+  // Company logo — fetched from entreprise_config, re-runs when tenant changes
+  useEffect(() => {
+    if (!tenant?.tenantId) { setLogoUrl(null); return }
+    supabase
+      .from('entreprise_config')
+      .select('logo_url')
+      .eq('tenant_id', tenant.tenantId)
+      .maybeSingle()
+      .then(({ data }) => setLogoUrl(data?.logo_url || null))
+  }, [tenant?.tenantId])
 
   // User display name — derived from auth profile (display only, not tenant-sensitive)
   useEffect(() => {
@@ -92,11 +104,16 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Badge entreprise — affiché depuis TenantContext, toujours cohérent avec la session active */}
+      {/* Badge entreprise — logo si disponible, sinon initiale */}
       {nomEntreprise && (
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0">
-          <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0">
-            <span className="text-[10px] font-black text-[#0D1117]">{nomEntreprise.charAt(0).toUpperCase()}</span>
+          <div className="w-6 h-6 rounded-md overflow-hidden bg-[#F0A30A] flex items-center justify-center shrink-0">
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt={nomEntreprise} className="w-full h-full object-contain" />
+            ) : (
+              <span className="text-[10px] font-black text-[#0D1117]">{nomEntreprise.charAt(0).toUpperCase()}</span>
+            )}
           </div>
           <span className="text-xs font-semibold text-[#F0A30A] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
         </div>

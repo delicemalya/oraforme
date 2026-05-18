@@ -53,11 +53,11 @@ const CC_TYPE_LABELS: Record<string, string> = Object.fromEntries(CC_TYPES.map(t
 function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-      <div className="px-5 py-3 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <Icon size={14} className="text-[#F0A30A]" />
+      <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <Icon size={13} className="text-[#F0A30A]" />
         <span className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{title}</span>
       </div>
-      <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">{children}</div>
     </div>
   )
 }
@@ -68,13 +68,13 @@ function Field({ label, value, onChange, placeholder, type = 'text', full = fals
 }) {
   return (
     <div className={full ? 'sm:col-span-2' : ''}>
-      <label className="block text-xs text-[#8B949E] mb-1.5">{label}</label>
+      <label className="block text-xs text-[#8B949E] mb-1">{label}</label>
       {type === 'textarea' ? (
-        <textarea rows={3} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 resize-none" />
+        <textarea rows={2} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 resize-none" />
       ) : (
         <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
+          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
       )}
     </div>
   )
@@ -217,7 +217,7 @@ export default function ParametresPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-4 max-w-3xl">
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -233,20 +233,20 @@ export default function ParametresPage() {
 
       {/* ── LOGO SECTION ─────────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-        <div className="px-5 py-3 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <Upload size={14} className="text-[#F0A30A]" />
+        <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <Upload size={13} className="text-[#F0A30A]" />
           <span className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Logo de l&apos;entreprise</span>
         </div>
-        <div className="p-5">
-          <div className="flex items-center gap-5">
+        <div className="p-4">
+          <div className="flex items-center gap-4">
             {/* Preview box */}
-            <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-white/[0.08]"
+            <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-white/[0.08]"
               style={{ background: cfg.logo_url ? 'transparent' : 'rgba(240,163,10,0.1)' }}>
               {cfg.logo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={cfg.logo_url} alt="Logo" className="w-full h-full object-contain" />
               ) : (
-                <span className="text-3xl font-black text-[#F0A30A]">
+                <span className="text-2xl font-black text-[#F0A30A]">
                   {cfg.nom ? cfg.nom.charAt(0).toUpperCase() : 'O'}
                 </span>
               )}
@@ -255,26 +255,26 @@ export default function ParametresPage() {
             {/* Upload controls */}
             <div className="flex-1">
               <p className="text-sm font-semibold text-white mb-0.5">{cfg.nom || 'Votre entreprise'}</p>
-              <p className="text-xs text-[#8B949E] mb-3">{cfg.ville}{cfg.pays ? `, ${cfg.pays}` : ''}</p>
+              <p className="text-xs text-[#8B949E] mb-2">{cfg.ville}{cfg.pays ? `, ${cfg.pays}` : ''}</p>
 
               <div className="flex flex-wrap items-center gap-2">
                 <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={handleLogoUpload} className="hidden" />
                 <motion.button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo}
                   whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-50"
                   style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117' }}>
-                  {uploadingLogo ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                  {uploadingLogo ? <Loader2 className="animate-spin" size={13} /> : <Upload size={13} />}
                   {uploadingLogo ? 'Upload en cours…' : cfg.logo_url ? 'Changer le logo' : 'Uploader un logo'}
                 </motion.button>
 
                 {cfg.logo_url && (
                   <button onClick={() => set('logo_url', '')}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors">
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors">
                     <X size={12} /> Supprimer
                   </button>
                 )}
               </div>
-              <p className="text-[10px] text-[#484F58] mt-2">PNG, JPG, WEBP ou SVG · max 2 Mo</p>
+              <p className="text-[10px] text-[#484F58] mt-1.5">PNG, JPG, WEBP ou SVG · max 2 Mo</p>
             </div>
           </div>
 
@@ -285,10 +285,10 @@ export default function ParametresPage() {
           )}
 
           {/* URL fallback */}
-          <div className="mt-4 pt-4 border-t border-white/[0.06]">
-            <label className="block text-xs text-[#8B949E] mb-1.5">Ou collez directement une URL d&apos;image</label>
+          <div className="mt-3 pt-3 border-t border-white/[0.06]">
+            <label className="block text-xs text-[#8B949E] mb-1">Ou collez directement une URL d&apos;image</label>
             <input type="url" value={cfg.logo_url} onChange={e => set('logo_url', e.target.value)} placeholder="https://…/logo.png"
-              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
+              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
           </div>
         </div>
       </div>
@@ -330,12 +330,12 @@ export default function ParametresPage() {
 
       {/* ── CENTRES DE COÛTS ─────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-        <div className="px-5 py-3 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <Layers size={14} className="text-[#F0A30A]" />
+        <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <Layers size={13} className="text-[#F0A30A]" />
           <span className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Centres de coûts</span>
           <span className="ml-auto text-[10px] text-[#484F58]">{costCenters.length} centre{costCenters.length > 1 ? 's' : ''}</span>
         </div>
-        <div className="p-5 space-y-4">
+        <div className="p-4 space-y-3">
           {ccLoading ? (
             <div className="flex items-center gap-2 text-sm text-[#8B949E]"><Loader2 size={14} className="animate-spin" /> Chargement…</div>
           ) : costCenters.length === 0 ? (
@@ -355,8 +355,8 @@ export default function ParametresPage() {
             </div>
           )}
 
-          <div className="border-t border-white/[0.06] pt-4">
-            <p className="text-[10px] text-[#6E7681] uppercase tracking-wider mb-3">Ajouter un centre</p>
+          <div className="border-t border-white/[0.06] pt-3">
+            <p className="text-[10px] text-[#6E7681] uppercase tracking-wider mb-2">Ajouter un centre</p>
             <div className="grid grid-cols-3 gap-2 mb-2">
               <input value={ccForm.code} onChange={e => setCcForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
                 placeholder="Code (RH…)" maxLength={10}
@@ -400,7 +400,7 @@ export default function ParametresPage() {
       </div>
 
       {/* Bottom save */}
-      <div className="flex justify-end pb-6">
+      <div className="flex justify-end pb-2">
         <motion.button onClick={save} disabled={saving} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
           className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm disabled:opacity-50" style={btnStyle}>
           {saving ? <Loader2 className="animate-spin" size={15} /> : saved ? <><Check size={15} /> Enregistré !</> : <><Save size={15} /> Enregistrer les paramètres</>}
