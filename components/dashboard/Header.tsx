@@ -111,22 +111,22 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Badge entreprise — logo si disponible, sinon initiale */}
+      {/* Logo entreprise client — après la barre de recherche */}
       {nomEntreprise && (
-        <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0">
+        <div className="hidden sm:flex items-center px-2 py-0.5 rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0" style={{ maxWidth: 180 }}>
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
               alt={nomEntreprise}
-              className="h-7 w-auto max-w-[120px] object-contain"
+              style={{ maxWidth: 150, maxHeight: 36, width: 'auto', height: 'auto', display: 'block', objectFit: 'contain' }}
             />
           ) : (
             <>
-              <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0">
+              <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0 mr-2">
                 <span className="text-[10px] font-black text-[#0D1117]">{nomEntreprise.charAt(0).toUpperCase()}</span>
               </div>
-              <span className="text-xs font-semibold text-[#F0A30A] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
+              <span className="text-xs font-semibold text-[#F0A30A] tracking-wide truncate">{nomEntreprise}</span>
             </>
           )}
         </div>
