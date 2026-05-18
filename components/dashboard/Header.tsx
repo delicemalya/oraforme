@@ -120,7 +120,7 @@ export default function Header() {
             src={logoUrl}
             alt={nomEntreprise}
             className="hidden sm:block shrink-0"
-            style={{ maxWidth: 165, maxHeight: 38, width: 'auto', height: 'auto', objectFit: 'contain', display: 'block' }}
+            style={{ width: 165, height: 36, objectFit: 'contain', display: 'block' }}
           />
         ) : (
           // Pas de logo : badge texte avec fond jaune
