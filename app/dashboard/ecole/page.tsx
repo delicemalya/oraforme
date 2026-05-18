@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
-  GraduationCap, Users, UserCheck, UserX, TrendingUp,
-  Wallet, AlertTriangle, BookOpen, RefreshCw, Award,
-  BarChart2, DollarSign, Users2, ChevronRight, Calendar,
-  CheckCircle, ArrowUpRight, Loader2,
+  BarChart2, Users, GraduationCap, BookOpen, UserX, Award,
+  TrendingUp, Wallet, AlertTriangle, RefreshCw, Loader2,
+  Receipt, Bot, Calculator, UserCheck, Users2,
+  ChevronRight, ArrowUpRight, CheckCircle, Layers, Plus,
+  DollarSign,
 } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -16,7 +17,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 
-// Types kept for backward-compat with _lib/ecole-dashboard-client.tsx
+// Types kept for backward-compat
 export type EcoleRole =
   | 'DIRECTION_GENERALE' | 'RAF' | 'SCOLARITE' | 'RH_PAIE'
   | 'FORMATEUR' | 'ETUDIANT' | 'PARENT' | 'DTI' | 'DAAC'
@@ -30,8 +31,6 @@ export type EcoleKpis = {
   myNotesMoyenne: number | null; myAbsences: number; myPaiementOk: boolean | null
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function fmt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} M`
   if (n >= 1_000) return new Intl.NumberFormat('fr-FR').format(Math.round(n))
@@ -41,45 +40,8 @@ function fmt(n: number) {
 const fade = (i: number) => ({
   initial: { opacity: 0, y: 14 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.38, delay: i * 0.05, ease: 'easeOut' as const },
+  transition: { duration: 0.38, delay: i * 0.04, ease: 'easeOut' as const },
 })
-
-// ── Sub-components ────────────────────────────────────────────────────────────
-
-function GradientCard({ label, value, sub, icon: Icon, gradient, href }: {
-  label: string; value: string | number; sub?: string
-  icon: React.ElementType; gradient: string; href?: string
-}) {
-  const inner = (
-    <div
-      className="relative rounded-2xl p-4 sm:p-5 overflow-hidden cursor-default min-h-[130px] flex flex-col justify-between"
-      style={{ background: gradient }}
-    >
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%)' }} />
-      <div className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-        <Icon size={18} className="text-white" />
-      </div>
-      <div className="relative">
-        <p className="text-white/70 text-[11px] font-semibold uppercase tracking-wider mb-2">{label}</p>
-        <p className="text-white text-2xl sm:text-3xl font-bold leading-none mb-1">{value}</p>
-        {sub && <p className="text-white/60 text-[11px]">{sub}</p>}
-      </div>
-    </div>
-  )
-  return href ? <Link href={href}>{inner}</Link> : inner
-}
-
-function SmallStat({ label, value, color }: { label: string; value: string | number; color: string }) {
-  return (
-    <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[#0D1117] border border-[#21262D]">
-      <span className="text-xs text-[#8B949E]">{label}</span>
-      <span className="text-sm font-bold" style={{ color }}>{value}</span>
-    </div>
-  )
-}
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 type MonthData = { month: string; montant: number }
 
@@ -96,7 +58,70 @@ type OverviewData = {
   recentPaie: { id: string; montant: number; methode: string; libelle: string; created_at: string }[]
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
+// ── Module Card Component ─────────────────────────────────────────────────────
+
+interface ModCard {
+  icon: React.ElementType
+  label: string
+  value: string
+  footer: string
+  delta: string
+  gradient: string
+  href: string
+  badge?: string
+  badgeVariant?: 'up' | 'down' | 'neutral'
+}
+
+function ModuleCard({ mod, i }: { mod: ModCard; i: number }) {
+  const Icon = mod.icon
+  return (
+    <motion.div
+      {...fade(i + 2)}
+      whileHover={{ y: -4, scale: 1.018 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Link href={mod.href} className="block">
+        <div
+          className="relative rounded-2xl p-4 overflow-hidden cursor-pointer flex flex-col justify-between"
+          style={{ background: mod.gradient, minHeight: 148 }}
+        >
+          {/* Shine */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: 'radial-gradient(ellipse at 80% 15%, rgba(255,255,255,0.18) 0%, transparent 58%)' }} />
+          {/* Circle deco */}
+          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10 pointer-events-none" />
+
+          {/* Top row: icon + badge */}
+          <div className="relative flex items-start justify-between mb-3">
+            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
+              <Icon size={17} className="text-white" />
+            </div>
+            {mod.badge && (
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${
+                mod.badgeVariant === 'up'   ? 'bg-white/25' :
+                mod.badgeVariant === 'down' ? 'bg-red-500/40' : 'bg-white/15'
+              }`}>
+                {mod.badge}
+              </span>
+            )}
+          </div>
+
+          {/* Bottom: label + value + footer */}
+          <div className="relative">
+            <p className="text-white/80 text-[11.5px] font-bold leading-tight mb-0.5">{mod.label}</p>
+            <p className="text-white text-[15px] font-extrabold font-mono leading-none">{mod.value}</p>
+            <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-white/20">
+              <span className="text-white/55 text-[10px] leading-tight">{mod.footer}</span>
+              <span className="text-white/90 text-[10.5px] font-bold">{mod.delta}</span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  )
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function EcoleOverviewPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
@@ -139,14 +164,12 @@ export default function EcoleOverviewPage() {
       supabase.from('employes').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('statut', 'actif'),
       supabase.from('staff_ecole').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('statut', 'actif'),
 
-      // All payments from last 8 months (to compute daily/weekly/monthly/chart in one query)
       supabase.from('paiements_scolaires')
         .select('montant, created_at, statut, methode, libelle')
         .eq('tenant_id', tenantId)
         .gte('created_at', eightAgo.toISOString())
         .order('created_at', { ascending: false }),
 
-      // Recent paid payments for the table
       supabase.from('paiements_scolaires')
         .select('id, montant, methode, libelle, created_at')
         .eq('tenant_id', tenantId)
@@ -154,7 +177,6 @@ export default function EcoleOverviewPage() {
         .order('created_at', { ascending: false })
         .limit(6),
 
-      // Today's expenses
       supabase.from('journal_comptable')
         .select('montant_ttc')
         .eq('tenant_id', tenantId)
@@ -176,7 +198,6 @@ export default function EcoleOverviewPage() {
     const weekPaid  = allPaid.filter(p => new Date(p.created_at) >= weekAgo)
     const monthPaid = allPaid.filter(p => new Date(p.created_at) >= monthStart)
 
-    // Build 8-month chart buckets client-side
     const monthly: MonthData[] = []
     for (let i = 7; i >= 0; i--) {
       const d   = new Date(now.getFullYear(), now.getMonth() - i, 1)
@@ -220,8 +241,6 @@ export default function EcoleOverviewPage() {
 
   useEffect(() => { if (tenantId) load() }, [tenantId, load])
 
-  // ── Loading ─────────────────────────────────────────────────────────────────
-
   if (tenantLoading || loading) return (
     <div className="flex items-center justify-center h-64 text-[#8B949E]">
       <Loader2 className="animate-spin mr-2" size={18} /> Chargement du tableau de bord…
@@ -233,228 +252,397 @@ export default function EcoleOverviewPage() {
   const d = data
   const totalPersonnel = d.nbEnseignants + d.nbEmployes + d.nbStaff
   const tauxActifs = d.nbEtudiants > 0 ? Math.round((d.nbActifs / d.nbEtudiants) * 100) : 0
+  const recoveryRate = (d.revenuMois + d.montantImpayes) > 0
+    ? Math.round((d.revenuMois / (d.revenuMois + d.montantImpayes)) * 100)
+    : 100
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  // ── Module cards (10 modules, 5 per row) ──────────────────────────────────
+  const modules: ModCard[] = [
+    {
+      icon: BarChart2,
+      label: 'Direction Générale',
+      value: `${fmt(d.revenuMois)} FCFA`,
+      footer: 'Revenus du mois',
+      delta: `+${d.nbPaiementsMois} paiements`,
+      gradient: 'linear-gradient(135deg, #C2410C, #F97316)',
+      href: '/dashboard/ecole/direction',
+      badge: '+18%', badgeVariant: 'up',
+    },
+    {
+      icon: Calculator,
+      label: 'Comptabilité OHADA',
+      value: 'Journal actif',
+      footer: 'Clôture en cours',
+      delta: 'OHADA',
+      gradient: 'linear-gradient(135deg, #5B21B6, #8B5CF6)',
+      href: '/dashboard/ecole/comptabilite',
+      badge: 'OHADA', badgeVariant: 'neutral',
+    },
+    {
+      icon: Wallet,
+      label: 'Trésorerie',
+      value: `${fmt(d.revenuSemaine)} FCFA`,
+      footer: '7 derniers jours',
+      delta: `${d.sessionsEnCours} sessions`,
+      gradient: 'linear-gradient(135deg, #1E40AF, #3B82F6)',
+      href: '/dashboard/ecole/tresorerie',
+      badge: 'Actif', badgeVariant: 'up',
+    },
+    {
+      icon: Users,
+      label: 'RH & Paie',
+      value: `${totalPersonnel} personnes`,
+      footer: `${d.nbEmployes} emp · ${d.nbEnseignants} form`,
+      delta: 'Clôture prévue',
+      gradient: 'linear-gradient(135deg, #991B1B, #EF4444)',
+      href: '/dashboard/ecole/rh',
+      badge: 'Paie', badgeVariant: 'neutral',
+    },
+    {
+      icon: GraduationCap,
+      label: 'Scolarité',
+      value: `${d.nbEtudiants} étudiants`,
+      footer: `${d.nbActifs} actifs · ${d.nbSuspendus} susp`,
+      delta: `+${d.nbDiplomes} diplômés`,
+      gradient: 'linear-gradient(135deg, #065F46, #10B981)',
+      href: '/dashboard/ecole/scolarite',
+      badge: `${tauxActifs}%`, badgeVariant: 'up',
+    },
+    {
+      icon: BookOpen,
+      label: 'Formateurs',
+      value: `${d.nbEnseignants} actifs`,
+      footer: `${d.nbEnsEmployes} emp · ${d.nbEnsPrestataires} pres`,
+      delta: 'Cours en cours',
+      gradient: 'linear-gradient(135deg, #1E40AF, #3B82F6)',
+      href: '/dashboard/ecole/espace-formateur',
+      badge: 'DAAC', badgeVariant: 'neutral',
+    },
+    {
+      icon: Layers,
+      label: 'DAAC',
+      value: `${d.sessionsEnCours} sessions`,
+      footer: 'Sessions académiques',
+      delta: 'Examens',
+      gradient: 'linear-gradient(135deg, #C2410C, #F97316)',
+      href: '/dashboard/ecole/daac',
+      badge: 'Actif', badgeVariant: 'up',
+    },
+    {
+      icon: Receipt,
+      label: 'Dépenses',
+      value: `${fmt(d.depensesJour)} FCFA`,
+      footer: "Sorties aujourd'hui",
+      delta: 'Journal',
+      gradient: 'linear-gradient(135deg, #991B1B, #EF4444)',
+      href: '/dashboard/ecole/tresorerie',
+      badge: 'Jour', badgeVariant: d.depensesJour > 100000 ? 'down' : 'neutral',
+    },
+    {
+      icon: Bot,
+      label: 'MIAA+ Assistant',
+      value: 'Actif · 24/7',
+      footer: 'Assistant IA',
+      delta: '→ Chat',
+      gradient: 'linear-gradient(135deg, #065F46, #10B981)',
+      href: '/dashboard/ecole/miaa',
+      badge: 'IA', badgeVariant: 'up',
+    },
+    {
+      icon: BarChart2,
+      label: 'Rapports IA',
+      value: 'Analytics',
+      footer: 'Tableau de bord',
+      delta: 'Auto',
+      gradient: 'linear-gradient(135deg, #5B21B6, #8B5CF6)',
+      href: '/dashboard/ecole/direction',
+      badge: '+22%', badgeVariant: 'up',
+    },
+  ]
 
   return (
-    <div className="space-y-5 pb-8">
+    <div className="flex flex-col gap-5 pb-10">
 
-      {/* Header */}
-      <motion.div {...fade(0)} className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Vue d&apos;ensemble</h1>
-          <p className="text-sm text-[#8B949E]">{nomEcole} · Tableau de bord complet</p>
-        </div>
-        <button
-          onClick={load}
-          className="p-2 rounded-lg border border-[#21262D] text-[#8B949E] hover:text-[#E6EDF3] hover:border-[#30363D] transition-all"
-        >
-          <RefreshCw size={14} />
-        </button>
-      </motion.div>
+      {/* ── Hero Banner ─────────────────────────────────────────────────────── */}
+      <motion.div {...fade(0)}
+        className="relative rounded-2xl overflow-hidden border border-white/[0.07]"
+        style={{ background: 'linear-gradient(120deg, #0F2D3C 0%, #0C3040 30%, #0A2535 60%, #081D2A 100%)' }}
+      >
+        <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(240,163,10,0.13) 0%, transparent 70%)' }} />
+        <div className="absolute -bottom-10 left-48 w-44 h-44 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)' }} />
 
-      {/* Alertes */}
-      {(d.nbImpayes > 0 || d.sessionsEnCours > 0 || d.nbEvenements > 0) && (
-        <motion.div {...fade(1)} className="flex flex-wrap gap-2">
-          {d.nbImpayes > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#F0A30A]/20 bg-[#F0A30A]/5 text-[#F0A30A] text-xs font-medium">
-              <AlertTriangle size={12} />
-              {d.nbImpayes} impayé{d.nbImpayes > 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA
+        <div className="relative z-10 p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          {/* Left */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-2xl font-extrabold tracking-tight text-white">Bonjour, Admin 👋</h1>
+              <button onClick={load} className="ml-2 p-1.5 rounded-lg border border-white/10 text-white/30 hover:text-white/60 hover:border-white/20 transition-all">
+                <RefreshCw size={13} />
+              </button>
             </div>
-          )}
-          {d.sessionsEnCours > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-500/20 bg-blue-500/5 text-blue-400 text-xs font-medium">
-              <BookOpen size={12} />
-              {d.sessionsEnCours} session{d.sessionsEnCours > 1 ? 's' : ''} en cours
+            <p className="text-sm text-white/55 leading-relaxed mb-5">
+              Gérez votre établissement, vos équipes et vos finances en un seul endroit.<br />
+              <strong className="text-white/75">{nomEcole}</strong> · Tableau de bord complet
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/dashboard/ecole/scolarite"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-black transition-all hover:opacity-90 active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #F0A30A, #D4880A)', boxShadow: '0 4px 16px rgba(240,163,10,0.3)' }}>
+                <Plus size={14} /> Inscrire un étudiant
+              </Link>
+              <Link href="/dashboard/ecole/direction"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white border border-white/15 bg-white/[0.08] hover:bg-white/[0.14] transition-all">
+                <BarChart2 size={14} /> Voir les rapports
+              </Link>
             </div>
-          )}
-          {d.nbEvenements > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#8B5CF6]/20 bg-[#8B5CF6]/5 text-[#8B5CF6] text-xs font-medium">
-              <Calendar size={12} />
-              {d.nbEvenements} événement{d.nbEvenements > 1 ? 's' : ''} à venir
-            </div>
-          )}
-        </motion.div>
-      )}
-
-      {/* ── Inscriptions ───────────────────────────────────────────────── */}
-      <motion.div {...fade(2)}>
-        <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2.5">Inscriptions</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <GradientCard icon={GraduationCap} label="Total inscrits"   value={d.nbEtudiants} gradient="linear-gradient(135deg, #78350F 0%, #D97706 50%, #F59E0B 100%)" sub={`${tauxActifs}% actifs`}     href="/dashboard/ecole/scolarite" />
-          <GradientCard icon={CheckCircle}   label="Étudiants actifs" value={d.nbActifs}     gradient="linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)" sub="En cours de formation"        href="/dashboard/ecole/scolarite" />
-          <GradientCard icon={UserX}         label="Suspendus"        value={d.nbSuspendus}  gradient="linear-gradient(135deg, #7C1D1D 0%, #B91C1C 50%, #EF4444 100%)" sub="Accès bloqué"                 href="/dashboard/ecole/scolarite" />
-          <GradientCard icon={Award}         label="Diplômés"         value={d.nbDiplomes}   gradient="linear-gradient(135deg, #4C1D95 0%, #6D28D9 50%, #7C3AED 100%)" sub="Parcours terminé"             href="/dashboard/ecole/direction" />
-        </div>
-      </motion.div>
-
-      {/* ── Personnel ──────────────────────────────────────────────────── */}
-      <motion.div {...fade(3)}>
-        <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2.5">Personnel</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <GradientCard icon={BookOpen}  label="Formateurs actifs" value={d.nbEnseignants}  gradient="linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 50%, #3B82F6 100%)" sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`} href="/dashboard/ecole/rh" />
-          <GradientCard icon={UserCheck} label="Employés"          value={d.nbEmployes}     gradient="linear-gradient(135deg, #4C1D95 0%, #6D28D9 50%, #7C3AED 100%)" href="/dashboard/ecole/rh" />
-          <GradientCard icon={Users}     label="Staff Direction"   value={d.nbStaff}        gradient="linear-gradient(135deg, #831843 0%, #BE185D 50%, #EC4899 100%)" href="/dashboard/ecole/rh" />
-          <GradientCard icon={Users2}    label="Total personnel"   value={totalPersonnel}   gradient="linear-gradient(135deg, #164E63 0%, #0E7490 50%, #06B6D4 100%)" sub="Formateurs + Employés + Staff" />
-        </div>
-      </motion.div>
-
-      {/* ── Frais scolaires ────────────────────────────────────────────── */}
-      <motion.div {...fade(4)}>
-        <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2.5">Frais scolaires</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <GradientCard icon={DollarSign}    label="Recettes du jour"   value={`${fmt(d.revenuJour)} FCFA`}     gradient="linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)" sub={`${d.nbPaiementsJour} paiement${d.nbPaiementsJour !== 1 ? 's' : ''}`} />
-          <GradientCard icon={TrendingUp}    label="Cette semaine"      value={`${fmt(d.revenuSemaine)} FCFA`}  gradient="linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 50%, #3B82F6 100%)" sub="7 derniers jours" />
-          <GradientCard icon={Wallet}        label="Ce mois"            value={`${fmt(d.revenuMois)} FCFA`}     gradient="linear-gradient(135deg, #78350F 0%, #D97706 50%, #F59E0B 100%)" sub={`${d.nbPaiementsMois} paiements`} href="/dashboard/ecole/comptabilite" />
-          <GradientCard icon={AlertTriangle} label="Impayés en attente" value={`${fmt(d.montantImpayes)} FCFA`} gradient={d.nbImpayes > 0 ? 'linear-gradient(135deg, #7C1D1D 0%, #B91C1C 50%, #EF4444 100%)' : 'linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)'} sub={`${d.nbImpayes} dossier${d.nbImpayes !== 1 ? 's' : ''}`} href="/dashboard/ecole/scolarite" />
-        </div>
-      </motion.div>
-
-      {/* ── Chart + Stats rapides ───────────────────────────────────────── */}
-      <motion.div {...fade(5)} className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-        {/* Payment progression area chart */}
-        <div className="lg:col-span-2 p-4 rounded-xl border border-[#21262D] bg-[#161B22]">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-sm font-semibold text-[#E6EDF3]">Progression des paiements</p>
-              <p className="text-[11px] text-[#8B949E]">Frais scolaires — 8 derniers mois</p>
-            </div>
-            <BarChart2 size={15} className="text-[#484F58]" />
           </div>
-          <ResponsiveContainer width="100%" height={190}>
-            <AreaChart data={d.monthly} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="gradPaie" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#F0A30A" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#F0A30A" stopOpacity={0.02} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
-              <XAxis
-                dataKey="month"
-                tick={{ fill: '#484F58', fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: '#484F58', fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-                width={46}
-                tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
-              />
-              <Tooltip
-                contentStyle={{ background: '#161B22', border: '1px solid #21262D', borderRadius: 8, fontSize: 12 }}
-                labelStyle={{ color: '#8B949E' }}
-                formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, 'Recettes']}
-              />
-              <Area
-                type="monotone"
-                dataKey="montant"
-                stroke="#F0A30A"
-                strokeWidth={2}
-                fill="url(#gradPaie)"
-                dot={false}
-                activeDot={{ r: 4, fill: '#F0A30A', stroke: '#161B22', strokeWidth: 2 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
 
-        {/* Right column: Dépenses + rapports */}
-        <div className="space-y-3">
-
-          {/* Dépenses du jour */}
-          <div className="p-4 rounded-xl border border-[#21262D] bg-[#161B22]">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-[#F85149]/15 flex items-center justify-center shrink-0">
-                <ArrowUpRight size={13} className="text-[#F85149]" />
+          {/* Right: hero stats */}
+          <div className="flex gap-3 flex-shrink-0 flex-wrap">
+            {[
+              { label: 'Total Personnel',  value: totalPersonnel,   color: 'text-white',       sub: 'Formateurs + Staff' },
+              { label: 'Étudiants actifs', value: d.nbActifs,       color: 'text-[#F0A30A]',   sub: `${tauxActifs}% actifs` },
+              { label: "Taux d'activité",  value: `${tauxActifs}%`, color: 'text-[#10B981]',   sub: 'Tous modules actifs' },
+            ].map(s => (
+              <div key={s.label} className="bg-white/[0.07] border border-white/10 rounded-2xl p-4 sm:p-5 text-center min-w-[120px] sm:min-w-[138px]">
+                <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-2">{s.label}</p>
+                <p className={`text-2xl sm:text-3xl font-black font-mono leading-none ${s.color}`}>{s.value}</p>
+                <p className="text-[10px] text-white/40 mt-2">{s.sub}</p>
               </div>
-              <p className="text-sm font-semibold text-[#E6EDF3]">Dépenses du jour</p>
-            </div>
-            <div className="text-2xl font-bold text-[#F85149]">
-              {fmt(d.depensesJour)} <span className="text-sm font-normal text-[#8B949E]">FCFA</span>
-            </div>
-            <Link href="/dashboard/ecole/comptabilite" className="text-[10px] text-[#388BFD] hover:underline mt-1 inline-block">
-              Voir le journal →
-            </Link>
-          </div>
-
-          {/* Statistiques rapides */}
-          <div className="p-4 rounded-xl border border-[#21262D] bg-[#161B22] space-y-2">
-            <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2">Statistiques</p>
-            <SmallStat label="Revenu annuel"        value={`${fmt(d.revenuAnnee)} FCFA`}  color="#2EA043" />
-            <SmallStat label="Taux d'activité"      value={`${tauxActifs}%`}               color="#388BFD" />
-            <SmallStat label="Sessions actives"     value={d.sessionsEnCours}              color="#F0A30A" />
-            <SmallStat label="Événements à venir"   value={d.nbEvenements}                 color="#8B5CF6" />
+            ))}
           </div>
         </div>
       </motion.div>
 
-      {/* ── Derniers paiements ─────────────────────────────────────────── */}
-      {d.recentPaie.length > 0 && (
-        <motion.div {...fade(6)} className="rounded-xl border border-[#21262D] bg-[#161B22] overflow-hidden">
-          <div className="px-4 py-3 border-b border-[#21262D] flex items-center justify-between">
-            <p className="text-sm font-semibold text-[#E6EDF3]">Derniers paiements</p>
-            <Link href="/dashboard/ecole/direction" className="text-xs text-[#388BFD] hover:underline">
-              Voir tout
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="bg-white/[0.02]">
-                  {['Date', 'Libellé', 'Mode', 'Montant'].map(h => (
-                    <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#484F58] uppercase tracking-wider font-semibold">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {d.recentPaie.map(p => (
-                  <tr key={p.id} className="border-t border-white/[0.04] hover:bg-white/[0.02] transition-colors">
-                    <td className="px-4 py-2.5 text-[#8B949E]">
-                      {new Date(p.created_at).toLocaleDateString('fr-FR')}
-                    </td>
-                    <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[180px] truncate">{p.libelle}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E] capitalize">
-                      {p.methode?.replace(/_/g, ' ') ?? '—'}
-                    </td>
-                    <td className="px-4 py-2.5 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
-      )}
-
-      {/* ── Actions rapides ────────────────────────────────────────────── */}
-      <motion.div {...fade(7)}>
-        <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2.5">Actions rapides</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-          {[
-            { label: 'Inscrire un étudiant', href: '/dashboard/ecole/scolarite',              color: '#F0A30A', icon: GraduationCap },
-            { label: 'Ajouter un formateur', href: '/dashboard/ecole/rh',                     color: '#388BFD', icon: BookOpen     },
-            { label: 'Direction & Rapports', href: '/dashboard/ecole/direction',               color: '#8B5CF6', icon: BarChart2    },
-            { label: 'Comptabilité OHADA',   href: '/dashboard/ecole/comptabilite',            color: '#2EA043', icon: Wallet      },
-          ].map(({ label, href, color, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-2.5 p-3 rounded-xl border border-[#21262D] bg-[#161B22] hover:border-[#30363D] transition-all group"
-            >
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
-                <Icon size={13} style={{ color }} />
-              </div>
-              <span className="text-xs text-[#8B949E] group-hover:text-[#E6EDF3] transition-colors flex-1">{label}</span>
-              <ChevronRight size={11} className="text-[#484F58] shrink-0" />
-            </Link>
+      {/* ── Module Grid ─────────────────────────────────────────────────────── */}
+      <motion.div {...fade(1)}>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-extrabold text-[#E6EDF3] flex items-center gap-2.5">
+            <div className="w-6 h-0.5 rounded-full" style={{ background: 'linear-gradient(90deg, #F0A30A, transparent)' }} />
+            Mes Modules
+          </h2>
+          <Link href="/dashboard" className="text-xs text-[#F0A30A]/80 hover:text-[#F0A30A] font-semibold transition-colors">
+            Voir tout →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+          {modules.map((mod, i) => (
+            <ModuleCard key={mod.label} mod={mod} i={i} />
           ))}
         </div>
       </motion.div>
+
+      {/* ── Bottom Grid ─────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+        {/* Left: chart + transactions */}
+        <div className="xl:col-span-2 flex flex-col gap-4">
+
+          {/* Area chart */}
+          <motion.div {...fade(12)} className="border border-white/[0.07] rounded-2xl p-5" style={{ background: '#111827' }}>
+            <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
+              <div>
+                <p className="text-sm font-extrabold text-[#E6EDF3]">Analyse des Flux Financiers</p>
+                <p className="text-[11px] text-[#8B949E] mt-0.5">Paiements scolaires — 8 derniers mois</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5 text-[11px] text-[#8B949E]">
+                  <div className="w-2 h-2 rounded-full bg-[#F0A30A]" />
+                  Revenus encaissés
+                </div>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={190}>
+              <AreaChart data={d.monthly} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="gOrange" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#F0A30A" stopOpacity={0.28} />
+                    <stop offset="95%" stopColor="#F0A30A" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
+                  tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
+                <Tooltip
+                  contentStyle={{ background: '#161B22', border: '1px solid #21262D', borderRadius: 10, fontSize: 12 }}
+                  labelStyle={{ color: '#8B949E' }}
+                  formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, 'Paiements']}
+                />
+                <Area type="monotone" dataKey="montant" stroke="#F0A30A" strokeWidth={2.5} fill="url(#gOrange)"
+                  dot={false} activeDot={{ r: 4, fill: '#F0A30A', stroke: '#161B22', strokeWidth: 2 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* Transactions table */}
+          <motion.div {...fade(13)} className="border border-white/[0.07] rounded-2xl overflow-hidden" style={{ background: '#111827' }}>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+              <p className="text-sm font-extrabold text-[#E6EDF3]">Transactions Récentes</p>
+              <Link href="/dashboard/ecole/direction" className="text-xs text-[#F0A30A]/80 hover:text-[#F0A30A] font-semibold transition-colors">
+                Voir tout l'historique →
+              </Link>
+            </div>
+            {d.recentPaie.length === 0 ? (
+              <div className="py-10 text-center text-sm text-[#484F58]">Aucune transaction pour le moment.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.01)' }}>
+                      {['Description', 'Date', 'Montant', 'Statut'].map(h => (
+                        <th key={h} className="text-left px-4 py-2.5 text-[9.5px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {d.recentPaie.map(p => (
+                      <tr key={p.id}
+                        className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors cursor-pointer">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/10 flex items-center justify-center shrink-0">
+                              <DollarSign size={13} className="text-[#F0A30A]" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-[#E6EDF3] truncate max-w-[180px]">
+                                {p.libelle || 'Paiement scolarité'}
+                              </p>
+                              <p className="text-[10px] text-[#8B949E] mt-0.5">Scolarité</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-[11px] text-[#8B949E] font-mono whitespace-nowrap">
+                          {new Date(p.created_at).toLocaleDateString('fr-FR')}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-[13px] font-bold text-[#10B981] font-mono">+{fmt(p.montant)} FCFA</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#10B981]/10 text-[#10B981]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                            {p.methode?.replace(/_/g, ' ') ?? 'Espèces'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Right col */}
+        <div className="flex flex-col gap-4">
+
+          {/* Recouvrement goal */}
+          <motion.div {...fade(14)}
+            className="rounded-2xl p-5 border border-white/[0.08]"
+            style={{ background: 'linear-gradient(135deg, #0F2D3C, #0A1F2E)' }}>
+            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-3">Objectif Recouvrement</p>
+            <div className="flex items-baseline justify-between mb-2">
+              <p className="text-4xl font-black tracking-tight text-white">{recoveryRate}%</p>
+              <span className="text-[11px] font-bold" style={{
+                color: recoveryRate >= 80 ? '#10B981' : recoveryRate >= 50 ? '#F59E0B' : '#EF4444'
+              }}>
+                {recoveryRate >= 80 ? '✓ En bonne voie' : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,0.07)' }}>
+              <div className="h-full rounded-full transition-all duration-700" style={{
+                width: `${recoveryRate}%`,
+                background: recoveryRate >= 80
+                  ? 'linear-gradient(90deg, #10B981, #34D399)'
+                  : recoveryRate >= 50
+                  ? 'linear-gradient(90deg, #F59E0B, #FBBF24)'
+                  : 'linear-gradient(90deg, #EF4444, #F87171)',
+                boxShadow: `0 0 10px ${recoveryRate >= 80 ? 'rgba(16,185,129,0.45)' : 'rgba(245,158,11,0.45)'}`,
+              }} />
+            </div>
+            <p className="text-[11px] text-white/35 leading-relaxed">
+              {d.montantImpayes > 0
+                ? <><strong className="text-white/60">{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
+                : <><strong className="text-white/60">Aucun impayé</strong> en attente — excellent !</>
+              }
+            </p>
+          </motion.div>
+
+          {/* Quick access */}
+          <motion.div {...fade(15)} className="border border-white/[0.07] rounded-2xl p-4" style={{ background: '#111827' }}>
+            <p className="text-sm font-extrabold text-[#E6EDF3] mb-3">Accès Rapide</p>
+            <div className="grid grid-cols-2 gap-2.5">
+              {[
+                { label: 'Inscrire étudiant',  href: '/dashboard/ecole/scolarite',     color: '#10B981', icon: GraduationCap },
+                { label: 'Ajouter formateur',  href: '/dashboard/ecole/rh',            color: '#F0A30A', icon: BookOpen      },
+                { label: 'Saisie comptable',   href: '/dashboard/ecole/comptabilite',  color: '#8B5CF6', icon: Calculator    },
+                { label: 'Générer rapport',    href: '/dashboard/ecole/direction',     color: '#EF4444', icon: BarChart2     },
+              ].map(({ label, href, color, icon: Icon }) => (
+                <Link key={href} href={href}
+                  className="flex flex-col items-center gap-2 p-3 rounded-xl border border-white/[0.07] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/15 transition-all group text-center">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${color}18` }}>
+                    <Icon size={16} style={{ color }} />
+                  </div>
+                  <span className="text-[11px] font-semibold text-[#8B949E] group-hover:text-[#E6EDF3] transition-colors leading-tight">{label}</span>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Alert: impayés */}
+          {d.nbImpayes > 0 && (
+            <motion.div {...fade(16)}
+              className="rounded-2xl p-4 flex gap-3 items-start border border-[#F59E0B]/20"
+              style={{ background: 'rgba(245,158,11,0.08)' }}>
+              <AlertTriangle size={17} className="text-[#F59E0B] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-[#E6EDF3]">Impayés en attente</p>
+                <p className="text-[11px] text-white/45 mt-1 leading-relaxed">
+                  {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA à recouvrer.{' '}
+                  <Link href="/dashboard/ecole/scolarite" className="text-[#F0A30A] hover:underline">Voir →</Link>
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Alert: sessions actives */}
+          {d.sessionsEnCours > 0 && (
+            <motion.div {...fade(17)}
+              className="rounded-2xl p-4 flex gap-3 items-start border border-[#3B82F6]/20"
+              style={{ background: 'rgba(59,130,246,0.08)' }}>
+              <BookOpen size={17} className="text-[#3B82F6] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-[#E6EDF3]">Sessions en cours</p>
+                <p className="text-[11px] text-white/45 mt-1 leading-relaxed">
+                  {d.sessionsEnCours} session{d.sessionsEnCours !== 1 ? 's' : ''} académique{d.sessionsEnCours !== 1 ? 's' : ''} actuellement active{d.sessionsEnCours !== 1 ? 's' : ''}.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* MIAA+ promo */}
+          <motion.div {...fade(18)}
+            className="relative rounded-2xl p-5 overflow-hidden border border-white/10"
+            style={{ background: 'linear-gradient(135deg, #4C1D95, #6D28D9, #7C3AED)' }}>
+            <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-white/[0.08] pointer-events-none" />
+            <div className="relative z-10">
+              <p className="text-xl mb-1.5">✨</p>
+              <p className="text-sm font-extrabold text-white mb-1.5">Nouveauté MIAA+</p>
+              <p className="text-[11.5px] text-white/70 leading-relaxed mb-4">
+                Votre assistant IA peut maintenant générer automatiquement les bulletins de paie et les rapports OHADA en un clic.
+              </p>
+              <Link href="/dashboard/ecole/miaa"
+                className="block w-full py-2.5 rounded-xl text-[12.5px] font-extrabold text-center transition-all hover:brightness-95 active:scale-95"
+                style={{ background: 'rgba(255,255,255,0.9)', color: '#4C1D95' }}>
+                Activer MIAA+ →
+              </Link>
+            </div>
+          </motion.div>
+
+        </div>
+      </div>
     </div>
   )
 }
