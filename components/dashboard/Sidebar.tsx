@@ -578,20 +578,6 @@ export default function Sidebar() {
       {/* Bas */}
       <div className="px-2 py-3 border-t border-[#30363D] shrink-0 space-y-0.5">
 
-        {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
-          <Link
-            href="/dashboard/equipe"
-            onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-              isActive('/dashboard/equipe')
-                ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium'
-                : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
-            }`}
-          >
-            <UsersRound size={15} className="shrink-0" />
-            <span>{t('nav.team')}</span>
-          </Link>
-        )}
 
         {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
           <Link

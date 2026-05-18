@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Globe, ChevronDown, LogOut, Sun, Moon } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Search, Globe, ChevronDown, LogOut, Sun, Moon, UsersRound } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
@@ -17,6 +19,9 @@ const DISPLAY_LOCALES: Locale[] = ['fr', 'en', 'ln', 'pt']
 
 export default function Header() {
   const { tenant } = useTenantContext()
+  const pathname = usePathname()
+  const isOwner = tenant?.role === 'owner'
+  const canSeeTeam = isOwner || tenant?.ecoleRole === 'DIRECTION_GENERALE'
 
   const [userName,     setUserName]     = useState('')
   const [initials,     setInitials]     = useState('U')
@@ -120,7 +125,7 @@ export default function Header() {
             src={logoUrl}
             alt={nomEntreprise}
             className="hidden sm:block shrink-0"
-            style={{ width: 165, height: 36, objectFit: 'contain', display: 'block' }}
+            style={{ width: 180, height: 36, objectFit: 'contain', display: 'block' }}
           />
         ) : (
           // Pas de logo : badge texte avec fond jaune
@@ -131,6 +136,21 @@ export default function Header() {
             <span className="text-xs font-semibold text-[#F0A30A] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
           </div>
         )
+      )}
+
+      {/* Équipe — déplacé du sidebar vers la navbar */}
+      {canSeeTeam && (
+        <Link
+          href="/dashboard/equipe"
+          className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
+            pathname === '/dashboard/equipe'
+              ? 'bg-[#F0A30A]/10 text-[#F0A30A]'
+              : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+          }`}
+        >
+          <UsersRound size={14} />
+          <span>Équipe</span>
+        </Link>
       )}
 
       <div className="flex items-center gap-1 ml-auto">
