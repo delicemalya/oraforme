@@ -361,9 +361,9 @@ export default function Sidebar() {
 
       {/* Logo */}
       <div className="border-b border-[#30363D] shrink-0">
-        <div className="flex justify-center px-1 pt-1 pb-1">
+        <div className="flex justify-center px-2" style={{ paddingTop: 4, paddingBottom: 4 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 170 }} />
+          <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 130 }} />
         </div>
         {/* Badge rôle */}
         {role && role !== 'owner' && (
