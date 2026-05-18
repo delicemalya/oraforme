@@ -701,7 +701,7 @@ export default function TresoreriePage() {
       {mainTab === 'caisse' && (
         <div className="space-y-4">
 
-          {/* Caisse selector */}
+          {/* Sélecteur de caisse — visible si plusieurs */}
           {caisses.length > 1 && (
             <div className="flex gap-2 flex-wrap">
               {caisses.map(c => (
@@ -719,353 +719,320 @@ export default function TresoreriePage() {
             </div>
           )}
 
-          {caisses.length === 0 ? (
-            /* No caisse yet — prompt to create one in Paramétrage */
+          {/* Sous-onglets — TOUJOURS visibles */}
+          <div className="flex gap-1 border-b border-[#21262D]">
+            {CAISSE_TABS.map(tab => {
+              const Icon = tab.icon
+              const active = caisseTab === tab.id
+              return (
+                <button key={tab.id} onClick={() => setCaisseTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors relative ${
+                    active ? 'text-[#F0A30A]' : 'text-[#484F58] hover:text-[#8B949E]'
+                  }`}>
+                  <Icon size={12} />
+                  {tab.label}
+                  {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#F0A30A] rounded-full" />}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Empty state — si pas de caisse et pas dans Paramétrage */}
+          {caisses.length === 0 && caisseTab !== 'parametrage' && (
             <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
               <Archive size={28} className="mx-auto mb-3 text-[#30363D]" />
               <p className="text-[#484F58] text-sm">Aucune caisse configurée</p>
               <p className="text-[#30363D] text-xs mt-1">Créez votre première caisse dans Paramétrage.</p>
               <button onClick={() => setCaisseTab('parametrage')}
-                className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F0A30A]/15 text-[#F0A30A] border border-[#F0A30A]/30">
+                className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F0A30A]/15 text-[#F0A30A] border border-[#F0A30A]/30 hover:bg-[#F0A30A]/25 transition-colors">
                 Aller au Paramétrage
               </button>
             </div>
-          ) : (
-            <>
-              {/* Caisse sub-tab nav */}
-              <div className="flex gap-1 border-b border-[#21262D]">
-                {CAISSE_TABS.map(tab => {
-                  const Icon = tab.icon
-                  const active = caisseTab === tab.id
-                  return (
-                    <button key={tab.id} onClick={() => setCaisseTab(tab.id)}
-                      className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors relative ${
-                        active ? 'text-[#F0A30A]' : 'text-[#484F58] hover:text-[#8B949E]'
-                      }`}>
-                      <Icon size={12} />
-                      {tab.label}
-                      {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#F0A30A] rounded-full" />}
-                    </button>
-                  )
-                })}
+          )}
+
+          {/* ── Aperçu ── */}
+          {caisseTab === 'apercu' && selectedCaisse && caisses.length > 0 && (
+            <div className="space-y-4">
+              <div className="relative rounded-2xl p-6 overflow-hidden"
+                style={{ background: 'linear-gradient(135deg,#1a1200 0%,#2a1e00 50%,#3d2c00 100%)' }}>
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(240,163,10,0.15) 0%,transparent 60%)' }} />
+                <div className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
+                  <Archive size={18} className="text-[#F0A30A]" />
+                </div>
+                <p className="text-[#F0A30A]/60 text-[10px] font-bold uppercase tracking-widest mb-2">{selectedCaisse.nom}</p>
+                <p className="text-white text-4xl font-bold mb-1">{fmtFCFA(selectedCaisse.solde)}</p>
+                <p className="text-[#F0A30A]/40 text-[10px]">Compte {selectedCaisse.numero_compte}</p>
               </div>
-
-              {/* ── Caisse: Aperçu ── */}
-              {caisseTab === 'apercu' && selectedCaisse && (
-                <div className="space-y-4">
-                  {/* Solde card */}
-                  <div className="relative rounded-2xl p-6 overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg,#1a1200 0%,#2a1e00 50%,#3d2c00 100%)' }}>
-                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(240,163,10,0.15) 0%,transparent 60%)' }} />
-                    <div className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
-                      <Archive size={18} className="text-[#F0A30A]" />
+              {(() => {
+                const todayOps = caisseOps.filter(o => o.date === today())
+                const depAuj = todayOps.filter(o => o.type === 'depense').reduce((s, o) => s + o.montant, 0)
+                const appAuj = todayOps.filter(o => o.type === 'approvisionnement').reduce((s, o) => s + o.montant, 0)
+                return (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-[#161B22] border border-[#F85149]/20 rounded-xl p-4">
+                      <p className="text-[10px] text-[#484F58] mb-1">Dépenses aujourd'hui</p>
+                      <p className="text-[#F85149] text-lg font-bold">−{fmtFCFA(depAuj)}</p>
+                      <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'depense').length} opération(s)</p>
                     </div>
-                    <p className="text-[#F0A30A]/60 text-[10px] font-bold uppercase tracking-widest mb-2">{selectedCaisse.nom}</p>
-                    <p className="text-white text-4xl font-bold mb-1">{fmtFCFA(selectedCaisse.solde)}</p>
-                    <p className="text-[#F0A30A]/40 text-[10px]">Compte {selectedCaisse.numero_compte}</p>
+                    <div className="bg-[#161B22] border border-[#2EA043]/20 rounded-xl p-4">
+                      <p className="text-[10px] text-[#484F58] mb-1">Approvisionnements</p>
+                      <p className="text-[#2EA043] text-lg font-bold">+{fmtFCFA(appAuj)}</p>
+                      <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'approvisionnement').length} opération(s)</p>
+                    </div>
                   </div>
+                )
+              })()}
+              <div className="flex gap-2">
+                <button onClick={() => { setOpType('depense'); setCaisseTab('operations') }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#F85149]/30 bg-[#F85149]/10 text-[#F85149] text-sm font-semibold transition-colors hover:bg-[#F85149]/20">
+                  <Minus size={15} /> Dépense
+                </button>
+                <button onClick={() => { setOpType('approvisionnement'); setCaisseTab('operations') }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#2EA043]/30 bg-[#2EA043]/10 text-[#2EA043] text-sm font-semibold transition-colors hover:bg-[#2EA043]/20">
+                  <Plus size={15} /> Approvisionnement
+                </button>
+              </div>
+            </div>
+          )}
 
-                  {/* Today's ops */}
-                  {(() => {
-                    const todayOps = caisseOps.filter(o => o.date === today())
-                    const depenseAujourdhui = todayOps.filter(o => o.type === 'depense').reduce((s, o) => s + o.montant, 0)
-                    const approvAujourdhui  = todayOps.filter(o => o.type === 'approvisionnement').reduce((s, o) => s + o.montant, 0)
-                    return (
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-[#161B22] border border-[#F85149]/20 rounded-xl p-4">
-                          <p className="text-[10px] text-[#484F58] mb-1">Dépenses aujourd'hui</p>
-                          <p className="text-[#F85149] text-lg font-bold">−{fmtFCFA(depenseAujourdhui)}</p>
-                          <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'depense').length} opération(s)</p>
-                        </div>
-                        <div className="bg-[#161B22] border border-[#2EA043]/20 rounded-xl p-4">
-                          <p className="text-[10px] text-[#484F58] mb-1">Approvisionnements</p>
-                          <p className="text-[#2EA043] text-lg font-bold">+{fmtFCFA(approvAujourdhui)}</p>
-                          <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'approvisionnement').length} opération(s)</p>
-                        </div>
-                      </div>
-                    )
-                  })()}
-
-                  {/* Quick actions */}
-                  <div className="flex gap-2">
-                    <button onClick={() => { setOpType('depense'); setCaisseTab('operations') }}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#F85149]/30 bg-[#F85149]/10 text-[#F85149] text-sm font-semibold transition-colors hover:bg-[#F85149]/20">
-                      <Minus size={15} /> Dépense
-                    </button>
-                    <button onClick={() => { setOpType('approvisionnement'); setCaisseTab('operations') }}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#2EA043]/30 bg-[#2EA043]/10 text-[#2EA043] text-sm font-semibold transition-colors hover:bg-[#2EA043]/20">
-                      <Plus size={15} /> Approvisionnement
-                    </button>
+          {/* ── Opérations ── */}
+          {caisseTab === 'operations' && selectedCaisse && caisses.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
+                <button onClick={() => setOpType('depense')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                    opType === 'depense' ? 'bg-[#F85149] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                  }`}>
+                  <Minus size={14} /> Dépense en espèces
+                </button>
+                <button onClick={() => setOpType('approvisionnement')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                    opType === 'approvisionnement' ? 'bg-[#2EA043] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                  }`}>
+                  <Plus size={14} /> Approvisionnement
+                </button>
+              </div>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
+                {opType === 'depense' && (
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
+                    <select value={fOp.categorie} onChange={e => setFOp(f => ({ ...f, categorie: e.target.value }))}
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F85149]/50">
+                      {CATS_DEPENSE.map(c => <option key={c}>{c}</option>)}
+                    </select>
+                  </div>
+                )}
+                <div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
+                  <input value={fOp.motif} onChange={e => setFOp(f => ({ ...f, motif: e.target.value }))}
+                    placeholder={opType === 'depense' ? 'Ex: Achat carburant générateur…' : 'Ex: Virement depuis compte BGFI…'}
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                </div>
+                {opType === 'depense' && (
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Bénéficiaire</label>
+                    <input value={fOp.beneficiaire} onChange={e => setFOp(f => ({ ...f, beneficiaire: e.target.value }))}
+                      placeholder="Ex: Pharmacie SIKA…"
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
+                    <input type="number" value={fOp.montant} onChange={e => setFOp(f => ({ ...f, montant: e.target.value }))}
+                      placeholder="0"
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
+                    <input type="date" value={fOp.date} onChange={e => setFOp(f => ({ ...f, date: e.target.value }))}
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
                   </div>
                 </div>
-              )}
-
-              {/* ── Caisse: Opérations ── */}
-              {caisseTab === 'operations' && selectedCaisse && (
-                <div className="space-y-4">
-
-                  {/* Type toggle */}
-                  <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
-                    <button onClick={() => setOpType('depense')}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                        opType === 'depense' ? 'bg-[#F85149] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
-                      }`}>
-                      <Minus size={14} /> Dépense en espèces
-                    </button>
-                    <button onClick={() => setOpType('approvisionnement')}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                        opType === 'approvisionnement' ? 'bg-[#2EA043] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
-                      }`}>
-                      <Plus size={14} /> Approvisionnement
-                    </button>
+                <div>
+                  <label className="text-xs text-[#8B949E] mb-1 block">N° pièce / référence</label>
+                  <input value={fOp.reference_piece} onChange={e => setFOp(f => ({ ...f, reference_piece: e.target.value }))}
+                    placeholder="Ex: RECU-2026-001"
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                </div>
+                {fOp.montant && parseFloat(fOp.montant) > 0 && (
+                  <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                    opType === 'depense' ? 'bg-[#F85149]/10 border-[#F85149]/20' : 'bg-[#2EA043]/10 border-[#2EA043]/20'
+                  }`}>
+                    <span className="text-xs text-[#8B949E]">Solde après opération</span>
+                    <span className={`text-sm font-bold ${opType === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}`}>
+                      {fmtFCFA(opType === 'depense'
+                        ? selectedCaisse.solde - parseFloat(fOp.montant)
+                        : selectedCaisse.solde + parseFloat(fOp.montant))}
+                    </span>
                   </div>
+                )}
+                <button onClick={saveCaisseOp} disabled={saving || !fOp.montant}
+                  className={`w-full py-3 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 text-white ${
+                    opType === 'depense' ? 'bg-[#F85149]' : 'bg-[#2EA043]'
+                  }`}>
+                  {saving && <Loader2 size={13} className="animate-spin" />}
+                  {opType === 'depense' ? 'Enregistrer la dépense' : "Enregistrer l'approvisionnement"}
+                </button>
+              </div>
+            </div>
+          )}
 
-                  <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
-                    {opType === 'depense' && (
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
-                        <select value={fOp.categorie} onChange={e => setFOp(f => ({ ...f, categorie: e.target.value }))}
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F85149]/50">
-                          {CATS_DEPENSE.map(c => <option key={c}>{c}</option>)}
-                        </select>
-                      </div>
-                    )}
+          {/* ── Journal ── */}
+          {caisseTab === 'journal' && selectedCaisse && caisses.length > 0 && (
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#30363D] flex items-center justify-between">
+                <h3 className="text-xs font-semibold text-[#E6EDF3]">Journal de caisse — {selectedCaisse.nom}</h3>
+                <span className="text-[10px] text-[#484F58]">{caisseOps.length} opération(s)</span>
+              </div>
+              {caisseOps.length === 0 ? (
+                <div className="p-10 text-center">
+                  <FileText size={24} className="mx-auto mb-2 text-[#30363D]" />
+                  <p className="text-[#484F58] text-sm">Aucune opération</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-[#21262D]">
+                        {['Date', 'Type', 'Motif', 'Bénéficiaire', 'Réf.', 'Montant', 'Statut'].map(h => (
+                          <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#21262D]">
+                      {caisseOps.map(op => (
+                        <tr key={op.id} className="hover:bg-[#21262D]/30 transition-colors">
+                          <td className="px-4 py-2.5 text-[#8B949E]">{fmtDate(op.date)}</td>
+                          <td className="px-4 py-2.5">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              op.type === 'depense' ? 'bg-[#F85149]/10 text-[#F85149]' : 'bg-[#2EA043]/10 text-[#2EA043]'
+                            }`}>
+                              {op.type === 'depense' ? 'Dépense' : 'Approv.'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[140px] truncate">{op.motif ?? '—'}</td>
+                          <td className="px-4 py-2.5 text-[#8B949E]">{op.beneficiaire ?? '—'}</td>
+                          <td className="px-4 py-2.5 text-[#484F58]">{op.reference_piece ?? '—'}</td>
+                          <td className={`px-4 py-2.5 font-bold ${op.type === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}`}>
+                            {op.type === 'depense' ? '−' : '+'}{fmtFCFA(op.montant)}
+                          </td>
+                          <td className="px-4 py-2.5">
+                            {op.cloture_date
+                              ? <span className="text-[10px] text-[#484F58]">Clôturé</span>
+                              : <span className="text-[10px] text-[#F0A30A]">En cours</span>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
 
-                    <div>
-                      <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
-                      <input value={fOp.motif} onChange={e => setFOp(f => ({ ...f, motif: e.target.value }))}
-                        placeholder={opType === 'depense' ? 'Ex: Achat carburant générateur…' : 'Ex: Virement depuis compte BGFI…'}
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
-                    </div>
-
-                    {opType === 'depense' && (
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Bénéficiaire</label>
-                        <input value={fOp.beneficiaire} onChange={e => setFOp(f => ({ ...f, beneficiaire: e.target.value }))}
-                          placeholder="Ex: Pharmacie SIKA…"
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
-                        <input type="number" value={fOp.montant} onChange={e => setFOp(f => ({ ...f, montant: e.target.value }))}
-                          placeholder="0"
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
-                      </div>
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
-                        <input type="date" value={fOp.date} onChange={e => setFOp(f => ({ ...f, date: e.target.value }))}
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-[#8B949E] mb-1 block">N° pièce / référence</label>
-                      <input value={fOp.reference_piece} onChange={e => setFOp(f => ({ ...f, reference_piece: e.target.value }))}
-                        placeholder="Ex: RECU-2026-001"
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
-                    </div>
-
-                    {/* Solde preview */}
-                    {fOp.montant && parseFloat(fOp.montant) > 0 && (
-                      <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
-                        opType === 'depense' ? 'bg-[#F85149]/10 border-[#F85149]/20' : 'bg-[#2EA043]/10 border-[#2EA043]/20'
-                      }`}>
-                        <span className="text-xs text-[#8B949E]">Solde après opération</span>
-                        <span className={`text-sm font-bold ${opType === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}`}>
-                          {fmtFCFA(opType === 'depense'
-                            ? selectedCaisse.solde - parseFloat(fOp.montant)
-                            : selectedCaisse.solde + parseFloat(fOp.montant))}
+          {/* ── Clôture ── */}
+          {caisseTab === 'cloture' && selectedCaisse && caisses.length > 0 && (
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
+                  <Lock size={18} className="text-[#F0A30A]" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#E6EDF3]">Clôture de caisse</p>
+                  <p className="text-[10px] text-[#484F58]">Arrêter les opérations d'une journée</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-[#8B949E] mb-1 block">Date à clôturer</label>
+                <input type="date" value={clotureDate} onChange={e => setClotureDate(e.target.value)}
+                  className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
+              </div>
+              <div>
+                <label className="text-xs text-[#8B949E] mb-1 block">Solde physique constaté (optionnel)</label>
+                <input type="number" value={clotureSolde} onChange={e => setClotureSolde(e.target.value)}
+                  placeholder={String(selectedCaisse.solde)}
+                  className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                <p className="text-[10px] text-[#484F58] mt-1">
+                  Solde comptable : {fmtFCFA(selectedCaisse.solde)}
+                  {clotureSolde && ` · Écart : ${parseFloat(clotureSolde) - selectedCaisse.solde >= 0 ? '+' : ''}${fmtFCFA(parseFloat(clotureSolde) - selectedCaisse.solde)}`}
+                </p>
+              </div>
+              {(() => {
+                const toClose = caisseOps.filter(o => o.date === clotureDate && !o.cloture_date)
+                return toClose.length > 0 ? (
+                  <div className="bg-[#0D1117] border border-[#F0A30A]/20 rounded-xl p-3">
+                    <p className="text-[10px] font-bold text-[#F0A30A] mb-2">{toClose.length} opération(s) à clôturer</p>
+                    {toClose.map(o => (
+                      <div key={o.id} className="flex justify-between text-[10px] py-0.5">
+                        <span className="text-[#8B949E]">{o.motif ?? o.type}</span>
+                        <span className={o.type === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}>
+                          {o.type === 'depense' ? '−' : '+'}{fmtFCFA(o.montant)}
                         </span>
                       </div>
-                    )}
-
-                    <button onClick={saveCaisseOp} disabled={saving || !fOp.montant}
-                      className={`w-full py-3 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 text-white ${
-                        opType === 'depense' ? 'bg-[#F85149]' : 'bg-[#2EA043]'
-                      }`}>
-                      {saving && <Loader2 size={13} className="animate-spin" />}
-                      {opType === 'depense' ? 'Enregistrer la dépense' : 'Enregistrer l\'approvisionnement'}
-                    </button>
+                    ))}
                   </div>
-                </div>
-              )}
-
-              {/* ── Caisse: Journal ── */}
-              {caisseTab === 'journal' && selectedCaisse && (
-                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
-                  <div className="px-5 py-3 border-b border-[#30363D] flex items-center justify-between">
-                    <h3 className="text-xs font-semibold text-[#E6EDF3]">Journal de caisse — {selectedCaisse.nom}</h3>
-                    <span className="text-[10px] text-[#484F58]">{caisseOps.length} opération(s)</span>
-                  </div>
-                  {caisseOps.length === 0 ? (
-                    <div className="p-10 text-center">
-                      <FileText size={24} className="mx-auto mb-2 text-[#30363D]" />
-                      <p className="text-[#484F58] text-sm">Aucune opération</p>
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr className="border-b border-[#21262D]">
-                            {['Date', 'Type', 'Motif', 'Bénéficiaire', 'Réf.', 'Montant', 'Statut'].map(h => (
-                              <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#21262D]">
-                          {caisseOps.map(op => (
-                            <tr key={op.id} className="hover:bg-[#21262D]/30 transition-colors">
-                              <td className="px-4 py-2.5 text-[#8B949E]">{fmtDate(op.date)}</td>
-                              <td className="px-4 py-2.5">
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                  op.type === 'depense'
-                                    ? 'bg-[#F85149]/10 text-[#F85149]'
-                                    : 'bg-[#2EA043]/10 text-[#2EA043]'
-                                }`}>
-                                  {op.type === 'depense' ? 'Dépense' : 'Approv.'}
-                                </span>
-                              </td>
-                              <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[140px] truncate">{op.motif ?? '—'}</td>
-                              <td className="px-4 py-2.5 text-[#8B949E]">{op.beneficiaire ?? '—'}</td>
-                              <td className="px-4 py-2.5 text-[#484F58]">{op.reference_piece ?? '—'}</td>
-                              <td className={`px-4 py-2.5 font-bold ${op.type === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}`}>
-                                {op.type === 'depense' ? '−' : '+'}{fmtFCFA(op.montant)}
-                              </td>
-                              <td className="px-4 py-2.5">
-                                {op.cloture_date ? (
-                                  <span className="text-[10px] text-[#484F58]">Clôturé</span>
-                                ) : (
-                                  <span className="text-[10px] text-[#F0A30A]">En cours</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* ── Caisse: Clôture ── */}
-              {caisseTab === 'cloture' && selectedCaisse && (
-                <div className="space-y-4">
-                  <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
-                        <Lock size={18} className="text-[#F0A30A]" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-[#E6EDF3]">Clôture de caisse</p>
-                        <p className="text-[10px] text-[#484F58]">Arrêter les opérations d'une journée</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Date à clôturer</label>
-                        <input type="date" value={clotureDate} onChange={e => setClotureDate(e.target.value)}
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
-                      </div>
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Solde physique constaté (optionnel)</label>
-                        <input type="number" value={clotureSolde} onChange={e => setClotureSolde(e.target.value)}
-                          placeholder={String(selectedCaisse.solde)}
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
-                        <p className="text-[10px] text-[#484F58] mt-1">
-                          Solde comptable : {fmtFCFA(selectedCaisse.solde)}
-                          {clotureSolde && (
-                            <span className={` · Écart : ${parseFloat(clotureSolde) - selectedCaisse.solde >= 0 ? '+' : ''}${fmtFCFA(parseFloat(clotureSolde) - selectedCaisse.solde)}`} />
-                          )}
-                        </p>
-                      </div>
-
-                      {/* Preview ops to close */}
-                      {(() => {
-                        const toClose = caisseOps.filter(o => o.date === clotureDate && !o.cloture_date)
-                        return toClose.length > 0 ? (
-                          <div className="bg-[#0D1117] border border-[#F0A30A]/20 rounded-xl p-3">
-                            <p className="text-[10px] font-bold text-[#F0A30A] mb-2">{toClose.length} opération(s) à clôturer</p>
-                            {toClose.map(o => (
-                              <div key={o.id} className="flex justify-between text-[10px] py-0.5">
-                                <span className="text-[#8B949E]">{o.motif ?? o.type}</span>
-                                <span className={o.type === 'depense' ? 'text-[#F85149]' : 'text-[#2EA043]'}>
-                                  {o.type === 'depense' ? '−' : '+'}{fmtFCFA(o.montant)}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-[10px] text-[#484F58]">Aucune opération non clôturée pour cette date.</p>
-                        )
-                      })()}
-
-                      <button onClick={saveCloture} disabled={savingCloture}
-                        className="w-full py-3 rounded-xl text-sm font-semibold bg-[#F0A30A] text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2">
-                        {savingCloture && <Loader2 size={13} className="animate-spin" />}
-                        Clôturer la caisse
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* ── Caisse: Paramétrage ── */}
-              {caisseTab === 'parametrage' && (
-                <div className="space-y-4">
-                  {/* Existing caisses */}
-                  {caisses.length > 0 && (
-                    <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
-                      <div className="px-5 py-3 border-b border-[#30363D]">
-                        <p className="text-xs font-semibold text-[#E6EDF3]">Caisses existantes</p>
-                      </div>
-                      {caisses.map(c => (
-                        <div key={c.id} className="flex items-center gap-3 px-5 py-3 border-b border-[#21262D] last:border-0">
-                          <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/10 flex items-center justify-center">
-                            <Archive size={14} className="text-[#F0A30A]" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-xs font-medium text-[#E6EDF3]">{c.nom}</p>
-                            <p className="text-[10px] text-[#484F58]">Compte {c.numero_compte} · {fmtFCFA(c.solde)}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Create new caisse */}
-                  <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
-                    <p className="text-xs font-semibold text-[#E6EDF3] mb-4">Créer une nouvelle caisse</p>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Nom de la caisse</label>
-                        <input value={fCaisse.nom} onChange={e => setFCaisse(f => ({ ...f, nom: e.target.value }))}
-                          placeholder="Ex: Caisse principale, Caisse annexe…"
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
-                      </div>
-                      <div>
-                        <label className="text-xs text-[#8B949E] mb-1 block">Compte OHADA</label>
-                        <select value={fCaisse.numero_compte} onChange={e => setFCaisse(f => ({ ...f, numero_compte: e.target.value }))}
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
-                          <option value="571000">571000 — Caisse principale</option>
-                          <option value="571100">571100 — Caisse annexe</option>
-                          <option value="572000">572000 — Caisse devises</option>
-                        </select>
-                      </div>
-                      <button onClick={saveCaisse} disabled={savingCaisse || !fCaisse.nom}
-                        className="w-full py-2.5 rounded-xl text-sm font-semibold bg-[#F0A30A] text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2">
-                        {savingCaisse && <Loader2 size={13} className="animate-spin" />}
-                        Créer la caisse
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
+                ) : (
+                  <p className="text-[10px] text-[#484F58]">Aucune opération non clôturée pour cette date.</p>
+                )
+              })()}
+              <button onClick={saveCloture} disabled={savingCloture}
+                className="w-full py-3 rounded-xl text-sm font-semibold bg-[#F0A30A] text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2">
+                {savingCloture && <Loader2 size={13} className="animate-spin" />}
+                Clôturer la caisse
+              </button>
+            </div>
           )}
+
+          {/* ── Paramétrage ── */}
+          {caisseTab === 'parametrage' && (
+            <div className="space-y-4">
+              {caisses.length > 0 && (
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                  <div className="px-5 py-3 border-b border-[#30363D]">
+                    <p className="text-xs font-semibold text-[#E6EDF3]">Caisses existantes</p>
+                  </div>
+                  {caisses.map(c => (
+                    <div key={c.id} className="flex items-center gap-3 px-5 py-3 border-b border-[#21262D] last:border-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/10 flex items-center justify-center">
+                        <Archive size={14} className="text-[#F0A30A]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-[#E6EDF3]">{c.nom}</p>
+                        <p className="text-[10px] text-[#484F58]">Compte {c.numero_compte} · {fmtFCFA(c.solde)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+                <p className="text-xs font-semibold text-[#E6EDF3] mb-4">Créer une nouvelle caisse</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Nom de la caisse</label>
+                    <input value={fCaisse.nom} onChange={e => setFCaisse(f => ({ ...f, nom: e.target.value }))}
+                      placeholder="Ex: Caisse principale, Caisse annexe…"
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Compte OHADA</label>
+                    <select value={fCaisse.numero_compte} onChange={e => setFCaisse(f => ({ ...f, numero_compte: e.target.value }))}
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+                      <option value="571000">571000 — Caisse principale</option>
+                      <option value="571100">571100 — Caisse annexe</option>
+                      <option value="572000">572000 — Caisse devises</option>
+                    </select>
+                  </div>
+                  <button onClick={saveCaisse} disabled={savingCaisse || !fCaisse.nom}
+                    className="w-full py-2.5 rounded-xl text-sm font-semibold bg-[#F0A30A] text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2">
+                    {savingCaisse && <Loader2 size={13} className="animate-spin" />}
+                    Créer la caisse
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       )}
 
