@@ -357,39 +357,21 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full overflow-hidden">
 
-      {/* Logo + entreprise */}
+      {/* Logo */}
       <div className="border-b border-[#30363D] shrink-0">
         <div className="flex justify-center px-1 pt-3 pb-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 130 }} />
+          <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 150 }} />
         </div>
-        {nomEntreprise && (
-          <div className="px-4 flex items-center gap-1.5 pb-1">
-            <Building2 size={10} className="text-[#484F58] shrink-0" />
-            <span className="text-xs text-[#8B949E] truncate">{nomEntreprise}</span>
-            {isSuperAdmin && (
-              <span className="text-[9px] bg-[#F85149]/20 text-[#F85149] border border-[#F85149]/30 rounded px-1 py-0.5 font-bold tracking-wide shrink-0">
-                Owner
-              </span>
-            )}
-          </div>
-        )}
         {/* Badge rôle */}
         {role && role !== 'owner' && (
-          <div className="px-4 mt-1">
+          <div className="px-4 pb-2">
             <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
               role === 'admin'
                 ? 'bg-blue-500/15 text-blue-400'
                 : 'bg-white/5 text-white/30'
             }`}>
               {role === 'admin' ? 'Administrateur' : 'Membre'}
-            </span>
-          </div>
-        )}
-        {secteur && (
-          <div className="px-4 mt-1 pb-2">
-            <span className="text-[9px] font-semibold uppercase tracking-widest text-[#484F58]">
-              {SECTOR_LABEL[secteur] ?? secteur}
             </span>
           </div>
         )}

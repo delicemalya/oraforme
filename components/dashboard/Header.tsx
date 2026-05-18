@@ -19,6 +19,7 @@ export default function Header() {
   const router = useRouter()
   const [userName, setUserName] = useState('')
   const [initials, setInitials] = useState('U')
+  const [nomEntreprise, setNomEntreprise] = useState<string | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [locale, setLocale] = useState<Locale>('fr')
@@ -38,13 +39,15 @@ export default function Header() {
       setInitials(email.charAt(0).toUpperCase())
       const { data } = await supabase
         .from('profiles')
-        .select('prenom, nom')
+        .select('prenom, nom, tenants(nom_entreprise)')
         .eq('user_id', user.id)
         .maybeSingle()
       if (data) {
         const name = [data.prenom, data.nom].filter(Boolean).join(' ')
         setUserName(name || email.split('@')[0])
         setInitials((name || email).charAt(0).toUpperCase())
+        const tenant = data.tenants as unknown as { nom_entreprise?: string } | null
+        setNomEntreprise(tenant?.nom_entreprise ?? null)
       } else {
         setUserName(email.split('@')[0])
       }
@@ -84,6 +87,16 @@ export default function Header() {
           <kbd className="hidden sm:block text-[10px] text-[#484F58] border border-[#30363D] rounded px-1 shrink-0">⌘K</kbd>
         </div>
       </div>
+
+      {/* Badge entreprise */}
+      {nomEntreprise && (
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0">
+          <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0">
+            <span className="text-[10px] font-black text-[#0D1117]">{nomEntreprise.charAt(0).toUpperCase()}</span>
+          </div>
+          <span className="text-xs font-semibold text-[#F0A30A] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
+        </div>
+      )}
 
       <div className="flex items-center gap-1 ml-auto">
 
