@@ -119,7 +119,7 @@ export default function Header() {
             <img
               src={logoUrl}
               alt={nomEntreprise}
-              style={{ maxWidth: 150, maxHeight: 36, width: 'auto', height: 'auto', display: 'block', objectFit: 'contain' }}
+              style={{ maxWidth: 165, maxHeight: 38, width: 'auto', height: 'auto', display: 'block', objectFit: 'contain' }}
             />
           ) : (
             <>
