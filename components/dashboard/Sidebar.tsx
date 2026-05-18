@@ -361,10 +361,14 @@ export default function Sidebar() {
 
       {/* Logo */}
       <div className="border-b border-[#30363D] shrink-0">
-        {/* width:100% remplit la sidebar, height:auto garde les proportions */}
-        <div style={{ lineHeight: 0, padding: 0 }}>
+        {/* overflow:hidden + marges négatives rognent le transparent interne du PNG */}
+        <div style={{ overflow: 'hidden', lineHeight: 0, padding: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="oraforme" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <img
+            src="/logo.png"
+            alt="oraforme"
+            style={{ width: '100%', height: 'auto', display: 'block', marginTop: '-12%', marginBottom: '-12%' }}
+          />
         </div>
         {/* Badge rôle */}
         {role && role !== 'owner' && (
