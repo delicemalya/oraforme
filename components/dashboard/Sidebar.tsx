@@ -358,13 +358,13 @@ export default function Sidebar() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Logo + entreprise */}
-      <div className="px-4 py-4 border-b border-[#30363D] shrink-0">
-        <div className="flex justify-center mb-2">
+      <div className="border-b border-[#30363D] shrink-0">
+        <div className="flex justify-center px-1 pt-3 pb-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 88 }} />
+          <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 130 }} />
         </div>
         {nomEntreprise && (
-          <div className="flex items-center gap-1.5">
+          <div className="px-4 flex items-center gap-1.5 pb-1">
             <Building2 size={10} className="text-[#484F58] shrink-0" />
             <span className="text-xs text-[#8B949E] truncate">{nomEntreprise}</span>
             {isSuperAdmin && (
@@ -376,7 +376,7 @@ export default function Sidebar() {
         )}
         {/* Badge rôle */}
         {role && role !== 'owner' && (
-          <div className="mt-1.5">
+          <div className="px-4 mt-1">
             <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
               role === 'admin'
                 ? 'bg-blue-500/15 text-blue-400'
@@ -387,7 +387,7 @@ export default function Sidebar() {
           </div>
         )}
         {secteur && (
-          <div className="mt-1">
+          <div className="px-4 mt-1 pb-2">
             <span className="text-[9px] font-semibold uppercase tracking-widest text-[#484F58]">
               {SECTOR_LABEL[secteur] ?? secteur}
             </span>
