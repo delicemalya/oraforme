@@ -199,6 +199,8 @@ export default function ParametresPage() {
     )
     setSaving(false)
     setSaved(true)
+    // Notify Header (and any other listener) that the config changed
+    window.dispatchEvent(new CustomEvent('oraforme:config-saved', { detail: { logo_url: cfg.logo_url } }))
     setTimeout(() => setSaved(false), 2500)
   }
 

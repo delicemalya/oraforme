@@ -36,7 +36,7 @@ export default function Header() {
     document.documentElement.setAttribute('data-theme', stored)
   }, [])
 
-  // Company logo — fetched from entreprise_config, re-runs when tenant changes
+  // Company logo — initial fetch + live update via CustomEvent from Paramètres page
   useEffect(() => {
     if (!tenant?.tenantId) { setLogoUrl(null); return }
     supabase
@@ -45,6 +45,13 @@ export default function Header() {
       .eq('tenant_id', tenant.tenantId)
       .maybeSingle()
       .then(({ data }) => setLogoUrl(data?.logo_url || null))
+
+    function onConfigSaved(e: Event) {
+      const url = (e as CustomEvent<{ logo_url: string }>).detail?.logo_url
+      setLogoUrl(url || null)
+    }
+    window.addEventListener('oraforme:config-saved', onConfigSaved)
+    return () => window.removeEventListener('oraforme:config-saved', onConfigSaved)
   }, [tenant?.tenantId])
 
   // User display name — derived from auth profile (display only, not tenant-sensitive)
