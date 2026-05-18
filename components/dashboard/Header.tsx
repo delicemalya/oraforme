@@ -113,21 +113,21 @@ export default function Header() {
 
       {/* Logo entreprise client — après la barre de recherche */}
       {nomEntreprise && (
-        <div className="hidden sm:flex items-center px-2 py-0.5 rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0" style={{ maxWidth: 180 }}>
+        <div className="hidden sm:flex items-center rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0 overflow-hidden" style={{ maxWidth: 175, height: 36 }}>
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
               alt={nomEntreprise}
-              style={{ maxWidth: 165, maxHeight: 38, width: 'auto', height: 'auto', display: 'block', objectFit: 'contain' }}
+              style={{ width: 165, height: 36, objectFit: 'contain', display: 'block' }}
             />
           ) : (
-            <>
-              <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0 mr-2">
+            <div className="flex items-center gap-2 px-2 h-full">
+              <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0">
                 <span className="text-[10px] font-black text-[#0D1117]">{nomEntreprise.charAt(0).toUpperCase()}</span>
               </div>
               <span className="text-xs font-semibold text-[#F0A30A] tracking-wide truncate">{nomEntreprise}</span>
-            </>
+            </div>
           )}
         </div>
       )}
