@@ -46,28 +46,28 @@ const fade = (i: number) => ({
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function KpiCard({ label, value, sub, color, icon: Icon, href }: {
-  label: string; value: string | number; sub?: string; color: string
-  icon: React.ElementType; href?: string
+function GradientCard({ label, value, sub, icon: Icon, gradient, href }: {
+  label: string; value: string | number; sub?: string
+  icon: React.ElementType; gradient: string; href?: string
 }) {
   const inner = (
-    <div className="p-4 rounded-xl border border-[#21262D] bg-[#161B22] hover:border-[#30363D] transition-all group h-full">
-      <div className="flex items-start justify-between mb-3">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
-          <Icon size={15} style={{ color }} />
-        </div>
-        {href && <ChevronRight size={13} className="text-[#484F58] group-hover:text-[#8B949E] transition-colors" />}
+    <div
+      className="relative rounded-2xl p-4 sm:p-5 overflow-hidden cursor-default min-h-[130px] flex flex-col justify-between"
+      style={{ background: gradient }}
+    >
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%)' }} />
+      <div className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+        <Icon size={18} className="text-white" />
       </div>
-      <div className="text-xl font-bold text-[#E6EDF3] mb-0.5">{value}</div>
-      <div className="text-xs text-[#8B949E]">{label}</div>
-      {sub && <div className="text-[10px] text-[#484F58] mt-0.5">{sub}</div>}
+      <div className="relative">
+        <p className="text-white/70 text-[11px] font-semibold uppercase tracking-wider mb-2">{label}</p>
+        <p className="text-white text-2xl sm:text-3xl font-bold leading-none mb-1">{value}</p>
+        {sub && <p className="text-white/60 text-[11px]">{sub}</p>}
+      </div>
     </div>
   )
-  return (
-    <div className="h-full">
-      {href ? <Link href={href} className="block h-full">{inner}</Link> : inner}
-    </div>
-  )
+  return href ? <Link href={href}>{inner}</Link> : inner
 }
 
 function SmallStat({ label, value, color }: { label: string; value: string | number; color: string }) {
@@ -281,10 +281,10 @@ export default function EcoleOverviewPage() {
       <motion.div {...fade(2)}>
         <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2.5">Inscriptions</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <KpiCard icon={GraduationCap} label="Total inscrits"   value={d.nbEtudiants} color="#F0A30A" sub={`${tauxActifs}% actifs`}     href="/dashboard/ecole/scolarite" />
-          <KpiCard icon={CheckCircle}   label="Étudiants actifs" value={d.nbActifs}     color="#2EA043" sub="En cours de formation"        href="/dashboard/ecole/scolarite" />
-          <KpiCard icon={UserX}         label="Suspendus"        value={d.nbSuspendus}  color="#F85149" sub="Accès bloqué"                 href="/dashboard/ecole/scolarite" />
-          <KpiCard icon={Award}         label="Diplômés"         value={d.nbDiplomes}   color="#8B5CF6" sub="Parcours terminé"             href="/dashboard/ecole/direction" />
+          <GradientCard icon={GraduationCap} label="Total inscrits"   value={d.nbEtudiants} gradient="linear-gradient(135deg, #78350F 0%, #D97706 50%, #F59E0B 100%)" sub={`${tauxActifs}% actifs`}     href="/dashboard/ecole/scolarite" />
+          <GradientCard icon={CheckCircle}   label="Étudiants actifs" value={d.nbActifs}     gradient="linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)" sub="En cours de formation"        href="/dashboard/ecole/scolarite" />
+          <GradientCard icon={UserX}         label="Suspendus"        value={d.nbSuspendus}  gradient="linear-gradient(135deg, #7C1D1D 0%, #B91C1C 50%, #EF4444 100%)" sub="Accès bloqué"                 href="/dashboard/ecole/scolarite" />
+          <GradientCard icon={Award}         label="Diplômés"         value={d.nbDiplomes}   gradient="linear-gradient(135deg, #4C1D95 0%, #6D28D9 50%, #7C3AED 100%)" sub="Parcours terminé"             href="/dashboard/ecole/direction" />
         </div>
       </motion.div>
 
@@ -292,10 +292,10 @@ export default function EcoleOverviewPage() {
       <motion.div {...fade(3)}>
         <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2.5">Personnel</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <KpiCard icon={BookOpen}  label="Formateurs actifs" value={d.nbEnseignants}  color="#388BFD" sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`} href="/dashboard/ecole/rh" />
-          <KpiCard icon={UserCheck} label="Employés"          value={d.nbEmployes}     color="#8B5CF6" href="/dashboard/ecole/rh" />
-          <KpiCard icon={Users}     label="Staff Direction"   value={d.nbStaff}        color="#EC4899" href="/dashboard/ecole/rh" />
-          <KpiCard icon={Users2}    label="Total personnel"   value={totalPersonnel}   color="#06B6D4" sub="Formateurs + Employés + Staff" />
+          <GradientCard icon={BookOpen}  label="Formateurs actifs" value={d.nbEnseignants}  gradient="linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 50%, #3B82F6 100%)" sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`} href="/dashboard/ecole/rh" />
+          <GradientCard icon={UserCheck} label="Employés"          value={d.nbEmployes}     gradient="linear-gradient(135deg, #4C1D95 0%, #6D28D9 50%, #7C3AED 100%)" href="/dashboard/ecole/rh" />
+          <GradientCard icon={Users}     label="Staff Direction"   value={d.nbStaff}        gradient="linear-gradient(135deg, #831843 0%, #BE185D 50%, #EC4899 100%)" href="/dashboard/ecole/rh" />
+          <GradientCard icon={Users2}    label="Total personnel"   value={totalPersonnel}   gradient="linear-gradient(135deg, #164E63 0%, #0E7490 50%, #06B6D4 100%)" sub="Formateurs + Employés + Staff" />
         </div>
       </motion.div>
 
@@ -303,10 +303,10 @@ export default function EcoleOverviewPage() {
       <motion.div {...fade(4)}>
         <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-2.5">Frais scolaires</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <KpiCard icon={DollarSign}    label="Recettes du jour"  value={`${fmt(d.revenuJour)} FCFA`}    color="#2EA043" sub={`${d.nbPaiementsJour} paiement${d.nbPaiementsJour !== 1 ? 's' : ''}`} />
-          <KpiCard icon={TrendingUp}    label="Cette semaine"     value={`${fmt(d.revenuSemaine)} FCFA`} color="#388BFD" sub="7 derniers jours" />
-          <KpiCard icon={Wallet}        label="Ce mois"           value={`${fmt(d.revenuMois)} FCFA`}    color="#F0A30A" sub={`${d.nbPaiementsMois} paiements`} href="/dashboard/ecole/comptabilite" />
-          <KpiCard icon={AlertTriangle} label="Impayés en attente"value={`${fmt(d.montantImpayes)} FCFA`}color="#F85149" sub={`${d.nbImpayes} dossier${d.nbImpayes !== 1 ? 's' : ''}`} href="/dashboard/ecole/scolarite" />
+          <GradientCard icon={DollarSign}    label="Recettes du jour"   value={`${fmt(d.revenuJour)} FCFA`}     gradient="linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)" sub={`${d.nbPaiementsJour} paiement${d.nbPaiementsJour !== 1 ? 's' : ''}`} />
+          <GradientCard icon={TrendingUp}    label="Cette semaine"      value={`${fmt(d.revenuSemaine)} FCFA`}  gradient="linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 50%, #3B82F6 100%)" sub="7 derniers jours" />
+          <GradientCard icon={Wallet}        label="Ce mois"            value={`${fmt(d.revenuMois)} FCFA`}     gradient="linear-gradient(135deg, #78350F 0%, #D97706 50%, #F59E0B 100%)" sub={`${d.nbPaiementsMois} paiements`} href="/dashboard/ecole/comptabilite" />
+          <GradientCard icon={AlertTriangle} label="Impayés en attente" value={`${fmt(d.montantImpayes)} FCFA`} gradient={d.nbImpayes > 0 ? 'linear-gradient(135deg, #7C1D1D 0%, #B91C1C 50%, #EF4444 100%)' : 'linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%)'} sub={`${d.nbImpayes} dossier${d.nbImpayes !== 1 ? 's' : ''}`} href="/dashboard/ecole/scolarite" />
         </div>
       </motion.div>
 

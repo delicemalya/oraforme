@@ -359,10 +359,9 @@ export default function Sidebar() {
 
       {/* Logo + entreprise */}
       <div className="px-4 py-4 border-b border-[#30363D] shrink-0">
-        <div className="flex items-center gap-2 mb-1.5">
+        <div className="flex justify-center mb-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="oraforme" className="w-8 h-8 shrink-0 object-contain" />
-          <span className="text-base font-bold text-[#E6EDF3]">oraforme</span>
+          <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 88 }} />
         </div>
         {nomEntreprise && (
           <div className="flex items-center gap-1.5">
