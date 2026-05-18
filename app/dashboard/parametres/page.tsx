@@ -184,8 +184,22 @@ export default function ParametresPage() {
     }
 
     const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path)
+
+    // Persist logo_url immediately — don't wait for the "Enregistrer" button
+    const { error: dbErr } = await supabase
+      .from('entreprise_config')
+      .upsert({ tenant_id: tenantId, logo_url: publicUrl }, { onConflict: 'tenant_id' })
+
+    if (dbErr) {
+      setUploadError(`Logo uploadé mais non sauvegardé : ${dbErr.message}`)
+      setUploadingLogo(false)
+      return
+    }
+
     set('logo_url', publicUrl)
     setUploadingLogo(false)
+    // Notify Header right away
+    window.dispatchEvent(new CustomEvent('oraforme:config-saved', { detail: { logo_url: publicUrl } }))
   }
 
   // ── Save ──────────────────────────────────────────────────────────────────
@@ -193,13 +207,15 @@ export default function ParametresPage() {
   async function save() {
     if (!tenantId) return
     setSaving(true)
-    await supabase.from('entreprise_config').upsert(
-      { tenant_id: tenantId, ...cfg },
-      { onConflict: 'tenant_id' }
-    )
+    const { error: saveErr } = await supabase
+      .from('entreprise_config')
+      .upsert({ tenant_id: tenantId, ...cfg }, { onConflict: 'tenant_id' })
     setSaving(false)
+    if (saveErr) {
+      setUploadError(`Erreur de sauvegarde : ${saveErr.message}`)
+      return
+    }
     setSaved(true)
-    // Notify Header (and any other listener) that the config changed
     window.dispatchEvent(new CustomEvent('oraforme:config-saved', { detail: { logo_url: cfg.logo_url } }))
     setTimeout(() => setSaved(false), 2500)
   }
