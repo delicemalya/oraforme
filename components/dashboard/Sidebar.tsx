@@ -361,7 +361,7 @@ export default function Sidebar() {
 
       {/* Logo */}
       <div className="border-b border-[#30363D] shrink-0">
-        <div className="flex justify-center px-1 pt-3 pb-2">
+        <div className="flex justify-center px-1 pt-1 pb-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="oraforme" className="w-full h-auto object-contain" style={{ maxHeight: 170 }} />
         </div>
