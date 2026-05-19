@@ -7,19 +7,29 @@ interface Entry { name: string; value: number; color: string }
 export default function ModuleChart({ data, title }: { data: Entry[]; title: string }) {
   const total = data.reduce((s, d) => s + d.value, 0)
 
+  const normalizedData = data.map(d => ({
+    ...d,
+    color: d.color === '#142850' ? '#F08900' : d.color,
+  }))
+
   return (
-    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 h-full">
+    <div style={{
+      background: 'var(--card-bg)',
+      border: '1px solid var(--border)',
+      borderRadius: 12,
+      padding: 20,
+    }}>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-[#FFFFFF]">{title}</h3>
-        <p className="text-[10px] text-[#484F58] mt-0.5">Répartition par statut</p>
+        <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{title}</h3>
+        <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Répartition par statut</p>
       </div>
 
-      {data.length > 0 ? (
+      {normalizedData.length > 0 ? (
         <>
           <ResponsiveContainer width="100%" height={150}>
             <PieChart>
               <Pie
-                data={data}
+                data={normalizedData}
                 cx="50%"
                 cy="50%"
                 innerRadius={42}
@@ -32,15 +42,15 @@ export default function ModuleChart({ data, title }: { data: Entry[]; title: str
                 animationDuration={900}
                 animationEasing="ease-out"
               >
-                {data.map((d, i) => <Cell key={i} fill={d.color} />)}
+                {normalizedData.map((d, i) => <Cell key={i} fill={d.color} />)}
               </Pie>
               <Tooltip
                 contentStyle={{
-                  background: '#1C2128',
-                  border: '1px solid #30363D',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--border)',
                   borderRadius: 10,
                   fontSize: 12,
-                  boxShadow: '0 4px 16px #00000040',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
                 }}
                 formatter={(val) => [
                   `${val} (${Math.round((Number(val) / total) * 100)}%)`,
@@ -51,19 +61,19 @@ export default function ModuleChart({ data, title }: { data: Entry[]; title: str
           </ResponsiveContainer>
 
           <div className="flex flex-col gap-1.5 mt-2">
-            {data.map((d, i) => (
+            {normalizedData.map((d, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                <span className="text-[11px] text-[#8B949E] flex-1">{d.name}</span>
-                <span className="text-[11px] font-bold" style={{ color: d.color }}>{d.value}</span>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: d.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)', flex: 1 }}>{d.name}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: d.color }}>{d.value}</span>
               </div>
             ))}
           </div>
         </>
       ) : (
-        <div className="h-[150px] flex flex-col items-center justify-center gap-2">
-          <div className="w-14 h-14 rounded-full border-4 border-dashed border-[#1a2d50]" />
-          <p className="text-xs text-[#484F58]">Aucune donnée</p>
+        <div style={{ height: 150, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', border: '3px dashed var(--border)' }} />
+          <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Aucune donnée</p>
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts'
 
@@ -21,65 +21,69 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
   const hasData = data.some(d => d.montant > 0)
 
   return (
-    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 h-full">
+    <div style={{
+      background: 'var(--card-bg)',
+      border: '1px solid var(--border)',
+      borderRadius: 12,
+      padding: 20,
+    }}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-[#FFFFFF]">Revenus — 7 derniers jours</h3>
-          <p className="text-[10px] text-[#484F58] mt-0.5">Factures payées par jour</p>
+          <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>Analyse des flux — 7 jours</h3>
+          <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Factures payées par jour</p>
         </div>
-        <span className="text-[10px] font-semibold text-[#484F58] border border-[#1a2d50] rounded-lg px-2 py-1">FCFA</span>
+        <span style={{
+          fontSize: 10, fontWeight: 600,
+          color: 'var(--text-secondary)',
+          border: '1px solid var(--border)',
+          borderRadius: 6,
+          padding: '3px 8px',
+        }}>FCFA</span>
       </div>
 
       <ResponsiveContainer width="100%" height={180}>
-        <AreaChart data={data} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
-          <defs>
-            <linearGradient id="gradRevenu" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#F08900" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#F08900" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1C2128" vertical={false} />
+        <LineChart data={data} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
           <XAxis
             dataKey="day"
-            tick={{ fill: '#484F58', fontSize: 11 }}
+            tick={{ fill: 'var(--text-secondary)', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: '#484F58', fontSize: 11 }}
+            tick={{ fill: 'var(--text-secondary)', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
             tickFormatter={fmtAxis}
           />
           <Tooltip
             contentStyle={{
-              background: '#1C2128',
-              border: '1px solid #30363D',
+              background: 'var(--card-bg)',
+              border: '1px solid var(--border)',
               borderRadius: 10,
               fontSize: 12,
-              boxShadow: '0 4px 16px #00000040',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
             }}
-            labelStyle={{ color: '#8B949E', marginBottom: 4 }}
+            labelStyle={{ color: 'var(--text-secondary)', marginBottom: 4 }}
             formatter={(val) => [`${fmtFull(Number(val))} FCFA`, 'Revenus']}
-            cursor={{ stroke: '#F0890022', strokeWidth: 1 }}
+            cursor={{ stroke: 'rgba(240,137,0,0.2)', strokeWidth: 1 }}
           />
-          <Area
+          <Line
             type="monotone"
             dataKey="montant"
             stroke="#F08900"
             strokeWidth={2}
-            fill="url(#gradRevenu)"
             dot={hasData ? { fill: '#F08900', r: 3, strokeWidth: 0 } : false}
-            activeDot={{ r: 5, fill: '#F08900', stroke: '#F0890030', strokeWidth: 5 }}
+            activeDot={{ r: 5, fill: '#F08900', stroke: 'rgba(240,137,0,0.25)', strokeWidth: 6 }}
             isAnimationActive
             animationDuration={900}
             animationEasing="ease-out"
           />
-        </AreaChart>
+        </LineChart>
       </ResponsiveContainer>
 
       {!hasData && (
-        <p className="text-xs text-[#484F58] text-center -mt-4">
+        <p style={{ fontSize: 12, color: 'var(--text-secondary)', textAlign: 'center', marginTop: -12 }}>
           Aucun revenu enregistré sur 7 jours
         </p>
       )}
