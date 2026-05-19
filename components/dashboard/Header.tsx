@@ -36,11 +36,11 @@ export default function Header() {
 
   useEffect(() => {
     setLocale(getStoredLocale())
-    const stored = localStorage.getItem('oraforme_theme') as 'dark' | 'light' | null
+    const stored = localStorage.getItem('oraforme-theme') as 'dark' | 'light' | null
     const effective: 'dark' | 'light' = stored === 'light' ? 'light' : 'dark'
     setTheme(effective)
-    document.documentElement.setAttribute('data-theme', effective)
-    localStorage.setItem('oraforme_theme', effective)
+    document.body.classList.toggle('light-mode', effective === 'light')
+    localStorage.setItem('oraforme-theme', effective)
   }, [])
 
   // Company logo — initial fetch + live update via CustomEvent from Paramètres page
@@ -99,8 +99,8 @@ export default function Header() {
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
-    localStorage.setItem('oraforme_theme', next)
-    document.documentElement.setAttribute('data-theme', next)
+    localStorage.setItem('oraforme-theme', next)
+    document.body.classList.toggle('light-mode', next === 'light')
   }
 
   return (
