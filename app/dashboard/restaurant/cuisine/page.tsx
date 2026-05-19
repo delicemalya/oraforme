@@ -35,10 +35,10 @@ const NEXT_STATUS: Partial<Record<StatutCmd, StatutCmd>> = {
 }
 
 const STATUS_CONFIG: Partial<Record<StatutCmd, { label: string; color: string; bg: string; border: string }>> = {
-  en_attente:    { label: 'En attente',     color: '#F0A30A', bg: '#F0A30A18', border: '#F0A30A40' },
-  en_preparation:{ label: 'En préparation', color: '#F07900', bg: '#F0790018', border: '#F0790040' },
+  en_attente:    { label: 'En attente',     color: '#F08900', bg: '#F0890018', border: '#F0890040' },
+  en_preparation:{ label: 'En préparation', color: '#F08900', bg: '#F0890018', border: '#F0890040' },
   pret:          { label: 'Prêt à servir',  color: '#2EA043', bg: '#2EA04318', border: '#2EA04340' },
-  livre:         { label: 'Livré',          color: '#8B0073', bg: '#8B007318', border: '#8B007340' },
+  livre:         { label: 'Livré',          color: '#8B0070', bg: '#8B007018', border: '#8B007040' },
 }
 
 export default function CuisinePage() {
@@ -86,7 +86,7 @@ export default function CuisinePage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin text-[#F0A30A]" size={28} />
+        <Loader2 className="animate-spin text-[#F08900]" size={28} />
       </div>
     )
   }
@@ -96,8 +96,8 @@ export default function CuisinePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#F0A30A]/15 flex items-center justify-center">
-            <ChefHat size={20} className="text-[#F0A30A]" />
+          <div className="w-10 h-10 rounded-xl bg-[#F08900]/15 flex items-center justify-center">
+            <ChefHat size={20} className="text-[#F08900]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Écran Cuisine</h1>
@@ -136,7 +136,7 @@ export default function CuisinePage() {
                   <span className="text-xs font-bold" style={{ color: cfg.color }}>{cfg.label}</span>
                   <span
                     className="ml-auto text-xs font-bold px-1.5 py-0.5 rounded-full"
-                    style={{ background: cfg.color, color: '#0D1117' }}
+                    style={{ background: cfg.color, color: '#142850' }}
                   >
                     {cmds.length}
                   </span>
@@ -179,7 +179,7 @@ export default function CuisinePage() {
                             {(cmd.items as CmdItem[]).map((item, i) => (
                               <div key={i} className="flex items-center justify-between">
                                 <span className="text-sm text-white">
-                                  <span className="font-bold text-[#F0A30A] mr-1">{item.quantite}×</span>
+                                  <span className="font-bold text-[#F08900] mr-1">{item.quantite}×</span>
                                   {item.nom}
                                 </span>
                               </div>
@@ -187,7 +187,7 @@ export default function CuisinePage() {
                           </div>
 
                           {cmd.note_client && (
-                            <p className="text-xs text-[#F0A30A] bg-[#F0A30A]/10 rounded-lg px-2.5 py-1.5">
+                            <p className="text-xs text-[#F08900] bg-[#F08900]/10 rounded-lg px-2.5 py-1.5">
                               📝 {cmd.note_client}
                             </p>
                           )}
@@ -200,7 +200,7 @@ export default function CuisinePage() {
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.97 }}
                               className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
-                              style={{ background: nextCfg.color, color: '#0D1117' }}
+                              style={{ background: nextCfg.color, color: '#142850' }}
                             >
                               {advancing === cmd.id ? (
                                 <Loader2 className="animate-spin" size={13} />

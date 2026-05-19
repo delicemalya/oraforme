@@ -27,16 +27,16 @@ export default async function AdminClientsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F01F38]/10 border border-[#F01F38]/20 flex items-center justify-center">
-          <Building2 size={18} className="text-[#F01F38]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
+          <Building2 size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Clients</h1>
+          <h1 className="text-xl font-bold text-[#FFFFFF]">Clients</h1>
           <p className="text-xs text-[#484F58]">{tenantRows.length} entreprise{tenantRows.length > 1 ? 's' : ''} inscrite{tenantRows.length > 1 ? 's' : ''}</p>
         </div>
       </div>
 
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
         <AdminClientsTable tenants={tenantRows} />
       </div>
     </div>

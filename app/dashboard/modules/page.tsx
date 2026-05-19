@@ -88,11 +88,11 @@ export default function ModulesMarketplacePage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#F0A30A]/10 border border-[#F0A30A]/20 flex items-center justify-center">
-            <Store size={18} className="text-[#F0A30A]" />
+          <div className="w-10 h-10 rounded-xl bg-[#F08900]/10 border border-[#F08900]/20 flex items-center justify-center">
+            <Store size={18} className="text-[#F08900]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#E6EDF3]">Modules</h1>
+            <h1 className="text-xl font-bold text-[#FFFFFF]">Modules</h1>
             <p className="text-xs text-[#484F58]">
               {activeList.length} actif{activeList.length > 1 ? 's' : ''} · {fmtFCFA(mrrTotal)}/mois
             </p>
@@ -103,7 +103,7 @@ export default function ModulesMarketplacePage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-40 bg-[#161B22] border border-[#30363D] rounded-xl animate-pulse" />
+            <div key={i} className="h-40 bg-[#0f1e3d] border border-[#30363D] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -159,19 +159,19 @@ export default function ModulesMarketplacePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+              className="relative bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
             >
               <button onClick={() => setConfirm(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]">
                 <X size={16} />
               </button>
               <div className="text-3xl mb-3">{MODULE_ICONS[confirm.id]}</div>
-              <h3 className="text-base font-bold text-[#E6EDF3] mb-1">
+              <h3 className="text-base font-bold text-[#FFFFFF] mb-1">
                 {confirm.action === 'activate' ? 'Activer' : 'Désactiver'} {MODULE_LABELS[confirm.id]} ?
               </h3>
               {confirm.action === 'activate' ? (
                 <p className="text-sm text-[#8B949E] mb-5">
                   Ce module sera immédiatement accessible dans votre sidebar.
-                  Tarif : <span className="text-[#F0A30A] font-medium">{fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois</span>
+                  Tarif : <span className="text-[#F08900] font-medium">{fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois</span>
                 </p>
               ) : (
                 <p className="text-sm text-[#8B949E] mb-5">
@@ -181,7 +181,7 @@ export default function ModulesMarketplacePage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirm(null)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] transition-colors"
                 >
                   Annuler
                 </button>
@@ -189,8 +189,8 @@ export default function ModulesMarketplacePage() {
                   onClick={() => toggleModule(confirm.id, confirm.action)}
                   className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     confirm.action === 'activate'
-                      ? 'bg-[#F0A30A] text-[#0D1117] hover:bg-[#F0A30A]/90'
-                      : 'bg-[#F01F38]/10 border border-[#F01F38]/30 text-[#F01F38] hover:bg-[#F01F38]/20'
+                      ? 'bg-[#F08900] text-[#142850] hover:bg-[#F08900]/90'
+                      : 'bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] hover:bg-[#F51E33]/20'
                   }`}
                 >
                   {confirm.action === 'activate' ? 'Activer' : 'Désactiver'}
@@ -211,7 +211,7 @@ export default function ModulesMarketplacePage() {
             className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl text-sm font-medium shadow-xl border ${
               toast.ok
                 ? 'bg-[#2EA043]/10 border-[#2EA043]/30 text-[#2EA043]'
-                : 'bg-[#F01F38]/10 border-[#F01F38]/30 text-[#F01F38]'
+                : 'bg-[#F51E33]/10 border-[#F51E33]/30 text-[#F51E33]'
             }`}
           >
             {toast.msg}
@@ -231,15 +231,15 @@ function ModuleCard({
   onAction: () => void
 }) {
   return (
-    <div className={`bg-[#161B22] border rounded-xl p-5 transition-all ${
+    <div className={`bg-[#0f1e3d] border rounded-xl p-5 transition-all ${
       m.active ? 'border-[#2EA043]/30' : 'border-[#30363D] hover:border-[#484F58]'
     }`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{m.icon}</span>
           <div>
-            <p className="text-sm font-semibold text-[#E6EDF3]">{m.label}</p>
-            <p className="text-xs text-[#F0A30A] font-medium">{fmtFCFA(m.price)}/mois</p>
+            <p className="text-sm font-semibold text-[#FFFFFF]">{m.label}</p>
+            <p className="text-xs text-[#F08900] font-medium">{fmtFCFA(m.price)}/mois</p>
           </div>
         </div>
         {m.active
@@ -255,8 +255,8 @@ function ModuleCard({
         disabled={toggling}
         className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
           m.active
-            ? 'bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#F01F38] hover:border-[#F01F38]/30'
-            : 'bg-[#F0A30A] text-[#0D1117] hover:bg-[#F0A30A]/90'
+            ? 'bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#F51E33] hover:border-[#F51E33]/30'
+            : 'bg-[#F08900] text-[#142850] hover:bg-[#F08900]/90'
         }`}
       >
         {toggling

@@ -122,15 +122,15 @@ export default function ExcelImport({ title, description, columns, onImport, tem
   }
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-6">
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-bold text-[#E6EDF3]">{title}</h3>
+          <h3 className="text-sm font-bold text-[#FFFFFF]">{title}</h3>
           {description && <p className="text-xs text-[#8B949E] mt-0.5">{description}</p>}
         </div>
         <button
           onClick={() => downloadCSV(generateCSVTemplate(columns), templateName ?? 'modele.csv')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#21262D] border border-[#30363D] text-xs text-[#8B949E] hover:text-[#E6EDF3] hover:border-[#484F58] transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a2d50] border border-[#30363D] text-xs text-[#8B949E] hover:text-[#FFFFFF] hover:border-[#484F58] transition-all"
         >
           <Download size={12} /> Modèle CSV
         </button>
@@ -148,8 +148,8 @@ export default function ExcelImport({ title, description, columns, onImport, tem
             onClick={() => inputRef.current?.click()}
             className={`relative border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all ${
               dragging
-                ? 'border-[#F0A30A] bg-[#F0A30A08]'
-                : 'border-[#30363D] hover:border-[#484F58] hover:bg-[#21262D]'
+                ? 'border-[#F08900] bg-[#F0890008]'
+                : 'border-[#30363D] hover:border-[#484F58] hover:bg-[#1a2d50]'
             }`}
           >
             <input
@@ -161,17 +161,17 @@ export default function ExcelImport({ title, description, columns, onImport, tem
             />
             <div className="flex flex-col items-center gap-3">
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
-                dragging ? 'bg-[#F0A30A20]' : 'bg-[#21262D]'
+                dragging ? 'bg-[#F0890020]' : 'bg-[#1a2d50]'
               }`}>
-                <Upload size={24} className={dragging ? 'text-[#F0A30A]' : 'text-[#484F58]'} />
+                <Upload size={24} className={dragging ? 'text-[#F08900]' : 'text-[#484F58]'} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#E6EDF3]">
+                <p className="text-sm font-semibold text-[#FFFFFF]">
                   {dragging ? 'Relâchez pour charger' : 'Glissez votre fichier ici'}
                 </p>
                 <p className="text-xs text-[#484F58] mt-1">CSV ou Excel · max 10 MB</p>
               </div>
-              <span className="text-xs text-[#F0A30A] font-semibold border border-[#F0A30A30] px-3 py-1 rounded-full">
+              <span className="text-xs text-[#F08900] font-semibold border border-[#F0890030] px-3 py-1 rounded-full">
                 ou cliquez pour parcourir
               </span>
             </div>
@@ -183,25 +183,25 @@ export default function ExcelImport({ title, description, columns, onImport, tem
           <motion.div key="preview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex items-center gap-2 mb-3">
               <FileSpreadsheet size={15} className="text-[#2EA043]" />
-              <span className="text-xs text-[#E6EDF3] font-medium">{file?.name}</span>
+              <span className="text-xs text-[#FFFFFF] font-medium">{file?.name}</span>
               <span className="text-xs text-[#484F58]">— Aperçu ({preview.length} premières lignes)</span>
             </div>
             <div className="overflow-x-auto rounded-xl border border-[#30363D] mb-4">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-[#21262D]">
+                  <tr className="bg-[#1a2d50]">
                     {columns.map(c => (
                       <th key={c.key} className="px-3 py-2 text-left text-[#8B949E] font-semibold whitespace-nowrap">
-                        {c.label}{c.required && <span className="text-[#F01F38] ml-0.5">*</span>}
+                        {c.label}{c.required && <span className="text-[#F51E33] ml-0.5">*</span>}
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {preview.map((row, i) => (
-                    <tr key={i} className="border-t border-[#21262D] hover:bg-[#21262D] transition-colors">
+                    <tr key={i} className="border-t border-[#1a2d50] hover:bg-[#1a2d50] transition-colors">
                       {columns.map(c => (
-                        <td key={c.key} className="px-3 py-2 text-[#E6EDF3] whitespace-nowrap">
+                        <td key={c.key} className="px-3 py-2 text-[#FFFFFF] whitespace-nowrap">
                           {row[c.key] ?? <span className="text-[#484F58]">—</span>}
                         </td>
                       ))}
@@ -211,10 +211,10 @@ export default function ExcelImport({ title, description, columns, onImport, tem
               </table>
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={reset} className="px-4 py-2 text-xs text-[#8B949E] bg-[#21262D] border border-[#30363D] rounded-lg hover:border-[#484F58] transition-all">
+              <button onClick={reset} className="px-4 py-2 text-xs text-[#8B949E] bg-[#1a2d50] border border-[#30363D] rounded-lg hover:border-[#484F58] transition-all">
                 Annuler
               </button>
-              <button onClick={handleImport} className="px-5 py-2 text-xs font-bold text-[#0D1117] bg-[#F0A30A] rounded-lg hover:bg-[#E09000] transition-all">
+              <button onClick={handleImport} className="px-5 py-2 text-xs font-bold text-[#142850] bg-[#F08900] rounded-lg hover:bg-[#E09000] transition-all">
                 Importer maintenant →
               </button>
             </div>
@@ -224,8 +224,8 @@ export default function ExcelImport({ title, description, columns, onImport, tem
         {/* STEP: IMPORTING */}
         {step === 'importing' && (
           <motion.div key="importing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
-            <div className="w-12 h-12 border-2 border-[#F0A30A] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-sm font-semibold text-[#E6EDF3]">Importation en cours...</p>
+            <div className="w-12 h-12 border-2 border-[#F08900] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm font-semibold text-[#FFFFFF]">Importation en cours...</p>
             <p className="text-xs text-[#484F58] mt-1">Validation et insertion des données</p>
           </motion.div>
         )}
@@ -238,24 +238,24 @@ export default function ExcelImport({ title, description, columns, onImport, tem
                 <CheckCircle2 size={24} className="text-[#2EA043]" />
               </div>
               <div>
-                <p className="text-sm font-bold text-[#E6EDF3]">{result.success} lignes importées avec succès</p>
+                <p className="text-sm font-bold text-[#FFFFFF]">{result.success} lignes importées avec succès</p>
                 {result.errors.length > 0 && (
-                  <p className="text-xs text-[#F01F38] mt-0.5">{result.errors.length} erreur(s) ignorée(s)</p>
+                  <p className="text-xs text-[#F51E33] mt-0.5">{result.errors.length} erreur(s) ignorée(s)</p>
                 )}
               </div>
             </div>
             {result.errors.length > 0 && (
-              <div className="bg-[#F01F3810] border border-[#F01F3830] rounded-xl p-4 space-y-1">
-                <p className="text-xs font-semibold text-[#F01F38] mb-2">Détails des erreurs :</p>
+              <div className="bg-[#F51E3310] border border-[#F51E3330] rounded-xl p-4 space-y-1">
+                <p className="text-xs font-semibold text-[#F51E33] mb-2">Détails des erreurs :</p>
                 {result.errors.slice(0, 5).map((e, i) => (
-                  <p key={i} className="text-xs text-[#F01F38]">Ligne {e.row} : {e.message}</p>
+                  <p key={i} className="text-xs text-[#F51E33]">Ligne {e.row} : {e.message}</p>
                 ))}
                 {result.errors.length > 5 && (
                   <p className="text-xs text-[#484F58]">... et {result.errors.length - 5} autres</p>
                 )}
               </div>
             )}
-            <button onClick={reset} className="w-full py-2 text-xs font-semibold text-[#0D1117] bg-[#F0A30A] rounded-xl hover:bg-[#E09000] transition-all">
+            <button onClick={reset} className="w-full py-2 text-xs font-semibold text-[#142850] bg-[#F08900] rounded-xl hover:bg-[#E09000] transition-all">
               Importer un autre fichier
             </button>
           </motion.div>

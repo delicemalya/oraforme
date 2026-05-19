@@ -40,10 +40,10 @@ export default function AdminSidebar() {
         <div className="flex items-center gap-2 mb-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="oraforme" className="w-7 h-7 shrink-0" />
-          <span className="text-base font-bold text-[#E6EDF3]">oraforme</span>
+          <span className="text-base font-bold text-[#FFFFFF]">oraforme</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] bg-[#F01F38]/20 text-[#F01F38] border border-[#F01F38]/30 rounded px-1.5 py-0.5 font-bold tracking-wider">
+          <span className="text-[10px] bg-[#F51E33]/20 text-[#F51E33] border border-[#F51E33]/30 rounded px-1.5 py-0.5 font-bold tracking-wider">
             SUPER ADMIN
           </span>
         </div>
@@ -62,13 +62,13 @@ export default function AdminSidebar() {
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 active
-                  ? 'bg-[#F01F38]/10 text-[#F01F38] font-medium'
-                  : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+                  ? 'bg-[#F51E33]/10 text-[#F51E33] font-medium'
+                  : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
               }`}
             >
               <Icon size={15} className="shrink-0" />
               <span className="truncate">{item.label}</span>
-              {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
+              {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F51E33]" />}
             </Link>
           )
         })}
@@ -79,7 +79,7 @@ export default function AdminSidebar() {
         <Link
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D] transition-all"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50] transition-all"
         >
           <LayoutDashboard size={15} className="shrink-0" />
           <span>Mon dashboard</span>
@@ -98,13 +98,13 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[#161B22] border-r border-[#30363D] h-screen sticky top-0">
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[#0f1e3d] border-r border-[#30363D] h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
       {/* Mobile trigger */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#161B22] border border-[#30363D] text-[#8B949E]"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0f1e3d] border border-[#30363D] text-[#8B949E]"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -113,7 +113,7 @@ export default function AdminSidebar() {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="w-56 bg-[#161B22] border-r border-[#30363D] h-full">
+          <div className="w-56 bg-[#0f1e3d] border-r border-[#30363D] h-full">
             <SidebarContent />
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setMobileOpen(false)} />

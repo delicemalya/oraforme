@@ -21,21 +21,21 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
   const hasData = data.some(d => d.montant > 0)
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 h-full">
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-[#E6EDF3]">Revenus — 7 derniers jours</h3>
+          <h3 className="text-sm font-semibold text-[#FFFFFF]">Revenus — 7 derniers jours</h3>
           <p className="text-[10px] text-[#484F58] mt-0.5">Factures payées par jour</p>
         </div>
-        <span className="text-[10px] font-semibold text-[#484F58] border border-[#21262D] rounded-lg px-2 py-1">FCFA</span>
+        <span className="text-[10px] font-semibold text-[#484F58] border border-[#1a2d50] rounded-lg px-2 py-1">FCFA</span>
       </div>
 
       <ResponsiveContainer width="100%" height={180}>
         <AreaChart data={data} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
           <defs>
             <linearGradient id="gradRevenu" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#F0A30A" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#F0A30A" stopOpacity={0} />
+              <stop offset="0%"   stopColor="#F08900" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="#F08900" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#1C2128" vertical={false} />
@@ -61,16 +61,16 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
             }}
             labelStyle={{ color: '#8B949E', marginBottom: 4 }}
             formatter={(val) => [`${fmtFull(Number(val))} FCFA`, 'Revenus']}
-            cursor={{ stroke: '#F0A30A22', strokeWidth: 1 }}
+            cursor={{ stroke: '#F0890022', strokeWidth: 1 }}
           />
           <Area
             type="monotone"
             dataKey="montant"
-            stroke="#F0A30A"
+            stroke="#F08900"
             strokeWidth={2}
             fill="url(#gradRevenu)"
-            dot={hasData ? { fill: '#F0A30A', r: 3, strokeWidth: 0 } : false}
-            activeDot={{ r: 5, fill: '#F0A30A', stroke: '#F0A30A30', strokeWidth: 5 }}
+            dot={hasData ? { fill: '#F08900', r: 3, strokeWidth: 0 } : false}
+            activeDot={{ r: 5, fill: '#F08900', stroke: '#F0890030', strokeWidth: 5 }}
             isAnimationActive
             animationDuration={900}
             animationEasing="ease-out"

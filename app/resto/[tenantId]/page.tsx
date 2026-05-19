@@ -96,15 +96,15 @@ export default function PublicOrderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0D1117] flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#F0A30A]" size={32} />
+      <div className="min-h-screen bg-[#142850] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#F08900]" size={32} />
       </div>
     )
   }
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#0D1117] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-[#142850] flex flex-col items-center justify-center p-6 text-center">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -118,7 +118,7 @@ export default function PublicOrderPage() {
         <button
           onClick={() => setSuccess(false)}
           className="px-6 py-3 rounded-xl font-semibold text-sm"
-          style={{ background: 'linear-gradient(135deg, #F0A30A, #d4880a)' }}
+          style={{ background: '#F08900' }}
         >
           Nouvelle commande
         </button>
@@ -127,11 +127,11 @@ export default function PublicOrderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D1117]">
+    <div className="min-h-screen bg-[#142850]">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#0D1117]/95 backdrop-blur border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-[#142850]/95 backdrop-blur border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ChefHat size={20} className="text-[#F0A30A]" />
+          <ChefHat size={20} className="text-[#F08900]" />
           <div>
             <p className="text-sm font-bold text-white">{restaurant}</p>
             {tableFromQR && <p className="text-xs text-[#8B949E]">Table {tableFromQR}</p>}
@@ -141,14 +141,14 @@ export default function PublicOrderPage() {
           onClick={() => setShowCart(true)}
           className="relative flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-all"
           style={{
-            borderColor: cartCount > 0 ? '#F0A30A' : 'rgba(255,255,255,0.1)',
-            color:       cartCount > 0 ? '#F0A30A' : '#8B949E',
-            background:  cartCount > 0 ? '#F0A30A12' : 'transparent',
+            borderColor: cartCount > 0 ? '#F08900' : 'rgba(255,255,255,0.1)',
+            color:       cartCount > 0 ? '#F08900' : '#8B949E',
+            background:  cartCount > 0 ? '#F0890012' : 'transparent',
           }}
         >
           <ShoppingCart size={16} />
           {cartCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#F0A30A] text-[#0D1117] text-[10px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#F08900] text-[#142850] text-[10px] font-bold flex items-center justify-center">
               {cartCount}
             </span>
           )}
@@ -182,7 +182,7 @@ export default function PublicOrderPage() {
                       <span className="text-3xl shrink-0">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-white">{item.nom}</p>
-                        <p className="text-sm font-bold text-[#F0A30A] mt-0.5">{fmt(item.prix)}</p>
+                        <p className="text-sm font-bold text-[#F08900] mt-0.5">{fmt(item.prix)}</p>
                       </div>
                       <div className="shrink-0">
                         {inCart ? (
@@ -197,7 +197,7 @@ export default function PublicOrderPage() {
                             <button
                               onClick={() => addToCart(item)}
                               className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                              style={{ background: '#F0A30A', color: '#0D1117' }}
+                              style={{ background: '#F08900', color: '#142850' }}
                             >
                               <Plus size={13} />
                             </button>
@@ -206,7 +206,7 @@ export default function PublicOrderPage() {
                           <button
                             onClick={() => addToCart(item)}
                             className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
-                            style={{ background: '#F0A30A', color: '#0D1117' }}
+                            style={{ background: '#F08900', color: '#142850' }}
                           >
                             <Plus size={16} />
                           </button>
@@ -233,7 +233,7 @@ export default function PublicOrderPage() {
               onClick={() => setShowCart(false)}
             />
             <motion.div
-              className="fixed bottom-0 left-0 right-0 z-50 bg-[#161B22] border-t border-white/[0.08] rounded-t-2xl max-h-[90vh] overflow-y-auto"
+              className="fixed bottom-0 left-0 right-0 z-50 bg-[#0f1e3d] border-t border-white/[0.08] rounded-t-2xl max-h-[90vh] overflow-y-auto"
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -254,7 +254,7 @@ export default function PublicOrderPage() {
                       <span className="text-xl shrink-0">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-white truncate">{item.nom}</p>
-                        <p className="text-xs text-[#F0A30A]">{fmt(item.prix)} × {item.quantite}</p>
+                        <p className="text-xs text-[#F08900]">{fmt(item.prix)} × {item.quantite}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <button onClick={() => updateQty(item.nom, -1)} className="w-7 h-7 rounded-full bg-white/[0.08] text-white flex items-center justify-center">
@@ -280,9 +280,9 @@ export default function PublicOrderPage() {
                       onClick={() => setMode(m)}
                       className="py-2 rounded-lg text-xs font-semibold border transition-all"
                       style={{
-                        borderColor: mode === m ? '#F0A30A' : 'rgba(255,255,255,0.08)',
-                        color:       mode === m ? '#F0A30A' : '#8B949E',
-                        background:  mode === m ? '#F0A30A15' : 'transparent',
+                        borderColor: mode === m ? '#F08900' : 'rgba(255,255,255,0.08)',
+                        color:       mode === m ? '#F08900' : '#8B949E',
+                        background:  mode === m ? '#F0890015' : 'transparent',
                       }}
                     >
                       {m === 'sur_place' ? 'Sur place' : m === 'emporter' ? 'À emporter' : 'Livraison'}
@@ -296,7 +296,7 @@ export default function PublicOrderPage() {
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E] text-xs">Table</span>
                       <input
-                        className="w-full pl-14 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F0A30A]/50"
+                        className="w-full pl-14 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F08900]/50"
                         placeholder="Numéro de table"
                         value={tableNum}
                         onChange={e => setTableNum(e.target.value)}
@@ -307,14 +307,14 @@ export default function PublicOrderPage() {
                     <div className="relative flex-1">
                       <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
                       <input
-                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F0A30A]/50"
+                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F08900]/50"
                         placeholder="Votre téléphone"
                         value={clientTel}
                         onChange={e => setClientTel(e.target.value)}
                       />
                     </div>
                     <input
-                      className="flex-1 px-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F0A30A]/50"
+                      className="flex-1 px-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F08900]/50"
                       placeholder="Votre nom"
                       value={clientNom}
                       onChange={e => setClientNom(e.target.value)}
@@ -324,7 +324,7 @@ export default function PublicOrderPage() {
                     <div className="relative">
                       <MapPin size={13} className="absolute left-3 top-3 text-[#8B949E]" />
                       <input
-                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F0A30A]/50"
+                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F08900]/50"
                         placeholder="Adresse de livraison"
                         value={adresse}
                         onChange={e => setAdresse(e.target.value)}
@@ -334,7 +334,7 @@ export default function PublicOrderPage() {
                   <div className="relative">
                     <MessageSquare size={13} className="absolute left-3 top-3 text-[#8B949E]" />
                     <textarea
-                      className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F0A30A]/50 resize-none"
+                      className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F08900]/50 resize-none"
                       rows={2}
                       placeholder="Note pour la cuisine (facultatif)"
                       value={note}
@@ -366,7 +366,7 @@ export default function PublicOrderPage() {
                 {/* Total + submit */}
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm font-semibold text-white">Total</span>
-                  <span className="text-lg font-bold text-[#F0A30A]">{fmt(total)}</span>
+                  <span className="text-lg font-bold text-[#F08900]">{fmt(total)}</span>
                 </div>
 
                 <motion.button
@@ -375,7 +375,7 @@ export default function PublicOrderPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   className="w-full py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, #F0A30A, #d4880a)', color: '#0D1117' }}
+                  style={{ background: '#F08900', color: '#142850' }}
                 >
                   {submitting ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />}
                   {submitting ? 'Envoi en cours…' : 'Commander'}

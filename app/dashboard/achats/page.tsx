@@ -15,8 +15,8 @@ const TABS = ['Fournisseurs', 'Achats', 'Dettes']
 const STATUTS = ['impaye', 'partiel', 'paye']
 const STATUT_LABELS: Record<string, string> = { impaye: 'Impayé', partiel: 'Partiel', paye: 'Payé' }
 const STATUT_COLORS: Record<string, string> = {
-  impaye: 'text-[#F01F38] bg-[#F01F38]/10 border-[#F01F38]/30',
-  partiel: 'text-[#F0A30A] bg-[#F0A30A]/10 border-[#F0A30A]/30',
+  impaye: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
+  partiel: 'text-[#F08900] bg-[#F08900]/10 border-[#F08900]/30',
   paye: 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30',
 }
 
@@ -109,32 +109,32 @@ export default function AchatsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center">
-          <ShoppingCart size={18} className="text-[#8B0073]" />
+        <div className="w-10 h-10 rounded-xl bg-[#8B0070]/10 border border-[#8B0070]/20 flex items-center justify-center">
+          <ShoppingCart size={18} className="text-[#8B0070]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Achats & Fournisseurs</h1>
+          <h1 className="text-xl font-bold text-[#FFFFFF]">Achats & Fournisseurs</h1>
           <p className="text-xs text-[#484F58]">
             {fournisseurs.length} fournisseur{fournisseurs.length > 1 ? 's' : ''} ·
-            <span className="text-[#F01F38] ml-1">Dettes : {fmtFCFA(totalDu)}</span>
+            <span className="text-[#F51E33] ml-1">Dettes : {fmtFCFA(totalDu)}</span>
           </p>
         </div>
         <button onClick={() => setModal(tab === 0 ? 'fournisseur' : 'achat')}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/30 text-[#8B0073] text-sm font-medium hover:bg-[#8B0073]/20 transition-colors">
+          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B0070]/10 border border-[#8B0070]/30 text-[#8B0070] text-sm font-medium hover:bg-[#8B0070]/20 transition-colors">
           <Plus size={15} /> {tab === 0 ? 'Fournisseur' : 'Achat'}
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1">
+      <div className="flex gap-1 bg-[#0f1e3d] border border-[#30363D] rounded-xl p-1">
         {TABS.map((t, i) => (
           <button key={i} onClick={() => setTab(i)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === i ? 'bg-[#8B0073]/10 text-[#8B0073]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+              tab === i ? 'bg-[#8B0070]/10 text-[#8B0070]' : 'text-[#8B949E] hover:text-[#FFFFFF]'
             }`}>
             {t}
             {i === 2 && debtsByFournisseur.length > 0 && (
-              <span className="ml-1.5 text-xs bg-[#F01F38] text-white rounded-full px-1.5 py-0.5">{debtsByFournisseur.length}</span>
+              <span className="ml-1.5 text-xs bg-[#F51E33] text-white rounded-full px-1.5 py-0.5">{debtsByFournisseur.length}</span>
             )}
           </button>
         ))}
@@ -142,27 +142,27 @@ export default function AchatsPage() {
 
       {/* Tab 0 — Fournisseurs */}
       {tab === 0 && (
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
           {loading ? (
             <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[#484F58]" /></div>
           ) : fournisseurs.length === 0 ? (
             <div className="p-10 text-center text-[#484F58] text-sm">Aucun fournisseur — ajoutez-en un</div>
           ) : (
-            <div className="divide-y divide-[#21262D]">
+            <div className="divide-y divide-[#1a2d50]">
               {fournisseurs.map(f => {
                 const dette = achats.filter(a => a.fournisseur_id === f.id && a.statut !== 'paye').reduce((s, a) => s + a.montant, 0)
                 return (
-                  <div key={f.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#21262D]/30 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center shrink-0">
-                      <span className="text-[#8B0073] text-sm font-bold">{f.nom.charAt(0).toUpperCase()}</span>
+                  <div key={f.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#1a2d50]/30 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-[#8B0070]/10 border border-[#8B0070]/20 flex items-center justify-center shrink-0">
+                      <span className="text-[#8B0070] text-sm font-bold">{f.nom.charAt(0).toUpperCase()}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#E6EDF3] truncate">{f.nom}</p>
+                      <p className="text-sm font-medium text-[#FFFFFF] truncate">{f.nom}</p>
                       <p className="text-xs text-[#484F58]">{f.telephone || f.contact || f.email || '—'}</p>
                     </div>
                     {dette > 0 && (
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-[#F01F38]">{fmtFCFA(dette)}</p>
+                        <p className="text-sm font-semibold text-[#F51E33]">{fmtFCFA(dette)}</p>
                         <p className="text-xs text-[#484F58]">dû</p>
                       </div>
                     )}
@@ -177,7 +177,7 @@ export default function AchatsPage() {
 
       {/* Tab 1 — Achats */}
       {tab === 1 && (
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -187,7 +187,7 @@ export default function AchatsPage() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#21262D]">
+              <tbody className="divide-y divide-[#1a2d50]">
                 {loading && <tr><td colSpan={6} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[#484F58] mx-auto" /></td></tr>}
                 {!loading && achats.length === 0 && (
                   <tr><td colSpan={6} className="text-center py-10 text-[#484F58]">Aucun achat enregistré</td></tr>
@@ -195,13 +195,13 @@ export default function AchatsPage() {
                 {achats.map(a => {
                   const f = fournisseurs.find(f => f.id === a.fournisseur_id)
                   return (
-                    <tr key={a.id} className="hover:bg-[#21262D]/30">
+                    <tr key={a.id} className="hover:bg-[#1a2d50]/30">
                       <td className="px-4 py-2.5 text-[#8B949E] text-xs whitespace-nowrap">
                         {new Date(a.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                       </td>
-                      <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[180px] truncate">{a.description}</td>
+                      <td className="px-4 py-2.5 text-[#FFFFFF] max-w-[180px] truncate">{a.description}</td>
                       <td className="px-4 py-2.5 text-[#8B949E] text-xs">{f?.nom ?? '—'}</td>
-                      <td className="px-4 py-2.5 font-medium text-[#E6EDF3] whitespace-nowrap">{fmtFCFA(a.montant)}</td>
+                      <td className="px-4 py-2.5 font-medium text-[#FFFFFF] whitespace-nowrap">{fmtFCFA(a.montant)}</td>
                       <td className="px-4 py-2.5">
                         <span className={`text-xs px-2 py-0.5 rounded border ${STATUT_COLORS[a.statut] ?? STATUT_COLORS.impaye}`}>
                           {STATUT_LABELS[a.statut] ?? a.statut}
@@ -220,12 +220,12 @@ export default function AchatsPage() {
             </table>
           </div>
           {achats.filter(a => a.statut !== 'paye').length > 0 && (
-            <div className="px-5 py-3 border-t border-[#30363D] flex items-center justify-between bg-[#F01F38]/5">
+            <div className="px-5 py-3 border-t border-[#30363D] flex items-center justify-between bg-[#F51E33]/5">
               <span className="text-sm text-[#8B949E] flex items-center gap-2">
-                <AlertCircle size={14} className="text-[#F01F38]" />
+                <AlertCircle size={14} className="text-[#F51E33]" />
                 Total non payé
               </span>
-              <span className="text-sm font-bold text-[#F01F38]">{fmtFCFA(totalDu)}</span>
+              <span className="text-sm font-bold text-[#F51E33]">{fmtFCFA(totalDu)}</span>
             </div>
           )}
         </div>
@@ -233,25 +233,25 @@ export default function AchatsPage() {
 
       {/* Tab 2 — Dettes */}
       {tab === 2 && (
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
           {debtsByFournisseur.length === 0 ? (
             <div className="p-10 text-center">
               <CheckCircle size={32} className="text-[#2EA043] mx-auto mb-3" />
-              <p className="text-sm text-[#E6EDF3] font-medium">Aucune dette fournisseur !</p>
+              <p className="text-sm text-[#FFFFFF] font-medium">Aucune dette fournisseur !</p>
               <p className="text-xs text-[#484F58] mt-1">Tous vos achats sont à jour</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#21262D]">
+            <div className="divide-y divide-[#1a2d50]">
               {debtsByFournisseur.map(f => {
                 const factures = achats.filter(a => a.fournisseur_id === f.id && a.statut !== 'paye')
                 return (
                   <div key={f.id} className="px-5 py-4">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-sm font-semibold text-[#E6EDF3]">{f.nom}</p>
+                        <p className="text-sm font-semibold text-[#FFFFFF]">{f.nom}</p>
                         <p className="text-xs text-[#484F58]">{factures.length} achat{factures.length > 1 ? 's' : ''} impayé{factures.length > 1 ? 's' : ''}</p>
                       </div>
-                      <p className="text-base font-bold text-[#F01F38]">{fmtFCFA(f.dette)}</p>
+                      <p className="text-base font-bold text-[#F51E33]">{fmtFCFA(f.dette)}</p>
                     </div>
                     <button
                       onClick={async () => {
@@ -275,9 +275,9 @@ export default function AchatsPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              className="relative bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#E6EDF3] mb-4">
+              <h3 className="text-base font-bold text-[#FFFFFF] mb-4">
                 {modal === 'fournisseur' ? '+ Nouveau fournisseur' : '+ Nouvel achat'}
               </h3>
               {modal === 'fournisseur' ? (
@@ -293,13 +293,13 @@ export default function AchatsPage() {
                       <input value={fForm[field.key as keyof typeof fForm]}
                         onChange={e => setFForm(f => ({ ...f, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
+                        className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
                     </div>
                   ))}
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[#30363D] text-[#8B949E]">Annuler</button>
                     <button onClick={saveFournisseur} disabled={saving || !fForm.nom}
-                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0073] text-white hover:bg-[#8B0073]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0070] text-white hover:bg-[#8B0070]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
                     </button>
                   </div>
@@ -309,7 +309,7 @@ export default function AchatsPage() {
                   <div>
                     <label className="text-xs text-[#8B949E] mb-1 block">Fournisseur</label>
                     <select value={aForm.fournisseur_id} onChange={e => setAForm(f => ({ ...f, fournisseur_id: e.target.value }))}
-                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                       <option value="">Sans fournisseur</option>
                       {fournisseurs.map(f => <option key={f.id} value={f.id}>{f.nom}</option>)}
                     </select>
@@ -318,13 +318,13 @@ export default function AchatsPage() {
                     <label className="text-xs text-[#8B949E] mb-1 block">Description *</label>
                     <input value={aForm.description} onChange={e => setAForm(f => ({ ...f, description: e.target.value }))}
                       placeholder="Décrivez l'achat..."
-                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
+                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
                   </div>
                   {costCenters.length > 0 && (
                     <div>
                       <label className="text-xs text-[#8B949E] mb-1 block">Centre de coût (facultatif)</label>
                       <select value={aForm.cost_center_id} onChange={e => setAForm(f => ({ ...f, cost_center_id: e.target.value }))}
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+                        className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                         <option value="">— Aucun centre —</option>
                         {costCenters.map(cc => <option key={cc.id} value={cc.id}>{cc.code} — {cc.nom}</option>)}
                       </select>
@@ -335,18 +335,18 @@ export default function AchatsPage() {
                       <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA) *</label>
                       <input type="number" value={aForm.montant} onChange={e => setAForm(f => ({ ...f, montant: e.target.value }))}
                         placeholder="0"
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
+                        className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
                     </div>
                     <div>
                       <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                       <input type="date" value={aForm.date} onChange={e => setAForm(f => ({ ...f, date: e.target.value }))}
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
+                        className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
                     </div>
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[#30363D] text-[#8B949E]">Annuler</button>
                     <button onClick={saveAchat} disabled={saving || !aForm.description || !aForm.montant}
-                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0073] text-white hover:bg-[#8B0073]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0070] text-white hover:bg-[#8B0070]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
                     </button>
                   </div>

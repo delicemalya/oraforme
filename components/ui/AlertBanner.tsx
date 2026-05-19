@@ -42,8 +42,8 @@ export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount
   if (alerts.length === 0) return null
 
   const COLORS = {
-    warning: { text: '#F0A30A', bg: '#F0A30A0C', border: '#F0A30A28' },
-    danger:  { text: '#F01F38', bg: '#F01F380C', border: '#F01F3828' },
+    warning: { text: '#F08900', bg: '#F089000C', border: '#F0890028' },
+    danger:  { text: '#F51E33', bg: '#F51E330C', border: '#F51E3328' },
   }
 
   return (

@@ -84,7 +84,7 @@ function KpiCard({ label, value, sub, color, icon: Icon, trend, i }: {
   )
 }
 
-function Section({ title, rows, total, totalLabel, totalColor = '#F0A30A' }: {
+function Section({ title, rows, total, totalLabel, totalColor = '#F08900' }: {
   title: string
   rows: { label: string; value: number; color?: string; indent?: boolean }[]
   total: number
@@ -92,22 +92,22 @@ function Section({ title, rows, total, totalLabel, totalColor = '#F0A30A' }: {
   totalColor?: string
 }) {
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 border-b border-[#30363D] bg-[#0D1117]/50">
-        <h3 className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">{title}</h3>
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-[#30363D] bg-[#142850]/50">
+        <h3 className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">{title}</h3>
       </div>
-      <div className="divide-y divide-[#21262D]">
+      <div className="divide-y divide-[#1a2d50]">
         {rows.map((r, i) => (
           <div key={i} className={`flex justify-between items-center px-5 py-2.5 ${r.indent ? 'pl-8' : ''}`}>
             <span className="text-sm text-[#8B949E]">{r.label}</span>
-            <span className="text-sm font-semibold" style={{ color: r.color ?? '#E6EDF3' }}>
+            <span className="text-sm font-semibold" style={{ color: r.color ?? '#FFFFFF' }}>
               {fmtFCFA(r.value)}
             </span>
           </div>
         ))}
       </div>
-      <div className="px-5 py-3 border-t border-[#30363D] bg-[#0D1117]/50 flex justify-between items-center">
-        <span className="text-sm font-bold text-[#E6EDF3]">{totalLabel}</span>
+      <div className="px-5 py-3 border-t border-[#30363D] bg-[#142850]/50 flex justify-between items-center">
+        <span className="text-sm font-bold text-[#FFFFFF]">{totalLabel}</span>
         <span className="text-base font-bold" style={{ color: totalColor }}>{fmtFCFA(total)}</span>
       </div>
     </div>
@@ -233,33 +233,33 @@ export default function RapportsPage() {
       {/* Header */}
       <motion.div {...fadeUp(0)} className="flex items-center justify-between pt-1 flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#071535,#0D2147)' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#071535,#142850)' }}>
             <BarChart2 size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#E6EDF3]">Rapports Financiers</h1>
+            <h1 className="text-xl font-bold text-[#FFFFFF]">Rapports Financiers</h1>
             <p className="text-xs text-[#484F58]">ERP · {nomEntreprise} · {moisLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <select value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))}
-            className="bg-[#161B22] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
+            className="bg-[#0f1e3d] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <button onClick={load} className="p-2 rounded-lg bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+          <button onClick={load} className="p-2 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
             <RefreshCw size={14} />
           </button>
         </div>
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-[#0f1e3d] border border-[#30363D] rounded-xl p-1 overflow-x-auto">
         {TABS.map((t, i) => {
           const Icon = TAB_ICONS[i]
           return (
             <button key={i} onClick={() => setTab(i)}
               className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === i ? 'bg-[#0D2147]/10 text-[#0D2147]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                tab === i ? 'bg-[#142850]/10 text-[#142850]' : 'text-[#8B949E] hover:text-[#FFFFFF]'
               }`}>
               <Icon size={11} />{t}
             </button>
@@ -279,48 +279,48 @@ export default function RapportsPage() {
             <div className="space-y-5">
               <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
                 <KpiCard i={1} label="Recettes totales"   value={fmtFCFA(data.totalEntrees)} sub="Encaissements exercice"
-                  color="linear-gradient(135deg,#071535 0%,#0D2147 50%,#1A3570 100%)" icon={TrendingUp} trend={marge > 0 ? marge : undefined} />
+                  color="linear-gradient(135deg,#071535 0%,#142850 50%,#1A3570 100%)" icon={TrendingUp} trend={marge > 0 ? marge : undefined} />
                 <KpiCard i={2} label="Charges totales"    value={fmtFCFA(totalCharges)}       sub="Toutes dépenses"
-                  color="linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F01F38 100%)"  icon={TrendingDown} />
+                  color="linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F51E33 100%)"  icon={TrendingDown} />
                 <KpiCard i={3} label="Résultat net"       value={fmtFCFA(resultatNet)}        sub={`Marge ${marge}%`}
-                  color={resultatNet >= 0 ? 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)' : 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)'}
+                  color={resultatNet >= 0 ? 'linear-gradient(135deg,#4A0040 0%,#8B0070 50%,#8B0070 100%)' : 'linear-gradient(135deg,#4A0040 0%,#8B0070 50%,#8B0070 100%)'}
                   icon={resultatNet >= 0 ? ArrowUpRight : ArrowDownRight} trend={marge} />
                 <KpiCard i={4} label="Taux de paiement"  value={`${txPaiement}%`}            sub={`${data.nbFacturesPayees}/${data.nbFactures} factures`}
-                  color="linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F07900 100%)"  icon={CheckCircle} />
+                  color="linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F08900 100%)"  icon={CheckCircle} />
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <div className="xl:col-span-2 bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
-                  <h2 className="text-sm font-bold text-[#E6EDF3] mb-4 flex items-center gap-2">
-                    <FileText size={14} className="text-[#F0A30A]" /> Détail financier — {data.annee}
+                <div className="xl:col-span-2 bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                  <h2 className="text-sm font-bold text-[#FFFFFF] mb-4 flex items-center gap-2">
+                    <FileText size={14} className="text-[#F08900]" /> Détail financier — {data.annee}
                   </h2>
                   <div className="space-y-3">
                     {[
-                      { label: 'Recettes brutes',     val: totalProduits,       color: '#0D2147', pct: 100 },
-                      { label: 'Achats & stock',       val: data.achatsTotal,    color: '#F01F38', pct: totalProduits > 0 ? (data.achatsTotal / totalProduits) * 100 : 0 },
-                      { label: 'Masse salariale',      val: data.salairesTotal,  color: '#8B0073', pct: totalProduits > 0 ? (data.salairesTotal / totalProduits) * 100 : 0 },
-                      { label: 'Charges locatives',    val: data.loyerTotal,     color: '#F97316', pct: totalProduits > 0 ? (data.loyerTotal / totalProduits) * 100 : 0 },
-                      { label: 'Résultat net',         val: resultatNet,         color: resultatNet >= 0 ? '#F07900' : '#F01F38', pct: totalProduits > 0 ? Math.abs(resultatNet / totalProduits) * 100 : 0 },
+                      { label: 'Recettes brutes',     val: totalProduits,       color: '#142850', pct: 100 },
+                      { label: 'Achats & stock',       val: data.achatsTotal,    color: '#F51E33', pct: totalProduits > 0 ? (data.achatsTotal / totalProduits) * 100 : 0 },
+                      { label: 'Masse salariale',      val: data.salairesTotal,  color: '#8B0070', pct: totalProduits > 0 ? (data.salairesTotal / totalProduits) * 100 : 0 },
+                      { label: 'Charges locatives',    val: data.loyerTotal,     color: '#F08900', pct: totalProduits > 0 ? (data.loyerTotal / totalProduits) * 100 : 0 },
+                      { label: 'Résultat net',         val: resultatNet,         color: resultatNet >= 0 ? '#F08900' : '#F51E33', pct: totalProduits > 0 ? Math.abs(resultatNet / totalProduits) * 100 : 0 },
                     ].map(row => (
                       <div key={row.label}>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs text-[#8B949E]">{row.label}</span>
                           <span className="text-xs font-bold" style={{ color: row.color }}>{fmtFCFA(row.val)}</span>
                         </div>
-                        <div className="h-1.5 bg-[#21262D] rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-[#1a2d50] rounded-full overflow-hidden">
                           <motion.div className="h-full rounded-full" style={{ background: row.color }}
                             initial={{ width: 0 }} animate={{ width: `${Math.min(row.pct, 100)}%` }} transition={{ duration: 0.8 }} />
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[#21262D]">
+                  <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[#1a2d50]">
                     {[
-                      { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#0D2147' : '#F0A30A' },
-                      { label: 'Employés', val: data.nbEmployes.toString(), color: '#F07900' },
-                      { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#0D2147' : marge >= 10 ? '#F0A30A' : '#F01F38' },
+                      { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#142850' : '#F08900' },
+                      { label: 'Employés', val: data.nbEmployes.toString(), color: '#F08900' },
+                      { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#142850' : marge >= 10 ? '#F08900' : '#F51E33' },
                     ].map(s => (
-                      <div key={s.label} className="bg-[#0D1117] border border-[#21262D] rounded-xl p-3 text-center">
+                      <div key={s.label} className="bg-[#142850] border border-[#1a2d50] rounded-xl p-3 text-center">
                         <p className="text-[10px] text-[#484F58] mb-1 uppercase tracking-wide">{s.label}</p>
                         <p className="text-base font-bold" style={{ color: s.color }}>{s.val}</p>
                       </div>
@@ -329,30 +329,30 @@ export default function RapportsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
+                  <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0073)' }}>
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0070)' }}>
                         <Users size={14} className="text-white" />
                       </div>
-                      <p className="text-sm font-bold text-[#E6EDF3]">Ressources Humaines</p>
+                      <p className="text-sm font-bold text-[#FFFFFF]">Ressources Humaines</p>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between py-2 border-b border-[#21262D]">
+                      <div className="flex justify-between py-2 border-b border-[#1a2d50]">
                         <span className="text-xs text-[#8B949E]">Effectif</span>
-                        <span className="text-sm font-bold text-[#F07900]">{data.nbEmployes}</span>
+                        <span className="text-sm font-bold text-[#F08900]">{data.nbEmployes}</span>
                       </div>
-                      <div className="flex justify-between py-2 border-b border-[#21262D]">
+                      <div className="flex justify-between py-2 border-b border-[#1a2d50]">
                         <span className="text-xs text-[#8B949E]">Masse salariale</span>
-                        <span className="text-sm font-bold text-[#8B0073]">{fmtFCFA(data.salairesTotal)}</span>
+                        <span className="text-sm font-bold text-[#8B0070]">{fmtFCFA(data.salairesTotal)}</span>
                       </div>
                       <div className="flex justify-between py-2">
                         <span className="text-xs text-[#8B949E]">Charges CNSS</span>
-                        <span className="text-sm font-bold text-[#F97316]">{fmtFCFA(data.cnssTotal)}</span>
+                        <span className="text-sm font-bold text-[#F08900]">{fmtFCFA(data.cnssTotal)}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
-                    <p className="text-xs font-bold text-[#E6EDF3] mb-3 uppercase tracking-wide">Exports</p>
+                  <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                    <p className="text-xs font-bold text-[#FFFFFF] mb-3 uppercase tracking-wide">Exports</p>
                     <div className="space-y-2">
                       {[
                         { label: 'Rapport PDF', note: 'À venir' },
@@ -360,10 +360,10 @@ export default function RapportsPage() {
                         { label: 'Rapport TVA Congo', note: 'Onglet TVA' },
                       ].map(e => (
                         <button key={e.label} onClick={() => e.note === 'Onglet TVA' ? setTab(4) : undefined}
-                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#21262D] hover:border-[#30363D] hover:bg-[#21262D] transition-all group text-left">
+                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#1a2d50] hover:border-[#30363D] hover:bg-[#1a2d50] transition-all group text-left">
                           <div className="flex items-center gap-2">
-                            <Download size={12} className="text-[#484F58] group-hover:text-[#F0A30A] transition-colors" />
-                            <span className="text-xs text-[#8B949E] group-hover:text-[#E6EDF3] transition-colors">{e.label}</span>
+                            <Download size={12} className="text-[#484F58] group-hover:text-[#F08900] transition-colors" />
+                            <span className="text-xs text-[#8B949E] group-hover:text-[#FFFFFF] transition-colors">{e.label}</span>
                           </div>
                           <span className="text-[10px] text-[#484F58]">{e.note}</span>
                         </button>
@@ -376,18 +376,18 @@ export default function RapportsPage() {
               {data.caResto > 0 && (() => {
                 const fiscal = calculerTVACongo(data.caResto)
                 return (
-                  <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
-                    <h2 className="text-sm font-bold text-[#E6EDF3] mb-4 flex items-center gap-2">
-                      <ChefHat size={14} className="text-[#F0A30A]" /> Restaurant — {data.annee}
+                  <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                    <h2 className="text-sm font-bold text-[#FFFFFF] mb-4 flex items-center gap-2">
+                      <ChefHat size={14} className="text-[#F08900]" /> Restaurant — {data.annee}
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { label: 'CA TTC Restaurant', val: fmtFCFA(data.caResto),   color: '#F0A30A' },
-                        { label: 'CA HT',              val: fmtFCFA(fiscal.ht),      color: '#F07900' },
-                        { label: 'TVA collectée (18%)',val: fmtFCFA(fiscal.tva),     color: '#8B0073' },
-                        { label: 'CA (5% TVA)',         val: fmtFCFA(fiscal.ca),      color: '#F01F38' },
+                        { label: 'CA TTC Restaurant', val: fmtFCFA(data.caResto),   color: '#F08900' },
+                        { label: 'CA HT',              val: fmtFCFA(fiscal.ht),      color: '#F08900' },
+                        { label: 'TVA collectée (18%)',val: fmtFCFA(fiscal.tva),     color: '#8B0070' },
+                        { label: 'CA (5% TVA)',         val: fmtFCFA(fiscal.ca),      color: '#F51E33' },
                       ].map(k => (
-                        <div key={k.label} className="bg-[#0D1117] border border-[#21262D] rounded-xl p-4">
+                        <div key={k.label} className="bg-[#142850] border border-[#1a2d50] rounded-xl p-4">
                           <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-2">{k.label}</p>
                           <p className="text-base font-bold" style={{ color: k.color }}>{k.val}</p>
                         </div>
@@ -407,56 +407,56 @@ export default function RapportsPage() {
                 <Section
                   title="PRODUITS D'EXPLOITATION"
                   rows={[
-                    { label: '707 — Ventes factures',          value: data.ventesFactures,   color: '#0D2147' },
-                    { label: '706 — Prestations de services',  value: data.prestations,       color: '#0D2147' },
-                    { label: '708/709 — Autres produits',      value: data.autresProduits,    color: '#0D2147' },
+                    { label: '707 — Ventes factures',          value: data.ventesFactures,   color: '#142850' },
+                    { label: '706 — Prestations de services',  value: data.prestations,       color: '#142850' },
+                    { label: '708/709 — Autres produits',      value: data.autresProduits,    color: '#142850' },
                   ]}
                   total={totalProduits}
                   totalLabel="TOTAL PRODUITS"
-                  totalColor="#0D2147"
+                  totalColor="#142850"
                 />
                 <Section
                   title="CHARGES D'EXPLOITATION"
                   rows={[
-                    { label: '601 — Achats & marchandises',    value: data.achatsTotal,       color: '#F01F38' },
-                    { label: '641 — Rémunérations personnel',  value: data.salairesTotal,     color: '#F01F38' },
-                    { label: '644 — Charges sociales (CNSS)',  value: data.cnssTotal,         color: '#F01F38' },
-                    { label: '651 — Loyer, énergie, comm.',    value: data.loyerTotal,        color: '#F01F38' },
-                    { label: '601 — Carburant & déplacements', value: data.carburantTotal,    color: '#F01F38' },
-                    { label: '441 — Taxes & impôts',          value: data.taxesTotal,        color: '#F01F38' },
-                    { label: '651 — Autres charges',           value: data.autresCharges,     color: '#F01F38' },
+                    { label: '601 — Achats & marchandises',    value: data.achatsTotal,       color: '#F51E33' },
+                    { label: '641 — Rémunérations personnel',  value: data.salairesTotal,     color: '#F51E33' },
+                    { label: '644 — Charges sociales (CNSS)',  value: data.cnssTotal,         color: '#F51E33' },
+                    { label: '651 — Loyer, énergie, comm.',    value: data.loyerTotal,        color: '#F51E33' },
+                    { label: '601 — Carburant & déplacements', value: data.carburantTotal,    color: '#F51E33' },
+                    { label: '441 — Taxes & impôts',          value: data.taxesTotal,        color: '#F51E33' },
+                    { label: '651 — Autres charges',           value: data.autresCharges,     color: '#F51E33' },
                   ]}
                   total={totalCharges}
                   totalLabel="TOTAL CHARGES"
-                  totalColor="#F01F38"
+                  totalColor="#F51E33"
                 />
               </div>
 
               {/* Résultat net */}
-              <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#0D2147]/40 bg-[#0D2147]/5' : 'border-[#F01F38]/40 bg-[#F01F38]/5'}`}>
+              <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#142850]/40 bg-[#142850]/5' : 'border-[#F51E33]/40 bg-[#F51E33]/5'}`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-[#8B949E]">
                       {resultatNet >= 0 ? 'BÉNÉFICE NET' : 'PERTE NETTE'} — EXERCICE {data.annee}
                     </p>
-                    <p className="text-3xl font-bold mt-1" style={{ color: resultatNet >= 0 ? '#0D2147' : '#F01F38' }}>
+                    <p className="text-3xl font-bold mt-1" style={{ color: resultatNet >= 0 ? '#142850' : '#F51E33' }}>
                       {fmtFCFA(Math.abs(resultatNet))}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-[#484F58]">Marge nette</p>
-                    <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#0D2147' : marge >= 10 ? '#F0A30A' : '#F01F38' }}>
+                    <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#142850' : marge >= 10 ? '#F08900' : '#F51E33' }}>
                       {marge}%
                     </p>
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {[
-                    { label: 'Produits', value: fmtFCFA(totalProduits), color: '#0D2147' },
-                    { label: 'Charges',  value: fmtFCFA(totalCharges),  color: '#F01F38' },
-                    { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#F07900' : '#F01F38' },
+                    { label: 'Produits', value: fmtFCFA(totalProduits), color: '#142850' },
+                    { label: 'Charges',  value: fmtFCFA(totalCharges),  color: '#F51E33' },
+                    { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#F08900' : '#F51E33' },
                   ].map(r => (
-                    <div key={r.label} className="bg-[#0D1117]/60 rounded-xl p-3 text-center">
+                    <div key={r.label} className="bg-[#142850]/60 rounded-xl p-3 text-center">
                       <p className="text-[10px] text-[#484F58] mb-1">{r.label}</p>
                       <p className="text-sm font-bold" style={{ color: r.color }}>{r.value}</p>
                     </div>
@@ -474,44 +474,44 @@ export default function RapportsPage() {
                 <Section
                   title="ACTIF"
                   rows={[
-                    { label: 'Trésorerie (caisse + banque)',  value: data.soldeTresorerie,       color: '#F07900' },
-                    { label: 'Créances clients (à recevoir)', value: data.clientsCreances,       color: '#F0A30A' },
+                    { label: 'Trésorerie (caisse + banque)',  value: data.soldeTresorerie,       color: '#F08900' },
+                    { label: 'Créances clients (à recevoir)', value: data.clientsCreances,       color: '#F08900' },
                   ]}
                   total={Math.max(0, data.soldeTresorerie) + data.clientsCreances}
                   totalLabel="TOTAL ACTIF"
-                  totalColor="#F07900"
+                  totalColor="#F08900"
                 />
                 <div className="space-y-3">
                   <Section
                     title="CAPITAUX PROPRES"
                     rows={[
-                      { label: 'Report à nouveau (N-1)',  value: data.openingBalance,  color: '#8B0073' },
-                      { label: 'Résultat de l\'exercice', value: resultatNet,           color: resultatNet >= 0 ? '#0D2147' : '#F01F38' },
+                      { label: 'Report à nouveau (N-1)',  value: data.openingBalance,  color: '#8B0070' },
+                      { label: 'Résultat de l\'exercice', value: resultatNet,           color: resultatNet >= 0 ? '#142850' : '#F51E33' },
                     ]}
                     total={data.openingBalance + resultatNet}
                     totalLabel="TOTAL CAPITAUX PROPRES"
-                    totalColor="#8B0073"
+                    totalColor="#8B0070"
                   />
                   <Section
                     title="DETTES"
                     rows={[
-                      { label: 'Fournisseurs (à payer)',       value: data.dettesFournisseurs, color: '#F01F38' },
-                      { label: 'Dettes sociales (CNSS)',       value: data.cnssTotal,          color: '#F97316' },
-                      { label: 'TVA collectée à reverser',     value: data.tvaCollectee + data.caCollecte, color: '#F0A30A' },
+                      { label: 'Fournisseurs (à payer)',       value: data.dettesFournisseurs, color: '#F51E33' },
+                      { label: 'Dettes sociales (CNSS)',       value: data.cnssTotal,          color: '#F08900' },
+                      { label: 'TVA collectée à reverser',     value: data.tvaCollectee + data.caCollecte, color: '#F08900' },
                     ]}
                     total={data.dettesFournisseurs + data.cnssTotal + data.tvaCollectee + data.caCollecte}
                     totalLabel="TOTAL DETTES"
-                    totalColor="#F01F38"
+                    totalColor="#F51E33"
                   />
                 </div>
               </div>
 
               {/* Équilibre */}
-              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+              <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Scale size={16} className="text-[#F0A30A]" />
-                    <span className="text-sm font-bold text-[#E6EDF3]">Vérification équilibre</span>
+                    <Scale size={16} className="text-[#F08900]" />
+                    <span className="text-sm font-bold text-[#FFFFFF]">Vérification équilibre</span>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-[#484F58]">Actif — Passif</p>
@@ -531,11 +531,11 @@ export default function RapportsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
-                  { label: 'Solde ouverture', value: data.openingBalance,    color: '#8B0073', icon: Wallet },
-                  { label: 'Variation nette', value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#0D2147' : '#F01F38', icon: Activity },
-                  { label: 'Solde clôture',  value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#F07900' : '#F01F38', icon: Wallet },
+                  { label: 'Solde ouverture', value: data.openingBalance,    color: '#8B0070', icon: Wallet },
+                  { label: 'Variation nette', value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#142850' : '#F51E33', icon: Activity },
+                  { label: 'Solde clôture',  value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#F08900' : '#F51E33', icon: Wallet },
                 ].map((k, i) => (
-                  <motion.div key={k.label} {...fadeUp(i)} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 flex items-center gap-4">
+                  <motion.div key={k.label} {...fadeUp(i)} className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: k.color + '20' }}>
                       <k.icon size={18} style={{ color: k.color }} />
                     </div>
@@ -550,22 +550,22 @@ export default function RapportsPage() {
               <Section
                 title="FLUX D'EXPLOITATION"
                 rows={[
-                  { label: 'Encaissements clients',          value: data.totalEntrees,   color: '#0D2147' },
-                  { label: 'Décaissements fournisseurs',     value: -data.achatsTotal,   color: '#F01F38' },
-                  { label: 'Décaissements salaires & CNSS',  value: -(data.salairesTotal + data.cnssTotal), color: '#F01F38' },
-                  { label: 'Décaissements charges diverses', value: -(data.loyerTotal + data.carburantTotal + data.taxesTotal + data.autresCharges), color: '#F01F38' },
+                  { label: 'Encaissements clients',          value: data.totalEntrees,   color: '#142850' },
+                  { label: 'Décaissements fournisseurs',     value: -data.achatsTotal,   color: '#F51E33' },
+                  { label: 'Décaissements salaires & CNSS',  value: -(data.salairesTotal + data.cnssTotal), color: '#F51E33' },
+                  { label: 'Décaissements charges diverses', value: -(data.loyerTotal + data.carburantTotal + data.taxesTotal + data.autresCharges), color: '#F51E33' },
                 ]}
                 total={data.totalEntrees - data.totalSorties}
                 totalLabel="FLUX NET D'EXPLOITATION"
-                totalColor={(data.totalEntrees - data.totalSorties) >= 0 ? '#0D2147' : '#F01F38'}
+                totalColor={(data.totalEntrees - data.totalSorties) >= 0 ? '#142850' : '#F51E33'}
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+                <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
                   <h3 className="text-xs font-bold text-[#484F58] uppercase tracking-wider mb-3">FLUX D'INVESTISSEMENT</h3>
                   <p className="text-sm text-[#484F58] text-center py-4">Non suivi dans cet exercice</p>
                 </div>
-                <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+                <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
                   <h3 className="text-xs font-bold text-[#484F58] uppercase tracking-wider mb-3">FLUX DE FINANCEMENT</h3>
                   <p className="text-sm text-[#484F58] text-center py-4">Non suivi dans cet exercice</p>
                 </div>
@@ -586,33 +586,33 @@ export default function RapportsPage() {
                 <Section
                   title="TVA COLLECTÉE — Sur factures"
                   rows={[
-                    { label: 'Base imposable HT',          value: data.ventesFactures,  color: '#E6EDF3' },
-                    { label: 'TVA 18% collectée',          value: tvaTotal,             color: '#8B0073' },
-                    { label: "Contribution d'Appui (5%)",  value: caTotal,              color: '#F97316' },
+                    { label: 'Base imposable HT',          value: data.ventesFactures,  color: '#FFFFFF' },
+                    { label: 'TVA 18% collectée',          value: tvaTotal,             color: '#8B0070' },
+                    { label: "Contribution d'Appui (5%)",  value: caTotal,              color: '#F08900' },
                   ]}
                   total={totalDGI}
                   totalLabel="TOTAL TVA + CA À REVERSER"
-                  totalColor="#F01F38"
+                  totalColor="#F51E33"
                 />
 
                 {fiscalResto && (
                   <Section
                     title="TVA COLLECTÉE — CA Restaurant"
                     rows={[
-                      { label: 'CA TTC restaurant',      value: data.caResto,       color: '#E6EDF3' },
-                      { label: 'CA HT (base imposable)', value: fiscalResto.ht,     color: '#E6EDF3' },
-                      { label: 'TVA 18% collectée',      value: fiscalResto.tva,    color: '#8B0073' },
-                      { label: "CA (5% TVA)",            value: fiscalResto.ca,     color: '#F97316' },
+                      { label: 'CA TTC restaurant',      value: data.caResto,       color: '#FFFFFF' },
+                      { label: 'CA HT (base imposable)', value: fiscalResto.ht,     color: '#FFFFFF' },
+                      { label: 'TVA 18% collectée',      value: fiscalResto.tva,    color: '#8B0070' },
+                      { label: "CA (5% TVA)",            value: fiscalResto.ca,     color: '#F08900' },
                     ]}
                     total={fiscalResto.tva + fiscalResto.ca}
                     totalLabel="TOTAL TVA RESTO À REVERSER"
-                    totalColor="#F01F38"
+                    totalColor="#F51E33"
                   />
                 )}
 
                 {/* Récap DGI */}
-                <div className="bg-[#F0A30A]/5 border-2 border-[#F0A30A]/30 rounded-2xl p-6">
-                  <h3 className="text-sm font-bold text-[#F0A30A] mb-4 uppercase tracking-wider">
+                <div className="bg-[#F08900]/5 border-2 border-[#F08900]/30 rounded-2xl p-6">
+                  <h3 className="text-sm font-bold text-[#F08900] mb-4 uppercase tracking-wider">
                     Déclaration DGI — {data.annee}
                   </h3>
                   <div className="space-y-3">
@@ -622,15 +622,15 @@ export default function RapportsPage() {
                       { label: 'TVA nette à reverser',         value: tvaTotal + (fiscalResto?.tva ?? 0) },
                       { label: "Contribution d'Appui (CA)",    value: caTotal + (fiscalResto?.ca ?? 0) },
                     ].map(r => (
-                      <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#F0A30A]/10 last:border-0">
+                      <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#F08900]/10 last:border-0">
                         <span className="text-sm text-[#8B949E]">{r.label}</span>
-                        <span className="text-sm font-bold text-[#F0A30A]">{fmtFCFA(r.value)}</span>
+                        <span className="text-sm font-bold text-[#F08900]">{fmtFCFA(r.value)}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-[#F0A30A]/30 flex justify-between items-center">
-                    <span className="text-base font-bold text-[#E6EDF3]">TOTAL À PAYER À LA DGI</span>
-                    <span className="text-xl font-bold text-[#F01F38]">
+                  <div className="mt-4 pt-4 border-t border-[#F08900]/30 flex justify-between items-center">
+                    <span className="text-base font-bold text-[#FFFFFF]">TOTAL À PAYER À LA DGI</span>
+                    <span className="text-xl font-bold text-[#F51E33]">
                       {fmtFCFA(totalDGI + (fiscalResto?.tva ?? 0) + (fiscalResto?.ca ?? 0))}
                     </span>
                   </div>
@@ -641,9 +641,9 @@ export default function RapportsPage() {
 
           {/* ── TAB 5 : Analyse MIAA+ ── */}
           {tab === 5 && (
-            <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5 overflow-hidden relative">
+            <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5 overflow-hidden relative">
               <div className="absolute top-0 right-0 w-48 h-48 opacity-5 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, #F0A30A 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
+                style={{ background: 'radial-gradient(circle, #F08900 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
               <div className="relative">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
@@ -651,32 +651,32 @@ export default function RapportsPage() {
                       <Sparkles size={16} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#E6EDF3]">Analyse MIAA+</p>
+                      <p className="text-sm font-bold text-[#FFFFFF]">Analyse MIAA+</p>
                       <p className="text-[10px] text-[#484F58]">Powered by Claude · {nomEntreprise} · {data.annee}</p>
                     </div>
                   </div>
                   <button onClick={genererAnalyse} disabled={aiLoading}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117' }}>
+                    style={{ background: 'linear-gradient(135deg,#F08900,#d4880a)', color: '#142850' }}>
                     {aiLoading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
                     {aiText ? 'Régénérer' : 'Générer'}
                   </button>
                 </div>
                 {!aiText && !aiLoading && (
                   <div className="border border-dashed border-[#30363D] rounded-xl p-8 text-center">
-                    <Sparkles size={24} className="mx-auto mb-3 text-[#F0A30A] opacity-40" />
+                    <Sparkles size={24} className="mx-auto mb-3 text-[#F08900] opacity-40" />
                     <p className="text-sm text-[#8B949E]">MIAA+ analyse vos données et génère une analyse financière complète</p>
                     <p className="text-xs text-[#484F58] mt-1">Compte de résultat · Trésorerie · Créances · Recommandations</p>
                   </div>
                 )}
                 {aiLoading && (
                   <div className="flex items-center gap-3 text-[#8B949E] py-6 px-2">
-                    <Loader2 size={16} className="animate-spin text-[#F0A30A]" />
+                    <Loader2 size={16} className="animate-spin text-[#F08900]" />
                     <span className="text-sm">MIAA+ rédige votre analyse financière complète…</span>
                   </div>
                 )}
                 {aiText && !aiLoading && (
-                  <div className="bg-[#0D1117] border-l-2 border-[#F0A30A]/60 rounded-r-xl p-5 text-sm text-[#E6EDF3] leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-[#142850] border-l-2 border-[#F08900]/60 rounded-r-xl p-5 text-sm text-[#FFFFFF] leading-relaxed whitespace-pre-wrap">
                     {aiText}
                   </div>
                 )}

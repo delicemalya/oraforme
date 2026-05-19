@@ -310,7 +310,7 @@ export default function EcoleOverviewPage() {
             <div className="flex flex-wrap gap-3">
               <Link href="/dashboard/ecole/scolarite"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-black hover:opacity-90 transition-all"
-                style={{ background: 'linear-gradient(135deg, #F0A30A, #D4880A)', boxShadow: '0 4px 16px rgba(240,163,10,0.3)' }}>
+                style={{ background: 'linear-gradient(135deg, #F08900, #D4880A)', boxShadow: '0 4px 16px rgba(240,163,10,0.3)' }}>
                 <Plus size={14} /> Inscrire un étudiant
               </Link>
               <Link href="/dashboard/ecole/direction"
@@ -322,9 +322,9 @@ export default function EcoleOverviewPage() {
           {/* Quick stats in hero */}
           <div className="flex gap-3 flex-shrink-0 flex-wrap">
             {[
-              { label: 'Recouvrement',     value: `${recoveryRate}%`,          color: recoveryRate >= 80 ? 'text-[#1A3570]' : 'text-[#F07900]' },
-              { label: 'Sessions actives', value: d.sessionsEnCours,           color: 'text-[#8B0073]' },
-              { label: 'Impayés',          value: `${d.nbImpayes} dossiers`,   color: d.nbImpayes > 0 ? 'text-[#F01F38]' : 'text-[#1A3570]' },
+              { label: 'Recouvrement',     value: `${recoveryRate}%`,          color: recoveryRate >= 80 ? 'text-[#1A3570]' : 'text-[#F08900]' },
+              { label: 'Sessions actives', value: d.sessionsEnCours,           color: 'text-[#8B0070]' },
+              { label: 'Impayés',          value: `${d.nbImpayes} dossiers`,   color: d.nbImpayes > 0 ? 'text-[#F51E33]' : 'text-[#1A3570]' },
             ].map(s => (
               <div key={s.label} className="bg-white/[0.07] border border-white/10 rounded-2xl px-4 py-3 text-center min-w-[110px]">
                 <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1.5">{s.label}</p>
@@ -345,7 +345,7 @@ export default function EcoleOverviewPage() {
           label="Inscrits (année en cours)"
           value={d.nbEtudiants}
           sub={`${d.nbActifs} actifs · ${d.nbSuspendus} suspendus`}
-          gradient="linear-gradient(135deg, #C2410C, #F97316)"
+          gradient="linear-gradient(135deg, #C2410C, #F08900)"
           href="/dashboard/ecole/scolarite"
           badge={`${tauxActifs}% actifs`}
           badgeVariant="up"
@@ -358,7 +358,7 @@ export default function EcoleOverviewPage() {
           label="Agents"
           value={nbAgents}
           sub={`${d.nbEmployes} employés · ${d.nbStaff} staff direction`}
-          gradient="linear-gradient(135deg, #1E40AF, #8B0073)"
+          gradient="linear-gradient(135deg, #1E40AF, #8B0070)"
           href="/dashboard/ecole/rh"
           badge="Personnel"
           badgeVariant="neutral"
@@ -371,7 +371,7 @@ export default function EcoleOverviewPage() {
           label="Formateurs (Enseignants)"
           value={d.nbEnseignants}
           sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`}
-          gradient="linear-gradient(135deg, #5B21B6, #8B0073)"
+          gradient="linear-gradient(135deg, #5B21B6, #8B0070)"
           href="/dashboard/ecole/rh"
           badge="Actifs"
           badgeVariant="up"
@@ -396,7 +396,7 @@ export default function EcoleOverviewPage() {
           value={`${fmt(d.depensesJour)}`}
           sub={`FCFA de dépenses aujourd'hui`}
           gradient={d.depensesJour > 100000
-            ? 'linear-gradient(135deg, #991B1B, #F01F38)'
+            ? 'linear-gradient(135deg, #991B1B, #F51E33)'
             : 'linear-gradient(135deg, #374151, #6B7280)'}
           href="/dashboard/ecole/tresorerie"
           badge="Dépenses"
@@ -411,11 +411,11 @@ export default function EcoleOverviewPage() {
         <motion.div {...fade(6)} className="xl:col-span-2 border border-white/[0.07] rounded-2xl p-5" style={{ background: '#111827' }}>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-sm font-extrabold text-[#E6EDF3]">Analyse des Flux Financiers</p>
+              <p className="text-sm font-extrabold text-[#FFFFFF]">Analyse des Flux Financiers</p>
               <p className="text-[11px] text-[#8B949E] mt-0.5">Paiements scolaires — 8 derniers mois</p>
             </div>
             <div className="flex items-center gap-1.5 text-[11px] text-[#8B949E]">
-              <div className="w-2 h-2 rounded-full bg-[#F0A30A]" />
+              <div className="w-2 h-2 rounded-full bg-[#F08900]" />
               Revenus encaissés
             </div>
           </div>
@@ -423,8 +423,8 @@ export default function EcoleOverviewPage() {
             <AreaChart data={d.monthly} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="gOrange2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#F0A30A" stopOpacity={0.28} />
-                  <stop offset="95%" stopColor="#F0A30A" stopOpacity={0.02} />
+                  <stop offset="5%"  stopColor="#F08900" stopOpacity={0.28} />
+                  <stop offset="95%" stopColor="#F08900" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -432,12 +432,12 @@ export default function EcoleOverviewPage() {
               <YAxis tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
               <Tooltip
-                contentStyle={{ background: '#161B22', border: '1px solid #21262D', borderRadius: 10, fontSize: 12 }}
+                contentStyle={{ background: '#0f1e3d', border: '1px solid #1a2d50', borderRadius: 10, fontSize: 12 }}
                 labelStyle={{ color: '#8B949E' }}
                 formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, 'Recettes']}
               />
-              <Area type="monotone" dataKey="montant" stroke="#F0A30A" strokeWidth={2.5} fill="url(#gOrange2)"
-                dot={false} activeDot={{ r: 4, fill: '#F0A30A', stroke: '#161B22', strokeWidth: 2 }} />
+              <Area type="monotone" dataKey="montant" stroke="#F08900" strokeWidth={2.5} fill="url(#gOrange2)"
+                dot={false} activeDot={{ r: 4, fill: '#F08900', stroke: '#0f1e3d', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>
@@ -451,7 +451,7 @@ export default function EcoleOverviewPage() {
             <div className="flex items-baseline justify-between mb-2">
               <p className="text-5xl font-black tracking-tight text-white">{recoveryRate}%</p>
               <span className="text-[11px] font-bold" style={{
-                color: recoveryRate >= 80 ? '#1A3570' : recoveryRate >= 50 ? '#F07900' : '#F01F38'
+                color: recoveryRate >= 80 ? '#1A3570' : recoveryRate >= 50 ? '#F08900' : '#F51E33'
               }}>
                 {recoveryRate >= 80 ? '✓ En bonne voie' : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
               </span>
@@ -459,7 +459,7 @@ export default function EcoleOverviewPage() {
             <div className="h-2 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,0.07)' }}>
               <div className="h-full rounded-full transition-all duration-700" style={{
                 width: `${recoveryRate}%`,
-                background: recoveryRate >= 80 ? 'linear-gradient(90deg,#1A3570,#1A3570)' : 'linear-gradient(90deg,#F07900,#F07900)',
+                background: recoveryRate >= 80 ? 'linear-gradient(90deg,#1A3570,#1A3570)' : 'linear-gradient(90deg,#F08900,#F08900)',
                 boxShadow: `0 0 10px ${recoveryRate >= 80 ? 'rgba(16,185,129,0.45)' : 'rgba(245,158,11,0.45)'}`,
               }} />
             </div>
@@ -474,7 +474,7 @@ export default function EcoleOverviewPage() {
           {/* Annual revenue */}
           <div className="mt-4 pt-4 border-t border-white/10">
             <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1">Chiffre d&apos;affaire annuel</p>
-            <p className="text-xl font-black text-[#F0A30A] font-mono">{fmt(d.revenuAnnee)} FCFA</p>
+            <p className="text-xl font-black text-[#F08900] font-mono">{fmt(d.revenuAnnee)} FCFA</p>
             <p className="text-[10px] text-white/35 mt-0.5">Total encaissé depuis le début</p>
           </div>
         </motion.div>
@@ -485,19 +485,19 @@ export default function EcoleOverviewPage() {
         <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-3">Raccourcis</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
           {[
-            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,   color: '#8B0073', sub: 'Journal OHADA' },
-            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,        color: '#8B0073', sub: 'Personnel & salaires' },
-            { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,  color: '#F97316', sub: 'Permissions' },
+            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,   color: '#8B0070', sub: 'Journal OHADA' },
+            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,        color: '#8B0070', sub: 'Personnel & salaires' },
+            { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,  color: '#F08900', sub: 'Permissions' },
             { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap,color: '#1A3570', sub: 'Inscriptions & frais' },
-            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,   color: '#F01F38', sub: 'Direction & rapports' },
+            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,   color: '#F51E33', sub: 'Direction & rapports' },
           ].map(({ label, href, color, icon: Icon, sub }) => (
             <Link key={href} href={href}
-              className="flex items-center gap-3 p-3.5 rounded-xl border border-[#21262D] bg-[#161B22] hover:border-[#30363D] hover:bg-[#21262D] transition-all group">
+              className="flex items-center gap-3 p-3.5 rounded-xl border border-[#1a2d50] bg-[#0f1e3d] hover:border-[#30363D] hover:bg-[#1a2d50] transition-all group">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
                 <Icon size={16} style={{ color }} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#E6EDF3] group-hover:text-white transition-colors truncate">{label}</p>
+                <p className="text-xs font-bold text-[#FFFFFF] group-hover:text-white transition-colors truncate">{label}</p>
                 <p className="text-[10px] text-[#484F58] truncate">{sub}</p>
               </div>
               <ChevronRight size={12} className="text-[#484F58] shrink-0" />
@@ -510,10 +510,10 @@ export default function EcoleOverviewPage() {
       <motion.div {...fade(9)} className="border border-white/[0.07] rounded-2xl overflow-hidden" style={{ background: '#111827' }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <div>
-            <p className="text-sm font-extrabold text-[#E6EDF3]">Transactions Récentes</p>
+            <p className="text-sm font-extrabold text-[#FFFFFF]">Transactions Récentes</p>
             <p className="text-[10px] text-[#484F58] mt-0.5">Derniers paiements scolaires enregistrés</p>
           </div>
-          <Link href="/dashboard/ecole/direction" className="text-xs text-[#F0A30A]/80 hover:text-[#F0A30A] font-semibold transition-colors">
+          <Link href="/dashboard/ecole/direction" className="text-xs text-[#F08900]/80 hover:text-[#F08900] font-semibold transition-colors">
             Voir tout l&apos;historique →
           </Link>
         </div>
@@ -538,11 +538,11 @@ export default function EcoleOverviewPage() {
                   <tr key={p.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors cursor-pointer">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/10 flex items-center justify-center shrink-0">
-                          <DollarSign size={13} className="text-[#F0A30A]" />
+                        <div className="w-8 h-8 rounded-lg bg-[#F08900]/10 flex items-center justify-center shrink-0">
+                          <DollarSign size={13} className="text-[#F08900]" />
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-[#E6EDF3] truncate max-w-[180px]">
+                          <p className="text-xs font-semibold text-[#FFFFFF] truncate max-w-[180px]">
                             {p.libelle || 'Paiement scolarité'}
                           </p>
                           <p className="text-[10px] text-[#8B949E] mt-0.5">Scolarité</p>
@@ -572,14 +572,14 @@ export default function EcoleOverviewPage() {
       {/* ── Alertes (si impayés) ─────────────────────────────────────────────── */}
       {d.nbImpayes > 0 && (
         <motion.div {...fade(10)}
-          className="rounded-2xl p-4 flex gap-3 items-start border border-[#F07900]/20"
+          className="rounded-2xl p-4 flex gap-3 items-start border border-[#F08900]/20"
           style={{ background: 'rgba(245,158,11,0.08)' }}>
-          <AlertTriangle size={17} className="text-[#F07900] shrink-0 mt-0.5" />
+          <AlertTriangle size={17} className="text-[#F08900] shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm font-bold text-[#E6EDF3]">Impayés en attente</p>
+            <p className="text-sm font-bold text-[#FFFFFF]">Impayés en attente</p>
             <p className="text-[11px] text-white/45 mt-1">
               {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA à recouvrer.{' '}
-              <Link href="/dashboard/ecole/scolarite" className="text-[#F0A30A] hover:underline">Traiter →</Link>
+              <Link href="/dashboard/ecole/scolarite" className="text-[#F08900] hover:underline">Traiter →</Link>
             </p>
           </div>
         </motion.div>

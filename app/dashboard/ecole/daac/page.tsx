@@ -80,7 +80,7 @@ export default function DaacPage() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">DAAC — Direction des Affaires Académiques</h1>
+          <h1 className="text-xl font-bold text-[#FFFFFF]">DAAC — Direction des Affaires Académiques</h1>
           <p className="text-sm text-[#8B949E] mt-0.5">
             Programmes, sessions, examens, délibérations, diplômes & soutenances
           </p>
@@ -90,20 +90,20 @@ export default function DaacPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
           className="grid grid-cols-2 lg:grid-cols-4 gap-3"
         >
-          <KpiCard label="Étudiants actifs"    value={actifs}         color="#F0A30A" />
-          <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#F07900" />
-          <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#8B0073" />
-          <KpiCard label="Soutenances planif." value={souPlanifie}    color="#0D2147" />
+          <KpiCard label="Étudiants actifs"    value={actifs}         color="#F08900" />
+          <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#F08900" />
+          <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#8B0070" />
+          <KpiCard label="Soutenances planif." value={souPlanifie}    color="#142850" />
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-[#161B22] border border-[#21262D] rounded-xl overflow-x-auto">
+        <div className="flex gap-1 p-1 bg-[#0f1e3d] border border-[#1a2d50] rounded-xl overflow-x-auto">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
-                tab === t.id ? 'bg-[#F01F38] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                tab === t.id ? 'bg-[#F51E33] text-white' : 'text-[#8B949E] hover:text-[#FFFFFF]'
               }`}
             >
               <t.icon size={12} />
@@ -123,7 +123,7 @@ export default function DaacPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="p-5 bg-[#161B22] border border-[#21262D] rounded-xl"
+            className="p-5 bg-[#0f1e3d] border border-[#1a2d50] rounded-xl"
           >
             {tab === 'matieres'     && <SectionMatieres     tenantId={tenantId} enseignants={enseignants} />}
             {tab === 'sessions'     && <SectionSessions     tenantId={tenantId} />}

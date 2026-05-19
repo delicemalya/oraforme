@@ -20,8 +20,8 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Donut chart */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-[#E6EDF3] mb-4">{donutTitle}</h3>
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">{donutTitle}</h3>
         {donutData.length > 0 ? (
           <>
             <ResponsiveContainer width="100%" height={190}>
@@ -46,7 +46,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
                     border: '1px solid #30363D',
                     borderRadius: 8,
                     fontSize: 12,
-                    color: '#E6EDF3',
+                    color: '#FFFFFF',
                   }}
                   formatter={(val, name) => [
                     `${val} (${Math.round((Number(val) / totalDonut) * 100)}%)`,
@@ -67,18 +67,18 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
           </>
         ) : (
           <div className="h-[190px] flex flex-col items-center justify-center gap-2">
-            <div className="w-16 h-16 rounded-full border-4 border-[#21262D] border-dashed" />
+            <div className="w-16 h-16 rounded-full border-4 border-[#1a2d50] border-dashed" />
             <p className="text-xs text-[#484F58]">Aucune donnée</p>
           </div>
         )}
       </div>
 
       {/* Bar chart */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-[#E6EDF3] mb-4">Activité — 7 derniers jours</h3>
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">Activité — 7 derniers jours</h3>
         <ResponsiveContainer width="100%" height={190}>
           <BarChart data={barData} margin={{ top: 4, right: 0, left: -24, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1a2d50" vertical={false} />
             <XAxis
               dataKey="day"
               tick={{ fill: '#484F58', fontSize: 11 }}
@@ -97,12 +97,12 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
                 border: '1px solid #30363D',
                 borderRadius: 8,
                 fontSize: 12,
-                color: '#E6EDF3',
+                color: '#FFFFFF',
               }}
-              cursor={{ fill: '#21262D', radius: 4 }}
+              cursor={{ fill: '#1a2d50', radius: 4 }}
               formatter={(val) => [val, 'Factures']}
             />
-            <Bar dataKey="factures" fill="#F0A30A" radius={[4, 4, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="factures" fill="#F08900" radius={[4, 4, 0, 0]} maxBarSize={32} />
           </BarChart>
         </ResponsiveContainer>
       </div>

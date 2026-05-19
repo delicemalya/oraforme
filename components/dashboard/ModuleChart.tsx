@@ -8,9 +8,9 @@ export default function ModuleChart({ data, title }: { data: Entry[]; title: str
   const total = data.reduce((s, d) => s + d.value, 0)
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 h-full">
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 h-full">
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-[#E6EDF3]">{title}</h3>
+        <h3 className="text-sm font-semibold text-[#FFFFFF]">{title}</h3>
         <p className="text-[10px] text-[#484F58] mt-0.5">Répartition par statut</p>
       </div>
 
@@ -62,7 +62,7 @@ export default function ModuleChart({ data, title }: { data: Entry[]; title: str
         </>
       ) : (
         <div className="h-[150px] flex flex-col items-center justify-center gap-2">
-          <div className="w-14 h-14 rounded-full border-4 border-dashed border-[#21262D]" />
+          <div className="w-14 h-14 rounded-full border-4 border-dashed border-[#1a2d50]" />
           <p className="text-xs text-[#484F58]">Aucune donnée</p>
         </div>
       )}

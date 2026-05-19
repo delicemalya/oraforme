@@ -48,9 +48,9 @@ interface EntrepriseConfig {
 
 const STATUT_CONFIG: Record<StatutFac, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   brouillon: { label: 'Brouillon',  color: '#8B949E', bg: '#8B949E18', icon: Clock },
-  envoyee:   { label: 'Envoyée',    color: '#F07900', bg: '#F0790018', icon: Send },
-  payee:     { label: 'Payée',      color: '#0D2147', bg: '#0D214718', icon: CheckCircle },
-  retard:    { label: 'En retard',  color: '#F01F38', bg: '#F01F3818', icon: AlertTriangle },
+  envoyee:   { label: 'Envoyée',    color: '#F08900', bg: '#F0890018', icon: Send },
+  payee:     { label: 'Payée',      color: '#142850', bg: '#14285018', icon: CheckCircle },
+  retard:    { label: 'En retard',  color: '#F51E33', bg: '#F51E3318', icon: AlertTriangle },
   annulee:   { label: 'Annulée',   color: '#484F58', bg: '#48495818', icon: XCircle },
 }
 
@@ -119,7 +119,7 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50"
+        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50"
       />
     </div>
   )
@@ -391,7 +391,7 @@ export default function FacturationPage() {
         {toast && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="fixed top-4 right-4 z-50 bg-[#161B22] border border-[#30363D] rounded-lg px-4 py-3 text-sm text-white shadow-xl"
+            className="fixed top-4 right-4 z-50 bg-[#0f1e3d] border border-[#30363D] rounded-lg px-4 py-3 text-sm text-white shadow-xl"
           >
             {toast}
           </motion.div>
@@ -412,7 +412,7 @@ export default function FacturationPage() {
             onClick={openNew}
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm"
-            style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117', boxShadow: '0 0 18px #F0A30A35' }}
+            style={{ background: '#F08900', color: '#142850', boxShadow: '0 0 18px #F0890035' }}
           >
             <Plus size={15} /> Nouvelle facture
           </motion.button>
@@ -421,10 +421,10 @@ export default function FacturationPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#F07900"  icon={FileText} />
-        <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#0D2147"  icon={CheckCircle} />
-        <KpiCard label="En attente"      value={fmt(totalEnAttente)} color="#F0A30A"  icon={Clock} />
-        <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#F01F38"  icon={AlertTriangle} />
+        <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#F08900"  icon={FileText} />
+        <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#142850"  icon={CheckCircle} />
+        <KpiCard label="En attente"      value={fmt(totalEnAttente)} color="#F08900"  icon={Clock} />
+        <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#F51E33"  icon={AlertTriangle} />
       </div>
 
       {/* Filters + Search */}
@@ -442,7 +442,7 @@ export default function FacturationPage() {
               key={val}
               onClick={() => setFilter(val)}
               className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: filter === val ? '#F0A30A' : 'transparent', color: filter === val ? '#0D1117' : '#8B949E' }}
+              style={{ background: filter === val ? '#F08900' : 'transparent', color: filter === val ? '#142850' : '#8B949E' }}
             >
               {label}
             </button>
@@ -451,7 +451,7 @@ export default function FacturationPage() {
         <div className="relative">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
           <input
-            className="pl-8 pr-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 w-52"
+            className="pl-8 pr-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50 w-52"
             placeholder="Rechercher client, N°…"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -489,7 +489,7 @@ export default function FacturationPage() {
                       className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
                     >
                       <td className="px-4 py-3">
-                        <span className="text-xs font-mono font-semibold text-[#F0A30A]">
+                        <span className="text-xs font-mono font-semibold text-[#F08900]">
                           {f.invoice_number ?? f.id.slice(0, 8).toUpperCase()}
                         </span>
                       </td>
@@ -502,7 +502,7 @@ export default function FacturationPage() {
                       </td>
                       <td className="px-4 py-3 text-xs text-[#8B949E]">{fmt(ht)}</td>
                       <td className="px-4 py-3 text-xs text-[#8B949E]">{fmt(tva + ca)}</td>
-                      <td className="px-4 py-3 text-sm font-bold text-[#F0A30A]">{fmt(ttc)}</td>
+                      <td className="px-4 py-3 text-sm font-bold text-[#F08900]">{fmt(ttc)}</td>
                       <td className="px-4 py-3">
                         {/* Controlled select — triggers confirmation dialog */}
                         <select
@@ -512,23 +512,23 @@ export default function FacturationPage() {
                           style={{ color: STATUT_CONFIG[f.statut]?.color, background: STATUT_CONFIG[f.statut]?.bg }}
                         >
                           {Object.entries(STATUT_CONFIG).map(([k, v]) => (
-                            <option key={k} value={k} className="bg-[#161B22] text-white">{v.label}</option>
+                            <option key={k} value={k} className="bg-[#0f1e3d] text-white">{v.label}</option>
                           ))}
                         </select>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <ActionBtn title="Voir détail"     onClick={() => setViewId(f.id)}                                                                       icon={<Eye size={13} />} />
-                          <ActionBtn title="Aperçu plein écran" onClick={() => router.push(`/dashboard/factures/${f.id}/preview`)}                                 icon={<ExternalLink size={13} />} hoverClass="hover:text-[#F0A30A]" />
+                          <ActionBtn title="Aperçu plein écran" onClick={() => router.push(`/dashboard/factures/${f.id}/preview`)}                                 icon={<ExternalLink size={13} />} hoverClass="hover:text-[#F08900]" />
                           <ActionBtn title="Modifier"        onClick={() => openEdit(f)}                                                                           icon={<Edit3 size={13} />} />
                           {f.client_phone && <ActionBtn title="WhatsApp" onClick={() => sendWhatsApp(f)}                                                           icon={<MessageCircle size={13} />} hoverClass="hover:text-[#25D366]" />}
-                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#F07900]" />}
+                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#F08900]" />}
                           <ActionBtn
                             title="Télécharger PDF"
                             onClick={() => downloadPDF(f.id, f.invoice_number ?? f.id.slice(0, 8))}
                             disabled={dlLoading === f.id}
                             icon={dlLoading === f.id ? <Loader2 className="animate-spin" size={13} /> : <Download size={13} />}
-                            hoverClass="hover:text-[#F07900]"
+                            hoverClass="hover:text-[#F08900]"
                           />
                           <ActionBtn title="Supprimer" onClick={() => del(f.id)} icon={<Trash2 size={13} />} hoverClass="hover:text-red-400" />
                         </div>
@@ -552,7 +552,7 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="relative w-full max-w-4xl bg-[#161B22] border border-white/[0.08] rounded-2xl shadow-2xl mb-10"
+                className="relative w-full max-w-4xl bg-[#0f1e3d] border border-white/[0.08] rounded-2xl shadow-2xl mb-10"
                 initial={{ scale: 0.96, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 20 }}
                 onClick={e => e.stopPropagation()}
               >
@@ -582,8 +582,8 @@ export default function FacturationPage() {
                       </div>
                       <div>
                         <label className="block text-xs text-[#8B949E] mb-1">Statut</label>
-                        <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F0A30A]/50">
-                          {Object.entries(STATUT_CONFIG).map(([k, v]) => <option key={k} value={k} className="bg-[#161B22]">{v.label}</option>)}
+                        <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F08900]/50">
+                          {Object.entries(STATUT_CONFIG).map(([k, v]) => <option key={k} value={k} className="bg-[#0f1e3d]">{v.label}</option>)}
                         </select>
                       </div>
                     </div>
@@ -593,7 +593,7 @@ export default function FacturationPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Lignes de facture</p>
-                      <button onClick={() => setLignes(p => [...p, emptyLigne()])} className="text-xs text-[#F0A30A] hover:underline flex items-center gap-1">
+                      <button onClick={() => setLignes(p => [...p, emptyLigne()])} className="text-xs text-[#F08900] hover:underline flex items-center gap-1">
                         <Plus size={11} /> Ajouter une ligne
                       </button>
                     </div>
@@ -612,16 +612,16 @@ export default function FacturationPage() {
                           className={`grid grid-cols-12 gap-2 items-center rounded-lg px-2 py-1.5 ${i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'}`}
                         >
                           <div className="col-span-5">
-                            <input className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/50" placeholder="Description du service…" value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
+                            <input className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F08900]/50" placeholder="Description du service…" value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
                           </div>
                           <div className="col-span-3">
-                            <input type="number" min="0" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/50 text-right" value={l.price || ''} onChange={e => updateLigne(i, 'price', e.target.value)} />
+                            <input type="number" min="0" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F08900]/50 text-right" value={l.price || ''} onChange={e => updateLigne(i, 'price', e.target.value)} />
                           </div>
                           <div className="col-span-2">
-                            <input type="number" min="1" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F0A30A]/50 text-center" value={l.quantity} onChange={e => updateLigne(i, 'quantity', e.target.value)} />
+                            <input type="number" min="1" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F08900]/50 text-center" value={l.quantity} onChange={e => updateLigne(i, 'quantity', e.target.value)} />
                           </div>
                           <div className="col-span-1 text-right">
-                            <span className="text-xs font-semibold text-[#F0A30A]">{fmt(l.price * l.quantity)}</span>
+                            <span className="text-xs font-semibold text-[#F08900]">{fmt(l.price * l.quantity)}</span>
                           </div>
                           <div className="col-span-1 flex justify-center">
                             {lignes.length > 1 && (
@@ -646,7 +646,7 @@ export default function FacturationPage() {
                       <div className="flex justify-between text-sm"><span className="text-[#8B949E]">CA (5 % de la TVA)</span><span className="text-white">{fmt(caLive)}</span></div>
                       <div className="border-t border-white/[0.08] pt-3 flex justify-between">
                         <span className="text-base font-bold text-white">TOTAL TTC</span>
-                        <span className="text-xl font-bold text-[#F0A30A]">{fmt(ttcLive)}</span>
+                        <span className="text-xl font-bold text-[#F08900]">{fmt(ttcLive)}</span>
                       </div>
                     </div>
                   </div>
@@ -654,7 +654,7 @@ export default function FacturationPage() {
                   {/* Notes */}
                   <div>
                     <label className="block text-xs text-[#8B949E] mb-1.5">Notes (optionnel)</label>
-                    <textarea rows={3} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 resize-none" placeholder="Conditions de paiement, remerciements…" value={notes} onChange={e => setNotes(e.target.value)} />
+                    <textarea rows={3} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50 resize-none" placeholder="Conditions de paiement, remerciements…" value={notes} onChange={e => setNotes(e.target.value)} />
                   </div>
 
                   {/* Actions */}
@@ -669,7 +669,7 @@ export default function FacturationPage() {
                       onClick={() => handleSave('envoyee')}
                       disabled={saving || !clientNom}
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm flex-1 justify-center disabled:opacity-40"
-                      style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117' }}
+                      style={{ background: '#F08900', color: '#142850' }}
                     >
                       {saving ? <Loader2 className="animate-spin" size={14} /> : <><Send size={14} /> Émettre la facture</>}
                     </button>
@@ -691,7 +691,7 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="relative w-full max-w-2xl max-h-[90vh] bg-[#161B22] border border-white/[0.08] rounded-2xl shadow-2xl flex flex-col"
+                className="relative w-full max-w-2xl max-h-[90vh] bg-[#0f1e3d] border border-white/[0.08] rounded-2xl shadow-2xl flex flex-col"
                 initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
                 onClick={e => e.stopPropagation()}
               >
@@ -714,7 +714,7 @@ export default function FacturationPage() {
                     <button
                       onClick={() => downloadPDF(viewedFac.id, viewedFac.invoice_number ?? viewedFac.id.slice(0, 8))}
                       disabled={dlLoading === viewedFac.id}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F07900]/15 border border-[#F07900]/30 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/25 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F08900]/15 border border-[#F08900]/30 text-[#F08900] text-xs font-semibold hover:bg-[#F08900]/25 transition-colors disabled:opacity-50"
                     >
                       {dlLoading === viewedFac.id ? <Loader2 className="animate-spin" size={12} /> : <Download size={12} />} PDF
                     </button>
@@ -760,10 +760,10 @@ export default function FacturationPage() {
                               className={`border-b border-white/[0.04] ${i === viewLignes.length - 1 ? 'border-0' : ''}`}
                               style={{ background: i % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent' }}
                             >
-                              <td className="px-3 py-2 text-[#E6EDF3]">{l.description}</td>
+                              <td className="px-3 py-2 text-[#FFFFFF]">{l.description}</td>
                               <td className="px-3 py-2 text-[#8B949E] text-right">{fmt(l.price)}</td>
                               <td className="px-3 py-2 text-[#8B949E] text-center">{l.quantity}</td>
-                              <td className="px-3 py-2 text-[#F0A30A] font-semibold text-right">{fmt(l.price * l.quantity)}</td>
+                              <td className="px-3 py-2 text-[#F08900] font-semibold text-right">{fmt(l.price * l.quantity)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -782,7 +782,7 @@ export default function FacturationPage() {
                         <div className="flex justify-between text-sm"><span className="text-[#8B949E]">CA 5 %</span><span className="text-white">{fmt(ca)}</span></div>
                         <div className="border-t border-white/[0.08] pt-2 flex justify-between">
                           <span className="font-bold text-white">TOTAL TTC</span>
-                          <span className="font-bold text-[#F0A30A] text-lg">{fmt(ttc)}</span>
+                          <span className="font-bold text-[#F08900] text-lg">{fmt(ttc)}</span>
                         </div>
                       </div>
                     )
@@ -845,7 +845,7 @@ export default function FacturationPage() {
                   {viewedFac.notes && (
                     <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
                       <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1.5">Notes</p>
-                      <p className="text-sm text-[#E6EDF3]">{viewedFac.notes}</p>
+                      <p className="text-sm text-[#FFFFFF]">{viewedFac.notes}</p>
                     </div>
                   )}
 
@@ -862,7 +862,7 @@ export default function FacturationPage() {
                     {viewedFac.client_email && (
                       <button
                         onClick={() => sendEmail(viewedFac)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#F07900]/30 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/10 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#F08900]/30 text-[#F08900] text-xs font-semibold hover:bg-[#F08900]/10 transition-colors"
                       >
                         <Mail size={13} /> Email
                       </button>
@@ -892,7 +892,7 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="w-full max-w-sm bg-[#161B22] border border-white/[0.08] rounded-2xl shadow-2xl p-6"
+                className="w-full max-w-sm bg-[#0f1e3d] border border-white/[0.08] rounded-2xl shadow-2xl p-6"
                 initial={{ scale: 0.92 }} animate={{ scale: 1 }} exit={{ scale: 0.92 }}
                 onClick={e => e.stopPropagation()}
               >

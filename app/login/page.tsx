@@ -103,11 +103,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#0D1117]">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#142850]">
       <div className="w-full max-w-md">
         {/* Back button */}
         <div className="mb-4">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M9.78 12.78a.75.75 0 0 1-1.06 0L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 1.06L6.06 8l3.72 3.72a.75.75 0 0 1 0 1.06z"/></svg>
             Accueil
           </Link>
@@ -118,19 +118,19 @@ export default function LoginPage() {
           <div className="inline-flex items-center gap-2 mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="oraforme" className="w-8 h-8" />
-            <span className="text-xl font-bold text-[#E6EDF3]">oraforme</span>
+            <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
           </div>
           <p className="text-[#8B949E] text-sm">Connectez-vous à votre espace</p>
         </div>
 
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-8">
+        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-8">
 
           {/* ── Google OAuth ──────────────────────────────────────────── */}
           <button
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-[#30363D] bg-[#21262D] text-[#E6EDF3] text-sm font-medium hover:border-[#484F58] hover:bg-[#30363D] transition-all disabled:opacity-60 disabled:cursor-not-allowed mb-5"
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-[#30363D] bg-[#1a2d50] text-[#FFFFFF] text-sm font-medium hover:border-[#484F58] hover:bg-[#30363D] transition-all disabled:opacity-60 disabled:cursor-not-allowed mb-5"
           >
             <GoogleIcon />
             Continuer avec Google
@@ -144,13 +144,13 @@ export default function LoginPage() {
           </div>
 
           {/* Mode toggle */}
-          <div className="flex rounded-lg bg-[#21262D] p-1 mb-6">
+          <div className="flex rounded-lg bg-[#1a2d50] p-1 mb-6">
             {(['email', 'phone'] as AuthMode[]).map(m => (
               <button
                 key={m}
                 onClick={() => switchMode(m)}
                 className={`flex-1 py-2 text-sm rounded-md font-medium transition-all ${
-                  mode === m ? 'bg-[#F0A30A] text-[#0D1117]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                  mode === m ? 'bg-[#F08900] text-[#142850]' : 'text-[#8B949E] hover:text-[#FFFFFF]'
                 }`}
               >
                 {m === 'email' ? '📧 Email' : '📱 Téléphone'}
@@ -173,7 +173,7 @@ export default function LoginPage() {
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-[#8B949E]">Mot de passe</label>
-                  <Link href="/forgot-password" className="text-xs text-[#F0A30A] hover:underline">
+                  <Link href="/forgot-password" className="text-xs text-[#F08900] hover:underline">
                     Oublié ?
                   </Link>
                 </div>
@@ -184,7 +184,7 @@ export default function LoginPage() {
                   onChange={e => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full px-4 py-2.5 rounded-lg bg-[#21262D] border border-[#30363D] text-[#E6EDF3] text-sm focus:outline-none focus:border-[#F0A30A] placeholder-[#484F58] transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F08900] placeholder-[#484F58] transition-colors"
                 />
               </div>
               {error && <ErrorBox message={error} />}
@@ -200,7 +200,7 @@ export default function LoginPage() {
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-[#8B949E]">Numéro de téléphone</label>
                 <div className="flex gap-2">
-                  <div className="px-3 py-2.5 rounded-lg bg-[#21262D] border border-[#30363D] text-[#8B949E] text-sm shrink-0 flex items-center">
+                  <div className="px-3 py-2.5 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#8B949E] text-sm shrink-0 flex items-center">
                     🇨🇬 +242
                   </div>
                   <input
@@ -208,7 +208,7 @@ export default function LoginPage() {
                     placeholder="06 000 00 00"
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
-                    className="flex-1 px-4 py-2.5 rounded-lg bg-[#21262D] border border-[#30363D] text-[#E6EDF3] text-sm focus:outline-none focus:border-[#F0A30A] placeholder-[#484F58]"
+                    className="flex-1 px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F08900] placeholder-[#484F58]"
                     required
                   />
                 </div>
@@ -226,7 +226,7 @@ export default function LoginPage() {
           {/* ── Phone: enter OTP ─────────────────────────────────────── */}
           {mode === 'phone' && phoneStep === 'otp' && (
             <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
-              <div className="p-3 bg-[#F0A30A]/5 border border-[#F0A30A]/20 rounded-lg text-xs text-[#F0A30A]">
+              <div className="p-3 bg-[#F08900]/5 border border-[#F08900]/20 rounded-lg text-xs text-[#F08900]">
                 Code envoyé au <strong>{phone}</strong>
               </div>
               <div className="flex flex-col gap-1.5">
@@ -239,7 +239,7 @@ export default function LoginPage() {
                   value={otp}
                   onChange={e => setOtp(e.target.value)}
                   maxLength={6}
-                  className="w-full px-4 py-3 text-center text-2xl tracking-[0.5em] rounded-lg bg-[#21262D] border border-[#30363D] text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A] placeholder-[#484F58]"
+                  className="w-full px-4 py-3 text-center text-2xl tracking-[0.5em] rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#FFFFFF] focus:outline-none focus:border-[#F08900] placeholder-[#484F58]"
                   required
                 />
               </div>
@@ -250,7 +250,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => { setPhoneStep('enter'); setOtp(''); setError('') }}
-                className="text-xs text-[#8B949E] hover:text-[#E6EDF3] text-center"
+                className="text-xs text-[#8B949E] hover:text-[#FFFFFF] text-center"
               >
                 ← Changer de numéro
               </button>
@@ -259,7 +259,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-[#8B949E] mt-6">
             Pas encore de compte ?{' '}
-            <Link href="/register" className="text-[#F0A30A] hover:underline">
+            <Link href="/register" className="text-[#F08900] hover:underline">
               Créer un compte
             </Link>
           </p>

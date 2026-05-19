@@ -13,8 +13,8 @@ const MODULE_LABELS: Record<string, string> = {
 }
 
 const MODULE_COLORS = [
-  '#F0A30A', '#F07900', '#0D2147', '#8B0073',
-  '#8B0073', '#0D2147', '#F07900', '#F01F38', '#84CC16', '#F97316',
+  '#F08900', '#F08900', '#142850', '#8B0070',
+  '#8B0070', '#142850', '#F08900', '#F51E33', '#84CC16', '#F08900',
 ]
 
 export default async function DashboardPage() {
@@ -123,10 +123,10 @@ export default async function DashboardPage() {
     const totalInvoices = Object.values(counts).reduce((s, v) => s + v, 0)
     moduleBreakdown = totalInvoices > 0
       ? ([
-          { name: 'Payées',     value: counts.payee,    color: '#0D2147' },
-          { name: 'Envoyées',   value: counts.envoyee,  color: '#F07900' },
+          { name: 'Payées',     value: counts.payee,    color: '#142850' },
+          { name: 'Envoyées',   value: counts.envoyee,  color: '#F08900' },
           { name: 'Brouillons', value: counts.brouillon,color: '#484F58' },
-          { name: 'Annulées',   value: counts.annulee,  color: '#F01F38' },
+          { name: 'Annulées',   value: counts.annulee,  color: '#F51E33' },
         ] as { name: string; value: number; color: string }[]).filter(d => d.value > 0)
       : modulesActifs.map((m, i) => ({ name: MODULE_LABELS[m] ?? m, value: 1, color: MODULE_COLORS[i % MODULE_COLORS.length] }))
 

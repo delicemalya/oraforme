@@ -17,15 +17,15 @@ function fmtShort(n: number) {
   return String(n)
 }
 
-const GOLD = '#F0A30A'
-const GOLDS = ['#F0A30A', '#E09000', '#C07800', '#A06000', '#805000']
+const GOLD = '#F08900'
+const GOLDS = ['#F08900', '#E09000', '#C07800', '#A06000', '#805000']
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-3 shadow-2xl text-xs">
-      <p className="text-[#E6EDF3] font-semibold mb-1 truncate max-w-[160px]">{label}</p>
-      <p className="text-[#F0A30A]">{fmtFull(payload[0].value)}</p>
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-3 shadow-2xl text-xs">
+      <p className="text-[#FFFFFF] font-semibold mb-1 truncate max-w-[160px]">{label}</p>
+      <p className="text-[#F08900]">{fmtFull(payload[0].value)}</p>
       {payload[0].payload.count && (
         <p className="text-[#484F58] mt-0.5">{payload[0].payload.count} facture(s)</p>
       )}
@@ -37,10 +37,10 @@ export default function TopClientsChart({ data }: { data: ClientRevenue[] }) {
   const hasData = data.some(d => d.montant > 0)
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-bold text-[#E6EDF3]">Top 5 Clients</h3>
+          <h3 className="text-sm font-bold text-[#FFFFFF]">Top 5 Clients</h3>
           <p className="text-[10px] text-[#484F58] mt-0.5">Par chiffre d'affaires ce mois</p>
         </div>
       </div>
@@ -72,7 +72,7 @@ export default function TopClientsChart({ data }: { data: ClientRevenue[] }) {
                   </span>
                   <span className="text-[#8B949E] truncate max-w-[120px]">{c.nom}</span>
                 </div>
-                <span className="text-[#E6EDF3] font-semibold">{fmtFull(c.montant)}</span>
+                <span className="text-[#FFFFFF] font-semibold">{fmtFull(c.montant)}</span>
               </div>
             ))}
           </div>

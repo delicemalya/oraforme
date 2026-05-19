@@ -23,11 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${geist.variable} h-full`}>
       <head>
-        <meta name="theme-color" content="#F0A30A" />
+        <meta name="theme-color" content="#F08900" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className="h-full bg-[#0D1117] text-[#E6EDF3] antialiased">
+      <body className="h-full bg-[#142850] text-[#FFFFFF] antialiased">
         {children}
         <PWAInstall />
       </body>

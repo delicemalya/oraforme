@@ -59,7 +59,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
   return (
     <div className="space-y-4">
       {/* Student card */}
-      <div className="rounded-xl border border-[#0D2147]/20 p-5" style={{ background: 'rgba(6,182,212,0.06)' }}>
+      <div className="rounded-xl border border-[#142850]/20 p-5" style={{ background: 'rgba(6,182,212,0.06)' }}>
         <div className="flex items-start gap-4">
           <Avatar nom={etudiant.nom} prenom={etudiant.prenom} photoUrl={etudiant.photo_url} size={56} />
           <div className="flex-1">
@@ -70,24 +70,24 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           {isAdmin && onToggleBlock && (
             <button onClick={onToggleBlock} disabled={blocking}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
-              style={etudiant.statut === 'suspendu' ? { background: '#0D2147', color: '#fff' } : { background: '#F01F38', color: '#fff' }}>
+              style={etudiant.statut === 'suspendu' ? { background: '#142850', color: '#fff' } : { background: '#F51E33', color: '#fff' }}>
               {blocking ? <Loader2 size={12} className="animate-spin" /> : etudiant.statut === 'suspendu' ? <><Unlock size={12} /> Débloquer</> : <><Lock size={12} /> Suspendre</>}
             </button>
           )}
         </div>
         {isAdmin && etudiant.statut === 'suspendu' && etudiant.code_deblocage && (
           <div className="mt-3 pt-3 border-t border-white/[0.06]">
-            <p className="text-[10px] text-[#8B949E]">Code de déblocage : <span className="font-mono font-bold text-[#F0A30A]">{etudiant.code_deblocage}</span></p>
+            <p className="text-[10px] text-[#8B949E]">Code de déblocage : <span className="font-mono font-bold text-[#F08900]">{etudiant.code_deblocage}</span></p>
           </div>
         )}
       </div>
 
       {/* Warning */}
       {etudiant.statut === 'suspendu' && (
-        <div className="rounded-xl border border-[#F01F38]/30 p-4 flex items-start gap-3" style={{ background: 'rgba(248,81,73,0.06)' }}>
-          <AlertCircle size={16} className="text-[#F01F38] shrink-0 mt-0.5" />
+        <div className="rounded-xl border border-[#F51E33]/30 p-4 flex items-start gap-3" style={{ background: 'rgba(248,81,73,0.06)' }}>
+          <AlertCircle size={16} className="text-[#F51E33] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-[#F01F38]">Accès suspendu</p>
+            <p className="text-sm font-bold text-[#F51E33]">Accès suspendu</p>
             <p className="text-xs text-[#8B949E] mt-0.5">Un solde impayé a été détecté. Régularisez votre situation auprès de l&apos;administration.</p>
           </div>
         </div>
@@ -95,10 +95,10 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
 
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
-        <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#0D2147" />
+        <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#142850" />
         <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
-        <KpiCard label="Absences"         value={totalAbs}                               color="#F01F38" sub={`${justifiedAbs} justifiées`} />
-        <KpiCard label="Alertes"          value={nbAlerts}                               color="#F0A30A" sub="non lues" />
+        <KpiCard label="Absences"         value={totalAbs}                               color="#F51E33" sub={`${justifiedAbs} justifiées`} />
+        <KpiCard label="Alertes"          value={nbAlerts}                               color="#F08900" sub="non lues" />
       </div>
 
       {/* Tabs */}
@@ -113,7 +113,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           return (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: activeTab === t.id ? '#0D2147' : 'transparent', color: activeTab === t.id ? '#fff' : '#8B949E' }}>
+              style={{ background: activeTab === t.id ? '#142850' : 'transparent', color: activeTab === t.id ? '#fff' : '#8B949E' }}>
               <Icon size={12} />{t.label}
               {t.count > 0 && activeTab !== t.id && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] bg-white/[0.08] text-[#8B949E]">{t.count}</span>}
             </button>
@@ -183,9 +183,9 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
                     <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-white">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#0D2147]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#142850]">{fmt(p.montant)} FCFA</td>
                     <td className="px-4 py-2.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#0D2147', background: '#0D214718' } : { color: '#F0A30A', background: '#F0A30A18' }}>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F08900', background: '#F0890018' }}>
                         {p.statut === 'paye' ? 'Payé' : 'En attente'}
                       </span>
                     </td>
@@ -212,7 +212,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
                     <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
                     <td className="px-4 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                     <td className="px-4 py-2.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#0D2147', background: '#0D214718' } : { color: '#F01F38', background: '#F01F3818' }}>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
                         {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                       </span>
                     </td>
@@ -234,9 +234,9 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         ) : (
           <div className="space-y-2">
             {notifs.map(n => (
-              <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#0D2147]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(6,182,212,0.04)' }}>
+              <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#142850]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(6,182,212,0.04)' }}>
                 <div className="flex items-start gap-2">
-                  <Bell size={12} className={n.read ? 'text-[#8B949E]' : 'text-[#0D2147]'} />
+                  <Bell size={12} className={n.read ? 'text-[#8B949E]' : 'text-[#142850]'} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-white">{n.titre}</p>
                     <p className="text-[10px] text-[#8B949E] mt-0.5">{n.message}</p>
@@ -419,27 +419,27 @@ export default function EspaceEtudiantPage() {
         </div>
 
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-[#0D2147]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(6,182,212,0.04)' }}>
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'linear-gradient(135deg,#0E4A5F,#0D2147)' }}>
+          className="rounded-xl border border-[#142850]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(6,182,212,0.04)' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: '#142850' }}>
             <User size={28} className="text-white" />
           </div>
           <h2 className="text-lg font-bold text-white mb-1">Accès à mon dossier</h2>
           <p className="text-xs text-[#8B949E] mb-6 max-w-sm">Entrez votre numéro étudiant (visible sur votre carte ou attestation d&apos;inscription)</p>
           <div className="flex gap-2 w-full max-w-sm">
             <input
-              className="flex-1 px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#0D2147]/50 text-center font-mono tracking-widest"
+              className="flex-1 px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#142850]/50 text-center font-mono tracking-widest"
               placeholder="Ex : ETU-2024-001"
               value={studentId}
               onChange={e => { setStudentId(e.target.value); setIdError(null) }}
               onKeyDown={e => e.key === 'Enter' && lookupByNumeroId()}
             />
             <button onClick={lookupByNumeroId} disabled={searching || !studentId.trim()}
-              className="px-5 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#0E4A5F,#0D2147)', color: '#fff' }}>
+              className="px-5 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
               {searching ? <Loader2 className="animate-spin" size={14} /> : <ChevronRight size={14} />}
             </button>
           </div>
           {idError && (
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-xs text-[#F01F38] flex items-center gap-1.5">
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-xs text-[#F51E33] flex items-center gap-1.5">
               <AlertCircle size={12} /> {idError}
             </motion.p>
           )}
@@ -472,12 +472,12 @@ export default function EspaceEtudiantPage() {
         <p className="text-xs text-[#8B949E] mt-0.5">Accédez au dossier complet d&apos;un étudiant — résultats, paiements, absences</p>
       </div>
 
-      <div className="rounded-xl border border-[#0D2147]/20 p-4 space-y-3" style={{ background: 'rgba(6,182,212,0.04)' }}>
+      <div className="rounded-xl border border-[#142850]/20 p-4 space-y-3" style={{ background: 'rgba(6,182,212,0.04)' }}>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
             <input
-              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#0D2147]/50"
+              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#142850]/50"
               placeholder="N° étudiant, nom, prénom…"
               value={adminSearch}
               onChange={e => setAdminSearch(e.target.value)}
@@ -485,7 +485,7 @@ export default function EspaceEtudiantPage() {
             />
           </div>
           <button onClick={adminSearchStudents} disabled={adminSearching || !adminSearch.trim()}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#0E4A5F,#0D2147)', color: '#fff' }}>
+            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
             {adminSearching ? <Loader2 className="animate-spin" size={14} /> : <Search size={14} />} Rechercher
           </button>
         </div>
@@ -505,7 +505,7 @@ export default function EspaceEtudiantPage() {
                 <p className="text-xs text-[#8B949E]">{e.numero_id} · {e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
               </div>
               <StatutBadge statut={e.statut} />
-              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#0D2147] transition-colors" />
+              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#142850] transition-colors" />
             </button>
           ))}
         </div>

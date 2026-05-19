@@ -70,18 +70,18 @@ export default function OnboardingPage() {
           <div className="inline-flex items-center gap-2 mb-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="oraforme" className="w-8 h-8" />
-            <span className="text-xl font-bold text-[#E6EDF3]">oraforme</span>
+            <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
           </div>
 
           <div className="flex items-center justify-center gap-1.5">
             {STEPS.map((s, i) => (
               <div key={s} className="flex items-center gap-1.5">
                 <div className={`flex items-center gap-1.5 text-xs ${
-                  i === step ? 'text-[#F0A30A]' : i < step ? 'text-[#8B949E]' : 'text-[#484F58]'
+                  i === step ? 'text-[#F08900]' : i < step ? 'text-[#8B949E]' : 'text-[#484F58]'
                 }`}>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${
-                    i < step   ? 'bg-[#F0A30A] border-[#F0A30A] text-[#0D1117]' :
-                    i === step ? 'border-[#F0A30A] text-[#F0A30A]'              :
+                    i < step   ? 'bg-[#F08900] border-[#F08900] text-[#142850]' :
+                    i === step ? 'border-[#F08900] text-[#F08900]'              :
                                  'border-[#30363D] text-[#484F58]'
                   }`}>
                     {i < step ? '✓' : i + 1}
@@ -89,7 +89,7 @@ export default function OnboardingPage() {
                   <span className="hidden sm:inline">{s}</span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className={`w-5 h-px ${i < step ? 'bg-[#F0A30A]' : 'bg-[#30363D]'}`} />
+                  <div className={`w-5 h-px ${i < step ? 'bg-[#F08900]' : 'bg-[#30363D]'}`} />
                 )}
               </div>
             ))}
@@ -97,12 +97,12 @@ export default function OnboardingPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-8">
+        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-8">
 
           {/* ── ÉTAPE 0 : Secteur ─────────────────────────────── */}
           {step === 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-[#E6EDF3] mb-1">Votre secteur d&apos;activité</h2>
+              <h2 className="text-lg font-semibold text-[#FFFFFF] mb-1">Votre secteur d&apos;activité</h2>
               <p className="text-sm text-[#8B949E] mb-6">
                 Oraforme configure automatiquement les modules adaptés à votre métier.
               </p>
@@ -114,14 +114,14 @@ export default function OnboardingPage() {
                     onClick={() => setSecteurId(id)}
                     className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all ${
                       secteurId === id
-                        ? 'border-[#F0A30A] bg-[#F0A30A]/5 shadow-[0_0_0_1px_#F0A30A33]'
-                        : 'border-[#30363D] bg-[#21262D] hover:border-[#484F58]'
+                        ? 'border-[#F08900] bg-[#F08900]/5 shadow-[0_0_0_1px_#F0890033]'
+                        : 'border-[#30363D] bg-[#1a2d50] hover:border-[#484F58]'
                     }`}
                   >
                     <span className="text-2xl">{cfg.emoji}</span>
-                    <span className="text-xs font-medium text-[#E6EDF3] leading-tight">{cfg.label}</span>
+                    <span className="text-xs font-medium text-[#FFFFFF] leading-tight">{cfg.label}</span>
                     {secteurId === id && (
-                      <span className="text-xs text-[#F0A30A]">{cfg.uiModules.length} modules</span>
+                      <span className="text-xs text-[#F08900]">{cfg.uiModules.length} modules</span>
                     )}
                   </button>
                 ))}
@@ -129,13 +129,13 @@ export default function OnboardingPage() {
 
               {/* Module preview */}
               {secteurCfg && uiModules.length > 0 && (
-                <div className="mt-4 p-3 bg-[#F0A30A]/5 border border-[#F0A30A]/20 rounded-lg">
-                  <p className="text-xs text-[#F0A30A] font-medium mb-2">
+                <div className="mt-4 p-3 bg-[#F08900]/5 border border-[#F08900]/20 rounded-lg">
+                  <p className="text-xs text-[#F08900] font-medium mb-2">
                     Modules inclus par défaut pour {secteurCfg.label}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {uiModules.map((m, i) => (
-                      <span key={i} className="text-xs bg-[#21262D] text-[#8B949E] px-2 py-0.5 rounded-full">
+                      <span key={i} className="text-xs bg-[#1a2d50] text-[#8B949E] px-2 py-0.5 rounded-full">
                         {m.emoji} {m.label}
                       </span>
                     ))}
@@ -154,7 +154,7 @@ export default function OnboardingPage() {
           {/* ── ÉTAPE 1 : Entreprise ──────────────────────────── */}
           {step === 1 && (
             <div>
-              <h2 className="text-lg font-semibold text-[#E6EDF3] mb-1">Votre entreprise</h2>
+              <h2 className="text-lg font-semibold text-[#FFFFFF] mb-1">Votre entreprise</h2>
               <p className="text-sm text-[#8B949E] mb-6">Ces informations apparaîtront sur vos documents officiels.</p>
               <div className="flex flex-col gap-4">
                 <Input
@@ -172,7 +172,7 @@ export default function OnboardingPage() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[#8B949E]">Pays</label>
                   <select
-                    className="w-full px-4 py-2.5 rounded-lg bg-[#21262D] border border-[#30363D] text-[#E6EDF3] text-sm focus:outline-none focus:border-[#F0A30A]"
+                    className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F08900]"
                     value={entreprise.pays}
                     onChange={e => setEntreprise(p => ({ ...p, pays: e.target.value }))}
                   >
@@ -198,7 +198,7 @@ export default function OnboardingPage() {
           {/* ── ÉTAPE 2 : Modules ─────────────────────────────── */}
           {step === 2 && (
             <div>
-              <h2 className="text-lg font-semibold text-[#E6EDF3] mb-1">Choisissez vos modules</h2>
+              <h2 className="text-lg font-semibold text-[#FFFFFF] mb-1">Choisissez vos modules</h2>
               <p className="text-sm text-[#8B949E] mb-5">
                 Les modules recommandés pour votre secteur sont déjà sélectionnés.
                 Ajoutez ou retirez librement selon vos besoins.
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
               {/* Modules recommandés */}
               {secteurCfg && (
                 <div className="mb-4">
-                  <p className="text-xs text-[#F0A30A] font-medium uppercase tracking-wider mb-2">
+                  <p className="text-xs text-[#F08900] font-medium uppercase tracking-wider mb-2">
                     ✦ Recommandés pour {secteurCfg.label}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -221,19 +221,19 @@ export default function OnboardingPage() {
                           onClick={() => toggleMod(key)}
                           className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
                             selected
-                              ? 'border-[#F0A30A] bg-[#F0A30A]/8'
-                              : 'border-[#30363D] bg-[#21262D] hover:border-[#484F58]'
+                              ? 'border-[#F08900] bg-[#F08900]/8'
+                              : 'border-[#30363D] bg-[#1a2d50] hover:border-[#484F58]'
                           }`}
                         >
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all ${
                             selected
-                              ? 'bg-[#F0A30A] border-[#F0A30A]'
+                              ? 'bg-[#F08900] border-[#F08900]'
                               : 'border-[#484F58]'
                           }`}>
-                            {selected && <Check size={10} className="text-[#0D1117]" />}
+                            {selected && <Check size={10} className="text-[#142850]" />}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs font-medium text-[#E6EDF3] truncate">
+                            <div className="text-xs font-medium text-[#FFFFFF] truncate">
                               {m.emoji} {m.label}
                             </div>
                             <div className="text-[10px] text-[#484F58]">
@@ -268,7 +268,7 @@ export default function OnboardingPage() {
                             className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
                               selected
                                 ? 'border-[#2EA043] bg-[#2EA043]/8'
-                                : 'border-[#21262D] bg-[#0D1117] hover:border-[#30363D]'
+                                : 'border-[#1a2d50] bg-[#142850] hover:border-[#30363D]'
                             }`}
                           >
                             <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all ${
@@ -276,7 +276,7 @@ export default function OnboardingPage() {
                                 ? 'bg-[#2EA043] border-[#2EA043]'
                                 : 'border-[#30363D]'
                             }`}>
-                              {selected ? <Check size={10} className="text-[#0D1117]" /> : <Plus size={9} className="text-[#484F58]" />}
+                              {selected ? <Check size={10} className="text-[#142850]" /> : <Plus size={9} className="text-[#484F58]" />}
                             </div>
                             <div className="min-w-0">
                               <div className="text-xs font-medium text-[#8B949E] truncate">
@@ -295,18 +295,18 @@ export default function OnboardingPage() {
               })()}
 
               {/* Total + modules sélectionnés */}
-              <div className="mt-4 p-3 bg-[#21262D] rounded-xl flex items-center justify-between">
+              <div className="mt-4 p-3 bg-[#1a2d50] rounded-xl flex items-center justify-between">
                 <div>
                   <span className="text-xs text-[#8B949E]">
                     {selectedMods.length} module{selectedMods.length !== 1 ? 's' : ''} sélectionné{selectedMods.length !== 1 ? 's' : ''}
                   </span>
                   {selectedMods.length === 0 && (
-                    <div className="flex items-center gap-1 text-[10px] text-[#F01F38] mt-0.5">
+                    <div className="flex items-center gap-1 text-[10px] text-[#F51E33] mt-0.5">
                       <X size={9} /> Sélectionnez au moins un module
                     </div>
                   )}
                 </div>
-                <span className="text-base font-bold text-[#F0A30A]">
+                <span className="text-base font-bold text-[#F08900]">
                   {totalMensuel.toLocaleString()} F<span className="text-xs font-normal text-[#8B949E]">/mois</span>
                 </span>
               </div>
@@ -321,13 +321,13 @@ export default function OnboardingPage() {
           {/* ── ÉTAPE 3 : Confirmation ────────────────────────── */}
           {step === 3 && (
             <div>
-              <h2 className="text-lg font-semibold text-[#E6EDF3] mb-1">Confirmation</h2>
+              <h2 className="text-lg font-semibold text-[#FFFFFF] mb-1">Confirmation</h2>
               <p className="text-sm text-[#8B949E] mb-6">Vérifiez vos informations avant de démarrer.</p>
 
               <div className="space-y-3">
-                <div className="p-4 bg-[#21262D] rounded-xl">
+                <div className="p-4 bg-[#1a2d50] rounded-xl">
                   <p className="text-xs text-[#8B949E] uppercase tracking-wider mb-2">Secteur</p>
-                  <p className="text-sm font-medium text-[#E6EDF3]">
+                  <p className="text-sm font-medium text-[#FFFFFF]">
                     {secteurCfg?.emoji} {secteurCfg?.label}
                   </p>
                   {secteurCfg?.description && (
@@ -335,9 +335,9 @@ export default function OnboardingPage() {
                   )}
                 </div>
 
-                <div className="p-4 bg-[#21262D] rounded-xl">
+                <div className="p-4 bg-[#1a2d50] rounded-xl">
                   <p className="text-xs text-[#8B949E] uppercase tracking-wider mb-2">Entreprise</p>
-                  <p className="text-sm font-semibold text-[#E6EDF3]">{entreprise.nom}</p>
+                  <p className="text-sm font-semibold text-[#FFFFFF]">{entreprise.nom}</p>
                   {entreprise.nif && (
                     <p className="text-xs text-[#8B949E] mt-0.5">NIF : {entreprise.nif}</p>
                   )}
@@ -346,7 +346,7 @@ export default function OnboardingPage() {
                   </p>
                 </div>
 
-                <div className="p-4 bg-[#21262D] rounded-xl">
+                <div className="p-4 bg-[#1a2d50] rounded-xl">
                   <p className="text-xs text-[#8B949E] uppercase tracking-wider mb-2">
                     Modules activés ({selectedMods.length})
                   </p>
@@ -356,7 +356,7 @@ export default function OnboardingPage() {
                       return m ? (
                         <span
                           key={key}
-                          className="inline-flex items-center gap-1 text-xs bg-[#F0A30A]/10 text-[#F0A30A] border border-[#F0A30A]/20 rounded-full px-2.5 py-1"
+                          className="inline-flex items-center gap-1 text-xs bg-[#F08900]/10 text-[#F08900] border border-[#F08900]/20 rounded-full px-2.5 py-1"
                         >
                           {m.emoji} {m.label}
                         </span>
@@ -365,9 +365,9 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-[#21262D] rounded-xl flex items-center justify-between">
+                <div className="p-4 bg-[#1a2d50] rounded-xl flex items-center justify-between">
                   <span className="text-sm text-[#8B949E]">Total mensuel estimé</span>
-                  <span className="text-xl font-bold text-[#F0A30A]">
+                  <span className="text-xl font-bold text-[#F08900]">
                     {totalMensuel.toLocaleString()} <span className="text-sm font-normal">FCFA</span>
                   </span>
                 </div>

@@ -3,100 +3,132 @@
 * { box-sizing: border-box; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   BASE — Thème sombre permanent · Palette marque Oraforme
-   Rouge #F01F38 · Orange #F07900 · Violet #8B0073 · Navy #0D2147
+   DESIGN SYSTEM ORAFORME — Palette marque stricte · Zéro dégradé
+   Navy #142850 · Rouge #F51E33 · Orange #F08900 · Violet #8B0070
 ════════════════════════════════════════════════════════════════════════════ */
 
+:root {
+  --color-navy:   #142850;
+  --color-red:    #F51E33;
+  --color-orange: #F08900;
+  --color-violet: #8B0070;
+  --color-white:  #FFFFFF;
+  --color-black:  #0D0D0D;
+}
+
 body {
-  background: #0D1117;
-  color: #E6EDF3;
+  background: var(--color-navy);
+  color: var(--color-white);
   font-family: var(--font-geist), Arial, sans-serif;
 }
 
-#dashboard-shell { background: #0D1117; }
-#main-content    { background: #0D1117; color: #E6EDF3; }
+#dashboard-shell { background: var(--color-navy); }
+#main-content    { background: var(--color-navy); color: var(--color-white); }
 
 /* ── Typographie globale ── */
-h1, h2, h3, h4, h5, h6 { color: #E6EDF3; }
-p { color: #E6EDF3; }
-label { color: #8B949E; }
+h1, h2, h3, h4, h5, h6 { color: var(--color-white); }
+p { color: var(--color-white); }
+label { color: rgba(255,255,255,0.6); }
 a { color: inherit; }
 
 /* ── Inputs ── */
 input, textarea, select {
-  background-color: #161B22;
-  border-color: #30363D;
-  color: #E6EDF3;
+  background-color: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--color-white);
 }
-input::placeholder, textarea::placeholder { color: #484F58; }
-select option { background-color: #21262D; color: #E6EDF3; }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.3); }
+select option { background-color: #0f1e3d; color: var(--color-white); }
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #8B0073;
-  box-shadow: 0 0 0 2px rgba(139,0,115,0.22);
+  border-color: var(--color-violet);
+  box-shadow: 0 0 0 2px rgba(139,0,112,0.25);
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #E6EDF3;
-  -webkit-box-shadow: 0 0 0 1000px #161B22 inset;
-  caret-color: #E6EDF3;
+  -webkit-text-fill-color: var(--color-white);
+  -webkit-box-shadow: 0 0 0 1000px #0f1e3d inset;
+  caret-color: var(--color-white);
 }
 
 /* ── Sélection ── */
-::selection { background: rgba(139,0,115,0.35); color: #FFFFFF; }
+::selection { background: rgba(139,0,112,0.35); color: var(--color-white); }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #0D1117; }
-::-webkit-scrollbar-thumb { background: #30363D; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #8B0073; }
+::-webkit-scrollbar-track { background: var(--color-navy); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-violet); }
 
-/* ── Ombres ── */
-.shadow-xl  { box-shadow: 0 2px 16px rgba(0,0,0,0.5) !important; }
-.shadow-2xl { box-shadow: 0 4px 32px rgba(0,0,0,0.6) !important; }
+/* ── Ombres — neutres, aucune couleur ── */
+.shadow-xl  { box-shadow: 0 2px 16px rgba(0,0,0,0.4) !important; }
+.shadow-2xl { box-shadow: 0 4px 32px rgba(0,0,0,0.5) !important; }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   HEADER — force fond sombre (source encore partiellement blanc)
+   HEADER — fond navy
 ══════════════════════════════════════════════════════════════════════════ */
 header {
-  background-color: #161B22 !important;
-  border-color: #30363D !important;
+  background-color: var(--color-navy) !important;
+  border-color: rgba(255,255,255,0.1) !important;
 }
-header * { color: #E6EDF3; }
+header * { color: var(--color-white); }
 header .bg-white,
-header [class*="bg-white"] { background-color: #21262D !important; }
+header [class*="bg-white"] { background-color: rgba(255,255,255,0.06) !important; }
 header input,
-header textarea { background-color: #0D1117 !important; border-color: #30363D !important; color: #E6EDF3 !important; }
-header input::placeholder { color: #484F58 !important; }
-header .absolute { background-color: #1C2128 !important; border-color: #30363D !important; }
-header .absolute * { color: #E6EDF3 !important; }
-header .absolute .hover\:bg-\[#F0F4FF\]:hover { background-color: #21262D !important; }
-/* logo/badge accents keep their brand color */
-header [style*="#8B0073"],
-header [style*="#F0A30A"],
-header [style*="#F01F38"],
-header [style*="#F07900"] { color: inherit !important; }
-header .text-\[#F0A30A\] { color: #F0A30A !important; }
+header textarea {
+  background-color: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.15) !important;
+  color: var(--color-white) !important;
+}
+header input::placeholder { color: rgba(255,255,255,0.3) !important; }
+header .absolute { background-color: #0f1e3d !important; border-color: rgba(255,255,255,0.1) !important; }
+header .absolute * { color: var(--color-white) !important; }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   COULEURS TAILWIND — overrides pour garantir texte blanc partout
+   COULEURS TAILWIND — tout texte blanc sur fond sombre
 ══════════════════════════════════════════════════════════════════════════ */
+.text-gray-900, .text-gray-800, .text-gray-700 { color: var(--color-white) !important; }
+.text-gray-600, .text-gray-500 { color: rgba(255,255,255,0.6) !important; }
+.text-gray-400, .text-gray-300 { color: rgba(255,255,255,0.4) !important; }
+.text-neutral-900, .text-neutral-800 { color: var(--color-white) !important; }
+.text-neutral-600, .text-neutral-500 { color: rgba(255,255,255,0.6) !important; }
+.text-black { color: var(--color-white) !important; }
 
-/* Empêche les classes gray/neutral Tailwind de mettre du texte sombre */
-.text-gray-900, .text-gray-800, .text-gray-700 { color: #E6EDF3 !important; }
-.text-gray-600, .text-gray-500 { color: #8B949E !important; }
-.text-gray-400, .text-gray-300 { color: #484F58 !important; }
-.text-neutral-900, .text-neutral-800 { color: #E6EDF3 !important; }
-.text-neutral-600, .text-neutral-500 { color: #8B949E !important; }
-.text-black { color: #E6EDF3 !important; }
-
-/* bg-white et variantes → carte sombre */
-#main-content .bg-white { background-color: #161B22 !important; }
-#main-content [class*="bg-white/"] { /* keep opacity */ }
+/* bg-white → fond navy subtil */
+#main-content .bg-white { background-color: rgba(255,255,255,0.04) !important; }
 #main-content .bg-gray-50,
-#main-content .bg-gray-100 { background-color: #161B22 !important; }
+#main-content .bg-gray-100 { background-color: rgba(255,255,255,0.04) !important; }
 
-/* Borders grises → border sombre */
+/* Borders → blanc semi-transparent */
 #main-content .border-gray-200,
-#main-content .border-gray-100 { border-color: #30363D !important; }
+#main-content .border-gray-100 { border-color: rgba(255,255,255,0.1) !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS DE SÉLECTION — sidebar & cards
+══════════════════════════════════════════════════════════════════════════ */
+.nav-item {
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+}
+.nav-item.active {
+  border-left: 4px solid var(--color-white);
+  background: rgba(255,255,255,0.08);
+  opacity: 1;
+  transform: translateX(4px);
+}
+.nav-item:not(.active) { opacity: 0.65; }
+.nav-item:not(.active):hover {
+  filter: brightness(1.1);
+  opacity: 1;
+  background: rgba(255,255,255,0.05);
+}
+
+/* Card hover scale */
+.kpi-card {
+  transition: all 0.2s ease;
+}
+.kpi-card:hover {
+  transform: scale(1.03);
+  filter: brightness(1.1);
+}

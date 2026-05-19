@@ -37,7 +37,7 @@ export interface AttestationPDFData {
 
 // ── Design ────────────────────────────────────────────────────────────────────
 
-const GOLD  = '#F0A30A'
+const GOLD  = '#F08900'
 const BLACK = '#111111'
 const GRAY  = '#6B7280'
 const WHITE = '#FFFFFF'
@@ -97,7 +97,7 @@ const s = StyleSheet.create({
   qrImg: { width: 60, height: 60 },
   qrLabel: { fontSize: 6, color: GRAY, marginTop: 3, textAlign: 'center' },
 
-  watermark: { position: 'absolute', top: '40%', left: '8%', transform: 'rotate(-35deg)', fontSize: 80, fontFamily: 'Helvetica-Bold', color: '#F0A30A06' },
+  watermark: { position: 'absolute', top: '40%', left: '8%', transform: 'rotate(-35deg)', fontSize: 80, fontFamily: 'Helvetica-Bold', color: '#F0890006' },
 })
 
 const TYPE_LABELS: Record<AttestationType, string> = {

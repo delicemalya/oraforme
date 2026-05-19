@@ -54,7 +54,7 @@ function Section({ title, icon: Icon, children }: { title: string; icon: React.E
   return (
     <div className="rounded-xl border border-white/[0.06] overflow-hidden">
       <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <Icon size={13} className="text-[#F0A30A]" />
+        <Icon size={13} className="text-[#F08900]" />
         <span className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{title}</span>
       </div>
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">{children}</div>
@@ -71,10 +71,10 @@ function Field({ label, value, onChange, placeholder, type = 'text', full = fals
       <label className="block text-xs text-[#8B949E] mb-1">{label}</label>
       {type === 'textarea' ? (
         <textarea rows={2} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 resize-none" />
+          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50 resize-none" />
       ) : (
         <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
+          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50" />
       )}
     </div>
   )
@@ -253,9 +253,9 @@ export default function ParametresPage() {
   }
 
   const btnStyle = {
-    background: saved ? 'linear-gradient(135deg,#2EA043,#238636)' : 'linear-gradient(135deg,#F0A30A,#d4880a)',
-    color: '#0D1117' as const,
-    boxShadow: saved ? '0 0 16px #2EA04340' : '0 0 16px #F0A30A35',
+    background: saved ? '#238636' : '#F08900',
+    color: '#142850' as const,
+    boxShadow: saved ? '0 0 16px #2EA04340' : '0 0 16px #F0890035',
   }
 
   return (
@@ -276,7 +276,7 @@ export default function ParametresPage() {
       {/* ── LOGO SECTION ─────────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-white/[0.06] overflow-hidden">
         <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <Upload size={13} className="text-[#F0A30A]" />
+          <Upload size={13} className="text-[#F08900]" />
           <span className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Logo de l&apos;entreprise</span>
         </div>
         <div className="p-4">
@@ -288,7 +288,7 @@ export default function ParametresPage() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={cfg.logo_url} alt="Logo" className="w-full h-full object-contain" />
               ) : (
-                <span className="text-2xl font-black text-[#F0A30A]">
+                <span className="text-2xl font-black text-[#F08900]">
                   {cfg.nom ? cfg.nom.charAt(0).toUpperCase() : 'O'}
                 </span>
               )}
@@ -304,7 +304,7 @@ export default function ParametresPage() {
                 <motion.button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo}
                   whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117' }}>
+                  style={{ background: '#F08900', color: '#142850' }}>
                   {uploadingLogo ? <Loader2 className="animate-spin" size={13} /> : <Upload size={13} />}
                   {uploadingLogo ? 'Upload en cours…' : cfg.logo_url ? 'Changer le logo' : 'Uploader un logo'}
                 </motion.button>
@@ -330,7 +330,7 @@ export default function ParametresPage() {
           <div className="mt-3 pt-3 border-t border-white/[0.06]">
             <label className="block text-xs text-[#8B949E] mb-1">Ou collez directement une URL d&apos;image</label>
             <input type="url" value={cfg.logo_url} onChange={e => set('logo_url', e.target.value)} placeholder="https://…/logo.png"
-              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
+              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50" />
           </div>
         </div>
       </div>
@@ -364,8 +364,8 @@ export default function ParametresPage() {
         <div>
           <label className="block text-xs text-[#8B949E] mb-1.5">Délai de paiement</label>
           <select value={cfg.delai_paiement} onChange={e => set('delai_paiement', Number(e.target.value))}
-            className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#F0A30A]/50">
-            {[15, 30, 45, 60, 90].map(d => <option key={d} value={d} className="bg-[#161B22]">{d} jours</option>)}
+            className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#F08900]/50">
+            {[15, 30, 45, 60, 90].map(d => <option key={d} value={d} className="bg-[#0f1e3d]">{d} jours</option>)}
           </select>
         </div>
       </Section>
@@ -373,7 +373,7 @@ export default function ParametresPage() {
       {/* ── CENTRES DE COÛTS ─────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-white/[0.06] overflow-hidden">
         <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <Layers size={13} className="text-[#F0A30A]" />
+          <Layers size={13} className="text-[#F08900]" />
           <span className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Centres de coûts</span>
           <span className="ml-auto text-[10px] text-[#484F58]">{costCenters.length} centre{costCenters.length > 1 ? 's' : ''}</span>
         </div>
@@ -386,10 +386,10 @@ export default function ParametresPage() {
             <div className="space-y-1.5">
               {costCenters.map(cc => (
                 <div key={cc.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <span className="text-xs font-mono font-bold text-[#F0A30A] w-12 shrink-0">{cc.code}</span>
-                  <span className="text-xs text-[#E6EDF3] flex-1 truncate">{cc.nom}</span>
+                  <span className="text-xs font-mono font-bold text-[#F08900] w-12 shrink-0">{cc.code}</span>
+                  <span className="text-xs text-[#FFFFFF] flex-1 truncate">{cc.nom}</span>
                   <span className="text-[10px] text-[#484F58] shrink-0">{CC_TYPE_LABELS[cc.type] ?? cc.type}</span>
-                  <button onClick={() => deleteCostCenter(cc.id)} className="shrink-0 text-[#484F58] hover:text-[#F01F38] transition-colors ml-1">
+                  <button onClick={() => deleteCostCenter(cc.id)} className="shrink-0 text-[#484F58] hover:text-[#F51E33] transition-colors ml-1">
                     <Trash2 size={12} />
                   </button>
                 </div>
@@ -402,19 +402,19 @@ export default function ParametresPage() {
             <div className="grid grid-cols-3 gap-2 mb-2">
               <input value={ccForm.code} onChange={e => setCcForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
                 placeholder="Code (RH…)" maxLength={10}
-                className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
+                className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50" />
               <input value={ccForm.nom} onChange={e => setCcForm(f => ({ ...f, nom: e.target.value }))}
                 placeholder="Nom du centre"
-                className="col-span-2 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50" />
+                className="col-span-2 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50" />
             </div>
             <div className="flex gap-2">
               <select value={ccForm.type} onChange={e => setCcForm(f => ({ ...f, type: e.target.value }))}
-                className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F0A30A]/50">
-                {CC_TYPES.map(t => <option key={t.value} value={t.value} className="bg-[#161B22]">{t.label}</option>)}
+                className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F08900]/50">
+                {CC_TYPES.map(t => <option key={t.value} value={t.value} className="bg-[#0f1e3d]">{t.label}</option>)}
               </select>
               <button onClick={saveCostCenter} disabled={ccSaving || !ccForm.code || !ccForm.nom}
                 className="px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-2 shrink-0"
-                style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117' }}>
+                style={{ background: '#F08900', color: '#142850' }}>
                 {ccSaving ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
                 Ajouter
               </button>
@@ -424,10 +424,10 @@ export default function ParametresPage() {
       </div>
 
       {/* ── FISCAL INFO ──────────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-[#F0A30A]/20 p-4" style={{ background: 'rgba(240,163,10,0.03)' }}>
+      <div className="rounded-xl border border-[#F08900]/20 p-4" style={{ background: 'rgba(240,163,10,0.03)' }}>
         <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/15 flex items-center justify-center shrink-0 mt-0.5">
-            <FileText size={14} className="text-[#F0A30A]" />
+          <div className="w-8 h-8 rounded-lg bg-[#F08900]/15 flex items-center justify-center shrink-0 mt-0.5">
+            <FileText size={14} className="text-[#F08900]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-white mb-1">Logique fiscale Congo-Brazzaville</p>

@@ -13,7 +13,7 @@ function fmtK(v: number) {
 }
 
 const TICK = { fill: '#6B7280', fontSize: 10 }
-const GRID = { stroke: '#21262D', strokeDasharray: '3 3' }
+const GRID = { stroke: '#1a2d50', strokeDasharray: '3 3' }
 
 // ── Area / multi-line trend ───────────────────────────────────────
 interface TrendSeries { dataKey: string; color: string; label?: string }
@@ -42,8 +42,8 @@ export function BiTrendChart({
         <XAxis dataKey="month" tick={TICK} axisLine={false} tickLine={false} />
         <YAxis tickFormatter={fmtK} tick={TICK} axisLine={false} tickLine={false} width={42} />
         <Tooltip
-          contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
-          labelStyle={{ color: '#E6EDF3', fontWeight: 600 }}
+          contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
+          labelStyle={{ color: '#FFFFFF', fontWeight: 600 }}
           itemStyle={{ color: '#8B949E' }}
           formatter={(v: unknown) => new Intl.NumberFormat('fr-FR').format(Number(v)) + ' FCFA'}
         />
@@ -87,8 +87,8 @@ export function BiBarChart({
         <XAxis dataKey="month" tick={TICK} axisLine={false} tickLine={false} />
         <YAxis tickFormatter={fmtK} tick={TICK} axisLine={false} tickLine={false} width={42} />
         <Tooltip
-          contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
-          labelStyle={{ color: '#E6EDF3', fontWeight: 600 }}
+          contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
+          labelStyle={{ color: '#FFFFFF', fontWeight: 600 }}
           itemStyle={{ color: '#8B949E' }}
           formatter={(v: unknown) => new Intl.NumberFormat('fr-FR').format(Number(v)) + ' FCFA'}
           cursor={{ fill: '#ffffff08' }}
@@ -123,8 +123,8 @@ export function BiCountBarChart({
         <XAxis dataKey="month" tick={TICK} axisLine={false} tickLine={false} />
         <YAxis tick={TICK} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
         <Tooltip
-          contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
-          labelStyle={{ color: '#E6EDF3', fontWeight: 600 }}
+          contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
+          labelStyle={{ color: '#FFFFFF', fontWeight: 600 }}
           cursor={{ fill: '#ffffff08' }}
         />
         <Bar dataKey={dataKey} fill={color} radius={[3, 3, 0, 0]} maxBarSize={22} />
@@ -167,10 +167,10 @@ export function BiDonutChart({
           ))}
         </Pie>
         <Tooltip
-          contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
+          contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
           formatter={(v: unknown) => { const n = Number(v); return [`${n} (${total > 0 ? Math.round((n / total) * 100) : 0}%)`, ''] }}
         />
-        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="#E6EDF3" fontSize={18} fontWeight={700}>
+        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="#FFFFFF" fontSize={18} fontWeight={700}>
           {total}
         </text>
         <text x="50%" y="50%" dy={16} textAnchor="middle" dominantBaseline="middle" fill="#6B7280" fontSize={9}>

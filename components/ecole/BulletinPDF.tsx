@@ -38,14 +38,14 @@ export interface BulletinPDFData {
 }
 
 // Colors
-const GOLD   = '#F0A30A'
+const GOLD   = '#F08900'
 const BLACK  = '#111111'
 const GRAY   = '#6B7280'
 const LGRAY  = '#F9FAFB'
 const WHITE  = '#FFFFFF'
 const MGRAY  = '#374151'
 const GREEN  = '#2EA043'
-const RED    = '#F01F38'
+const RED    = '#F51E33'
 
 const s = StyleSheet.create({
   page: { padding: 36, backgroundColor: WHITE, fontFamily: 'Helvetica', fontSize: 9, color: BLACK },
@@ -211,10 +211,10 @@ export function BulletinPDF({ data }: { data: BulletinPDFData }) {
             <Text style={[s.resultSub, { color: moyColor }]}>/ {max}</Text>
           </View>
           {data.rang && (
-            <View style={[s.resultBox, { backgroundColor: '#F0790015', borderWidth: 1.5, borderColor: '#F07900' }]}>
-              <Text style={[s.resultLabel, { color: '#F07900' }]}>Rang de classe</Text>
-              <Text style={[s.resultValue, { color: '#F07900' }]}>{data.rang}</Text>
-              {data.effectif_classe && <Text style={[s.resultSub, { color: '#F07900' }]}>/ {data.effectif_classe} élèves</Text>}
+            <View style={[s.resultBox, { backgroundColor: '#F0890015', borderWidth: 1.5, borderColor: '#F08900' }]}>
+              <Text style={[s.resultLabel, { color: '#F08900' }]}>Rang de classe</Text>
+              <Text style={[s.resultValue, { color: '#F08900' }]}>{data.rang}</Text>
+              {data.effectif_classe && <Text style={[s.resultSub, { color: '#F08900' }]}>/ {data.effectif_classe} élèves</Text>}
             </View>
           )}
           <View style={[s.resultBox, { backgroundColor: GOLD + '15', borderWidth: 1.5, borderColor: GOLD }]}>

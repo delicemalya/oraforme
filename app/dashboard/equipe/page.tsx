@@ -49,38 +49,38 @@ type ModuleDef = { id: string; label: string; sublabel: string; icon: LucideIcon
 
 const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
   ecole: [
-    { id: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,     color: '#F0A30A' },
-    { id: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,      color: '#F07900' },
-    { id: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,          color: '#0D2147' },
-    { id: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA',                icon: Calculator,     color: '#8B0073' },
-    { id: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap,  color: '#0D2147' },
-    { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#8B0073' },
-    { id: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,            color: '#F97316' },
+    { id: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,     color: '#F08900' },
+    { id: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,      color: '#F08900' },
+    { id: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,          color: '#142850' },
+    { id: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA',                icon: Calculator,     color: '#8B0070' },
+    { id: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap,  color: '#142850' },
+    { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#8B0070' },
+    { id: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,            color: '#F08900' },
   ],
   restaurant: [
-    { id: 'pos',        label: 'Caisse POS',  sublabel: 'Ventes',     icon: ChefHat,   color: '#F0A30A' },
-    { id: 'stock',      label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0D2147' },
-    { id: 'rh',         label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F07900' },
-    { id: 'tresorerie', label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0073' },
-    { id: 'miaa',       label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F97316' },
+    { id: 'pos',        label: 'Caisse POS',  sublabel: 'Ventes',     icon: ChefHat,   color: '#F08900' },
+    { id: 'stock',      label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#142850' },
+    { id: 'rh',         label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F08900' },
+    { id: 'tresorerie', label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0070' },
+    { id: 'miaa',       label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F08900' },
   ],
   commerce: [
-    { id: 'facturation', label: 'Facturation', sublabel: 'Devis',      icon: FileText,  color: '#F0A30A' },
-    { id: 'stock',       label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0D2147' },
-    { id: 'rh',          label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F07900' },
-    { id: 'tresorerie',  label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0073' },
-    { id: 'miaa',        label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F97316' },
+    { id: 'facturation', label: 'Facturation', sublabel: 'Devis',      icon: FileText,  color: '#F08900' },
+    { id: 'stock',       label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#142850' },
+    { id: 'rh',          label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F08900' },
+    { id: 'tresorerie',  label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0070' },
+    { id: 'miaa',        label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F08900' },
   ],
   default: [
-    { id: 'facturation',  label: 'Facturation',  sublabel: '',          icon: FileText,  color: '#F0A30A' },
-    { id: 'stock',        label: 'Stock',        sublabel: '',          icon: Package,   color: '#0D2147' },
-    { id: 'rh',           label: 'RH',           sublabel: '',          icon: Users,     color: '#F07900' },
-    { id: 'tresorerie',   label: 'Trésorerie',   sublabel: '',          icon: Wallet,    color: '#8B0073' },
-    { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#8B0073' },
-    { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#0D2147' },
-    { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#8B0073' },
-    { id: 'transport',    label: 'Transport',    sublabel: '',          icon: Truck,     color: '#F97316' },
-    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#0D2147' },
+    { id: 'facturation',  label: 'Facturation',  sublabel: '',          icon: FileText,  color: '#F08900' },
+    { id: 'stock',        label: 'Stock',        sublabel: '',          icon: Package,   color: '#142850' },
+    { id: 'rh',           label: 'RH',           sublabel: '',          icon: Users,     color: '#F08900' },
+    { id: 'tresorerie',   label: 'Trésorerie',   sublabel: '',          icon: Wallet,    color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#8B0070' },
+    { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#142850' },
+    { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#8B0070' },
+    { id: 'transport',    label: 'Transport',    sublabel: '',          icon: Truck,     color: '#F08900' },
+    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#142850' },
   ],
 }
 
@@ -88,7 +88,7 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
 
 function RoleBadge({ role }: { role: Role }) {
   const cfg = {
-    owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-[#F07900] border-amber-500/20' },
+    owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-[#F08900] border-amber-500/20' },
     admin:  { label: 'Administrateur', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
     membre: { label: 'Membre',         cls: 'bg-white/5 text-white/40 border-white/10' },
   }
@@ -108,7 +108,7 @@ function Toggle({ checked, onChange, disabled }: {
       onClick={() => !disabled && onChange(!checked)}
       disabled={disabled}
       className={`relative w-8 h-4 rounded-full transition-colors ${
-        checked ? 'bg-[#0D2147]' : 'bg-white/10'
+        checked ? 'bg-[#142850]' : 'bg-white/10'
       } ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
     >
       <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${
@@ -312,7 +312,7 @@ export default function EquipePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <UsersRound size={20} className="text-[#F07900]" />
+            <UsersRound size={20} className="text-[#F08900]" />
             Gestion de l'équipe
           </h1>
           <p className="text-sm text-white/40 mt-0.5">
@@ -321,7 +321,7 @@ export default function EquipePage() {
         </div>
         <button
           onClick={() => setInviteOpen(true)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#F07900] text-sm hover:bg-amber-500/30 transition"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#F08900] text-sm hover:bg-amber-500/30 transition"
         >
           <Plus size={14} />
           Inviter un membre
@@ -343,10 +343,10 @@ export default function EquipePage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-[#161B22] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md"
+              className="bg-[#0f1e3d] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md"
             >
               <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-                <Send size={16} className="text-[#F07900]" />
+                <Send size={16} className="text-[#F08900]" />
                 Inviter un membre
               </h2>
 
@@ -391,7 +391,7 @@ export default function EquipePage() {
 
                 {inviteMsg && (
                   <div className={`flex items-center gap-2 text-sm rounded-lg px-3 py-2 ${
-                    inviteMsg.ok ? 'bg-[#0D2147]/10 text-[#A8C4E4]' : 'bg-red-500/10 text-red-400'
+                    inviteMsg.ok ? 'bg-[#142850]/10 text-[#A8C4E4]' : 'bg-red-500/10 text-red-400'
                   }`}>
                     {inviteMsg.ok ? <Check size={14} /> : <X size={14} />}
                     {inviteMsg.text}
@@ -409,7 +409,7 @@ export default function EquipePage() {
                 <button
                   onClick={sendInvite}
                   disabled={!inviteEmail.trim() || inviting}
-                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#F07900] disabled:opacity-40 transition flex items-center justify-center gap-2"
+                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#F08900] disabled:opacity-40 transition flex items-center justify-center gap-2"
                 >
                   {inviting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                   Envoyer
@@ -440,7 +440,7 @@ export default function EquipePage() {
                 }`}
               >
                 <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
-                  <span className="text-xs font-bold text-[#F07900]">
+                  <span className="text-xs font-bold text-[#F08900]">
                     {(member.prenom?.[0] ?? member.nom?.[0] ?? '?').toUpperCase()}
                   </span>
                 </div>
@@ -482,7 +482,7 @@ export default function EquipePage() {
             </div>
           ) : selected.role === 'owner' ? (
             <div className="flex flex-col items-center justify-center h-64 bg-white/[0.02] border border-white/[0.06] rounded-xl text-center">
-              <Shield size={28} className="text-[#F07900]/40 mb-3" />
+              <Shield size={28} className="text-[#F08900]/40 mb-3" />
               <p className="text-sm text-white/50 font-medium">
                 {selected.prenom} {selected.nom}
               </p>
@@ -497,7 +497,7 @@ export default function EquipePage() {
               <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center">
-                    <span className="text-sm font-bold text-[#F07900]">
+                    <span className="text-sm font-bold text-[#F08900]">
                       {(selected.prenom?.[0] ?? '?').toUpperCase()}
                     </span>
                   </div>
@@ -605,7 +605,7 @@ export default function EquipePage() {
                   <button
                     onClick={savePerms}
                     disabled={saving}
-                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#F07900] disabled:opacity-40 transition"
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#F08900] disabled:opacity-40 transition"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     Enregistrer les permissions

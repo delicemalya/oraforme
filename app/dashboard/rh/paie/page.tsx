@@ -232,8 +232,8 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
 
 function StatutBulletin({ statut }: { statut: string }) {
   const MAP: Record<string, { label: string; color: string; bg: string }> = {
-    generee: { label: 'Générée',  color: '#F0A30A', bg: '#F0A30A18' },
-    validee: { label: 'Validée',  color: '#F07900', bg: '#F0790018' },
+    generee: { label: 'Générée',  color: '#F08900', bg: '#F0890018' },
+    validee: { label: 'Validée',  color: '#F08900', bg: '#F0890018' },
     payee:   { label: 'Payée',    color: '#2EA043', bg: '#2EA04318' },
   }
   const s = MAP[statut] ?? MAP.generee
@@ -257,7 +257,7 @@ function NumInput({ value, onChange, disabled }: {
       onChange={e => onChange(Number(e.target.value) || 0)}
       disabled={disabled}
       className="w-24 bg-white/[0.06] border border-white/10 rounded-md px-2 py-1 text-xs text-white text-right
-                 focus:outline-none focus:border-[#F07900]/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                 focus:outline-none focus:border-[#F08900]/60 disabled:opacity-40 disabled:cursor-not-allowed"
     />
   )
 }
@@ -484,14 +484,14 @@ export default function PaiePage() {
             <ChevronLeft size={14} />
           </button>
           <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5">
-            <Calendar size={13} className="text-[#F07900]" />
+            <Calendar size={13} className="text-[#F08900]" />
             <select
               value={mois}
               onChange={e => setMois(Number(e.target.value))}
               className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
             >
               {MOIS_LABELS.slice(1).map((m, i) => (
-                <option key={i+1} value={i+1} className="bg-[#161B22]">{m}</option>
+                <option key={i+1} value={i+1} className="bg-[#0f1e3d]">{m}</option>
               ))}
             </select>
             <select
@@ -500,7 +500,7 @@ export default function PaiePage() {
               className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
             >
               {[2023, 2024, 2025, 2026].map(y => (
-                <option key={y} value={y} className="bg-[#161B22]">{y}</option>
+                <option key={y} value={y} className="bg-[#0f1e3d]">{y}</option>
               ))}
             </select>
           </div>
@@ -528,9 +528,9 @@ export default function PaiePage() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-3 bg-[#F0A30A]/10 border border-[#F0A30A]/30 rounded-xl px-4 py-3">
-              <AlertTriangle size={15} className="text-[#F0A30A] shrink-0" />
-              <p className="text-sm text-[#F0A30A]">
+            <div className="flex items-center gap-3 bg-[#F08900]/10 border border-[#F08900]/30 rounded-xl px-4 py-3">
+              <AlertTriangle size={15} className="text-[#F08900] shrink-0" />
+              <p className="text-sm text-[#F08900]">
                 La paie de <strong>{MOIS_LABELS[mois]} {annee}</strong> n&apos;a pas encore été générée.
                 Vérifiez les primes et heures supplémentaires puis cliquez sur &quot;Générer toutes les paies&quot;.
               </p>
@@ -545,7 +545,7 @@ export default function PaiePage() {
           label="Masse salariale brute"
           value={`${fmt(totalBrut)} FCFA`}
           sub={`${rows.length} employés actifs`}
-          color="#F07900"
+          color="#F08900"
           icon={DollarSign}
         />
         <KpiCard
@@ -559,14 +559,14 @@ export default function PaiePage() {
           label="Charges patronales CNSS"
           value={`${fmt(totalPatro)} FCFA`}
           sub="Taux 14,16 % plafonné"
-          color="#F0A30A"
+          color="#F08900"
           icon={Building2}
         />
         <KpiCard
           label="Coût total employeur"
           value={`${fmt(totalCout)} FCFA`}
           sub={`IRPP total : ${fmt(totalIRPP)} FCFA`}
-          color="#F01F38"
+          color="#F51E33"
           icon={Users}
         />
       </div>
@@ -581,11 +581,11 @@ export default function PaiePage() {
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
           style={{
             background: saved
-              ? 'linear-gradient(135deg, #2EA043, #238636)'
-              : 'linear-gradient(135deg, #F07900, #1a6fd8)',
+              ? '#238636'
+              : '#F08900',
             boxShadow: saved
               ? '0 0 20px #2EA04340'
-              : '0 0 20px #F0790040',
+              : '0 0 20px #F0890040',
           }}
         >
           {saving ? (
@@ -692,12 +692,12 @@ export default function PaiePage() {
                     </td>
 
                     {/* CNSS salarié */}
-                    <td className="px-3 py-3 text-right text-xs text-[#F01F38]">
+                    <td className="px-3 py-3 text-right text-xs text-[#F51E33]">
                       −{fmt(row.cnss_salarie)}
                     </td>
 
                     {/* IRPP */}
-                    <td className="px-3 py-3 text-right text-xs text-[#F0A30A]">
+                    <td className="px-3 py-3 text-right text-xs text-[#F08900]">
                       −{fmt(row.irpp)}
                     </td>
 
@@ -718,12 +718,12 @@ export default function PaiePage() {
                         onChange={e => updateStatut(row.employe_id, e.target.value as 'generee' | 'validee' | 'payee')}
                         className="bg-transparent text-[10px] focus:outline-none cursor-pointer"
                         style={{
-                          color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#F07900' : '#F0A30A',
+                          color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#F08900' : '#F08900',
                         }}
                       >
-                        <option value="generee"  className="bg-[#161B22] text-[#F0A30A]">Générée</option>
-                        <option value="validee"  className="bg-[#161B22] text-[#F07900]">Validée</option>
-                        <option value="payee"    className="bg-[#161B22] text-[#2EA043]">Payée</option>
+                        <option value="generee"  className="bg-[#0f1e3d] text-[#F08900]">Générée</option>
+                        <option value="validee"  className="bg-[#0f1e3d] text-[#F08900]">Validée</option>
+                        <option value="payee"    className="bg-[#0f1e3d] text-[#2EA043]">Payée</option>
                       </select>
                     </td>
 
@@ -760,10 +760,10 @@ export default function PaiePage() {
                   <td className="px-3 py-3 text-right text-xs font-bold text-white">
                     {fmt(totalBrut)}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F01F38]">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F51E33]">
                     −{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F0A30A]">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F08900]">
                     −{fmt(totalIRPP)}
                   </td>
                   <td className="px-3 py-3 text-right text-xs font-bold text-[#2EA043]">
@@ -800,11 +800,11 @@ export default function PaiePage() {
               </div>
               <div>
                 <p className="text-[10px] text-[#8B949E]">CNSS salarié total</p>
-                <p className="font-bold text-[#F01F38]">{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))} FCFA</p>
+                <p className="font-bold text-[#F51E33]">{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))} FCFA</p>
               </div>
               <div>
                 <p className="text-[10px] text-[#8B949E]">IRPP total</p>
-                <p className="font-bold text-[#F0A30A]">{fmt(totalIRPP)} FCFA</p>
+                <p className="font-bold text-[#F08900]">{fmt(totalIRPP)} FCFA</p>
               </div>
               <div>
                 <p className="text-[10px] text-[#8B949E]">Net à payer</p>

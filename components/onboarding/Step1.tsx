@@ -58,7 +58,7 @@ export default function Step1() {
         </motion.div>
 
         <h1 className="text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight">
-          <span className="text-[#E6EDF3]">Votre espace prêt en</span>
+          <span className="text-[#FFFFFF]">Votre espace prêt en</span>
           <br />
           <span className="bg-gradient-to-r from-yellow-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">
             30 secondes
@@ -144,7 +144,7 @@ export default function Step1() {
                       className="absolute top-3.5 right-3.5 w-5 h-5 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-[0_2px_8px_rgba(250,204,21,0.4)]"
                     >
                       <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-                        <path d="M1 3.5L3.2 5.8L8 1" stroke="#0D1117" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M1 3.5L3.2 5.8L8 1" stroke="#142850" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </motion.div>
                   )}
@@ -165,7 +165,7 @@ export default function Step1() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ type: "spring", stiffness: 320, damping: 26 }}
-              className="flex items-center gap-3 bg-[#0D1117] border border-yellow-400/20 rounded-2xl px-5 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+              className="flex items-center gap-3 bg-[#142850] border border-yellow-400/20 rounded-2xl px-5 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
             >
               <div className="w-8 h-8 rounded-xl bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center text-sm shrink-0">
                 ✨
@@ -216,7 +216,7 @@ export default function Step1() {
           disabled={!selected}
           className={`relative px-10 py-3.5 rounded-2xl font-semibold text-sm overflow-hidden transition-all duration-400
             ${selected
-              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0D1117] shadow-[0_8px_32px_rgba(250,204,21,0.3)] cursor-pointer"
+              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#142850] shadow-[0_8px_32px_rgba(250,204,21,0.3)] cursor-pointer"
               : "bg-white/[0.04] text-[#30363D] border border-white/[0.07] cursor-default"
             }`}
         >
@@ -239,7 +239,7 @@ export default function Step1() {
           </span>
         </motion.button>
 
-        <p className="text-xs text-[#21262D]">Vous pourrez modifier ces choix plus tard</p>
+        <p className="text-xs text-[#1a2d50]">Vous pourrez modifier ces choix plus tard</p>
       </motion.div>
     </div>
   );

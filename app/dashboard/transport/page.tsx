@@ -39,16 +39,16 @@ type Course = {
 }
 
 const STATUTS_CHAUFFEUR: Record<string, { label: string; color: string; bg: string }> = {
-  actif:     { label: 'Disponible', color: '#0D2147', bg: '#0D214718' },
+  actif:     { label: 'Disponible', color: '#142850', bg: '#14285018' },
   inactif:   { label: 'Inactif',    color: '#484F58', bg: '#484F5818' },
-  en_course: { label: 'En course',  color: '#F0A30A', bg: '#F0A30A18' },
+  en_course: { label: 'En course',  color: '#F08900', bg: '#F0890018' },
 }
 
 const STATUTS_COURSE: Record<string, { label: string; color: string; bg: string }> = {
-  en_attente: { label: 'En attente', color: '#F07900', bg: '#F0790018' },
-  en_cours:   { label: 'En cours',   color: '#F0A30A', bg: '#F0A30A18' },
-  terminee:   { label: 'Terminée',   color: '#0D2147', bg: '#0D214718' },
-  annulee:    { label: 'Annulée',    color: '#F01F38', bg: '#F01F3818' },
+  en_attente: { label: 'En attente', color: '#F08900', bg: '#F0890018' },
+  en_cours:   { label: 'En cours',   color: '#F08900', bg: '#F0890018' },
+  terminee:   { label: 'Terminée',   color: '#142850', bg: '#14285018' },
+  annulee:    { label: 'Annulée',    color: '#F51E33', bg: '#F51E3318' },
 }
 
 const TABS = ['Courses', 'Chauffeurs', 'Statistiques']
@@ -187,22 +187,22 @@ export default function TransportPage() {
       {/* ── Header ── */}
       <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3] flex items-center gap-2">
-            <Truck size={20} className="text-[#F0A30A]" /> Transport VTC
+          <h1 className="text-xl font-bold text-[#FFFFFF] flex items-center gap-2">
+            <Truck size={20} className="text-[#F08900]" /> Transport VTC
           </h1>
           <p className="text-xs text-[#8B949E] mt-0.5">Gestion de flotte, courses et chauffeurs</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setModal('chauffeur')}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#484F58] hover:text-[#E6EDF3] transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#0f1e3d] border border-[#30363D] rounded-xl hover:border-[#484F58] hover:text-[#FFFFFF] transition-all"
           >
             <User size={11} /> Nouveau chauffeur
           </button>
           <button
             onClick={() => setModal('course')}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#0D1117] rounded-xl hover:opacity-90 transition-all"
-            style={{ background: 'linear-gradient(135deg, #F0A30A, #d4880a)' }}
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#142850] rounded-xl hover:opacity-90 transition-all"
+            style={{ background: '#F08900' }}
           >
             <Plus size={11} /> Nouvelle course
           </button>
@@ -212,15 +212,15 @@ export default function TransportPage() {
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 auto-rows-[120px]">
         {[
-          { label: 'Total courses', value: totalCourses, icon: Navigation, grad: 'linear-gradient(135deg,#071535,#0D2147,#1A3570)', i: 0 },
-          { label: 'Terminées', value: coursesTerminees, icon: CheckCircle, grad: 'linear-gradient(135deg,#4A0040,#8B0073,#8B0073)', i: 1 },
-          { label: "Chiffre d'affaires", value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: 'linear-gradient(135deg,#7A3800,#C06000,#F07900)', i: 2 },
-          { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: 'linear-gradient(135deg,#4A0040,#8B0073,#8B0073)', i: 3 },
+          { label: 'Total courses', value: totalCourses, icon: Navigation, grad: '#142850', i: 0 },
+          { label: 'Terminées', value: coursesTerminees, icon: CheckCircle, grad: '#8B0070', i: 1 },
+          { label: "Chiffre d'affaires", value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: '#F08900', i: 2 },
+          { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: '#8B0070', i: 3 },
         ].map(k => {
           const Icon = k.icon
           return (
             <motion.div key={k.label} {...fadeUp(k.i)} className="relative rounded-2xl p-4 overflow-hidden flex flex-col justify-between" style={{ background: k.grad }}>
-              <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 80% 20%,rgba(255,255,255,.12) 0%,transparent 60%)' }} />
+              <div className="absolute inset-0" style={{ background: 'transparent' }} />
               <div className="relative flex items-start justify-between">
                 <p className="text-white/70 text-[11px] font-semibold uppercase tracking-wider">{k.label}</p>
                 <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
@@ -234,13 +234,13 @@ export default function TransportPage() {
       </div>
 
       {/* ── Tabs ── */}
-      <div className="flex gap-1 bg-[#161B22] border border-[#21262D] rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-[#0f1e3d] border border-[#1a2d50] rounded-xl p-1 w-fit">
         {TABS.map((tab_, i) => (
           <button
             key={tab_}
             onClick={() => setTab(i)}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-              tab === i ? 'bg-[#F0A30A] text-[#0D1117]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+              tab === i ? 'bg-[#F08900] text-[#142850]' : 'text-[#8B949E] hover:text-[#FFFFFF]'
             }`}
           >
             {tab_}
@@ -250,7 +250,7 @@ export default function TransportPage() {
 
       {loading && (
         <div className="flex items-center justify-center py-20">
-          <Loader2 size={24} className="text-[#F0A30A] animate-spin" />
+          <Loader2 size={24} className="text-[#F08900] animate-spin" />
         </div>
       )}
 
@@ -265,8 +265,8 @@ export default function TransportPage() {
                 onClick={() => setFilterStatut(s)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                   filterStatut === s
-                    ? 'border-[#F0A30A] text-[#F0A30A] bg-[#F0A30A]/10'
-                    : 'border-[#21262D] text-[#8B949E] hover:border-[#30363D]'
+                    ? 'border-[#F08900] text-[#F08900] bg-[#F08900]/10'
+                    : 'border-[#1a2d50] text-[#8B949E] hover:border-[#30363D]'
                 }`}
               >
                 {s === 'all' ? 'Toutes' : STATUTS_COURSE[s]?.label}
@@ -280,10 +280,10 @@ export default function TransportPage() {
               <p className="text-sm">Aucune course enregistrée</p>
             </div>
           ) : (
-            <div className="bg-[#161B22] border border-[#21262D] rounded-2xl overflow-hidden">
+            <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#21262D]" style={{ background: 'rgba(255,255,255,.01)' }}>
+                  <tr className="border-b border-[#1a2d50]" style={{ background: 'rgba(255,255,255,.01)' }}>
                     <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">Client</th>
                     <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider hidden sm:table-cell">Trajet</th>
                     <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider hidden md:table-cell">Chauffeur</th>
@@ -301,20 +301,20 @@ export default function TransportPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: i * 0.03 }}
-                        className="border-b border-[#21262D] hover:bg-[#21262D]/40 transition-colors"
+                        className="border-b border-[#1a2d50] hover:bg-[#1a2d50]/40 transition-colors"
                       >
                         <td className="px-4 py-3">
-                          <p className="text-xs font-semibold text-[#E6EDF3]">{c.client_nom}</p>
+                          <p className="text-xs font-semibold text-[#FFFFFF]">{c.client_nom}</p>
                           <p className="text-[10px] text-[#484F58] flex items-center gap-1">
                             <Phone size={9} /> {c.client_tel}
                           </p>
                         </td>
                         <td className="px-4 py-3 hidden sm:table-cell">
                           <div className="flex items-center gap-1 text-[11px] text-[#8B949E]">
-                            <MapPin size={10} className="text-[#0D2147]" /> {c.depart}
+                            <MapPin size={10} className="text-[#142850]" /> {c.depart}
                           </div>
                           <div className="flex items-center gap-1 text-[11px] text-[#8B949E]">
-                            <MapPin size={10} className="text-[#F01F38]" /> {c.arrivee}
+                            <MapPin size={10} className="text-[#F51E33]" /> {c.arrivee}
                           </div>
                           {c.distance_km > 0 && <p className="text-[10px] text-[#484F58]">{c.distance_km} km</p>}
                         </td>
@@ -322,7 +322,7 @@ export default function TransportPage() {
                           <p className="text-xs text-[#8B949E]">{c.chauffeur_nom ?? '—'}</p>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <p className="text-sm font-bold text-[#E6EDF3]">{fmtFCFA(c.tarif)}</p>
+                          <p className="text-sm font-bold text-[#FFFFFF]">{fmtFCFA(c.tarif)}</p>
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -337,7 +337,7 @@ export default function TransportPage() {
                             {c.statut === 'en_attente' && (
                               <button
                                 onClick={() => updateStatutCourse(c.id, 'en_cours', c.chauffeur_id)}
-                                className="text-[10px] px-2 py-1 rounded-lg bg-[#F0A30A]/10 text-[#F0A30A] hover:bg-[#F0A30A]/20 transition-all"
+                                className="text-[10px] px-2 py-1 rounded-lg bg-[#F08900]/10 text-[#F08900] hover:bg-[#F08900]/20 transition-all"
                               >
                                 Démarrer
                               </button>
@@ -345,7 +345,7 @@ export default function TransportPage() {
                             {c.statut === 'en_cours' && (
                               <button
                                 onClick={() => updateStatutCourse(c.id, 'terminee', c.chauffeur_id)}
-                                className="text-[10px] px-2 py-1 rounded-lg bg-[#0D2147]/10 text-[#0D2147] hover:bg-[#0D2147]/20 transition-all"
+                                className="text-[10px] px-2 py-1 rounded-lg bg-[#142850]/10 text-[#142850] hover:bg-[#142850]/20 transition-all"
                               >
                                 Terminer
                               </button>
@@ -353,7 +353,7 @@ export default function TransportPage() {
                             {(c.statut === 'en_attente' || c.statut === 'en_cours') && (
                               <button
                                 onClick={() => updateStatutCourse(c.id, 'annulee', c.chauffeur_id)}
-                                className="text-[10px] px-2 py-1 rounded-lg bg-[#F01F38]/10 text-[#F01F38] hover:bg-[#F01F38]/20 transition-all"
+                                className="text-[10px] px-2 py-1 rounded-lg bg-[#F51E33]/10 text-[#F51E33] hover:bg-[#F51E33]/20 transition-all"
                               >
                                 Annuler
                               </button>
@@ -386,15 +386,15 @@ export default function TransportPage() {
                   <motion.div
                     key={ch.id}
                     {...fadeUp(i)}
-                    className="bg-[#161B22] border border-[#21262D] rounded-2xl p-4 hover:border-[#30363D] transition-all"
+                    className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-4 hover:border-[#30363D] transition-all"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#F0A30A]/20 flex items-center justify-center">
-                          <span className="text-[#F0A30A] font-bold text-sm">{ch.nom.charAt(0).toUpperCase()}</span>
+                        <div className="w-10 h-10 rounded-full bg-[#F08900]/20 flex items-center justify-center">
+                          <span className="text-[#F08900] font-bold text-sm">{ch.nom.charAt(0).toUpperCase()}</span>
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-[#E6EDF3]">{ch.nom}</p>
+                          <p className="text-sm font-semibold text-[#FFFFFF]">{ch.nom}</p>
                           <p className="text-[10px] text-[#484F58] flex items-center gap-1">
                             <Phone size={9} /> {ch.telephone}
                           </p>
@@ -417,14 +417,14 @@ export default function TransportPage() {
                         <span>Permis: {ch.permis}</span>
                       </div>
                     </div>
-                    <div className="mt-3 pt-3 border-t border-[#21262D] flex gap-2">
+                    <div className="mt-3 pt-3 border-t border-[#1a2d50] flex gap-2">
                       <button
                         onClick={async () => {
                           const next = ch.statut === 'actif' ? 'inactif' : 'actif'
                           await supabase.from('chauffeurs').update({ statut: next }).eq('id', ch.id)
                           load()
                         }}
-                        className="flex-1 text-[10px] py-1.5 rounded-lg border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] hover:border-[#484F58] transition-all"
+                        className="flex-1 text-[10px] py-1.5 rounded-lg border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] hover:border-[#484F58] transition-all"
                       >
                         {ch.statut === 'actif' ? 'Désactiver' : 'Activer'}
                       </button>
@@ -442,25 +442,25 @@ export default function TransportPage() {
         <motion.div {...fadeUp(1)} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {[
-              { label: 'Taux de réussite', value: totalCourses > 0 ? `${Math.round((coursesTerminees / totalCourses) * 100)}%` : '—', icon: TrendingUp, color: '#0D2147' },
-              { label: 'Courses en attente', value: courses.filter(c => c.statut === 'en_attente').length, icon: Clock, color: '#F07900' },
-              { label: 'Courses annulées', value: courses.filter(c => c.statut === 'annulee').length, icon: AlertCircle, color: '#F01F38' },
+              { label: 'Taux de réussite', value: totalCourses > 0 ? `${Math.round((coursesTerminees / totalCourses) * 100)}%` : '—', icon: TrendingUp, color: '#142850' },
+              { label: 'Courses en attente', value: courses.filter(c => c.statut === 'en_attente').length, icon: Clock, color: '#F08900' },
+              { label: 'Courses annulées', value: courses.filter(c => c.statut === 'annulee').length, icon: AlertCircle, color: '#F51E33' },
             ].map((s, i) => {
               const Icon = s.icon
               return (
-                <motion.div key={s.label} {...fadeUp(i)} className="bg-[#161B22] border border-[#21262D] rounded-2xl p-4">
+                <motion.div key={s.label} {...fadeUp(i)} className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon size={16} style={{ color: s.color }} />
                     <p className="text-xs text-[#8B949E]">{s.label}</p>
                   </div>
-                  <p className="text-2xl font-bold text-[#E6EDF3]">{s.value}</p>
+                  <p className="text-2xl font-bold text-[#FFFFFF]">{s.value}</p>
                 </motion.div>
               )
             })}
           </div>
 
-          <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-4">
-            <p className="text-sm font-bold text-[#E6EDF3] mb-4">Revenus par chauffeur</p>
+          <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-4">
+            <p className="text-sm font-bold text-[#FFFFFF] mb-4">Revenus par chauffeur</p>
             {chauffeurs.length === 0 ? (
               <p className="text-xs text-[#484F58] text-center py-4">Aucun chauffeur</p>
             ) : (
@@ -472,11 +472,11 @@ export default function TransportPage() {
                     <div key={ch.id}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-[#8B949E]">{ch.nom}</span>
-                        <span className="text-xs font-bold text-[#E6EDF3]">{fmtFCFA(rev)}</span>
+                        <span className="text-xs font-bold text-[#FFFFFF]">{fmtFCFA(rev)}</span>
                       </div>
-                      <div className="h-1.5 bg-[#21262D] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[#1a2d50] rounded-full overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-[#F0A30A]"
+                          className="h-full rounded-full bg-[#F08900]"
                           initial={{ width: 0 }}
                           animate={{ width: `${pct}%` }}
                           transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -501,11 +501,11 @@ export default function TransportPage() {
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-lg shadow-2xl"
+              className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-lg shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-bold text-[#E6EDF3]">Nouvelle course</h2>
-                <button onClick={() => setModal(null)} className="text-[#484F58] hover:text-[#E6EDF3] transition-colors">
+                <h2 className="text-base font-bold text-[#FFFFFF]">Nouvelle course</h2>
+                <button onClick={() => setModal(null)} className="text-[#484F58] hover:text-[#FFFFFF] transition-colors">
                   <X size={18} />
                 </button>
               </div>
@@ -513,7 +513,7 @@ export default function TransportPage() {
                 <select
                   value={cForm.chauffeur_id}
                   onChange={e => setCForm(f => ({ ...f, chauffeur_id: e.target.value }))}
-                  className="w-full bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3]"
+                  className="w-full bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF]"
                 >
                   <option value="">Sélectionner un chauffeur</option>
                   {chauffeurs.filter(c => c.statut === 'actif').map(c => (
@@ -523,38 +523,38 @@ export default function TransportPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <input placeholder="Nom client *" value={cForm.client_nom}
                     onChange={e => setCForm(f => ({ ...f, client_nom: e.target.value }))}
-                    className="bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                    className="bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                   <input placeholder="Téléphone" value={cForm.client_tel}
                     onChange={e => setCForm(f => ({ ...f, client_tel: e.target.value }))}
-                    className="bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                    className="bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                 </div>
                 <input placeholder="Point de départ *" value={cForm.depart}
                   onChange={e => setCForm(f => ({ ...f, depart: e.target.value }))}
-                  className="w-full bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                  className="w-full bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                 <input placeholder="Destination *" value={cForm.arrivee}
                   onChange={e => setCForm(f => ({ ...f, arrivee: e.target.value }))}
-                  className="w-full bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                  className="w-full bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                 <div className="grid grid-cols-3 gap-3">
                   <input placeholder="Distance (km)" type="number" value={cForm.distance_km}
                     onChange={e => setCForm(f => ({ ...f, distance_km: e.target.value }))}
-                    className="bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                    className="bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                   <input placeholder="Tarif (FCFA) *" type="number" value={cForm.tarif}
                     onChange={e => setCForm(f => ({ ...f, tarif: e.target.value }))}
-                    className="bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                    className="bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                   <input type="date" value={cForm.date}
                     onChange={e => setCForm(f => ({ ...f, date: e.target.value }))}
-                    className="bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3]" />
+                    className="bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF]" />
                 </div>
               </div>
               <div className="flex gap-3 mt-5">
-                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-sm text-[#8B949E] hover:text-[#E6EDF3] transition-all">
+                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-sm text-[#8B949E] hover:text-[#FFFFFF] transition-all">
                   Annuler
                 </button>
                 <button
                   onClick={saveCourse}
                   disabled={saving || !cForm.chauffeur_id || !cForm.depart || !cForm.arrivee}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)' }}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[#142850] disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ background: '#F08900' }}
                 >
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                   Créer la course
@@ -575,42 +575,42 @@ export default function TransportPage() {
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl"
+              className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-bold text-[#E6EDF3]">Nouveau chauffeur</h2>
-                <button onClick={() => setModal(null)} className="text-[#484F58] hover:text-[#E6EDF3] transition-colors">
+                <h2 className="text-base font-bold text-[#FFFFFF]">Nouveau chauffeur</h2>
+                <button onClick={() => setModal(null)} className="text-[#484F58] hover:text-[#FFFFFF] transition-colors">
                   <X size={18} />
                 </button>
               </div>
               <div className="space-y-3">
                 <input placeholder="Nom complet *" value={dForm.nom}
                   onChange={e => setDForm(f => ({ ...f, nom: e.target.value }))}
-                  className="w-full bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                  className="w-full bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                 <input placeholder="Téléphone" value={dForm.telephone}
                   onChange={e => setDForm(f => ({ ...f, telephone: e.target.value }))}
-                  className="w-full bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                  className="w-full bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                 <input placeholder="N° de permis" value={dForm.permis}
                   onChange={e => setDForm(f => ({ ...f, permis: e.target.value }))}
-                  className="w-full bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                  className="w-full bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                 <div className="grid grid-cols-2 gap-3">
                   <input placeholder="Modèle véhicule" value={dForm.vehicule}
                     onChange={e => setDForm(f => ({ ...f, vehicule: e.target.value }))}
-                    className="bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                    className="bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                   <input placeholder="Plaque" value={dForm.plaque}
                     onChange={e => setDForm(f => ({ ...f, plaque: e.target.value }))}
-                    className="bg-[#21262D] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58]" />
+                    className="bg-[#1a2d50] border border-[#30363D] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
                 </div>
               </div>
               <div className="flex gap-3 mt-5">
-                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-sm text-[#8B949E] hover:text-[#E6EDF3] transition-all">
+                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-sm text-[#8B949E] hover:text-[#FFFFFF] transition-all">
                   Annuler
                 </button>
                 <button
                   onClick={saveChauffeur}
                   disabled={saving || !dForm.nom}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[#0D1117] disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)' }}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[#142850] disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ background: '#F08900' }}
                 >
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                   Enregistrer

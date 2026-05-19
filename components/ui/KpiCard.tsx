@@ -54,7 +54,7 @@ export default function KpiCard({
       transition={{ duration: 0.5, delay: delay / 1000, ease: [0.23, 1, 0.32, 1] }}
       whileHover={{ scale: 1.025, y: -2, transition: { duration: 0.18 } }}
       whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-      className="relative bg-[#161B22] border border-[#30363D] rounded-xl p-4 overflow-hidden cursor-default select-none"
+      className="relative bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4 overflow-hidden cursor-default select-none"
       style={{ willChange: 'transform', transition: 'box-shadow 0.25s ease, border-color 0.25s ease' }}
       onMouseEnter={e => {
         const el = e.currentTarget as HTMLDivElement
@@ -70,13 +70,13 @@ export default function KpiCard({
       {/* Radial bg glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 0% 0%, ${color}09 0%, transparent 60%)` }}
+        style={{ background: `transparent` }}
       />
 
       <div className="flex items-start justify-between mb-3 relative">
         <div
           className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: `linear-gradient(135deg, ${color}2A, ${color}0F)` }}
+          style={{ background: `#142850` }}
         >
           <Icon size={16} style={{ color }} />
         </div>
@@ -84,8 +84,8 @@ export default function KpiCard({
           <span
             className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shrink-0"
             style={{
-              color: trendUp ? '#0D2147' : '#F01F38',
-              backgroundColor: trendUp ? '#0D214718' : '#F01F3818',
+              color: trendUp ? '#142850' : '#F51E33',
+              backgroundColor: trendUp ? '#14285018' : '#F51E3318',
             }}
           >
             {trendUp ? '▲' : '▼'} {trend}

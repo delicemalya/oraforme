@@ -51,7 +51,7 @@ function FInput({ label, ...p }: React.InputHTMLAttributes<HTMLInputElement> & {
   return (
     <div>
       {label && <label className="block text-xs text-[#8B949E] mb-1.5">{label}</label>}
-      <input {...p} className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 transition-colors" />
+      <input {...p} className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50 transition-colors" />
     </div>
   )
 }
@@ -59,7 +59,7 @@ function FSelect({ label, children, ...p }: React.SelectHTMLAttributes<HTMLSelec
   return (
     <div>
       {label && <label className="block text-xs text-[#8B949E] mb-1.5">{label}</label>}
-      <select {...p} className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50 transition-colors">
+      <select {...p} className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F08900]/50 transition-colors">
         {children}
       </select>
     </div>
@@ -69,10 +69,10 @@ function ModalShell({ title, children, onClose }: { title: string; children: Rea
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-[#E6EDF3]">{title}</h2>
-          <button onClick={onClose} className="text-[#484F58] hover:text-[#E6EDF3] transition-colors"><X size={16} /></button>
+          <h2 className="text-base font-semibold text-[#FFFFFF]">{title}</h2>
+          <button onClick={onClose} className="text-[#484F58] hover:text-[#FFFFFF] transition-colors"><X size={16} /></button>
         </div>
         {children}
       </div>
@@ -82,11 +82,11 @@ function ModalShell({ title, children, onClose }: { title: string; children: Rea
 function ModalActions({ onCancel, onSave, saving, label }: { onCancel: () => void; onSave: () => void; saving: boolean; label: string }) {
   return (
     <div className="flex gap-3 pt-2">
-      <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-sm text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+      <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-sm text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
         Annuler
       </button>
       <button onClick={onSave} disabled={saving}
-        className="flex-1 py-2.5 rounded-xl bg-[#F0A30A] text-[#0D1117] text-sm font-semibold hover:bg-[#F0A30A]/90 disabled:opacity-50 transition-colors">
+        className="flex-1 py-2.5 rounded-xl bg-[#F08900] text-[#142850] text-sm font-semibold hover:bg-[#F08900]/90 disabled:opacity-50 transition-colors">
         {saving ? 'Enregistrement…' : label}
       </button>
     </div>
@@ -301,7 +301,7 @@ export default function StockPage() {
   })
 
   if (tLoading || loading) {
-    return <div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-[#F0A30A] border-t-transparent rounded-full animate-spin" /></div>
+    return <div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-[#F08900] border-t-transparent rounded-full animate-spin" /></div>
   }
 
   return (
@@ -309,19 +309,19 @@ export default function StockPage() {
 
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-[#0D1117] border-[#0D2147]/40 text-[#E6EDF3]' : 'bg-[#0D1117] border-red-500/40 text-red-300'}`}>
-          {toast.ok ? <Check size={14} className="text-[#0D2147]" /> : <X size={14} className="text-red-400" />}
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-[#142850] border-[#142850]/40 text-[#FFFFFF]' : 'bg-[#142850] border-red-500/40 text-red-300'}`}>
+          {toast.ok ? <Check size={14} className="text-[#142850]" /> : <X size={14} className="text-red-400" />}
           {toast.msg}
         </div>
       )}
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F0A30A]/10 border border-[#F0A30A]/20 flex items-center justify-center">
-          <Package size={18} className="text-[#F0A30A]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F08900]/10 border border-[#F08900]/20 flex items-center justify-center">
+          <Package size={18} className="text-[#F08900]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Stock & Inventaire</h1>
+          <h1 className="text-xl font-bold text-[#FFFFFF]">Stock & Inventaire</h1>
           <p className="text-xs text-[#484F58]">{products.length} produits{alertes.length > 0 && <span className="ml-2 text-red-400">· {alertes.length} alerte{alertes.length > 1 ? 's' : ''}</span>}</p>
         </div>
       </div>
@@ -329,13 +329,13 @@ export default function StockPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Valeur du stock', value: fmtFCFA(valeurTotale),      gradient: 'linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F07900 100%)', Icon: TrendingUp },
-          { label: 'Produits',         value: products.length.toString(), gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', Icon: Package },
-          { label: 'En alerte',        value: alertes.length.toString(),  gradient: alertes.length > 0 ? 'linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F01F38 100%)' : 'linear-gradient(135deg,#071535 0%,#0D2147 50%,#1A3570 100%)', Icon: AlertTriangle },
-          { label: 'Fournisseurs',     value: suppliers.length.toString(),gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', Icon: Users2 },
+          { label: 'Valeur du stock', value: fmtFCFA(valeurTotale),      gradient: '#F08900', Icon: TrendingUp },
+          { label: 'Produits',         value: products.length.toString(), gradient: '#8B0070', Icon: Package },
+          { label: 'En alerte',        value: alertes.length.toString(),  gradient: alertes.length > 0 ? '#F51E33' : '#142850', Icon: AlertTriangle },
+          { label: 'Fournisseurs',     value: suppliers.length.toString(),gradient: '#8B0070', Icon: Users2 },
         ].map(k => (
           <div key={k.label} className="relative rounded-xl p-4 overflow-hidden" style={{ background: k.gradient }}>
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.10) 0%, transparent 60%)' }} />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'transparent' }} />
             <div className="relative">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-white/70 text-[10px] font-semibold uppercase tracking-wider">{k.label}</p>
@@ -350,13 +350,13 @@ export default function StockPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1">
+      <div className="flex gap-1 bg-[#0f1e3d] border border-[#30363D] rounded-xl p-1">
         {TABS.map(t => {
           const Icon = t.icon
           const active = tab === t.id
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium flex-1 justify-center transition-colors ${active ? 'bg-[#F0A30A] text-[#0D1117]' : 'text-[#484F58] hover:text-[#8B949E]'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium flex-1 justify-center transition-colors ${active ? 'bg-[#F08900] text-[#142850]' : 'text-[#484F58] hover:text-[#8B949E]'}`}
             >
               <Icon size={13} /><span className="hidden sm:inline">{t.label}</span>
             </button>
@@ -371,24 +371,24 @@ export default function StockPage() {
             <div className="relative flex-1">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#484F58]" />
               <input placeholder="Rechercher par nom, SKU…" value={search} onChange={e => setSearch(e.target.value)}
-                className="w-full bg-[#161B22] border border-[#30363D] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/40" />
+                className="w-full bg-[#0f1e3d] border border-[#30363D] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/40" />
             </div>
             <div className="flex gap-2 flex-wrap">
               {categories.map(c => (
                 <button key={c} onClick={() => setCatFilter(c)}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${catFilter === c ? 'bg-[#F0A30A]/10 text-[#F0A30A] border border-[#F0A30A]/30' : 'bg-[#161B22] border border-[#30363D] text-[#484F58] hover:text-[#E6EDF3]'}`}>
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${catFilter === c ? 'bg-[#F08900]/10 text-[#F08900] border border-[#F08900]/30' : 'bg-[#0f1e3d] border border-[#30363D] text-[#484F58] hover:text-[#FFFFFF]'}`}>
                   {c === 'tous' ? 'Tous' : c}
                 </button>
               ))}
               {alertes.length > 0 && (
                 <button onClick={() => setCatFilter(catFilter === 'alertes' ? 'tous' : 'alertes')}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${catFilter === 'alertes' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-[#161B22] border border-[#30363D] text-red-400/70 hover:text-red-400'}`}>
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${catFilter === 'alertes' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-[#0f1e3d] border border-[#30363D] text-red-400/70 hover:text-red-400'}`}>
                   <AlertTriangle size={11} /> Alertes ({alertes.length})
                 </button>
               )}
             </div>
             <button onClick={() => setMProd(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#F0A30A] text-[#0D1117] rounded-xl text-sm font-semibold hover:bg-[#F0A30A]/90 transition-colors shrink-0">
+              className="flex items-center gap-2 px-4 py-2 bg-[#F08900] text-[#142850] rounded-xl text-sm font-semibold hover:bg-[#F08900]/90 transition-colors shrink-0">
               <Plus size={14} /> Ajouter
             </button>
           </div>
@@ -400,7 +400,7 @@ export default function StockPage() {
             </div>
           ) : (
             <>
-              <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+              <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -414,17 +414,17 @@ export default function StockPage() {
                       {filtered.map((p, i) => {
                         const enAlerte = p.stock_actuel <= p.seuil_alerte
                         return (
-                          <tr key={p.id} className={`group ${i < filtered.length - 1 ? 'border-b border-[#21262D]' : ''} hover:bg-[#21262D]/50 transition-colors`}>
+                          <tr key={p.id} className={`group ${i < filtered.length - 1 ? 'border-b border-[#1a2d50]' : ''} hover:bg-[#1a2d50]/50 transition-colors`}>
                             <td className="px-4 py-3">
-                              <p className="font-medium text-[#E6EDF3]">{p.nom}</p>
+                              <p className="font-medium text-[#FFFFFF]">{p.nom}</p>
                               {p.sku && <p className="text-xs text-[#484F58]">SKU : {p.sku}</p>}
                             </td>
                             <td className="px-4 py-3 text-[#8B949E] whitespace-nowrap">{p.categorie || '—'}</td>
                             <td className="px-4 py-3 text-[#8B949E]">{p.unite}</td>
-                            <td className="px-4 py-3 text-[#E6EDF3] whitespace-nowrap">{fmtFCFA(p.prix_achat)}</td>
-                            <td className="px-4 py-3 text-[#E6EDF3] whitespace-nowrap">{fmtFCFA(p.prix_vente)}</td>
+                            <td className="px-4 py-3 text-[#FFFFFF] whitespace-nowrap">{fmtFCFA(p.prix_achat)}</td>
+                            <td className="px-4 py-3 text-[#FFFFFF] whitespace-nowrap">{fmtFCFA(p.prix_vente)}</td>
                             <td className="px-4 py-3">
-                              <span className={`font-bold ${enAlerte ? 'text-red-400' : 'text-[#E6EDF3]'}`}>{p.stock_actuel}</span>
+                              <span className={`font-bold ${enAlerte ? 'text-red-400' : 'text-[#FFFFFF]'}`}>{p.stock_actuel}</span>
                               <span className="text-xs text-[#484F58] ml-1">{p.unite}</span>
                             </td>
                             <td className="px-4 py-3">
@@ -435,11 +435,11 @@ export default function StockPage() {
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => { setMAdjust(p); setAdjForm({ ...emptyAdj, warehouse_id: warehouses[0]?.id ?? '' }) }}
-                                  className="text-xs px-2.5 py-1 rounded-lg bg-[#F0A30A]/10 text-[#F0A30A] hover:bg-[#F0A30A]/20 font-medium transition-colors whitespace-nowrap">
+                                  className="text-xs px-2.5 py-1 rounded-lg bg-[#F08900]/10 text-[#F08900] hover:bg-[#F08900]/20 font-medium transition-colors whitespace-nowrap">
                                   Ajuster
                                 </button>
                                 <button onClick={() => { setMEdit(p); setEditForm({ nom: p.nom, categorie: p.categorie ?? '', sku: p.sku ?? '', unite: p.unite, prix_achat: String(p.prix_achat), prix_vente: String(p.prix_vente), seuil_alerte: String(p.seuil_alerte) }) }}
-                                  className="text-[#484F58] hover:text-[#F07900] transition-colors">
+                                  className="text-[#484F58] hover:text-[#F08900] transition-colors">
                                   <Pencil size={13} />
                                 </button>
                                 <button onClick={() => deleteProduct(p.id)} className="text-[#484F58] hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
@@ -453,12 +453,12 @@ export default function StockPage() {
                 </div>
               </div>
 
-              <div className="bg-[#161B22] border border-[#30363D] rounded-xl px-5 py-4 flex items-center justify-between">
+              <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl px-5 py-4 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Valeur totale du stock</p>
                   <p className="text-xs text-[#484F58] mt-0.5">{products.length} produits · {products.reduce((s, p) => s + p.stock_actuel, 0)} unités</p>
                 </div>
-                <p className="text-2xl font-bold text-[#F0A30A]">{fmtFCFA(valeurTotale)}</p>
+                <p className="text-2xl font-bold text-[#F08900]">{fmtFCFA(valeurTotale)}</p>
               </div>
             </>
           )}
@@ -472,7 +472,7 @@ export default function StockPage() {
           {movements.length === 0 ? (
             <div className="text-center py-16 text-[#484F58]"><RotateCcw size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun mouvement — ajustez un produit pour commencer</p></div>
           ) : (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+            <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -487,12 +487,12 @@ export default function StockPage() {
                       const mt = MOV_META[m.type] ?? MOV_META.ADJUSTMENT
                       const MIcon = mt.Icon
                       return (
-                        <tr key={m.id} className={`${i < movements.length - 1 ? 'border-b border-[#21262D]' : ''}`}>
+                        <tr key={m.id} className={`${i < movements.length - 1 ? 'border-b border-[#1a2d50]' : ''}`}>
                           <td className="px-4 py-3 text-xs text-[#484F58] whitespace-nowrap">
                             {new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                             {' '}{new Date(m.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                           </td>
-                          <td className="px-4 py-3 text-[#E6EDF3] font-medium">{(m.products as { nom: string } | null)?.nom ?? '—'}</td>
+                          <td className="px-4 py-3 text-[#FFFFFF] font-medium">{(m.products as { nom: string } | null)?.nom ?? '—'}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${mt.bg} ${mt.color}`}>
                               <MIcon size={9} />{mt.label}
@@ -518,7 +518,7 @@ export default function StockPage() {
       {tab === 'entrepots' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => setMWarehouse(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F0A30A] text-[#0D1117] rounded-xl text-sm font-semibold hover:bg-[#F0A30A]/90 transition-colors">
+            <button onClick={() => setMWarehouse(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F08900] text-[#142850] rounded-xl text-sm font-semibold hover:bg-[#F08900]/90 transition-colors">
               <Plus size={14} /> Ajouter un entrepôt
             </button>
           </div>
@@ -527,12 +527,12 @@ export default function StockPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {warehouses.map(w => (
-                <div key={w.id} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center shrink-0">
-                    <Warehouse size={15} className="text-[#8B0073]" />
+                <div key={w.id} className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#8B0070]/10 border border-[#8B0070]/20 flex items-center justify-center shrink-0">
+                    <Warehouse size={15} className="text-[#8B0070]" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#E6EDF3]">{w.nom}</p>
+                    <p className="font-semibold text-[#FFFFFF]">{w.nom}</p>
                     <p className="text-xs text-[#484F58] mt-0.5">{w.localisation || 'Aucune localisation'}</p>
                   </div>
                 </div>
@@ -546,14 +546,14 @@ export default function StockPage() {
       {tab === 'fournisseurs' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => setMSupplier(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F0A30A] text-[#0D1117] rounded-xl text-sm font-semibold hover:bg-[#F0A30A]/90 transition-colors">
+            <button onClick={() => setMSupplier(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F08900] text-[#142850] rounded-xl text-sm font-semibold hover:bg-[#F08900]/90 transition-colors">
               <Plus size={14} /> Ajouter un fournisseur
             </button>
           </div>
           {suppliers.length === 0 ? (
             <div className="text-center py-16 text-[#484F58]"><Users2 size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun fournisseur enregistré</p></div>
           ) : (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+            <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#30363D]">
@@ -564,8 +564,8 @@ export default function StockPage() {
                 </thead>
                 <tbody>
                   {suppliers.map((s, i) => (
-                    <tr key={s.id} className={`${i < suppliers.length - 1 ? 'border-b border-[#21262D]' : ''} hover:bg-[#21262D]/50 transition-colors`}>
-                      <td className="px-4 py-3 font-medium text-[#E6EDF3]">{s.nom}</td>
+                    <tr key={s.id} className={`${i < suppliers.length - 1 ? 'border-b border-[#1a2d50]' : ''} hover:bg-[#1a2d50]/50 transition-colors`}>
+                      <td className="px-4 py-3 font-medium text-[#FFFFFF]">{s.nom}</td>
                       <td className="px-4 py-3 text-[#8B949E]">{s.telephone || '—'}</td>
                       <td className="px-4 py-3 text-[#8B949E]">{s.email || '—'}</td>
                       <td className="px-4 py-3 text-[#8B949E]">{s.adresse || '—'}</td>
@@ -582,14 +582,14 @@ export default function StockPage() {
       {tab === 'achats' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => setMPurchase(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F0A30A] text-[#0D1117] rounded-xl text-sm font-semibold hover:bg-[#F0A30A]/90 transition-colors">
+            <button onClick={() => setMPurchase(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F08900] text-[#142850] rounded-xl text-sm font-semibold hover:bg-[#F08900]/90 transition-colors">
               <Plus size={14} /> Nouvel achat
             </button>
           </div>
           {purchases.length === 0 ? (
             <div className="text-center py-16 text-[#484F58]"><ShoppingCart size={32} className="mx-auto mb-3 opacity-30" /><p className="text-sm">Aucun achat enregistré</p></div>
           ) : (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+            <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#30363D]">
@@ -600,12 +600,12 @@ export default function StockPage() {
                 </thead>
                 <tbody>
                   {purchases.map((p, i) => (
-                    <tr key={p.id} className={`${i < purchases.length - 1 ? 'border-b border-[#21262D]' : ''} hover:bg-[#21262D]/50 transition-colors`}>
+                    <tr key={p.id} className={`${i < purchases.length - 1 ? 'border-b border-[#1a2d50]' : ''} hover:bg-[#1a2d50]/50 transition-colors`}>
                       <td className="px-4 py-3 text-xs text-[#8B949E] whitespace-nowrap">
                         {new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-4 py-3 text-[#E6EDF3]">{(p.suppliers as { nom: string } | null)?.nom ?? 'Sans fournisseur'}</td>
-                      <td className="px-4 py-3 font-bold text-[#F0A30A]">{fmtFCFA(p.montant_total)}</td>
+                      <td className="px-4 py-3 text-[#FFFFFF]">{(p.suppliers as { nom: string } | null)?.nom ?? 'Sans fournisseur'}</td>
+                      <td className="px-4 py-3 font-bold text-[#F08900]">{fmtFCFA(p.montant_total)}</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.statut === 'reçu' ? 'bg-emerald-500/10 text-emerald-400' : p.statut === 'commande' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>
                           {p.statut}
@@ -689,9 +689,9 @@ export default function StockPage() {
                 })}
               </div>
             </div>
-            <div className="bg-[#0D1117] rounded-xl px-4 py-3 flex items-center justify-between text-sm">
+            <div className="bg-[#142850] rounded-xl px-4 py-3 flex items-center justify-between text-sm">
               <span className="text-[#484F58]">Stock actuel</span>
-              <span className="font-bold text-[#E6EDF3]">{mAdjust.stock_actuel} <span className="text-[#484F58] font-normal">{mAdjust.unite}</span></span>
+              <span className="font-bold text-[#FFFFFF]">{mAdjust.stock_actuel} <span className="text-[#484F58] font-normal">{mAdjust.unite}</span></span>
             </div>
             <FInput
               label={adjForm.type === 'ADJUSTMENT' ? 'Delta (+/−) en ' + mAdjust.unite : `Quantité (${mAdjust.unite})`}
@@ -767,24 +767,24 @@ export default function StockPage() {
                     </FSelect>
                     <input type="number" min="0" placeholder="Qté" value={item.quantite}
                       onChange={e => setPurchForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? {...it, quantite: e.target.value} : it) }))}
-                      className="bg-[#0D1117] border border-[#30363D] rounded-lg px-2 py-2 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50 w-full" />
+                      className="bg-[#142850] border border-[#30363D] rounded-lg px-2 py-2 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F08900]/50 w-full" />
                     <input type="number" min="0" placeholder="Prix" value={item.prix}
                       onChange={e => setPurchForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? {...it, prix: e.target.value} : it) }))}
-                      className="bg-[#0D1117] border border-[#30363D] rounded-lg px-2 py-2 text-sm text-[#E6EDF3] focus:outline-none focus:border-[#F0A30A]/50 w-full" />
+                      className="bg-[#142850] border border-[#30363D] rounded-lg px-2 py-2 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F08900]/50 w-full" />
                     <button onClick={() => setPurchForm(f => ({ ...f, items: f.items.filter((_, i) => i !== idx) }))}
                       className="text-[#484F58] hover:text-red-400 transition-colors pb-2 self-end"><X size={13} /></button>
                   </div>
                 ))}
                 <button onClick={() => setPurchForm(f => ({ ...f, items: [...f.items, { product_id: '', quantite: '', prix: '' }] }))}
-                  className="flex items-center gap-1.5 text-xs text-[#484F58] hover:text-[#F0A30A] transition-colors mt-1">
+                  className="flex items-center gap-1.5 text-xs text-[#484F58] hover:text-[#F08900] transition-colors mt-1">
                   <Plus size={12} /> Ajouter un article
                 </button>
               </div>
             </div>
 
-            <div className="bg-[#0D1117] rounded-xl px-4 py-3 flex items-center justify-between">
+            <div className="bg-[#142850] rounded-xl px-4 py-3 flex items-center justify-between">
               <span className="text-sm text-[#8B949E]">Total commande</span>
-              <span className="font-bold text-[#F0A30A]">{fmtFCFA(purchForm.items.reduce((s, i) => s + (Number(i.quantite) || 0) * (Number(i.prix) || 0), 0))}</span>
+              <span className="font-bold text-[#F08900]">{fmtFCFA(purchForm.items.reduce((s, i) => s + (Number(i.quantite) || 0) * (Number(i.prix) || 0), 0))}</span>
             </div>
             <ModalActions onCancel={() => setMPurchase(false)} onSave={savePurchase} saving={saving} label="Valider et mettre à jour le stock" />
           </div>

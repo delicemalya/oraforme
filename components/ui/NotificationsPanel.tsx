@@ -17,10 +17,10 @@ interface Notification {
 }
 
 const TYPE_CONFIG = {
-  info:    { icon: Info,          color: '#F07900', bg: '#F0790015' },
-  warning: { icon: AlertTriangle, color: '#F0A30A', bg: '#F0A30A15' },
-  success: { icon: CheckCircle,   color: '#0D2147', bg: '#0D214715' },
-  error:   { icon: XCircle,       color: '#F01F38', bg: '#F01F3815' },
+  info:    { icon: Info,          color: '#F08900', bg: '#F0890015' },
+  warning: { icon: AlertTriangle, color: '#F08900', bg: '#F0890015' },
+  success: { icon: CheckCircle,   color: '#142850', bg: '#14285015' },
+  error:   { icon: XCircle,       color: '#F51E33', bg: '#F51E3315' },
 }
 
 function timeAgo(date: string): string {
@@ -88,11 +88,11 @@ export default function NotificationsPanel() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[#161B22] border border-[#30363D] text-[#8B949E] hover:border-[#F0A30A] hover:text-[#E6EDF3] transition-all"
+        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[#0f1e3d] border border-[#30363D] text-[#8B949E] hover:border-[#F08900] hover:text-[#FFFFFF] transition-all"
       >
         <Bell size={15} />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F01F38] rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F51E33] rounded-full text-[9px] font-bold text-white flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -105,19 +105,19 @@ export default function NotificationsPanel() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
             transition={{ duration: 0.18 }}
-            className="absolute right-0 top-full mt-2 z-50 w-[340px] bg-[#161B22] border border-[#30363D] rounded-2xl shadow-2xl overflow-hidden"
+            className="absolute right-0 top-full mt-2 z-50 w-[340px] bg-[#0f1e3d] border border-[#30363D] rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#30363D]">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-[#E6EDF3]">Notifications</h3>
+                <h3 className="text-sm font-bold text-[#FFFFFF]">Notifications</h3>
                 {unread > 0 && (
-                  <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#F01F38] text-white rounded-full">{unread}</span>
+                  <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#F51E33] text-white rounded-full">{unread}</span>
                 )}
               </div>
               <div className="flex items-center gap-2">
                 {unread > 0 && (
-                  <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-[#8B949E] hover:text-[#F0A30A] transition-colors">
+                  <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-[#8B949E] hover:text-[#F08900] transition-colors">
                     <CheckCheck size={12} /> Tout lire
                   </button>
                 )}
@@ -144,8 +144,8 @@ export default function NotificationsPanel() {
                     <div
                       key={n.id}
                       onClick={() => { markRead(n.id); if (n.link) setOpen(false) }}
-                      className={`flex items-start gap-3 px-4 py-3.5 border-b border-[#21262D] cursor-pointer transition-colors hover:bg-[#21262D] ${
-                        !n.read ? 'bg-[#F0A30A04]' : ''
+                      className={`flex items-start gap-3 px-4 py-3.5 border-b border-[#1a2d50] cursor-pointer transition-colors hover:bg-[#1a2d50] ${
+                        !n.read ? 'bg-[#F0890004]' : ''
                       }`}
                     >
                       <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: cfg.bg }}>
@@ -153,16 +153,16 @@ export default function NotificationsPanel() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <p className={`text-xs font-semibold leading-tight ${n.read ? 'text-[#8B949E]' : 'text-[#E6EDF3]'}`}>
+                          <p className={`text-xs font-semibold leading-tight ${n.read ? 'text-[#8B949E]' : 'text-[#FFFFFF]'}`}>
                             {n.title}
                           </p>
-                          {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#F0A30A] shrink-0 mt-1" />}
+                          {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#F08900] shrink-0 mt-1" />}
                         </div>
                         {n.message && <p className="text-[10px] text-[#484F58] mt-0.5 line-clamp-2">{n.message}</p>}
                         <div className="flex items-center justify-between mt-1">
                           <span className="text-[9px] text-[#484F58]">{timeAgo(n.created_at)}</span>
                           {n.link && (
-                            <Link href={n.link} className="text-[9px] text-[#F0A30A] flex items-center gap-0.5 hover:underline">
+                            <Link href={n.link} className="text-[9px] text-[#F08900] flex items-center gap-0.5 hover:underline">
                               Voir <ExternalLink size={8} />
                             </Link>
                           )}

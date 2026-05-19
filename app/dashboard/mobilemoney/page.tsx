@@ -21,7 +21,7 @@ type MobileTx = {
 
 const FRAIS: Record<string, number> = { airtel: 0.01, mtn: 0.012, wave: 0.008, orange: 0.011 }
 const OP_LABELS: Record<string, string> = { airtel: 'Airtel Money', mtn: 'MTN MoMo', wave: 'Wave', orange: 'Orange Money' }
-const OP_COLORS: Record<string, string> = { airtel: '#F01F38', mtn: '#F0A30A', wave: '#F07900', orange: '#F97316' }
+const OP_COLORS: Record<string, string> = { airtel: '#F51E33', mtn: '#F08900', wave: '#F08900', orange: '#F08900' }
 
 export default function MobileMoneyPage() {
   const [txs, setTxs] = useState<MobileTx[]>([])
@@ -103,11 +103,11 @@ export default function MobileMoneyPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#0D2147]/10 border border-[#0D2147]/20 flex items-center justify-center">
-          <Smartphone size={18} className="text-[#0D2147]" />
+        <div className="w-10 h-10 rounded-xl bg-[#142850]/10 border border-[#142850]/20 flex items-center justify-center">
+          <Smartphone size={18} className="text-[#142850]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3]">Mobile Money</h1>
+          <h1 className="text-xl font-bold text-[#FFFFFF]">Mobile Money</h1>
           <p className="text-xs text-[#484F58]">Airtel Money · MTN MoMo · Wave · Orange Money</p>
         </div>
       </div>
@@ -118,16 +118,16 @@ export default function MobileMoneyPage() {
           { op: 'airtel', solde: airtelSolde, num: '06 XXX XXX' },
           { op: 'mtn',    solde: mtnSolde,   num: '05 XXX XXX' },
         ].map(w => (
-          <div key={w.op} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5"
+          <div key={w.op} className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5"
             style={{ borderTop: `3px solid ${OP_COLORS[w.op]}` }}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Smartphone size={16} style={{ color: OP_COLORS[w.op] }} />
-                <span className="text-sm font-semibold text-[#E6EDF3]">{OP_LABELS[w.op]}</span>
+                <span className="text-sm font-semibold text-[#FFFFFF]">{OP_LABELS[w.op]}</span>
               </div>
               <span className="text-xs text-[#484F58]">{w.num}</span>
             </div>
-            <p className={`text-2xl font-bold ${w.solde >= 0 ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>
+            <p className={`text-2xl font-bold ${w.solde >= 0 ? 'text-[#142850]' : 'text-[#F51E33]'}`}>
               {fmtFCFA(w.solde)}
             </p>
             <p className="text-xs text-[#484F58] mt-1">Solde estimé</p>
@@ -138,11 +138,11 @@ export default function MobileMoneyPage() {
       {/* KPIs */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Total reçu', value: fmtFCFA(totalRecu), color: '#0D2147' },
-          { label: 'Total envoyé', value: fmtFCFA(totalEnvoi), color: '#F01F38' },
+          { label: 'Total reçu', value: fmtFCFA(totalRecu), color: '#142850' },
+          { label: 'Total envoyé', value: fmtFCFA(totalEnvoi), color: '#F51E33' },
           { label: 'Frais payés', value: fmtFCFA(totalFrais), color: '#8B949E' },
         ].map(k => (
-          <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4 text-center">
+          <div key={k.label} className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4 text-center">
             <p className="text-xs text-[#484F58] mb-1">{k.label}</p>
             <p className="text-base font-bold" style={{ color: k.color }}>{k.value}</p>
           </div>
@@ -152,19 +152,19 @@ export default function MobileMoneyPage() {
       {/* Actions */}
       <div className="flex flex-wrap gap-3">
         <button onClick={() => { setForm(f => ({ ...f, type: 'reception' })); setModal('recevoir') }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0D2147]/10 border border-[#0D2147]/30 text-[#0D2147] text-sm font-medium hover:bg-[#0D2147]/20 transition-colors">
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#142850]/10 border border-[#142850]/30 text-[#142850] text-sm font-medium hover:bg-[#142850]/20 transition-colors">
           <ArrowDownLeft size={15} /> Recevoir paiement
         </button>
         <button onClick={() => { setForm(f => ({ ...f, type: 'envoi' })); setModal('envoyer') }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F01F38]/10 border border-[#F01F38]/30 text-[#F01F38] text-sm font-medium hover:bg-[#F01F38]/20 transition-colors">
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] text-sm font-medium hover:bg-[#F51E33]/20 transition-colors">
           <ArrowUpRight size={15} /> Envoyer de l&apos;argent
         </button>
       </div>
 
       {/* Transactions */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-[#30363D] flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[#E6EDF3]">Historique transactions</h2>
+          <h2 className="text-sm font-semibold text-[#FFFFFF]">Historique transactions</h2>
           <span className="text-xs text-[#484F58]">{txs.length} transaction{txs.length > 1 ? 's' : ''}</span>
         </div>
         {loading ? (
@@ -172,26 +172,26 @@ export default function MobileMoneyPage() {
         ) : txs.length === 0 ? (
           <div className="p-10 text-center text-[#484F58] text-sm">Aucune transaction Mobile Money</div>
         ) : (
-          <div className="divide-y divide-[#21262D]">
+          <div className="divide-y divide-[#1a2d50]">
             {txs.slice(0, 50).map(t => (
-              <div key={t.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#21262D]/30">
+              <div key={t.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#1a2d50]/30">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                   style={{ backgroundColor: OP_COLORS[t.operateur] + '20' }}>
                   <Smartphone size={13} style={{ color: OP_COLORS[t.operateur] }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#E6EDF3] truncate">{t.nom_destinataire || t.numero_destinataire || 'Transaction'}</p>
+                  <p className="text-sm text-[#FFFFFF] truncate">{t.nom_destinataire || t.numero_destinataire || 'Transaction'}</p>
                   <p className="text-xs text-[#484F58]">{OP_LABELS[t.operateur]} · {t.reference}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className={`text-sm font-semibold ${t.type === 'reception' ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>
+                  <p className={`text-sm font-semibold ${t.type === 'reception' ? 'text-[#142850]' : 'text-[#F51E33]'}`}>
                     {t.type === 'reception' ? '+' : '-'}{fmtFCFA(t.montant)}
                   </p>
                   {t.frais > 0 && <p className="text-xs text-[#484F58]">Frais : {fmtFCFA(t.frais)}</p>}
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded border ${
-                  t.statut === 'confirme' ? 'text-[#0D2147] bg-[#0D2147]/10 border-[#0D2147]/30'
-                  : 'text-[#8B949E] bg-[#21262D] border-[#30363D]'
+                  t.statut === 'confirme' ? 'text-[#142850] bg-[#142850]/10 border-[#142850]/30'
+                  : 'text-[#8B949E] bg-[#1a2d50] border-[#30363D]'
                 }`}>{t.statut}</span>
               </div>
             ))}
@@ -206,9 +206,9 @@ export default function MobileMoneyPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              className="relative bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#E6EDF3] mb-4">
+              <h3 className="text-base font-bold text-[#FFFFFF] mb-4">
                 {modal === 'recevoir' ? '📥 Recevoir un paiement' : '📤 Envoyer de l\'argent'}
               </h3>
 
@@ -221,7 +221,7 @@ export default function MobileMoneyPage() {
                         className={`py-2 rounded-lg text-xs font-medium transition-colors border ${
                           form.operateur === op
                             ? 'border-current'
-                            : 'border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3]'
+                            : 'border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF]'
                         }`}
                         style={form.operateur === op ? { color: OP_COLORS[op], backgroundColor: OP_COLORS[op] + '15', borderColor: OP_COLORS[op] + '50' } : {}}>
                         {OP_LABELS[op].split(' ')[0]}
@@ -233,7 +233,7 @@ export default function MobileMoneyPage() {
                   <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
                   <input type="number" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#0D2147]/50" />
+                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#142850]/50" />
                   {form.type === 'envoi' && form.montant && (
                     <p className="text-xs text-[#8B949E] mt-1">
                       Frais : {fmtFCFA(Math.round(parseInt(form.montant||'0') * (FRAIS[form.operateur] ?? 0.01)))}
@@ -246,25 +246,25 @@ export default function MobileMoneyPage() {
                       <label className="text-xs text-[#8B949E] mb-1 block">Numéro destinataire</label>
                       <input value={form.numero} onChange={e => setForm(f => ({ ...f, numero: e.target.value }))}
                         placeholder="0X XXX XXXX"
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
+                        className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none" />
                     </div>
                     <div>
                       <label className="text-xs text-[#8B949E] mb-1 block">Nom destinataire</label>
                       <input value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))}
                         placeholder="Nom du bénéficiaire"
-                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
+                        className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none" />
                     </div>
                   </>
                 )}
                 {modal === 'recevoir' && form.montant && (
-                  <div className="bg-[#0D2147]/5 border border-[#0D2147]/20 rounded-lg p-3">
+                  <div className="bg-[#142850]/5 border border-[#142850]/20 rounded-lg p-3">
                     <p className="text-xs text-[#8B949E] mb-2">Partagez cette référence de paiement :</p>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 text-sm text-[#0D2147] font-mono bg-[#0D1117] rounded px-2 py-1">
+                      <code className="flex-1 text-sm text-[#142850] font-mono bg-[#142850] rounded px-2 py-1">
                         PAY-{form.operateur.toUpperCase()}-{form.montant}FCFA
                       </code>
                       <button onClick={() => copyToClipboard(`PAY-${form.operateur.toUpperCase()}-${form.montant}FCFA`)}
-                        className="p-1.5 text-[#8B949E] hover:text-[#0D2147] transition-colors">
+                        className="p-1.5 text-[#8B949E] hover:text-[#142850] transition-colors">
                         {copied ? <Check size={13} /> : <Copy size={13} />}
                       </button>
                     </div>
@@ -274,11 +274,11 @@ export default function MobileMoneyPage() {
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
                   Annuler
                 </button>
                 <button onClick={save} disabled={saving || !form.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#0D2147] text-white hover:bg-[#0D2147]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#142850] text-white hover:bg-[#142850]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   Confirmer
                 </button>

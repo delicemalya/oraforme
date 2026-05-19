@@ -38,7 +38,7 @@ export interface EntrepriseConfigData {
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
-const GOLD  = '#F0A30A'
+const GOLD  = '#F08900'
 const BLACK = '#111111'
 const GRAY  = '#6B7280'
 const LGRAY = '#F9FAFB'

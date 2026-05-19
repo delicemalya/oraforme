@@ -48,8 +48,8 @@ interface Candidat {
 
 function scoreColor(s: number) {
   if (s >= 70) return '#2EA043'
-  if (s >= 50) return '#F0A30A'
-  return '#F01F38'
+  if (s >= 50) return '#F08900'
+  return '#F51E33'
 }
 
 function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
@@ -59,7 +59,7 @@ function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
   const cx = size / 2
   return (
     <svg width={size} height={size} style={{ overflow: 'visible' }}>
-      <circle cx={cx} cy={cx} r={r} fill="none" stroke="#21262D" strokeWidth={size * 0.08} />
+      <circle cx={cx} cy={cx} r={r} fill="none" stroke="#1a2d50" strokeWidth={size * 0.08} />
       <motion.circle
         cx={cx} cy={cx} r={r} fill="none"
         stroke={c} strokeWidth={size * 0.08}
@@ -95,10 +95,10 @@ function ScoreBadge({ score }: { score: number }) {
 
 function StatutBadge({ statut }: { statut: string }) {
   const map: Record<string, { label: string; color: string }> = {
-    nouveau:  { label: 'Nouveau',  color: '#F07900' },
+    nouveau:  { label: 'Nouveau',  color: '#F08900' },
     retenu:   { label: 'Retenu',   color: '#2EA043' },
-    rejete:   { label: 'Rejeté',  color: '#F01F38' },
-    entretien:{ label: 'Entretien',color: '#F0A30A' },
+    rejete:   { label: 'Rejeté',  color: '#F51E33' },
+    entretien:{ label: 'Entretien',color: '#F08900' },
   }
   const s = map[statut] ?? map.nouveau
   return (
@@ -124,12 +124,12 @@ function DropZone({ onFile, disabled }: { onFile: (f: File) => void; disabled?: 
       }}
       onClick={() => !disabled && inputRef.current?.click()}
       className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all select-none ${
-        drag ? 'border-[#F0A30A] bg-[#F0A30A]/5' :
-        disabled ? 'border-[#21262D] opacity-50 cursor-not-allowed' :
-        'border-[#30363D] hover:border-[#484F58] hover:bg-[#21262D]/30'
+        drag ? 'border-[#F08900] bg-[#F08900]/5' :
+        disabled ? 'border-[#1a2d50] opacity-50 cursor-not-allowed' :
+        'border-[#30363D] hover:border-[#484F58] hover:bg-[#1a2d50]/30'
       }`}
     >
-      <Upload size={32} className={`mx-auto mb-3 ${drag ? 'text-[#F0A30A]' : 'text-[#484F58]'}`} />
+      <Upload size={32} className={`mx-auto mb-3 ${drag ? 'text-[#F08900]' : 'text-[#484F58]'}`} />
       <p className="text-sm text-[#8B949E] font-medium">Glissez un CV ici</p>
       <p className="text-xs text-[#484F58] mt-1">PDF ou DOCX — ou cliquez pour parcourir</p>
       <input
@@ -205,8 +205,8 @@ function TabOffres({ tenantId, offres, onRefresh }: {
               key={String(item)}
               onClick={() => onToggle(item)}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
-                sel ? 'bg-[#F0A30A]/15 border-[#F0A30A]/40 text-[#F0A30A]'
-                    : 'bg-[#0D1117] border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
+                sel ? 'bg-[#F08900]/15 border-[#F08900]/40 text-[#F08900]'
+                    : 'bg-[#142850] border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
               }`}
             >
               {sel && '✓ '}{item}{typeof item === 'number' ? ' an' + (item > 1 ? 's' : '') : ''}
@@ -224,7 +224,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-3 py-2 bg-[#F0A30A] text-[#0D1117] rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors"
+          className="flex items-center gap-2 px-3 py-2 bg-[#F08900] text-[#142850] rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors"
         >
           <Plus size={13} /> Créer une offre
         </motion.button>
@@ -236,21 +236,21 @@ function TabOffres({ tenantId, offres, onRefresh }: {
             initial={{ opacity: 0, y: -10, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -8, height: 0 }}
-            className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 space-y-4 overflow-hidden"
+            className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 space-y-4 overflow-hidden"
           >
-            <h3 className="text-sm font-bold text-[#E6EDF3]">Nouvelle offre d'emploi</h3>
+            <h3 className="text-sm font-bold text-[#FFFFFF]">Nouvelle offre d'emploi</h3>
             <input
               value={form.titre}
               onChange={e => setForm(f => ({ ...f, titre: e.target.value }))}
               placeholder="Intitulé du poste *"
-              className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/40 transition-colors"
+              className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/40 transition-colors"
             />
             <textarea
               value={form.description}
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Description du poste..."
               rows={3}
-              className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/40 transition-colors resize-none"
+              className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/40 transition-colors resize-none"
             />
             <CheckGroup label="Niveau d'études requis" items={NIVEAUX} selected={form.niveaux}
               onToggle={v => setForm(f => ({ ...f, niveaux: toggle(f.niveaux, v as string) }))} />
@@ -261,14 +261,14 @@ function TabOffres({ tenantId, offres, onRefresh }: {
             <CheckGroup label="Mots-clés / Domaines" items={MOTS_CLES} selected={form.mots_cles}
               onToggle={v => setForm(f => ({ ...f, mots_cles: toggle(f.mots_cles, v as string) }))} />
             <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-xs text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-xs text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
                 Annuler
               </button>
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={handleCreate}
                 disabled={saving || !form.titre.trim()}
-                className="flex items-center gap-2 px-4 py-2 bg-[#F0A30A] text-[#0D1117] rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-[#F08900] text-[#142850] rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors disabled:opacity-50"
               >
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                 {saving ? 'Création...' : 'Créer l\'offre'}
@@ -291,11 +291,11 @@ function TabOffres({ tenantId, offres, onRefresh }: {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-[#161B22] border border-[#30363D] rounded-xl p-4 flex items-start justify-between gap-4 hover:border-[#484F58] transition-colors"
+              className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4 flex items-start justify-between gap-4 hover:border-[#484F58] transition-colors"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="text-sm font-semibold text-[#E6EDF3] truncate">{o.titre}</p>
+                  <p className="text-sm font-semibold text-[#FFFFFF] truncate">{o.titre}</p>
                   <span className="text-[10px] font-semibold text-[#2EA043] bg-[#2EA04318] px-1.5 py-0.5 rounded-full shrink-0">
                     {o.statut}
                   </span>
@@ -313,7 +313,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
                     </span>
                   ) : null}
                   {o.criteres?.langues?.slice(0, 2).map(l => (
-                    <span key={l} className="text-[10px] text-[#F07900] border border-[#F07900]/20 rounded px-1.5 py-0.5">{l}</span>
+                    <span key={l} className="text-[10px] text-[#F08900] border border-[#F08900]/20 rounded px-1.5 py-0.5">{l}</span>
                   ))}
                 </div>
               </div>
@@ -408,7 +408,7 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
             <select
               value={selectedOffre}
               onChange={e => setSelectedOffre(e.target.value)}
-              className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/40 appearance-none pr-8"
+              className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40 appearance-none pr-8"
             >
               <option value="all">Toutes les offres</option>
               {offres.map(o => <option key={o.id} value={o.id}>{o.titre}</option>)}
@@ -421,9 +421,9 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
         {progress > 0 && (
           <div className="flex flex-col justify-end">
             <p className="text-xs text-[#8B949E] mb-1">{progressText}</p>
-            <div className="h-2 bg-[#21262D] rounded-full overflow-hidden">
+            <div className="h-2 bg-[#1a2d50] rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-[#F0A30A] rounded-full"
+                className="h-full bg-[#F08900] rounded-full"
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.4 }}
               />
@@ -450,8 +450,8 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               filter === f
-                ? 'bg-[#F0A30A] text-[#0D1117]'
-                : 'bg-[#161B22] border border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
+                ? 'bg-[#F08900] text-[#142850]'
+                : 'bg-[#0f1e3d] border border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
             }`}
           >
             {{ all: 'Tous', top: 'Score > 70', recommande: 'Recommandés', rejete: 'Rejetés' }[f]}
@@ -467,11 +467,11 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
           <p className="text-sm">Aucun candidat. Déposez des CVs ci-dessus pour commencer l'analyse.</p>
         </div>
       ) : (
-        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#21262D]">
+                <tr className="border-b border-[#1a2d50]">
                   {['Candidat', 'Score IA', 'Niveau', 'Expérience', 'Langues', 'Statut', ''].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-[#484F58] uppercase tracking-wider whitespace-nowrap">
                       {h}
@@ -479,14 +479,14 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#21262D]">
+              <tbody className="divide-y divide-[#1a2d50]">
                 {shown.map((c, i) => (
                   <motion.tr
                     key={c.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.04 }}
-                    className="hover:bg-[#21262D]/40 transition-colors"
+                    className="hover:bg-[#1a2d50]/40 transition-colors"
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
@@ -497,7 +497,7 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
                           {(c.nom ?? 'C').charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-[#E6EDF3]">{c.nom}</p>
+                          <p className="text-xs font-semibold text-[#FFFFFF]">{c.nom}</p>
                           <p className="text-[10px] text-[#484F58] truncate max-w-[120px]">{c.email}</p>
                         </div>
                       </div>
@@ -570,7 +570,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1, ease: 'easeOut' }}
-          className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 hover:border-[#484F58] transition-all"
+          className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 hover:border-[#484F58] transition-all"
           style={c.score >= 70 ? { boxShadow: `0 0 24px ${scoreColor(c.score)}10` } : undefined}
         >
           <div className="flex flex-col sm:flex-row gap-5">
@@ -584,7 +584,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <h3 className="text-base font-bold text-[#E6EDF3]">{c.nom}</h3>
+                  <h3 className="text-base font-bold text-[#FFFFFF]">{c.nom}</h3>
                   <p className="text-xs text-[#484F58]">
                     {c.niveau_etudes} · {c.annees_experience} an{c.annees_experience !== 1 ? 's' : ''} exp.
                   </p>
@@ -615,11 +615,11 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 )}
                 {c.points_faibles.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-bold text-[#F01F38] mb-1.5">❌ Points faibles</p>
+                    <p className="text-[10px] font-bold text-[#F51E33] mb-1.5">❌ Points faibles</p>
                     <ul className="space-y-0.5">
                       {c.points_faibles.slice(0, 4).map((p, j) => (
                         <li key={j} className="text-xs text-[#8B949E] flex items-start gap-1.5">
-                          <span className="text-[#F01F38] mt-0.5 shrink-0">·</span>{p}
+                          <span className="text-[#F51E33] mt-0.5 shrink-0">·</span>{p}
                         </li>
                       ))}
                     </ul>
@@ -642,7 +642,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 {c.email && (
                   <a
                     href={`mailto:${c.email}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F07900]/10 border border-[#F07900]/20 text-[#F07900] rounded-lg text-xs font-semibold hover:bg-[#F07900]/20 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F08900]/10 border border-[#F08900]/20 text-[#F08900] rounded-lg text-xs font-semibold hover:bg-[#F08900]/20 transition-colors"
                   >
                     <Mail size={12} /> Contacter
                   </a>
@@ -651,7 +651,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                   <a
                     href={`https://wa.me/${c.telephone.replace(/\s/g, '')}`}
                     target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0D2147]/10 border border-[#2EA043]/20 text-[#2EA043] rounded-lg text-xs font-semibold hover:bg-[#0D2147]/20 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#142850]/10 border border-[#2EA043]/20 text-[#2EA043] rounded-lg text-xs font-semibold hover:bg-[#142850]/20 transition-colors"
                   >
                     <Phone size={12} /> WhatsApp
                   </a>
@@ -659,14 +659,14 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 <button
                   onClick={() => updateStatut(c.id, 'retenu')}
                   disabled={c.statut === 'retenu'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0D2147] text-white rounded-lg text-xs font-bold hover:bg-[#071535] transition-colors disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#142850] text-white rounded-lg text-xs font-bold hover:bg-[#071535] transition-colors disabled:opacity-40"
                 >
                   <Check size={12} /> Retenir
                 </button>
                 <button
                   onClick={() => updateStatut(c.id, 'rejete')}
                   disabled={c.statut === 'rejete'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F01F38]/10 border border-[#F01F38]/20 text-[#F01F38] rounded-lg text-xs font-semibold hover:bg-[#F01F38]/20 transition-colors disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F51E33]/10 border border-[#F51E33]/20 text-[#F51E33] rounded-lg text-xs font-semibold hover:bg-[#F51E33]/20 transition-colors disabled:opacity-40"
                 >
                   <X size={12} /> Rejeter
                 </button>
@@ -694,19 +694,19 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
   return (
     <div className="space-y-5">
       {/* Config card */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
         <div className="flex items-center gap-2.5 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/15 flex items-center justify-center">
-            <Bot size={15} className="text-[#F0A30A]" />
+          <div className="w-8 h-8 rounded-lg bg-[#F08900]/15 flex items-center justify-center">
+            <Bot size={15} className="text-[#F08900]" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-[#E6EDF3]">Configuration de l'Agent</h3>
+            <h3 className="text-sm font-bold text-[#FFFFFF]">Configuration de l'Agent</h3>
             <p className="text-xs text-[#484F58]">Décisions automatiques basées sur le score IA</p>
           </div>
           <div className="ml-auto">
             <button
               onClick={() => setConfig(c => ({ ...c, actif: !c.actif }))}
-              className={`relative w-11 h-6 rounded-full transition-colors ${config.actif ? 'bg-[#0D2147]' : 'bg-[#30363D]'}`}
+              className={`relative w-11 h-6 rounded-full transition-colors ${config.actif ? 'bg-[#142850]' : 'bg-[#30363D]'}`}
             >
               <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${config.actif ? 'translate-x-5.5 translate-x-[22px]' : 'translate-x-0.5'}`} />
             </button>
@@ -719,18 +719,18 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
             <input
               value={config.nom}
               onChange={e => setConfig(c => ({ ...c, nom: e.target.value }))}
-              className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/40 transition-colors"
+              className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40 transition-colors"
             />
           </div>
           <div>
             <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">
-              Seuil de score minimum : <span className="text-[#F0A30A]">{config.seuil}/100</span>
+              Seuil de score minimum : <span className="text-[#F08900]">{config.seuil}/100</span>
             </label>
             <input
               type="range" min={0} max={100}
               value={config.seuil}
               onChange={e => setConfig(c => ({ ...c, seuil: Number(e.target.value) }))}
-              className="w-full accent-[#F0A30A]"
+              className="w-full accent-[#F08900]"
             />
           </div>
           <div>
@@ -746,8 +746,8 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
                   onClick={() => setConfig(c => ({ ...c, action: opt.val }))}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                     config.action === opt.val
-                      ? 'bg-[#F0A30A]/15 border-[#F0A30A]/40 text-[#F0A30A]'
-                      : 'bg-[#0D1117] border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
+                      ? 'bg-[#F08900]/15 border-[#F08900]/40 text-[#F08900]'
+                      : 'bg-[#142850] border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
                   }`}
                 >
                   {opt.label}
@@ -759,8 +759,8 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
       </div>
 
       {/* Historique décisions */}
-      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
-        <h3 className="text-sm font-bold text-[#E6EDF3] mb-3">
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <h3 className="text-sm font-bold text-[#FFFFFF] mb-3">
           Décisions de l'agent ({autoDecisions.length})
         </h3>
         {autoDecisions.length === 0 ? (
@@ -775,11 +775,11 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="flex items-center gap-3 py-2.5 border-b border-[#21262D] last:border-0"
+                className="flex items-center gap-3 py-2.5 border-b border-[#1a2d50] last:border-0"
               >
                 <ScoreBadge score={c.score} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-[#E6EDF3] truncate">{c.nom}</p>
+                  <p className="text-xs font-semibold text-[#FFFFFF] truncate">{c.nom}</p>
                   <p className="text-[10px] text-[#484F58]">{c.resume_court?.slice(0, 80)}...</p>
                 </div>
                 <span className="text-[10px] text-[#2EA043] bg-[#2EA04314] px-2 py-0.5 rounded-full shrink-0">
@@ -827,7 +827,7 @@ export default function RecrutementPage() {
   if (tenantLoading || dataLoading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 size={28} className="text-[#F0A30A] animate-spin" />
+        <Loader2 size={28} className="text-[#F08900] animate-spin" />
       </div>
     )
   }
@@ -836,14 +836,14 @@ export default function RecrutementPage() {
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-lg font-bold text-[#E6EDF3]">Recrutement IA</h1>
+        <h1 className="text-lg font-bold text-[#FFFFFF]">Recrutement IA</h1>
         <p className="text-xs text-[#8B949E] mt-0.5">
           Analysez vos CVs avec l'IA · {offres.length} offre{offres.length !== 1 ? 's' : ''} · {candidats.length} candidat{candidats.length !== 1 ? 's' : ''}
         </p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1">
+      <div className="flex gap-1 bg-[#0f1e3d] border border-[#30363D] rounded-xl p-1">
         {TABS.map(tab => {
           const Icon = tab.icon
           const active = activeTab === tab.id
@@ -853,8 +853,8 @@ export default function RecrutementPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all flex-1 justify-center ${
                 active
-                  ? 'bg-[#F0A30A] text-[#0D1117]'
-                  : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+                  ? 'bg-[#F08900] text-[#142850]'
+                  : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
               }`}
             >
               <Icon size={13} />

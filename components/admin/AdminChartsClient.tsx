@@ -9,10 +9,10 @@ import { fmtFCFA } from '@/lib/admin-config'
 type ModuleRevData = { module: string; clients: number; mrr: number }
 type GrowthData = { date: string; inscriptions: number }
 
-const RED = '#F01F38'
-const ORANGE = '#F0A30A'
-const GREEN = '#0D2147'
-const BLUE = '#F07900'
+const RED = '#F51E33'
+const ORANGE = '#F08900'
+const GREEN = '#142850'
+const BLUE = '#F08900'
 
 function CustomTooltip({ active, payload, label }: {
   active?: boolean
@@ -21,7 +21,7 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-3 text-xs shadow-xl">
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-lg p-3 text-xs shadow-xl">
       <p className="text-[#8B949E] mb-1.5">{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color }}>
@@ -38,10 +38,10 @@ export function ModuleRevenueChart({ data }: { data: ModuleRevData[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={data} barGap={4} margin={{ top: 4, right: 4, left: 0, bottom: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1a2d50" vertical={false} />
         <XAxis dataKey="module" tick={{ fill: '#8B949E', fontSize: 11 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: '#8B949E', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? `${v/1000}k` : v} width={40} />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#21262D' }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1a2d50' }} />
         <Bar dataKey="clients" name="Clients" fill={BLUE} radius={[3, 3, 0, 0]} maxBarSize={28} />
         <Bar dataKey="mrr" name="MRR" fill={RED} radius={[3, 3, 0, 0]} maxBarSize={28} />
       </BarChart>
@@ -53,7 +53,7 @@ export function GrowthChart({ data }: { data: GrowthData[] }) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1a2d50" vertical={false} />
         <XAxis dataKey="date" tick={{ fill: '#8B949E', fontSize: 10 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: '#8B949E', fontSize: 10 }} axisLine={false} tickLine={false} width={24} allowDecimals={false} />
         <Tooltip content={<CustomTooltip />} />

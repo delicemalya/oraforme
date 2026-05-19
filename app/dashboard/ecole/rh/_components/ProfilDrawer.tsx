@@ -48,10 +48,10 @@ const GOLD_BDR = 'rgba(244,180,0,0.28)'
 const T1 = '#F0F4FF'
 const T2 = '#8E9AB8'
 const T3 = '#4A5572'
-const GREEN  = '#0D2147'
-const RED    = '#F01F38'
-const BLUE   = '#8B0073'
-const PURPLE = '#8B0073'
+const GREEN  = '#142850'
+const RED    = '#F51E33'
+const BLUE   = '#8B0070'
+const PURPLE = '#8B0070'
 
 const fmtN   = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
 const fmtD   = (d: string | null | undefined) =>
@@ -63,7 +63,7 @@ function Avatar({ name, size = 78 }: { name: string; size?: number }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: 'linear-gradient(135deg,#F4B400,#E07800)',
+      background: '#E07800',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size / 2.5, fontWeight: 800, color: '#000',
       boxShadow: '0 0 0 4px rgba(244,180,0,0.22),0 0 32px rgba(244,180,0,0.14)',
@@ -193,7 +193,7 @@ function ProfilEmploye({ d }: { d: EmployeFull }) {
           {d.prime_rendement > 0 && <PayRow label="Prime rendement"  value={`+${fmtN(d.prime_rendement)} FCFA`} color={GREEN} mono />}
           {d.taux_horaire && d.taux_horaire > 0 && <PayRow label="Taux horaire" value={`${fmtN(d.taux_horaire)} FCFA/h`} color={BLUE} mono />}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'linear-gradient(135deg,rgba(244,180,0,0.12),rgba(244,180,0,0.04))', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#142850', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE BRUT</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(brut)} FCFA</span>
         </div>
@@ -265,7 +265,7 @@ function ProfilEnseignant({ d }: { d: Enseignant }) {
           {d.taux_horaire    != null && <PayRow label="Taux horaire"    value={`${fmtN(d.taux_horaire)} FCFA/h`}  color={BLUE} mono />}
         </div>
         {d.salaire_mensuel != null && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'linear-gradient(135deg,rgba(244,180,0,0.12),rgba(244,180,0,0.04))', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#142850', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
             <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>TOTAL MENSUEL</span>
             <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire_mensuel)} FCFA</span>
           </div>
@@ -380,7 +380,7 @@ function ProfilStaff({ d }: { d: StaffFull }) {
       </Card>
 
       <Card title="Paiement" icon="💳">
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'linear-gradient(135deg,rgba(244,180,0,0.12),rgba(244,180,0,0.04))', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#142850', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginBottom: 12 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE MENSUEL</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire)} FCFA</span>
         </div>
@@ -454,7 +454,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
         }}>
 
         {/* Gold accent line top */}
-        <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,rgba(244,180,0,0.5),transparent)', flexShrink: 0 }} />
+        <div style={{ height: 1, background: '#142850', flexShrink: 0 }} />
 
         {/* ── Profile header ─────────────────────────────────────────────── */}
         <div style={{
@@ -464,7 +464,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
           position: 'relative', overflow: 'hidden',
         }}>
           {/* Radial glow */}
-          <div style={{ position: 'absolute', top: -60, right: 80, width: 220, height: 220, background: 'radial-gradient(circle,rgba(244,180,0,0.06) 0%,transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: -60, right: 80, width: 220, height: 220, background: 'transparent', pointerEvents: 'none' }} />
 
           {/* Close + type badge */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -516,7 +516,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
 
             {/* Modifier button */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
-              <button style={{ padding: '8px 16px', borderRadius: 9, background: 'linear-gradient(135deg,#F4B400,#E07800)', color: '#000', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(244,180,0,0.25)' }}>
+              <button style={{ padding: '8px 16px', borderRadius: 9, background: '#E07800', color: '#000', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(244,180,0,0.25)' }}>
                 ✏️ Modifier
               </button>
               <button style={{ padding: '7px 16px', borderRadius: 9, background: CARD, color: T2, fontWeight: 600, fontSize: 12, border: `1px solid ${BORDER}`, cursor: 'pointer' }}>

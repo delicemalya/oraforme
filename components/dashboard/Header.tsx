@@ -104,11 +104,11 @@ export default function Header() {
   }
 
   return (
-    <header className="h-14 bg-[#161B22] border-b border-[#30363D] flex items-center px-4 lg:px-6 gap-3 shrink-0">
+    <header className="h-14 bg-[#0f1e3d] border-b border-[#30363D] flex items-center px-4 lg:px-6 gap-3 shrink-0">
       <div className="w-8 lg:hidden shrink-0" />
 
       <div className="flex-1 max-w-sm">
-        <div className="flex items-center gap-2 bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-1.5">
+        <div className="flex items-center gap-2 bg-[#142850] border border-[#30363D] rounded-lg px-3 py-1.5">
           <Search size={13} className="text-[#484F58] shrink-0" />
           <input
             placeholder="Rechercher..."
@@ -131,11 +131,11 @@ export default function Header() {
           />
         ) : (
           // Pas de logo : badge texte avec fond jaune
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#F0A30A]/10 border border-[#F0A30A]/20 shrink-0">
-            <div className="w-5 h-5 rounded-md bg-[#F0A30A] flex items-center justify-center shrink-0">
-              <span className="text-[10px] font-black text-[#0D1117]">{nomEntreprise.charAt(0).toUpperCase()}</span>
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#F08900]/10 border border-[#F08900]/20 shrink-0">
+            <div className="w-5 h-5 rounded-md bg-[#F08900] flex items-center justify-center shrink-0">
+              <span className="text-[10px] font-black text-[#142850]">{nomEntreprise.charAt(0).toUpperCase()}</span>
             </div>
-            <span className="text-xs font-semibold text-[#F0A30A] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
+            <span className="text-xs font-semibold text-[#F08900] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
           </div>
         )
       )}
@@ -146,8 +146,8 @@ export default function Header() {
           href="/dashboard/equipe"
           className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
             pathname === '/dashboard/equipe'
-              ? 'bg-[#F0A30A]/10 text-[#F0A30A]'
-              : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+              ? 'bg-[#F08900]/10 text-[#F08900]'
+              : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
           }`}
         >
           <UsersRound size={14} />
@@ -161,7 +161,7 @@ export default function Header() {
         <button
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
-          className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#21262D]"
+          className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#1a2d50]"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
@@ -171,7 +171,7 @@ export default function Header() {
           <button
             onClick={() => setLangOpen(!langOpen)}
             title="Changer de langue"
-            className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#21262D] flex items-center gap-1"
+            className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#1a2d50] flex items-center gap-1"
           >
             <Globe size={16} />
             <span className="hidden sm:block text-[10px] font-bold text-[#484F58]">
@@ -182,7 +182,7 @@ export default function Header() {
           {langOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setLangOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-40 bg-[#161B22] border border-[#30363D] rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-40 bg-[#0f1e3d] border border-[#30363D] rounded-xl shadow-xl z-20 py-1 overflow-hidden">
                 <p className="text-[9px] font-bold text-[#484F58] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
                 {DISPLAY_LOCALES.map(l => (
                   <button
@@ -190,14 +190,14 @@ export default function Header() {
                     onClick={() => handleLocaleChange(l)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left ${
                       locale === l
-                        ? 'text-[#F0A30A] bg-[#F0A30A]/5'
-                        : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
+                        ? 'text-[#F08900] bg-[#F08900]/5'
+                        : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
                     }`}
                   >
                     <span className="text-base">{LOCALE_FLAGS[l]}</span>
                     <span className="text-xs font-medium">{LOCALE_LABELS[l]}</span>
                     {locale === l && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F0A30A]" />
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F08900]" />
                     )}
                   </button>
                 ))}
@@ -212,21 +212,21 @@ export default function Header() {
         <div className="relative ml-1">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#21262D] transition-colors"
+            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#1a2d50] transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-[#F0A30A]/20 border border-[#F0A30A]/30 flex items-center justify-center shrink-0">
-              <span className="text-[#F0A30A] text-xs font-bold">{initials}</span>
+            <div className="w-7 h-7 rounded-full bg-[#F08900]/20 border border-[#F08900]/30 flex items-center justify-center shrink-0">
+              <span className="text-[#F08900] text-xs font-bold">{initials}</span>
             </div>
-            <span className="text-sm text-[#E6EDF3] hidden sm:block max-w-[96px] truncate">{userName}</span>
+            <span className="text-sm text-[#FFFFFF] hidden sm:block max-w-[96px] truncate">{userName}</span>
             <ChevronDown size={12} className="text-[#484F58] hidden sm:block" />
           </button>
 
           {dropdownOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-44 bg-[#161B22] border border-[#30363D] rounded-lg shadow-xl z-20 py-1">
-                <div className="px-3 py-2 border-b border-[#21262D]">
-                  <p className="text-xs font-medium text-[#E6EDF3] truncate">{userName}</p>
+              <div className="absolute right-0 top-full mt-1 w-44 bg-[#0f1e3d] border border-[#30363D] rounded-lg shadow-xl z-20 py-1">
+                <div className="px-3 py-2 border-b border-[#1a2d50]">
+                  <p className="text-xs font-medium text-[#FFFFFF] truncate">{userName}</p>
                   {nomEntreprise && (
                     <p className="text-[10px] text-[#484F58] truncate">{nomEntreprise}</p>
                   )}

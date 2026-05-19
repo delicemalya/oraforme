@@ -64,13 +64,13 @@ export default function PWAInstall() {
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-[360px] z-50"
       >
-        <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-4 shadow-2xl">
+        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-4 shadow-2xl">
           <div className="flex items-start gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#F0A30A] flex items-center justify-center shrink-0">
-              <Smartphone size={20} className="text-[#0D1117]" />
+            <div className="w-11 h-11 rounded-xl bg-[#F08900] flex items-center justify-center shrink-0">
+              <Smartphone size={20} className="text-[#142850]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#E6EDF3]">Installer Oraforme</p>
+              <p className="text-sm font-bold text-[#FFFFFF]">Installer Oraforme</p>
               <p className="text-xs text-[#8B949E] mt-0.5 leading-relaxed">
                 Accédez rapidement depuis votre écran d'accueil, même hors ligne.
               </p>
@@ -80,10 +80,10 @@ export default function PWAInstall() {
             </button>
           </div>
           <div className="flex gap-2 mt-3">
-            <button onClick={dismiss} className="flex-1 py-2 text-xs text-[#8B949E] bg-[#21262D] border border-[#30363D] rounded-xl hover:border-[#484F58] transition-all">
+            <button onClick={dismiss} className="flex-1 py-2 text-xs text-[#8B949E] bg-[#1a2d50] border border-[#30363D] rounded-xl hover:border-[#484F58] transition-all">
               Plus tard
             </button>
-            <button onClick={install} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#0D1117] bg-[#F0A30A] rounded-xl hover:bg-[#E09000] transition-all">
+            <button onClick={install} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#142850] bg-[#F08900] rounded-xl hover:bg-[#E09000] transition-all">
               <Download size={13} /> Installer
             </button>
           </div>

@@ -12,16 +12,16 @@ function fmtFull(n: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 }
 
-const COLORS = ['#F0A30A', '#F07900', '#0D2147', '#8B0073', '#F97316', '#8B0073', '#0D2147', '#84CC16']
+const COLORS = ['#F08900', '#F08900', '#142850', '#8B0070', '#F08900', '#8B0070', '#142850', '#84CC16']
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null
   const { name, value, payload: d } = payload[0]
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-3 shadow-2xl text-xs">
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-3 shadow-2xl text-xs">
       <div className="flex items-center gap-2 mb-1">
         <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-        <span className="text-[#E6EDF3] font-semibold">{name}</span>
+        <span className="text-[#FFFFFF] font-semibold">{name}</span>
       </div>
       <span className="text-[#8B949E]">{fmtFull(value)}</span>
     </div>
@@ -35,8 +35,8 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
 
   if (!hasData) {
     return (
-      <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
-        <h3 className="text-sm font-bold text-[#E6EDF3] mb-1">Répartition des dépenses</h3>
+      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-5">
+        <h3 className="text-sm font-bold text-[#FFFFFF] mb-1">Répartition des dépenses</h3>
         <p className="text-[10px] text-[#484F58] mb-6">Par catégorie ce mois</p>
         <div className="h-[180px] flex items-center justify-center text-xs text-[#484F58]">
           Aucune dépense enregistrée
@@ -46,10 +46,10 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
   }
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-bold text-[#E6EDF3]">Répartition des dépenses</h3>
+          <h3 className="text-sm font-bold text-[#FFFFFF]">Répartition des dépenses</h3>
           <p className="text-[10px] text-[#484F58] mt-0.5">Par catégorie ce mois · {fmtFull(total)}</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
               <span className="text-[#8B949E] truncate max-w-[120px]">{item.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[#E6EDF3] font-semibold">{fmtFull(item.value)}</span>
+              <span className="text-[#FFFFFF] font-semibold">{fmtFull(item.value)}</span>
               <span className="text-[#484F58] w-8 text-right">{total > 0 ? Math.round((item.value / total) * 100) : 0}%</span>
             </div>
           </div>

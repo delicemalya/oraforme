@@ -32,7 +32,7 @@ async function getEcoleRole(): Promise<{ role: string | null; email: string | nu
 
 // ── Dossier étudiant partagé ──────────────────────────────────────────────────
 
-function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0073' }: {
+function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
   etudiant: Etudiant; onBack: () => void; accentColor?: string
 }) {
   const [notes,     setNotes]     = useState<Note[]>([])
@@ -97,10 +97,10 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0073' }: {
 
       {/* Suspended warning */}
       {etudiant.statut === 'suspendu' && (
-        <div className="rounded-xl border border-[#F01F38]/30 p-4" style={{ background: 'rgba(248,81,73,0.06)' }}>
+        <div className="rounded-xl border border-[#F51E33]/30 p-4" style={{ background: 'rgba(248,81,73,0.06)' }}>
           <div className="flex items-center gap-2">
-            <AlertCircle size={16} className="text-[#F01F38]" />
-            <p className="text-sm font-bold text-[#F01F38]">Accès suspendu — solde impayé détecté</p>
+            <AlertCircle size={16} className="text-[#F51E33]" />
+            <p className="text-sm font-bold text-[#F51E33]">Accès suspendu — solde impayé détecté</p>
           </div>
           <p className="text-xs text-[#8B949E] mt-1 ml-6">Veuillez vous rapprocher de l&apos;administration pour régulariser la situation.</p>
         </div>
@@ -112,10 +112,10 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0073' }: {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-3">
-            <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#0D2147" />
+            <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#142850" />
             <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
-            <KpiCard label="Absences"         value={totalAbs}                            color="#F01F38" sub={`${justifiedAbs} justifiées`} />
-            <KpiCard label="Alertes"          value={nbAlerts}                            color="#F0A30A" sub="non lues" />
+            <KpiCard label="Absences"         value={totalAbs}                            color="#F51E33" sub={`${justifiedAbs} justifiées`} />
+            <KpiCard label="Alertes"          value={nbAlerts}                            color="#F08900" sub="non lues" />
           </div>
 
           {/* Tabs */}
@@ -199,9 +199,9 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0073' }: {
                         <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-white">{p.libelle}</td>
                         <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                        <td className="px-4 py-2.5 font-semibold text-[#0D2147]">{fmt(p.montant)} FCFA</td>
+                        <td className="px-4 py-2.5 font-semibold text-[#142850]">{fmt(p.montant)} FCFA</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#0D2147', background: '#0D214718' } : { color: '#F0A30A', background: '#F0A30A18' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F08900', background: '#F0890018' }}>
                             {p.statut === 'paye' ? 'Payé' : 'En attente'}
                           </span>
                         </td>
@@ -228,7 +228,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0073' }: {
                         <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
                         <td className="px-4 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#0D2147', background: '#0D214718' } : { color: '#F01F38', background: '#F01F3818' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
                             {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                           </span>
                         </td>
@@ -250,9 +250,9 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0073' }: {
             ) : (
               <div className="space-y-2">
                 {notifs.map(n => (
-                  <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#F0A30A]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(240,163,10,0.04)' }}>
+                  <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#F08900]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(240,163,10,0.04)' }}>
                     <div className="flex items-start gap-2">
-                      <Bell size={12} className={n.read ? 'text-[#8B949E]' : 'text-[#F0A30A]'} />
+                      <Bell size={12} className={n.read ? 'text-[#8B949E]' : 'text-[#F08900]'} />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-white">{n.titre}</p>
                         <p className="text-[10px] text-[#8B949E] mt-0.5">{n.message}</p>
@@ -339,7 +339,7 @@ export default function EspaceParentPage() {
               </button>
             )}
           </div>
-          <DossierEtudiant etudiant={selected} onBack={() => setSelected(null)} accentColor="#8B0073" />
+          <DossierEtudiant etudiant={selected} onBack={() => setSelected(null)} accentColor="#8B0070" />
         </div>
       )
     }
@@ -352,8 +352,8 @@ export default function EspaceParentPage() {
         </div>
 
         {children.length === 0 ? (
-          <div className="rounded-xl border border-[#F0A30A]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(240,163,10,0.04)' }}>
-            <AlertCircle size={32} className="text-[#F0A30A] mb-3" />
+          <div className="rounded-xl border border-[#F08900]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(240,163,10,0.04)' }}>
+            <AlertCircle size={32} className="text-[#F08900] mb-3" />
             <p className="text-sm font-semibold text-white mb-1">Aucun enfant trouvé</p>
             <p className="text-xs text-[#8B949E] max-w-sm">
               Aucun étudiant n&apos;est associé à l&apos;email <strong className="text-white">{userEmail}</strong>.<br/>
@@ -365,14 +365,14 @@ export default function EspaceParentPage() {
             <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{children.length} enfant{children.length > 1 ? 's' : ''}</p>
             {children.map(etu => (
               <button key={etu.id} onClick={() => setSelected(etu)}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] hover:border-[#8B0073]/30 hover:bg-[#8B0073]/[0.04] text-left transition-all group">
+                className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] hover:border-[#8B0070]/30 hover:bg-[#8B0070]/[0.04] text-left transition-all group">
                 <Avatar nom={etu.nom} prenom={etu.prenom} photoUrl={etu.photo_url} size={44} />
                 <div className="flex-1">
                   <p className="text-sm font-bold text-white">{etu.prenom} {etu.nom}</p>
                   <p className="text-xs text-[#8B949E]">{etu.numero_id} · {etu.classe ?? NIVEAUX.find(n => n.value === etu.niveau)?.label} · {etu.annee_scolaire}</p>
                   <div className="mt-1"><StatutBadge statut={etu.statut} /></div>
                 </div>
-                <ChevronRight size={16} className="text-[#8B949E] group-hover:text-[#8B0073] transition-colors" />
+                <ChevronRight size={16} className="text-[#8B949E] group-hover:text-[#8B0070] transition-colors" />
               </button>
             ))}
           </div>
@@ -389,7 +389,7 @@ export default function EspaceParentPage() {
           <h1 className="text-xl font-bold text-white">Espace Parent</h1>
           <p className="text-xs text-[#8B949E] mt-0.5">Administration · Dossier famille</p>
         </div>
-        <DossierEtudiant etudiant={selected} onBack={() => { setSelected(null); setResults([]) }} accentColor="#8B0073" />
+        <DossierEtudiant etudiant={selected} onBack={() => { setSelected(null); setResults([]) }} accentColor="#8B0070" />
       </div>
     )
   }
@@ -401,12 +401,12 @@ export default function EspaceParentPage() {
         <p className="text-xs text-[#8B949E] mt-0.5">Recherche par téléphone, email, nom du parent ou de l&apos;enfant</p>
       </div>
 
-      <div className="rounded-xl border border-[#8B0073]/20 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
+      <div className="rounded-xl border border-[#8B0070]/20 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
             <input
-              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#8B0073]/50"
+              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#8B0070]/50"
               placeholder="Tél, email parent, nom de l'enfant…"
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -414,7 +414,7 @@ export default function EspaceParentPage() {
             />
           </div>
           <button onClick={searchByParent} disabled={searching || !search.trim()}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#8B0073', color: '#fff' }}>
+            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
             {searching ? <Loader2 className="animate-spin" size={14} /> : <Search size={14} />} Rechercher
           </button>
         </div>
@@ -439,7 +439,7 @@ export default function EspaceParentPage() {
                 </div>
               </div>
               <StatutBadge statut={e.statut} />
-              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#8B0073] transition-colors" />
+              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#8B0070] transition-colors" />
             </button>
           ))}
         </div>

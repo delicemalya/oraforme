@@ -244,7 +244,7 @@ export function CreateEmployeeWizard({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
         className="relative w-full max-w-3xl rounded-2xl overflow-hidden flex flex-col"
-        style={{ background: '#0D1117', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '92vh' }}>
+        style={{ background: '#142850', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '92vh' }}>
 
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <div className="shrink-0 px-6 pt-5 pb-4 border-b border-white/[0.06]">
@@ -261,7 +261,7 @@ export function CreateEmployeeWizard({
           {/* Progress bar */}
           <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
             <motion.div className="h-full rounded-full"
-              style={{ background: 'linear-gradient(90deg,#2EA043,#F07900)' }}
+              style={{ background: '#F08900' }}
               animate={{ width: `${pct}%` }} transition={{ duration: 0.3 }} />
           </div>
 
@@ -446,10 +446,10 @@ export function CreateEmployeeWizard({
                         <div key={p.id} onClick={() => togglePerm(p.id)}
                           className="flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all"
                           style={acc_.permissions[p.id]
-                            ? { borderColor: '#F07900', background: 'rgba(56,139,253,0.06)' }
+                            ? { borderColor: '#F08900', background: 'rgba(56,139,253,0.06)' }
                             : { borderColor: 'rgba(255,255,255,0.04)' }}>
                           <div className="w-3.5 h-3.5 rounded flex items-center justify-center shrink-0 transition-all"
-                            style={{ background: acc_.permissions[p.id] ? '#F07900' : 'rgba(255,255,255,0.08)' }}>
+                            style={{ background: acc_.permissions[p.id] ? '#F08900' : 'rgba(255,255,255,0.08)' }}>
                             {acc_.permissions[p.id] && <Check size={9} className="text-white" />}
                           </div>
                           <span className="text-xs" style={{ color: acc_.permissions[p.id] ? '#fff' : '#8B949E' }}>{p.label}</span>
@@ -538,7 +538,7 @@ export function CreateEmployeeWizard({
                       className="flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-all group"
                       style={{ background: 'rgba(255,255,255,0.02)' }}>
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(56,139,253,0.1)' }}>
-                        <FileText size={16} style={{ color: '#F07900' }} />
+                        <FileText size={16} style={{ color: '#F08900' }} />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-white">{doc.label}</p>
@@ -619,7 +619,7 @@ export function CreateEmployeeWizard({
 
                       <div className="rounded-xl p-4"
                         style={{ background: 'rgba(56,139,253,0.05)', border: '1px solid rgba(56,139,253,0.12)' }}>
-                        <p className="text-xs font-semibold text-[#F07900] mb-2">Workflow automatique à la création</p>
+                        <p className="text-xs font-semibold text-[#F08900] mb-2">Workflow automatique à la création</p>
                         <ul className="space-y-1 text-xs text-[#8B949E]">
                           <li>✓ Dossier enregistré dans RH & Paie</li>
                           <li>✓ Compte tiers créé en Comptabilité (641 — Rémunérations du personnel)</li>
@@ -642,7 +642,7 @@ export function CreateEmployeeWizard({
         {!done && (
           <div className="shrink-0 px-6 py-4 border-t border-white/[0.06]">
             {errMsg && (
-              <div className="mb-3 px-4 py-3 rounded-xl text-xs font-medium" style={{ background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.25)', color: '#F01F38' }}>
+              <div className="mb-3 px-4 py-3 rounded-xl text-xs font-medium" style={{ background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.25)', color: '#F51E33' }}>
                 ⚠ {errMsg}
               </div>
             )}
@@ -657,13 +657,13 @@ export function CreateEmployeeWizard({
             {step < STEPS.length ? (
               <button onClick={() => setStep(s => s + 1)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold"
-                style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
+                style={{ background: '#22863a', color: '#fff' }}>
                 Suivant <ChevronRight size={13} />
               </button>
             ) : (
               <button onClick={submit} disabled={saving || !id_.nom || !id_.prenom || !post_.poste}
                 className="flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
-                style={{ background: 'linear-gradient(135deg,#2EA043,#22863a)', color: '#fff' }}>
+                style={{ background: '#22863a', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={13} />}
                 {saving ? 'Création en cours…' : "Créer l'employé"}
               </button>

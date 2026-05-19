@@ -70,133 +70,133 @@ const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
 
 const SECTOR_NAV: Record<string, NavItem[]> = {
   ecole: [
-    { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F0A30A' },
-    { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#F01F38' },
-    { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#8B0073' },
-    { id: 'comptabilite',           label: 'Comptabilité',           sublabel: 'Journal OHADA',            icon: Calculator,     href: '/dashboard/ecole/comptabilite',           color: '#0D2147' },
-    { id: 'tresorerie',             label: 'Trésorerie',             sublabel: 'Wallets & encaissements',  icon: Wallet,         href: '/dashboard/tresorerie',                   color: '#0D2147' },
-    { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F0A30A' },
-    { id: 'espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           icon: BookOpen,       href: '/dashboard/ecole/espace-formateur',       color: '#0D2147' },
-    { id: 'espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              icon: GraduationCap,  href: '/dashboard/ecole/espace-etudiant',        color: '#0D2147' },
-    { id: 'espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi de mes enfants',     icon: HeartHandshake, href: '/dashboard/ecole/espace-parent',          color: '#8B0073' },
+    { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F08900' },
+    { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#F51E33' },
+    { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#8B0070' },
+    { id: 'comptabilite',           label: 'Comptabilité',           sublabel: 'Journal OHADA',            icon: Calculator,     href: '/dashboard/ecole/comptabilite',           color: '#142850' },
+    { id: 'tresorerie',             label: 'Trésorerie',             sublabel: 'Wallets & encaissements',  icon: Wallet,         href: '/dashboard/tresorerie',                   color: '#142850' },
+    { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F08900' },
+    { id: 'espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           icon: BookOpen,       href: '/dashboard/ecole/espace-formateur',       color: '#142850' },
+    { id: 'espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              icon: GraduationCap,  href: '/dashboard/ecole/espace-etudiant',        color: '#142850' },
+    { id: 'espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi de mes enfants',     icon: HeartHandshake, href: '/dashboard/ecole/espace-parent',          color: '#8B0070' },
     { id: 'parametres-academiques', label: 'Paramètres académ.',     sublabel: 'LMD & mentions',           icon: Settings,       href: '/dashboard/ecole/parametres-academiques', color: '#8B949E' },
-    { id: 'miaa',                   label: 'MIAA+',                  sublabel: 'IA scolaire',              icon: Bot,            href: '/dashboard/ecole/miaa',                   color: '#F97316' },
+    { id: 'miaa',                   label: 'MIAA+',                  sublabel: 'IA scolaire',              icon: Bot,            href: '/dashboard/ecole/miaa',                   color: '#F08900' },
   ],
   restaurant: [
-    { id: 'pos',        label: 'Caisse POS',   sublabel: 'Ventes & commandes', icon: ChefHat,   href: '/dashboard/restaurant',  color: '#F0A30A' },
-    { id: 'stock',      label: 'Stock',        sublabel: 'Inventaire',         icon: Package,   href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'rh',         label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,     href: '/dashboard/rh',          color: '#388BFD' },
-    { id: 'tresorerie', label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'miaa',       label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F97316' },
+    { id: 'pos',        label: 'Caisse POS',   sublabel: 'Ventes & commandes', icon: ChefHat,   href: '/dashboard/restaurant',  color: '#F08900' },
+    { id: 'stock',      label: 'Stock',        sublabel: 'Inventaire',         icon: Package,   href: '/dashboard/stock',       color: '#142850' },
+    { id: 'rh',         label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,     href: '/dashboard/rh',          color: '#8B0070' },
+    { id: 'tresorerie', label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'miaa',       label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
   ],
   commerce: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     href: '/dashboard/rh',          color: '#388BFD' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F97316' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   href: '/dashboard/stock',       color: '#142850' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     href: '/dashboard/rh',          color: '#8B0070' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
   ],
   supermarche: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Caisse & ventes',   icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Rayons & inventaire',icon: Package,    href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#0D2147' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#388BFD' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0073' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Caisse & ventes',   icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',       label: 'Stock',        sublabel: 'Rayons & inventaire',icon: Package,    href: '/dashboard/stock',       color: '#142850' },
+    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#142850' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#8B0070' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
   ],
   boisson: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Ventes & livraisons',icon: FileText,   href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire boissons',icon: Package,    href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#0D2147' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#388BFD' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0073' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Ventes & livraisons',icon: FileText,   href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire boissons',icon: Package,    href: '/dashboard/stock',       color: '#142850' },
+    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#142850' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#8B0070' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
   ],
   transport_public: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Lignes & voyageurs', icon: Truck,       href: '/dashboard/transport',  color: '#F0A30A' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Billets & recettes', icon: FileText,    href: '/dashboard/facturation', color: '#388BFD' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs & agents',icon: Users,       href: '/dashboard/rh',         color: '#0D2147' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0073' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',       color: '#F97316' },
+    { id: 'transport',   label: 'Transport',    sublabel: 'Lignes & voyageurs', icon: Truck,       href: '/dashboard/transport',  color: '#F08900' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Billets & recettes', icon: FileText,    href: '/dashboard/facturation', color: '#8B0070' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs & agents',icon: Users,       href: '/dashboard/rh',         color: '#142850' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',       color: '#F08900' },
   ],
   sante: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Consultations',      icon: FileText,  href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel médical',  icon: Users,     href: '/dashboard/rh',          color: '#0D2147' },
-    { id: 'stock',       label: 'Pharmacie',    sublabel: 'Médicaments',        icon: Package,   href: '/dashboard/stock',       color: '#388BFD' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F97316' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Consultations',      icon: FileText,  href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel médical',  icon: Users,     href: '/dashboard/rh',          color: '#142850' },
+    { id: 'stock',       label: 'Pharmacie',    sublabel: 'Médicaments',        icon: Package,   href: '/dashboard/stock',       color: '#8B0070' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
   ],
   transport: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Flotte & courses',  icon: Truck,     href: '/dashboard/transport',   color: '#F0A30A' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#388BFD' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs',        icon: Users,     href: '/dashboard/rh',          color: '#0D2147' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F97316' },
+    { id: 'transport',   label: 'Transport',    sublabel: 'Flotte & courses',  icon: Truck,     href: '/dashboard/transport',   color: '#F08900' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#8B0070' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs',        icon: Users,     href: '/dashboard/rh',          color: '#142850' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
   ],
   hotel: [
-    { id: 'hotel',       label: 'Hébergement',  sublabel: 'Réservations',       icon: Hotel,       href: '/dashboard/hotel',       color: '#F0A30A' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',   icon: FileText,    href: '/dashboard/facturation', color: '#388BFD' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#0D2147' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F97316' },
+    { id: 'hotel',       label: 'Hébergement',  sublabel: 'Réservations',       icon: Hotel,       href: '/dashboard/hotel',       color: '#F08900' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',   icon: FileText,    href: '/dashboard/facturation', color: '#8B0070' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#142850' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F08900' },
   ],
   boutique: [
-    { id: 'facturation',  label: 'Caisse & Ventes', sublabel: 'Factures & reçus',  icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#0D2147' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0073' },
+    { id: 'facturation',  label: 'Caisse & Ventes', sublabel: 'Factures & reçus',  icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   btp: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & travaux',    icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',        label: 'Stock chantier',   sublabel: 'Matériaux',          icon: Package,     href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#0D2147' },
-    { id: 'rh',           label: 'RH & Équipes',    sublabel: 'Personnel chantier', icon: Users,       href: '/dashboard/rh',          color: '#388BFD' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0073' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & travaux',    icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',        label: 'Stock chantier',   sublabel: 'Matériaux',          icon: Package,     href: '/dashboard/stock',       color: '#142850' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
+    { id: 'rh',           label: 'RH & Équipes',    sublabel: 'Personnel chantier', icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   cabinet: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & honoraires', icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#388BFD' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0073' },
-    { id: 'miaa',         label: 'MIAA+',            sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F97316' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & honoraires', icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'miaa',         label: 'MIAA+',            sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F08900' },
   ],
   petrole: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Ventes & contrats',  icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#0D2147' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#388BFD' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0073' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Ventes & contrats',  icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   ong: [
-    { id: 'facturation',  label: 'Projets & Budget', sublabel: 'Rapports bailleurs', icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Suivi des charges',  icon: Receipt,     href: '/dashboard/depenses',    color: '#0D2147' },
-    { id: 'stock',        label: 'Stock & Matériel', sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'rh',           label: 'RH & Bénévoles',  sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#388BFD' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0073' },
+    { id: 'facturation',  label: 'Projets & Budget', sublabel: 'Rapports bailleurs', icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Suivi des charges',  icon: Receipt,     href: '/dashboard/depenses',    color: '#142850' },
+    { id: 'stock',        label: 'Stock & Matériel', sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
+    { id: 'rh',           label: 'RH & Bénévoles',  sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   banque: [
-    { id: 'facturation',  label: 'Comptes clients',  sublabel: 'Prêts & épargne',    icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA & reporting',  icon: Calculator,  href: '/dashboard/comptabilite',color: '#388BFD' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#0D2147' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Liquidités',         icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
+    { id: 'facturation',  label: 'Comptes clients',  sublabel: 'Prêts & épargne',    icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA & reporting',  icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#142850' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Liquidités',         icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
   ],
   pharmacie: [
-    { id: 'facturation',  label: 'Caisse',           sublabel: 'Ventes & ordonnances',icon: FileText,   href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',        label: 'Stock médicaments',sublabel: 'Inventaire & péremption',icon: Package, href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#0D2147' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#388BFD' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0073' },
+    { id: 'facturation',  label: 'Caisse',           sublabel: 'Ventes & ordonnances',icon: FileText,   href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',        label: 'Stock médicaments',sublabel: 'Inventaire & péremption',icon: Package, href: '/dashboard/stock',       color: '#142850' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   agriculture: [
-    { id: 'facturation',  label: 'Ventes & Récoltes',sublabel: 'Clients & marchés',  icon: FileText,    href: '/dashboard/facturation', color: '#F0A30A' },
-    { id: 'stock',        label: 'Stock & Cheptel',  sublabel: 'Inventaire agricole',icon: Package,     href: '/dashboard/stock',       color: '#0D2147' },
-    { id: 'achats',       label: 'Achats & Intrants',sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#0D2147' },
-    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Charges exploitation',icon: Receipt,    href: '/dashboard/depenses',    color: '#F97316' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Saisonniers & agents',icon: Users,      href: '/dashboard/rh',          color: '#388BFD' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0073' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0073' },
+    { id: 'facturation',  label: 'Ventes & Récoltes',sublabel: 'Clients & marchés',  icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'stock',        label: 'Stock & Cheptel',  sublabel: 'Inventaire agricole',icon: Package,     href: '/dashboard/stock',       color: '#142850' },
+    { id: 'achats',       label: 'Achats & Intrants',sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
+    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Charges exploitation',icon: Receipt,    href: '/dashboard/depenses',    color: '#F08900' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Saisonniers & agents',icon: Users,      href: '/dashboard/rh',          color: '#8B0070' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
 }
 
@@ -360,7 +360,7 @@ export default function Sidebar() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Logo */}
-      <div className="border-b border-[#1A3570] shrink-0">
+      <div className="border-b border-white/10 shrink-0">
         {/* overflow:hidden + marges négatives rognent le transparent interne du PNG */}
         <div style={{ overflow: 'hidden', lineHeight: 0, padding: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -398,16 +398,17 @@ export default function Sidebar() {
             <Link
               href={href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                active ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium' : 'text-white hover:text-white hover:bg-[#1A3570]'
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
+                active
+                  ? 'border-white bg-white/[0.08] text-white font-medium'
+                  : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               <LayoutDashboard size={15} className="shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="truncate">{label}</div>
-                {sub && <div className="text-[10px] text-white/45 truncate">{sub}</div>}
+                {sub && <div className="text-[10px] text-white/40 truncate">{sub}</div>}
               </div>
-              {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
             </Link>
           )
         })()}
@@ -429,20 +430,22 @@ export default function Sidebar() {
                       key={item.id}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group"
-                      style={{ background: active ? 'rgba(240,31,56,0.12)' : 'transparent' }}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group border-l-4 ${
+                        active
+                          ? 'border-white bg-white/[0.08] text-white font-medium'
+                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
+                      }`}
                     >
-                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? '#F01F38' : '#A8C4E4' }} />
+                      <Icon size={15} className={`shrink-0 transition-colors ${active ? 'text-white' : 'text-white/50'}`} />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? '#F01F38' : '#E6EDF3' }}>
+                        <div className="text-sm font-medium leading-tight truncate text-white">
                           {item.label}
                         </div>
-                        <div className="text-[10px] text-white/45 truncate flex items-center gap-1">
+                        <div className="text-[10px] text-white/40 truncate flex items-center gap-1">
                           {item.sublabel}
-                          {!isOwner && !canEdit && <Lock size={8} className="text-[#30363D]" />}
+                          {!isOwner && !canEdit && <Lock size={8} className="text-white/25" />}
                         </div>
                       </div>
-                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#F01F38' }} />}
                     </Link>
                   )
                 })}
@@ -463,20 +466,22 @@ export default function Sidebar() {
                       key={item.id}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group"
-                      style={{ background: active ? 'rgba(240,31,56,0.12)' : 'transparent' }}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group border-l-4 ${
+                        active
+                          ? 'border-white bg-white/[0.08] text-white font-medium'
+                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
+                      }`}
                     >
-                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? '#F01F38' : '#A8C4E4' }} />
+                      <Icon size={15} className={`shrink-0 transition-colors ${active ? 'text-white' : 'text-white/50'}`} />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? '#F01F38' : '#E6EDF3' }}>
+                        <div className="text-sm font-medium leading-tight truncate text-white">
                           {item.label}
                         </div>
-                        <div className="text-[10px] text-white/45 truncate flex items-center gap-1">
+                        <div className="text-[10px] text-white/40 truncate flex items-center gap-1">
                           {item.sublabel}
-                          {!isOwner && !canEdit && <Lock size={8} className="text-[#30363D]" />}
+                          {!isOwner && !canEdit && <Lock size={8} className="text-white/25" />}
                         </div>
                       </div>
-                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#F01F38' }} />}
                     </Link>
                   )
                 })}
@@ -503,13 +508,14 @@ export default function Sidebar() {
                       key={mod.id}
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                        active ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium' : 'text-white hover:text-white hover:bg-[#1A3570]'
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
+                        active
+                          ? 'border-white bg-white/[0.08] text-white font-medium'
+                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
                       }`}
                     >
                       <Icon size={15} className="shrink-0" />
                       <span className="truncate">{mod.label}</span>
-                      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
                     </Link>
                   )
                 })}
@@ -527,13 +533,14 @@ export default function Sidebar() {
                       key={mod.id}
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                        active ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium' : 'text-white hover:text-white hover:bg-[#1A3570]'
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
+                        active
+                          ? 'border-white bg-white/[0.08] text-white font-medium'
+                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
                       }`}
                     >
                       <Icon size={15} className="shrink-0" />
                       <span className="truncate">{mod.label}</span>
-                      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
                     </Link>
                   )
                 })}
@@ -551,11 +558,11 @@ export default function Sidebar() {
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
                       title={`Accéder à ${mod.label}`}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#7A9ACC] hover:text-white hover:bg-[#1A3570]/60 transition-all group"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/35 hover:text-white/65 hover:bg-white/[0.04] transition-all duration-200 group"
                     >
-                      <Icon size={15} className="shrink-0 group-hover:text-white" />
+                      <Icon size={15} className="shrink-0 group-hover:text-white/65" />
                       <span className="truncate flex-1">{mod.label}</span>
-                      <span className="text-[8px] font-bold border border-[#1A3570] text-[#30363D] group-hover:border-[#484F58] group-hover:text-[#7A9ACC] rounded px-1 py-0.5 shrink-0 transition-colors">
+                      <span className="text-[8px] font-bold border border-white/10 text-white/25 group-hover:border-white/20 group-hover:text-white/40 rounded px-1 py-0.5 shrink-0 transition-colors">
                         ACTIVER
                       </span>
                     </Link>
@@ -569,24 +576,24 @@ export default function Sidebar() {
         {!loaded && (
           <div className="space-y-1 pt-2">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-9 rounded-lg bg-[#1A3570] animate-pulse mx-1" />
+              <div key={i} className="h-9 rounded-lg bg-white/10 animate-pulse mx-1" />
             ))}
           </div>
         )}
       </nav>
 
       {/* Bas */}
-      <div className="px-2 py-3 border-t border-[#1A3570] shrink-0 space-y-0.5">
+      <div className="px-2 py-3 border-t border-white/10 shrink-0 space-y-0.5">
 
 
         {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
           <Link
             href="/dashboard/roles"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
               isActive('/dashboard/roles')
-                ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium'
-                : 'text-white hover:text-white hover:bg-[#1A3570]'
+                ? 'border-white bg-white/[0.08] text-white font-medium'
+                : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
             }`}
           >
             <ShieldCheck size={15} className="shrink-0" />
@@ -598,10 +605,10 @@ export default function Sidebar() {
           <Link
             href="/dashboard/modules"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
               isActive('/dashboard/modules')
-                ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium'
-                : 'text-white hover:text-white hover:bg-[#1A3570]'
+                ? 'border-white bg-white/[0.08] text-white font-medium'
+                : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
             }`}
           >
             <Store size={15} className="shrink-0" />
@@ -613,10 +620,10 @@ export default function Sidebar() {
           <Link
             href="/dashboard/analytics"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
               isActive('/dashboard/analytics')
-                ? 'bg-[#F07900]/10 text-[#F07900] font-medium'
-                : 'text-white hover:text-white hover:bg-[#1A3570]'
+                ? 'border-white bg-white/[0.08] text-white font-medium'
+                : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
             }`}
           >
             <Activity size={15} className="shrink-0" />
@@ -627,10 +634,10 @@ export default function Sidebar() {
         <Link
           href="/dashboard/parametres"
           onClick={() => setMobileOpen(false)}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
             isActive('/dashboard/parametres')
-              ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium'
-              : 'text-white hover:text-white hover:bg-[#1A3570]'
+              ? 'border-white bg-white/[0.08] text-white font-medium'
+              : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
           }`}
         >
           <Settings size={15} className="shrink-0" />
@@ -641,17 +648,17 @@ export default function Sidebar() {
           <Link
             href="/admin"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#F01F38] hover:bg-[#F01F38]/5 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#F51E33] hover:bg-[#F51E33]/10 transition-all duration-200"
           >
             <ShieldAlert size={15} className="shrink-0" />
             <span>Admin oraforme</span>
-            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38] animate-pulse" />
+            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F51E33] animate-pulse" />
           </Link>
         )}
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white hover:text-red-400 hover:bg-red-500/5 transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/65 hover:text-[#F51E33] hover:bg-[#F51E33]/5 transition-all duration-200"
         >
           <LogOut size={15} className="shrink-0" />
           Déconnexion
@@ -662,12 +669,12 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[#0D2147] border-r border-[#1A3570] h-screen sticky top-0">
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[#142850] border-r border-white/10 h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0D2147] border border-[#1A3570] text-white"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#142850] border border-white/10 text-white"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -675,7 +682,7 @@ export default function Sidebar() {
 
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="w-56 bg-[#0D2147] border-r border-[#1A3570] h-full">
+          <div className="w-56 bg-[#142850] border-r border-white/10 h-full">
             <SidebarContent />
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setMobileOpen(false)} />
