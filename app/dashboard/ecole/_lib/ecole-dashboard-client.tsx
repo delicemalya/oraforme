@@ -36,21 +36,27 @@ function StatCard({
   color: string; href?: string; i: number
 }) {
   const inner = (
-    <div className="p-5 bg-[#0f1e3d] border border-[#1a2d50] rounded-xl hover:border-[#30363D] transition-all group h-full">
-      <div className="flex items-start justify-between mb-3">
-        <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${color}18` }}>
+    <div style={{
+      padding: 20,
+      background: 'var(--card-bg)',
+      border: '1px solid var(--border)',
+      borderRadius: 12,
+      height: '100%',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${color}18` }}>
           <Icon size={16} style={{ color }} />
         </div>
-        {href && <ChevronRight size={14} className="text-[#484F58] group-hover:text-[#8B949E] transition-colors" />}
+        {href && <ChevronRight size={14} style={{ color: 'var(--text-secondary)' }} />}
       </div>
-      <div className="text-2xl font-bold text-[#FFFFFF] mb-0.5">{value}</div>
-      <div className="text-xs text-[#8B949E]">{label}</div>
-      {sub && <div className="text-[10px] text-[#484F58] mt-0.5">{sub}</div>}
+      <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{value}</div>
+      <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{label}</div>
+      {sub && <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2, opacity: 0.7 }}>{sub}</div>}
     </div>
   )
   return (
     <motion.div {...fade(i)}>
-      {href ? <Link href={href}>{inner}</Link> : inner}
+      {href ? <Link href={href} style={{ display: 'block', height: '100%' }}>{inner}</Link> : inner}
     </motion.div>
   )
 }
@@ -59,35 +65,45 @@ function QuickAction({ icon: Icon, label, href, color }: { icon: React.ElementTy
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 p-3 bg-[#0f1e3d] border border-[#1a2d50] rounded-xl hover:border-[#30363D] transition-all group"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '10px 14px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--border)',
+        borderRadius: 12,
+        textDecoration: 'none',
+        transition: 'border-color 0.15s',
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F08900' }}
+      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)' }}
     >
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
+      <div style={{ width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: `${color}18` }}>
         <Icon size={15} style={{ color }} />
       </div>
-      <span className="text-sm text-[#8B949E] group-hover:text-[#FFFFFF] transition-colors truncate">{label}</span>
-      <ChevronRight size={12} className="ml-auto text-[#484F58] shrink-0 group-hover:text-[#8B949E]" />
+      <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+      <ChevronRight size={12} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
     </Link>
   )
 }
 
 function SectionTitle({ title, sub }: { title: string; sub?: string }) {
   return (
-    <div className="mb-4">
-      <h2 className="text-base font-semibold text-[#FFFFFF]">{title}</h2>
-      {sub && <p className="text-xs text-[#8B949E] mt-0.5">{sub}</p>}
+    <div style={{ marginBottom: 16 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{title}</h2>
+      {sub && <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{sub}</p>}
     </div>
   )
 }
 
 function AlertPill({ text, type }: { text: string; type: 'warn' | 'info' | 'ok' }) {
-  const styles = {
-    warn: 'bg-[#F08900]/8 border-[#F08900]/20 text-[#F08900]',
-    info: 'bg-blue-500/8 border-blue-500/20 text-blue-400',
-    ok:   'bg-[#142850]/8 border-[#142850]/20 text-[#142850]',
-  }
+  const s = {
+    warn: { bg: 'rgba(245,30,51,0.08)',   border: 'rgba(245,30,51,0.2)',   color: '#F51E33', Icon: AlertTriangle },
+    info: { bg: 'rgba(240,137,0,0.08)',   border: 'rgba(240,137,0,0.2)',   color: '#F08900', Icon: Bell },
+    ok:   { bg: 'rgba(139,0,112,0.08)',   border: 'rgba(139,0,112,0.2)',   color: '#8B0070', Icon: CheckCircle },
+  }[type]
   return (
-    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs ${styles[type]}`}>
-      {type === 'warn' ? <AlertTriangle size={12} /> : type === 'ok' ? <CheckCircle size={12} /> : <Bell size={12} />}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, border: `1px solid ${s.border}`, background: s.bg, fontSize: 12, color: s.color }}>
+      <s.Icon size={12} />
       {text}
     </div>
   )
@@ -99,15 +115,14 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   const tauxPresence = pct(k.nbActifs - k.nbAbsencesJour, k.nbActifs)
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <motion.div {...fade(0)} className="flex items-center justify-between">
+      <motion.div {...fade(0)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Direction Générale</h1>
-          <p className="text-sm text-[#8B949E]">{nomEcole} — vue d&apos;ensemble</p>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Direction Générale</h1>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole} — vue d&apos;ensemble</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {k.nbNotifs > 0 && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#F08900]/10 border border-[#F08900]/20 text-[#F08900] text-xs">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, background: 'rgba(240,137,0,0.1)', border: '1px solid rgba(240,137,0,0.2)', color: '#F08900', fontSize: 12 }}>
               <Bell size={11} />
               {k.nbNotifs} alerte{k.nbNotifs > 1 ? 's' : ''}
             </div>
@@ -115,33 +130,30 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         </div>
       </motion.div>
 
-      {/* KPIs académiques */}
       <div>
         <SectionTitle title="Académique" sub="Données en temps réel" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits"  value={k.nbEtudiants}    sub={`${k.nbActifs} actifs`}        color="#F08900" href="/dashboard/ecole/scolarite" />
-          <StatCard i={2} icon={Users}          label="Enseignants"         value={k.nbEnseignants}  sub="Personnel pédagogique"         color="#F08900" href="/dashboard/ecole/rh" />
-          <StatCard i={3} icon={UserX}          label="Absences aujourd'hui"value={k.nbAbsencesJour} sub={`Taux présence ${tauxPresence}%`} color="#F51E33" href="/dashboard/ecole/scolarite" />
-          <StatCard i={4} icon={BookOpen}        label="Examens à venir"    value={k.nbExamensAvenir}sub="Sessions programmées"          color="#142850" href="/dashboard/ecole/scolarite" />
+          <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits"   value={k.nbEtudiants}    sub={`${k.nbActifs} actifs`}           color="#F08900" href="/dashboard/ecole/scolarite" />
+          <StatCard i={2} icon={Users}          label="Enseignants"          value={k.nbEnseignants}  sub="Personnel pédagogique"            color="#F08900" href="/dashboard/ecole/rh" />
+          <StatCard i={3} icon={UserX}          label="Absences aujourd'hui" value={k.nbAbsencesJour} sub={`Taux présence ${tauxPresence}%`}  color="#F51E33" href="/dashboard/ecole/scolarite" />
+          <StatCard i={4} icon={BookOpen}       label="Examens à venir"      value={k.nbExamensAvenir}sub="Sessions programmées"             color="#8B0070" href="/dashboard/ecole/scolarite" />
         </div>
       </div>
 
-      {/* KPIs financiers */}
       <div>
         <SectionTitle title="Finances" sub="Ce mois-ci" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard i={5} icon={TrendingUp} label="Recettes du mois"     value={`${fmt(k.revenuMois)} F`}     sub="Paiements scolaires"    color="#142850" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={6} icon={AlertTriangle} label="Impayés en attente" value={`${fmt(k.montantImpayes)} F`} sub={`${k.nbPaiementsEnAttente} dossiers`} color="#F08900" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={7} icon={Wallet}      label="Solde trésorerie"    value={`${fmt(k.soldeTresorerie)} F`} sub="Cumul du mois"          color="#F08900" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={8} icon={Users}       label="Employés"            value={k.nbEmployes}                  sub={`${k.nbHeurePending} heures à valider`} color="#8B0070" href="/dashboard/ecole/rh" />
+          <StatCard i={5} icon={TrendingUp}    label="Recettes du mois"     value={`${fmt(k.revenuMois)} F`}      sub="Paiements scolaires"           color="#F08900" href="/dashboard/ecole/comptabilite" />
+          <StatCard i={6} icon={AlertTriangle} label="Impayés en attente"   value={`${fmt(k.montantImpayes)} F`}  sub={`${k.nbPaiementsEnAttente} dossiers`} color="#F51E33" href="/dashboard/ecole/comptabilite" />
+          <StatCard i={7} icon={Wallet}        label="Solde trésorerie"     value={`${fmt(k.soldeTresorerie)} F`} sub="Cumul du mois"                color="#F08900" href="/dashboard/ecole/comptabilite" />
+          <StatCard i={8} icon={Users}         label="Employés"             value={k.nbEmployes}                  sub={`${k.nbHeurePending} heures à valider`} color="#8B0070" href="/dashboard/ecole/rh" />
         </div>
       </div>
 
-      {/* Alertes */}
       {(k.nbAbsencesJour > 0 || k.nbPaiementsEnAttente > 0 || k.nbHeurePending > 0) && (
         <motion.div {...fade(9)}>
           <SectionTitle title="Alertes du jour" />
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {k.nbAbsencesJour > 0 && <AlertPill type="warn" text={`${k.nbAbsencesJour} absence${k.nbAbsencesJour > 1 ? 's' : ''} enregistrée${k.nbAbsencesJour > 1 ? 's' : ''} aujourd'hui`} />}
             {k.nbPaiementsEnAttente > 0 && <AlertPill type="warn" text={`${k.nbPaiementsEnAttente} paiement${k.nbPaiementsEnAttente > 1 ? 's' : ''} en attente`} />}
             {k.nbHeurePending > 0 && <AlertPill type="info" text={`${k.nbHeurePending} déclaration${k.nbHeurePending > 1 ? 's' : ''} d'heures à valider`} />}
@@ -149,16 +161,15 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         </motion.div>
       )}
 
-      {/* Actions rapides */}
       <motion.div {...fade(10)}>
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-          <QuickAction icon={Plus}          label="Ajouter un étudiant"    href="/dashboard/ecole/scolarite"                    color="#F08900" />
-          <QuickAction icon={Users}         label="Ajouter un enseignant"  href="/dashboard/ecole/rh"                           color="#F08900" />
-          <QuickAction icon={CalendarCheck} label="Marquer les présences"  href="/dashboard/ecole/scolarite"                    color="#142850" />
-          <QuickAction icon={Award}         label="Valider un diplôme"     href="/dashboard/ecole/direction"                    color="#8B0070" />
-          <QuickAction icon={FileText}      label="Générer un bulletin"    href="/dashboard/ecole/scolarite"                    color="#142850" />
-          <QuickAction icon={Settings2}     label="Paramètres académiques" href="/dashboard/ecole/parametres-academiques"       color="#F51E33" />
+          <QuickAction icon={Plus}          label="Ajouter un étudiant"    href="/dashboard/ecole/scolarite"               color="#F08900" />
+          <QuickAction icon={Users}         label="Ajouter un enseignant"  href="/dashboard/ecole/rh"                      color="#F08900" />
+          <QuickAction icon={CalendarCheck} label="Marquer les présences"  href="/dashboard/ecole/scolarite"               color="#8B0070" />
+          <QuickAction icon={Award}         label="Valider un diplôme"     href="/dashboard/ecole/direction"               color="#8B0070" />
+          <QuickAction icon={FileText}      label="Générer un bulletin"    href="/dashboard/ecole/scolarite"               color="#F08900" />
+          <QuickAction icon={Settings2}     label="Paramètres académiques" href="/dashboard/ecole/parametres-academiques"  color="#F51E33" />
         </div>
       </motion.div>
     </div>
@@ -169,25 +180,25 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">RAF — Finances & Trésorerie</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>RAF — Finances & Trésorerie</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
 
       <div>
         <SectionTitle title="Situation financière" sub="Ce mois-ci" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard i={1} icon={TrendingUp}    label="Recettes du mois"    value={`${fmt(k.revenuMois)} F`}     color="#142850" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={2} icon={AlertTriangle} label="Impayés en attente"  value={`${fmt(k.montantImpayes)} F`} color="#F08900" sub={`${k.nbPaiementsEnAttente} dossiers`} href="/dashboard/ecole/comptabilite" />
-          <StatCard i={3} icon={Wallet}        label="Solde trésorerie"    value={`${fmt(k.soldeTresorerie)} F`} color="#F08900" href="/dashboard/ecole/comptabilite" />
-          <StatCard i={4} icon={CheckCircle}   label="Heures à valider"    value={k.nbHeurePending}              color="#8B0070" sub="Déclarations formateurs" href="/dashboard/ecole/rh" />
+          <StatCard i={1} icon={TrendingUp}    label="Recettes du mois"   value={`${fmt(k.revenuMois)} F`}      color="#F08900" href="/dashboard/ecole/comptabilite" />
+          <StatCard i={2} icon={AlertTriangle} label="Impayés en attente" value={`${fmt(k.montantImpayes)} F`}  color="#F51E33" sub={`${k.nbPaiementsEnAttente} dossiers`} href="/dashboard/ecole/comptabilite" />
+          <StatCard i={3} icon={Wallet}        label="Solde trésorerie"   value={`${fmt(k.soldeTresorerie)} F`} color="#F08900" href="/dashboard/ecole/comptabilite" />
+          <StatCard i={4} icon={CheckCircle}   label="Heures à valider"   value={k.nbHeurePending}              color="#8B0070" sub="Déclarations formateurs" href="/dashboard/ecole/rh" />
         </div>
       </div>
 
       <div>
         <SectionTitle title="RH & Paie" />
         <div className="grid grid-cols-2 gap-3">
-          <StatCard i={5} icon={Users}  label="Total employés" value={k.nbEmployes}  color="#F08900" href="/dashboard/ecole/rh" />
-          <StatCard i={6} icon={Clock}  label="Heures à payer" value={k.nbHeurePending} sub="En attente de validation" color="#F51E33" href="/dashboard/ecole/rh" />
+          <StatCard i={5} icon={Users} label="Total employés" value={k.nbEmployes}     color="#F08900" href="/dashboard/ecole/rh" />
+          <StatCard i={6} icon={Clock} label="Heures à payer" value={k.nbHeurePending} sub="En attente de validation" color="#F51E33" href="/dashboard/ecole/rh" />
         </div>
       </div>
 
@@ -200,10 +211,10 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(8)}>
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 gap-2">
-          <QuickAction icon={Wallet}    label="Trésorerie"           href="/dashboard/ecole/comptabilite" color="#F08900" />
-          <QuickAction icon={CheckCircle} label="Valider heures"     href="/dashboard/ecole/rh"           color="#142850" />
-          <QuickAction icon={Download}  label="Export paie"          href="/dashboard/ecole/rh"           color="#8B0070" />
-          <QuickAction icon={FileText}  label="Journal comptable"    href="/dashboard/ecole/comptabilite" color="#F08900" />
+          <QuickAction icon={Wallet}      label="Trésorerie"        href="/dashboard/ecole/comptabilite" color="#F08900" />
+          <QuickAction icon={CheckCircle} label="Valider heures"    href="/dashboard/ecole/rh"           color="#8B0070" />
+          <QuickAction icon={Download}    label="Export paie"       href="/dashboard/ecole/rh"           color="#8B0070" />
+          <QuickAction icon={FileText}    label="Journal comptable" href="/dashboard/ecole/comptabilite" color="#F08900" />
         </div>
       </motion.div>
     </div>
@@ -215,18 +226,17 @@ function ScolariteView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">Service Scolarité</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Service Scolarité</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard i={1} icon={GraduationCap} label="Étudiants actifs"     value={k.nbActifs}          color="#F08900" href="/dashboard/ecole/scolarite" />
-        <StatCard i={2} icon={UserX}         label="Absences aujourd'hui" value={k.nbAbsencesJour}    color="#F51E33" sub={`Présence ${tauxPresence}%`} href="/dashboard/ecole/scolarite" />
-        <StatCard i={3} icon={BookOpen}      label="Examens à venir"      value={k.nbExamensAvenir}   color="#142850" href="/dashboard/ecole/scolarite" />
-        <StatCard i={4} icon={Users}         label="Total inscrits"        value={k.nbEtudiants}       color="#F08900" href="/dashboard/ecole/scolarite" />
+        <StatCard i={1} icon={GraduationCap} label="Étudiants actifs"     value={k.nbActifs}         color="#F08900" href="/dashboard/ecole/scolarite" />
+        <StatCard i={2} icon={UserX}         label="Absences aujourd'hui" value={k.nbAbsencesJour}   color="#F51E33" sub={`Présence ${tauxPresence}%`} href="/dashboard/ecole/scolarite" />
+        <StatCard i={3} icon={BookOpen}      label="Examens à venir"      value={k.nbExamensAvenir}  color="#8B0070" href="/dashboard/ecole/scolarite" />
+        <StatCard i={4} icon={Users}         label="Total inscrits"       value={k.nbEtudiants}      color="#F08900" href="/dashboard/ecole/scolarite" />
       </div>
 
-      {/* Alertes du jour */}
       <motion.div {...fade(5)} className="space-y-2">
         <SectionTitle title="Alertes & Rappels" />
         {k.nbAbsencesJour > 5 && <AlertPill type="warn" text={`Taux d'absence élevé : ${k.nbAbsencesJour} absents aujourd'hui`} />}
@@ -237,12 +247,12 @@ function ScolariteView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(6)}>
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-          <QuickAction icon={CalendarCheck} label="Marquer les présences"  href="/dashboard/ecole/scolarite" color="#F08900" />
-          <QuickAction icon={Plus}          label="Ajouter un étudiant"    href="/dashboard/ecole/scolarite" color="#142850" />
-          <QuickAction icon={FileText}      label="Générer un bulletin"    href="/dashboard/ecole/scolarite" color="#F08900" />
-          <QuickAction icon={BookOpen}      label="Créer un examen"        href="/dashboard/ecole/scolarite" color="#8B0070" />
-          <QuickAction icon={Award}         label="Attestations"           href="/dashboard/ecole/scolarite" color="#142850" />
-          <QuickAction icon={BarChart2}     label="Rapports absences"      href="/dashboard/ecole/scolarite" color="#F08900" />
+          <QuickAction icon={CalendarCheck} label="Marquer les présences" href="/dashboard/ecole/scolarite" color="#F08900" />
+          <QuickAction icon={Plus}          label="Ajouter un étudiant"   href="/dashboard/ecole/scolarite" color="#F08900" />
+          <QuickAction icon={FileText}      label="Générer un bulletin"   href="/dashboard/ecole/scolarite" color="#F08900" />
+          <QuickAction icon={BookOpen}      label="Créer un examen"       href="/dashboard/ecole/scolarite" color="#8B0070" />
+          <QuickAction icon={Award}         label="Attestations"          href="/dashboard/ecole/scolarite" color="#8B0070" />
+          <QuickAction icon={BarChart2}     label="Rapports absences"     href="/dashboard/ecole/scolarite" color="#F08900" />
         </div>
       </motion.div>
     </div>
@@ -253,14 +263,14 @@ function RhView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">RH & Paie</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>RH & Paie</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <StatCard i={1} icon={Users}   label="Total employés"        value={k.nbEmployes}      color="#F08900" href="/dashboard/ecole/rh" />
-        <StatCard i={2} icon={Users}   label="Enseignants"           value={k.nbEnseignants}   color="#F08900" href="/dashboard/ecole/rh" />
-        <StatCard i={3} icon={Clock}   label="Heures à valider"      value={k.nbHeurePending}  color="#F51E33" sub="Déclarations en attente" href="/dashboard/ecole/rh" />
+        <StatCard i={1} icon={Users} label="Total employés"   value={k.nbEmployes}     color="#F08900" href="/dashboard/ecole/rh" />
+        <StatCard i={2} icon={Users} label="Enseignants"      value={k.nbEnseignants}  color="#F08900" href="/dashboard/ecole/rh" />
+        <StatCard i={3} icon={Clock} label="Heures à valider" value={k.nbHeurePending} color="#F51E33" sub="Déclarations en attente" href="/dashboard/ecole/rh" />
       </div>
 
       {k.nbHeurePending > 0 && (
@@ -272,10 +282,10 @@ function RhView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(5)}>
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 gap-2">
-          <QuickAction icon={CheckCircle} label="Valider heures formateurs" href="/dashboard/ecole/rh"     color="#142850" />
-          <QuickAction icon={Plus}        label="Ajouter un employé"         href="/dashboard/ecole/rh"     color="#F08900" />
-          <QuickAction icon={FileText}    label="Bulletin de paie"           href="/dashboard/ecole/rh"     color="#F08900" />
-          <QuickAction icon={Download}    label="Exporter le livre de paie"  href="/dashboard/ecole/rh"     color="#8B0070" />
+          <QuickAction icon={CheckCircle} label="Valider heures formateurs" href="/dashboard/ecole/rh" color="#8B0070" />
+          <QuickAction icon={Plus}        label="Ajouter un employé"        href="/dashboard/ecole/rh" color="#F08900" />
+          <QuickAction icon={FileText}    label="Bulletin de paie"          href="/dashboard/ecole/rh" color="#F08900" />
+          <QuickAction icon={Download}    label="Exporter le livre de paie" href="/dashboard/ecole/rh" color="#8B0070" />
         </div>
       </motion.div>
     </div>
@@ -290,30 +300,26 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">Mon espace Formateur</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Mon espace Formateur</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <StatCard i={1} icon={Clock}        label="Heures déclarées"   value={k.myHeuresTotales}  color="#F08900" />
-        <StatCard i={2} icon={CheckCircle}  label="Heures validées"    value={k.myHeuresValidees} color="#142850" sub={`${pctValidees}% validées`} />
-        <StatCard i={3} icon={BookOpen}     label="Examens à venir"    value={k.nbExamensAvenir}  color="#F08900" href="/dashboard/ecole/scolarite" />
+        <StatCard i={1} icon={Clock}       label="Heures déclarées" value={k.myHeuresTotales}  color="#F08900" />
+        <StatCard i={2} icon={CheckCircle} label="Heures validées"  value={k.myHeuresValidees} color="#8B0070" sub={`${pctValidees}% validées`} />
+        <StatCard i={3} icon={BookOpen}    label="Examens à venir"  value={k.nbExamensAvenir}  color="#F08900" href="/dashboard/ecole/scolarite" />
       </div>
 
-      {/* Progress bar heures */}
       {k.myHeuresTotales > 0 && (
-        <motion.div {...fade(4)} className="p-4 bg-[#0f1e3d] border border-[#1a2d50] rounded-xl">
-          <div className="flex justify-between text-xs text-[#8B949E] mb-2">
+        <motion.div {...fade(4)} style={{ padding: 16, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8 }}>
             <span>Heures validées</span>
-            <span className="text-[#142850] font-medium">{pctValidees}%</span>
+            <span style={{ color: '#F08900', fontWeight: 600 }}>{pctValidees}%</span>
           </div>
-          <div className="h-2 bg-[#1a2d50] rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#142850] rounded-full transition-all"
-              style={{ width: `${pctValidees}%` }}
-            />
+          <div style={{ height: 8, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+            <div style={{ height: '100%', background: '#F08900', borderRadius: 999, width: `${pctValidees}%`, transition: 'width 0.4s ease' }} />
           </div>
-          <p className="text-xs text-[#484F58] mt-2">
+          <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 8 }}>
             {k.myHeuresValidees}h validées / {k.myHeuresTotales}h déclarées
           </p>
         </motion.div>
@@ -322,10 +328,10 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(5)}>
         <SectionTitle title="Actions rapides" />
         <div className="grid grid-cols-2 gap-2">
-          <QuickAction icon={Plus}      label="Déclarer des heures"   href="/dashboard/ecole/rh"         color="#F08900" />
-          <QuickAction icon={BookOpen}  label="Mes cours"             href="/dashboard/ecole/scolarite"  color="#F08900" />
-          <QuickAction icon={FileText}  label="Créer un examen"       href="/dashboard/ecole/scolarite"  color="#142850" />
-          <QuickAction icon={Download}  label="Mes paiements"         href="/dashboard/ecole/rh"         color="#8B0070" />
+          <QuickAction icon={Plus}     label="Déclarer des heures" href="/dashboard/ecole/rh"        color="#F08900" />
+          <QuickAction icon={BookOpen} label="Mes cours"           href="/dashboard/ecole/scolarite" color="#F08900" />
+          <QuickAction icon={FileText} label="Créer un examen"     href="/dashboard/ecole/scolarite" color="#8B0070" />
+          <QuickAction icon={Download} label="Mes paiements"       href="/dashboard/ecole/rh"        color="#8B0070" />
         </div>
       </motion.div>
     </div>
@@ -333,16 +339,16 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 }
 
 function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
-  const moyenneColor = k.myNotesMoyenne === null ? '#8B949E'
-    : k.myNotesMoyenne >= 14 ? '#142850'
-    : k.myNotesMoyenne >= 10 ? '#F08900'
+  const moyenneColor = k.myNotesMoyenne === null ? '#8B0070'
+    : k.myNotesMoyenne >= 14 ? '#F08900'
+    : k.myNotesMoyenne >= 10 ? '#8B0070'
     : '#F51E33'
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">Mon espace Étudiant</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Mon espace Étudiant</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -352,13 +358,13 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
           value={k.myNotesMoyenne !== null ? `${k.myNotesMoyenne.toFixed(2)}/20` : 'N/A'}
           color={moyenneColor}
         />
-        <StatCard i={2} icon={UserX}       label="Mes absences"      value={k.myAbsences}     color="#F51E33" />
-        <StatCard i={3} icon={BookOpen}    label="Examens à venir"   value={k.nbExamensAvenir} color="#F08900" href="/dashboard/ecole/espace-etudiant" />
+        <StatCard i={2} icon={UserX}       label="Mes absences"    value={k.myAbsences}      color="#F51E33" />
+        <StatCard i={3} icon={BookOpen}    label="Examens à venir" value={k.nbExamensAvenir}  color="#F08900" href="/dashboard/ecole/espace-etudiant" />
         <StatCard i={4}
           icon={k.myPaiementOk ? CheckCircle : AlertTriangle}
           label="Scolarité"
           value={k.myPaiementOk === null ? 'N/A' : k.myPaiementOk ? 'À jour' : 'En attente'}
-          color={k.myPaiementOk ? '#142850' : '#F08900'}
+          color={k.myPaiementOk ? '#8B0070' : '#F08900'}
         />
       </div>
 
@@ -371,10 +377,10 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(6)}>
         <SectionTitle title="Accès rapide" />
         <div className="grid grid-cols-2 gap-2">
-          <QuickAction icon={FileText}  label="Mes bulletins"       href="/dashboard/ecole/espace-etudiant" color="#F08900" />
-          <QuickAction icon={BookOpen}  label="Mes cours"           href="/dashboard/ecole/espace-etudiant" color="#F08900" />
-          <QuickAction icon={CalendarCheck} label="Mon planning"   href="/dashboard/ecole/espace-etudiant" color="#142850" />
-          <QuickAction icon={Download}  label="Mon attestation"    href="/dashboard/ecole/espace-etudiant" color="#8B0070" />
+          <QuickAction icon={FileText}      label="Mes bulletins"  href="/dashboard/ecole/espace-etudiant" color="#F08900" />
+          <QuickAction icon={BookOpen}      label="Mes cours"      href="/dashboard/ecole/espace-etudiant" color="#F08900" />
+          <QuickAction icon={CalendarCheck} label="Mon planning"   href="/dashboard/ecole/espace-etudiant" color="#8B0070" />
+          <QuickAction icon={Download}      label="Mon attestation"href="/dashboard/ecole/espace-etudiant" color="#8B0070" />
         </div>
       </motion.div>
     </div>
@@ -385,23 +391,23 @@ function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">Espace Parent</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Espace Parent</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
 
-      <motion.div {...fade(1)} className="p-5 bg-[#0f1e3d] border border-[#1a2d50] rounded-xl">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-lg bg-[#8B0070]/15 flex items-center justify-center">
-            <Activity size={16} className="text-[#8B0070]" />
+      <motion.div {...fade(1)} style={{ padding: 20, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(139,0,112,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Activity size={16} style={{ color: '#8B0070' }} />
           </div>
           <div>
-            <div className="text-sm font-semibold text-[#FFFFFF]">Suivi en temps réel</div>
-            <div className="text-xs text-[#8B949E]">Consultez le dossier de votre enfant</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>Suivi en temps réel</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Consultez le dossier de votre enfant</div>
           </div>
         </div>
         <Link
           href="/dashboard/ecole/espace-parent"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#8B0070]/10 text-[#8B0070] text-sm font-medium hover:bg-[#8B0070]/15 transition-colors"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, background: 'rgba(139,0,112,0.1)', color: '#8B0070', fontSize: 14, fontWeight: 500, textDecoration: 'none' }}
         >
           Accéder à l&apos;espace parent <ChevronRight size={14} />
         </Link>
@@ -410,10 +416,10 @@ function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(2)}>
         <SectionTitle title="Accès rapide" />
         <div className="grid grid-cols-2 gap-2">
-          <QuickAction icon={UserX}        label="Présences & absences"  href="/dashboard/ecole/espace-parent" color="#F08900" />
-          <QuickAction icon={FileText}     label="Bulletins de notes"    href="/dashboard/ecole/espace-parent" color="#F08900" />
-          <QuickAction icon={AlertTriangle}label="Alertes"               href="/dashboard/ecole/espace-parent" color="#F51E33" />
-          <QuickAction icon={CalendarCheck}label="Emploi du temps"       href="/dashboard/ecole/espace-parent" color="#142850" />
+          <QuickAction icon={UserX}         label="Présences & absences" href="/dashboard/ecole/espace-parent" color="#F08900" />
+          <QuickAction icon={FileText}      label="Bulletins de notes"   href="/dashboard/ecole/espace-parent" color="#F08900" />
+          <QuickAction icon={AlertTriangle} label="Alertes"              href="/dashboard/ecole/espace-parent" color="#F51E33" />
+          <QuickAction icon={CalendarCheck} label="Emploi du temps"      href="/dashboard/ecole/espace-parent" color="#8B0070" />
         </div>
       </motion.div>
     </div>
@@ -424,21 +430,21 @@ function DtiView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">DTI — Technologies</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>DTI — Technologies</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <StatCard i={1} icon={Users}         label="Comptes actifs"     value={k.nbActifs}       color="#84CC16" />
-        <StatCard i={2} icon={ShieldCheck}   label="Rôles configurés"   value="OK"               color="#142850" />
-        <StatCard i={3} icon={Zap}           label="Notifications"       value={k.nbNotifs}      color="#F08900" />
+        <StatCard i={1} icon={Users}       label="Comptes actifs"   value={k.nbActifs}  color="#F08900" />
+        <StatCard i={2} icon={ShieldCheck} label="Rôles configurés" value="OK"          color="#8B0070" />
+        <StatCard i={3} icon={Zap}         label="Notifications"    value={k.nbNotifs}  color="#F08900" />
       </div>
       <motion.div {...fade(4)}>
         <SectionTitle title="Administration" />
         <div className="grid grid-cols-2 gap-2">
-          <QuickAction icon={ShieldCheck} label="Gérer les rôles"    href="/dashboard/roles"           color="#84CC16" />
-          <QuickAction icon={Users}       label="Équipe & comptes"   href="/dashboard/equipe"          color="#F08900" />
-          <QuickAction icon={Bell}        label="Notifications"      href="/dashboard/parametres"      color="#F08900" />
-          <QuickAction icon={Activity}    label="Paramètres système" href="/dashboard/parametres"      color="#8B0070" />
+          <QuickAction icon={ShieldCheck} label="Gérer les rôles"    href="/dashboard/roles"      color="#8B0070" />
+          <QuickAction icon={Users}       label="Équipe & comptes"   href="/dashboard/equipe"     color="#F08900" />
+          <QuickAction icon={Bell}        label="Notifications"      href="/dashboard/parametres" color="#F08900" />
+          <QuickAction icon={Activity}    label="Paramètres système" href="/dashboard/parametres" color="#8B0070" />
         </div>
       </motion.div>
     </div>
@@ -449,24 +455,24 @@ function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#FFFFFF]">DAAC — Affaires Académiques</h1>
-        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>DAAC — Affaires Académiques</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits" value={k.nbEtudiants}    color="#F51E33" href="/dashboard/ecole/scolarite" />
-        <StatCard i={2} icon={Users}         label="Enseignants"        value={k.nbEnseignants}  color="#F08900" href="/dashboard/ecole/rh" />
-        <StatCard i={3} icon={BookOpen}      label="Examens à venir"    value={k.nbExamensAvenir}color="#F08900" href="/dashboard/ecole/scolarite" />
-        <StatCard i={4} icon={Award}         label="Diplômes en attente"value="—"               color="#8B0070" href="/dashboard/ecole/direction" />
+        <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits" value={k.nbEtudiants}     color="#F51E33" href="/dashboard/ecole/scolarite" />
+        <StatCard i={2} icon={Users}         label="Enseignants"        value={k.nbEnseignants}   color="#F08900" href="/dashboard/ecole/rh" />
+        <StatCard i={3} icon={BookOpen}      label="Examens à venir"    value={k.nbExamensAvenir} color="#F08900" href="/dashboard/ecole/scolarite" />
+        <StatCard i={4} icon={Award}         label="Diplômes en attente"value="—"                color="#8B0070" href="/dashboard/ecole/direction" />
       </div>
       <motion.div {...fade(5)}>
         <SectionTitle title="Actions académiques" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-          <QuickAction icon={Award}         label="Diplômes & soutenances"  href="/dashboard/ecole/direction"                  color="#F51E33" />
-          <QuickAction icon={BookOpen}      label="Programmes & sessions"   href="/dashboard/ecole/scolarite"                  color="#F08900" />
-          <QuickAction icon={FileText}      label="Attestations"            href="/dashboard/ecole/scolarite"                  color="#142850" />
-          <QuickAction icon={BarChart2}     label="Statistiques académiques" href="/dashboard/ecole/direction"                 color="#8B0070" />
-          <QuickAction icon={GraduationCap} label="Étudiants"               href="/dashboard/ecole/scolarite"                 color="#F08900" />
-          <QuickAction icon={Settings2}     label="Paramètres académiques"  href="/dashboard/ecole/parametres-academiques"    color="#142850" />
+          <QuickAction icon={Award}         label="Diplômes & soutenances"   href="/dashboard/ecole/direction"               color="#F51E33" />
+          <QuickAction icon={BookOpen}      label="Programmes & sessions"    href="/dashboard/ecole/scolarite"               color="#F08900" />
+          <QuickAction icon={FileText}      label="Attestations"             href="/dashboard/ecole/scolarite"               color="#8B0070" />
+          <QuickAction icon={BarChart2}     label="Statistiques académiques" href="/dashboard/ecole/direction"               color="#8B0070" />
+          <QuickAction icon={GraduationCap} label="Étudiants"               href="/dashboard/ecole/scolarite"               color="#F08900" />
+          <QuickAction icon={Settings2}     label="Paramètres académiques"  href="/dashboard/ecole/parametres-academiques"  color="#F08900" />
         </div>
       </motion.div>
     </div>
@@ -478,12 +484,12 @@ function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 const ROLE_BADGE: Record<EcoleRole, { label: string; color: string }> = {
   DIRECTION_GENERALE: { label: 'Direction Générale', color: '#F08900' },
   RAF:                { label: 'RAF',                 color: '#F08900' },
-  SCOLARITE:          { label: 'Scolarité',           color: '#142850' },
-  RH_PAIE:            { label: 'RH & Paie',          color: '#8B0070' },
-  FORMATEUR:          { label: 'Formateur',           color: '#142850' },
+  SCOLARITE:          { label: 'Scolarité',           color: '#8B0070' },
+  RH_PAIE:            { label: 'RH & Paie',           color: '#8B0070' },
+  FORMATEUR:          { label: 'Formateur',           color: '#F08900' },
   ETUDIANT:           { label: 'Étudiant',            color: '#8B0070' },
   PARENT:             { label: 'Parent',              color: '#F08900' },
-  DTI:                { label: 'DTI',                 color: '#84CC16' },
+  DTI:                { label: 'DTI',                 color: '#F08900' },
   DAAC:               { label: 'DAAC',                color: '#F51E33' },
 }
 
@@ -500,16 +506,18 @@ export default function EcoleDashboardClient({
   return (
     <div className="pb-8">
       {/* Role badge */}
-      <motion.div {...fade(0)} className="mb-5">
+      <motion.div {...fade(0)} style={{ marginBottom: 20 }}>
         <span
-          className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border"
           style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 999,
             color: badge.color,
             borderColor: `${badge.color}30`,
-            background:  `${badge.color}10`,
+            border: `1px solid ${badge.color}30`,
+            background: `${badge.color}10`,
           }}
         >
-          <span className="w-1.5 h-1.5 rounded-full" style={{ background: badge.color }} />
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: badge.color, display: 'inline-block' }} />
           {badge.label}
         </span>
       </motion.div>
