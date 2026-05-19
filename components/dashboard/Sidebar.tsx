@@ -400,7 +400,7 @@ export default function Sidebar() {
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
                 active
-                  ? 'border-white bg-white/[0.08] text-white font-medium'
+                  ? 'border-[#F08900] bg-white/10 text-white font-medium rounded-r-lg'
                   : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
               }`}
             >

@@ -415,14 +415,19 @@ export function StatutBadge({ statut }: { statut: StatutEtu }) {
   )
 }
 
-export function Avatar({ nom, prenom, photoUrl, size = 32 }: { nom: string; prenom: string; photoUrl: string | null; size?: number }) {
+const AVATAR_PALETTE = ['#F08900', '#F51E33', '#8B0070']
+
+export function Avatar({ nom, prenom, photoUrl, size = 32, avatarIndex }: { nom: string; prenom: string; photoUrl: string | null; size?: number; avatarIndex?: number }) {
   if (photoUrl) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={photoUrl} alt={nom} className="rounded-full object-cover shrink-0" style={{ width: size, height: size }} />
   }
-  const color = `hsl(${(nom.charCodeAt(0) * 7 + prenom.charCodeAt(0) * 3) % 360}, 55%, 38%)`
+  const idx = avatarIndex !== undefined
+    ? avatarIndex % 3
+    : (nom.charCodeAt(0) + prenom.charCodeAt(0)) % 3
+  const bg = AVATAR_PALETTE[idx]
   return (
-    <div className="rounded-full flex items-center justify-center font-bold text-white shrink-0" style={{ width: size, height: size, background: color, fontSize: size * 0.35 }}>
+    <div className="rounded-full flex items-center justify-center shrink-0" style={{ width: size, height: size, background: bg, fontSize: size * 0.35, fontWeight: 700, color: '#FFFFFF' }}>
       {((prenom[0] ?? '') + (nom[0] ?? '')).toUpperCase()}
     </div>
   )
@@ -443,21 +448,18 @@ export function FI({ label, value, onChange, placeholder, type = 'text' }: {
   )
 }
 
-const BRAND_COLORS: Record<string, string> = {
-  '#142850': '#142850',
-  '#8B0070': '#8B0070',
-  '#F08900': '#F08900',
-  '#F51E33': '#F51E33',
-}
-
-export function KpiCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color: string }) {
-  const bg = BRAND_COLORS[color] ?? color
+export function KpiCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
+  const isPrimary = color === '#F08900'
   return (
-    <div className="relative rounded-xl p-4 overflow-hidden" style={{ background: bg }}>
+    <div className="relative rounded-xl overflow-hidden" style={{
+      padding: '20px 24px',
+      background: isPrimary ? '#F08900' : 'rgba(255,255,255,0.06)',
+      border: isPrimary ? 'none' : '1px solid rgba(255,255,255,0.12)',
+    }}>
       <div className="relative">
-        <p className="text-white/70 text-[10px] font-semibold uppercase tracking-wider mb-1">{label}</p>
-        <p className="text-white text-2xl font-bold leading-none">{value}</p>
-        {sub && <p className="text-white/50 text-[10px] mt-1">{sub}</p>}
+        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', marginBottom: 8 }}>{label}</p>
+        <p style={{ fontSize: 36, fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>{value}</p>
+        {sub && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{sub}</p>}
       </div>
     </div>
   )

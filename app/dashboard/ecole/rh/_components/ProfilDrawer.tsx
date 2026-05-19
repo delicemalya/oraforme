@@ -39,16 +39,16 @@ export type ProfilPerson =
 
 // ── Tokens ────────────────────────────────────────────────────────────────────
 
-const G  = '#F4B400'
-const BG = '#080E1A'
-const CARD    = 'rgba(255,255,255,0.03)'
-const BORDER  = 'rgba(255,255,255,0.07)'
-const GOLD_DIM = 'rgba(244,180,0,0.15)'
-const GOLD_BDR = 'rgba(244,180,0,0.28)'
-const T1 = '#F0F4FF'
-const T2 = '#8E9AB8'
-const T3 = '#4A5572'
-const GREEN  = '#142850'
+const G  = '#F08900'
+const BG = '#1a2f50'
+const CARD    = 'rgba(255,255,255,0.06)'
+const BORDER  = 'rgba(255,255,255,0.12)'
+const ORG_DIM = 'rgba(240,137,0,0.15)'
+const ORG_BDR = 'rgba(240,137,0,0.28)'
+const T1 = '#FFFFFF'
+const T2 = 'rgba(255,255,255,0.55)'
+const T3 = 'rgba(255,255,255,0.4)'
+const GREEN  = '#F08900'
 const RED    = '#F51E33'
 const BLUE   = '#8B0070'
 const PURPLE = '#8B0070'
@@ -63,10 +63,9 @@ function Avatar({ name, size = 78 }: { name: string; size?: number }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: '#E07800',
+      background: '#F08900',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size / 2.5, fontWeight: 800, color: '#000',
-      boxShadow: '0 0 0 4px rgba(244,180,0,0.22),0 0 32px rgba(244,180,0,0.14)',
+      fontSize: size / 2.5, fontWeight: 800, color: '#FFFFFF',
     }}>
       {name.charAt(0).toUpperCase()}
     </div>
@@ -94,7 +93,7 @@ function Card({ title, icon, children }: { title: string; icon: string; children
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: '18px 20px' }}>
       <p style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: T1, marginBottom: 14 }}>
-        <span style={{ width: 26, height: 26, borderRadius: 7, background: GOLD_DIM, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>{icon}</span>
+        <span style={{ width: 26, height: 26, borderRadius: 7, background: ORG_DIM, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>{icon}</span>
         {title}
       </p>
       {children}
@@ -180,7 +179,7 @@ function ProfilEmploye({ d }: { d: EmployeFull }) {
         <StatChip label="Salaire brut"  value={fmtN(brut)} sub="FCFA / mois"  color={G}      icon="💰" />
         <StatChip label="Type contrat"  value={d.type_employe}                 color={PURPLE} icon="📋" />
         <StatChip label="Ancienneté"    value={since != null ? `${since} an${since !== 1 ? 's' : ''}` : '—'} color={BLUE} icon="📅" />
-        <StatChip label="Statut"        value={d.statut}  color={d.statut === 'actif' ? GREEN : G} icon="✦" />
+        <StatChip label="Statut"        value={d.statut}  color={d.statut === 'actif' ? RED : T2} icon="✦" />
       </div>
 
       {/* Rémunération détaillée */}
@@ -193,7 +192,7 @@ function ProfilEmploye({ d }: { d: EmployeFull }) {
           {d.prime_rendement > 0 && <PayRow label="Prime rendement"  value={`+${fmtN(d.prime_rendement)} FCFA`} color={GREEN} mono />}
           {d.taux_horaire && d.taux_horaire > 0 && <PayRow label="Taux horaire" value={`${fmtN(d.taux_horaire)} FCFA/h`} color={BLUE} mono />}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#142850', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(240,137,0,0.25)`, marginTop: 10 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE BRUT</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(brut)} FCFA</span>
         </div>
@@ -256,7 +255,7 @@ function ProfilEnseignant({ d }: { d: Enseignant }) {
         <StatChip label="Salaire mensuel" value={d.salaire_mensuel ? fmtN(d.salaire_mensuel) : '—'} sub="FCFA"    color={G}      icon="💰" />
         <StatChip label="Taux horaire"    value={d.taux_horaire    ? fmtN(d.taux_horaire)    : '—'} sub="FCFA/h"  color={BLUE}   icon="⏱" />
         <StatChip label="Matière"         value={d.matiere ?? '—'}                                   color={PURPLE} icon="📚" />
-        <StatChip label="Statut"          value={d.statut} color={d.statut === 'actif' ? GREEN : G}              icon="✦" />
+        <StatChip label="Statut"          value={d.statut} color={d.statut === 'actif' ? RED : T2}               icon="✦" />
       </div>
 
       <Card title="Rémunération & Paiement" icon="💰">
@@ -265,7 +264,7 @@ function ProfilEnseignant({ d }: { d: Enseignant }) {
           {d.taux_horaire    != null && <PayRow label="Taux horaire"    value={`${fmtN(d.taux_horaire)} FCFA/h`}  color={BLUE} mono />}
         </div>
         {d.salaire_mensuel != null && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#142850', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(240,137,0,0.25)`, marginTop: 10 }}>
             <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>TOTAL MENSUEL</span>
             <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire_mensuel)} FCFA</span>
           </div>
@@ -365,7 +364,7 @@ function ProfilStaff({ d }: { d: StaffFull }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
         <StatChip label="Salaire mensuel" value={fmtN(d.salaire)} sub="FCFA / mois"  color={G}      icon="💰" />
         <StatChip label="Poste"           value={d.poste}                             color={PURPLE} icon="💼" />
-        <StatChip label="Statut"          value={d.statut} color={d.statut === 'actif' ? GREEN : G} icon="✦" />
+        <StatChip label="Statut"          value={d.statut} color={d.statut === 'actif' ? RED : T2} icon="✦" />
       </div>
 
       <Card title="Informations & Contact" icon="👤">
@@ -380,7 +379,7 @@ function ProfilStaff({ d }: { d: StaffFull }) {
       </Card>
 
       <Card title="Paiement" icon="💳">
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#142850', borderRadius: 10, border: `1px solid rgba(244,180,0,0.2)`, marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(240,137,0,0.25)`, marginBottom: 12 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE MENSUEL</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire)} FCFA</span>
         </div>
@@ -416,19 +415,19 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
     switch (person.type) {
       case 'employe': {
         const d = person.data
-        return { nom: d.nom, prenom: d.prenom, roleTag: `${d.poste}${d.departement ? ` · ${d.departement}` : ''}`, statusColor: d.statut === 'actif' ? GREEN : G, phone: d.telephone, email: d.email_pro }
+        return { nom: d.nom, prenom: d.prenom, roleTag: `${d.poste}${d.departement ? ` · ${d.departement}` : ''}`, statusColor: d.statut === 'actif' ? RED : G, phone: d.telephone, email: d.email_pro }
       }
       case 'enseignant': {
         const d = person.data
-        return { nom: d.nom, prenom: d.prenom, roleTag: d.matiere ?? 'Formateur', statusColor: d.statut === 'actif' ? GREEN : G, phone: d.telephone, email: d.email }
+        return { nom: d.nom, prenom: d.prenom, roleTag: d.matiere ?? 'Formateur', statusColor: d.statut === 'actif' ? RED : G, phone: d.telephone, email: d.email }
       }
       case 'etudiant': {
         const d = person.data
-        return { nom: d.nom, prenom: d.prenom, roleTag: `${d.niveau}${d.classe ? ` · ${d.classe}` : ''}`, statusColor: d.statut === 'actif' ? GREEN : RED, phone: d.tel_parent, email: d.email_parent }
+        return { nom: d.nom, prenom: d.prenom, roleTag: `${d.niveau}${d.classe ? ` · ${d.classe}` : ''}`, statusColor: d.statut === 'actif' ? RED : PURPLE, phone: d.tel_parent, email: d.email_parent }
       }
       case 'staff': {
         const d = person.data
-        return { nom: d.nom, prenom: d.prenom, roleTag: d.poste, statusColor: d.statut === 'actif' ? GREEN : G, phone: d.telephone, email: d.email }
+        return { nom: d.nom, prenom: d.prenom, roleTag: d.poste, statusColor: d.statut === 'actif' ? RED : G, phone: d.telephone, email: d.email }
       }
     }
   })()
@@ -453,8 +452,8 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
           fontFamily: "'Sora',system-ui,-apple-system,sans-serif",
         }}>
 
-        {/* Gold accent line top */}
-        <div style={{ height: 1, background: '#142850', flexShrink: 0 }} />
+        {/* Orange accent line top */}
+        <div style={{ height: 2, background: '#F08900', flexShrink: 0 }} />
 
         {/* ── Profile header ─────────────────────────────────────────────── */}
         <div style={{
@@ -469,7 +468,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
           {/* Close + type badge */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: GOLD_DIM, border: `1px solid ${GOLD_BDR}`, color: G, letterSpacing: 0.6 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: ORG_DIM, border: `1px solid ${ORG_BDR}`, color: G, letterSpacing: 0.6 }}>
                 {TYPE_LABEL[person.type].toUpperCase()}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: statusColor }}>
@@ -494,7 +493,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
                 {prenom} <span style={{ color: G }}>{nom.toUpperCase()}</span>
               </h2>
               <div style={{ marginBottom: 12 }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: GOLD_DIM, border: `1px solid ${GOLD_BDR}`, color: G, fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: ORG_DIM, border: `1px solid ${ORG_BDR}`, color: G, fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>
                   {roleTag}
                 </span>
               </div>
@@ -516,7 +515,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
 
             {/* Modifier button */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
-              <button style={{ padding: '8px 16px', borderRadius: 9, background: '#E07800', color: '#000', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(244,180,0,0.25)' }}>
+              <button style={{ padding: '8px 16px', borderRadius: 9, background: '#F08900', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>
                 ✏️ Modifier
               </button>
               <button style={{ padding: '7px 16px', borderRadius: 9, background: CARD, color: T2, fontWeight: 600, fontSize: 12, border: `1px solid ${BORDER}`, cursor: 'pointer' }}>

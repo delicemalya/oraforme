@@ -81,7 +81,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
         </div>
         <button onClick={() => setShowWizard(true)}
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold"
-          style={{ background: '#142850', color: '#fff' }}>
+          style={{ background: '#F08900', color: '#fff' }}>
           <Plus size={13} /> Nouvel employé
         </button>
       </div>
@@ -96,28 +96,28 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {displayed.map(e => {
+          {displayed.map((e, idx) => {
             const brut = (e.salaire_base || 0) + (e.prime_logement || 0) + (e.prime_transport || 0) + (e.prime_risque || 0) + (e.prime_rendement || 0)
             const sc = e.statut === 'actif'
-              ? { color: '#142850', bg: '#14285018', label: 'ACTIF' }
+              ? { color: '#F51E33', bg: 'rgba(245,30,51,0.15)', border: '1px solid #F51E33', label: 'ACTIF' }
               : e.statut === 'suspendu'
-              ? { color: '#F08900', bg: '#F0890018', label: 'SUSPENDU' }
-              : { color: '#8B949E', bg: '#8B949E18', label: (e.statut ?? 'INACTIF').toUpperCase() }
+              ? { color: '#F08900', bg: 'rgba(240,137,0,0.15)', border: '1px solid #F08900', label: 'SUSPENDU' }
+              : { color: 'rgba(255,255,255,0.6)', bg: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', label: (e.statut ?? 'INACTIF').toUpperCase() }
             return (
               <motion.div key={e.id} layout
-                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
-                style={{ background: 'rgba(255,255,255,0.025)' }}>
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-[#F08900] hover:-translate-y-0.5 transition-all"
+                style={{ background: 'rgba(255,255,255,0.06)' }}>
 
                 {/* Status */}
                 <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide"
-                  style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
+                  style={{ color: sc.color, background: sc.bg, border: sc.border }}>{sc.label}</span>
 
                 {/* Avatar + Nom */}
                 <div className="flex flex-col items-center text-center pt-1">
                   <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.1] mb-2 shrink-0">
                     {e.photo_url
                       ? <img src={e.photo_url} alt="" className="w-full h-full object-cover" />
-                      : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={64} />}
+                      : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={64} avatarIndex={idx} />}
                   </div>
                   <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.postnom ? e.postnom + ' ' : ''}{e.nom}</p>
                   <p className="text-[11px] text-[#8B949E] mt-0.5 capitalize">{e.poste}</p>
@@ -146,8 +146,8 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <DollarSign size={11} className="text-[#142850] shrink-0" />
-                    <p className="text-[11px] font-semibold" style={{ color: '#142850' }}>{fmt(brut)} FCFA/mois</p>
+                    <DollarSign size={11} className="text-[#F08900] shrink-0" />
+                    <p className="text-[11px] font-semibold" style={{ color: '#F08900' }}>{fmt(brut)} FCFA/mois</p>
                   </div>
                 </div>
 
@@ -313,8 +313,8 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
             {([['tous', 'Tous'], ['employe', 'Employés'], ['prestataire', 'Prestataires']] as const).map(([k, l]) => (
               <button key={k} onClick={() => setFilterType(k)}
                 className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-                style={{ background: filterType === k ? (k === 'prestataire' ? '#F08900' : '#142850') : 'transparent',
-                         color: filterType === k ? '#fff' : '#8B949E' }}>
+                style={{ background: filterType === k ? '#F08900' : 'transparent',
+                         color: filterType === k ? '#fff' : 'rgba(255,255,255,0.5)' }}>
                 {l}
               </button>
             ))}
@@ -324,7 +324,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
             <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#142850', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
           <Plus size={13} /> Ajouter
         </button>
       </div>
@@ -333,16 +333,16 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="rounded-xl border border-[#142850]/30 p-5 space-y-4"
-            style={{ background: 'rgba(46,160,67,0.04)' }}>
+            className="rounded-xl border border-white/10 p-5 space-y-4"
+            style={{ background: 'rgba(255,255,255,0.04)' }}>
 
-            <p className="text-sm font-bold text-[#142850]">Nouvel enseignant / formateur</p>
+            <p className="text-sm font-bold text-white">Nouvel enseignant / formateur</p>
 
             {/* Type : Employé ou Prestataire */}
             <div>
               <p className={SEC}>Type de relation</p>
               <div className="flex gap-2">
-                {([['employe', 'Enseignant Employé', 'CDI/CDD/Vacataire/Stagiaire — paie mensuelle', '#142850'],
+                {([['employe', 'Enseignant Employé', 'CDI/CDD/Vacataire/Stagiaire — paie mensuelle', '#8B0070'],
                    ['prestataire', 'Prestataire', 'Payé à l\'heure via Trésorerie', '#F08900']] as const).map(([val, label, desc, color]) => (
                   <button key={val} type="button" onClick={() => setForm(p => ({ ...p, type_enseignant: val, type_contrat: '', salaire: '' }))}
                     className="flex-1 rounded-xl border p-3 text-left transition-all"
@@ -477,7 +477,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
             </div>
 
             <div className="flex gap-2 pt-1">
-              <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
               <button onClick={() => { setShowForm(false); setForm(EMPTY_ENS_FORM); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -541,7 +541,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                     <>
                       <div>
                         <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Mensuel</p>
-                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#142850' }}>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F08900' }}>
                           {e.salaire_mensuel ? `${fmt(e.salaire_mensuel)} F` : '—'}
                         </p>
                       </div>
@@ -724,7 +724,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
           <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
           <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-52" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#142850', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
           <Plus size={13} /> Ajouter un agent
         </button>
       </div>
@@ -732,10 +732,10 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="rounded-xl border border-[#142850]/30 p-5 space-y-4"
-            style={{ background: 'rgba(46,160,67,0.04)' }}>
+            className="rounded-xl border border-white/10 p-5 space-y-4"
+            style={{ background: 'rgba(255,255,255,0.04)' }}>
 
-            <p className="text-sm font-bold text-[#142850]">Nouvel agent</p>
+            <p className="text-sm font-bold text-white">Nouvel agent</p>
 
             {/* Photo */}
             <div className="flex items-center gap-4">
@@ -833,7 +833,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
             </div>
 
             <div className="flex gap-2 pt-1">
-              <button onClick={save} disabled={saving || !form.nom || !form.poste} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.nom || !form.poste} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
               <button onClick={() => { setShowForm(false); setForm(EMPTY_STAFF); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -849,16 +849,16 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {displayed.map(s => {
             const sc = s.statut === 'actif'
-              ? { color: '#142850', bg: '#14285018', label: 'ACTIF' }
-              : { color: '#8B949E', bg: '#8B949E18', label: 'INACTIF' }
+              ? { color: '#F51E33', bg: 'rgba(245,30,51,0.15)', border: '1px solid #F51E33', label: 'ACTIF' }
+              : { color: 'rgba(255,255,255,0.6)', bg: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', label: 'INACTIF' }
             return (
               <motion.div key={s.id} layout
-                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
-                style={{ background: 'rgba(255,255,255,0.025)' }}>
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-[#F08900] hover:-translate-y-0.5 transition-all"
+                style={{ background: 'rgba(255,255,255,0.06)' }}>
 
                 {/* Status badge */}
                 <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide"
-                  style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
+                  style={{ color: sc.color, background: sc.bg, border: sc.border }}>{sc.label}</span>
 
                 {/* Avatar + Nom */}
                 <div className="flex flex-col items-center text-center pt-1">
@@ -874,7 +874,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                 {/* Salaire */}
                 <div className="pt-2 border-t border-white/[0.06] text-center">
                   <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Salaire mensuel</p>
-                  <p className="text-sm font-bold mt-0.5" style={{ color: '#142850' }}>{fmt(s.salaire)} FCFA</p>
+                  <p className="text-sm font-bold mt-0.5" style={{ color: '#F08900' }}>{fmt(s.salaire)} FCFA</p>
                 </div>
 
                 {/* Contact */}
@@ -950,16 +950,16 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
     setConges(p => p.map(c => c.id === id ? { ...c, statut } : c))
   }
 
-  const STATUT_COLORS: Record<string, { color: string; bg: string }> = {
-    en_attente: { color: '#F08900', bg: '#F0890018' },
-    approuve:   { color: '#142850', bg: '#14285018' },
-    refuse:     { color: '#F51E33', bg: '#F51E3318' },
+  const STATUT_COLORS: Record<string, { color: string; bg: string; border: string }> = {
+    en_attente: { color: '#F08900', bg: 'rgba(240,137,0,0.15)',   border: '1px solid #F08900' },
+    approuve:   { color: '#FFFFFF', bg: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' },
+    refuse:     { color: '#F51E33', bg: 'rgba(245,30,51,0.15)',   border: '1px solid #F51E33' },
   }
 
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#142850' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
           <Plus size={13} /> Demande de congé
         </button>
       </div>
@@ -987,7 +987,7 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.employe_id || !form.date_debut || !form.date_fin} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#142850' }}>
+              <button onClick={add} disabled={saving || !form.employe_id || !form.date_debut || !form.date_fin} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Soumettre
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -1017,7 +1017,7 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
                     <td className="px-4 py-2.5">
                       {c.statut === 'en_attente' && (
                         <div className="flex gap-1">
-                          <button onClick={() => updateStatut(c.id, 'approuve')} className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: '#14285018', color: '#142850' }}>Approuver</button>
+                          <button onClick={() => updateStatut(c.id, 'approuve')} className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF' }}>Approuver</button>
                           <button onClick={() => updateStatut(c.id, 'refuse')}   className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: '#F51E3318', color: '#F51E33' }}>Refuser</button>
                         </div>
                       )}
@@ -1565,7 +1565,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
               placeholder="https://…" value={logoInput} onChange={e => setLogoInput(e.target.value)} />
           </div>
           <button onClick={() => { setLogoUrl(logoInput); localStorage.setItem(`logo_${tenantId}`, logoInput); setShowLogo(false) }}
-            className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1" style={{ background: '#142850', color: '#fff' }}>
+            className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1" style={{ background: '#F08900', color: '#fff' }}>
             <Check size={12} /> OK
           </button>
         </div>
@@ -1653,7 +1653,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                 </div>
                 <div className="p-3 text-center" style={{ background: 'rgba(46,160,67,0.06)' }}>
                   <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">Net à payer</p>
-                  <p className="text-base font-bold mt-0.5" style={{ color: '#142850' }}>{fmt(net)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#F08900' }}>{fmt(net)} <span className="text-[9px] text-white/40">FCFA</span></p>
                 </div>
               </div>
 
@@ -1666,7 +1666,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                     return (
                       <button key={m.id} onClick={() => payer(m.id)} disabled={paying}
                         className="flex flex-col items-center gap-1.5 py-4 rounded-xl border font-semibold transition-all disabled:opacity-40 text-[11px]"
-                        style={{ background: 'rgba(46,160,67,0.08)', borderColor: 'rgba(46,160,67,0.3)', color: '#142850' }}>
+                        style={{ background: 'rgba(240,137,0,0.08)', borderColor: 'rgba(240,137,0,0.3)', color: '#F08900' }}>
                         {paying ? <Loader2 size={16} className="animate-spin" /> : <Icon size={16} />}
                         {m.label}
                       </button>
@@ -1720,7 +1720,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                       <td className="px-4 py-2.5 font-bold text-white">{fmt(p.net)} FCFA</td>
                       <td className="px-4 py-2.5 text-[#484F58] capitalize">{(p.mode_paiement ?? '—').replace('_', ' ')}</td>
                       <td className="px-4 py-2.5">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: '#142850', background: '#14285018' }}>Payé</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: '#FFFFFF', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' }}>Payé</span>
                       </td>
                       <td className="px-4 py-2.5">
                         <button onClick={() => downloadBulletin(p)} title="Télécharger bulletin"
@@ -1742,7 +1742,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
         {toast && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-            style={{ background: toast.ok ? '#142850' : '#dc2626' }}>
+            style={{ background: toast.ok ? '#8B0070' : '#F51E33' }}>
             {toast.ok ? <Check size={14} /> : <AlertCircle size={14} />} {toast.msg}
           </motion.div>
         )}
@@ -1822,11 +1822,11 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
         <div className="space-y-2">
           {postes.map(p => (
             <div key={p.id} className="rounded-xl border border-white/[0.06] p-4 flex items-start gap-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-              <AlertCircle size={14} className="mt-0.5 shrink-0" style={{ color: p.statut === 'ouvert' ? '#142850' : '#484F58' }} />
+              <AlertCircle size={14} className="mt-0.5 shrink-0" style={{ color: p.statut === 'ouvert' ? '#F08900' : 'rgba(255,255,255,0.35)' }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-white">{p.titre}</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'ouvert' ? { color: '#142850', background: '#14285018' } : { color: '#8B949E', background: '#8B949E18' }}>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'ouvert' ? { color: '#F08900', background: 'rgba(240,137,0,0.15)', border: '1px solid #F08900' } : { color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
                     {p.statut === 'ouvert' ? 'Ouvert' : 'Fermé'}
                   </span>
                 </div>
@@ -1953,7 +1953,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
   const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
     declare:   { label: 'Déclaré',  color: '#F08900', bg: '#F0890018' },
     validated: { label: 'Validé',   color: '#F08900', bg: '#F0890018' },
-    paye:      { label: 'Payé',     color: '#142850', bg: '#14285018' },
+    paye:      { label: 'Payé',     color: '#FFFFFF', bg: 'rgba(255,255,255,0.08)' },
   }
 
   const kpis = [
@@ -2001,7 +2001,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
                   <p className="text-[10px] text-[#8B949E]">
                     {h.heures}h · {h.matiere ?? '—'} · {new Date(h.date_declaration).toLocaleDateString('fr-FR')}
                     {h.periode ? ` · ${h.periode}` : ''}
-                    {' · '}<span style={{ color: '#142850' }}>{new Intl.NumberFormat('fr-FR').format(h.heures * (ens?.taux_horaire ?? 5000))} FCFA</span>
+                    {' · '}<span style={{ color: '#F08900' }}>{new Intl.NumberFormat('fr-FR').format(h.heures * (ens?.taux_horaire ?? 5000))} FCFA</span>
                   </p>
                 </div>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: cfg.color, background: cfg.bg }}>{cfg.label}</span>
@@ -2014,7 +2014,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
                   )}
                   {h.statut === 'validated' && (
                     <button onClick={() => marquerPaye(h)} disabled={saving === h.id}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
                       {saving === h.id ? <Loader2 size={10} className="animate-spin" /> : <DollarSign size={10} />} Payer
                     </button>
                   )}
@@ -2028,7 +2028,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
       {toast && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-          style={{ background: '#142850' }}>
+          style={{ background: '#8B0070' }}>
           <Check size={14} /> {toast}
         </motion.div>
       )}
@@ -2082,7 +2082,7 @@ export default function RhPage() {
           return (
             <button key={t.id} onClick={() => setSubTab(t.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#142850' : 'transparent', color: subTab === t.id ? '#fff' : '#8B949E' }}>
+              style={{ background: subTab === t.id ? '#8B0070' : 'transparent', color: subTab === t.id ? '#fff' : 'rgba(255,255,255,0.5)' }}>
               <Icon size={12} /> {t.label}
             </button>
           )
