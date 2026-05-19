@@ -3,14 +3,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
-  BarChart2, Users, GraduationCap, BookOpen,
-  TrendingUp, Wallet, AlertTriangle, RefreshCw, Loader2,
-  Receipt, Bot, Calculator, ChevronRight, Plus,
-  DollarSign, ShieldCheck, Building2,
+  Users, GraduationCap, BookOpen,
+  TrendingUp, AlertTriangle, RefreshCw, Loader2,
+  Receipt, Calculator, ChevronRight, Plus,
+  DollarSign, ShieldCheck,
 } from 'lucide-react'
 import Link from 'next/link'
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts'
 import { supabase } from '@/lib/supabase'
@@ -57,46 +57,40 @@ type OverviewData = {
   recentPaie: { id: string; montant: number; methode: string; libelle: string; created_at: string }[]
 }
 
-// ── Static KPI Card (gradient, no interactivity) ──────────────────────────────
+// ── KPI Card — fond neutre, icône couleur token ───────────────────────────────
 
 function StatCard({
-  icon: Icon, label, value, sub, gradient, href, badge, badgeVariant, i,
+  icon: Icon, label, value, sub, color, href, badge, i,
 }: {
-  icon: React.ElementType; label: string; value: string | number; sub: string
-  gradient: string; href: string; badge?: string
-  badgeVariant?: 'up' | 'down' | 'neutral'; i: number
+  icon: React.ElementType; label: string; value: string | number; sub?: string
+  color: string; href?: string; badge?: string; i: number
 }) {
-  return (
-    <motion.div {...fade(i)} whileHover={{ y: -3, scale: 1.015 }} transition={{ duration: 0.2 }}>
-      <Link href={href} className="block">
-        <div className="relative rounded-2xl p-4 sm:p-5 overflow-hidden flex flex-col justify-between"
-          style={{ background: gradient, minHeight: 156 }}>
-          {/* Shine */}
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 80% 15%, rgba(255,255,255,0.18) 0%, transparent 58%)' }} />
-          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10 pointer-events-none" />
-
-          {/* Top row */}
-          <div className="relative flex items-start justify-between mb-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-              <Icon size={18} className="text-white" />
-            </div>
-            {badge && (
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${
-                badgeVariant === 'up'   ? 'bg-white/25' :
-                badgeVariant === 'down' ? 'bg-red-500/40' : 'bg-white/15'
-              }`}>{badge}</span>
-            )}
-          </div>
-
-          {/* Bottom */}
-          <div className="relative">
-            <p className="text-white/75 text-[11px] font-semibold uppercase tracking-wider mb-1">{label}</p>
-            <p className="text-white text-3xl font-extrabold font-mono leading-none mb-1">{value}</p>
-            <p className="text-white/55 text-[11px]">{sub}</p>
-          </div>
+  const inner = (
+    <div className="kpi-card" style={{
+      background: 'var(--card-bg)',
+      border: '1px solid var(--border)',
+      borderRadius: 12,
+      padding: '20px 24px',
+      height: '100%',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ width: 36, height: 36, background: `${color}18`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Icon size={18} style={{ color }} />
         </div>
-      </Link>
+        {badge && (
+          <span style={{ background: 'rgba(240,137,0,0.1)', color: '#F08900', fontSize: 10, fontWeight: 600, borderRadius: 4, padding: '2px 8px' }}>
+            {badge}
+          </span>
+        )}
+      </div>
+      <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: 6 }}>{label}</p>
+      <p style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4 }}>{value}</p>
+      {sub && <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{sub}</p>}
+    </div>
+  )
+  return (
+    <motion.div {...fade(i)} whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+      {href ? <Link href={href} style={{ display: 'block', height: '100%' }}>{inner}</Link> : inner}
     </motion.div>
   )
 }
@@ -111,7 +105,6 @@ function RevenueCard({
   nbPaiementsJour: number; nbPaiementsSemaine: number; nbPaiementsMois: number; i: number
 }) {
   const [period, setPeriod] = useState<'jour' | 'semaine' | 'mois'>('mois')
-
   const cfg = {
     jour:    { value: revenuJour,    nb: nbPaiementsJour,    sub: "Aujourd'hui" },
     semaine: { value: revenuSemaine, nb: nbPaiementsSemaine, sub: '7 derniers jours' },
@@ -119,40 +112,34 @@ function RevenueCard({
   }[period]
 
   return (
-    <motion.div {...fade(i)} whileHover={{ y: -3, scale: 1.015 }} transition={{ duration: 0.2 }}>
-      <Link href="/dashboard/ecole/comptabilite" className="block">
-        <div className="relative rounded-2xl p-4 sm:p-5 overflow-hidden flex flex-col justify-between"
-          style={{ background: 'linear-gradient(135deg, #071535, #1A3570)', minHeight: 156 }}>
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 80% 15%, rgba(255,255,255,0.18) 0%, transparent 58%)' }} />
-          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10 pointer-events-none" />
-
-          {/* Top row: icon + period selector */}
-          <div className="relative flex items-start justify-between mb-3 gap-2">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-              <TrendingUp size={18} className="text-white" />
+    <motion.div {...fade(i)} whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+      <Link href="/dashboard/ecole/comptabilite" style={{ display: 'block', height: '100%' }}>
+        <div className="kpi-card" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px', height: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ width: 36, height: 36, background: 'rgba(240,137,0,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <TrendingUp size={18} style={{ color: '#F08900' }} />
             </div>
-            {/* Period toggle */}
-            <div className="flex gap-0.5 bg-black/20 rounded-lg p-0.5" onClick={e => e.preventDefault()}>
+            <div style={{ display: 'flex', gap: 2, background: 'var(--border)', borderRadius: 8, padding: 3 }}
+              onClick={e => e.preventDefault()}>
               {(['jour', 'semaine', 'mois'] as const).map(p => (
-                <button key={p} onClick={e => { e.preventDefault(); e.stopPropagation(); setPeriod(p) }}
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
-                    period === p ? 'bg-white text-[#071535] shadow' : 'text-white/70 hover:text-white'
-                  }`}>
+                <button key={p}
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); setPeriod(p) }}
+                  style={{
+                    padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700,
+                    background: period === p ? '#F08900' : 'transparent',
+                    color: period === p ? '#FFFFFF' : 'var(--text-secondary)',
+                    border: 'none', cursor: 'pointer',
+                  }}>
                   {p === 'jour' ? 'Jour' : p === 'semaine' ? '7j' : 'Mois'}
                 </button>
               ))}
             </div>
           </div>
-
-          {/* Bottom */}
-          <div className="relative">
-            <p className="text-white/75 text-[11px] font-semibold uppercase tracking-wider mb-1">Recettes</p>
-            <p className="text-white text-3xl font-extrabold font-mono leading-none mb-1">
-              {fmt(cfg.value)} <span className="text-xl font-bold">FCFA</span>
-            </p>
-            <p className="text-white/55 text-[11px]">{cfg.sub} · {cfg.nb} paiement{cfg.nb !== 1 ? 's' : ''}</p>
-          </div>
+          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: 6 }}>Recettes</p>
+          <p style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4 }}>
+            {fmt(cfg.value)} <span style={{ fontSize: 16, fontWeight: 600 }}>FCFA</span>
+          </p>
+          <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{cfg.sub} · {cfg.nb} paiement{cfg.nb !== 1 ? 's' : ''}</p>
         </div>
       </Link>
     </motion.div>
@@ -272,7 +259,7 @@ export default function EcoleOverviewPage() {
   useEffect(() => { if (tenantId) load() }, [tenantId, load])
 
   if (tenantLoading || loading) return (
-    <div className="flex items-center justify-center h-64 text-[#8B949E]">
+    <div className="flex items-center justify-center h-64" style={{ color: 'var(--text-secondary)' }}>
       <Loader2 className="animate-spin mr-2" size={18} /> Chargement du tableau de bord…
     </div>
   )
@@ -286,49 +273,47 @@ export default function EcoleOverviewPage() {
     ? Math.round((d.revenuMois / (d.revenuMois + d.montantImpayes)) * 100) : 100
 
   return (
-    <div className="flex flex-col gap-5 pb-10">
+    <div className="flex flex-col gap-6 pb-10">
 
-      {/* ── Hero Banner ─────────────────────────────────────────────────────── */}
-      <motion.div {...fade(0)}
-        className="relative rounded-2xl overflow-hidden border border-white/[0.07]"
-        style={{ background: 'linear-gradient(120deg, #0F2D3C 0%, #0C3040 30%, #0A2535 60%, #081D2A 100%)' }}>
-        <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(240,163,10,0.13) 0%, transparent 70%)' }} />
-        <div className="relative z-10 p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+      {/* ── Banner — fond orange plat ────────────────────────────────────────── */}
+      <motion.div {...fade(0)} style={{ background: '#F08900', borderRadius: 12, padding: '20px 24px' }}>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h1 className="text-2xl font-extrabold tracking-tight text-white">Bonjour, Admin 👋</h1>
-              <button onClick={load}
-                className="p-1.5 rounded-lg border border-white/10 text-white/30 hover:text-white/60 transition-all">
+            <div className="flex items-center gap-2 mb-1">
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>Bonjour, Admin 👋</h1>
+              <button onClick={load} style={{ color: 'rgba(255,255,255,0.5)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}
+                className="hover:opacity-80 transition-opacity">
                 <RefreshCw size={13} />
               </button>
             </div>
-            <p className="text-sm text-white/55 leading-relaxed mb-5">
-              Gérez votre établissement, vos équipes et vos finances en un seul endroit.<br />
-              <strong className="text-white/75">{nomEcole}</strong> · Tableau de bord complet
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>
+              Gérez votre établissement, vos équipes et vos finances en un seul endroit.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
+              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> · Tableau de bord complet
+            </p>
+            <div className="flex flex-wrap gap-3 mt-4">
               <Link href="/dashboard/ecole/scolarite"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-black hover:opacity-90 transition-all"
-                style={{ background: 'linear-gradient(135deg, #F08900, #D4880A)', boxShadow: '0 4px 16px rgba(240,163,10,0.3)' }}>
-                <Plus size={14} /> Inscrire un étudiant
+                style={{ background: '#FFFFFF', color: '#F08900', fontWeight: 700, fontSize: 13, padding: '8px 16px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Plus size={13} /> Inscrire un étudiant
               </Link>
               <Link href="/dashboard/ecole/direction"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white border border-white/15 bg-white/[0.08] hover:bg-white/[0.14] transition-all">
-                <BarChart2 size={14} /> Voir les rapports
+                style={{ background: 'transparent', color: '#FFFFFF', fontWeight: 600, fontSize: 13, padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.5)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                Voir les rapports
               </Link>
             </div>
           </div>
-          {/* Quick stats in hero */}
+
+          {/* Mini-stats */}
           <div className="flex gap-3 flex-shrink-0 flex-wrap">
             {[
-              { label: 'Recouvrement',     value: `${recoveryRate}%`,          color: recoveryRate >= 80 ? 'text-[#1A3570]' : 'text-[#F08900]' },
-              { label: 'Sessions actives', value: d.sessionsEnCours,           color: 'text-[#8B0070]' },
-              { label: 'Impayés',          value: `${d.nbImpayes} dossiers`,   color: d.nbImpayes > 0 ? 'text-[#F51E33]' : 'text-[#1A3570]' },
+              { label: 'Recouvrement',     value: `${recoveryRate}%` },
+              { label: 'Sessions actives', value: d.sessionsEnCours },
+              { label: 'Impayés',          value: `${d.nbImpayes} dossiers` },
             ].map(s => (
-              <div key={s.label} className="bg-white/[0.07] border border-white/10 rounded-2xl px-4 py-3 text-center min-w-[110px]">
-                <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1.5">{s.label}</p>
-                <p className={`text-xl font-black font-mono leading-none ${s.color}`}>{s.value}</p>
+              <div key={s.label} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '12px 16px', textAlign: 'center', minWidth: 100 }}>
+                <p style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{s.label}</p>
+                <p style={{ fontSize: 18, fontWeight: 800, color: '#FFFFFF' }}>{s.value}</p>
               </div>
             ))}
           </div>
@@ -337,227 +322,184 @@ export default function EcoleOverviewPage() {
 
       {/* ── 5 KPI Cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <StatCard i={1} icon={GraduationCap} label="Inscrits (année en cours)"
+          value={d.nbEtudiants} sub={`${d.nbActifs} actifs · ${d.nbSuspendus} suspendus`}
+          color="#F08900" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% actifs`} />
 
-        {/* 1. Inscrits */}
-        <StatCard
-          i={1}
-          icon={GraduationCap}
-          label="Inscrits (année en cours)"
-          value={d.nbEtudiants}
-          sub={`${d.nbActifs} actifs · ${d.nbSuspendus} suspendus`}
-          gradient="linear-gradient(135deg, #C2410C, #F08900)"
-          href="/dashboard/ecole/scolarite"
-          badge={`${tauxActifs}% actifs`}
-          badgeVariant="up"
-        />
+        <StatCard i={2} icon={Users} label="Agents"
+          value={nbAgents} sub={`${d.nbEmployes} employés · ${d.nbStaff} staff direction`}
+          color="#F08900" href="/dashboard/ecole/rh" badge="Personnel" />
 
-        {/* 2. Agents */}
-        <StatCard
-          i={2}
-          icon={Users}
-          label="Agents"
-          value={nbAgents}
-          sub={`${d.nbEmployes} employés · ${d.nbStaff} staff direction`}
-          gradient="linear-gradient(135deg, #1E40AF, #8B0070)"
-          href="/dashboard/ecole/rh"
-          badge="Personnel"
-          badgeVariant="neutral"
-        />
+        <StatCard i={3} icon={BookOpen} label="Formateurs (Enseignants)"
+          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`}
+          color="#8B0070" href="/dashboard/ecole/rh" badge="Actifs" />
 
-        {/* 3. Formateurs */}
-        <StatCard
-          i={3}
-          icon={BookOpen}
-          label="Formateurs (Enseignants)"
-          value={d.nbEnseignants}
-          sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`}
-          gradient="linear-gradient(135deg, #5B21B6, #8B0070)"
-          href="/dashboard/ecole/rh"
-          badge="Actifs"
-          badgeVariant="up"
-        />
+        <RevenueCard i={4}
+          revenuJour={d.revenuJour} revenuSemaine={d.revenuSemaine} revenuMois={d.revenuMois}
+          nbPaiementsJour={d.nbPaiementsJour} nbPaiementsSemaine={d.nbPaiementsSemaine} nbPaiementsMois={d.nbPaiementsMois} />
 
-        {/* 4. Recettes (with period toggle) */}
-        <RevenueCard
-          i={4}
-          revenuJour={d.revenuJour}
-          revenuSemaine={d.revenuSemaine}
-          revenuMois={d.revenuMois}
-          nbPaiementsJour={d.nbPaiementsJour}
-          nbPaiementsSemaine={d.nbPaiementsSemaine}
-          nbPaiementsMois={d.nbPaiementsMois}
-        />
-
-        {/* 5. Sorties du jour */}
-        <StatCard
-          i={5}
-          icon={Receipt}
-          label="Sorties du jour"
-          value={`${fmt(d.depensesJour)}`}
-          sub={`FCFA de dépenses aujourd'hui`}
-          gradient={d.depensesJour > 100000
-            ? 'linear-gradient(135deg, #991B1B, #F51E33)'
-            : 'linear-gradient(135deg, #374151, #6B7280)'}
-          href="/dashboard/ecole/tresorerie"
-          badge="Dépenses"
-          badgeVariant={d.depensesJour > 100000 ? 'down' : 'neutral'}
-        />
+        <StatCard i={5} icon={Receipt} label="Sorties du jour"
+          value={fmt(d.depensesJour)} sub="FCFA de dépenses aujourd'hui"
+          color={d.depensesJour > 100000 ? '#F51E33' : '#F08900'}
+          href="/dashboard/ecole/tresorerie" badge="Dépenses" />
       </div>
 
-      {/* ── Chart + right panel ──────────────────────────────────────────────── */}
+      {/* ── Graphique + panel droit ──────────────────────────────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
-        {/* Area chart (2/3) */}
-        <motion.div {...fade(6)} className="xl:col-span-2 border border-white/[0.07] rounded-2xl p-5" style={{ background: '#111827' }}>
+        {/* Graphique flux financiers */}
+        <motion.div {...fade(6)} className="xl:col-span-2" style={{
+          background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, padding: 20,
+        }}>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-sm font-extrabold text-[#FFFFFF]">Analyse des Flux Financiers</p>
-              <p className="text-[11px] text-[#8B949E] mt-0.5">Paiements scolaires — 8 derniers mois</p>
+              <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>Analyse des Flux Financiers</p>
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Paiements scolaires — 8 derniers mois</p>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-[#8B949E]">
-              <div className="w-2 h-2 rounded-full bg-[#F08900]" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-secondary)' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#F08900' }} />
               Revenus encaissés
             </div>
           </div>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={d.monthly} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="gOrange2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#F08900" stopOpacity={0.28} />
-                  <stop offset="95%" stopColor="#F08900" stopOpacity={0.02} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-              <XAxis dataKey="month" tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
+            <LineChart data={d.monthly} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="month" tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} width={50}
                 tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
               <Tooltip
-                contentStyle={{ background: '#0f1e3d', border: '1px solid #1a2d50', borderRadius: 10, fontSize: 12 }}
-                labelStyle={{ color: '#8B949E' }}
+                contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12 }}
+                labelStyle={{ color: 'var(--text-secondary)' }}
                 formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, 'Recettes']}
               />
-              <Area type="monotone" dataKey="montant" stroke="#F08900" strokeWidth={2.5} fill="url(#gOrange2)"
-                dot={false} activeDot={{ r: 4, fill: '#F08900', stroke: '#0f1e3d', strokeWidth: 2 }} />
-            </AreaChart>
+              <Line type="monotone" dataKey="montant" stroke="#F08900" strokeWidth={2}
+                dot={false} activeDot={{ r: 4, fill: '#F08900', stroke: 'rgba(240,137,0,0.25)', strokeWidth: 6 }} />
+            </LineChart>
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Recovery goal (1/3) */}
-        <motion.div {...fade(7)}
-          className="rounded-2xl p-5 border border-white/[0.08] flex flex-col justify-between"
-          style={{ background: 'linear-gradient(135deg, #0F2D3C, #0A1F2E)' }}>
+        {/* Objectif recouvrement */}
+        <motion.div {...fade(7)} style={{
+          background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, padding: 20,
+          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        }}>
           <div>
-            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-3">Objectif Recouvrement</p>
-            <div className="flex items-baseline justify-between mb-2">
-              <p className="text-5xl font-black tracking-tight text-white">{recoveryRate}%</p>
-              <span className="text-[11px] font-bold" style={{
-                color: recoveryRate >= 80 ? '#1A3570' : recoveryRate >= 50 ? '#F08900' : '#F51E33'
+            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Objectif Recouvrement</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+              <p style={{ fontSize: 48, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>{recoveryRate}%</p>
+              <span style={{
+                fontSize: 11, fontWeight: 700,
+                color: recoveryRate >= 80 ? '#F08900' : recoveryRate >= 50 ? '#F08900' : '#F51E33',
               }}>
                 {recoveryRate >= 80 ? '✓ En bonne voie' : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
               </span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,0.07)' }}>
-              <div className="h-full rounded-full transition-all duration-700" style={{
+            <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden', marginBottom: 12 }}>
+              <div style={{
+                height: '100%', borderRadius: 3,
                 width: `${recoveryRate}%`,
-                background: recoveryRate >= 80 ? 'linear-gradient(90deg,#1A3570,#1A3570)' : 'linear-gradient(90deg,#F08900,#F08900)',
-                boxShadow: `0 0 10px ${recoveryRate >= 80 ? 'rgba(16,185,129,0.45)' : 'rgba(245,158,11,0.45)'}`,
+                background: recoveryRate >= 80 ? '#F08900' : '#F51E33',
+                transition: 'width 0.7s ease',
               }} />
             </div>
-            <p className="text-[11px] text-white/35 leading-relaxed">
+            <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {d.montantImpayes > 0
-                ? <><strong className="text-white/60">{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
-                : <>Aucun impayé — <strong className="text-white/60">excellent !</strong></>
+                ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
+                : <>Aucun impayé — <strong style={{ color: '#F08900' }}>excellent !</strong></>
               }
             </p>
           </div>
-
-          {/* Annual revenue */}
-          <div className="mt-4 pt-4 border-t border-white/10">
-            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1">Chiffre d&apos;affaire annuel</p>
-            <p className="text-xl font-black text-[#F08900] font-mono">{fmt(d.revenuAnnee)} FCFA</p>
-            <p className="text-[10px] text-white/35 mt-0.5">Total encaissé depuis le début</p>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Chiffre d&apos;affaire annuel</p>
+            <p style={{ fontSize: 20, fontWeight: 800, color: '#F08900' }}>{fmt(d.revenuAnnee)} FCFA</p>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Total encaissé depuis le début</p>
           </div>
         </motion.div>
       </div>
 
-      {/* ── Raccourcis rapides (5 items) ─────────────────────────────────────── */}
+      {/* ── Raccourcis ───────────────────────────────────────────────────────── */}
       <motion.div {...fade(8)}>
-        <p className="text-[10px] font-bold text-[#484F58] uppercase tracking-widest mb-3">Raccourcis</p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Raccourcis</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
-            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,   color: '#8B0070', sub: 'Journal OHADA' },
-            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,        color: '#8B0070', sub: 'Personnel & salaires' },
-            { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,  color: '#F08900', sub: 'Permissions' },
-            { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap,color: '#1A3570', sub: 'Inscriptions & frais' },
-            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,   color: '#F51E33', sub: 'Direction & rapports' },
+            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,    color: '#8B0070', sub: 'Journal OHADA' },
+            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,         color: '#F08900', sub: 'Personnel & salaires' },
+            { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,   color: '#F08900', sub: 'Permissions' },
+            { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap, color: '#F08900', sub: 'Inscriptions & frais' },
+            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,    color: '#F51E33', sub: 'Direction & rapports' },
           ].map(({ label, href, color, icon: Icon, sub }) => (
             <Link key={href} href={href}
-              className="flex items-center gap-3 p-3.5 rounded-xl border border-[#1a2d50] bg-[#0f1e3d] hover:border-[#30363D] hover:bg-[#1a2d50] transition-all group">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
-                <Icon size={16} style={{ color }} />
+              className="flex items-center gap-3 transition-all duration-200 group"
+              style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', textDecoration: 'none' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = '#F08900'; el.style.transform = 'translateY(-1px)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'var(--border)'; el.style.transform = 'translateY(0)' }}
+            >
+              <Icon size={20} style={{ color, flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 1 }}>{label}</p>
+                <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{sub}</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#FFFFFF] group-hover:text-white transition-colors truncate">{label}</p>
-                <p className="text-[10px] text-[#484F58] truncate">{sub}</p>
-              </div>
-              <ChevronRight size={12} className="text-[#484F58] shrink-0" />
+              <ChevronRight size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
             </Link>
           ))}
         </div>
       </motion.div>
 
-      {/* ── Transactions Récentes ────────────────────────────────────────────── */}
-      <motion.div {...fade(9)} className="border border-white/[0.07] rounded-2xl overflow-hidden" style={{ background: '#111827' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+      {/* ── Transactions récentes ─────────────────────────────────────────────── */}
+      <motion.div {...fade(9)} style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
           <div>
-            <p className="text-sm font-extrabold text-[#FFFFFF]">Transactions Récentes</p>
-            <p className="text-[10px] text-[#484F58] mt-0.5">Derniers paiements scolaires enregistrés</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Transactions Récentes</p>
+            <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>Derniers paiements scolaires enregistrés</p>
           </div>
-          <Link href="/dashboard/ecole/direction" className="text-xs text-[#F08900]/80 hover:text-[#F08900] font-semibold transition-colors">
-            Voir tout l&apos;historique →
+          <Link href="/dashboard/ecole/direction" style={{ fontSize: 12, color: '#F08900', fontWeight: 600 }}>
+            Voir tout →
           </Link>
         </div>
 
         {d.recentPaie.length === 0 ? (
-          <div className="py-12 text-center">
-            <DollarSign size={28} className="text-[#30363D] mx-auto mb-2" />
-            <p className="text-sm text-[#484F58]">Aucune transaction pour le moment.</p>
+          <div style={{ padding: '48px 0', textAlign: 'center' }}>
+            <DollarSign size={28} style={{ color: 'var(--border)', margin: '0 auto 8px' }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Aucune transaction pour le moment.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.01)' }}>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   {['Description', 'Date', 'Montant', 'Mode'].map(h => (
-                    <th key={h} className="text-left px-4 py-2.5 text-[9.5px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
+                    <th key={h} className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {d.recentPaie.map(p => (
-                  <tr key={p.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors cursor-pointer">
+                  <tr key={p.id} style={{ borderBottom: '1px solid var(--border)' }}
+                    className="transition-colors"
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(240,137,0,0.03)'}
+                    onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                  >
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-[#F08900]/10 flex items-center justify-center shrink-0">
-                          <DollarSign size={13} className="text-[#F08900]" />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(240,137,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <DollarSign size={13} style={{ color: '#F08900' }} />
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-[#FFFFFF] truncate max-w-[180px]">
+                          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', maxWidth: 180 }} className="truncate">
                             {p.libelle || 'Paiement scolarité'}
                           </p>
-                          <p className="text-[10px] text-[#8B949E] mt-0.5">Scolarité</p>
+                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>Scolarité</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-[11px] text-[#8B949E] font-mono whitespace-nowrap">
+                    <td className="px-4 py-3" style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
                       {new Date(p.created_at).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-[13px] font-bold text-[#1A3570] font-mono">+{fmt(p.montant)} FCFA</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#F08900', fontFamily: 'monospace' }}>+{fmt(p.montant)} FCFA</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#1A3570]/10 text-[#1A3570]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#1A3570]" />
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: 'rgba(240,137,0,0.1)', color: '#F08900' }}>
                         {p.methode?.replace(/_/g, ' ') ?? 'Espèces'}
                       </span>
                     </td>
@@ -569,17 +511,15 @@ export default function EcoleOverviewPage() {
         )}
       </motion.div>
 
-      {/* ── Alertes (si impayés) ─────────────────────────────────────────────── */}
+      {/* ── Alerte impayés ───────────────────────────────────────────────────── */}
       {d.nbImpayes > 0 && (
-        <motion.div {...fade(10)}
-          className="rounded-2xl p-4 flex gap-3 items-start border border-[#F08900]/20"
-          style={{ background: 'rgba(245,158,11,0.08)' }}>
-          <AlertTriangle size={17} className="text-[#F08900] shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm font-bold text-[#FFFFFF]">Impayés en attente</p>
-            <p className="text-[11px] text-white/45 mt-1">
+        <motion.div {...fade(10)} style={{ background: 'rgba(245,30,51,0.06)', border: '1px solid rgba(245,30,51,0.2)', borderRadius: 12, padding: '16px 20px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <AlertTriangle size={17} style={{ color: '#F51E33', flexShrink: 0, marginTop: 1 }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Impayés en attente</p>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
               {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA à recouvrer.{' '}
-              <Link href="/dashboard/ecole/scolarite" className="text-[#F08900] hover:underline">Traiter →</Link>
+              <Link href="/dashboard/ecole/scolarite" style={{ color: '#F08900', fontWeight: 600 }}>Traiter →</Link>
             </p>
           </div>
         </motion.div>
