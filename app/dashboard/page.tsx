@@ -36,7 +36,10 @@ export default async function DashboardPage() {
     plan: string; secteur_activite: string | null
   } | null
 
-  const tid       = profile.tenant_id
+  const firstName  = (profile as { prenom?: string | null }).prenom ?? null
+  const lastName   = (profile as { nom?: string | null }).nom ?? null
+  const userName   = firstName ? [firstName, lastName].filter(Boolean).join(" ") : null
+  const tid        = profile.tenant_id
   const secteur   = tenant?.secteur_activite ?? null
   const ecoleRole = (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null
 
@@ -211,6 +214,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
+      userName={userName ?? undefined}
       data={{
         tenant: {
           nom_entreprise: tenant?.nom_entreprise ?? 'Votre entreprise',

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   TrendingUp, Users, Package, AlertTriangle, Plus, Download,
@@ -8,7 +9,7 @@ import {
   Wallet, CheckCircle, Send, FileText, ArrowUpRight, ArrowDownRight,
   Zap, BarChart2, Star, ChevronRight, ChefHat, Bot, ShoppingCart,
   Receipt, Truck, Hotel, BookOpen, Calculator, HeartHandshake,
-  Award, Layers, Settings,
+  Award, Layers, Settings, RefreshCw,
 } from 'lucide-react'
 import Link from 'next/link'
 import RevenueChart from '@/components/dashboard/RevenueChart'
@@ -446,8 +447,9 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function DashboardClient({ data }: { data: DashboardData }) {
+export default function DashboardClient({ data, userName }: { data: DashboardData; userName?: string }) {
   const { t } = useLocale()
+  const router = useRouter()
   const { tenant, kpis, alerts, recentActivity, chartData } = data
   const isFinancial = data.isFinancial ?? true
   const secteur     = data.secteur ?? null
@@ -456,6 +458,14 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   const daacKpis    = data.daacKpis ?? null
   const rhKpis          = data.rhKpis ?? null
   const ecoleFinancials = data.ecoleFinancials ?? null
+
+  const [greeting, setGreeting] = useState('Bonjour')
+  useEffect(() => {
+    const h = new Date().getHours()
+    setGreeting(h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir')
+  }, [])
+
+  const displayName = userName || 'Admin'
 
   // Estimate solde from revenue minus alerts amount
   const soldeTresorerie = kpis.revenuMois - alerts.pendingAmount * 0.3
@@ -618,28 +628,27 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       i: 0,
     },
     {
-      label: t('dash.activeClients'),
-      value: chartData.moduleBreakdown.find(m => m.name === 'Payées')?.value ?? kpis.nbEmployes,
-      sub: t('dash.billedInvoices'),
-      icon: Users,
+      label: 'Factures payées',
+      value: chartData.moduleBreakdown.find(m => m.name === 'Payées')?.value ?? 0,
+      sub: 'Ce mois-ci',
+      icon: CheckCircle,
       gradient: 'linear-gradient(135deg, #4A0040 0%, #8B0073 60%, #A8008E 100%)',
-      trend: alerts.pendingCount > 0 ? -(alerts.pendingCount) : undefined,
       href: '/dashboard/facturation',
       i: 1,
     },
     {
-      label: t('dash.pending'),
+      label: 'Factures en attente',
       value: alerts.pendingCount,
-      sub: `${fmt(alerts.pendingAmount)} FCFA attendus`,
+      sub: `${fmt(alerts.pendingAmount)} FCFA à encaisser`,
       icon: Clock,
       gradient: 'linear-gradient(135deg, #7A3800 0%, #C06000 60%, #F07900 100%)',
       href: '/dashboard/facturation',
       i: 2,
     },
     {
-      label: t('dash.alerts'),
+      label: alerts.lowStockCount > 0 ? 'Ruptures de stock' : 'Alertes stock',
       value: kpis.nbAlertes,
-      sub: alerts.lowStockCount > 0 ? `${alerts.lowStockCount} ${t('dash.lowStock')}` : t('dash.everything'),
+      sub: alerts.lowStockCount > 0 ? `${alerts.lowStockCount} article${alerts.lowStockCount > 1 ? 's' : ''} épuisé${alerts.lowStockCount > 1 ? 's' : ''}` : 'Tout est en ordre',
       icon: AlertTriangle,
       gradient: kpis.nbAlertes > 0
         ? 'linear-gradient(135deg, #7A0000 0%, #C5001E 60%, #F01F38 100%)'
@@ -709,42 +718,85 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         </motion.div>
       )}
 
-      {/* ── Title + actions ──────────────────────────────────────────────── */}
-      <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-        <div>
-          <h1 className="text-xl font-bold text-[#E6EDF3] leading-tight">{tenant.nom_entreprise}</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">
-            Plan <span className="text-[#F0A30A] font-bold capitalize">{tenant.plan}</span>
-            {' · '}{tenant.modules_actifs.length} module{tenant.modules_actifs.length !== 1 ? 's' : ''} actif{tenant.modules_actifs.length !== 1 ? 's' : ''}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#484F58] hover:text-[#E6EDF3] transition-all">
-            <Clock size={11} /> {t('dash.lastDays')} <ChevronDown size={10} />
-          </button>
-          {isFinancial && (
-            <>
-              <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#484F58] transition-all">
-                <Download size={11} /> CSV
-              </button>
-              <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#484F58] transition-all">
-                <Download size={11} /> PDF
-              </button>
-            </>
-          )}
-          {isFinancial && (
-            <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-white/80 border border-white/20 rounded-xl hover:bg-white/5 transition-all"
-              style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <Wallet size={11} /> {t('dash.withdrawal')}
+      {/* ── Greeting Banner ──────────────────────────────────────────────── */}
+      <motion.div {...fadeUp(0)} className="relative rounded-2xl overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0D1730 0%, #111827 60%, #1a1230 100%)' }}>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 90% 50%, rgba(139,0,115,0.18) 0%, transparent 65%)' }} />
+        <div className="relative p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-xl font-bold text-white leading-tight">
+                  {greeting}, {displayName} 👋
+                </h1>
+                <button
+                  onClick={() => router.refresh()}
+                  className="p-1 text-white/30 hover:text-white/70 transition-colors"
+                  title="Rafraîchir"
+                >
+                  <RefreshCw size={13} />
+                </button>
+              </div>
+              <p className="text-sm text-white/55 mb-1">
+                {isFinancial
+                  ? 'Gérez vos ventes, finances et équipes en un seul endroit.'
+                  : 'Consultez les informations de votre espace.'}
+              </p>
+              <p className="text-xs text-white/35">
+                <span className="font-semibold text-white/60">{tenant.nom_entreprise}</span>
+                {' · '}Plan <span className="text-[#F0A30A] font-bold capitalize">{tenant.plan}</span>
+                {' · '}{tenant.modules_actifs.length} module{tenant.modules_actifs.length !== 1 ? 's' : ''} actif{tenant.modules_actifs.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            {/* Quick stats chips */}
+            {isFinancial && (
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center min-w-[90px]">
+                  <p className="text-[9px] text-white/40 uppercase tracking-wider mb-0.5">Chiffre du mois</p>
+                  <p className="text-sm font-bold text-white">{fmt(kpis.revenuMois)} F</p>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center min-w-[90px]">
+                  <p className="text-[9px] text-white/40 uppercase tracking-wider mb-0.5">En attente</p>
+                  <p className={`text-sm font-bold ${alerts.pendingCount > 0 ? 'text-[#F07900]' : 'text-white'}`}>
+                    {alerts.pendingCount} facture{alerts.pendingCount !== 1 ? 's' : ''}
+                  </p>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center min-w-[90px]">
+                  <p className="text-[9px] text-white/40 uppercase tracking-wider mb-0.5">Alertes stock</p>
+                  <p className={`text-sm font-bold ${alerts.lowStockCount > 0 ? 'text-[#F01F38]' : 'text-[#0D2147]'}`}>
+                    {alerts.lowStockCount > 0 ? `${alerts.lowStockCount} article${alerts.lowStockCount > 1 ? 's' : ''}` : '✓ OK'}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Action buttons */}
+          <div className="flex items-center gap-2 flex-wrap mt-4">
+            <Link
+              href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
+              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#0D1117] rounded-xl hover:opacity-90 transition-all"
+              style={{ background: 'linear-gradient(135deg, #F0A30A, #d4880a)' }}
+            >
+              <Plus size={11} /> {secteur === 'ecole' ? t('dash.newInscription') : t('dash.newAction')}
+            </Link>
+            {isFinancial && (
+              <>
+                <button className="flex items-center gap-1.5 px-3 py-2 text-xs text-white/60 border border-white/15 rounded-xl hover:bg-white/5 transition-all">
+                  <Wallet size={11} /> {t('dash.withdrawal')}
+                </button>
+                <button className="flex items-center gap-1.5 px-3 py-2 text-xs text-white/50 border border-white/10 rounded-xl hover:bg-white/5 transition-all">
+                  <Download size={11} /> CSV
+                </button>
+                <button className="flex items-center gap-1.5 px-3 py-2 text-xs text-white/50 border border-white/10 rounded-xl hover:bg-white/5 transition-all">
+                  <Download size={11} /> PDF
+                </button>
+              </>
+            )}
+            <button className="flex items-center gap-1.5 px-3 py-2 text-xs text-white/50 border border-white/10 rounded-xl hover:bg-white/5 transition-all ml-auto">
+              <Clock size={11} /> {t('dash.lastDays')} <ChevronDown size={10} />
             </button>
-          )}
-          <Link
-            href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#0D1117] rounded-xl hover:opacity-90 transition-all shrink-0"
-            style={{ background: 'linear-gradient(135deg, #F0A30A, #d4880a)' }}
-          >
-            <Plus size={11} /> {secteur === 'ecole' ? t('dash.newInscription') : t('dash.newAction')}
-          </Link>
+          </div>
         </div>
       </motion.div>
 

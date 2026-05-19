@@ -15,12 +15,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     // DashboardShell provides TenantContext (client-side, reactive to auth changes)
     // This is the single source of truth for tenant identity across all dashboard components.
     <DashboardShell>
-      <div id="dashboard-shell" className="flex h-screen bg-[#F0F4FF] overflow-hidden">
+      <div id="dashboard-shell" className="flex h-screen bg-[#0D1117] overflow-hidden">
         <Sidebar />
         <div id="main-content" className="flex-1 flex flex-col overflow-hidden min-w-0">
           <Header />
           <main className="flex-1 overflow-y-auto">
-            <div className="p-4 lg:p-6 max-w-[1400px] mx-auto">
+            <div className="p-4 lg:p-6 ">
               {children}
             </div>
           </main>

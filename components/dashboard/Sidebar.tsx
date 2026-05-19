@@ -376,7 +376,7 @@ export default function Sidebar() {
             <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
               role === 'admin'
                 ? 'bg-blue-500/15 text-blue-400'
-                : 'bg-white/5 text-white/30'
+                : 'bg-white/5 text-white/50'
             }`}>
               {role === 'admin' ? 'Administrateur' : 'Membre'}
             </span>
@@ -399,15 +399,15 @@ export default function Sidebar() {
               href={href}
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                active ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium' : 'text-[#A8C4E4] hover:text-[#FFFFFF] hover:bg-[#1A3570]'
+                active ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium' : 'text-white hover:text-white hover:bg-[#1A3570]'
               }`}
             >
               <LayoutDashboard size={15} className="shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="truncate">{label}</div>
-                {sub && <div className="text-[10px] text-[#7A9ACC] truncate">{sub}</div>}
+                {sub && <div className="text-[10px] text-white/45 truncate">{sub}</div>}
               </div>
-              {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F0A30A]" />}
+              {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
             </Link>
           )
         })()}
@@ -417,7 +417,7 @@ export default function Sidebar() {
           <>
             {coreNavItems.length > 0 && (
               <>
-                <p className="text-xs text-[#7A9ACC] uppercase tracking-wider px-3 pt-3 pb-1">
+                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">
                   {CORE_SECTION_LABEL}
                 </p>
                 {coreNavItems.map(item => {
@@ -430,19 +430,19 @@ export default function Sidebar() {
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group"
-                      style={{ background: active ? `${item.color}18` : 'transparent' }}
+                      style={{ background: active ? 'rgba(240,31,56,0.12)' : 'transparent' }}
                     >
-                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? item.color : '#484F58' }} />
+                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? '#F01F38' : '#A8C4E4' }} />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? item.color : '#8B949E' }}>
+                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? '#F01F38' : '#E6EDF3' }}>
                           {item.label}
                         </div>
-                        <div className="text-[10px] text-[#7A9ACC] truncate flex items-center gap-1">
+                        <div className="text-[10px] text-white/45 truncate flex items-center gap-1">
                           {item.sublabel}
                           {!isOwner && !canEdit && <Lock size={8} className="text-[#30363D]" />}
                         </div>
                       </div>
-                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: item.color }} />}
+                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#F01F38' }} />}
                     </Link>
                   )
                 })}
@@ -451,7 +451,7 @@ export default function Sidebar() {
 
             {businessNavItems.length > 0 && (
               <>
-                <p className="text-xs text-[#7A9ACC] uppercase tracking-wider px-3 pt-3 pb-1">
+                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">
                   {SECTOR_LABEL[secteur!] ?? secteur}
                 </p>
                 {businessNavItems.map(item => {
@@ -464,19 +464,19 @@ export default function Sidebar() {
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group"
-                      style={{ background: active ? `${item.color}18` : 'transparent' }}
+                      style={{ background: active ? 'rgba(240,31,56,0.12)' : 'transparent' }}
                     >
-                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? item.color : '#484F58' }} />
+                      <Icon size={15} className="shrink-0 transition-colors" style={{ color: active ? '#F01F38' : '#A8C4E4' }} />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? item.color : '#8B949E' }}>
+                        <div className="text-sm font-medium leading-tight truncate" style={{ color: active ? '#F01F38' : '#E6EDF3' }}>
                           {item.label}
                         </div>
-                        <div className="text-[10px] text-[#7A9ACC] truncate flex items-center gap-1">
+                        <div className="text-[10px] text-white/45 truncate flex items-center gap-1">
                           {item.sublabel}
                           {!isOwner && !canEdit && <Lock size={8} className="text-[#30363D]" />}
                         </div>
                       </div>
-                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: item.color }} />}
+                      {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#F01F38' }} />}
                     </Link>
                   )
                 })}
@@ -484,7 +484,7 @@ export default function Sidebar() {
             )}
 
             {sectorNav.length === 0 && (
-              <p className="text-xs text-[#7A9ACC] px-3 py-2">Aucun module assigné.</p>
+              <p className="text-xs text-white/50 px-3 py-2">Aucun module assigné.</p>
             )}
           </>
         )}
@@ -494,7 +494,7 @@ export default function Sidebar() {
           <>
             {coreActiveModules.length > 0 && (
               <>
-                <p className="text-xs text-[#7A9ACC] uppercase tracking-wider px-3 pt-3 pb-1">{CORE_SECTION_LABEL}</p>
+                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">{CORE_SECTION_LABEL}</p>
                 {coreActiveModules.map(mod => {
                   const Icon = mod.icon
                   const active = isActive(mod.href)
@@ -504,12 +504,12 @@ export default function Sidebar() {
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                        active ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium' : 'text-[#A8C4E4] hover:text-[#FFFFFF] hover:bg-[#1A3570]'
+                        active ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium' : 'text-white hover:text-white hover:bg-[#1A3570]'
                       }`}
                     >
                       <Icon size={15} className="shrink-0" />
                       <span className="truncate">{mod.label}</span>
-                      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F0A30A]" />}
+                      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
                     </Link>
                   )
                 })}
@@ -518,7 +518,7 @@ export default function Sidebar() {
 
             {businessActiveModules.length > 0 && (
               <>
-                <p className="text-xs text-[#7A9ACC] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
+                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
                 {businessActiveModules.map(mod => {
                   const Icon = mod.icon
                   const active = isActive(mod.href)
@@ -528,12 +528,12 @@ export default function Sidebar() {
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                        active ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium' : 'text-[#A8C4E4] hover:text-[#FFFFFF] hover:bg-[#1A3570]'
+                        active ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium' : 'text-white hover:text-white hover:bg-[#1A3570]'
                       }`}
                     >
                       <Icon size={15} className="shrink-0" />
                       <span className="truncate">{mod.label}</span>
-                      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F0A30A]" />}
+                      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F01F38]" />}
                     </Link>
                   )
                 })}
@@ -542,7 +542,7 @@ export default function Sidebar() {
 
             {isOwner && inactiveModules.length > 0 && (
               <>
-                <p className="text-xs text-[#7A9ACC] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.inactive')}</p>
+                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.inactive')}</p>
                 {inactiveModules.map(mod => {
                   const Icon = mod.icon
                   return (
@@ -551,9 +551,9 @@ export default function Sidebar() {
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
                       title={`Accéder à ${mod.label}`}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#7A9ACC] hover:text-[#A8C4E4] hover:bg-[#1A3570]/60 transition-all group"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#7A9ACC] hover:text-white hover:bg-[#1A3570]/60 transition-all group"
                     >
-                      <Icon size={15} className="shrink-0 group-hover:text-[#A8C4E4]" />
+                      <Icon size={15} className="shrink-0 group-hover:text-white" />
                       <span className="truncate flex-1">{mod.label}</span>
                       <span className="text-[8px] font-bold border border-[#1A3570] text-[#30363D] group-hover:border-[#484F58] group-hover:text-[#7A9ACC] rounded px-1 py-0.5 shrink-0 transition-colors">
                         ACTIVER
@@ -585,8 +585,8 @@ export default function Sidebar() {
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
               isActive('/dashboard/roles')
-                ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium'
-                : 'text-[#A8C4E4] hover:text-[#FFFFFF] hover:bg-[#1A3570]'
+                ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium'
+                : 'text-white hover:text-white hover:bg-[#1A3570]'
             }`}
           >
             <ShieldCheck size={15} className="shrink-0" />
@@ -600,8 +600,8 @@ export default function Sidebar() {
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
               isActive('/dashboard/modules')
-                ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium'
-                : 'text-[#A8C4E4] hover:text-[#FFFFFF] hover:bg-[#1A3570]'
+                ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium'
+                : 'text-white hover:text-white hover:bg-[#1A3570]'
             }`}
           >
             <Store size={15} className="shrink-0" />
@@ -616,7 +616,7 @@ export default function Sidebar() {
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
               isActive('/dashboard/analytics')
                 ? 'bg-[#F07900]/10 text-[#F07900] font-medium'
-                : 'text-[#A8C4E4] hover:text-[#FFFFFF] hover:bg-[#1A3570]'
+                : 'text-white hover:text-white hover:bg-[#1A3570]'
             }`}
           >
             <Activity size={15} className="shrink-0" />
@@ -629,8 +629,8 @@ export default function Sidebar() {
           onClick={() => setMobileOpen(false)}
           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
             isActive('/dashboard/parametres')
-              ? 'bg-[#F0A30A]/10 text-[#F0A30A] font-medium'
-              : 'text-[#A8C4E4] hover:text-[#FFFFFF] hover:bg-[#1A3570]'
+              ? 'bg-[#F01F38]/15 text-[#F01F38] font-medium'
+              : 'text-white hover:text-white hover:bg-[#1A3570]'
           }`}
         >
           <Settings size={15} className="shrink-0" />
@@ -651,7 +651,7 @@ export default function Sidebar() {
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#A8C4E4] hover:text-red-400 hover:bg-red-500/5 transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white hover:text-red-400 hover:bg-red-500/5 transition-all"
         >
           <LogOut size={15} className="shrink-0" />
           Déconnexion
@@ -667,7 +667,7 @@ export default function Sidebar() {
       </aside>
 
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0D2147] border border-[#1A3570] text-[#A8C4E4]"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0D2147] border border-[#1A3570] text-white"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
