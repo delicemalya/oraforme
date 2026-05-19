@@ -91,12 +91,12 @@ function ChartCard({ title, icon: Icon, iconColor, children, className = '' }: {
   title: string; icon: React.ElementType; iconColor: string; children: React.ReactNode; className?: string
 }) {
   return (
-    <div className={`bg-white border border-[#EEF2FF] rounded-2xl overflow-hidden ${className}`}>
-      <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#EEF2FF]">
+    <div className={`bg-[#161B22] border border-[#21262D] rounded-2xl overflow-hidden ${className}`}>
+      <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#21262D]">
         <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: iconColor + '22' }}>
           <Icon size={13} style={{ color: iconColor }} />
         </div>
-        <span className="text-xs font-bold text-[#111827] uppercase tracking-wider">{title}</span>
+        <span className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">{title}</span>
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -165,30 +165,30 @@ export default function AnalyticsPage() {
             <Activity size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#111827]">Analytics & BI</h1>
-            <p className="text-xs text-[#6B7280]">Intelligence économique · Exercice {year}</p>
+            <h1 className="text-xl font-bold text-[#E6EDF3]">Analytics & BI</h1>
+            <p className="text-xs text-[#484F58]">Intelligence économique · Exercice {year}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+            className="bg-[#161B22] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <button onClick={load}
-            className="p-2 rounded-lg bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors">
+            className="p-2 rounded-lg bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
       </motion.div>
 
       {/* ── Tabs ── */}
-      <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1 overflow-x-auto">
         {TABS.map(t => {
           const Icon = t.icon
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex-1 min-w-fit py-2 px-2.5 rounded-lg text-[10px] font-semibold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === t.id ? 'bg-[#1D4ED8]/15 text-[#8B0073]' : 'text-[#4B5563] hover:text-[#111827]'
+                tab === t.id ? 'bg-[#1D4ED8]/15 text-[#F07900]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
               }`}>
               <Icon size={11} />{t.label}
             </button>
@@ -197,7 +197,7 @@ export default function AnalyticsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-24 text-[#4B5563]">
+        <div className="flex items-center justify-center py-24 text-[#8B949E]">
           <Loader2 size={20} className="animate-spin mr-2" /> Chargement des analytics…
         </div>
       ) : data ? (
@@ -263,7 +263,7 @@ export default function AnalyticsPage() {
                         </div>
                       </>
                     ) : (
-                      <p className="text-xs text-[#6B7280] text-center py-8">Aucune facture</p>
+                      <p className="text-xs text-[#484F58] text-center py-8">Aucune facture</p>
                     )}
                   </ChartCard>
 
@@ -284,7 +284,7 @@ export default function AnalyticsPage() {
                       ))}
                     </div>
                     <button onClick={runAutomation} disabled={running}
-                      className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold bg-[#1D4ED8]/15 text-[#8B0073] hover:bg-[#1D4ED8]/25 transition-colors disabled:opacity-50">
+                      className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold bg-[#1D4ED8]/15 text-[#F07900] hover:bg-[#1D4ED8]/25 transition-colors disabled:opacity-50">
                       {running ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
                       {running ? 'Vérification…' : 'Lancer les vérifications'}
                     </button>
@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
                       {data.rh.contratsExpirant30 > 0 && (
                         <div className="flex items-start gap-2 bg-[#F0A30A]/10 rounded-xl p-2.5">
                           <Clock size={12} className="text-[#F0A30A] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#111827]">
+                          <p className="text-[10px] text-[#E6EDF3]">
                             <b>{data.rh.contratsExpirant30}</b> contrat(s) expirant dans 30 jours
                           </p>
                         </div>
@@ -307,7 +307,7 @@ export default function AnalyticsPage() {
                       {data.stock.articlesRupture > 0 && (
                         <div className="flex items-start gap-2 bg-[#F01F38]/10 rounded-xl p-2.5">
                           <AlertTriangle size={12} className="text-[#F01F38] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#111827]">
+                          <p className="text-[10px] text-[#E6EDF3]">
                             <b>{data.stock.articlesRupture}</b> article(s) en rupture de stock
                           </p>
                         </div>
@@ -315,7 +315,7 @@ export default function AnalyticsPage() {
                       {data.stock.articlesCritiques > 0 && (
                         <div className="flex items-start gap-2 bg-[#F97316]/10 rounded-xl p-2.5">
                           <AlertTriangle size={12} className="text-[#F97316] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#111827]">
+                          <p className="text-[10px] text-[#E6EDF3]">
                             <b>{data.stock.articlesCritiques}</b> article(s) en stock critique
                           </p>
                         </div>
@@ -323,15 +323,15 @@ export default function AnalyticsPage() {
                       {data.financial.totalCreances > 0 && (
                         <div className="flex items-start gap-2 bg-[#8B0073]/10 rounded-xl p-2.5">
                           <FileText size={12} className="text-[#8B0073] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#111827]">
+                          <p className="text-[10px] text-[#E6EDF3]">
                             Créances clients : <b>{fmtFCFA(data.financial.totalCreances)}</b>
                           </p>
                         </div>
                       )}
                       {data.automation.notifUnread > 0 && (
-                        <div className="flex items-start gap-2 bg-[#8B0073]/10 rounded-xl p-2.5">
-                          <Bell size={12} className="text-[#8B0073] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#111827]">
+                        <div className="flex items-start gap-2 bg-[#F07900]/10 rounded-xl p-2.5">
+                          <Bell size={12} className="text-[#F07900] mt-0.5 shrink-0" />
+                          <p className="text-[10px] text-[#E6EDF3]">
                             <b>{data.automation.notifUnread}</b> notification(s) non lue(s)
                           </p>
                         </div>
@@ -339,7 +339,7 @@ export default function AnalyticsPage() {
                       {!data.rh.contratsExpirant30 && !data.stock.articlesRupture && !data.stock.articlesCritiques && !data.financial.totalCreances && !data.automation.notifUnread && (
                         <div className="flex flex-col items-center py-6 gap-2">
                           <CheckCircle size={20} className="text-[#2EA043]" />
-                          <p className="text-xs text-[#6B7280]">Aucune alerte active</p>
+                          <p className="text-xs text-[#484F58]">Aucune alerte active</p>
                         </div>
                       )}
                     </div>
@@ -388,14 +388,14 @@ export default function AnalyticsPage() {
                             <div key={s.name} className="flex items-center justify-between px-1">
                               <div className="flex items-center gap-2">
                                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
-                                <span className="text-xs text-[#4B5563]">{s.name}</span>
+                                <span className="text-xs text-[#8B949E]">{s.name}</span>
                               </div>
-                              <span className="text-xs font-bold text-[#111827]">{s.value}</span>
+                              <span className="text-xs font-bold text-[#E6EDF3]">{s.value}</span>
                             </div>
                           ))}
                         </div>
                       </>
-                    ) : <p className="text-xs text-[#6B7280] text-center py-8">Aucune facture</p>}
+                    ) : <p className="text-xs text-[#484F58] text-center py-8">Aucune facture</p>}
                   </ChartCard>
 
                   <ChartCard title="Indicateurs clés" icon={Activity} iconColor="#8B0073">
@@ -410,7 +410,7 @@ export default function AnalyticsPage() {
                             <span className="text-xs text-[#6B7280]">{r.label}</span>
                             <span className="text-xs font-bold" style={{ color: r.color }}>{r.val}</span>
                           </div>
-                          <div className="h-1.5 bg-[#F0F4FF] rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[#21262D] rounded-full overflow-hidden">
                             <motion.div className="h-full rounded-full" style={{ background: r.color }}
                               initial={{ width: 0 }} animate={{ width: `${Math.min(r.pct, 100)}%` }}
                               transition={{ duration: 0.8 }} />
@@ -452,12 +452,12 @@ export default function AnalyticsPage() {
                   />
                 </ChartCard>
 
-                <div className="bg-white border border-[#EEF2FF] rounded-2xl overflow-hidden">
-                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#EEF2FF]">
+                <div className="bg-[#161B22] border border-[#21262D] rounded-2xl overflow-hidden">
+                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#21262D]">
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#1D4ED8]/20">
-                      <Users size={13} className="text-[#8B0073]" />
+                      <Users size={13} className="text-[#F07900]" />
                     </div>
-                    <span className="text-xs font-bold text-[#111827] uppercase tracking-wider">Répartition effectif</span>
+                    <span className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">Répartition effectif</span>
                   </div>
                   <div className="p-5 grid grid-cols-3 gap-4">
                     {[
@@ -467,13 +467,13 @@ export default function AnalyticsPage() {
                     ].map(r => (
                       <div key={r.label} className="text-center">
                         <p className="text-2xl font-bold mb-1" style={{ color: r.color }}>{r.val}</p>
-                        <p className="text-[10px] text-[#6B7280] mb-2">{r.label}</p>
-                        <div className="h-1 bg-[#F0F4FF] rounded-full overflow-hidden">
+                        <p className="text-[10px] text-[#484F58] mb-2">{r.label}</p>
+                        <div className="h-1 bg-[#21262D] rounded-full overflow-hidden">
                           <motion.div className="h-full rounded-full" style={{ background: r.color }}
                             initial={{ width: 0 }} animate={{ width: `${Math.min(r.pct, 100)}%` }}
                             transition={{ duration: 0.8 }} />
                         </div>
-                        <p className="text-[9px] text-[#6B7280] mt-1">{Math.round(r.pct)}%</p>
+                        <p className="text-[9px] text-[#484F58] mt-1">{Math.round(r.pct)}%</p>
                       </div>
                     ))}
                   </div>
@@ -543,34 +543,34 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Top articles */}
-                <div className="bg-white border border-[#EEF2FF] rounded-2xl overflow-hidden">
-                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#EEF2FF]">
+                <div className="bg-[#161B22] border border-[#21262D] rounded-2xl overflow-hidden">
+                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#21262D]">
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#D97706]/20">
                       <Package size={13} className="text-[#D97706]" />
                     </div>
-                    <span className="text-xs font-bold text-[#111827] uppercase tracking-wider">Top articles par valeur</span>
+                    <span className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">Top articles par valeur</span>
                   </div>
-                  <div className="divide-y divide-[#EEF2FF]">
+                  <div className="divide-y divide-[#21262D]">
                     {data.stock.topArticles.length > 0 ? data.stock.topArticles.map((a, i) => {
                       const pct = data.stock.valeurStock > 0 ? (a.valeur / data.stock.valeurStock) * 100 : 0
                       return (
                         <div key={i} className="px-5 py-3.5">
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm text-[#111827] font-medium truncate pr-4">{a.nom}</span>
+                            <span className="text-sm text-[#E6EDF3] font-medium truncate pr-4">{a.nom}</span>
                             <span className="text-xs font-bold text-[#F0A30A] shrink-0">{fmtFCFA(a.valeur)}</span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="flex-1 h-1 bg-[#F0F4FF] rounded-full overflow-hidden">
+                            <div className="flex-1 h-1 bg-[#21262D] rounded-full overflow-hidden">
                               <motion.div className="h-full rounded-full bg-[#F0A30A]"
                                 initial={{ width: 0 }} animate={{ width: `${Math.min(pct, 100)}%` }}
                                 transition={{ duration: 0.7, delay: i * 0.1 }} />
                             </div>
-                            <span className="text-[10px] text-[#6B7280] shrink-0">{a.quantite} unités</span>
+                            <span className="text-[10px] text-[#484F58] shrink-0">{a.quantite} unités</span>
                           </div>
                         </div>
                       )
                     }) : (
-                      <p className="text-xs text-[#6B7280] text-center py-8">Aucun article en stock</p>
+                      <p className="text-xs text-[#484F58] text-center py-8">Aucun article en stock</p>
                     )}
                   </div>
                 </div>
@@ -597,14 +597,14 @@ export default function AnalyticsPage() {
                         ].map(r => (
                           <div key={r.label} className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded-full" style={{ background: r.color }} />
-                            <span className="text-xs text-[#4B5563]">{r.label}</span>
+                            <span className="text-xs text-[#8B949E]">{r.label}</span>
                             <span className="text-xs font-bold ml-auto" style={{ color: r.color }}>{r.val}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-[#6B7280] text-center py-6">Aucun article</p>
+                    <p className="text-xs text-[#484F58] text-center py-6">Aucun article</p>
                   )}
                 </ChartCard>
               </div>
@@ -633,15 +633,15 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Run checks panel */}
-                <div className="bg-white border border-[#EEF2FF] rounded-2xl p-5">
+                <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#1D4ED8]/20">
-                        <Zap size={16} className="text-[#8B0073]" />
+                        <Zap size={16} className="text-[#F07900]" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-[#111827]">Moteur d'automatisation</p>
-                        <p className="text-xs text-[#6B7280]">Contrats expirants · Factures impayées · Alertes stock</p>
+                        <p className="text-sm font-bold text-[#E6EDF3]">Moteur d'automatisation</p>
+                        <p className="text-xs text-[#484F58]">Contrats expirants · Factures impayées · Alertes stock</p>
                       </div>
                     </div>
                     <button onClick={runAutomation} disabled={running}
@@ -662,10 +662,10 @@ export default function AnalyticsPage() {
                       { label: 'Factures en retard', val: data.financial.nbFactures - data.financial.nbFactPay, color: '#F01F38', desc: 'non payées' },
                       { label: 'Stock critique',     val: data.stock.articlesRupture + data.stock.articlesCritiques, color: '#F97316', desc: 'à réapprovisionner' },
                     ].map(r => (
-                      <div key={r.label} className="bg-white border border-[#EEF2FF] rounded-xl p-3 text-center">
+                      <div key={r.label} className="bg-[#0D1117] border border-[#21262D] rounded-xl p-3 text-center">
                         <p className="text-2xl font-bold mb-1" style={{ color: r.color }}>{r.val}</p>
-                        <p className="text-[10px] font-semibold text-[#111827]">{r.label}</p>
-                        <p className="text-[9px] text-[#6B7280] mt-0.5">{r.desc}</p>
+                        <p className="text-[10px] font-semibold text-[#E6EDF3]">{r.label}</p>
+                        <p className="text-[9px] text-[#484F58] mt-0.5">{r.desc}</p>
                       </div>
                     ))}
                   </div>
@@ -683,7 +683,7 @@ export default function AnalyticsPage() {
                       height={200}
                     />
                   ) : (
-                    <p className="text-xs text-[#6B7280] text-center py-8">Aucune tâche planifiée</p>
+                    <p className="text-xs text-[#484F58] text-center py-8">Aucune tâche planifiée</p>
                   )}
                 </ChartCard>
               </div>

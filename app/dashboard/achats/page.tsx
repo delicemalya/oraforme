@@ -113,8 +113,8 @@ export default function AchatsPage() {
           <ShoppingCart size={18} className="text-[#8B0073]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">Achats & Fournisseurs</h1>
-          <p className="text-xs text-[#6B7280]">
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Achats & Fournisseurs</h1>
+          <p className="text-xs text-[#484F58]">
             {fournisseurs.length} fournisseur{fournisseurs.length > 1 ? 's' : ''} ·
             <span className="text-[#F01F38] ml-1">Dettes : {fmtFCFA(totalDu)}</span>
           </p>
@@ -126,11 +126,11 @@ export default function AchatsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1">
+      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1">
         {TABS.map((t, i) => (
           <button key={i} onClick={() => setTab(i)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === i ? 'bg-[#8B0073]/10 text-[#8B0073]' : 'text-[#4B5563] hover:text-[#111827]'
+              tab === i ? 'bg-[#8B0073]/10 text-[#8B0073]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
             }`}>
             {t}
             {i === 2 && debtsByFournisseur.length > 0 && (
@@ -142,28 +142,28 @@ export default function AchatsPage() {
 
       {/* Tab 0 — Fournisseurs */}
       {tab === 0 && (
-        <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
           {loading ? (
-            <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[#6B7280]" /></div>
+            <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[#484F58]" /></div>
           ) : fournisseurs.length === 0 ? (
-            <div className="p-10 text-center text-[#6B7280] text-sm">Aucun fournisseur — ajoutez-en un</div>
+            <div className="p-10 text-center text-[#484F58] text-sm">Aucun fournisseur — ajoutez-en un</div>
           ) : (
-            <div className="divide-y divide-[#EEF2FF]">
+            <div className="divide-y divide-[#21262D]">
               {fournisseurs.map(f => {
                 const dette = achats.filter(a => a.fournisseur_id === f.id && a.statut !== 'paye').reduce((s, a) => s + a.montant, 0)
                 return (
-                  <div key={f.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#F0F4FF]/80 transition-colors">
+                  <div key={f.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#21262D]/30 transition-colors">
                     <div className="w-9 h-9 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center shrink-0">
                       <span className="text-[#8B0073] text-sm font-bold">{f.nom.charAt(0).toUpperCase()}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#111827] truncate">{f.nom}</p>
-                      <p className="text-xs text-[#6B7280]">{f.telephone || f.contact || f.email || '—'}</p>
+                      <p className="text-sm font-medium text-[#E6EDF3] truncate">{f.nom}</p>
+                      <p className="text-xs text-[#484F58]">{f.telephone || f.contact || f.email || '—'}</p>
                     </div>
                     {dette > 0 && (
                       <div className="text-right">
                         <p className="text-sm font-semibold text-[#F01F38]">{fmtFCFA(dette)}</p>
-                        <p className="text-xs text-[#6B7280]">dû</p>
+                        <p className="text-xs text-[#484F58]">dû</p>
                       </div>
                     )}
                     {dette === 0 && <CheckCircle size={16} className="text-[#2EA043]" />}
@@ -177,31 +177,31 @@ export default function AchatsPage() {
 
       {/* Tab 1 — Achats */}
       {tab === 1 && (
-        <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E2E8F0]">
+                <tr className="border-b border-[#30363D]">
                   {['Date', 'Description', 'Fournisseur', 'Montant', 'Statut', ''].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">{h}</th>
+                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#484F58] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EEF2FF]">
-                {loading && <tr><td colSpan={6} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[#6B7280] mx-auto" /></td></tr>}
+              <tbody className="divide-y divide-[#21262D]">
+                {loading && <tr><td colSpan={6} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[#484F58] mx-auto" /></td></tr>}
                 {!loading && achats.length === 0 && (
-                  <tr><td colSpan={6} className="text-center py-10 text-[#6B7280]">Aucun achat enregistré</td></tr>
+                  <tr><td colSpan={6} className="text-center py-10 text-[#484F58]">Aucun achat enregistré</td></tr>
                 )}
                 {achats.map(a => {
                   const f = fournisseurs.find(f => f.id === a.fournisseur_id)
                   return (
-                    <tr key={a.id} className="hover:bg-[#F0F4FF]/80">
-                      <td className="px-4 py-2.5 text-[#4B5563] text-xs whitespace-nowrap">
+                    <tr key={a.id} className="hover:bg-[#21262D]/30">
+                      <td className="px-4 py-2.5 text-[#8B949E] text-xs whitespace-nowrap">
                         {new Date(a.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                       </td>
-                      <td className="px-4 py-2.5 text-[#111827] max-w-[180px] truncate">{a.description}</td>
-                      <td className="px-4 py-2.5 text-[#4B5563] text-xs">{f?.nom ?? '—'}</td>
-                      <td className="px-4 py-2.5 font-medium text-[#111827] whitespace-nowrap">{fmtFCFA(a.montant)}</td>
+                      <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[180px] truncate">{a.description}</td>
+                      <td className="px-4 py-2.5 text-[#8B949E] text-xs">{f?.nom ?? '—'}</td>
+                      <td className="px-4 py-2.5 font-medium text-[#E6EDF3] whitespace-nowrap">{fmtFCFA(a.montant)}</td>
                       <td className="px-4 py-2.5">
                         <span className={`text-xs px-2 py-0.5 rounded border ${STATUT_COLORS[a.statut] ?? STATUT_COLORS.impaye}`}>
                           {STATUT_LABELS[a.statut] ?? a.statut}
@@ -220,8 +220,8 @@ export default function AchatsPage() {
             </table>
           </div>
           {achats.filter(a => a.statut !== 'paye').length > 0 && (
-            <div className="px-5 py-3 border-t border-[#E2E8F0] flex items-center justify-between bg-[#F01F38]/5">
-              <span className="text-sm text-[#4B5563] flex items-center gap-2">
+            <div className="px-5 py-3 border-t border-[#30363D] flex items-center justify-between bg-[#F01F38]/5">
+              <span className="text-sm text-[#8B949E] flex items-center gap-2">
                 <AlertCircle size={14} className="text-[#F01F38]" />
                 Total non payé
               </span>
@@ -233,23 +233,23 @@ export default function AchatsPage() {
 
       {/* Tab 2 — Dettes */}
       {tab === 2 && (
-        <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
           {debtsByFournisseur.length === 0 ? (
             <div className="p-10 text-center">
               <CheckCircle size={32} className="text-[#2EA043] mx-auto mb-3" />
-              <p className="text-sm text-[#111827] font-medium">Aucune dette fournisseur !</p>
-              <p className="text-xs text-[#6B7280] mt-1">Tous vos achats sont à jour</p>
+              <p className="text-sm text-[#E6EDF3] font-medium">Aucune dette fournisseur !</p>
+              <p className="text-xs text-[#484F58] mt-1">Tous vos achats sont à jour</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#EEF2FF]">
+            <div className="divide-y divide-[#21262D]">
               {debtsByFournisseur.map(f => {
                 const factures = achats.filter(a => a.fournisseur_id === f.id && a.statut !== 'paye')
                 return (
                   <div key={f.id} className="px-5 py-4">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-sm font-semibold text-[#111827]">{f.nom}</p>
-                        <p className="text-xs text-[#6B7280]">{factures.length} achat{factures.length > 1 ? 's' : ''} impayé{factures.length > 1 ? 's' : ''}</p>
+                        <p className="text-sm font-semibold text-[#E6EDF3]">{f.nom}</p>
+                        <p className="text-xs text-[#484F58]">{factures.length} achat{factures.length > 1 ? 's' : ''} impayé{factures.length > 1 ? 's' : ''}</p>
                       </div>
                       <p className="text-base font-bold text-[#F01F38]">{fmtFCFA(f.dette)}</p>
                     </div>
@@ -275,9 +275,9 @@ export default function AchatsPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-white border border-[#E2E8F0] rounded-2xl p-6 w-full max-w-md shadow-2xl">
-              <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[#6B7280] hover:text-[#4B5563]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#111827] mb-4">
+              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
+              <h3 className="text-base font-bold text-[#E6EDF3] mb-4">
                 {modal === 'fournisseur' ? '+ Nouveau fournisseur' : '+ Nouvel achat'}
               </h3>
               {modal === 'fournisseur' ? (
@@ -289,15 +289,15 @@ export default function AchatsPage() {
                     { key: 'email', label: 'Email', placeholder: 'email@example.com' },
                   ].map(field => (
                     <div key={field.key}>
-                      <label className="text-xs text-[#4B5563] mb-1 block">{field.label}</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">{field.label}</label>
                       <input value={fForm[field.key as keyof typeof fForm]}
                         onChange={e => setFForm(f => ({ ...f, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
                     </div>
                   ))}
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                     <button onClick={saveFournisseur} disabled={saving || !fForm.nom}
                       className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0073] text-white hover:bg-[#8B0073]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
@@ -307,24 +307,24 @@ export default function AchatsPage() {
               ) : (
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Fournisseur</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Fournisseur</label>
                     <select value={aForm.fournisseur_id} onChange={e => setAForm(f => ({ ...f, fournisseur_id: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
                       <option value="">Sans fournisseur</option>
                       {fournisseurs.map(f => <option key={f.id} value={f.id}>{f.nom}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Description *</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Description *</label>
                     <input value={aForm.description} onChange={e => setAForm(f => ({ ...f, description: e.target.value }))}
                       placeholder="Décrivez l'achat..."
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
                   </div>
                   {costCenters.length > 0 && (
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Centre de coût (facultatif)</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Centre de coût (facultatif)</label>
                       <select value={aForm.cost_center_id} onChange={e => setAForm(f => ({ ...f, cost_center_id: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
                         <option value="">— Aucun centre —</option>
                         {costCenters.map(cc => <option key={cc.id} value={cc.id}>{cc.code} — {cc.nom}</option>)}
                       </select>
@@ -332,19 +332,19 @@ export default function AchatsPage() {
                   )}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA) *</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA) *</label>
                       <input type="number" value={aForm.montant} onChange={e => setAForm(f => ({ ...f, montant: e.target.value }))}
                         placeholder="0"
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Date</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                       <input type="date" value={aForm.date} onChange={e => setAForm(f => ({ ...f, date: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
                     </div>
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                     <button onClick={saveAchat} disabled={saving || !aForm.description || !aForm.montant}
                       className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0073] text-white hover:bg-[#8B0073]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer

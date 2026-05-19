@@ -54,7 +54,7 @@ export default function KpiCard({
       transition={{ duration: 0.5, delay: delay / 1000, ease: [0.23, 1, 0.32, 1] }}
       whileHover={{ scale: 1.025, y: -2, transition: { duration: 0.18 } }}
       whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-      className="relative bg-white border border-[#E2E8F0] rounded-xl p-4 overflow-hidden cursor-default select-none"
+      className="relative bg-[#161B22] border border-[#30363D] rounded-xl p-4 overflow-hidden cursor-default select-none"
       style={{ willChange: 'transform', transition: 'box-shadow 0.25s ease, border-color 0.25s ease' }}
       onMouseEnter={e => {
         const el = e.currentTarget as HTMLDivElement
@@ -94,8 +94,8 @@ export default function KpiCard({
       </div>
 
       <p className="text-2xl font-bold leading-none relative" style={{ color }}>{display}</p>
-      <p className="text-[10px] text-[#6B7280] mt-1.5 uppercase tracking-wider font-semibold relative">{label}</p>
-      {sub && <p className="text-[10px] text-[#4B5563] mt-0.5 relative truncate">{sub}</p>}
+      <p className="text-[10px] text-[#484F58] mt-1.5 uppercase tracking-wider font-semibold relative">{label}</p>
+      {sub && <p className="text-[10px] text-[#8B949E] mt-0.5 relative truncate">{sub}</p>}
     </motion.div>
   )
 }

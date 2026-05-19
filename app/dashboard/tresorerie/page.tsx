@@ -705,7 +705,7 @@ export default function TresoreriePage() {
   if (tLoading || loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Loader2 className="animate-spin text-[#6B7280]" size={24} />
+        <Loader2 className="animate-spin text-[#484F58]" size={24} />
       </div>
     )
   }
@@ -728,8 +728,8 @@ export default function TresoreriePage() {
       {/* ── Page header ───────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-lg font-bold text-[#111827]">Trésorerie</h1>
-          <p className="text-xs text-[#6B7280]">Gestion des flux financiers</p>
+          <h1 className="text-lg font-bold text-[#E6EDF3]">Trésorerie</h1>
+          <p className="text-xs text-[#484F58]">Gestion des flux financiers</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setModal('encaisser')}
@@ -741,14 +741,14 @@ export default function TresoreriePage() {
             <ArrowDownCircle size={13} /> Décaisser
           </button>
           <button onClick={load}
-            className="p-1.5 rounded-lg text-[#6B7280] hover:text-[#4B5563] hover:bg-[#F0F4FF] transition-colors">
+            className="p-1.5 rounded-lg text-[#484F58] hover:text-[#8B949E] hover:bg-[#21262D] transition-colors">
             <RefreshCw size={14} />
           </button>
         </div>
       </div>
 
       {/* ── Main tab nav ──────────────────────────────────────────────────── */}
-      <div className="flex gap-1 overflow-x-auto pb-1 mb-5 border-b border-[#EEF2FF]">
+      <div className="flex gap-1 overflow-x-auto pb-1 mb-5 border-b border-[#21262D]">
         {MAIN_TABS.map(tab => {
           const Icon = tab.icon
           const active = mainTab === tab.id
@@ -757,7 +757,7 @@ export default function TresoreriePage() {
               className={`flex items-center gap-1.5 px-3 py-2 rounded-t-lg text-xs font-medium whitespace-nowrap transition-colors relative ${
                 active
                   ? 'text-[#F0A30A] bg-[#F0A30A]/5'
-                  : 'text-[#6B7280] hover:text-[#4B5563] hover:bg-[#F0F4FF]'
+                  : 'text-[#484F58] hover:text-[#8B949E] hover:bg-[#21262D]'
               }`}>
               <Icon size={13} />
               {tab.label}
@@ -836,38 +836,38 @@ export default function TresoreriePage() {
           {/* Répartition rapide Banque / Caisse */}
           {(comptesBancaires.length > 0 || caisses.length > 0) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-4">
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Landmark size={14} className="text-[#8B0073]" />
-                  <span className="text-xs font-semibold text-[#111827]">Comptes bancaires</span>
-                  <span className="ml-auto text-xs font-bold text-[#8B0073]">{fmtFCFA(totalBanque)}</span>
+                  <Landmark size={14} className="text-[#F07900]" />
+                  <span className="text-xs font-semibold text-[#E6EDF3]">Comptes bancaires</span>
+                  <span className="ml-auto text-xs font-bold text-[#F07900]">{fmtFCFA(totalBanque)}</span>
                 </div>
                 {comptesBancaires.length === 0 ? (
-                  <p className="text-[10px] text-[#6B7280]">Aucun compte configuré</p>
+                  <p className="text-[10px] text-[#484F58]">Aucun compte configuré</p>
                 ) : comptesBancaires.map(c => (
-                  <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-[#EEF2FF] last:border-0">
+                  <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-[#21262D] last:border-0">
                     <div>
-                      <p className="text-xs text-[#111827]">{c.intitule}</p>
-                      <p className="text-[10px] text-[#6B7280]">{c.banque}</p>
+                      <p className="text-xs text-[#E6EDF3]">{c.intitule}</p>
+                      <p className="text-[10px] text-[#484F58]">{c.banque}</p>
                     </div>
                     <span className={`text-xs font-bold ${c.solde >= 0 ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{fmtFCFA(c.solde)}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-4">
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Archive size={14} className="text-[#F0A30A]" />
-                  <span className="text-xs font-semibold text-[#111827]">Caisses</span>
+                  <span className="text-xs font-semibold text-[#E6EDF3]">Caisses</span>
                   <span className="ml-auto text-xs font-bold text-[#F0A30A]">{fmtFCFA(totalCaisse)}</span>
                 </div>
                 {caisses.length === 0 ? (
-                  <p className="text-[10px] text-[#6B7280]">Aucune caisse configurée</p>
+                  <p className="text-[10px] text-[#484F58]">Aucune caisse configurée</p>
                 ) : caisses.map(c => (
-                  <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-[#EEF2FF] last:border-0">
+                  <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-[#21262D] last:border-0">
                     <div>
-                      <p className="text-xs text-[#111827]">{c.nom}</p>
-                      <p className="text-[10px] text-[#6B7280]">Cpte {c.numero_compte}</p>
+                      <p className="text-xs text-[#E6EDF3]">{c.nom}</p>
+                      <p className="text-[10px] text-[#484F58]">Cpte {c.numero_compte}</p>
                     </div>
                     <span className={`text-xs font-bold ${c.solde >= 0 ? 'text-[#F0A30A]' : 'text-[#F01F38]'}`}>{fmtFCFA(c.solde)}</span>
                   </div>
@@ -877,8 +877,8 @@ export default function TresoreriePage() {
           )}
 
           {/* Chart */}
-          <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-            <h2 className="text-xs font-semibold text-[#111827] mb-4">Flux de trésorerie — 30 jours</h2>
+          <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+            <h2 className="text-xs font-semibold text-[#E6EDF3] mb-4">Flux de trésorerie — 30 jours</h2>
             <ResponsiveContainer width="100%" height={180}>
               <ComposedChart data={chartFull} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
@@ -895,33 +895,33 @@ export default function TresoreriePage() {
           </div>
 
           {/* Recent transactions */}
-          <div className="bg-white border border-[#E2E8F0] rounded-xl">
-            <div className="px-5 py-3 border-b border-[#E2E8F0]">
-              <h2 className="text-xs font-semibold text-[#111827]">Transactions récentes</h2>
+          <div className="bg-[#161B22] border border-[#30363D] rounded-xl">
+            <div className="px-5 py-3 border-b border-[#30363D]">
+              <h2 className="text-xs font-semibold text-[#E6EDF3]">Transactions récentes</h2>
             </div>
             {transactions.length === 0 ? (
               <div className="p-10 text-center">
-                <Wallet size={24} className="mx-auto mb-2 text-[#9CA3AF]" />
-                <p className="text-[#6B7280] text-sm">Aucune transaction</p>
+                <Wallet size={24} className="mx-auto mb-2 text-[#30363D]" />
+                <p className="text-[#484F58] text-sm">Aucune transaction</p>
               </div>
             ) : (
-              <div className="divide-y divide-[#EEF2FF]">
+              <div className="divide-y divide-[#21262D]">
                 {transactions.slice(0, 20).map(t => (
-                  <div key={t.id} className="flex items-center gap-3 px-5 py-2.5 hover:bg-[#F0F4FF]/80 transition-colors">
+                  <div key={t.id} className="flex items-center gap-3 px-5 py-2.5 hover:bg-[#21262D]/30 transition-colors">
                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${t.type === 'entree' ? 'bg-[#2EA043]/10' : 'bg-[#F01F38]/10'}`}>
                       {t.type === 'entree'
                         ? <ArrowUpCircle size={13} className="text-[#2EA043]" />
                         : <ArrowDownCircle size={13} className="text-[#F01F38]" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-[#111827] truncate">{t.description}</p>
-                      <p className="text-[10px] text-[#6B7280]">{t.categorie}</p>
+                      <p className="text-xs text-[#E6EDF3] truncate">{t.description}</p>
+                      <p className="text-[10px] text-[#484F58]">{t.categorie}</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className={`text-xs font-bold ${t.type === 'entree' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
                         {t.type === 'entree' ? '+' : '−'}{fmtFCFA(t.montant)}
                       </p>
-                      <p className="text-[10px] text-[#6B7280]">{fmtDate(t.date)}</p>
+                      <p className="text-[10px] text-[#484F58]">{fmtDate(t.date)}</p>
                     </div>
                   </div>
                 ))}
@@ -937,21 +937,21 @@ export default function TresoreriePage() {
       {mainTab === 'banque' && (
         <div className="space-y-4">
           {/* Sous-onglets banque */}
-          <div className="flex gap-1 border-b border-[#EEF2FF]">
+          <div className="flex gap-1 border-b border-[#21262D]">
             {BANQUE_TABS.map(tab => {
               const Icon = tab.icon
               const active = banqueTab === tab.id
               return (
                 <button key={tab.id} onClick={() => setBanqueTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors relative ${active ? 'text-[#8B0073]' : 'text-[#6B7280] hover:text-[#4B5563]'}`}>
+                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors relative ${active ? 'text-[#F07900]' : 'text-[#484F58] hover:text-[#8B949E]'}`}>
                   <Icon size={12} />{tab.label}
-                  {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8B0073] rounded-full" />}
+                  {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#F07900] rounded-full" />}
                 </button>
               )
             })}
             <div className="ml-auto flex items-center">
               <button onClick={() => setModal('addBanque')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#8B0073]/10 text-[#8B0073] border border-[#8B0073]/30 hover:bg-[#8B0073]/15 transition-colors">
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F07900]/15 text-[#F07900] border border-[#F07900]/30 hover:bg-[#F07900]/25 transition-colors">
                 <Plus size={12} /> Compte
               </button>
             </div>
@@ -960,11 +960,11 @@ export default function TresoreriePage() {
           {/* ── Comptes ── */}
           {banqueTab === 'comptes' && (
             comptesBancaires.length === 0 ? (
-              <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
-                <Landmark size={28} className="mx-auto mb-3 text-[#9CA3AF]" />
-                <p className="text-[#6B7280] text-sm">Aucun compte bancaire</p>
-                <p className="text-[#9CA3AF] text-xs mt-1">Ajoutez vos comptes pour suivre vos soldes.</p>
-                <button onClick={() => setModal('addBanque')} className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#8B0073]/10 text-[#8B0073] border border-[#8B0073]/30">
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+                <Landmark size={28} className="mx-auto mb-3 text-[#30363D]" />
+                <p className="text-[#484F58] text-sm">Aucun compte bancaire</p>
+                <p className="text-[#30363D] text-xs mt-1">Ajoutez vos comptes pour suivre vos soldes.</p>
+                <button onClick={() => setModal('addBanque')} className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F07900]/15 text-[#F07900] border border-[#F07900]/30">
                   <Plus size={12} className="inline mr-1" />Ajouter un compte
                 </button>
               </div>
@@ -975,17 +975,17 @@ export default function TresoreriePage() {
                   const col = colors[i % colors.length]
                   return (
                     <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                      className="bg-white border border-[#E2E8F0] rounded-2xl p-5 hover:border-[#8B0073] transition-colors">
+                      className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 hover:border-[#484F58] transition-colors">
                       <div className="flex items-start justify-between mb-4">
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${col}20` }}>
                           <Landmark size={18} style={{ color: col }} />
                         </div>
                         <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border" style={{ color: col, borderColor: `${col}40`, background: `${col}10` }}>ACTIF</span>
                       </div>
-                      <p className="text-sm font-bold text-[#111827] mb-0.5">{c.intitule}</p>
-                      <p className="text-[10px] text-[#6B7280] mb-4">{c.banque}{c.numero_compte ? ` · ${c.numero_compte}` : ''}</p>
+                      <p className="text-sm font-bold text-[#E6EDF3] mb-0.5">{c.intitule}</p>
+                      <p className="text-[10px] text-[#484F58] mb-4">{c.banque}{c.numero_compte ? ` · ${c.numero_compte}` : ''}</p>
                       <p className="text-2xl font-bold" style={{ color: col }}>{fmtFCFA(c.solde)}</p>
-                      <p className="text-[9px] text-[#6B7280] mt-1">Solde actuel</p>
+                      <p className="text-[9px] text-[#484F58] mt-1">Solde actuel</p>
                     </motion.div>
                   )
                 })}
@@ -998,10 +998,10 @@ export default function TresoreriePage() {
             <div className="space-y-4">
               {/* Toggle émis / reçus */}
               <div className="flex gap-2 items-center flex-wrap">
-                <div className="flex gap-1 p-1 bg-white border border-[#E2E8F0] rounded-xl">
+                <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
                   {(['emis', 'recu'] as const).map(t => (
                     <button key={t} onClick={() => setChequeType(t)}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${chequeType === t ? 'bg-[#8B0073] text-white' : 'text-[#4B5563] hover:text-[#111827]'}`}>
+                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${chequeType === t ? 'bg-[#8B0073] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'}`}>
                       {t === 'emis' ? 'Chèques émis' : 'Chèques reçus'}
                     </button>
                   ))}
@@ -1015,53 +1015,53 @@ export default function TresoreriePage() {
               {/* Formulaire chèque */}
               {showChequeForm && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-white border border-[#8B0073]/30 rounded-2xl p-5 space-y-3">
-                  <p className="text-xs font-bold text-[#111827]">{chequeType === 'emis' ? 'Nouveau chèque émis' : 'Chèque reçu à encaisser'}</p>
+                  className="bg-[#161B22] border border-[#8B0073]/30 rounded-2xl p-5 space-y-3">
+                  <p className="text-xs font-bold text-[#E6EDF3]">{chequeType === 'emis' ? 'Nouveau chèque émis' : 'Chèque reçu à encaisser'}</p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">N° chèque *</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">N° chèque *</label>
                       <input value={fCheque.numero} onChange={e => setFCheque(f => ({ ...f, numero: e.target.value }))}
-                        placeholder="Ex: 0012345" className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                        placeholder="Ex: 0012345" className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA) *</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA) *</label>
                       <input type="number" value={fCheque.montant} onChange={e => setFCheque(f => ({ ...f, montant: e.target.value }))}
-                        placeholder="0" className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                        placeholder="0" className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">{chequeType === 'emis' ? 'Bénéficiaire' : 'Émetteur'}</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">{chequeType === 'emis' ? 'Bénéficiaire' : 'Émetteur'}</label>
                       <input value={chequeType === 'emis' ? fCheque.beneficiaire : fCheque.emetteur}
                         onChange={e => setFCheque(f => chequeType === 'emis' ? { ...f, beneficiaire: e.target.value } : { ...f, emetteur: e.target.value })}
-                        placeholder="Nom..." className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                        placeholder="Nom..." className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#8B0073]/50" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Banque tirée</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Banque tirée</label>
                       <select value={fCheque.banque_tiree} onChange={e => setFCheque(f => ({ ...f, banque_tiree: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
                         {BANQUES_CONGO.map(b => <option key={b}>{b}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Date d'émission</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Date d'émission</label>
                       <input type="date" value={fCheque.date_emission} onChange={e => setFCheque(f => ({ ...f, date_emission: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Compte bancaire</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Compte bancaire</label>
                       <select value={fCheque.compte_bancaire_id} onChange={e => setFCheque(f => ({ ...f, compte_bancaire_id: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
                         <option value="">— Aucun —</option>
                         {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule} · {c.banque}</option>)}
                       </select>
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Motif</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
                     <input value={fCheque.motif} onChange={e => setFCheque(f => ({ ...f, motif: e.target.value }))}
-                      placeholder="Objet du chèque..." className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none" />
+                      placeholder="Objet du chèque..." className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => setShowChequeForm(false)} className="flex-1 py-2 rounded-xl text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563]">Annuler</button>
+                    <button onClick={() => setShowChequeForm(false)} className="flex-1 py-2 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                     <button onClick={saveCheque} disabled={saving || !fCheque.numero || !fCheque.montant}
                       className="flex-1 py-2 rounded-xl text-sm font-semibold bg-[#8B0073] text-white disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
@@ -1072,34 +1072,34 @@ export default function TresoreriePage() {
 
               {/* Liste des chèques */}
               {cheques.filter(c => c.type === chequeType).length === 0 ? (
-                <div className="bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center">
-                  <FileText size={24} className="mx-auto mb-2 text-[#9CA3AF]" />
-                  <p className="text-[#6B7280] text-sm">Aucun chèque {chequeType === 'emis' ? 'émis' : 'reçu'}</p>
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-10 text-center">
+                  <FileText size={24} className="mx-auto mb-2 text-[#30363D]" />
+                  <p className="text-[#484F58] text-sm">Aucun chèque {chequeType === 'emis' ? 'émis' : 'reçu'}</p>
                 </div>
               ) : (
-                <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="border-b border-[#EEF2FF]">
+                        <tr className="border-b border-[#21262D]">
                           {['N° chèque', chequeType === 'emis' ? 'Bénéficiaire' : 'Émetteur', 'Banque', 'Montant', 'Date', 'Statut', 'Actions'].map(h => (
-                            <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">{h}</th>
+                            <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#EEF2FF]">
+                      <tbody className="divide-y divide-[#21262D]">
                         {cheques.filter(c => c.type === chequeType).map(ch => (
-                          <tr key={ch.id} className="hover:bg-[#F0F4FF]/80 transition-colors">
-                            <td className="px-4 py-2.5 font-mono text-[#111827]">{ch.numero}</td>
-                            <td className="px-4 py-2.5 text-[#4B5563]">{(chequeType === 'emis' ? ch.beneficiaire : ch.emetteur) ?? '—'}</td>
-                            <td className="px-4 py-2.5 text-[#6B7280]">{ch.banque_tiree ?? '—'}</td>
+                          <tr key={ch.id} className="hover:bg-[#21262D]/30 transition-colors">
+                            <td className="px-4 py-2.5 font-mono text-[#E6EDF3]">{ch.numero}</td>
+                            <td className="px-4 py-2.5 text-[#8B949E]">{(chequeType === 'emis' ? ch.beneficiaire : ch.emetteur) ?? '—'}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{ch.banque_tiree ?? '—'}</td>
                             <td className="px-4 py-2.5 font-bold text-[#8B0073]">{fmtFCFA(ch.montant)}</td>
-                            <td className="px-4 py-2.5 text-[#6B7280]">{fmtDate(ch.date_emission)}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{fmtDate(ch.date_emission)}</td>
                             <td className="px-4 py-2.5">
                               {ch.statut === 'en_attente' && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F0A30A]/10 text-[#F0A30A] font-semibold flex items-center gap-1 w-fit"><Clock size={9} />En attente</span>}
                               {ch.statut === 'encaisse'   && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#2EA043]/10 text-[#2EA043] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Encaissé</span>}
                               {ch.statut === 'rejete'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F01F38]/10 text-[#F01F38] font-semibold flex items-center gap-1 w-fit"><AlertTriangle size={9} />Rejeté</span>}
-                              {ch.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#6B7280] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
+                              {ch.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#484F58] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
                             </td>
                             <td className="px-4 py-2.5">
                               {ch.statut === 'en_attente' && (
@@ -1115,7 +1115,7 @@ export default function TresoreriePage() {
                                     Rejeter
                                   </button>
                                   <button onClick={() => updateChequeStatut(ch.id, 'annule')}
-                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#F0F4FF] text-[#6B7280] border border-[#E2E8F0]">
+                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#21262D] text-[#484F58] border border-[#30363D]">
                                     Annuler
                                   </button>
                                 </div>
@@ -1136,57 +1136,57 @@ export default function TresoreriePage() {
             <div className="space-y-4">
               <div className="flex justify-end">
                 <button onClick={() => setShowVirementForm(f => !f)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#8B0073]/10 text-[#8B0073] border border-[#8B0073]/30 hover:bg-[#8B0073]/15 transition-colors">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#F07900]/15 text-[#F07900] border border-[#F07900]/30 hover:bg-[#F07900]/25 transition-colors">
                   <Plus size={12} /> Nouveau virement
                 </button>
               </div>
 
               {showVirementForm && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-white border border-[#8B0073]/30 rounded-2xl p-5 space-y-3">
-                  <p className="text-xs font-bold text-[#111827]">Ordre de virement</p>
+                  className="bg-[#161B22] border border-[#F07900]/30 rounded-2xl p-5 space-y-3">
+                  <p className="text-xs font-bold text-[#E6EDF3]">Ordre de virement</p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Compte source</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Compte source</label>
                       <select value={fVirement.compte_source_id} onChange={e => setFVirement(f => ({ ...f, compte_source_id: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
                         <option value="">— Aucun —</option>
                         {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Destination *</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Destination *</label>
                       <input value={fVirement.compte_dest_label} onChange={e => setFVirement(f => ({ ...f, compte_dest_label: e.target.value }))}
                         placeholder="Ex: Fournisseur MAKALA, BGFI 0012…"
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA) *</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA) *</label>
                       <input type="number" value={fVirement.montant} onChange={e => setFVirement(f => ({ ...f, montant: e.target.value }))}
-                        placeholder="0" className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                        placeholder="0" className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Date</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                       <input type="date" value={fVirement.date} onChange={e => setFVirement(f => ({ ...f, date: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Motif</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
                       <input value={fVirement.motif} onChange={e => setFVirement(f => ({ ...f, motif: e.target.value }))}
                         placeholder="Objet du virement…"
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Référence bancaire</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Référence bancaire</label>
                       <input value={fVirement.reference} onChange={e => setFVirement(f => ({ ...f, reference: e.target.value }))}
                         placeholder="Ex: VIR-2026-001"
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none" />
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none" />
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => setShowVirementForm(false)} className="flex-1 py-2 rounded-xl text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563]">Annuler</button>
+                    <button onClick={() => setShowVirementForm(false)} className="flex-1 py-2 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                     <button onClick={saveVirement} disabled={saving || !fVirement.compte_dest_label || !fVirement.montant}
-                      className="flex-1 py-2 rounded-xl text-sm font-semibold bg-[#8B0073] text-white disabled:opacity-50 flex items-center justify-center gap-2">
+                      className="flex-1 py-2 rounded-xl text-sm font-semibold bg-[#F07900] text-white disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
                     </button>
                   </div>
@@ -1194,35 +1194,35 @@ export default function TresoreriePage() {
               )}
 
               {virements.length === 0 ? (
-                <div className="bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center">
-                  <Send size={24} className="mx-auto mb-2 text-[#9CA3AF]" />
-                  <p className="text-[#6B7280] text-sm">Aucun virement</p>
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-10 text-center">
+                  <Send size={24} className="mx-auto mb-2 text-[#30363D]" />
+                  <p className="text-[#484F58] text-sm">Aucun virement</p>
                 </div>
               ) : (
-                <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="border-b border-[#EEF2FF]">
+                        <tr className="border-b border-[#21262D]">
                           {['Date', 'Source', 'Destination', 'Montant', 'Motif', 'Réf.', 'Statut', 'Actions'].map(h => (
-                            <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">{h}</th>
+                            <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#EEF2FF]">
+                      <tbody className="divide-y divide-[#21262D]">
                         {virements.map(v => (
-                          <tr key={v.id} className="hover:bg-[#F0F4FF]/80 transition-colors">
-                            <td className="px-4 py-2.5 text-[#4B5563]">{fmtDate(v.date)}</td>
-                            <td className="px-4 py-2.5 text-[#6B7280]">{v.compte_source_label ?? '—'}</td>
-                            <td className="px-4 py-2.5 text-[#111827] max-w-[120px] truncate">{v.compte_dest_label}</td>
-                            <td className="px-4 py-2.5 font-bold text-[#8B0073]">{fmtFCFA(v.montant)}</td>
-                            <td className="px-4 py-2.5 text-[#4B5563] max-w-[100px] truncate">{v.motif ?? '—'}</td>
-                            <td className="px-4 py-2.5 text-[#6B7280]">{v.reference ?? '—'}</td>
+                          <tr key={v.id} className="hover:bg-[#21262D]/30 transition-colors">
+                            <td className="px-4 py-2.5 text-[#8B949E]">{fmtDate(v.date)}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{v.compte_source_label ?? '—'}</td>
+                            <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[120px] truncate">{v.compte_dest_label}</td>
+                            <td className="px-4 py-2.5 font-bold text-[#F07900]">{fmtFCFA(v.montant)}</td>
+                            <td className="px-4 py-2.5 text-[#8B949E] max-w-[100px] truncate">{v.motif ?? '—'}</td>
+                            <td className="px-4 py-2.5 text-[#484F58]">{v.reference ?? '—'}</td>
                             <td className="px-4 py-2.5">
                               {v.statut === 'en_attente' && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F0A30A]/10 text-[#F0A30A] font-semibold flex items-center gap-1 w-fit"><Clock size={9} />En attente</span>}
                               {v.statut === 'execute'    && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#2EA043]/10 text-[#2EA043] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Exécuté</span>}
                               {v.statut === 'rejete'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F01F38]/10 text-[#F01F38] font-semibold flex items-center gap-1 w-fit"><AlertTriangle size={9} />Rejeté</span>}
-                              {v.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#6B7280] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
+                              {v.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#484F58] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
                             </td>
                             <td className="px-4 py-2.5">
                               {v.statut === 'en_attente' && (
@@ -1232,7 +1232,7 @@ export default function TresoreriePage() {
                                     Exécuter
                                   </button>
                                   <button onClick={() => updateVirementStatut(v.id, 'annule')}
-                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#F0F4FF] text-[#6B7280] border border-[#E2E8F0]">
+                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#21262D] text-[#484F58] border border-[#30363D]">
                                     Annuler
                                   </button>
                                 </div>
@@ -1264,7 +1264,7 @@ export default function TresoreriePage() {
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                     selectedCaisse?.id === c.id
                       ? 'bg-[#F0A30A]/15 text-[#F0A30A] border-[#F0A30A]/40'
-                      : 'text-[#4B5563] border-[#E2E8F0] hover:border-[#8B0073]'
+                      : 'text-[#8B949E] border-[#30363D] hover:border-[#484F58]'
                   }`}>
                   <Archive size={12} />
                   {c.nom}
@@ -1275,14 +1275,14 @@ export default function TresoreriePage() {
           )}
 
           {/* Sous-onglets — TOUJOURS visibles */}
-          <div className="flex gap-1 border-b border-[#EEF2FF]">
+          <div className="flex gap-1 border-b border-[#21262D]">
             {CAISSE_TABS.map(tab => {
               const Icon = tab.icon
               const active = caisseTab === tab.id
               return (
                 <button key={tab.id} onClick={() => setCaisseTab(tab.id)}
                   className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors relative ${
-                    active ? 'text-[#F0A30A]' : 'text-[#6B7280] hover:text-[#4B5563]'
+                    active ? 'text-[#F0A30A]' : 'text-[#484F58] hover:text-[#8B949E]'
                   }`}>
                   <Icon size={12} />
                   {tab.label}
@@ -1294,10 +1294,10 @@ export default function TresoreriePage() {
 
           {/* Empty state — si pas de caisse et pas dans Paramétrage */}
           {caisses.length === 0 && caisseTab !== 'parametrage' && (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
-              <Archive size={28} className="mx-auto mb-3 text-[#9CA3AF]" />
-              <p className="text-[#6B7280] text-sm">Aucune caisse configurée</p>
-              <p className="text-[#9CA3AF] text-xs mt-1">Créez votre première caisse dans Paramétrage.</p>
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+              <Archive size={28} className="mx-auto mb-3 text-[#30363D]" />
+              <p className="text-[#484F58] text-sm">Aucune caisse configurée</p>
+              <p className="text-[#30363D] text-xs mt-1">Créez votre première caisse dans Paramétrage.</p>
               <button onClick={() => setCaisseTab('parametrage')}
                 className="mt-4 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F0A30A]/15 text-[#F0A30A] border border-[#F0A30A]/30 hover:bg-[#F0A30A]/25 transition-colors">
                 Aller au Paramétrage
@@ -1324,15 +1324,15 @@ export default function TresoreriePage() {
                 const appAuj = todayOps.filter(o => o.type === 'approvisionnement').reduce((s, o) => s + o.montant, 0)
                 return (
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white border border-[#F01F38]/20 rounded-xl p-4">
-                      <p className="text-[10px] text-[#6B7280] mb-1">Dépenses aujourd'hui</p>
+                    <div className="bg-[#161B22] border border-[#F01F38]/20 rounded-xl p-4">
+                      <p className="text-[10px] text-[#484F58] mb-1">Dépenses aujourd'hui</p>
                       <p className="text-[#F01F38] text-lg font-bold">−{fmtFCFA(depAuj)}</p>
-                      <p className="text-[10px] text-[#6B7280] mt-0.5">{todayOps.filter(o => o.type === 'depense').length} opération(s)</p>
+                      <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'depense').length} opération(s)</p>
                     </div>
-                    <div className="bg-white border border-[#2EA043]/20 rounded-xl p-4">
-                      <p className="text-[10px] text-[#6B7280] mb-1">Approvisionnements</p>
+                    <div className="bg-[#161B22] border border-[#2EA043]/20 rounded-xl p-4">
+                      <p className="text-[10px] text-[#484F58] mb-1">Approvisionnements</p>
                       <p className="text-[#2EA043] text-lg font-bold">+{fmtFCFA(appAuj)}</p>
-                      <p className="text-[10px] text-[#6B7280] mt-0.5">{todayOps.filter(o => o.type === 'approvisionnement').length} opération(s)</p>
+                      <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'approvisionnement').length} opération(s)</p>
                     </div>
                   </div>
                 )
@@ -1353,68 +1353,68 @@ export default function TresoreriePage() {
           {/* ── Opérations ── */}
           {caisseTab === 'operations' && selectedCaisse && caisses.length > 0 && (
             <div className="space-y-4">
-              <div className="flex gap-1 p-1 bg-white border border-[#E2E8F0] rounded-xl">
+              <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
                 <button onClick={() => setOpType('depense')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                    opType === 'depense' ? 'bg-[#F01F38] text-white' : 'text-[#4B5563] hover:text-[#111827]'
+                    opType === 'depense' ? 'bg-[#F01F38] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
                   }`}>
                   <Minus size={14} /> Dépense en espèces
                 </button>
                 <button onClick={() => setOpType('approvisionnement')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                    opType === 'approvisionnement' ? 'bg-[#2EA043] text-white' : 'text-[#4B5563] hover:text-[#111827]'
+                    opType === 'approvisionnement' ? 'bg-[#2EA043] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
                   }`}>
                   <Plus size={14} /> Approvisionnement
                 </button>
               </div>
-              <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 space-y-4">
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
                 {opType === 'depense' && (
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Catégorie</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
                     <select value={fOp.categorie} onChange={e => setFOp(f => ({ ...f, categorie: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#F01F38]/50">
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F01F38]/50">
                       {CATS_DEPENSE.map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                 )}
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Motif</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Motif</label>
                   <input value={fOp.motif} onChange={e => setFOp(f => ({ ...f, motif: e.target.value }))}
                     placeholder={opType === 'depense' ? 'Ex: Achat carburant générateur…' : 'Ex: Virement depuis compte BGFI…'}
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
                 </div>
                 {opType === 'depense' && (
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Bénéficiaire</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Bénéficiaire</label>
                     <input value={fOp.beneficiaire} onChange={e => setFOp(f => ({ ...f, beneficiaire: e.target.value }))}
                       placeholder="Ex: Pharmacie SIKA…"
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA)</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
                     <input type="number" value={fOp.montant} onChange={e => setFOp(f => ({ ...f, montant: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Date</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                     <input type="date" value={fOp.date} onChange={e => setFOp(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#F0A30A]/60" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">N° pièce / référence</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">N° pièce / référence</label>
                   <input value={fOp.reference_piece} onChange={e => setFOp(f => ({ ...f, reference_piece: e.target.value }))}
                     placeholder="Ex: RECU-2026-001"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
                 </div>
                 {fOp.montant && parseFloat(fOp.montant) > 0 && (
                   <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
                     opType === 'depense' ? 'bg-[#F01F38]/10 border-[#F01F38]/20' : 'bg-[#2EA043]/10 border-[#2EA043]/20'
                   }`}>
-                    <span className="text-xs text-[#4B5563]">Solde après opération</span>
+                    <span className="text-xs text-[#8B949E]">Solde après opération</span>
                     <span className={`text-sm font-bold ${opType === 'depense' ? 'text-[#F01F38]' : 'text-[#2EA043]'}`}>
                       {fmtFCFA(opType === 'depense'
                         ? selectedCaisse.solde - parseFloat(fOp.montant)
@@ -1435,30 +1435,30 @@ export default function TresoreriePage() {
 
           {/* ── Journal ── */}
           {caisseTab === 'journal' && selectedCaisse && caisses.length > 0 && (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-[#E2E8F0] flex items-center justify-between">
-                <h3 className="text-xs font-semibold text-[#111827]">Journal de caisse — {selectedCaisse.nom}</h3>
-                <span className="text-[10px] text-[#6B7280]">{caisseOps.length} opération(s)</span>
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#30363D] flex items-center justify-between">
+                <h3 className="text-xs font-semibold text-[#E6EDF3]">Journal de caisse — {selectedCaisse.nom}</h3>
+                <span className="text-[10px] text-[#484F58]">{caisseOps.length} opération(s)</span>
               </div>
               {caisseOps.length === 0 ? (
                 <div className="p-10 text-center">
-                  <FileText size={24} className="mx-auto mb-2 text-[#9CA3AF]" />
-                  <p className="text-[#6B7280] text-sm">Aucune opération</p>
+                  <FileText size={24} className="mx-auto mb-2 text-[#30363D]" />
+                  <p className="text-[#484F58] text-sm">Aucune opération</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="border-b border-[#EEF2FF]">
+                      <tr className="border-b border-[#21262D]">
                         {['Date', 'Type', 'Motif', 'Bénéficiaire', 'Réf.', 'Montant', 'Statut'].map(h => (
-                          <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">{h}</th>
+                          <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EEF2FF]">
+                    <tbody className="divide-y divide-[#21262D]">
                       {caisseOps.map(op => (
-                        <tr key={op.id} className="hover:bg-[#F0F4FF]/80 transition-colors">
-                          <td className="px-4 py-2.5 text-[#4B5563]">{fmtDate(op.date)}</td>
+                        <tr key={op.id} className="hover:bg-[#21262D]/30 transition-colors">
+                          <td className="px-4 py-2.5 text-[#8B949E]">{fmtDate(op.date)}</td>
                           <td className="px-4 py-2.5">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                               op.type === 'depense' ? 'bg-[#F01F38]/10 text-[#F01F38]' : 'bg-[#2EA043]/10 text-[#2EA043]'
@@ -1466,15 +1466,15 @@ export default function TresoreriePage() {
                               {op.type === 'depense' ? 'Dépense' : 'Approv.'}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-[#111827] max-w-[140px] truncate">{op.motif ?? '—'}</td>
-                          <td className="px-4 py-2.5 text-[#4B5563]">{op.beneficiaire ?? '—'}</td>
-                          <td className="px-4 py-2.5 text-[#6B7280]">{op.reference_piece ?? '—'}</td>
+                          <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[140px] truncate">{op.motif ?? '—'}</td>
+                          <td className="px-4 py-2.5 text-[#8B949E]">{op.beneficiaire ?? '—'}</td>
+                          <td className="px-4 py-2.5 text-[#484F58]">{op.reference_piece ?? '—'}</td>
                           <td className={`px-4 py-2.5 font-bold ${op.type === 'depense' ? 'text-[#F01F38]' : 'text-[#2EA043]'}`}>
                             {op.type === 'depense' ? '−' : '+'}{fmtFCFA(op.montant)}
                           </td>
                           <td className="px-4 py-2.5">
                             {op.cloture_date
-                              ? <span className="text-[10px] text-[#6B7280]">Clôturé</span>
+                              ? <span className="text-[10px] text-[#484F58]">Clôturé</span>
                               : <span className="text-[10px] text-[#F0A30A]">En cours</span>}
                           </td>
                         </tr>
@@ -1488,27 +1488,27 @@ export default function TresoreriePage() {
 
           {/* ── Clôture ── */}
           {caisseTab === 'cloture' && selectedCaisse && caisses.length > 0 && (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 space-y-4">
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
                   <Lock size={18} className="text-[#F0A30A]" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[#111827]">Clôture de caisse</p>
-                  <p className="text-[10px] text-[#6B7280]">Arrêter les opérations d'une journée</p>
+                  <p className="text-sm font-bold text-[#E6EDF3]">Clôture de caisse</p>
+                  <p className="text-[10px] text-[#484F58]">Arrêter les opérations d'une journée</p>
                 </div>
               </div>
               <div>
-                <label className="text-xs text-[#4B5563] mb-1 block">Date à clôturer</label>
+                <label className="text-xs text-[#8B949E] mb-1 block">Date à clôturer</label>
                 <input type="date" value={clotureDate} onChange={e => setClotureDate(e.target.value)}
-                  className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#F0A30A]/60" />
+                  className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F0A30A]/50" />
               </div>
               <div>
-                <label className="text-xs text-[#4B5563] mb-1 block">Solde physique constaté (optionnel)</label>
+                <label className="text-xs text-[#8B949E] mb-1 block">Solde physique constaté (optionnel)</label>
                 <input type="number" value={clotureSolde} onChange={e => setClotureSolde(e.target.value)}
                   placeholder={String(selectedCaisse.solde)}
-                  className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60" />
-                <p className="text-[10px] text-[#6B7280] mt-1">
+                  className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
+                <p className="text-[10px] text-[#484F58] mt-1">
                   Solde comptable : {fmtFCFA(selectedCaisse.solde)}
                   {clotureSolde && ` · Écart : ${parseFloat(clotureSolde) - selectedCaisse.solde >= 0 ? '+' : ''}${fmtFCFA(parseFloat(clotureSolde) - selectedCaisse.solde)}`}
                 </p>
@@ -1516,11 +1516,11 @@ export default function TresoreriePage() {
               {(() => {
                 const toClose = caisseOps.filter(o => o.date === clotureDate && !o.cloture_date)
                 return toClose.length > 0 ? (
-                  <div className="bg-white border border-[#F0A30A]/20 rounded-xl p-3">
+                  <div className="bg-[#0D1117] border border-[#F0A30A]/20 rounded-xl p-3">
                     <p className="text-[10px] font-bold text-[#F0A30A] mb-2">{toClose.length} opération(s) à clôturer</p>
                     {toClose.map(o => (
                       <div key={o.id} className="flex justify-between text-[10px] py-0.5">
-                        <span className="text-[#4B5563]">{o.motif ?? o.type}</span>
+                        <span className="text-[#8B949E]">{o.motif ?? o.type}</span>
                         <span className={o.type === 'depense' ? 'text-[#F01F38]' : 'text-[#2EA043]'}>
                           {o.type === 'depense' ? '−' : '+'}{fmtFCFA(o.montant)}
                         </span>
@@ -1528,7 +1528,7 @@ export default function TresoreriePage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[10px] text-[#6B7280]">Aucune opération non clôturée pour cette date.</p>
+                  <p className="text-[10px] text-[#484F58]">Aucune opération non clôturée pour cette date.</p>
                 )
               })()}
               <button onClick={saveCloture} disabled={savingCloture}
@@ -1543,36 +1543,36 @@ export default function TresoreriePage() {
           {caisseTab === 'parametrage' && (
             <div className="space-y-4">
               {caisses.length > 0 && (
-                <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
-                  <div className="px-5 py-3 border-b border-[#E2E8F0]">
-                    <p className="text-xs font-semibold text-[#111827]">Caisses existantes</p>
+                <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                  <div className="px-5 py-3 border-b border-[#30363D]">
+                    <p className="text-xs font-semibold text-[#E6EDF3]">Caisses existantes</p>
                   </div>
                   {caisses.map(c => (
-                    <div key={c.id} className="flex items-center gap-3 px-5 py-3 border-b border-[#EEF2FF] last:border-0">
+                    <div key={c.id} className="flex items-center gap-3 px-5 py-3 border-b border-[#21262D] last:border-0">
                       <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/10 flex items-center justify-center">
                         <Archive size={14} className="text-[#F0A30A]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-xs font-medium text-[#111827]">{c.nom}</p>
-                        <p className="text-[10px] text-[#6B7280]">Compte {c.numero_compte} · {fmtFCFA(c.solde)}</p>
+                        <p className="text-xs font-medium text-[#E6EDF3]">{c.nom}</p>
+                        <p className="text-[10px] text-[#484F58]">Compte {c.numero_compte} · {fmtFCFA(c.solde)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5">
-                <p className="text-xs font-semibold text-[#111827] mb-4">Créer une nouvelle caisse</p>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5">
+                <p className="text-xs font-semibold text-[#E6EDF3] mb-4">Créer une nouvelle caisse</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Nom de la caisse</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Nom de la caisse</label>
                     <input value={fCaisse.nom} onChange={e => setFCaisse(f => ({ ...f, nom: e.target.value }))}
                       placeholder="Ex: Caisse principale, Caisse annexe…"
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Compte OHADA</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Compte OHADA</label>
                     <select value={fCaisse.numero_compte} onChange={e => setFCaisse(f => ({ ...f, numero_compte: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
                       <option value="571000">571000 — Caisse principale</option>
                       <option value="571100">571100 — Caisse annexe</option>
                       <option value="572000">572000 — Caisse devises</option>
@@ -1599,44 +1599,44 @@ export default function TresoreriePage() {
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {mainTab === 'import' && (
         <div className="space-y-5">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 space-y-4">
+          <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-5 space-y-4">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-9 h-9 rounded-xl bg-[#8B0073]/10 flex items-center justify-center"><Upload size={16} className="text-[#8B0073]" /></div>
+              <div className="w-9 h-9 rounded-xl bg-[#F07900]/10 flex items-center justify-center"><Upload size={16} className="text-[#F07900]" /></div>
               <div>
-                <p className="text-sm font-bold text-[#111827]">Importer un relevé bancaire</p>
-                <p className="text-[10px] text-[#6B7280]">Fichier CSV — formats BGFI, Ecobank, Rawbank supportés</p>
+                <p className="text-sm font-bold text-[#E6EDF3]">Importer un relevé bancaire</p>
+                <p className="text-[10px] text-[#484F58]">Fichier CSV — formats BGFI, Ecobank, Rawbank supportés</p>
               </div>
             </div>
             <div>
-              <label className="text-xs text-[#4B5563] mb-1 block">Compte bancaire associé</label>
+              <label className="text-xs text-[#8B949E] mb-1 block">Compte bancaire associé</label>
               {comptesBancaires.length === 0 ? (
                 <p className="text-xs text-[#F01F38]">Aucun compte bancaire — ajoutez-en un dans l'onglet Banque.</p>
               ) : (
                 <select value={csvCompte} onChange={e => setCsvCompte(e.target.value)}
-                  className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#8B0073]/50">
+                  className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F07900]/50">
                   <option value="">— Sélectionner un compte —</option>
                   {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule} · {c.banque}</option>)}
                 </select>
               )}
             </div>
             <div>
-              <label className="text-xs text-[#4B5563] mb-1 block">Fichier CSV</label>
+              <label className="text-xs text-[#8B949E] mb-1 block">Fichier CSV</label>
               <div className="flex items-center gap-3">
                 <input ref={csvInputRef} type="file" accept=".csv,.txt" onChange={handleCSVFile} className="hidden" />
                 <button onClick={() => csvInputRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#8B0073]/40 bg-[#8B0073]/10 text-[#8B0073] text-xs font-semibold hover:bg-[#8B0073]/20 transition-colors">
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#F07900]/40 bg-[#F07900]/10 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/20 transition-colors">
                   <Upload size={13} /> Choisir un fichier CSV
                 </button>
                 {csvRows.length > 0 && <span className="text-xs text-[#2EA043] font-semibold">{csvRows.length} lignes détectées</span>}
               </div>
-              <p className="text-[10px] text-[#6B7280] mt-1">Colonnes attendues : Date, Libellé, Débit, Crédit (ou Montant). Séparateur ; ou ,</p>
+              <p className="text-[10px] text-[#484F58] mt-1">Colonnes attendues : Date, Libellé, Débit, Crédit (ou Montant). Séparateur ; ou ,</p>
             </div>
           </div>
 
           {csvRows.length > 0 && (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-[#E2E8F0] flex items-center justify-between">
-                <h3 className="text-xs font-semibold text-[#111827]">Aperçu — {csvRows.length} lignes</h3>
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#30363D] flex items-center justify-between">
+                <h3 className="text-xs font-semibold text-[#E6EDF3]">Aperçu — {csvRows.length} lignes</h3>
                 <button onClick={importReleve} disabled={importingSaving || !csvCompte}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 disabled:opacity-50 transition-colors">
                   {importingSaving ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
@@ -1646,17 +1646,17 @@ export default function TresoreriePage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="border-b border-[#EEF2FF]">
+                    <tr className="border-b border-[#21262D]">
                       {['Date', 'Libellé', 'Type', 'Montant'].map(h => (
-                        <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">{h}</th>
+                        <th key={h} className="text-left px-4 py-2 text-[10px] font-bold text-[#484F58] uppercase tracking-wider">{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EEF2FF]">
+                  <tbody className="divide-y divide-[#21262D]">
                     {csvRows.slice(0, 50).map((r, i) => (
-                      <tr key={i} className="hover:bg-[#F0F4FF]/80">
-                        <td className="px-4 py-2 text-[#4B5563]">{fmtDate(r.date)}</td>
-                        <td className="px-4 py-2 text-[#111827] max-w-[200px] truncate">{r.libelle}</td>
+                      <tr key={i} className="hover:bg-[#21262D]/30">
+                        <td className="px-4 py-2 text-[#8B949E]">{fmtDate(r.date)}</td>
+                        <td className="px-4 py-2 text-[#E6EDF3] max-w-[200px] truncate">{r.libelle}</td>
                         <td className="px-4 py-2">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.type === 'credit' ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'bg-[#F01F38]/10 text-[#F01F38]'}`}>
                             {r.type === 'credit' ? 'Crédit' : 'Débit'}
@@ -1669,7 +1669,7 @@ export default function TresoreriePage() {
                     ))}
                   </tbody>
                 </table>
-                {csvRows.length > 50 && <p className="px-4 py-2 text-[10px] text-[#6B7280]">… et {csvRows.length - 50} lignes supplémentaires</p>}
+                {csvRows.length > 50 && <p className="px-4 py-2 text-[10px] text-[#484F58]">… et {csvRows.length - 50} lignes supplémentaires</p>}
               </div>
             </div>
           )}
@@ -1683,7 +1683,7 @@ export default function TresoreriePage() {
         <div className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
             <select value={rapprochCompte} onChange={e => setRapprochCompte(e.target.value)}
-              className="bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#8B0073]/50">
+              className="bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F07900]/50">
               <option value="">— Sélectionner un compte —</option>
               {comptesBancaires.map(c => <option key={c.id} value={c.id}>{c.intitule} · {c.banque}</option>)}
             </select>
@@ -1694,49 +1694,49 @@ export default function TresoreriePage() {
                 Auto-rapprocher
               </button>
             )}
-            <div className="ml-auto text-xs text-[#6B7280]">
+            <div className="ml-auto text-xs text-[#484F58]">
               {releveLignes.filter(l => l.statut === 'non_rapproche').length} en attente ·{' '}
               <span className="text-[#2EA043]">{releveLignes.filter(l => l.statut === 'rapproche').length} rapprochés</span>
             </div>
           </div>
 
           {!rapprochCompte ? (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
-              <GitMerge size={28} className="mx-auto mb-3 text-[#9CA3AF]" />
-              <p className="text-[#6B7280] text-sm">Sélectionnez un compte pour commencer</p>
-              <p className="text-[#9CA3AF] text-xs mt-1">Importez d'abord un relevé dans l'onglet "Import relevés"</p>
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
+              <GitMerge size={28} className="mx-auto mb-3 text-[#30363D]" />
+              <p className="text-[#484F58] text-sm">Sélectionnez un compte pour commencer</p>
+              <p className="text-[#30363D] text-xs mt-1">Importez d'abord un relevé dans l'onglet "Import relevés"</p>
             </div>
           ) : releveLignes.filter(l => l.statut === 'non_rapproche').length === 0 ? (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
               <CheckCheck size={28} className="mx-auto mb-3 text-[#2EA043]" />
               <p className="text-[#2EA043] text-sm font-semibold">Tout est rapproché !</p>
-              <p className="text-[#6B7280] text-xs mt-1">Aucune ligne en attente pour ce compte.</p>
+              <p className="text-[#484F58] text-xs mt-1">Aucune ligne en attente pour ce compte.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Lignes de relevé */}
-              <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
-                <div className="px-4 py-3 border-b border-[#E2E8F0]">
-                  <p className="text-xs font-semibold text-[#111827]">Relevé bancaire</p>
-                  <p className="text-[10px] text-[#6B7280]">Cliquer pour sélectionner une ligne</p>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#30363D]">
+                  <p className="text-xs font-semibold text-[#E6EDF3]">Relevé bancaire</p>
+                  <p className="text-[10px] text-[#484F58]">Cliquer pour sélectionner une ligne</p>
                 </div>
-                <div className="divide-y divide-[#EEF2FF] max-h-96 overflow-y-auto">
+                <div className="divide-y divide-[#21262D] max-h-96 overflow-y-auto">
                   {releveLignes.filter(l => l.statut === 'non_rapproche').map(ligne => (
                     <div key={ligne.id} onClick={() => setRapprochLigne(l => l?.id === ligne.id ? null : ligne)}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${rapprochLigne?.id === ligne.id ? 'bg-[#8B0073]/10 border-l-2 border-[#F07900]' : 'hover:bg-[#F0F4FF]/50'}`}>
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${rapprochLigne?.id === ligne.id ? 'bg-[#F07900]/10 border-l-2 border-[#F07900]' : 'hover:bg-[#21262D]/50'}`}>
                       <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${ligne.type === 'credit' ? 'bg-[#2EA043]/10' : 'bg-[#F01F38]/10'}`}>
                         {ligne.type === 'credit' ? <ArrowUpCircle size={12} className="text-[#2EA043]" /> : <ArrowDownCircle size={12} className="text-[#F01F38]" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-[#111827] truncate">{ligne.libelle}</p>
-                        <p className="text-[10px] text-[#6B7280]">{fmtDate(ligne.date)}</p>
+                        <p className="text-xs text-[#E6EDF3] truncate">{ligne.libelle}</p>
+                        <p className="text-[10px] text-[#484F58]">{fmtDate(ligne.date)}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
                           {ligne.type === 'credit' ? '+' : '−'}{fmtFCFA(ligne.montant)}
                         </p>
                         <button onClick={e => { e.stopPropagation(); ignorerLigne(ligne.id) }}
-                          className="text-[10px] text-[#6B7280] hover:text-[#F01F38] transition-colors">Ignorer</button>
+                          className="text-[10px] text-[#484F58] hover:text-[#F01F38] transition-colors">Ignorer</button>
                       </div>
                     </div>
                   ))}
@@ -1744,20 +1744,20 @@ export default function TresoreriePage() {
               </div>
 
               {/* Transactions correspondantes */}
-              <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
-                <div className="px-4 py-3 border-b border-[#E2E8F0]">
-                  <p className="text-xs font-semibold text-[#111827]">Transactions Oraforme</p>
-                  <p className="text-[10px] text-[#6B7280]">
+              <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#30363D]">
+                  <p className="text-xs font-semibold text-[#E6EDF3]">Transactions Oraforme</p>
+                  <p className="text-[10px] text-[#484F58]">
                     {rapprochLigne ? `Sélectionné: ${fmtFCFA(rapprochLigne.montant)} · ${fmtDate(rapprochLigne.date)}` : 'Sélectionnez une ligne du relevé'}
                   </p>
                 </div>
                 {!rapprochLigne ? (
                   <div className="p-10 text-center">
-                    <Link2 size={24} className="mx-auto mb-2 text-[#9CA3AF]" />
-                    <p className="text-[#6B7280] text-xs">Cliquez sur une ligne du relevé à gauche</p>
+                    <Link2 size={24} className="mx-auto mb-2 text-[#30363D]" />
+                    <p className="text-[#484F58] text-xs">Cliquez sur une ligne du relevé à gauche</p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-[#EEF2FF] max-h-96 overflow-y-auto">
+                  <div className="divide-y divide-[#21262D] max-h-96 overflow-y-auto">
                     {(() => {
                       const txType = rapprochLigne.type === 'credit' ? 'entree' : 'sortie'
                       const ligneDate = new Date(rapprochLigne.date).getTime()
@@ -1770,7 +1770,7 @@ export default function TresoreriePage() {
                       const list = [...suggestions, ...others]
                       if (list.length === 0) return (
                         <div className="p-8 text-center">
-                          <p className="text-[#6B7280] text-xs">Aucune transaction correspondante</p>
+                          <p className="text-[#484F58] text-xs">Aucune transaction correspondante</p>
                         </div>
                       )
                       return list.map(tx => {
@@ -1778,11 +1778,11 @@ export default function TresoreriePage() {
                         const isSelected = rapprochTx?.id === tx.id
                         return (
                           <div key={tx.id} onClick={() => setRapprochTx(t => t?.id === tx.id ? null : tx)}
-                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isSelected ? 'bg-[#2EA043]/10 border-l-2 border-[#2EA043]' : 'hover:bg-[#F0F4FF]/50'}`}>
+                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isSelected ? 'bg-[#2EA043]/10 border-l-2 border-[#2EA043]' : 'hover:bg-[#21262D]/50'}`}>
                             {isSuggestion && <span className="w-1.5 h-1.5 rounded-full bg-[#F0A30A] shrink-0" title="Suggestion" />}
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-[#111827] truncate">{tx.description}</p>
-                              <p className="text-[10px] text-[#6B7280]">{tx.categorie} · {fmtDate(tx.date)}</p>
+                              <p className="text-xs text-[#E6EDF3] truncate">{tx.description}</p>
+                              <p className="text-[10px] text-[#484F58]">{tx.categorie} · {fmtDate(tx.date)}</p>
                             </div>
                             <p className={`text-xs font-bold shrink-0 ${tx.type === 'entree' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{fmtFCFA(tx.montant)}</p>
                           </div>
@@ -1792,7 +1792,7 @@ export default function TresoreriePage() {
                   </div>
                 )}
                 {rapprochLigne && rapprochTx && (
-                  <div className="px-4 py-3 border-t border-[#E2E8F0]">
+                  <div className="px-4 py-3 border-t border-[#30363D]">
                     <button onClick={() => rapprocher(rapprochLigne, rapprochTx)} disabled={rapprochSaving}
                       className="w-full py-2.5 rounded-xl text-sm font-semibold bg-[#2EA043] text-white disabled:opacity-50 flex items-center justify-center gap-2">
                       {rapprochSaving ? <Loader2 size={13} className="animate-spin" /> : <Link2 size={13} />}
@@ -1806,17 +1806,17 @@ export default function TresoreriePage() {
 
           {/* Lignes rapprochées */}
           {releveLignes.filter(l => l.statut === 'rapproche').length > 0 && (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-[#E2E8F0]">
+            <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#30363D]">
                 <p className="text-xs font-semibold text-[#2EA043]">Lignes rapprochées — {releveLignes.filter(l => l.statut === 'rapproche').length}</p>
               </div>
-              <div className="divide-y divide-[#EEF2FF]">
+              <div className="divide-y divide-[#21262D]">
                 {releveLignes.filter(l => l.statut === 'rapproche').slice(0, 20).map(ligne => (
                   <div key={ligne.id} className="flex items-center gap-3 px-4 py-2.5">
                     <CheckCheck size={14} className="text-[#2EA043] shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-[#4B5563] truncate">{ligne.libelle}</p>
-                      <p className="text-[10px] text-[#6B7280]">{fmtDate(ligne.date)}</p>
+                      <p className="text-xs text-[#8B949E] truncate">{ligne.libelle}</p>
+                      <p className="text-[10px] text-[#484F58]">{fmtDate(ligne.date)}</p>
                     </div>
                     <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{ligne.type === 'credit' ? '+' : '−'}{fmtFCFA(ligne.montant)}</p>
                   </div>
@@ -1855,11 +1855,11 @@ export default function TresoreriePage() {
           <div className="space-y-5">
             {/* Sélecteur de période */}
             <div className="flex items-center gap-3">
-              <p className="text-xs text-[#4B5563]">Horizon de prévision :</p>
-              <div className="flex gap-1 p-1 bg-white border border-[#E2E8F0] rounded-xl">
+              <p className="text-xs text-[#8B949E]">Horizon de prévision :</p>
+              <div className="flex gap-1 p-1 bg-[#0D1117] border border-[#30363D] rounded-xl">
                 {[30, 60, 90].map(d => (
                   <button key={d} onClick={() => setPrevisionDays(d)}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${previsionDays === d ? 'bg-[#8B0073] text-white' : 'text-[#4B5563] hover:text-[#111827]'}`}>
+                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${previsionDays === d ? 'bg-[#F07900] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'}`}>
                     {d} jours
                   </button>
                 ))}
@@ -1868,20 +1868,20 @@ export default function TresoreriePage() {
 
             {/* KPI Prévisions */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-4">
-                <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mb-1">Solde actuel</p>
-                <p className="text-lg font-bold text-[#111827]">{fmtFCFA(tresorerieGlobale)}</p>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Solde actuel</p>
+                <p className="text-lg font-bold text-[#E6EDF3]">{fmtFCFA(tresorerieGlobale)}</p>
               </div>
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-4">
-                <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mb-1">Solde prévu J+{previsionDays}</p>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Solde prévu J+{previsionDays}</p>
                 <p className={`text-lg font-bold ${endSolde >= 0 ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{fmtFCFA(endSolde)}</p>
               </div>
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-4">
-                <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mb-1">Entrées/jour (moy.)</p>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Entrées/jour (moy.)</p>
                 <p className="text-lg font-bold text-[#2EA043]">{fmtFCFA(Math.round(dailyE))}</p>
               </div>
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-4">
-                <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mb-1">Sorties/jour (moy.)</p>
+              <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Sorties/jour (moy.)</p>
                 <p className="text-lg font-bold text-[#F01F38]">{fmtFCFA(Math.round(dailyS))}</p>
               </div>
             </div>
@@ -1905,9 +1905,9 @@ export default function TresoreriePage() {
             )}
 
             {/* Graphique prévisionnel */}
-            <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-              <h2 className="text-xs font-semibold text-[#111827] mb-1">Solde prévisionnel — {previsionDays} jours</h2>
-              <p className="text-[10px] text-[#6B7280] mb-4">Basé sur la moyenne des 90 derniers jours d'activité</p>
+            <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+              <h2 className="text-xs font-semibold text-[#E6EDF3] mb-1">Solde prévisionnel — {previsionDays} jours</h2>
+              <p className="text-[10px] text-[#484F58] mb-4">Basé sur la moyenne des 90 derniers jours d'activité</p>
               <ResponsiveContainer width="100%" height={200}>
                 <ComposedChart data={forecast} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
@@ -1925,7 +1925,7 @@ export default function TresoreriePage() {
             </div>
 
             {last90.length === 0 && (
-              <div className="bg-white border border-[#F0A30A]/20 rounded-xl p-4">
+              <div className="bg-[#161B22] border border-[#F0A30A]/20 rounded-xl p-4">
                 <p className="text-xs text-[#F0A30A]">Aucune transaction des 90 derniers jours — les prévisions sont basées sur des données insuffisantes.</p>
               </div>
             )}
@@ -1942,21 +1942,21 @@ export default function TresoreriePage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/70" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-white border border-[#2EA043]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+              className="relative bg-[#161B22] border border-[#2EA043]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 rounded-xl bg-[#2EA043]/20 flex items-center justify-center">
                   <ArrowUpCircle size={20} className="text-[#2EA043]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#111827]">Encaisser</h3>
-                  <p className="text-[11px] text-[#6B7280]">Enregistrer une entrée d'argent</p>
+                  <h3 className="text-base font-bold text-[#E6EDF3]">Encaisser</h3>
+                  <p className="text-[11px] text-[#484F58]">Enregistrer une entrée d'argent</p>
                 </div>
-                <button onClick={() => setModal(null)} className="ml-auto text-[#6B7280] hover:text-[#4B5563]"><X size={16} /></button>
+                <button onClick={() => setModal(null)} className="ml-auto text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-2 block font-medium">Mode de réception</label>
+                  <label className="text-xs text-[#8B949E] mb-2 block font-medium">Mode de réception</label>
                   <div className="grid grid-cols-5 gap-2">
                     {MODES.map(m => {
                       const Icon = m.icon
@@ -1972,29 +1972,29 @@ export default function TresoreriePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Catégorie</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
                   <select value={fEnc.categorie} onChange={e => setFEnc(f => ({ ...f, categorie: e.target.value }))}
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#2EA043]/50">
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#2EA043]/50">
                     {CATS_ENTREE.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Description</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Description</label>
                   <input value={fEnc.description} onChange={e => setFEnc(f => ({ ...f, description: e.target.value }))}
                     placeholder="Ex: Paiement client KALALA…"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#2EA043]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#2EA043]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA)</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
                     <input type="number" value={fEnc.montant} onChange={e => setFEnc(f => ({ ...f, montant: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#2EA043]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#2EA043]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Date</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                     <input type="date" value={fEnc.date} onChange={e => setFEnc(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#2EA043]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#2EA043]/50" />
                   </div>
                 </div>
                 {fEnc.montant && parseInt(fEnc.montant) > 0 && (
@@ -2007,7 +2007,7 @@ export default function TresoreriePage() {
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563]">Annuler</button>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                 <button onClick={saveEncaisser} disabled={saving || !fEnc.description || !fEnc.montant}
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#2EA043] text-white">
                   {saving && <Loader2 size={13} className="animate-spin" />}
@@ -2028,21 +2028,21 @@ export default function TresoreriePage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/70" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-white border border-[#F01F38]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+              className="relative bg-[#161B22] border border-[#F01F38]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 rounded-xl bg-[#F01F38]/20 flex items-center justify-center">
                   <ArrowDownCircle size={20} className="text-[#F01F38]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#111827]">Décaisser</h3>
-                  <p className="text-[11px] text-[#6B7280]">Enregistrer une sortie d'argent</p>
+                  <h3 className="text-base font-bold text-[#E6EDF3]">Décaisser</h3>
+                  <p className="text-[11px] text-[#484F58]">Enregistrer une sortie d'argent</p>
                 </div>
-                <button onClick={() => setModal(null)} className="ml-auto text-[#6B7280] hover:text-[#4B5563]"><X size={16} /></button>
+                <button onClick={() => setModal(null)} className="ml-auto text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-2 block font-medium">Mode de paiement</label>
+                  <label className="text-xs text-[#8B949E] mb-2 block font-medium">Mode de paiement</label>
                   <div className="grid grid-cols-5 gap-2">
                     {MODES.map(m => {
                       const Icon = m.icon
@@ -2058,29 +2058,29 @@ export default function TresoreriePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Catégorie</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
                   <select value={fDec.categorie} onChange={e => setFDec(f => ({ ...f, categorie: e.target.value }))}
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#F01F38]/50">
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F01F38]/50">
                     {CATS_SORTIE.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Description</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Description</label>
                   <input value={fDec.description} onChange={e => setFDec(f => ({ ...f, description: e.target.value }))}
                     placeholder="Ex: Loyer bureau janvier…"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F01F38]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F01F38]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA)</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
                     <input type="number" value={fDec.montant} onChange={e => setFDec(f => ({ ...f, montant: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F01F38]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F01F38]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Date</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                     <input type="date" value={fDec.date} onChange={e => setFDec(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#F01F38]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F01F38]/50" />
                   </div>
                 </div>
                 {fDec.montant && parseInt(fDec.montant) > 0 && (
@@ -2093,7 +2093,7 @@ export default function TresoreriePage() {
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563]">Annuler</button>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                 <button onClick={saveDecaisser} disabled={saving || !fDec.description || !fDec.montant}
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#F01F38] text-white">
                   {saving && <Loader2 size={13} className="animate-spin" />}
@@ -2114,51 +2114,51 @@ export default function TresoreriePage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/70" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-white border border-[#8B0073]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              className="relative bg-[#161B22] border border-[#F07900]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-[#8B0073]/20 flex items-center justify-center">
-                  <Landmark size={20} className="text-[#8B0073]" />
+                <div className="w-10 h-10 rounded-xl bg-[#F07900]/20 flex items-center justify-center">
+                  <Landmark size={20} className="text-[#F07900]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#111827]">Ajouter un compte</h3>
-                  <p className="text-[11px] text-[#6B7280]">Compte bancaire de l'entreprise</p>
+                  <h3 className="text-base font-bold text-[#E6EDF3]">Ajouter un compte</h3>
+                  <p className="text-[11px] text-[#484F58]">Compte bancaire de l'entreprise</p>
                 </div>
-                <button onClick={() => setModal(null)} className="ml-auto text-[#6B7280] hover:text-[#4B5563]"><X size={16} /></button>
+                <button onClick={() => setModal(null)} className="ml-auto text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Banque</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Banque</label>
                   <select value={fBanque.banque} onChange={e => setFBanque(f => ({ ...f, banque: e.target.value }))}
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#8B0073]/50">
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#F07900]/50">
                     {BANQUES_CONGO.map(b => <option key={b}>{b}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Intitulé du compte</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Intitulé du compte</label>
                   <input value={fBanque.intitule} onChange={e => setFBanque(f => ({ ...f, intitule: e.target.value }))}
                     placeholder="Ex: Compte courant entreprise"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Numéro de compte</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Numéro de compte</label>
                   <input value={fBanque.numero_compte} onChange={e => setFBanque(f => ({ ...f, numero_compte: e.target.value }))}
                     placeholder="Ex: 001-12345678-01"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Solde initial (FCFA)</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Solde initial (FCFA)</label>
                   <input type="number" value={fBanque.solde} onChange={e => setFBanque(f => ({ ...f, solde: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                 </div>
               </div>
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563]">Annuler</button>
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                 <button onClick={saveBanque} disabled={saving || !fBanque.intitule}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#8B0073] text-white">
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#F07900] text-white">
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   Ajouter le compte
                 </button>

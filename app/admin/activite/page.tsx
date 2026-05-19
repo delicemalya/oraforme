@@ -111,36 +111,36 @@ export default async function AdminActivitePage() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center">
-          <Activity size={18} className="text-[#8B0073]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F07900]/10 border border-[#F07900]/20 flex items-center justify-center">
+          <Activity size={18} className="text-[#F07900]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">Activité en temps réel</h1>
-          <p className="text-xs text-[#6B7280]">Vue opérateur — toutes les entreprises abonnées</p>
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Activité en temps réel</h1>
+          <p className="text-xs text-[#484F58]">Vue opérateur — toutes les entreprises abonnées</p>
         </div>
       </div>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-          <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Entrées aujourd'hui</p>
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+          <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-3">Entrées aujourd'hui</p>
           <p className="text-2xl font-bold text-[#2EA043]">{fmtFCFA(todayIn)}</p>
-          <p className="text-xs text-[#6B7280] mt-1">{todayTx.filter(t => t.type === 'entree').length} transactions</p>
+          <p className="text-xs text-[#484F58] mt-1">{todayTx.filter(t => t.type === 'entree').length} transactions</p>
         </div>
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-          <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Sorties aujourd'hui</p>
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+          <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-3">Sorties aujourd'hui</p>
           <p className="text-2xl font-bold text-[#F01F38]">{fmtFCFA(todayOut)}</p>
-          <p className="text-xs text-[#6B7280] mt-1">{todayTx.filter(t => t.type === 'sortie').length} transactions</p>
+          <p className="text-xs text-[#484F58] mt-1">{todayTx.filter(t => t.type === 'sortie').length} transactions</p>
         </div>
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-          <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Activité 7 jours</p>
-          <p className="text-2xl font-bold text-[#111827]">{weekCount}</p>
-          <p className="text-xs text-[#6B7280] mt-1">transactions toutes entreprises</p>
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+          <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-3">Activité 7 jours</p>
+          <p className="text-2xl font-bold text-[#E6EDF3]">{weekCount}</p>
+          <p className="text-xs text-[#484F58] mt-1">transactions toutes entreprises</p>
         </div>
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-          <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-3">Plus actif</p>
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+          <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-3">Plus actif</p>
           <p className="text-lg font-bold text-[#F0A30A] truncate">{mostActiveTenant}</p>
-          <p className="text-xs text-[#6B7280] mt-1">
+          <p className="text-xs text-[#484F58] mt-1">
             {inactiveCount > 0
               ? `⚠ ${inactiveCount} inactif${inactiveCount > 1 ? 's' : ''} +21j`
               : 'Tous actifs ✓'}
@@ -151,21 +151,21 @@ export default async function AdminActivitePage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
 
         {/* Activity feed — 3/5 */}
-        <div className="lg:col-span-3 bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[#111827]">Flux d'activité</h2>
-            <span className="text-xs text-[#6B7280]">{recentTx.length} dernières opérations</span>
+        <div className="lg:col-span-3 bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-[#30363D] flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-[#E6EDF3]">Flux d'activité</h2>
+            <span className="text-xs text-[#484F58]">{recentTx.length} dernières opérations</span>
           </div>
-          <div className="divide-y divide-[#EEF2FF] max-h-[520px] overflow-y-auto">
+          <div className="divide-y divide-[#21262D] max-h-[520px] overflow-y-auto">
             {recentTx.length === 0 && (
-              <div className="py-12 text-center text-[#6B7280] text-sm">Aucune activité enregistrée</div>
+              <div className="py-12 text-center text-[#484F58] text-sm">Aucune activité enregistrée</div>
             )}
             {recentTx.map(tx => {
               const style = TYPE_STYLE[tx.type as keyof typeof TYPE_STYLE] ?? TYPE_STYLE.sortie
               const Icon  = style.icon
               const tenant = tenantMap[tx.tenant_id]
               return (
-                <div key={tx.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#F0F4FF]/40 transition-colors">
+                <div key={tx.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#21262D]/40 transition-colors">
                   {/* Type icon */}
                   <div
                     className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
@@ -177,13 +177,13 @@ export default async function AdminActivitePage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-[#4B5563] truncate max-w-[100px]">
+                      <span className="text-xs font-semibold text-[#8B949E] truncate max-w-[100px]">
                         {tenant?.nom_entreprise ?? tx.tenant_id.slice(0, 8)}
                       </span>
-                      <span className="text-[10px] text-[#6B7280]">·</span>
-                      <span className="text-xs text-[#6B7280] truncate">{tx.categorie ?? tx.type}</span>
+                      <span className="text-[10px] text-[#484F58]">·</span>
+                      <span className="text-xs text-[#484F58] truncate">{tx.categorie ?? tx.type}</span>
                     </div>
-                    <p className="text-sm text-[#111827] truncate">{tx.description || '—'}</p>
+                    <p className="text-sm text-[#E6EDF3] truncate">{tx.description || '—'}</p>
                   </div>
 
                   {/* Amount + time */}
@@ -191,7 +191,7 @@ export default async function AdminActivitePage() {
                     <p className="text-sm font-bold" style={{ color: style.color }}>
                       {tx.type === 'entree' ? '+' : '-'}{fmtFCFA(tx.montant ?? 0)}
                     </p>
-                    <p className="text-[10px] text-[#6B7280]">{timeAgo(tx.created_at)}</p>
+                    <p className="text-[10px] text-[#484F58]">{timeAgo(tx.created_at)}</p>
                   </div>
                 </div>
               )
@@ -200,9 +200,9 @@ export default async function AdminActivitePage() {
         </div>
 
         {/* Tenant health — 2/5 */}
-        <div className="lg:col-span-2 bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[#111827]">Santé des clients</h2>
+        <div className="lg:col-span-2 bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-[#30363D] flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-[#E6EDF3]">Santé des clients</h2>
             {(inactiveCount + warnCount) > 0 && (
               <div className="flex items-center gap-1 text-[#F0A30A]">
                 <AlertTriangle size={12} />
@@ -210,9 +210,9 @@ export default async function AdminActivitePage() {
               </div>
             )}
           </div>
-          <div className="divide-y divide-[#EEF2FF] max-h-[520px] overflow-y-auto">
+          <div className="divide-y divide-[#21262D] max-h-[520px] overflow-y-auto">
             {tenantRows.length === 0 && (
-              <div className="py-12 text-center text-[#6B7280] text-sm">Aucun client</div>
+              <div className="py-12 text-center text-[#484F58] text-sm">Aucun client</div>
             )}
             {tenantRows.map(t => {
               const RISK = {
@@ -223,7 +223,7 @@ export default async function AdminActivitePage() {
               const r = RISK[t.risk]
               const RIcon = r.icon
               return (
-                <div key={t.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#F0F4FF]/40 transition-colors">
+                <div key={t.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#21262D]/40 transition-colors">
                   <div
                     className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
                     style={{ backgroundColor: r.color + '15', border: `1px solid ${r.color}30` }}
@@ -231,12 +231,12 @@ export default async function AdminActivitePage() {
                     <RIcon size={13} style={{ color: r.color }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#111827] truncate">{t.nom_entreprise}</p>
+                    <p className="text-sm font-medium text-[#E6EDF3] truncate">{t.nom_entreprise}</p>
                     <p className="text-xs" style={{ color: r.color }}>{r.label}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-xs text-[#111827] font-medium">{t.txCount} ops</p>
-                    <p className="text-[10px] text-[#6B7280]">
+                    <p className="text-xs text-[#E6EDF3] font-medium">{t.txCount} ops</p>
+                    <p className="text-[10px] text-[#484F58]">
                       {t.lastDate ? timeAgo(t.lastDate) : '—'}
                     </p>
                   </div>
@@ -248,23 +248,23 @@ export default async function AdminActivitePage() {
       </div>
 
       {/* Tenant activity breakdown table */}
-      <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#111827] mb-4">Tableau de bord opérateur</h2>
+      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
+        <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4">Tableau de bord opérateur</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#E2E8F0]">
-                <th className="text-left py-2 px-3 text-xs text-[#6B7280] uppercase tracking-wider font-semibold">Entreprise</th>
-                <th className="text-left py-2 px-3 text-xs text-[#6B7280] uppercase tracking-wider font-semibold">Plan</th>
-                <th className="text-right py-2 px-3 text-xs text-[#6B7280] uppercase tracking-wider font-semibold">Modules</th>
-                <th className="text-right py-2 px-3 text-xs text-[#6B7280] uppercase tracking-wider font-semibold">Opérations</th>
-                <th className="text-left py-2 px-3 text-xs text-[#6B7280] uppercase tracking-wider font-semibold">Dernière activité</th>
-                <th className="text-left py-2 px-3 text-xs text-[#6B7280] uppercase tracking-wider font-semibold">Statut</th>
+              <tr className="border-b border-[#30363D]">
+                <th className="text-left py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Entreprise</th>
+                <th className="text-left py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Plan</th>
+                <th className="text-right py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Modules</th>
+                <th className="text-right py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Opérations</th>
+                <th className="text-left py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Dernière activité</th>
+                <th className="text-left py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Statut</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#EEF2FF]">
+            <tbody className="divide-y divide-[#21262D]">
               {tenantRows.length === 0 && (
-                <tr><td colSpan={6} className="text-center py-8 text-[#6B7280]">Aucun client</td></tr>
+                <tr><td colSpan={6} className="text-center py-8 text-[#484F58]">Aucun client</td></tr>
               )}
               {tenantRows.map(t => {
                 const RISK_BADGE = {
@@ -278,12 +278,12 @@ export default async function AdminActivitePage() {
                   danger: 'Inactif',
                 }
                 return (
-                  <tr key={t.id} className="hover:bg-[#F0F4FF]/80 transition-colors">
-                    <td className="py-2.5 px-3 font-medium text-[#111827] truncate max-w-[160px]">{t.nom_entreprise}</td>
-                    <td className="py-2.5 px-3 text-[#4B5563] capitalize">{t.plan ?? '—'}</td>
-                    <td className="py-2.5 px-3 text-right text-[#111827]">{(t.modules_actifs ?? []).length}</td>
-                    <td className="py-2.5 px-3 text-right font-medium text-[#111827]">{t.txCount}</td>
-                    <td className="py-2.5 px-3 text-[#4B5563] text-xs">
+                  <tr key={t.id} className="hover:bg-[#21262D]/30 transition-colors">
+                    <td className="py-2.5 px-3 font-medium text-[#E6EDF3] truncate max-w-[160px]">{t.nom_entreprise}</td>
+                    <td className="py-2.5 px-3 text-[#8B949E] capitalize">{t.plan ?? '—'}</td>
+                    <td className="py-2.5 px-3 text-right text-[#E6EDF3]">{(t.modules_actifs ?? []).length}</td>
+                    <td className="py-2.5 px-3 text-right font-medium text-[#E6EDF3]">{t.txCount}</td>
+                    <td className="py-2.5 px-3 text-[#8B949E] text-xs">
                       {t.lastDate
                         ? new Date(t.lastDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
                         : 'Jamais'}

@@ -28,14 +28,14 @@ function fadeUp(i: number) {
 
 function KpiCard({ label, value, sub, icon: Icon, color }: { label: string; value: string | number; sub: string; icon: React.ElementType; color: string }) {
   return (
-    <div className="bg-white border border-[#EEF2FF] rounded-2xl p-4 flex items-start gap-3">
+    <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-4 flex items-start gap-3">
       <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
         <Icon size={18} style={{ color }} />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] text-[#4B5563] font-medium uppercase tracking-wide mb-0.5">{label}</p>
-        <p className="text-xl font-bold text-[#111827] leading-none">{value}</p>
-        <p className="text-[10px] text-[#6B7280] mt-0.5">{sub}</p>
+        <p className="text-[11px] text-[#8B949E] font-medium uppercase tracking-wide mb-0.5">{label}</p>
+        <p className="text-xl font-bold text-[#E6EDF3] leading-none">{value}</p>
+        <p className="text-[10px] text-[#484F58] mt-0.5">{sub}</p>
       </div>
     </div>
   )
@@ -46,13 +46,13 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
 }) {
   return (
     <div>
-      <label className="block text-xs text-[#4B5563] mb-1.5 font-medium">{label}</label>
+      <label className="block text-xs text-[#8B949E] mb-1.5 font-medium">{label}</label>
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60 transition-colors"
+        className="w-full bg-[#0D1117] border border-[#30363D] rounded-xl px-3.5 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/60 transition-colors"
       />
     </div>
   )
@@ -117,7 +117,7 @@ export default function ClientsPage() {
 
   if (tenantLoading || loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-[#4B5563]">
+      <div className="flex items-center justify-center h-64 text-[#8B949E]">
         <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
       </div>
     )
@@ -131,7 +131,7 @@ export default function ClientsPage() {
         {toast && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="fixed top-4 right-4 z-50 bg-white border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#111827] shadow-2xl flex items-center gap-2"
+            className="fixed top-4 right-4 z-50 bg-[#161B22] border border-[#30363D] rounded-xl px-4 py-3 text-sm text-[#E6EDF3] shadow-2xl flex items-center gap-2"
           >
             <CheckCircle size={14} className="text-[#2EA043]" /> {toast}
           </motion.div>
@@ -141,8 +141,8 @@ export default function ClientsPage() {
       {/* Header */}
       <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">Clients</h1>
-          <p className="text-xs text-[#4B5563] mt-0.5">
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Clients</h1>
+          <p className="text-xs text-[#8B949E] mt-0.5">
             {clients.length} client{clients.length !== 1 ? 's' : ''} enregistré{clients.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -165,9 +165,9 @@ export default function ClientsPage() {
 
       {/* Search */}
       <motion.div {...fadeUp(2)} className="relative max-w-sm">
-        <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B7280]" />
+        <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#484F58]" />
         <input
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#EEF2FF] rounded-xl text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60 transition-colors"
+          className="w-full pl-9 pr-4 py-2.5 bg-[#161B22] border border-[#21262D] rounded-xl text-sm text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50 transition-colors"
           placeholder="Rechercher un client…"
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -177,12 +177,12 @@ export default function ClientsPage() {
       {/* Empty state */}
       {clients.length === 0 ? (
         <motion.div {...fadeUp(3)} className="flex flex-col items-center justify-center py-20 gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-[#F0F4FF] flex items-center justify-center">
-            <Users size={28} className="text-[#6B7280]" />
+          <div className="w-16 h-16 rounded-2xl bg-[#21262D] flex items-center justify-center">
+            <Users size={28} className="text-[#484F58]" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-semibold text-[#4B5563]">Aucun client encore</p>
-            <p className="text-xs text-[#6B7280] mt-1">Ajoutez votre premier client pour commencer.</p>
+            <p className="text-sm font-semibold text-[#8B949E]">Aucun client encore</p>
+            <p className="text-xs text-[#484F58] mt-1">Ajoutez votre premier client pour commencer.</p>
           </div>
           <motion.button
             onClick={() => setShowForm(true)}
@@ -194,7 +194,7 @@ export default function ClientsPage() {
           </motion.button>
         </motion.div>
       ) : filtered.length === 0 ? (
-        <motion.div {...fadeUp(3)} className="text-center py-16 text-[#6B7280]">
+        <motion.div {...fadeUp(3)} className="text-center py-16 text-[#484F58]">
           <Search size={28} className="mx-auto mb-3 opacity-40" />
           <p className="text-sm">Aucun client ne correspond à cette recherche.</p>
         </motion.div>
@@ -207,7 +207,7 @@ export default function ClientsPage() {
                 key={c.id}
                 {...fadeUp(i % 12)}
                 whileHover={{ y: -2 }}
-                className="bg-white border border-[#EEF2FF] hover:border-[#E2E8F0] rounded-2xl p-4 transition-colors group relative overflow-hidden"
+                className="bg-[#161B22] border border-[#21262D] hover:border-[#30363D] rounded-2xl p-4 transition-colors group relative overflow-hidden"
               >
                 {/* Subtle glow on hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-2xl"
@@ -223,15 +223,15 @@ export default function ClientsPage() {
                         {initials(c.nom)}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#111827] leading-tight">{c.nom}</p>
-                        <p className="text-[10px] text-[#6B7280] mt-0.5">{fmtDate(c.created_at)}</p>
+                        <p className="text-sm font-semibold text-[#E6EDF3] leading-tight">{c.nom}</p>
+                        <p className="text-[10px] text-[#484F58] mt-0.5">{fmtDate(c.created_at)}</p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       <button
                         onClick={() => setDeleteId(c.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B7280] hover:text-red-400 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#484F58] hover:text-red-400 transition-colors"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -240,19 +240,19 @@ export default function ClientsPage() {
 
                   <div className="space-y-1.5 pl-0.5">
                     {c.email && (
-                      <div className="flex items-center gap-2 text-xs text-[#4B5563]">
+                      <div className="flex items-center gap-2 text-xs text-[#8B949E]">
                         <Mail size={11} style={{ color }} className="shrink-0" />
                         <span className="truncate">{c.email}</span>
                       </div>
                     )}
                     {c.telephone && (
-                      <div className="flex items-center gap-2 text-xs text-[#4B5563]">
+                      <div className="flex items-center gap-2 text-xs text-[#8B949E]">
                         <Phone size={11} style={{ color }} className="shrink-0" />
                         <span>{c.telephone}</span>
                       </div>
                     )}
                     {c.adresse && (
-                      <div className="flex items-center gap-2 text-xs text-[#4B5563]">
+                      <div className="flex items-center gap-2 text-xs text-[#8B949E]">
                         <MapPin size={11} style={{ color }} className="shrink-0" />
                         <span className="truncate">{c.adresse}</span>
                       </div>
@@ -289,18 +289,18 @@ export default function ClientsPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="relative w-full max-w-md bg-white border border-[#E2E8F0] rounded-2xl shadow-2xl"
+                className="relative w-full max-w-md bg-[#161B22] border border-[#30363D] rounded-2xl shadow-2xl"
                 initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
                 onClick={e => e.stopPropagation()}
               >
-                <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEF2FF]">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[#21262D]">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg bg-[#F0A30A]/15 flex items-center justify-center">
                       <UserPlus size={15} className="text-[#F0A30A]" />
                     </div>
-                    <h2 className="text-base font-bold text-[#111827]">Nouveau client</h2>
+                    <h2 className="text-base font-bold text-[#E6EDF3]">Nouveau client</h2>
                   </div>
-                  <button onClick={() => setShowForm(false)} className="text-[#6B7280] hover:text-[#111827] transition-colors p-1">
+                  <button onClick={() => setShowForm(false)} className="text-[#484F58] hover:text-[#E6EDF3] transition-colors p-1">
                     <X size={18} />
                   </button>
                 </div>
@@ -310,20 +310,20 @@ export default function ClientsPage() {
                   <FormInput label="Email" type="email" value={form.email} onChange={v => setField('email', v)} placeholder="client@example.com" />
                   <FormInput label="Téléphone" value={form.telephone} onChange={v => setField('telephone', v)} placeholder="+242 06 000 0000" />
                   <div>
-                    <label className="block text-xs text-[#4B5563] mb-1.5 font-medium">Adresse</label>
+                    <label className="block text-xs text-[#8B949E] mb-1.5 font-medium">Adresse</label>
                     <textarea
                       rows={2}
                       value={form.adresse}
                       onChange={e => setField('adresse', e.target.value)}
                       placeholder="Adresse complète"
-                      className="w-full bg-white border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60 transition-colors resize-none"
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-xl px-3.5 py-2.5 text-sm text-[#E6EDF3] placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/60 transition-colors resize-none"
                     />
                   </div>
 
                   <div className="flex gap-3 pt-1">
                     <button
                       onClick={() => setShowForm(false)}
-                      className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] text-sm font-medium transition-colors"
+                      className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] text-sm font-medium transition-colors"
                     >
                       Annuler
                     </button>
@@ -350,17 +350,17 @@ export default function ClientsPage() {
             <motion.div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteId(null)} />
             <motion.div className="fixed inset-0 z-[60] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <motion.div
-                className="w-full max-w-xs bg-white border border-[#E2E8F0] rounded-2xl shadow-2xl p-6 text-center"
+                className="w-full max-w-xs bg-[#161B22] border border-[#30363D] rounded-2xl shadow-2xl p-6 text-center"
                 initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
                 onClick={e => e.stopPropagation()}
               >
                 <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
                   <Trash2 size={20} className="text-red-400" />
                 </div>
-                <p className="text-sm font-bold text-[#111827] mb-1">Supprimer ce client ?</p>
-                <p className="text-xs text-[#4B5563] mb-5">Cette action est irréversible.</p>
+                <p className="text-sm font-bold text-[#E6EDF3] mb-1">Supprimer ce client ?</p>
+                <p className="text-xs text-[#8B949E] mb-5">Cette action est irréversible.</p>
                 <div className="flex gap-3">
-                  <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-[#4B5563] hover:text-white text-sm font-medium transition-colors">
+                  <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[#30363D] text-[#8B949E] hover:text-white text-sm font-medium transition-colors">
                     Annuler
                   </button>
                   <button onClick={() => handleDelete(deleteId)} className="flex-1 py-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 text-sm font-semibold transition-colors">

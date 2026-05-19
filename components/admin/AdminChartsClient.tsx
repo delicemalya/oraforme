@@ -21,8 +21,8 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-lg p-3 text-xs shadow-xl">
-      <p className="text-[#4B5563] mb-1.5">{label}</p>
+    <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-3 text-xs shadow-xl">
+      <p className="text-[#8B949E] mb-1.5">{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color }}>
           {p.name}: <span className="font-semibold">{

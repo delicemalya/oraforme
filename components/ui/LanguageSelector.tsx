@@ -23,7 +23,7 @@ export default function LanguageSelector() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-[#4B5563] hover:border-[#F0A30A] hover:text-[#111827] transition-all text-xs font-medium"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#161B22] border border-[#30363D] text-[#8B949E] hover:border-[#F0A30A] hover:text-[#E6EDF3] transition-all text-xs font-medium"
         title="Changer de langue"
       >
         <Globe size={13} />
@@ -38,7 +38,7 @@ export default function LanguageSelector() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.96 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-1.5 z-50 bg-white border border-[#E2E8F0] rounded-xl shadow-2xl overflow-hidden min-w-[160px]"
+            className="absolute right-0 top-full mt-1.5 z-50 bg-[#161B22] border border-[#30363D] rounded-xl shadow-2xl overflow-hidden min-w-[160px]"
           >
             {SUPPORTED_LOCALES.map((loc) => (
               <button
@@ -47,7 +47,7 @@ export default function LanguageSelector() {
                 className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-left transition-colors ${
                   locale === loc
                     ? 'bg-[#F0A30A15] text-[#F0A30A] font-semibold'
-                    : 'text-[#4B5563] hover:bg-[#F0F4FF] hover:text-[#111827]'
+                    : 'text-[#8B949E] hover:bg-[#21262D] hover:text-[#E6EDF3]'
                 }`}
               >
                 <span className="text-base">{LOCALE_FLAGS[loc as Locale]}</span>

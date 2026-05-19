@@ -36,11 +36,11 @@ export default function AdminSidebar() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Header */}
-      <div className="px-4 py-4 border-b border-[#E2E8F0] shrink-0">
+      <div className="px-4 py-4 border-b border-[#30363D] shrink-0">
         <div className="flex items-center gap-2 mb-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="oraforme" className="w-7 h-7 shrink-0" />
-          <span className="text-base font-bold text-[#111827]">oraforme</span>
+          <span className="text-base font-bold text-[#E6EDF3]">oraforme</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] bg-[#F01F38]/20 text-[#F01F38] border border-[#F01F38]/30 rounded px-1.5 py-0.5 font-bold tracking-wider">
@@ -51,7 +51,7 @@ export default function AdminSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-2 py-3 overflow-y-auto space-y-0.5">
-        <p className="text-xs text-[#6B7280] uppercase tracking-wider px-3 pt-1 pb-2">Panneau de contrôle</p>
+        <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-1 pb-2">Panneau de contrôle</p>
         {NAV.map(item => {
           const Icon = item.icon
           const active = isActive(item.href, item.exact)
@@ -63,7 +63,7 @@ export default function AdminSidebar() {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 active
                   ? 'bg-[#F01F38]/10 text-[#F01F38] font-medium'
-                  : 'text-[#4B5563] hover:text-[#111827] hover:bg-[#F0F4FF]'
+                  : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
               }`}
             >
               <Icon size={15} className="shrink-0" />
@@ -75,18 +75,18 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="px-2 py-3 border-t border-[#E2E8F0] shrink-0 space-y-0.5">
+      <div className="px-2 py-3 border-t border-[#30363D] shrink-0 space-y-0.5">
         <Link
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#4B5563] hover:text-[#111827] hover:bg-[#F0F4FF] transition-all"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D] transition-all"
         >
           <LayoutDashboard size={15} className="shrink-0" />
           <span>Mon dashboard</span>
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#4B5563] hover:text-red-400 hover:bg-red-500/5 transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8B949E] hover:text-red-400 hover:bg-red-500/5 transition-all"
         >
           <LogOut size={15} className="shrink-0" />
           Déconnexion
@@ -98,13 +98,13 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-white border-r border-[#E2E8F0] h-screen sticky top-0">
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[#161B22] border-r border-[#30363D] h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
       {/* Mobile trigger */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white border border-[#E2E8F0] text-[#4B5563]"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#161B22] border border-[#30363D] text-[#8B949E]"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -113,7 +113,7 @@ export default function AdminSidebar() {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="w-56 bg-white border-r border-[#E2E8F0] h-full">
+          <div className="w-56 bg-[#161B22] border-r border-[#30363D] h-full">
             <SidebarContent />
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setMobileOpen(false)} />

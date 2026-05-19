@@ -433,11 +433,11 @@ export function FI({ label, value, onChange, placeholder, type = 'text' }: {
 }) {
   return (
     <div>
-      <label className="block text-xs text-[#4B5563] mb-1">{label}</label>
+      <label className="block text-xs text-[#8B949E] mb-1">{label}</label>
       <input
         type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#9CA3AF] focus:outline-none focus:border-[#F0A30A]/60"
+        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F0A30A]/50"
       />
     </div>
   )
@@ -471,7 +471,7 @@ export function KpiCard({ label, value, sub, color }: { label: string; value: st
 
 export function EmptyState({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-[#6B7280]">
+    <div className="flex flex-col items-center justify-center py-16 text-[#484F58]">
       <Icon size={32} className="mb-3 opacity-30" />
       <p className="text-sm">{message}</p>
     </div>

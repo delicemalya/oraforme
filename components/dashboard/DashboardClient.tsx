@@ -153,20 +153,20 @@ function QuickLinksCard({ secteur, modules }: { secteur: string | null; modules:
   ]
 
   return (
-    <motion.div {...fadeUp(5)} className="bg-white border border-[#EEF2FF] rounded-2xl p-4">
+    <motion.div {...fadeUp(5)} className="bg-[#161B22] border border-[#21262D] rounded-2xl p-4">
       <div className="flex items-center gap-2 mb-3">
         <Zap size={14} className="text-[#F0A30A]" />
-        <p className="text-xs font-bold text-[#111827]">{t('dash.quickLinks')}</p>
+        <p className="text-xs font-bold text-[#E6EDF3]">{t('dash.quickLinks')}</p>
       </div>
       <div className="space-y-1.5">
         {links.map(l => (
           <Link key={l.href} href={l.href}
-            className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#EEF2FF] hover:border-[#E2E8F0] hover:bg-[#F0F4FF] transition-all group">
+            className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#21262D] hover:border-[#30363D] hover:bg-[#21262D] transition-all group">
             <div className="flex items-center gap-2.5">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: l.color }} />
-              <span className="text-xs text-[#4B5563] group-hover:text-[#111827] transition-colors">{l.label}</span>
+              <span className="text-xs text-[#8B949E] group-hover:text-[#E6EDF3] transition-colors">{l.label}</span>
             </div>
-            <ChevronRight size={12} className="text-[#6B7280] group-hover:text-[#4B5563] transition-colors" />
+            <ChevronRight size={12} className="text-[#484F58] group-hover:text-[#8B949E] transition-colors" />
           </Link>
         ))}
       </div>
@@ -178,13 +178,13 @@ function TopModulesCard({ data }: { data: { name: string; value: number; color: 
   const { t } = useLocale()
   const total = data.reduce((s, d) => s + d.value, 0) || 1
   return (
-    <motion.div {...fadeUp(6)} className="bg-white border border-[#EEF2FF] rounded-2xl p-4">
+    <motion.div {...fadeUp(6)} className="bg-[#161B22] border border-[#21262D] rounded-2xl p-4">
       <div className="flex items-center gap-2 mb-3">
-        <BarChart2 size={14} className="text-[#8B0073]" />
-        <p className="text-xs font-bold text-[#111827]">{t('dash.invoiceBreakdown')}</p>
+        <BarChart2 size={14} className="text-[#F07900]" />
+        <p className="text-xs font-bold text-[#E6EDF3]">{t('dash.invoiceBreakdown')}</p>
       </div>
       {data.length === 0 ? (
-        <p className="text-xs text-[#6B7280] text-center py-4">{t('dash.noData')}</p>
+        <p className="text-xs text-[#484F58] text-center py-4">{t('dash.noData')}</p>
       ) : (
         <div className="space-y-3">
           {data.map((d, i) => {
@@ -194,11 +194,11 @@ function TopModulesCard({ data }: { data: { name: string; value: number; color: 
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full" style={{ background: d.color }} />
-                    <span className="text-[11px] text-[#4B5563]">{d.name}</span>
+                    <span className="text-[11px] text-[#8B949E]">{d.name}</span>
                   </div>
                   <span className="text-[11px] font-bold" style={{ color: d.color }}>{d.value}</span>
                 </div>
-                <div className="h-1.5 bg-[#F0F4FF] rounded-full overflow-hidden">
+                <div className="h-1.5 bg-[#21262D] rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ background: d.color }}
@@ -357,7 +357,7 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
     <motion.div {...fadeUp(9)} className="pt-2">
       <div className="flex items-center gap-2 mb-3">
         <Zap size={14} className="text-[#F0A30A]" />
-        <h3 className="text-xs font-bold text-[#111827] uppercase tracking-wider">{t('dash.shortcuts')}</h3>
+        <h3 className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">{t('dash.shortcuts')}</h3>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {cards.map((sc, i) => {
@@ -371,7 +371,7 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
             >
               <Link
                 href={sc.href}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl border border-[#EEF2FF] bg-white hover:border-[#E2E8F0] hover:bg-[#F0F4FF] transition-all group text-center"
+                className="flex flex-col items-center gap-2 p-3 rounded-xl border border-[#21262D] bg-[#161B22] hover:border-[#30363D] hover:bg-[#21262D] transition-all group text-center"
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -380,8 +380,8 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
                   <Icon size={18} style={{ color: sc.color }} />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold text-[#111827] group-hover:text-white leading-tight">{sc.label}</p>
-                  <p className="text-[10px] text-[#6B7280] group-hover:text-[#4B5563] leading-tight mt-0.5">{sc.desc}</p>
+                  <p className="text-[11px] font-semibold text-[#E6EDF3] group-hover:text-white leading-tight">{sc.label}</p>
+                  <p className="text-[10px] text-[#484F58] group-hover:text-[#8B949E] leading-tight mt-0.5">{sc.desc}</p>
                 </div>
               </Link>
             </motion.div>
@@ -417,7 +417,7 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35, delay: i * 0.05 }}
-      className="border-b border-[#EEF2FF] hover:bg-[#F0F4FF]/40 transition-colors group"
+      className="border-b border-[#21262D] hover:bg-[#21262D]/40 transition-colors group"
     >
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
@@ -425,13 +425,13 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
             {init}
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#111827]">{item.client_nom}</p>
-            <p className="text-[10px] text-[#6B7280]">il y a {ago}</p>
+            <p className="text-xs font-semibold text-[#E6EDF3]">{item.client_nom}</p>
+            <p className="text-[10px] text-[#484F58]">il y a {ago}</p>
           </div>
         </div>
       </td>
       <td className="px-4 py-3 text-right">
-        <p className="text-sm font-bold text-[#111827]">{fmt(item.total)} FCFA</p>
+        <p className="text-sm font-bold text-[#E6EDF3]">{fmt(item.total)} FCFA</p>
       </td>
       <td className="px-4 py-3">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold"
@@ -712,22 +712,22 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       {/* ── Title + actions ──────────────────────────────────────────────── */}
       <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
         <div>
-          <h1 className="text-xl font-bold text-[#111827] leading-tight">{tenant.nom_entreprise}</h1>
-          <p className="text-xs text-[#4B5563] mt-0.5">
+          <h1 className="text-xl font-bold text-[#E6EDF3] leading-tight">{tenant.nom_entreprise}</h1>
+          <p className="text-xs text-[#8B949E] mt-0.5">
             Plan <span className="text-[#F0A30A] font-bold capitalize">{tenant.plan}</span>
             {' · '}{tenant.modules_actifs.length} module{tenant.modules_actifs.length !== 1 ? 's' : ''} actif{tenant.modules_actifs.length !== 1 ? 's' : ''}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#4B5563] bg-white border border-[#E2E8F0] rounded-xl hover:border-[#8B0073] hover:text-[#111827] transition-all">
+          <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#484F58] hover:text-[#E6EDF3] transition-all">
             <Clock size={11} /> {t('dash.lastDays')} <ChevronDown size={10} />
           </button>
           {isFinancial && (
             <>
-              <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#4B5563] bg-white border border-[#E2E8F0] rounded-xl hover:border-[#8B0073] transition-all">
+              <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#484F58] transition-all">
                 <Download size={11} /> CSV
               </button>
-              <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#4B5563] bg-white border border-[#E2E8F0] rounded-xl hover:border-[#8B0073] transition-all">
+              <button className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#8B949E] bg-[#161B22] border border-[#30363D] rounded-xl hover:border-[#484F58] transition-all">
                 <Download size={11} /> PDF
               </button>
             </>
@@ -785,11 +785,11 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
 
       {/* ── Recent transactions ──────────────────────────────────────────── */}
       {isFinancial && recentActivity.length > 0 && (
-        <motion.div {...fadeUp(7)} className="bg-white border border-[#EEF2FF] rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#EEF2FF]">
+        <motion.div {...fadeUp(7)} className="bg-[#161B22] border border-[#21262D] rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[#21262D]">
             <div>
-              <h3 className="text-sm font-bold text-[#111827]">{t('dash.lastTransactions')}</h3>
-              <p className="text-[10px] text-[#6B7280] mt-0.5">{recentActivity.length} {t('dash.lastFactures')}</p>
+              <h3 className="text-sm font-bold text-[#E6EDF3]">{t('dash.lastTransactions')}</h3>
+              <p className="text-[10px] text-[#484F58] mt-0.5">{recentActivity.length} {t('dash.lastFactures')}</p>
             </div>
             <Link href="/dashboard/facturation"
               className="text-xs text-[#F0A30A] hover:text-[#E09000] transition-colors font-medium">
@@ -799,10 +799,10 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#EEF2FF]" style={{ background: 'rgba(255,255,255,0.01)' }}>
-                  <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">{t('common.name')}</th>
-                  <th className="text-right px-4 py-3 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">{t('common.amount')}</th>
-                  <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">{t('common.status')}</th>
+                <tr className="border-b border-[#21262D]" style={{ background: 'rgba(255,255,255,0.01)' }}>
+                  <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.name')}</th>
+                  <th className="text-right px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.amount')}</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-semibold text-[#484F58] uppercase tracking-wider">{t('common.status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -817,12 +817,12 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
 
       {/* Non-financial: simplified view */}
       {!isFinancial && (
-        <motion.div {...fadeUp(7)} className="bg-white border border-[#EEF2FF] rounded-2xl p-6 text-center">
+        <motion.div {...fadeUp(7)} className="bg-[#161B22] border border-[#21262D] rounded-2xl p-6 text-center">
           <div className="w-12 h-12 rounded-2xl bg-[#F0A30A]/10 flex items-center justify-center mx-auto mb-3">
             <Star size={20} className="text-[#F0A30A]" />
           </div>
-          <p className="text-sm font-semibold text-[#111827] mb-1">{t('dash.restricted')}</p>
-          <p className="text-xs text-[#4B5563]">{t('dash.restrictedMsg')}</p>
+          <p className="text-sm font-semibold text-[#E6EDF3] mb-1">{t('dash.restricted')}</p>
+          <p className="text-xs text-[#8B949E]">{t('dash.restrictedMsg')}</p>
         </motion.div>
       )}
 

@@ -189,19 +189,19 @@ export default function MIAAPage() {
     <div className="flex flex-col lg:flex-row gap-5 h-[calc(100vh-120px)] min-h-[600px]">
 
       {/* ── LEFT: Chat ──────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden min-h-0">
+      <div className="flex-1 flex flex-col bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden min-h-0">
 
         {/* Chat Header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#E2E8F0] shrink-0" style={{ background: 'linear-gradient(135deg,#0D1117 0%,#161B22 100%)' }}>
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#30363D] shrink-0" style={{ background: 'linear-gradient(135deg,#0D1117 0%,#161B22 100%)' }}>
           <MIAALogo size={40} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-[#111827]">✨ MIAA+ — Assistant Intelligent</h1>
+              <h1 className="text-sm font-bold text-[#E6EDF3]">✨ MIAA+ — Assistant Intelligent</h1>
               <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#F0A30A20', color: '#F0A30A' }}>IA</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#2EA043] animate-pulse shrink-0" />
-              <p className="text-[10px] text-[#4B5563] truncate">
+              <p className="text-[10px] text-[#8B949E] truncate">
                 {entreprise ? `${entreprise} · ` : ''}oraforme ERP · Spécialisé Congo-Brazzaville
               </p>
             </div>
@@ -209,7 +209,7 @@ export default function MIAAPage() {
           <button
             onClick={clearChat}
             title="Nouvelle conversation"
-            className="p-2 text-[#6B7280] hover:text-[#4B5563] hover:bg-[#F0F4FF] rounded-lg transition-colors"
+            className="p-2 text-[#484F58] hover:text-[#8B949E] hover:bg-[#21262D] rounded-lg transition-colors"
           >
             <Trash2 size={14} />
           </button>
@@ -235,7 +235,7 @@ export default function MIAAPage() {
                   className={`max-w-[78%] text-xs px-3.5 py-2.5 rounded-2xl leading-relaxed ${
                     m.role === 'user'
                       ? 'rounded-br-sm font-semibold text-[#0D1117]'
-                      : 'rounded-bl-sm text-[#111827] border-l-2 border-[#F0A30A]/50'
+                      : 'rounded-bl-sm text-[#E6EDF3] border-l-2 border-[#F0A30A]/50'
                   }`}
                   style={m.role === 'user' ? { background: '#F0A30A' } : { background: '#1C2128' }}
                   dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
@@ -261,7 +261,7 @@ export default function MIAAPage() {
                     transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
                   />
                 ))}
-                <span className="text-[9px] text-[#6B7280] ml-1">MIAA+ est en train d&apos;écrire…</span>
+                <span className="text-[9px] text-[#484F58] ml-1">MIAA+ est en train d&apos;écrire…</span>
               </div>
             </motion.div>
           )}
@@ -275,7 +275,7 @@ export default function MIAAPage() {
               <button
                 key={s}
                 onClick={() => send(s)}
-                className="text-[11px] text-[#4B5563] hover:text-[#111827] bg-white hover:bg-[#F0F4FF] border border-[#EEF2FF] hover:border-[#F0A30A]/40 rounded-full px-3 py-1 transition-all"
+                className="text-[11px] text-[#8B949E] hover:text-[#E6EDF3] bg-[#0D1117] hover:bg-[#21262D] border border-[#21262D] hover:border-[#F0A30A]/40 rounded-full px-3 py-1 transition-all"
               >
                 {s}
               </button>
@@ -284,7 +284,7 @@ export default function MIAAPage() {
         )}
 
         {/* Input bar */}
-        <div className="flex items-center gap-2.5 px-4 py-3.5 border-t border-[#E2E8F0] shrink-0">
+        <div className="flex items-center gap-2.5 px-4 py-3.5 border-t border-[#30363D] shrink-0">
           <input
             ref={inputRef}
             value={input}
@@ -292,7 +292,7 @@ export default function MIAAPage() {
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
             placeholder="Posez votre question à MIAA+… (Entrée pour envoyer)"
             disabled={loading}
-            className="flex-1 bg-white border border-[#E2E8F0] rounded-xl px-4 py-2 text-xs text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60 transition-colors disabled:opacity-50"
+            className="flex-1 bg-[#0D1117] border border-[#30363D] rounded-xl px-4 py-2 text-xs text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50 transition-colors disabled:opacity-50"
           />
           <motion.button
             whileTap={{ scale: 0.88 }}
@@ -310,8 +310,8 @@ export default function MIAAPage() {
       <div className="lg:w-72 flex flex-col gap-4 overflow-y-auto">
 
         {/* Capabilities */}
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
-          <p className="text-xs font-bold text-[#111827] mb-3 flex items-center gap-2">
+        <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-4">
+          <p className="text-xs font-bold text-[#E6EDF3] mb-3 flex items-center gap-2">
             <Sparkles size={13} className="text-[#F0A30A]" /> Capacités MIAA+
           </p>
           <div className="grid grid-cols-2 gap-2">
@@ -325,8 +325,8 @@ export default function MIAAPage() {
                   style={{ background: `${cap.color}08` }}
                 >
                   <Icon size={14} style={{ color: cap.color }} className="mb-1.5" />
-                  <p className="text-[10px] font-semibold text-[#111827] leading-tight">{cap.label}</p>
-                  <p className="text-[9px] text-[#4B5563] mt-0.5 leading-tight">{cap.desc}</p>
+                  <p className="text-[10px] font-semibold text-[#E6EDF3] leading-tight">{cap.label}</p>
+                  <p className="text-[9px] text-[#8B949E] mt-0.5 leading-tight">{cap.desc}</p>
                 </motion.div>
               )
             })}
@@ -334,8 +334,8 @@ export default function MIAAPage() {
         </div>
 
         {/* Quick actions by category */}
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 flex-1">
-          <p className="text-xs font-bold text-[#111827] mb-3">Questions rapides</p>
+        <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-4 flex-1">
+          <p className="text-xs font-bold text-[#E6EDF3] mb-3">Questions rapides</p>
           <div className="space-y-2">
             {QUICK_CATEGORIES.map((cat, ci) => (
               <div key={cat.label} className="border border-white/[0.05] rounded-xl overflow-hidden">
@@ -343,10 +343,10 @@ export default function MIAAPage() {
                   onClick={() => setExpandedCat(expandedCat === ci ? null : ci)}
                   className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-white/[0.03] transition-colors"
                 >
-                  <span className="text-xs font-medium text-[#4B5563]">{cat.label}</span>
+                  <span className="text-xs font-medium text-[#8B949E]">{cat.label}</span>
                   {expandedCat === ci
-                    ? <ChevronUp size={12} className="text-[#6B7280]" />
-                    : <ChevronDown size={12} className="text-[#6B7280]" />
+                    ? <ChevronUp size={12} className="text-[#484F58]" />
+                    : <ChevronDown size={12} className="text-[#484F58]" />
                   }
                 </button>
                 <AnimatePresence>
@@ -363,7 +363,7 @@ export default function MIAAPage() {
                           <button
                             key={a}
                             onClick={() => send(a)}
-                            className="w-full text-left text-[10px] text-[#4B5563] hover:text-[#111827] hover:bg-[#F0F4FF] px-2 py-1.5 rounded-lg transition-all"
+                            className="w-full text-left text-[10px] text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D] px-2 py-1.5 rounded-lg transition-all"
                           >
                             {a}
                           </button>
@@ -378,20 +378,20 @@ export default function MIAAPage() {
         </div>
 
         {/* Config hint */}
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
-          <p className="text-[10px] font-semibold text-[#4B5563] uppercase tracking-wider mb-2">Configuration</p>
-          <div className="space-y-2 text-[10px] text-[#6B7280]">
+        <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-4">
+          <p className="text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-2">Configuration</p>
+          <div className="space-y-2 text-[10px] text-[#484F58]">
             <div className="flex justify-between">
               <span>Modèle IA</span>
-              <span className="text-[#4B5563]">Claude Haiku 4.5</span>
+              <span className="text-[#8B949E]">Claude Haiku 4.5</span>
             </div>
             <div className="flex justify-between">
               <span>Langue</span>
-              <span className="text-[#4B5563]">Français 🇫🇷</span>
+              <span className="text-[#8B949E]">Français 🇫🇷</span>
             </div>
             <div className="flex justify-between">
               <span>Contexte</span>
-              <span className="text-[#4B5563]">Congo-Brazzaville</span>
+              <span className="text-[#8B949E]">Congo-Brazzaville</span>
             </div>
             <div className="flex justify-between">
               <span>Modules actifs</span>

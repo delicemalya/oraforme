@@ -19,10 +19,10 @@ export default function Modal({ title, onClose, children }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-[#E2E8F0] rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0]">
-          <h2 className="text-base font-semibold text-[#111827]">{title}</h2>
-          <button onClick={onClose} className="text-[#4B5563] hover:text-[#111827] transition-colors">
+      <div className="relative bg-[#161B22] border border-[#30363D] rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#30363D]">
+          <h2 className="text-base font-semibold text-[#E6EDF3]">{title}</h2>
+          <button onClick={onClose} className="text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
             <X size={18} />
           </button>
         </div>

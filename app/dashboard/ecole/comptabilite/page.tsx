@@ -98,7 +98,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
   const totalDepenses = entries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ttc, 0)
   const solde         = totalRecettes - totalDepenses
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#4B5563]" size={18} /></div>
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
 
   return (
     <div className="space-y-4">
@@ -129,7 +129,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Date" value={form.date} onChange={v => setForm(p => ({ ...p, date: v }))} type="date" />
               <div>
-                <label className="block text-xs text-[#4B5563] mb-1">Type</label>
+                <label className="block text-xs text-[#8B949E] mb-1">Type</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   <option value="recette">Recette</option>
                   <option value="depense">Dépense</option>
@@ -139,7 +139,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
                 <FI label="Libellé *" value={form.libelle} onChange={v => setForm(p => ({ ...p, libelle: v }))} placeholder="Description de l'opération…" />
               </div>
               <div>
-                <label className="block text-xs text-[#4B5563] mb-1">Compte OHADA</label>
+                <label className="block text-xs text-[#8B949E] mb-1">Compte OHADA</label>
                 <select value={form.categorie} onChange={e => setForm(p => ({ ...p, categorie: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {COMPTES_OHADA.map(c => <option key={c.code} value={c.code}>{c.code} — {c.label}</option>)}
                 </select>
@@ -156,28 +156,28 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
               <button onClick={add} disabled={saving || !form.libelle || !form.montant_ht} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0073', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#4B5563] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[#4B5563] text-xs">Aucune écriture comptable.</div>
+        <div className="text-center py-12 text-[#8B949E] text-xs">Aucune écriture comptable.</div>
       ) : (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <table className="w-full text-xs">
             <thead>
               <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
                 {['Date', 'Compte OHADA', 'Libellé', 'Type', 'Montant HT', 'TVA%', 'TTC'].map(h => (
-                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#4B5563]">{h}</th>
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {displayed.map(e => (
                 <tr key={e.id} className="border-t border-white/[0.04] hover:bg-white/[0.01]">
-                  <td className="px-4 py-2.5 text-[#4B5563] font-mono">{new Date(e.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+                  <td className="px-4 py-2.5 text-[#8B949E] font-mono">{new Date(e.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                   <td className="px-4 py-2.5">
                     <span className="text-[10px] font-mono bg-[#8B0073]/10 text-[#8B0073] px-1.5 py-0.5 rounded">
                       {e.categorie.split('—')[0]?.trim() || e.categorie}
@@ -189,8 +189,8 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
                       {e.type === 'recette' ? 'Recette' : 'Dépense'}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-[#4B5563]">{fmt(e.montant_ht)}</td>
-                  <td className="px-4 py-2.5 text-[#4B5563]">{e.tva}%</td>
+                  <td className="px-4 py-2.5 text-[#8B949E]">{fmt(e.montant_ht)}</td>
+                  <td className="px-4 py-2.5 text-[#8B949E]">{e.tva}%</td>
                   <td className="px-4 py-2.5 font-semibold" style={{ color: e.type === 'recette' ? '#2EA043' : '#F01F38' }}>
                     {fmt(e.montant_ttc)} FCFA
                   </td>
@@ -218,7 +218,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
       .then(({ data }) => { setEntries((data ?? []) as JournalEntry[]); setLoading(false) })
   }, [tenantId])
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#4B5563]" size={18} /></div>
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
 
   const byAccount: Record<string, JournalEntry[]> = {}
   entries.forEach(e => {
@@ -236,19 +236,19 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
     solde:         entries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ttc, 0) - entries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ttc, 0),
   })).sort((a, b) => a.code.localeCompare(b.code))
 
-  if (accounts.length === 0) return <div className="text-center py-12 text-[#4B5563] text-xs">Aucune écriture dans le journal.</div>
+  if (accounts.length === 0) return <div className="text-center py-12 text-[#8B949E] text-xs">Aucune écriture dans le journal.</div>
 
   return (
     <div className="flex gap-5">
       <div className="w-56 shrink-0 rounded-xl border border-white/[0.06] overflow-hidden h-fit" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider">Comptes</p></div>
+        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Comptes</p></div>
         <div className="overflow-y-auto max-h-[520px]">
           {accounts.map(a => (
             <button key={a.code} onClick={() => setSelected(a.code)}
               className={`w-full flex items-center justify-between px-3 py-2.5 text-left border-b border-white/[0.04] ${selected === a.code ? 'bg-[#8B0073]/10' : 'hover:bg-white/[0.02]'}`}>
               <div>
                 <p className="text-xs font-mono font-bold text-[#8B0073]">{a.code}</p>
-                <p className="text-[10px] text-[#4B5563] truncate">{a.label}</p>
+                <p className="text-[10px] text-[#8B949E] truncate">{a.label}</p>
               </div>
               <p className="text-[10px] font-bold ml-2" style={{ color: a.solde >= 0 ? '#2EA043' : '#F01F38' }}>
                 {a.solde >= 0 ? '+' : ''}{fmt(a.solde / 1000)}k
@@ -266,7 +266,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-bold text-white font-mono">{account.code} — {account.label}</p>
-                  <p className="text-[10px] text-[#4B5563] mt-0.5">{account.entries.length} écriture(s)</p>
+                  <p className="text-[10px] text-[#8B949E] mt-0.5">{account.entries.length} écriture(s)</p>
                 </div>
                 <div className="flex gap-3">
                   <KpiCard label="Débit"    value={fmt(account.totalDepenses) + ' FCFA'} color="#F01F38" />
@@ -276,14 +276,14 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
               </div>
               <div className="rounded-xl border border-white/[0.06] overflow-hidden">
                 <table className="w-full text-xs">
-                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Débit', 'Crédit'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#4B5563]">{h}</th>)}</tr></thead>
+                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Débit', 'Crédit'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
                   <tbody>
                     {account.entries.map(e => (
                       <tr key={e.id} className="border-t border-white/[0.04]">
-                        <td className="px-4 py-2.5 text-[#4B5563]">{new Date(e.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+                        <td className="px-4 py-2.5 text-[#8B949E]">{new Date(e.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-white">{e.libelle}</td>
-                        <td className="px-4 py-2.5">{e.type === 'depense' ? <span className="text-[#F01F38] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[#6B7280]">—</span>}</td>
-                        <td className="px-4 py-2.5">{e.type === 'recette' ? <span className="text-[#2EA043] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[#6B7280]">—</span>}</td>
+                        <td className="px-4 py-2.5">{e.type === 'depense' ? <span className="text-[#F01F38] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[#484F58]">—</span>}</td>
+                        <td className="px-4 py-2.5">{e.type === 'recette' ? <span className="text-[#2EA043] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[#484F58]">—</span>}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -293,7 +293,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
           )
         })()
       ) : (
-        <div className="flex-1 flex items-center justify-center text-[#4B5563]">
+        <div className="flex-1 flex items-center justify-center text-[#8B949E]">
           <div className="text-center"><BookOpen size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sélectionnez un compte</p></div>
         </div>
       )}
@@ -317,7 +317,7 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
       .then(({ data }) => { setEntries((data ?? []) as JournalEntry[]); setLoading(false) })
   }, [tenantId, annee])
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#4B5563]" size={18} /></div>
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
 
   const recettes = entries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ttc, 0)
   const depenses = entries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ttc, 0)
@@ -337,12 +337,12 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <label className="text-xs text-[#4B5563]">Exercice :</label>
+          <label className="text-xs text-[#8B949E]">Exercice :</label>
           <select value={annee} onChange={e => setAnnee(Number(e.target.value))} className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
             {[2022, 2023, 2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
-        <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#4B5563] hover:text-white">
+        <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#8B949E] hover:text-white">
           <Download size={12} /> Exporter PDF
         </button>
       </div>
@@ -365,7 +365,7 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
                 return (
                   <tr key={code} className="border-b border-white/[0.04]">
                     <td className="px-4 py-2.5 font-mono text-[#8B0073]">{code}</td>
-                    <td className="px-4 py-2.5 text-[#4B5563] text-[10px]">{label}</td>
+                    <td className="px-4 py-2.5 text-[#8B949E] text-[10px]">{label}</td>
                     <td className="px-4 py-2.5 text-right font-semibold text-[#2EA043]">{fmt(amount)} FCFA</td>
                   </tr>
                 )
@@ -389,7 +389,7 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
                 return (
                   <tr key={code} className="border-b border-white/[0.04]">
                     <td className="px-4 py-2.5 font-mono text-[#8B0073]">{code}</td>
-                    <td className="px-4 py-2.5 text-[#4B5563] text-[10px]">{label}</td>
+                    <td className="px-4 py-2.5 text-[#8B949E] text-[10px]">{label}</td>
                     <td className="px-4 py-2.5 text-right font-semibold text-[#F01F38]">{fmt(amount)} FCFA</td>
                   </tr>
                 )
@@ -406,7 +406,7 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
       <div className="rounded-xl border-2 p-4 flex items-center justify-between" style={{ borderColor: resultat >= 0 ? '#2EA043' : '#F01F38', background: resultat >= 0 ? 'rgba(46,160,67,0.05)' : 'rgba(248,81,73,0.05)' }}>
         <div>
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: resultat >= 0 ? '#2EA043' : '#F01F38' }}>RÉSULTAT DE L&apos;EXERCICE {annee}</p>
-          <p className="text-[10px] text-[#4B5563] mt-0.5">{resultat >= 0 ? 'Bénéfice — à affecter aux réserves' : 'Perte — à couvrir'}</p>
+          <p className="text-[10px] text-[#8B949E] mt-0.5">{resultat >= 0 ? 'Bénéfice — à affecter aux réserves' : 'Perte — à couvrir'}</p>
         </div>
         <p className="text-2xl font-bold" style={{ color: resultat >= 0 ? '#2EA043' : '#F01F38' }}>
           {resultat >= 0 ? '+' : '-'}{fmt(Math.abs(resultat))} FCFA
@@ -519,7 +519,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               <div className="col-span-2 md:col-span-1">
                 <label className="text-[10px] text-white/40 mb-1 block">Type</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
-                  className="w-full bg-[#F0F4FF] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
+                  className="w-full bg-[#21262D] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
                   <option value="entree">Entrée (recette)</option>
                   <option value="sortie">Sortie (dépense)</option>
                 </select>
@@ -527,23 +527,23 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Montant (FCFA)</label>
                 <input type="number" value={form.montant} onChange={e => setForm(p => ({ ...p, montant: e.target.value }))}
-                  placeholder="0" className="w-full bg-[#F0F4FF] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                  placeholder="0" className="w-full bg-[#21262D] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
               </div>
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Date</label>
                 <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
-                  className="w-full bg-[#F0F4FF] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                  className="w-full bg-[#21262D] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
               </div>
               <div className="col-span-2">
                 <label className="text-[10px] text-white/40 mb-1 block">Libellé</label>
                 <input value={form.label} onChange={e => setForm(p => ({ ...p, label: e.target.value }))}
                   placeholder="ex: Paiement frais de scolarité — Janvier"
-                  className="w-full bg-[#F0F4FF] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                  className="w-full bg-[#21262D] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
               </div>
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Compte OHADA</label>
                 <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-                  className="w-full bg-[#F0F4FF] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
+                  className="w-full bg-[#21262D] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
                   {COMPTES_OHADA.map(c => (
                     <option key={c.code} value={c.code}>{c.code} — {c.label.substring(0, 30)}</option>
                   ))}
@@ -552,7 +552,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Mode de paiement</label>
                 <select value={form.mode_paiement} onChange={e => setForm(p => ({ ...p, mode_paiement: e.target.value }))}
-                  className="w-full bg-[#F0F4FF] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
+                  className="w-full bg-[#21262D] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
                   <option value="especes">Espèces</option>
                   <option value="virement">Virement</option>
                   <option value="mobile_money">Mobile Money</option>
@@ -696,7 +696,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
       })
   }, [tenantId])
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#4B5563]" size={18} /></div>
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
 
   const hist = data.filter((_, i) => i < data.length - 3)
   const proj = data.slice(-3)
@@ -737,7 +737,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
         </div>
         <div>
           <p className="text-sm font-bold text-white">Prévisions IA — Trésorerie</p>
-          <p className="text-xs text-[#4B5563]">Projection sur 3 mois basée sur l&apos;historique comptable (régression linéaire)</p>
+          <p className="text-xs text-[#8B949E]">Projection sur 3 mois basée sur l&apos;historique comptable (régression linéaire)</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: isPositiveTrend ? '#2EA043' : '#F0A30A', background: isPositiveTrend ? '#2EA04318' : '#F0A30A18' }}>
@@ -748,7 +748,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
 
       {/* Chart */}
       <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-4">Historique + Prévisions (6 + 3 mois)</p>
+        <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-4">Historique + Prévisions (6 + 3 mois)</p>
         <div className="flex items-end gap-2 overflow-x-auto pb-2">
           {data.map((m, i) => {
             const isForecast = i >= data.length - 3
@@ -768,7 +768,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
                     title={`Dépenses : ${fmt(Math.round(m.depenses))} FCFA`}
                   />
                 </div>
-                <p className={`text-[9px] font-medium text-center leading-tight ${isForecast ? 'text-[#8B0073]' : 'text-[#6B7280]'}`}>
+                <p className={`text-[9px] font-medium text-center leading-tight ${isForecast ? 'text-[#8B0073]' : 'text-[#484F58]'}`}>
                   {isForecast && <span className="block text-[8px] text-[#8B0073]/70">prév.</span>}
                   {m.label}
                 </p>
@@ -777,26 +777,26 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
           })}
         </div>
         <div className="flex items-center gap-4 mt-3 border-t border-white/[0.06] pt-3">
-          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#2EA043]" /><span className="text-[10px] text-[#4B5563]">Recettes</span></div>
-          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#F01F38]" /><span className="text-[10px] text-[#4B5563]">Dépenses</span></div>
-          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm border border-dashed border-[#8B0073] bg-[#8B0073]/20" /><span className="text-[10px] text-[#4B5563]">Prévision</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#2EA043]" /><span className="text-[10px] text-[#8B949E]">Recettes</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#F01F38]" /><span className="text-[10px] text-[#8B949E]">Dépenses</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm border border-dashed border-[#8B0073] bg-[#8B0073]/20" /><span className="text-[10px] text-[#8B949E]">Prévision</span></div>
         </div>
       </div>
 
       {/* Projected KPIs */}
       <div>
-        <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3">Projection 3 mois</p>
+        <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3">Projection 3 mois</p>
         <div className="grid grid-cols-3 gap-3">
           {proj.map(m => (
             <div key={m.month} className="rounded-xl border border-[#8B0073]/20 p-4" style={{ background: 'rgba(139,92,246,0.04)' }}>
               <p className="text-[10px] font-bold text-[#8B0073] mb-2">{m.label}</p>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#4B5563]">Recettes</span>
+                  <span className="text-[#8B949E]">Recettes</span>
                   <span className="text-[#2EA043] font-semibold">{fmt(Math.round(m.recettes))} F</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#4B5563]">Dépenses</span>
+                  <span className="text-[#8B949E]">Dépenses</span>
                   <span className="text-[#F01F38] font-semibold">{fmt(Math.round(m.depenses))} F</span>
                 </div>
                 <div className="flex justify-between text-xs border-t border-white/[0.06] pt-1 mt-1">
@@ -813,7 +813,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
 
       {/* Insights */}
       <div>
-        <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3">Analyses & Recommandations</p>
+        <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3">Analyses & Recommandations</p>
         <div className="space-y-2">
           {insights.map((ins, i) => {
             const Icon = ins.icon
@@ -822,7 +822,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${ins.color}18` }}>
                   <Icon size={13} style={{ color: ins.color }} />
                 </div>
-                <p className="text-xs text-[#4B5563] leading-relaxed">{ins.text}</p>
+                <p className="text-xs text-[#8B949E] leading-relaxed">{ins.text}</p>
               </div>
             )
           })}
@@ -830,7 +830,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
       </div>
 
       {data.length === 0 && (
-        <div className="text-center py-12 text-[#4B5563] text-xs">
+        <div className="text-center py-12 text-[#8B949E] text-xs">
           <Sparkles size={24} className="mx-auto mb-3 opacity-30" />
           Aucune donnée comptable pour générer des prévisions.
         </div>
@@ -854,7 +854,7 @@ export default function ComptabilitePage() {
   }, [tenantId])
 
   if (tenantLoading) return (
-    <div className="flex items-center justify-center h-64 text-[#4B5563]">
+    <div className="flex items-center justify-center h-64 text-[#8B949E]">
       <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
     </div>
   )
@@ -864,9 +864,9 @@ export default function ComptabilitePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Comptabilité OHADA</h1>
-          <p className="text-xs text-[#4B5563] mt-0.5">{nomEcole} · Plan comptable OHADA · Exonéré TVA éducation</p>
+          <p className="text-xs text-[#8B949E] mt-0.5">{nomEcole} · Plan comptable OHADA · Exonéré TVA éducation</p>
         </div>
-        <button onClick={() => window.location.reload()} className="p-2 rounded-lg border border-white/[0.08] text-[#4B5563] hover:text-white transition-colors"><RefreshCw size={14} /></button>
+        <button onClick={() => window.location.reload()} className="p-2 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors"><RefreshCw size={14} /></button>
       </div>
 
       <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 w-fit">

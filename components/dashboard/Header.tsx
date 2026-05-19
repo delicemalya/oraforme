@@ -36,12 +36,9 @@ export default function Header() {
 
   useEffect(() => {
     setLocale(getStoredLocale())
-    // Nouveau thème par défaut : clair — réinitialise l'ancien choix sombre
-    const stored = localStorage.getItem('oraforme_theme') as 'dark' | 'light' | null
-    const effective: 'dark' | 'light' = stored === 'dark' ? 'dark' : 'light'
-    setTheme(effective)
-    document.documentElement.setAttribute('data-theme', effective)
-    localStorage.setItem('oraforme_theme', effective)
+    const stored = (localStorage.getItem('oraforme_theme') as 'dark' | 'light') ?? 'light'
+    setTheme(stored)
+    document.documentElement.setAttribute('data-theme', stored)
   }, [])
 
   // Company logo — initial fetch + live update via CustomEvent from Paramètres page
@@ -105,17 +102,17 @@ export default function Header() {
   }
 
   return (
-    <header className="h-14 bg-white border-b border-[#E2E8F0] flex items-center px-4 lg:px-6 gap-3 shrink-0">
+    <header className="h-14 bg-[#161B22] border-b border-[#30363D] flex items-center px-4 lg:px-6 gap-3 shrink-0">
       <div className="w-8 lg:hidden shrink-0" />
 
       <div className="flex-1 max-w-sm">
-        <div className="flex items-center gap-2 bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5">
-          <Search size={13} className="text-[#6B7280] shrink-0" />
+        <div className="flex items-center gap-2 bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-1.5">
+          <Search size={13} className="text-[#484F58] shrink-0" />
           <input
             placeholder="Rechercher..."
-            className="bg-transparent text-sm text-[#4B5563] placeholder-[#9CA3AF] outline-none flex-1 w-0 min-w-0"
+            className="bg-transparent text-sm text-[#8B949E] placeholder-[#484F58] outline-none flex-1 w-0 min-w-0"
           />
-          <kbd className="hidden sm:block text-[10px] text-[#6B7280] border border-[#E2E8F0] rounded px-1 shrink-0">⌘K</kbd>
+          <kbd className="hidden sm:block text-[10px] text-[#484F58] border border-[#30363D] rounded px-1 shrink-0">⌘K</kbd>
         </div>
       </div>
 
@@ -148,7 +145,7 @@ export default function Header() {
           className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
             pathname === '/dashboard/equipe'
               ? 'bg-[#F0A30A]/10 text-[#F0A30A]'
-              : 'text-[#4B5563] hover:text-[#111827] hover:bg-[#F0F4FF]'
+              : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
           }`}
         >
           <UsersRound size={14} />
@@ -162,7 +159,7 @@ export default function Header() {
         <button
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
-          className="p-2 text-[#6B7280] hover:text-[#4B5563] transition-colors rounded-lg hover:bg-[#F0F4FF]"
+          className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#21262D]"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
@@ -172,10 +169,10 @@ export default function Header() {
           <button
             onClick={() => setLangOpen(!langOpen)}
             title="Changer de langue"
-            className="p-2 text-[#6B7280] hover:text-[#4B5563] transition-colors rounded-lg hover:bg-[#F0F4FF] flex items-center gap-1"
+            className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#21262D] flex items-center gap-1"
           >
             <Globe size={16} />
-            <span className="hidden sm:block text-[10px] font-bold text-[#6B7280]">
+            <span className="hidden sm:block text-[10px] font-bold text-[#484F58]">
               {locale.toUpperCase()}
             </span>
           </button>
@@ -183,8 +180,8 @@ export default function Header() {
           {langOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setLangOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-[#E2E8F0] rounded-xl shadow-xl z-20 py-1 overflow-hidden">
-                <p className="text-[9px] font-bold text-[#6B7280] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
+              <div className="absolute right-0 top-full mt-1 w-40 bg-[#161B22] border border-[#30363D] rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+                <p className="text-[9px] font-bold text-[#484F58] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
                 {DISPLAY_LOCALES.map(l => (
                   <button
                     key={l}
@@ -192,7 +189,7 @@ export default function Header() {
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left ${
                       locale === l
                         ? 'text-[#F0A30A] bg-[#F0A30A]/5'
-                        : 'text-[#4B5563] hover:text-[#111827] hover:bg-[#F0F4FF]'
+                        : 'text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]'
                     }`}
                   >
                     <span className="text-base">{LOCALE_FLAGS[l]}</span>
@@ -213,28 +210,28 @@ export default function Header() {
         <div className="relative ml-1">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#F0F4FF] transition-colors"
+            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#21262D] transition-colors"
           >
             <div className="w-7 h-7 rounded-full bg-[#F0A30A]/20 border border-[#F0A30A]/30 flex items-center justify-center shrink-0">
               <span className="text-[#F0A30A] text-xs font-bold">{initials}</span>
             </div>
-            <span className="text-sm text-[#111827] hidden sm:block max-w-[96px] truncate">{userName}</span>
-            <ChevronDown size={12} className="text-[#6B7280] hidden sm:block" />
+            <span className="text-sm text-[#E6EDF3] hidden sm:block max-w-[96px] truncate">{userName}</span>
+            <ChevronDown size={12} className="text-[#484F58] hidden sm:block" />
           </button>
 
           {dropdownOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-[#E2E8F0] rounded-lg shadow-xl z-20 py-1">
-                <div className="px-3 py-2 border-b border-[#EEF2FF]">
-                  <p className="text-xs font-medium text-[#111827] truncate">{userName}</p>
+              <div className="absolute right-0 top-full mt-1 w-44 bg-[#161B22] border border-[#30363D] rounded-lg shadow-xl z-20 py-1">
+                <div className="px-3 py-2 border-b border-[#21262D]">
+                  <p className="text-xs font-medium text-[#E6EDF3] truncate">{userName}</p>
                   {nomEntreprise && (
-                    <p className="text-[10px] text-[#6B7280] truncate">{nomEntreprise}</p>
+                    <p className="text-[10px] text-[#484F58] truncate">{nomEntreprise}</p>
                   )}
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#4B5563] hover:text-red-400 hover:bg-red-500/5 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#8B949E] hover:text-red-400 hover:bg-red-500/5 transition-colors"
                 >
                   <LogOut size={14} />
                   Déconnexion

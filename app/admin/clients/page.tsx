@@ -31,12 +31,12 @@ export default async function AdminClientsPage() {
           <Building2 size={18} className="text-[#F01F38]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">Clients</h1>
-          <p className="text-xs text-[#6B7280]">{tenantRows.length} entreprise{tenantRows.length > 1 ? 's' : ''} inscrite{tenantRows.length > 1 ? 's' : ''}</p>
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Clients</h1>
+          <p className="text-xs text-[#484F58]">{tenantRows.length} entreprise{tenantRows.length > 1 ? 's' : ''} inscrite{tenantRows.length > 1 ? 's' : ''}</p>
         </div>
       </div>
 
-      <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+      <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
         <AdminClientsTable tenants={tenantRows} />
       </div>
     </div>

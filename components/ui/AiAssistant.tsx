@@ -237,23 +237,23 @@ export default function AiAssistant() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 10 }}
               transition={{ type: 'spring', stiffness: 340, damping: 28 }}
-              className="fixed bottom-[84px] right-6 z-50 w-[360px] bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+              className="fixed bottom-[84px] right-6 z-50 w-[360px] bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden shadow-2xl flex flex-col"
               style={{ maxHeight: '520px', willChange: 'transform' }}
               onClick={e => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-[#EEF2FF] shrink-0" style={{ background: 'linear-gradient(135deg, #0D1117 0%, #161B22 100%)' }}>
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-[#21262D] shrink-0" style={{ background: 'linear-gradient(135deg, #0D1117 0%, #161B22 100%)' }}>
                 <MIAALogo size={34} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-[#111827]">✨ MIAA+ — Assistant Intelligent</p>
+                  <p className="text-xs font-bold text-[#E6EDF3]">✨ MIAA+ — Assistant Intelligent</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#2EA043] animate-pulse shrink-0" />
-                    <p className="text-[10px] text-[#4B5563] truncate">Module : {MODULE_LABELS[currentModule] ?? currentModule}</p>
+                    <p className="text-[10px] text-[#8B949E] truncate">Module : {MODULE_LABELS[currentModule] ?? currentModule}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setOpen(false)}
-                  className="p-1.5 text-[#6B7280] hover:text-[#4B5563] hover:bg-[#F0F4FF] rounded-lg transition-colors shrink-0"
+                  className="p-1.5 text-[#484F58] hover:text-[#8B949E] hover:bg-[#21262D] rounded-lg transition-colors shrink-0"
                 >
                   <X size={14} />
                 </button>
@@ -278,7 +278,7 @@ export default function AiAssistant() {
                       className={`max-w-[82%] text-xs px-3 py-2 rounded-2xl leading-relaxed ${
                         m.role === 'user'
                           ? 'rounded-br-sm text-[#0D1117] font-semibold'
-                          : 'rounded-bl-sm text-[#111827] border-l-2 border-[#F0A30A]/60'
+                          : 'rounded-bl-sm text-[#E6EDF3] border-l-2 border-[#F0A30A]/60'
                       }`}
                       style={m.role === 'user'
                         ? { background: '#F0A30A' }
@@ -302,7 +302,7 @@ export default function AiAssistant() {
                           transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
                         />
                       ))}
-                      <span className="text-[9px] text-[#6B7280] ml-1">MIAA+ écrit…</span>
+                      <span className="text-[9px] text-[#484F58] ml-1">MIAA+ écrit…</span>
                     </div>
                   </div>
                 )}
@@ -316,7 +316,7 @@ export default function AiAssistant() {
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="text-left text-[11px] text-[#4B5563] hover:text-[#111827] bg-white hover:bg-[#F0F4FF] border border-[#EEF2FF] hover:border-[#F0A30A]/30 rounded-xl px-3 py-1.5 transition-all"
+                      className="text-left text-[11px] text-[#8B949E] hover:text-[#E6EDF3] bg-[#0D1117] hover:bg-[#21262D] border border-[#21262D] hover:border-[#F0A30A]/30 rounded-xl px-3 py-1.5 transition-all"
                     >
                       {s}
                     </button>
@@ -325,14 +325,14 @@ export default function AiAssistant() {
               )}
 
               {/* Input */}
-              <div className="flex items-center gap-2 px-3 py-3 border-t border-[#EEF2FF] shrink-0">
+              <div className="flex items-center gap-2 px-3 py-3 border-t border-[#21262D] shrink-0">
                 <input
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
                   placeholder="Posez votre question à MIAA+…"
                   disabled={loading}
-                  className="flex-1 bg-white border border-[#E2E8F0] rounded-xl px-3 py-1.5 text-xs text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#F0A30A]/60 transition-colors disabled:opacity-50"
+                  className="flex-1 bg-[#0D1117] border border-[#30363D] rounded-xl px-3 py-1.5 text-xs text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F0A30A]/50 transition-colors disabled:opacity-50"
                 />
                 <motion.button
                   whileTap={{ scale: 0.88 }}

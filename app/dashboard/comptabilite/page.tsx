@@ -332,27 +332,27 @@ export default function ComptabilitePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/20 flex items-center justify-center">
-          <BookOpen size={18} className="text-[#8B0073]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F07900]/10 border border-[#F07900]/20 flex items-center justify-center">
+          <BookOpen size={18} className="text-[#F07900]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">Comptabilité</h1>
-          <p className="text-xs text-[#6B7280]">Double entrée OHADA · TVA Congo automatique</p>
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Comptabilité</h1>
+          <p className="text-xs text-[#484F58]">Double entrée OHADA · TVA Congo automatique</p>
         </div>
         <button onClick={() => setShowModal(true)}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B0073]/10 border border-[#8B0073]/30 text-[#8B0073] text-sm font-medium hover:bg-[#8B0073]/20 transition-colors">
+          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F07900]/10 border border-[#F07900]/30 text-[#F07900] text-sm font-medium hover:bg-[#F07900]/20 transition-colors">
           <Plus size={15} /> Opération
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1 overflow-x-auto">
         {TABS.map((t, i) => {
           const Icon = TAB_ICONS[i]
           return (
             <button key={i} onClick={() => setTab(i)}
               className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                tab === i ? 'bg-[#8B0073]/10 text-[#8B0073]' : 'text-[#4B5563] hover:text-[#111827]'
+                tab === i ? 'bg-[#F07900]/10 text-[#F07900]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
               }`}>
               {Icon && <Icon size={11} />}
               {t}
@@ -363,35 +363,35 @@ export default function ComptabilitePage() {
 
       {/* Tab 0 — Journal simplifié */}
       {tab === 0 && (
-        <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E2E8F0]">
+                <tr className="border-b border-[#30363D]">
                   {['Date', 'Libellé', 'Catégorie', 'Type', 'HT', 'TVA', 'CA', 'TTC'].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#484F58] uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EEF2FF]">
-                {loading && <tr><td colSpan={8} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[#6B7280] mx-auto" /></td></tr>}
+              <tbody className="divide-y divide-[#21262D]">
+                {loading && <tr><td colSpan={8} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[#484F58] mx-auto" /></td></tr>}
                 {!loading && entries.length === 0 && (
-                  <tr><td colSpan={8} className="text-center py-10 text-[#6B7280] text-sm">Aucune opération</td></tr>
+                  <tr><td colSpan={8} className="text-center py-10 text-[#484F58] text-sm">Aucune opération</td></tr>
                 )}
                 {entries.map(e => (
-                  <tr key={e.id} className="hover:bg-[#F0F4FF]/80 transition-colors">
-                    <td className="px-4 py-2.5 text-[#4B5563] text-xs whitespace-nowrap">
+                  <tr key={e.id} className="hover:bg-[#21262D]/30 transition-colors">
+                    <td className="px-4 py-2.5 text-[#8B949E] text-xs whitespace-nowrap">
                       {new Date(e.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                     </td>
                     <td className="px-4 py-2.5 max-w-[200px]">
-                      <p className="text-[#111827] truncate">{e.libelle}</p>
+                      <p className="text-[#E6EDF3] truncate">{e.libelle}</p>
                       {(e.debit_account || e.credit_account) && (
-                        <p className="text-[10px] text-[#6B7280] font-mono mt-0.5">
+                        <p className="text-[10px] text-[#484F58] font-mono mt-0.5">
                           D:{e.debit_account} / C:{e.credit_account}
                         </p>
                       )}
                     </td>
-                    <td className="px-4 py-2.5 text-[#4B5563] text-xs">{e.categorie}</td>
+                    <td className="px-4 py-2.5 text-[#8B949E] text-xs">{e.categorie}</td>
                     <td className="px-4 py-2.5">
                       <span className={`text-xs px-2 py-0.5 rounded border ${
                         e.type === 'recette'
@@ -399,9 +399,9 @@ export default function ComptabilitePage() {
                           : 'text-[#F01F38] bg-[#F01F38]/10 border-[#F01F38]/30'
                       }`}>{e.type}</span>
                     </td>
-                    <td className="px-4 py-2.5 text-right text-[#111827] font-medium whitespace-nowrap">{fmtFCFA(e.montant_ht)}</td>
-                    <td className="px-4 py-2.5 text-right text-[#4B5563] text-xs whitespace-nowrap">{fmtFCFA(e.tva)}</td>
-                    <td className="px-4 py-2.5 text-right text-[#4B5563] text-xs whitespace-nowrap">{fmtFCFA(e.ca)}</td>
+                    <td className="px-4 py-2.5 text-right text-[#E6EDF3] font-medium whitespace-nowrap">{fmtFCFA(e.montant_ht)}</td>
+                    <td className="px-4 py-2.5 text-right text-[#8B949E] text-xs whitespace-nowrap">{fmtFCFA(e.tva)}</td>
+                    <td className="px-4 py-2.5 text-right text-[#8B949E] text-xs whitespace-nowrap">{fmtFCFA(e.ca)}</td>
                     <td className="px-4 py-2.5 text-right text-[#F0A30A] font-semibold whitespace-nowrap">{fmtFCFA(e.montant_ttc)}</td>
                   </tr>
                 ))}
@@ -415,38 +415,38 @@ export default function ComptabilitePage() {
       {tab === 1 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-[#6B7280]">
+            <p className="text-xs text-[#484F58]">
               {doubleEntries.length} écritures · alimentées automatiquement par toutes les opérations (trésorerie, factures, paie, dépenses)
             </p>
           </div>
-          <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+          <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#E2E8F0]">
+                  <tr className="border-b border-[#30363D]">
                     {['Date', 'Libellé', 'Compte Débité', 'Compte Crédité', 'Montant', 'Source'].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                      <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#484F58] uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#EEF2FF]">
-                  {loading && <tr><td colSpan={6} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[#6B7280] mx-auto" /></td></tr>}
+                <tbody className="divide-y divide-[#21262D]">
+                  {loading && <tr><td colSpan={6} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[#484F58] mx-auto" /></td></tr>}
                   {!loading && doubleEntries.length === 0 && (
-                    <tr><td colSpan={6} className="text-center py-10 text-[#6B7280] text-sm">
+                    <tr><td colSpan={6} className="text-center py-10 text-[#484F58] text-sm">
                       Aucune écriture — les opérations de trésorerie génèrent des écritures automatiquement
                     </td></tr>
                   )}
                   {doubleEntries.map(e => (
-                    <tr key={e.id} className="hover:bg-[#F0F4FF]/80 transition-colors">
-                      <td className="px-4 py-2.5 text-[#4B5563] text-xs whitespace-nowrap">
+                    <tr key={e.id} className="hover:bg-[#21262D]/30 transition-colors">
+                      <td className="px-4 py-2.5 text-[#8B949E] text-xs whitespace-nowrap">
                         {new Date(e.date_operation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </td>
-                      <td className="px-4 py-2.5 text-[#111827] max-w-[180px] truncate">{e.libelle}</td>
+                      <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[180px] truncate">{e.libelle}</td>
                       <td className="px-4 py-2.5">
                         <span className="font-mono text-[11px] text-[#2EA043] bg-[#2EA043]/10 px-2 py-0.5 rounded">
                           {e.debit_account}
                         </span>
-                        <p className="text-[10px] text-[#6B7280] mt-0.5 max-w-[120px] truncate">
+                        <p className="text-[10px] text-[#484F58] mt-0.5 max-w-[120px] truncate">
                           {accountLabel(e.debit_account)}
                         </p>
                       </td>
@@ -454,7 +454,7 @@ export default function ComptabilitePage() {
                         <span className="font-mono text-[11px] text-[#F01F38] bg-[#F01F38]/10 px-2 py-0.5 rounded">
                           {e.credit_account}
                         </span>
-                        <p className="text-[10px] text-[#6B7280] mt-0.5 max-w-[120px] truncate">
+                        <p className="text-[10px] text-[#484F58] mt-0.5 max-w-[120px] truncate">
                           {accountLabel(e.credit_account)}
                         </p>
                       </td>
@@ -463,7 +463,7 @@ export default function ComptabilitePage() {
                       </td>
                       <td className="px-4 py-2.5">
                         {e.source && (
-                          <span className="text-[10px] text-[#8B0073] bg-[#8B0073]/10 px-2 py-0.5 rounded">
+                          <span className="text-[10px] text-[#F07900] bg-[#F07900]/10 px-2 py-0.5 rounded">
                             {e.source}
                           </span>
                         )}
@@ -480,38 +480,38 @@ export default function ComptabilitePage() {
       {/* Tab 2 — Grand Livre */}
       {tab === 2 && (
         <div className="space-y-4">
-          <p className="text-xs text-[#6B7280]">Balance des comptes OHADA — cumulé tous exercices</p>
+          <p className="text-xs text-[#484F58]">Balance des comptes OHADA — cumulé tous exercices</p>
           {loading ? (
-            <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-[#6B7280]" /></div>
+            <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-[#484F58]" /></div>
           ) : grandLivre.length === 0 ? (
-            <div className="bg-white border border-[#E2E8F0] rounded-xl p-10 text-center">
-              <Scale size={32} className="text-[#9CA3AF] mx-auto mb-3" />
-              <p className="text-[#6B7280] text-sm">Aucune écriture comptable</p>
-              <p className="text-[#9CA3AF] text-xs mt-1">Enregistrez des opérations de trésorerie pour alimenter le Grand Livre</p>
+            <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-10 text-center">
+              <Scale size={32} className="text-[#30363D] mx-auto mb-3" />
+              <p className="text-[#484F58] text-sm">Aucune écriture comptable</p>
+              <p className="text-[#30363D] text-xs mt-1">Enregistrez des opérations de trésorerie pour alimenter le Grand Livre</p>
             </div>
           ) : (
-            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#E2E8F0]">
+                    <tr className="border-b border-[#30363D]">
                       {['Compte', 'Intitulé', 'Type', 'Débit total', 'Crédit total', 'Solde'].map(h => (
-                        <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                        <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#484F58] uppercase tracking-wider whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EEF2FF]">
+                  <tbody className="divide-y divide-[#21262D]">
                     {grandLivre.map(gl => (
-                      <tr key={gl.account_number} className="hover:bg-[#F0F4FF]/80 transition-colors">
+                      <tr key={gl.account_number} className="hover:bg-[#21262D]/30 transition-colors">
                         <td className="px-4 py-2.5">
-                          <span className="font-mono text-[11px] bg-[#F0F4FF] text-[#111827] px-2 py-0.5 rounded">
+                          <span className="font-mono text-[11px] bg-[#21262D] text-[#E6EDF3] px-2 py-0.5 rounded">
                             {gl.account_number}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-[#111827] text-xs max-w-[180px] truncate">{gl.account_name}</td>
+                        <td className="px-4 py-2.5 text-[#E6EDF3] text-xs max-w-[180px] truncate">{gl.account_name}</td>
                         <td className="px-4 py-2.5">
                           <span className={`text-[10px] px-2 py-0.5 rounded ${
-                            gl.account_type === 'tresorerie' ? 'bg-[#8B0073]/10 text-[#8B0073]' :
+                            gl.account_type === 'tresorerie' ? 'bg-[#F07900]/10 text-[#F07900]' :
                             gl.account_type === 'produit'    ? 'bg-[#2EA043]/10 text-[#2EA043]' :
                             gl.account_type === 'charge'     ? 'bg-[#F01F38]/10 text-[#F01F38]' :
                             gl.account_type === 'actif'      ? 'bg-[#F0A30A]/10 text-[#F0A30A]' :
@@ -532,9 +532,9 @@ export default function ComptabilitePage() {
                       </tr>
                     ))}
                     {/* Totals row */}
-                    <tr className="bg-[#F0F4FF] border-t-2 border-[#8B0073]/30">
+                    <tr className="bg-[#21262D] border-t-2 border-[#F07900]/30">
                       <td className="px-4 py-3" colSpan={3}>
-                        <span className="text-xs font-bold text-[#111827] uppercase tracking-wider">Totaux</span>
+                        <span className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">Totaux</span>
                       </td>
                       <td className="px-4 py-3 text-right font-bold text-[#2EA043] whitespace-nowrap">
                         {fmtFCFA(grandLivre.reduce((s, g) => s + g.total_debit, 0))}
@@ -559,12 +559,12 @@ export default function ComptabilitePage() {
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <select value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))}
-              className="bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+              className="bg-[#161B22] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
               {MONTHS_FR.map((m, i) => <option key={i} value={i}>{m} {selectedYear}</option>)}
             </select>
           </div>
-          <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 mb-4">
-            <h2 className="text-sm font-semibold text-[#111827] mb-4">Recettes vs Dépenses — 6 derniers mois</h2>
+          <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 mb-4">
+            <h2 className="text-sm font-semibold text-[#E6EDF3] mb-4">Recettes vs Dépenses — 6 derniers mois</h2>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={monthlyData} barGap={4} margin={{ top: 4, right: 4, left: 0, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
@@ -579,8 +579,8 @@ export default function ComptabilitePage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white border border-[#E2E8F0] rounded-xl p-6">
-            <h2 className="text-sm font-bold text-[#111827] mb-4 uppercase tracking-wider">
+          <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-6">
+            <h2 className="text-sm font-bold text-[#E6EDF3] mb-4 uppercase tracking-wider">
               Rapport {MONTHS_FR[selectedMonth]} {selectedYear}
             </h2>
             <div className="space-y-3">
@@ -592,8 +592,8 @@ export default function ComptabilitePage() {
                 { label: 'Dépenses totales',                    value: fmtFCFA(reportDepenses),   color: '#F01F38' },
                 { label: 'Bénéfice brut',                       value: fmtFCFA(reportBenef),      color: reportBenef >= 0 ? '#2EA043' : '#F01F38' },
               ].map(r => (
-                <div key={r.label} className="flex items-center justify-between border-b border-[#EEF2FF] pb-2 last:border-0">
-                  <span className="text-sm text-[#4B5563]">{r.label}</span>
+                <div key={r.label} className="flex items-center justify-between border-b border-[#21262D] pb-2 last:border-0">
+                  <span className="text-sm text-[#8B949E]">{r.label}</span>
                   <span className="text-sm font-semibold" style={{ color: r.color }}>{r.value}</span>
                 </div>
               ))}
@@ -614,7 +614,7 @@ export default function ComptabilitePage() {
                 })),
                 `journal_${MONTHS_FR[selectedMonth]}_${selectedYear}.csv`
               )}
-              className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors"
+              className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
             >
               <Download size={14} /> Exporter CSV ({monthEntries.length} lignes)
             </button>
@@ -630,7 +630,7 @@ export default function ComptabilitePage() {
                 })),
                 `grand_livre_${selectedYear}.csv`
               )}
-              className="mt-2 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors"
+              className="mt-2 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
             >
               <Download size={14} /> Exporter Grand Livre CSV
             </button>
@@ -640,9 +640,9 @@ export default function ComptabilitePage() {
 
       {/* Tab 4 — Analyse MIAA+ */}
       {tab === 4 && (
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-6">
+        <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#111827]">Analyse MIAA+ de votre comptabilité</h2>
+            <h2 className="text-sm font-semibold text-[#E6EDF3]">Analyse MIAA+ de votre comptabilité</h2>
             <button onClick={analyserMIAA} disabled={aiLoading}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm bg-[#F0A30A] text-[#0D1117] font-medium hover:bg-[#F0A30A]/90 disabled:opacity-50 transition-colors">
               {aiLoading ? <Loader2 size={13} className="animate-spin" /> : '✨'}
@@ -650,18 +650,18 @@ export default function ComptabilitePage() {
             </button>
           </div>
           {!aiAnalysis && !aiLoading && (
-            <p className="text-sm text-[#6B7280] text-center py-8">
+            <p className="text-sm text-[#484F58] text-center py-8">
               Cliquez sur &quot;Analyser&quot; pour obtenir une analyse IA de votre comptabilité
             </p>
           )}
           {aiLoading && (
-            <div className="flex items-center gap-3 text-[#4B5563] py-6">
+            <div className="flex items-center gap-3 text-[#8B949E] py-6">
               <Loader2 size={16} className="animate-spin text-[#F0A30A]" />
               <span className="text-sm">MIAA+ analyse vos données…</span>
             </div>
           )}
           {aiAnalysis && (
-            <div className="bg-white border-l-2 border-[#F0A30A]/60 rounded-r-xl p-4 text-sm text-[#111827] leading-relaxed whitespace-pre-wrap">
+            <div className="bg-[#0D1117] border-l-2 border-[#F0A30A]/60 rounded-r-xl p-4 text-sm text-[#E6EDF3] leading-relaxed whitespace-pre-wrap">
               {aiAnalysis}
             </div>
           )}
@@ -679,7 +679,7 @@ export default function ComptabilitePage() {
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-[#484F58]">
                 Comparez les relevés bancaires avec vos transactions enregistrées
               </p>
               <div className="flex gap-2">
@@ -688,12 +688,12 @@ export default function ComptabilitePage() {
                     rapprochements.map(r => ({ date: r.date_releve, reference: r.reference, libelle: r.libelle ?? '', type: r.type, montant: r.montant, statut: r.statut })),
                     'rapprochement_bancaire.csv'
                   )}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
                 >
                   <Download size={12} /> CSV
                 </button>
                 <button onClick={() => setShowRapModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-[#8B0073]/10 border border-[#8B0073]/30 text-[#8B0073] hover:bg-[#8B0073]/20 transition-colors">
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-[#F07900]/10 border border-[#F07900]/30 text-[#F07900] hover:bg-[#F07900]/20 transition-colors">
                   <Plus size={12} /> Ajouter ligne
                 </button>
               </div>
@@ -707,51 +707,51 @@ export default function ComptabilitePage() {
                 { label: 'Non rapprochés',    value: nbNonRap,             color: '#F0A30A' },
                 { label: 'Écarts détectés',   value: nbEcart,              color: '#F01F38' },
               ].map(k => (
-                <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-xl p-4">
-                  <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mb-1">{k.label}</p>
+                <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
+                  <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">{k.label}</p>
                   <p className="text-lg font-bold" style={{ color: k.color }}>{k.value}</p>
                 </div>
               ))}
             </div>
 
             {/* Filter */}
-            <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1 w-fit">
+            <div className="flex gap-1 bg-[#161B22] border border-[#30363D] rounded-xl p-1 w-fit">
               {([['all', 'Tous'], ['non_rapproche', 'Non rapprochés'], ['rapproche', 'Rapprochés'], ['ecart', 'Écarts']] as const).map(([v, l]) => (
                 <button key={v} onClick={() => setRapFilter(v)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${rapFilter === v ? 'bg-[#8B0073]/10 text-[#8B0073]' : 'text-[#4B5563] hover:text-[#111827]'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${rapFilter === v ? 'bg-[#F07900]/10 text-[#F07900]' : 'text-[#8B949E] hover:text-[#E6EDF3]'}`}>
                   {l}
                 </button>
               ))}
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+            <div className="bg-[#161B22] border border-[#30363D] rounded-xl overflow-hidden">
               {rapLoading ? (
-                <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-[#6B7280]" /></div>
+                <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-[#484F58]" /></div>
               ) : filtered.length === 0 ? (
                 <div className="text-center py-12">
-                  <GitMerge size={32} className="text-[#9CA3AF] mx-auto mb-3" />
-                  <p className="text-[#6B7280] text-sm">Aucune ligne de rapprochement</p>
-                  <p className="text-[#9CA3AF] text-xs mt-1">Ajoutez vos lignes de relevé bancaire pour les rapprocher</p>
+                  <GitMerge size={32} className="text-[#30363D] mx-auto mb-3" />
+                  <p className="text-[#484F58] text-sm">Aucune ligne de rapprochement</p>
+                  <p className="text-[#30363D] text-xs mt-1">Ajoutez vos lignes de relevé bancaire pour les rapprocher</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-[#E2E8F0]">
+                      <tr className="border-b border-[#30363D]">
                         {['Date', 'Référence', 'Libellé', 'Type', 'Montant', 'Statut', 'Actions'].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                          <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#484F58] uppercase tracking-wider whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EEF2FF]">
+                    <tbody className="divide-y divide-[#21262D]">
                       {filtered.map(r => (
-                        <tr key={r.id} className="hover:bg-[#F0F4FF]/80 transition-colors">
-                          <td className="px-4 py-2.5 text-[#4B5563] text-xs whitespace-nowrap">
+                        <tr key={r.id} className="hover:bg-[#21262D]/30 transition-colors">
+                          <td className="px-4 py-2.5 text-[#8B949E] text-xs whitespace-nowrap">
                             {new Date(r.date_releve).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
                           </td>
-                          <td className="px-4 py-2.5 font-mono text-[11px] text-[#111827]">{r.reference}</td>
-                          <td className="px-4 py-2.5 text-[#4B5563] text-xs max-w-[160px] truncate">{r.libelle ?? '—'}</td>
+                          <td className="px-4 py-2.5 font-mono text-[11px] text-[#E6EDF3]">{r.reference}</td>
+                          <td className="px-4 py-2.5 text-[#8B949E] text-xs max-w-[160px] truncate">{r.libelle ?? '—'}</td>
                           <td className="px-4 py-2.5">
                             <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${r.type === 'credit' ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'bg-[#F01F38]/10 text-[#F01F38]'}`}>
                               {r.type === 'credit' ? '↑ Crédit' : '↓ Débit'}
@@ -786,7 +786,7 @@ export default function ComptabilitePage() {
                                 </button>
                               )}
                               <button onClick={() => deleteRap(r.id)}
-                                className="px-2 py-1 rounded text-[10px] bg-[#484F58]/10 text-[#6B7280] hover:bg-[#F01F38]/10 hover:text-[#F01F38] transition-colors" title="Supprimer">
+                                className="px-2 py-1 rounded text-[10px] bg-[#484F58]/10 text-[#484F58] hover:bg-[#F01F38]/10 hover:text-[#F01F38] transition-colors" title="Supprimer">
                                 <Trash2 size={10} />
                               </button>
                             </div>
@@ -809,22 +809,22 @@ export default function ComptabilitePage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60" onClick={() => setShowRapModal(false)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-white border border-[#E2E8F0] rounded-2xl p-6 w-full max-w-md shadow-2xl">
-              <button onClick={() => setShowRapModal(false)} className="absolute top-4 right-4 text-[#6B7280] hover:text-[#4B5563]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#111827] mb-4">Nouvelle ligne de relevé</h3>
+              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              <button onClick={() => setShowRapModal(false)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
+              <h3 className="text-base font-bold text-[#E6EDF3] mb-4">Nouvelle ligne de relevé</h3>
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Date relevé</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Date relevé</label>
                     <input type="date" value={rapForm.date_releve} onChange={e => setRapForm(f => ({ ...f, date_releve: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Type</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Type</label>
                     <div className="flex gap-2">
                       {(['credit', 'debit'] as const).map(t => (
                         <button key={t} onClick={() => setRapForm(f => ({ ...f, type: t }))}
-                          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${rapForm.type === t ? t === 'credit' ? 'bg-[#2EA043] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#F0F4FF] text-[#4B5563]'}`}>
+                          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${rapForm.type === t ? t === 'credit' ? 'bg-[#2EA043] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#21262D] text-[#8B949E]'}`}>
                           {t === 'credit' ? '↑ Crédit' : '↓ Débit'}
                         </button>
                       ))}
@@ -832,31 +832,31 @@ export default function ComptabilitePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Référence</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Référence</label>
                   <input value={rapForm.reference} onChange={e => setRapForm(f => ({ ...f, reference: e.target.value }))}
                     placeholder="VIR-2025-001, CHQ-456…"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Montant (FCFA)</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
                   <input type="number" value={rapForm.montant} onChange={e => setRapForm(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                 </div>
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Libellé (optionnel)</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Libellé (optionnel)</label>
                   <input value={rapForm.libelle} onChange={e => setRapForm(f => ({ ...f, libelle: e.target.value }))}
                     placeholder="Description…"
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                 </div>
               </div>
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setShowRapModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
                   Annuler
                 </button>
                 <button onClick={saveRapprochement} disabled={rapSaving || !rapForm.reference || !rapForm.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0073] text-white hover:bg-[#8B0073]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#F07900] text-white hover:bg-[#F07900]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
                   {rapSaving && <Loader2 size={13} className="animate-spin" />}
                   Enregistrer
                 </button>
@@ -873,14 +873,14 @@ export default function ComptabilitePage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60" onClick={() => setShowModal(false)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-white border border-[#E2E8F0] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
-              <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-[#6B7280] hover:text-[#4B5563]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#111827] mb-4">Nouvelle opération</h3>
+              className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+              <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
+              <h3 className="text-base font-bold text-[#E6EDF3] mb-4">Nouvelle opération</h3>
               <div className="flex gap-2 mb-4">
                 {(['recette', 'depense'] as const).map(t => (
                   <button key={t} onClick={() => setForm(f => ({ ...f, type: t, categorie: t === 'recette' ? CATS_RECETTE[0] : CATS_DEPENSE[0] }))}
                     className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      form.type === t ? t === 'recette' ? 'bg-[#2EA043] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#F0F4FF] text-[#4B5563]'
+                      form.type === t ? t === 'recette' ? 'bg-[#2EA043] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#21262D] text-[#8B949E]'
                     }`}>
                     {t === 'recette' ? '+ Recette' : '− Dépense'}
                   </button>
@@ -888,58 +888,58 @@ export default function ComptabilitePage() {
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Libellé</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Libellé</label>
                   <input value={form.libelle} onChange={e => setForm(f => ({ ...f, libelle: e.target.value }))}
                     placeholder="Description de l'opération..."
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Montant HT (FCFA)</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Montant HT (FCFA)</label>
                     <input type="number" value={form.montant_ht} onChange={e => setForm(f => ({ ...f, montant_ht: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] placeholder-[#9CA3AF] outline-none focus:border-[#8B0073]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#F07900]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[#4B5563] mb-1 block">Date</label>
+                    <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                     <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none" />
                   </div>
                 </div>
                 {form.type === 'recette' && form.montant_ht && (
                   <div className="bg-[#F0A30A]/5 border border-[#F0A30A]/20 rounded-lg p-3 text-xs space-y-1">
-                    <p className="text-[#4B5563]">TVA (18%) : <span className="text-[#F0A30A] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18))}</span></p>
-                    <p className="text-[#4B5563]">CA (5% TVA) : <span className="text-[#F0A30A] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18 * 0.05))}</span></p>
-                    <p className="text-[#4B5563] font-medium">TTC : <span className="text-[#F0A30A] font-bold">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 1.189))}</span></p>
+                    <p className="text-[#8B949E]">TVA (18%) : <span className="text-[#F0A30A] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18))}</span></p>
+                    <p className="text-[#8B949E]">CA (5% TVA) : <span className="text-[#F0A30A] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18 * 0.05))}</span></p>
+                    <p className="text-[#8B949E] font-medium">TTC : <span className="text-[#F0A30A] font-bold">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 1.189))}</span></p>
                   </div>
                 )}
                 <div>
-                  <label className="text-xs text-[#4B5563] mb-1 block">Catégorie</label>
+                  <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
                   <select value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))}
-                    className="w-full bg-white border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#111827] outline-none">
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none">
                     {(form.type === 'recette' ? CATS_RECETTE : CATS_DEPENSE).map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
 
                 {/* Double-entry accounts */}
-                <div className="border-t border-[#E2E8F0] pt-3">
+                <div className="border-t border-[#30363D] pt-3">
                   <p className="text-[10px] text-[#6E7681] uppercase tracking-wider mb-2 flex items-center gap-1">
                     <BookOpen size={10} /> Écriture à partie double (OHADA)
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Compte débité</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Compte débité</label>
                       <select value={form.debit_account} onChange={e => setForm(f => ({ ...f, debit_account: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-2 py-2 text-xs text-[#111827] outline-none">
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-2 py-2 text-xs text-[#E6EDF3] outline-none">
                         {(OHADA_ACCOUNTS as readonly { number: string; name: string }[]).map(a => (
                           <option key={a.number} value={a.number}>{a.number} — {a.name}</option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-[#4B5563] mb-1 block">Compte crédité</label>
+                      <label className="text-xs text-[#8B949E] mb-1 block">Compte crédité</label>
                       <select value={form.credit_account} onChange={e => setForm(f => ({ ...f, credit_account: e.target.value }))}
-                        className="w-full bg-white border border-[#E2E8F0] rounded-lg px-2 py-2 text-xs text-[#111827] outline-none">
+                        className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-2 py-2 text-xs text-[#E6EDF3] outline-none">
                         {(OHADA_ACCOUNTS as readonly { number: string; name: string }[]).map(a => (
                           <option key={a.number} value={a.number}>{a.number} — {a.name}</option>
                         ))}
@@ -947,7 +947,7 @@ export default function ComptabilitePage() {
                     </div>
                   </div>
                   {form.debit_account && form.credit_account && (
-                    <p className="text-[10px] text-[#6B7280] mt-2 font-mono">
+                    <p className="text-[10px] text-[#484F58] mt-2 font-mono">
                       D {form.debit_account} / C {form.credit_account}
                     </p>
                   )}
@@ -955,11 +955,11 @@ export default function ComptabilitePage() {
               </div>
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#F0F4FF] border border-[#E2E8F0] text-[#4B5563] hover:text-[#111827] transition-colors">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
                   Annuler
                 </button>
                 <button onClick={save} disabled={saving || !form.libelle || !form.montant_ht}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0073] text-white hover:bg-[#8B0073]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#F07900] text-white hover:bg-[#F07900]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   Enregistrer
                 </button>

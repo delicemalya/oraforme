@@ -126,8 +126,8 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#4B5563]" />
-            <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#9CA3AF] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
+            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+            <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117' }}>
             <Plus size={13} /> Inscrire
@@ -137,7 +137,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
 
       {/* ── Grille de cartes Étudiants ───────────────────────────────────── */}
       {displayed.length === 0 ? (
-        <div className="text-center py-16 text-[#4B5563] text-xs space-y-2">
+        <div className="text-center py-16 text-[#8B949E] text-xs space-y-2">
           <Users2 size={32} className="mx-auto opacity-20" />
           <p className="font-medium">Aucun étudiant trouvé.</p>
         </div>
@@ -166,11 +166,11 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                 {/* Niveau + Classe */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
                   <div>
-                    <p className="text-[9px] text-[#6B7280] uppercase tracking-wide">Niveau</p>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Niveau</p>
                     <p className="text-[10px] text-white mt-0.5">{NIVEAUX.find(n => n.value === e.niveau)?.label ?? e.niveau}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] text-[#6B7280] uppercase tracking-wide">Classe</p>
+                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Classe</p>
                     <p className="text-[10px] text-white mt-0.5 truncate">{e.classe ?? '—'}</p>
                   </div>
                 </div>
@@ -179,25 +179,25 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                 <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
                   {e.tel_parent && (
                     <div className="flex items-center gap-2">
-                      <Phone size={11} className="text-[#6B7280] shrink-0" />
-                      <p className="text-[11px] text-[#4B5563]">{e.tel_parent}</p>
+                      <Phone size={11} className="text-[#484F58] shrink-0" />
+                      <p className="text-[11px] text-[#8B949E]">{e.tel_parent}</p>
                     </div>
                   )}
                   {e.email_parent && (
                     <div className="flex items-center gap-2">
-                      <Mail size={11} className="text-[#6B7280] shrink-0" />
-                      <p className="text-[11px] text-[#4B5563] truncate">{e.email_parent}</p>
+                      <Mail size={11} className="text-[#484F58] shrink-0" />
+                      <p className="text-[11px] text-[#8B949E] truncate">{e.email_parent}</p>
                     </div>
                   )}
                   {!e.tel_parent && !e.email_parent && (
-                    <p className="text-[11px] text-[#6B7280]">Aucun contact parent</p>
+                    <p className="text-[11px] text-[#484F58]">Aucun contact parent</p>
                   )}
                 </div>
 
                 {/* Boutons */}
                 <div className="flex gap-2 pt-1 mt-auto">
                   <button onClick={() => del(e.id)}
-                    className="p-2 rounded-lg border border-white/[0.06] text-[#6B7280] hover:text-red-400 hover:border-red-400/30 transition-all"
+                    className="p-2 rounded-lg border border-white/[0.06] text-[#484F58] hover:text-red-400 hover:border-red-400/30 transition-all"
                     title="Supprimer">
                     <Trash2 size={12} />
                   </button>
@@ -228,10 +228,10 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                     <p className="text-[10px] font-mono text-[#8B0073]">{selected.numero_id} · {selected.classe ?? selected.niveau}</p>
                   </div>
                 </div>
-                <button onClick={() => setSelected(null)} className="text-[#4B5563] hover:text-white"><X size={15} /></button>
+                <button onClick={() => setSelected(null)} className="text-[#8B949E] hover:text-white"><X size={15} /></button>
               </div>
 
-              <div className="space-y-1 text-xs text-[#4B5563]">
+              <div className="space-y-1 text-xs text-[#8B949E]">
                 {selected.date_naissance && <p>Né(e) le : <span className="text-white">{new Date(selected.date_naissance).toLocaleDateString('fr-FR')}</span></p>}
                 {selected.adresse && <p>Adresse : <span className="text-white">{selected.adresse}</span></p>}
                 {selected.tel_parent && <p>Parent : <span className="text-white">{selected.tel_parent}</span></p>}
@@ -240,7 +240,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
               </div>
 
               <div>
-                <p className="text-[10px] text-[#4B5563] uppercase tracking-wider mb-1.5">Modifier le statut</p>
+                <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-1.5">Modifier le statut</p>
                 <div className="grid grid-cols-2 gap-1.5">
                   {(['actif', 'suspendu', 'banni', 'diplome'] as const).map(s => {
                     const cfg = STATUT_ETU[s]
@@ -258,7 +258,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                 <div className="border border-[#F0A30A]/20 rounded-lg p-3" style={{ background: 'rgba(240,163,10,0.06)' }}>
                   {selected.code_deblocage ? (
                     <>
-                      <p className="text-[10px] text-[#4B5563] mb-1">Code de déblocage :</p>
+                      <p className="text-[10px] text-[#8B949E] mb-1">Code de déblocage :</p>
                       <p className="text-xl font-mono font-bold text-[#F0A30A] tracking-widest">{selected.code_deblocage}</p>
                     </>
                   ) : (
@@ -282,33 +282,33 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
           <>
             <motion.div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowForm(false)} />
             <motion.div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div className="w-full max-w-3xl bg-white border border-white/[0.08] rounded-2xl shadow-2xl" initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 16 }} onClick={e => e.stopPropagation()}>
+              <motion.div className="w-full max-w-3xl bg-[#161B22] border border-white/[0.08] rounded-2xl shadow-2xl" initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 16 }} onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
                   <h2 className="text-base font-bold text-white">Inscrire un étudiant</h2>
-                  <button onClick={() => setShowForm(false)} className="text-[#4B5563] hover:text-white"><X size={18} /></button>
+                  <button onClick={() => setShowForm(false)} className="text-[#8B949E] hover:text-white"><X size={18} /></button>
                 </div>
                 <div className="p-6 grid grid-cols-2 gap-5">
-                  <div className="col-span-2"><p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3">Informations personnelles</p></div>
+                  <div className="col-span-2"><p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3">Informations personnelles</p></div>
                   {([['Prénom *', 'prenom', 'Éric'], ['Nom *', 'nom', 'MBEMBA'], ['Date de naissance', 'date_naissance', '', 'date'], ['Lieu de naissance', 'lieu_naissance', 'Brazzaville'], ['Nationalité', 'nationalite', 'Congolaise'], ['Adresse', 'adresse', '']] as [string,string,string,string?][]).map(([label, key, ph, type]) => (
                     <FI key={key} label={label} value={(form as Record<string, string>)[key]} onChange={v => sf(key, v)} placeholder={ph} type={type || 'text'} />
                   ))}
                   <div>
-                    <label className="block text-xs text-[#4B5563] mb-1.5">Niveau</label>
+                    <label className="block text-xs text-[#8B949E] mb-1.5">Niveau</label>
                     <select value={form.niveau} onChange={e => sf('niveau', e.target.value)} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
-                      {NIVEAUX.map(n => <option key={n.value} value={n.value} className="bg-white">{n.label}</option>)}
+                      {NIVEAUX.map(n => <option key={n.value} value={n.value} className="bg-[#161B22]">{n.label}</option>)}
                     </select>
                   </div>
                   <FI label="Classe / Filière" value={form.classe} onChange={v => sf('classe', v)} placeholder="Terminale A, L3 Informatique…" />
                   <FI label="Année scolaire" value={form.annee_scolaire} onChange={v => sf('annee_scolaire', v)} placeholder="2024-2025" />
                   <FI label="Photo (URL)" value={form.photo_url} onChange={v => sf('photo_url', v)} placeholder="https://…/photo.jpg" />
 
-                  <div className="col-span-2 border-t border-white/[0.06] pt-4"><p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3">Parents & Tuteur</p></div>
+                  <div className="col-span-2 border-t border-white/[0.06] pt-4"><p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3">Parents & Tuteur</p></div>
                   {([['Nom du père', 'nom_pere', ''], ['Nom de la mère', 'nom_mere', ''], ['Téléphone parent', 'tel_parent', '+242 06…'], ['Email parent', 'email_parent', ''], ['Profession', 'profession_parent', ''], ['Nom tuteur', 'nom_tuteur', ''], ['Tél tuteur', 'tel_tuteur', ''], ['Lien (ex: oncle)', 'lien_tuteur', '']] as [string,string,string][]).map(([label, key, ph]) => (
                     <FI key={key} label={label} value={(form as Record<string, string>)[key]} onChange={v => sf(key, v)} placeholder={ph} />
                   ))}
 
                   <div className="col-span-2 flex gap-3 pt-2">
-                    <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-[#4B5563] text-sm">Annuler</button>
+                    <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-[#8B949E] text-sm">Annuler</button>
                     <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#F0A30A,#d4880a)', color: '#0D1117' }}>
                       {saving ? <Loader2 className="animate-spin" size={14} /> : <><Check size={14} /> Inscrire</>}
                     </button>
@@ -427,14 +427,14 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
   return (
     <div className="flex gap-5">
       <div className="w-56 shrink-0 rounded-xl border border-white/[0.06] overflow-hidden h-fit" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider">Étudiants</p></div>
+        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Étudiants</p></div>
         <div className="overflow-y-auto max-h-[520px]">
           {etudiants.map(e => (
             <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-white/[0.04] ${selectedId === e.id ? 'bg-[#F0A30A]/10' : 'hover:bg-white/[0.02]'}`}>
               <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={26} />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-white truncate">{e.prenom} {e.nom}</p>
-                <p className="text-[10px] text-[#4B5563]">{e.classe ?? e.niveau}</p>
+                <p className="text-[10px] text-[#8B949E]">{e.classe ?? e.niveau}</p>
               </div>
             </button>
           ))}
@@ -442,7 +442,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
       </div>
 
       {!selectedEtu ? (
-        <div className="flex-1 flex items-center justify-center text-[#4B5563] h-64">
+        <div className="flex-1 flex items-center justify-center text-[#8B949E] h-64">
           <div className="text-center"><CreditCard size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sélectionnez un étudiant</p></div>
         </div>
       ) : (
@@ -452,28 +452,28 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
               <Avatar nom={selectedEtu.nom} prenom={selectedEtu.prenom} photoUrl={selectedEtu.photo_url} size={40} />
               <div>
                 <p className="text-sm font-bold text-white">{selectedEtu.prenom} {selectedEtu.nom}</p>
-                <p className="text-xs text-[#4B5563]">{selectedEtu.numero_id} · {selectedEtu.classe ?? selectedEtu.niveau}</p>
+                <p className="text-xs text-[#8B949E]">{selectedEtu.numero_id} · {selectedEtu.classe ?? selectedEtu.niveau}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-[10px] text-[#4B5563]">Total payé</p>
+              <p className="text-[10px] text-[#8B949E]">Total payé</p>
               <p className="text-lg font-bold text-[#2EA043]">{fmt(totalPaye)} FCFA</p>
             </div>
           </div>
 
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider">Frais configurés</p>
+              <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Frais configurés</p>
               <div className="flex gap-2">
                 {frais.length === 0 && <button onClick={initFrais} className="text-[10px] text-[#F0A30A] hover:underline">Initialiser frais par défaut</button>}
-                <button onClick={() => setShowNewFrais(p => !p)} className="text-[10px] text-[#8B0073] hover:underline flex items-center gap-1"><Plus size={10} /> Ajouter</button>
+                <button onClick={() => setShowNewFrais(p => !p)} className="text-[10px] text-[#F07900] hover:underline flex items-center gap-1"><Plus size={10} /> Ajouter</button>
               </div>
             </div>
             {showNewFrais && (
               <div className="flex gap-2 mb-3">
                 <input className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-1.5 text-xs text-white" placeholder="Libellé" value={fraisForm.libelle} onChange={e => setFraisForm(p => ({ ...p, libelle: e.target.value }))} />
                 <input type="number" className="w-24 bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-1.5 text-xs text-white text-right" placeholder="Montant" value={fraisForm.montant} onChange={e => setFraisForm(p => ({ ...p, montant: e.target.value }))} />
-                <button onClick={addFrais} disabled={saving} className="px-3 py-1.5 rounded-md bg-[#8B0073]/10 text-[#8B0073] text-xs font-semibold"><Check size={12} /></button>
+                <button onClick={addFrais} disabled={saving} className="px-3 py-1.5 rounded-md bg-[#F07900]/15 text-[#F07900] text-xs font-semibold"><Check size={12} /></button>
               </div>
             )}
             <div className="flex flex-wrap gap-2">
@@ -487,27 +487,27 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
           </div>
 
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
-            <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3">Enregistrer un paiement</p>
+            <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3">Enregistrer un paiement</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Libellé</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Libellé</label>
                 <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={paieForm.libelle} onChange={e => setPaieForm(p => ({ ...p, libelle: e.target.value }))} placeholder="Mensualité Octobre…" />
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Frais (optionnel)</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Frais (optionnel)</label>
                 <select className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={paieForm.frais_id} onChange={e => setPaieForm(p => ({ ...p, frais_id: e.target.value, libelle: e.target.value ? frais.find(f => f.id === e.target.value)?.libelle ?? p.libelle : p.libelle }))}>
-                  <option value="" className="bg-white">— Manuel —</option>
-                  {frais.map(f => <option key={f.id} value={f.id} className="bg-white">{f.libelle} ({fmt(f.montant)} FCFA)</option>)}
+                  <option value="" className="bg-[#161B22]">— Manuel —</option>
+                  {frais.map(f => <option key={f.id} value={f.id} className="bg-[#161B22]">{f.libelle} ({fmt(f.montant)} FCFA)</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Montant (FCFA)</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Montant (FCFA)</label>
                 <input type="number" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-right" value={paieForm.montant} onChange={e => setPaieForm(p => ({ ...p, montant: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Méthode</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Méthode</label>
                 <select className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={paieForm.methode} onChange={e => setPaieForm(p => ({ ...p, methode: e.target.value }))}>
-                  {['especes', 'mobile_money', 'virement', 'cheque'].map(m => <option key={m} value={m} className="bg-white">{m.replace('_', ' ')}</option>)}
+                  {['especes', 'mobile_money', 'virement', 'cheque'].map(m => <option key={m} value={m} className="bg-[#161B22]">{m.replace('_', ' ')}</option>)}
                 </select>
               </div>
             </div>
@@ -518,19 +518,19 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
 
           {paiements.length > 0 && (
             <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-              <div className="px-4 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider">Historique</p></div>
+              <div className="px-4 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Historique</p></div>
               <table className="w-full text-xs">
-                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[#4B5563]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
                 <tbody>
                   {paiements.map(p => (
                     <tr key={p.id} className="border-t border-white/[0.04]">
-                      <td className="px-3 py-2 text-[#4B5563]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-3 py-2 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                       <td className="px-3 py-2 text-white">{p.libelle}</td>
-                      <td className="px-3 py-2 text-[#4B5563] capitalize">{p.methode.replace('_', ' ')}</td>
+                      <td className="px-3 py-2 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
                       <td className="px-3 py-2 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
                       <td className="px-3 py-2 flex items-center gap-1.5">
-                        <button onClick={() => selectedEtu && printReceipt(selectedEtu, p, nomEcole)} className="text-[#6B7280] hover:text-[#8B0073]"><Printer size={11} /></button>
-                        <button onClick={() => delPaiement(p.id)} className="text-[#6B7280] hover:text-red-400"><Trash2 size={11} /></button>
+                        <button onClick={() => selectedEtu && printReceipt(selectedEtu, p, nomEcole)} className="text-[#484F58] hover:text-[#F07900]"><Printer size={11} /></button>
+                        <button onClick={() => delPaiement(p.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={11} /></button>
                       </td>
                     </tr>
                   ))}
@@ -586,7 +586,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
   return (
     <div className="flex gap-5">
       <div className="w-52 shrink-0 rounded-xl border border-white/[0.06] overflow-hidden h-fit" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider">Étudiant</p></div>
+        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Étudiant</p></div>
         {etudiants.map(e => (
           <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-white/[0.04] ${selectedId === e.id ? 'bg-[#F0A30A]/10' : 'hover:bg-white/[0.02]'}`}>
             <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={24} />
@@ -596,7 +596,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
       </div>
 
       {!selectedEtu ? (
-        <div className="flex-1 flex items-center justify-center text-[#4B5563]">
+        <div className="flex-1 flex items-center justify-center text-[#8B949E]">
           <div className="text-center"><BookOpen size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sélectionnez un étudiant</p></div>
         </div>
       ) : (
@@ -611,7 +611,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-white">{moyenne.toFixed(2)} / 20</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ color: mention.color, background: mention.color + '20' }}>{mention.label}</span>
-                <button onClick={() => printBulletin(selectedEtu, notes, periode, nomEcole)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8B0073]/10 border border-[#8B0073]/30 text-[#8B0073] text-xs font-semibold">
+                <button onClick={() => printBulletin(selectedEtu, notes, periode, nomEcole)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F07900]/15 border border-[#F07900]/30 text-[#F07900] text-xs font-semibold">
                   <Printer size={12} /> Bulletin PDF
                 </button>
               </div>
@@ -619,28 +619,28 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
           </div>
 
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
-            <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3">Ajouter une note</p>
+            <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3">Ajouter une note</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
               <div className="sm:col-span-2">
-                <label className="text-[10px] text-[#4B5563] block mb-1">Matière *</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Matière *</label>
                 <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} placeholder="Mathématiques…" />
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Type</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Type</label>
                 <select className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={form.type_note} onChange={e => setForm(p => ({ ...p, type_note: e.target.value }))}>
-                  {['devoir', 'examen', 'tp', 'oral', 'projet'].map(t => <option key={t} value={t} className="bg-white">{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                  {['devoir', 'examen', 'tp', 'oral', 'projet'].map(t => <option key={t} value={t} className="bg-[#161B22]">{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Coeff.</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Coeff.</label>
                 <input type="number" min="0.5" step="0.5" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-center" value={form.coefficient} onChange={e => setForm(p => ({ ...p, coefficient: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Note *</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Note *</label>
                 <input type="number" min="0" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-right" value={form.note} onChange={e => setForm(p => ({ ...p, note: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Sur</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Sur</label>
                 <input type="number" min="10" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-right" value={form.note_max} onChange={e => setForm(p => ({ ...p, note_max: e.target.value }))} />
               </div>
             </div>
@@ -652,7 +652,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
           {periodeNotes.length > 0 ? (
             <div className="rounded-xl border border-white/[0.06] overflow-hidden">
               <table className="w-full text-xs">
-                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Type', 'Note', '/Max', 'Coeff.', 'Moy /20', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[#4B5563]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Type', 'Note', '/Max', 'Coeff.', 'Moy /20', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
                 <tbody>
                   {periodeNotes.map(n => {
                     const moy20 = (n.note / n.note_max) * 20
@@ -660,12 +660,12 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
                     return (
                       <tr key={n.id} className="border-t border-white/[0.04]">
                         <td className="px-3 py-2 font-medium text-white">{n.matiere}</td>
-                        <td className="px-3 py-2 text-[#4B5563] capitalize">{n.type_note}</td>
+                        <td className="px-3 py-2 text-[#8B949E] capitalize">{n.type_note}</td>
                         <td className="px-3 py-2 font-bold text-white">{n.note}</td>
-                        <td className="px-3 py-2 text-[#4B5563]">{n.note_max}</td>
-                        <td className="px-3 py-2 text-[#4B5563]">×{n.coefficient}</td>
+                        <td className="px-3 py-2 text-[#8B949E]">{n.note_max}</td>
+                        <td className="px-3 py-2 text-[#8B949E]">×{n.coefficient}</td>
                         <td className="px-3 py-2"><span className="font-bold px-1.5 py-0.5 rounded text-[10px]" style={{ color: m.color, background: m.color + '20' }}>{moy20.toFixed(2)}</span></td>
-                        <td className="px-3 py-2"><button onClick={() => delNote(n.id)} className="text-[#6B7280] hover:text-red-400"><Trash2 size={11} /></button></td>
+                        <td className="px-3 py-2"><button onClick={() => delNote(n.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={11} /></button></td>
                       </tr>
                     )
                   })}
@@ -673,7 +673,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
               </table>
             </div>
           ) : (
-            <div className="text-center py-10 text-[#4B5563] text-xs">Aucune note pour {PERIODES.find(p => p.value === periode)?.label}.</div>
+            <div className="text-center py-10 text-[#8B949E] text-xs">Aucune note pour {PERIODES.find(p => p.value === periode)?.label}.</div>
           )}
         </div>
       )}
@@ -718,7 +718,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} placeholder="Terminale A, L1 Info…" />
               <div>
-                <label className="block text-xs text-[#4B5563] mb-1">Niveau</label>
+                <label className="block text-xs text-[#8B949E] mb-1">Niveau</label>
                 <select value={form.niveau} onChange={e => setForm(p => ({ ...p, niveau: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {NIVEAUX.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
                 </select>
@@ -730,13 +730,13 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
               <button onClick={save} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F0A30A', color: '#0D1117' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#4B5563] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
       {classes.length === 0 ? (
-        <div className="text-center py-12 text-[#4B5563] text-xs">Aucune classe enregistrée.</div>
+        <div className="text-center py-12 text-[#8B949E] text-xs">Aucune classe enregistrée.</div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {classes.map(c => {
@@ -746,12 +746,12 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-bold text-white">{c.nom}</p>
-                    <p className="text-[10px] text-[#4B5563] mt-0.5">{niv?.label ?? c.niveau} · {c.annee_scolaire}</p>
+                    <p className="text-[10px] text-[#8B949E] mt-0.5">{niv?.label ?? c.niveau} · {c.annee_scolaire}</p>
                   </div>
-                  <button onClick={() => del(c.id)} className="text-[#6B7280] hover:text-red-400"><Trash2 size={12} /></button>
+                  <button onClick={() => del(c.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={12} /></button>
                 </div>
                 <div className="mt-3 text-right">
-                  <span className="text-[10px] font-semibold text-[#8B0073]">{c.nb_places} places</span>
+                  <span className="text-[10px] font-semibold text-[#F07900]">{c.nb_places} places</span>
                 </div>
               </div>
             )
@@ -817,7 +817,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
-                <label className="block text-xs text-[#4B5563] mb-1">Type</label>
+                <label className="block text-xs text-[#8B949E] mb-1">Type</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {(Object.entries(TYPE_EVENT) as [TypeEvent, { label: string }][]).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
@@ -825,7 +825,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
               <FI label="Date début *" value={form.date_debut} onChange={v => setForm(p => ({ ...p, date_debut: v }))} type="date" />
               <FI label="Date fin"     value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
               <div className="col-span-2">
-                <label className="block text-xs text-[#4B5563] mb-1">Description</label>
+                <label className="block text-xs text-[#8B949E] mb-1">Description</label>
                 <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" />
               </div>
             </div>
@@ -833,14 +833,14 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
               <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F0A30A', color: '#0D1117' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#4B5563] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[#4B5563] text-xs">Aucun événement planifié.</div>
+        <div className="text-center py-12 text-[#8B949E] text-xs">Aucun événement planifié.</div>
       ) : (
         <div className="space-y-2">
           {displayed.map(p => {
@@ -856,13 +856,13 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
                     <p className="text-sm font-semibold text-white">{p.titre}</p>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: t.color, background: t.bg }}>{t.label}</span>
                   </div>
-                  {p.description && <p className="text-[11px] text-[#4B5563] mt-0.5 line-clamp-1">{p.description}</p>}
-                  <p className="text-[10px] text-[#6B7280] mt-1">
+                  {p.description && <p className="text-[11px] text-[#8B949E] mt-0.5 line-clamp-1">{p.description}</p>}
+                  <p className="text-[10px] text-[#484F58] mt-1">
                     {new Date(p.date_debut + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
                     {p.date_fin && ` → ${new Date(p.date_fin + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`}
                   </p>
                 </div>
-                <button onClick={() => del(p.id)} className="text-[#6B7280] hover:text-red-400 shrink-0"><Trash2 size={12} /></button>
+                <button onClick={() => del(p.id)} className="text-[#484F58] hover:text-red-400 shrink-0"><Trash2 size={12} /></button>
               </div>
             )
           })}
@@ -945,7 +945,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
   return (
     <div className="flex gap-5">
       <div className="w-52 shrink-0 rounded-xl border border-white/[0.06] overflow-hidden h-fit" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#4B5563] uppercase tracking-wider">Étudiant</p></div>
+        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Étudiant</p></div>
         <div className="overflow-y-auto max-h-[480px]">
           {etudiants.map(e => (
             <button key={e.id} onClick={() => setSelectedId(e.id)}
@@ -958,7 +958,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
       </div>
 
       {!selectedEtu ? (
-        <div className="flex-1 flex items-center justify-center text-[#4B5563]">
+        <div className="flex-1 flex items-center justify-center text-[#8B949E]">
           <div className="text-center"><ClipboardList size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sélectionnez un étudiant</p></div>
         </div>
       ) : (
@@ -970,24 +970,24 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
           </div>
 
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
-            <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-3">Enregistrer une absence</p>
+            <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider mb-3">Enregistrer une absence</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Date *</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Date *</label>
                 <input type="date" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={form.date_absence} onChange={e => setForm(p => ({ ...p, date_absence: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Matière</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Matière</label>
                 <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" placeholder="Mathématiques…" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-[#4B5563] block mb-1">Motif</label>
+                <label className="text-[10px] text-[#8B949E] block mb-1">Motif</label>
                 <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" placeholder="Maladie…" value={form.motif} onChange={e => setForm(p => ({ ...p, motif: e.target.value }))} />
               </div>
               <div className="flex items-end pb-1">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.justifiee} onChange={e => setForm(p => ({ ...p, justifiee: e.target.checked }))} className="accent-[#F0A30A]" />
-                  <span className="text-xs text-[#4B5563]">Justifiée</span>
+                  <span className="text-xs text-[#8B949E]">Justifiée</span>
                 </label>
               </div>
             </div>
@@ -997,23 +997,23 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
           </div>
 
           {absences.length === 0 ? (
-            <div className="text-center py-8 text-[#4B5563] text-xs">Aucune absence enregistrée.</div>
+            <div className="text-center py-8 text-[#8B949E] text-xs">Aucune absence enregistrée.</div>
           ) : (
             <div className="rounded-xl border border-white/[0.06] overflow-hidden">
               <table className="w-full text-xs">
-                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut', ''].map(h => <th key={h} className="text-left px-3 py-2.5 text-[10px] text-[#4B5563]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut', ''].map(h => <th key={h} className="text-left px-3 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
                 <tbody>
                   {absences.map(a => (
                     <tr key={a.id} className="border-t border-white/[0.04]">
-                      <td className="px-3 py-2.5 text-[#4B5563]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+                      <td className="px-3 py-2.5 text-[#8B949E]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                       <td className="px-3 py-2.5 text-white">{a.matiere ?? '—'}</td>
-                      <td className="px-3 py-2.5 text-[#4B5563]">{a.motif ?? '—'}</td>
+                      <td className="px-3 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                       <td className="px-3 py-2.5">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04320' } : { color: '#F01F38', background: '#F01F3820' }}>
                           {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                         </span>
                       </td>
-                      <td className="px-3 py-2.5"><button onClick={() => delAbsence(a.id)} className="text-[#6B7280] hover:text-red-400"><Trash2 size={11} /></button></td>
+                      <td className="px-3 py-2.5"><button onClick={() => delAbsence(a.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={11} /></button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -1060,7 +1060,7 @@ export default function ScolaritePage() {
 
   if (tenantLoading || loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-[#4B5563]">
+      <div className="flex items-center justify-center h-64 text-[#8B949E]">
         <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
       </div>
     )
@@ -1071,9 +1071,9 @@ export default function ScolaritePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Scolarité</h1>
-          <p className="text-xs text-[#4B5563] mt-0.5">{nomEcole} · {etudiants.length} étudiant(s) inscrits</p>
+          <p className="text-xs text-[#8B949E] mt-0.5">{nomEcole} · {etudiants.length} étudiant(s) inscrits</p>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[#4B5563] hover:text-white transition-colors">
+        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors">
           <RefreshCw size={14} />
         </button>
       </div>

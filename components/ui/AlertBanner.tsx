@@ -65,12 +65,12 @@ export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-semibold" style={{ color: c.text }}>{a.message}</span>
                 {a.sub && (
-                  <span className="text-xs text-[#4B5563] ml-2 hidden sm:inline">{a.sub}</span>
+                  <span className="text-xs text-[#8B949E] ml-2 hidden sm:inline">{a.sub}</span>
                 )}
               </div>
               <button
                 onClick={() => setAlerts(prev => prev.filter(x => x.id !== a.id))}
-                className="text-[#6B7280] hover:text-[#4B5563] transition-colors shrink-0 p-0.5 rounded"
+                className="text-[#484F58] hover:text-[#8B949E] transition-colors shrink-0 p-0.5 rounded"
               >
                 <X size={13} />
               </button>

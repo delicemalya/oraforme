@@ -36,16 +36,16 @@ function StatCard({
   color: string; href?: string; i: number
 }) {
   const inner = (
-    <div className="p-5 bg-white border border-[#EEF2FF] rounded-xl hover:border-[#E2E8F0] transition-all group h-full">
+    <div className="p-5 bg-[#161B22] border border-[#21262D] rounded-xl hover:border-[#30363D] transition-all group h-full">
       <div className="flex items-start justify-between mb-3">
         <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${color}18` }}>
           <Icon size={16} style={{ color }} />
         </div>
-        {href && <ChevronRight size={14} className="text-[#6B7280] group-hover:text-[#4B5563] transition-colors" />}
+        {href && <ChevronRight size={14} className="text-[#484F58] group-hover:text-[#8B949E] transition-colors" />}
       </div>
-      <div className="text-2xl font-bold text-[#111827] mb-0.5">{value}</div>
-      <div className="text-xs text-[#4B5563]">{label}</div>
-      {sub && <div className="text-[10px] text-[#6B7280] mt-0.5">{sub}</div>}
+      <div className="text-2xl font-bold text-[#E6EDF3] mb-0.5">{value}</div>
+      <div className="text-xs text-[#8B949E]">{label}</div>
+      {sub && <div className="text-[10px] text-[#484F58] mt-0.5">{sub}</div>}
     </div>
   )
   return (
@@ -59,13 +59,13 @@ function QuickAction({ icon: Icon, label, href, color }: { icon: React.ElementTy
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 p-3 bg-white border border-[#EEF2FF] rounded-xl hover:border-[#E2E8F0] transition-all group"
+      className="flex items-center gap-3 p-3 bg-[#161B22] border border-[#21262D] rounded-xl hover:border-[#30363D] transition-all group"
     >
       <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
         <Icon size={15} style={{ color }} />
       </div>
-      <span className="text-sm text-[#4B5563] group-hover:text-[#111827] transition-colors truncate">{label}</span>
-      <ChevronRight size={12} className="ml-auto text-[#6B7280] shrink-0 group-hover:text-[#4B5563]" />
+      <span className="text-sm text-[#8B949E] group-hover:text-[#E6EDF3] transition-colors truncate">{label}</span>
+      <ChevronRight size={12} className="ml-auto text-[#484F58] shrink-0 group-hover:text-[#8B949E]" />
     </Link>
   )
 }
@@ -73,8 +73,8 @@ function QuickAction({ icon: Icon, label, href, color }: { icon: React.ElementTy
 function SectionTitle({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="mb-4">
-      <h2 className="text-base font-semibold text-[#111827]">{title}</h2>
-      {sub && <p className="text-xs text-[#4B5563] mt-0.5">{sub}</p>}
+      <h2 className="text-base font-semibold text-[#E6EDF3]">{title}</h2>
+      {sub && <p className="text-xs text-[#8B949E] mt-0.5">{sub}</p>}
     </div>
   )
 }
@@ -102,8 +102,8 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       {/* Header */}
       <motion.div {...fade(0)} className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">Direction Générale</h1>
-          <p className="text-sm text-[#4B5563]">{nomEcole} — vue d&apos;ensemble</p>
+          <h1 className="text-xl font-bold text-[#E6EDF3]">Direction Générale</h1>
+          <p className="text-sm text-[#8B949E]">{nomEcole} — vue d&apos;ensemble</p>
         </div>
         <div className="flex items-center gap-2">
           {k.nbNotifs > 0 && (
@@ -169,8 +169,8 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">RAF — Finances & Trésorerie</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">RAF — Finances & Trésorerie</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
 
       <div>
@@ -215,8 +215,8 @@ function ScolariteView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">Service Scolarité</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">Service Scolarité</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -253,8 +253,8 @@ function RhView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">RH & Paie</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">RH & Paie</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
@@ -290,8 +290,8 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">Mon espace Formateur</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">Mon espace Formateur</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
@@ -302,18 +302,18 @@ function FormateurView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
       {/* Progress bar heures */}
       {k.myHeuresTotales > 0 && (
-        <motion.div {...fade(4)} className="p-4 bg-white border border-[#EEF2FF] rounded-xl">
-          <div className="flex justify-between text-xs text-[#4B5563] mb-2">
+        <motion.div {...fade(4)} className="p-4 bg-[#161B22] border border-[#21262D] rounded-xl">
+          <div className="flex justify-between text-xs text-[#8B949E] mb-2">
             <span>Heures validées</span>
             <span className="text-[#2EA043] font-medium">{pctValidees}%</span>
           </div>
-          <div className="h-2 bg-[#F0F4FF] rounded-full overflow-hidden">
+          <div className="h-2 bg-[#21262D] rounded-full overflow-hidden">
             <div
               className="h-full bg-[#2EA043] rounded-full transition-all"
               style={{ width: `${pctValidees}%` }}
             />
           </div>
-          <p className="text-xs text-[#6B7280] mt-2">
+          <p className="text-xs text-[#484F58] mt-2">
             {k.myHeuresValidees}h validées / {k.myHeuresTotales}h déclarées
           </p>
         </motion.div>
@@ -341,8 +341,8 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">Mon espace Étudiant</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">Mon espace Étudiant</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -385,18 +385,18 @@ function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">Espace Parent</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">Espace Parent</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
 
-      <motion.div {...fade(1)} className="p-5 bg-white border border-[#EEF2FF] rounded-xl">
+      <motion.div {...fade(1)} className="p-5 bg-[#161B22] border border-[#21262D] rounded-xl">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-9 h-9 rounded-lg bg-[#EC4899]/15 flex items-center justify-center">
             <Activity size={16} className="text-[#EC4899]" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-[#111827]">Suivi en temps réel</div>
-            <div className="text-xs text-[#4B5563]">Consultez le dossier de votre enfant</div>
+            <div className="text-sm font-semibold text-[#E6EDF3]">Suivi en temps réel</div>
+            <div className="text-xs text-[#8B949E]">Consultez le dossier de votre enfant</div>
           </div>
         </div>
         <Link
@@ -424,8 +424,8 @@ function DtiView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">DTI — Technologies</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">DTI — Technologies</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <StatCard i={1} icon={Users}         label="Comptes actifs"     value={k.nbActifs}       color="#84CC16" />
@@ -449,8 +449,8 @@ function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 className="text-xl font-bold text-[#111827]">DAAC — Affaires Académiques</h1>
-        <p className="text-sm text-[#4B5563]">{nomEcole}</p>
+        <h1 className="text-xl font-bold text-[#E6EDF3]">DAAC — Affaires Académiques</h1>
+        <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits" value={k.nbEtudiants}    color="#EF4444" href="/dashboard/ecole/scolarite" />
