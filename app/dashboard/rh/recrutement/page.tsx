@@ -651,7 +651,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                   <a
                     href={`https://wa.me/${c.telephone.replace(/\s/g, '')}`}
                     target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2EA043]/10 border border-[#2EA043]/20 text-[#2EA043] rounded-lg text-xs font-semibold hover:bg-[#2EA043]/20 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0D2147]/10 border border-[#2EA043]/20 text-[#2EA043] rounded-lg text-xs font-semibold hover:bg-[#0D2147]/20 transition-colors"
                   >
                     <Phone size={12} /> WhatsApp
                   </a>
@@ -659,7 +659,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 <button
                   onClick={() => updateStatut(c.id, 'retenu')}
                   disabled={c.statut === 'retenu'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2EA043] text-white rounded-lg text-xs font-bold hover:bg-green-600 transition-colors disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0D2147] text-white rounded-lg text-xs font-bold hover:bg-[#071535] transition-colors disabled:opacity-40"
                 >
                   <Check size={12} /> Retenir
                 </button>
@@ -706,7 +706,7 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
           <div className="ml-auto">
             <button
               onClick={() => setConfig(c => ({ ...c, actif: !c.actif }))}
-              className={`relative w-11 h-6 rounded-full transition-colors ${config.actif ? 'bg-[#2EA043]' : 'bg-[#30363D]'}`}
+              className={`relative w-11 h-6 rounded-full transition-colors ${config.actif ? 'bg-[#0D2147]' : 'bg-[#30363D]'}`}
             >
               <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${config.actif ? 'translate-x-5.5 translate-x-[22px]' : 'translate-x-0.5'}`} />
             </button>

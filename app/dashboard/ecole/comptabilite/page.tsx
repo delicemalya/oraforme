@@ -103,9 +103,9 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total Recettes" value={fmt(totalRecettes) + ' FCFA'} color="#2EA043" />
+        <KpiCard label="Total Recettes" value={fmt(totalRecettes) + ' FCFA'} color="#0D2147" />
         <KpiCard label="Total Dépenses" value={fmt(totalDepenses) + ' FCFA'} color="#F01F38" />
-        <KpiCard label="Solde" value={fmt(Math.abs(solde)) + ' FCFA'} sub={solde >= 0 ? 'Excédent' : 'Déficit'} color={solde >= 0 ? '#2EA043' : '#F01F38'} />
+        <KpiCard label="Solde" value={fmt(Math.abs(solde)) + ' FCFA'} sub={solde >= 0 ? 'Excédent' : 'Déficit'} color={solde >= 0 ? '#0D2147' : '#F01F38'} />
       </div>
 
       <div className="flex items-center gap-2 justify-between flex-wrap">
@@ -117,7 +117,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
             </button>
           ))}
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#8B0073,#7c3aed)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#8B0073,#C0008E)', color: '#fff' }}>
           <Plus size={13} /> Saisir une écriture
         </button>
       </div>
@@ -185,13 +185,13 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
                   </td>
                   <td className="px-4 py-2.5 text-white max-w-[200px] truncate">{e.libelle}</td>
                   <td className="px-4 py-2.5">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={e.type === 'recette' ? { color: '#2EA043', background: '#2EA04318' } : { color: '#F01F38', background: '#F01F3818' }}>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={e.type === 'recette' ? { color: '#0D2147', background: '#0D214718' } : { color: '#F01F38', background: '#F01F3818' }}>
                       {e.type === 'recette' ? 'Recette' : 'Dépense'}
                     </span>
                   </td>
                   <td className="px-4 py-2.5 text-[#8B949E]">{fmt(e.montant_ht)}</td>
                   <td className="px-4 py-2.5 text-[#8B949E]">{e.tva}%</td>
-                  <td className="px-4 py-2.5 font-semibold" style={{ color: e.type === 'recette' ? '#2EA043' : '#F01F38' }}>
+                  <td className="px-4 py-2.5 font-semibold" style={{ color: e.type === 'recette' ? '#0D2147' : '#F01F38' }}>
                     {fmt(e.montant_ttc)} FCFA
                   </td>
                 </tr>
@@ -250,7 +250,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
                 <p className="text-xs font-mono font-bold text-[#8B0073]">{a.code}</p>
                 <p className="text-[10px] text-[#8B949E] truncate">{a.label}</p>
               </div>
-              <p className="text-[10px] font-bold ml-2" style={{ color: a.solde >= 0 ? '#2EA043' : '#F01F38' }}>
+              <p className="text-[10px] font-bold ml-2" style={{ color: a.solde >= 0 ? '#0D2147' : '#F01F38' }}>
                 {a.solde >= 0 ? '+' : ''}{fmt(a.solde / 1000)}k
               </p>
             </button>
@@ -270,8 +270,8 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
                 </div>
                 <div className="flex gap-3">
                   <KpiCard label="Débit"    value={fmt(account.totalDepenses) + ' FCFA'} color="#F01F38" />
-                  <KpiCard label="Crédit"   value={fmt(account.totalRecettes) + ' FCFA'} color="#2EA043" />
-                  <KpiCard label="Solde"    value={fmt(Math.abs(account.solde)) + ' FCFA'} color={account.solde >= 0 ? '#2EA043' : '#F01F38'} />
+                  <KpiCard label="Crédit"   value={fmt(account.totalRecettes) + ' FCFA'} color="#0D2147" />
+                  <KpiCard label="Solde"    value={fmt(Math.abs(account.solde)) + ' FCFA'} color={account.solde >= 0 ? '#0D2147' : '#F01F38'} />
                 </div>
               </div>
               <div className="rounded-xl border border-white/[0.06] overflow-hidden">
@@ -283,7 +283,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
                         <td className="px-4 py-2.5 text-[#8B949E]">{new Date(e.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-white">{e.libelle}</td>
                         <td className="px-4 py-2.5">{e.type === 'depense' ? <span className="text-[#F01F38] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[#484F58]">—</span>}</td>
-                        <td className="px-4 py-2.5">{e.type === 'recette' ? <span className="text-[#2EA043] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[#484F58]">—</span>}</td>
+                        <td className="px-4 py-2.5">{e.type === 'recette' ? <span className="text-[#0D2147] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[#484F58]">—</span>}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -348,15 +348,15 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total Produits"  value={fmt(recettes) + ' FCFA'}         color="#2EA043" />
+        <KpiCard label="Total Produits"  value={fmt(recettes) + ' FCFA'}         color="#0D2147" />
         <KpiCard label="Total Charges"   value={fmt(depenses) + ' FCFA'}         color="#F01F38" />
-        <KpiCard label="Résultat net"     value={fmt(Math.abs(resultat)) + ' FCFA'} sub={resultat >= 0 ? 'Bénéfice' : 'Perte'} color={resultat >= 0 ? '#2EA043' : '#F01F38'} />
+        <KpiCard label="Résultat net"     value={fmt(Math.abs(resultat)) + ' FCFA'} sub={resultat >= 0 ? 'Bénéfice' : 'Perte'} color={resultat >= 0 ? '#0D2147' : '#F01F38'} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl border border-[#2EA043]/20 overflow-hidden">
+        <div className="rounded-xl border border-[#0D2147]/20 overflow-hidden">
           <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(46,160,67,0.06)' }}>
-            <p className="text-xs font-bold text-[#2EA043] uppercase tracking-wider">Produits — Comptes 7xx</p>
+            <p className="text-xs font-bold text-[#0D2147] uppercase tracking-wider">Produits — Comptes 7xx</p>
           </div>
           <table className="w-full text-xs">
             <tbody>
@@ -366,13 +366,13 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
                   <tr key={code} className="border-b border-white/[0.04]">
                     <td className="px-4 py-2.5 font-mono text-[#8B0073]">{code}</td>
                     <td className="px-4 py-2.5 text-[#8B949E] text-[10px]">{label}</td>
-                    <td className="px-4 py-2.5 text-right font-semibold text-[#2EA043]">{fmt(amount)} FCFA</td>
+                    <td className="px-4 py-2.5 text-right font-semibold text-[#0D2147]">{fmt(amount)} FCFA</td>
                   </tr>
                 )
               })}
-              <tr className="border-t-2 border-[#2EA043]/30">
-                <td colSpan={2} className="px-4 py-2.5 text-xs font-bold text-[#2EA043]">TOTAL PRODUITS</td>
-                <td className="px-4 py-2.5 text-right font-bold text-[#2EA043]">{fmt(recettes)} FCFA</td>
+              <tr className="border-t-2 border-[#0D2147]/30">
+                <td colSpan={2} className="px-4 py-2.5 text-xs font-bold text-[#0D2147]">TOTAL PRODUITS</td>
+                <td className="px-4 py-2.5 text-right font-bold text-[#0D2147]">{fmt(recettes)} FCFA</td>
               </tr>
             </tbody>
           </table>
@@ -403,12 +403,12 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
         </div>
       </div>
 
-      <div className="rounded-xl border-2 p-4 flex items-center justify-between" style={{ borderColor: resultat >= 0 ? '#2EA043' : '#F01F38', background: resultat >= 0 ? 'rgba(46,160,67,0.05)' : 'rgba(248,81,73,0.05)' }}>
+      <div className="rounded-xl border-2 p-4 flex items-center justify-between" style={{ borderColor: resultat >= 0 ? '#0D2147' : '#F01F38', background: resultat >= 0 ? 'rgba(46,160,67,0.05)' : 'rgba(248,81,73,0.05)' }}>
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: resultat >= 0 ? '#2EA043' : '#F01F38' }}>RÉSULTAT DE L&apos;EXERCICE {annee}</p>
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: resultat >= 0 ? '#0D2147' : '#F01F38' }}>RÉSULTAT DE L&apos;EXERCICE {annee}</p>
           <p className="text-[10px] text-[#8B949E] mt-0.5">{resultat >= 0 ? 'Bénéfice — à affecter aux réserves' : 'Perte — à couvrir'}</p>
         </div>
-        <p className="text-2xl font-bold" style={{ color: resultat >= 0 ? '#2EA043' : '#F01F38' }}>
+        <p className="text-2xl font-bold" style={{ color: resultat >= 0 ? '#0D2147' : '#F01F38' }}>
           {resultat >= 0 ? '+' : '-'}{fmt(Math.abs(resultat))} FCFA
         </p>
       </div>
@@ -472,9 +472,9 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
       {/* KPIs trésorerie */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Total Entrées',  val: totalEntrees, color: '#2EA043', icon: ArrowUpCircle },
+          { label: 'Total Entrées',  val: totalEntrees, color: '#0D2147', icon: ArrowUpCircle },
           { label: 'Total Sorties',  val: totalSorties, color: '#F01F38', icon: ArrowDownCircle },
-          { label: 'Solde Net',      val: solde,        color: solde >= 0 ? '#2EA043' : '#F01F38', icon: Wallet },
+          { label: 'Solde Net',      val: solde,        color: solde >= 0 ? '#0D2147' : '#F01F38', icon: Wallet },
         ].map(k => (
           <div key={k.label} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg shrink-0" style={{ background: `${k.color}22` }}>
@@ -562,7 +562,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               <div className="flex gap-2 items-end">
                 <button onClick={() => setShowForm(false)} className="flex-1 py-2 rounded-lg bg-white/[0.04] text-white/50 text-xs hover:bg-white/[0.08] transition">Annuler</button>
                 <button onClick={add} disabled={saving || !form.montant || !form.label}
-                  className="flex-1 py-2 rounded-lg bg-[#8B0073] text-white text-xs font-medium hover:bg-[#7C3AED] disabled:opacity-40 transition flex items-center justify-center gap-1">
+                  className="flex-1 py-2 rounded-lg bg-[#8B0073] text-white text-xs font-medium hover:bg-[#8B0073] disabled:opacity-40 transition flex items-center justify-center gap-1">
                   {saving ? <Loader2 size={11} className="animate-spin" /> : <Check size={11} />} Enregistrer
                 </button>
               </div>
@@ -599,14 +599,14 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
                     <td className="px-4 py-2.5 text-white/80">{t.label || t.description || t.source || '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                        t.source === 'paiements_scolaires' ? 'bg-amber-500/10 text-amber-400'
+                        t.source === 'paiements_scolaires' ? 'bg-amber-500/10 text-[#F07900]'
                         : t.source === 'manuel' ? 'bg-white/5 text-white/30'
                         : 'bg-blue-500/10 text-blue-400'
                       }`}>
                         {t.source === 'paiements_scolaires' ? 'Scolarité' : t.source === 'manuel' ? 'Manuel' : (t.source ?? '—')}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-right font-semibold" style={{ color: isEntree ? '#2EA043' : '#F01F38' }}>
+                    <td className="px-4 py-2.5 text-right font-semibold" style={{ color: isEntree ? '#0D2147' : '#F01F38' }}>
                       {isEntree ? '+' : '-'}{fmt(t.montant)} FCFA
                     </td>
                   </tr>
@@ -711,12 +711,12 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
   const insights: { icon: React.ElementType; color: string; text: string }[] = [
     {
       icon: avgR > avgD ? TrendingUp : TrendingDown,
-      color: avgR > avgD ? '#2EA043' : '#F01F38',
+      color: avgR > avgD ? '#0D2147' : '#F01F38',
       text: `Recettes moyennes : ${fmt(Math.round(avgR))} FCFA/mois sur les derniers mois`,
     },
     {
       icon: isPositiveTrend ? CheckCircle : AlertTriangle,
-      color: isPositiveTrend ? '#2EA043' : '#F0A30A',
+      color: isPositiveTrend ? '#0D2147' : '#F0A30A',
       text: isPositiveTrend
         ? `Tendance favorable — solde projeté à ${fmt(Math.round(trend))} FCFA dans 3 mois`
         : `Attention — solde projeté déficitaire dans 3 mois : ${fmt(Math.round(Math.abs(trend)))} FCFA`,
@@ -740,7 +740,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
           <p className="text-xs text-[#8B949E]">Projection sur 3 mois basée sur l&apos;historique comptable (régression linéaire)</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: isPositiveTrend ? '#2EA043' : '#F0A30A', background: isPositiveTrend ? '#2EA04318' : '#F0A30A18' }}>
+          <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: isPositiveTrend ? '#0D2147' : '#F0A30A', background: isPositiveTrend ? '#0D214718' : '#F0A30A18' }}>
             {isPositiveTrend ? '↗ Favorable' : '↘ À surveiller'}
           </span>
         </div>
@@ -759,7 +759,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
                 <div className="flex items-end gap-0.5" style={{ height: barH }}>
                   <div
                     className="w-4 rounded-t-sm transition-all"
-                    style={{ height: rH, background: isForecast ? '#2EA04370' : '#2EA043', border: isForecast ? '1px dashed #2EA043' : 'none' }}
+                    style={{ height: rH, background: isForecast ? '#0D214770' : '#0D2147', border: isForecast ? '1px dashed #0D2147' : 'none' }}
                     title={`Recettes : ${fmt(Math.round(m.recettes))} FCFA`}
                   />
                   <div
@@ -777,7 +777,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
           })}
         </div>
         <div className="flex items-center gap-4 mt-3 border-t border-white/[0.06] pt-3">
-          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#2EA043]" /><span className="text-[10px] text-[#8B949E]">Recettes</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#0D2147]" /><span className="text-[10px] text-[#8B949E]">Recettes</span></div>
           <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#F01F38]" /><span className="text-[10px] text-[#8B949E]">Dépenses</span></div>
           <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm border border-dashed border-[#8B0073] bg-[#8B0073]/20" /><span className="text-[10px] text-[#8B949E]">Prévision</span></div>
         </div>
@@ -793,7 +793,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
                   <span className="text-[#8B949E]">Recettes</span>
-                  <span className="text-[#2EA043] font-semibold">{fmt(Math.round(m.recettes))} F</span>
+                  <span className="text-[#0D2147] font-semibold">{fmt(Math.round(m.recettes))} F</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-[#8B949E]">Dépenses</span>
@@ -801,7 +801,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
                 </div>
                 <div className="flex justify-between text-xs border-t border-white/[0.06] pt-1 mt-1">
                   <span className="text-white font-bold">Solde</span>
-                  <span className="font-bold" style={{ color: m.solde >= 0 ? '#2EA043' : '#F01F38' }}>
+                  <span className="font-bold" style={{ color: m.solde >= 0 ? '#0D2147' : '#F01F38' }}>
                     {m.solde >= 0 ? '+' : ''}{fmt(Math.round(m.solde))} F
                   </span>
                 </div>

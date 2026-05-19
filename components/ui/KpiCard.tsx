@@ -84,8 +84,8 @@ export default function KpiCard({
           <span
             className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shrink-0"
             style={{
-              color: trendUp ? '#2EA043' : '#F01F38',
-              backgroundColor: trendUp ? '#2EA04318' : '#F01F3818',
+              color: trendUp ? '#0D2147' : '#F01F38',
+              backgroundColor: trendUp ? '#0D214718' : '#F01F3818',
             }}
           >
             {trendUp ? '▲' : '▼'} {trend}

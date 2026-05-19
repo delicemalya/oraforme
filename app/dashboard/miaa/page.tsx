@@ -77,7 +77,7 @@ function MIAALogo({ size = 40 }: { size?: number }) {
         </div>
       </div>
       <div
-        className="absolute -top-0.5 -right-0.5 rounded-full bg-[#EC4899] flex items-center justify-center text-white font-bold"
+        className="absolute -top-0.5 -right-0.5 rounded-full bg-[#8B0073] flex items-center justify-center text-white font-bold"
         style={{ width: size * 0.34, height: size * 0.34, fontSize: size * 0.17 }}
       >
         +

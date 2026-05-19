@@ -212,10 +212,10 @@ export default function TransportPage() {
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 auto-rows-[120px]">
         {[
-          { label: 'Total courses', value: totalCourses, icon: Navigation, grad: 'linear-gradient(135deg,#065F46,#0D2147,#1A3570)', i: 0 },
+          { label: 'Total courses', value: totalCourses, icon: Navigation, grad: 'linear-gradient(135deg,#071535,#0D2147,#1A3570)', i: 0 },
           { label: 'Terminées', value: coursesTerminees, icon: CheckCircle, grad: 'linear-gradient(135deg,#4A0040,#8B0073,#8B0073)', i: 1 },
-          { label: "Chiffre d'affaires", value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: 'linear-gradient(135deg,#78350F,#D97706,#F59E0B)', i: 2 },
-          { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: 'linear-gradient(135deg,#4C1D95,#7C3AED,#8B0073)', i: 3 },
+          { label: "Chiffre d'affaires", value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: 'linear-gradient(135deg,#7A3800,#C06000,#F07900)', i: 2 },
+          { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: 'linear-gradient(135deg,#4A0040,#8B0073,#8B0073)', i: 3 },
         ].map(k => {
           const Icon = k.icon
           return (

@@ -581,13 +581,13 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#EC4899,#be185d)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#8B0073,#be185d)', color: '#fff' }}>
           <Megaphone size={13} /> Nouvelle annonce
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#EC4899]/30 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#8B0073]/30 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
             <div className="space-y-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
@@ -602,7 +602,7 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.titre || !form.message} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#EC4899', color: '#fff' }}>
+              <button onClick={add} disabled={saving || !form.titre || !form.message} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0073', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Megaphone size={12} />} Publier
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -621,7 +621,7 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-semibold text-white">{a.titre}</p>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#EC4899]/10 text-[#EC4899] font-bold capitalize">{a.cible}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#8B0073]/10 text-[#8B0073] font-bold capitalize">{a.cible}</span>
                   </div>
                   <p className="text-xs text-[#8B949E] leading-relaxed">{a.message}</p>
                   <p className="text-[10px] text-[#484F58] mt-2">{new Date(a.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>

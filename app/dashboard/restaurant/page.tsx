@@ -44,7 +44,7 @@ const TABS = [
 type TabKey = typeof TABS[number]['key']
 
 const MODES_PAIE: { key: ModePaie; label: string; color: string }[] = [
-  { key: 'especes', label: 'Espèces',    color: '#2EA043' },
+  { key: 'especes', label: 'Espèces',    color: '#0D2147' },
   { key: 'airtel',  label: 'Airtel Money', color: '#E53935' },
   { key: 'mtn',     label: 'MTN MoMo',   color: '#F0A30A' },
 ]
@@ -52,7 +52,7 @@ const MODES_PAIE: { key: ModePaie; label: string; color: string }[] = [
 const TABLE_COLORS: Record<string, string> = {
   libre:   '#484F58',
   occupee: '#F0A30A',
-  prete:   '#2EA043',
+  prete:   '#0D2147',
 }
 
 function fmtFCFA(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA' }
@@ -321,7 +321,7 @@ export default function RestaurantPage() {
 
   const cmdsLivrees = cmdsDuJour.filter(c => c.statut !== 'annule')
   const chartPaie = [
-    { name: 'Espèces',    val: cmdsLivrees.filter(c => ['especes', 'Espèces'].includes(c.paiement ?? '')).reduce((s, c) => s + c.total, 0), color: '#2EA043' },
+    { name: 'Espèces',    val: cmdsLivrees.filter(c => ['especes', 'Espèces'].includes(c.paiement ?? '')).reduce((s, c) => s + c.total, 0), color: '#0D2147' },
     { name: 'Airtel',     val: cmdsLivrees.filter(c => c.paiement === 'airtel').reduce((s, c) => s + c.total, 0), color: '#E53935' },
     { name: 'MTN',        val: cmdsLivrees.filter(c => c.paiement === 'mtn').reduce((s, c) => s + c.total, 0), color: '#F0A30A' },
   ].filter(x => x.val > 0)
@@ -411,8 +411,8 @@ export default function RestaurantPage() {
             {[
               { label: "CA aujourd'hui",   val: fmtFCFA(caDuJour),           color: '#F0A30A', icon: DollarSign },
               { label: 'Commandes',        val: cmdsDuJour.length,            color: '#F07900', icon: ShoppingCart },
-              { label: 'En attente/prép',  val: enPrepa,                      color: enPrepa > 0 ? '#F0A30A' : '#2EA043', icon: Clock },
-              { label: 'Plats au menu',    val: menu.filter(m=>m.disponible).length, color: '#2EA043', icon: ChefHat },
+              { label: 'En attente/prép',  val: enPrepa,                      color: enPrepa > 0 ? '#F0A30A' : '#0D2147', icon: Clock },
+              { label: 'Plats au menu',    val: menu.filter(m=>m.disponible).length, color: '#0D2147', icon: ChefHat },
             ].map(k => {
               const Icon = k.icon
               return (
@@ -585,7 +585,7 @@ export default function RestaurantPage() {
             {[
               { key: ['en_attente', 'en_preparation'] as StatutCmd[], label: 'En préparation', color: '#F07900', nextStatut: 'pret' as StatutCmd, btnLabel: 'Marquer prêt' },
               { key: ['pret'] as StatutCmd[], label: 'Prêt à servir', color: '#F0A30A', nextStatut: 'livre' as StatutCmd, btnLabel: 'Marquer livré' },
-              { key: ['livre'] as StatutCmd[], label: 'Livré', color: '#2EA043', nextStatut: null, btnLabel: '' },
+              { key: ['livre'] as StatutCmd[], label: 'Livré', color: '#0D2147', nextStatut: null, btnLabel: '' },
             ].map(col => {
               const cols = commandes.filter(c => (col.key as string[]).includes(c.statut))
               return (
@@ -677,7 +677,7 @@ export default function RestaurantPage() {
                       <td className="px-4 py-3 font-semibold text-[#F0A30A]">{fmtFCFA(item.prix)}</td>
                       <td className="px-4 py-3">
                         <button onClick={() => toggleDispo(item.id, item.disponible)}
-                          className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all ${item.disponible ? 'bg-[#10B981]/10 text-[#10B981] hover:bg-red-500/10 hover:text-red-400' : 'bg-red-500/10 text-red-400 hover:bg-[#10B981]/10 hover:text-[#10B981]'}`}>
+                          className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all ${item.disponible ? 'bg-[#1A3570]/10 text-[#1A3570] hover:bg-red-500/10 hover:text-red-400' : 'bg-red-500/10 text-red-400 hover:bg-[#1A3570]/10 hover:text-[#1A3570]'}`}>
                           {item.disponible ? '● Disponible' : '● Indisponible'}
                         </button>
                       </td>
@@ -793,7 +793,7 @@ export default function RestaurantPage() {
                     <div className="space-y-2">
                       <button onClick={() => { navigator.clipboard.writeText(tableUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
                         className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[#30363D] text-[#8B949E] hover:text-white text-xs transition-colors">
-                        {copied ? <><Check size={12} className="text-[#2EA043]" /> Copié !</> : <><Copy size={12} /> Copier lien</>}
+                        {copied ? <><Check size={12} className="text-[#0D2147]" /> Copié !</> : <><Copy size={12} /> Copier lien</>}
                       </button>
                       <a href={tableUrl} target="_blank" rel="noopener noreferrer"
                         className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[#F07900]/30 text-[#F07900] hover:bg-[#F07900]/10 text-xs transition-colors">
@@ -1097,7 +1097,7 @@ export default function RestaurantPage() {
               { label: 'CA TTC', val: fmtFCFA(caDuJour), color: '#F0A30A' },
               { label: 'CA HT', val: fmtFCFA(calculerTVACongo(caDuJour).ht), color: '#F07900' },
               { label: 'TVA collectée', val: fmtFCFA(calculerTVACongo(caDuJour).tva), color: '#8B0073' },
-              { label: 'Nb commandes', val: cmdsDuJour.length, color: '#2EA043' },
+              { label: 'Nb commandes', val: cmdsDuJour.length, color: '#0D2147' },
             ].map(k => (
               <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
                 <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-2">{k.label}</p>
@@ -1210,7 +1210,7 @@ export default function RestaurantPage() {
           <div className="relative bg-[#161B22] border border-[#30363D] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <button onClick={() => setReceipt(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
             <div className="text-center mb-5">
-              <CheckCircle size={40} className="text-[#2EA043] mx-auto mb-3" />
+              <CheckCircle size={40} className="text-[#0D2147] mx-auto mb-3" />
               <h3 className="text-base font-bold text-[#E6EDF3]">Commande enregistrée !</h3>
               <p className="text-sm text-[#8B949E] mt-1">Reçu N° <span className="text-[#F0A30A] font-bold">{receipt.numeroRecu}</span></p>
             </div>

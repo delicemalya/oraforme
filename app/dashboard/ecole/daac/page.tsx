@@ -93,7 +93,7 @@ export default function DaacPage() {
           <KpiCard label="Étudiants actifs"    value={actifs}         color="#F0A30A" />
           <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#F07900" />
           <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#8B0073" />
-          <KpiCard label="Soutenances planif." value={souPlanifie}    color="#2EA043" />
+          <KpiCard label="Soutenances planif." value={souPlanifie}    color="#0D2147" />
         </motion.div>
 
         {/* Tabs */}
@@ -103,7 +103,7 @@ export default function DaacPage() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
-                tab === t.id ? 'bg-[#EF4444] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                tab === t.id ? 'bg-[#F01F38] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
               }`}
             >
               <t.icon size={12} />

@@ -183,10 +183,10 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
       {/* KPIs hero gradient */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Effectif actif',    val: employes.filter(e=>e.statut==='actif').length,        gradient: 'linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)',  icon: Users },
+          { label: 'Effectif actif',    val: employes.filter(e=>e.statut==='actif').length,        gradient: 'linear-gradient(135deg,#071535 0%,#0D2147 50%,#1A3570 100%)',  icon: Users },
           { label: 'En congé / Malade', val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', icon: Calendar },
-          { label: 'Masse salariale',   val: `${fmt(masseBrute)} F`,                               gradient: 'linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)',   icon: TrendingUp },
-          { label: 'Charge patronale',  val: `${fmt(masseBrute * TAUX_CNSS_PATRONAL)} F`,          gradient: 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)',  icon: AlertTriangle },
+          { label: 'Masse salariale',   val: `${fmt(masseBrute)} F`,                               gradient: 'linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F07900 100%)',   icon: TrendingUp },
+          { label: 'Charge patronale',  val: `${fmt(masseBrute * TAUX_CNSS_PATRONAL)} F`,          gradient: 'linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F01F38 100%)',  icon: AlertTriangle },
         ].map(k => {
           const Icon = k.icon
           return (

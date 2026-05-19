@@ -102,7 +102,7 @@ function MIAALogo({ size = 32 }: { size?: number }) {
       </div>
       {/* Pink + badge */}
       <div
-        className="absolute -top-0.5 -right-0.5 rounded-full bg-[#EC4899] flex items-center justify-center text-white font-bold"
+        className="absolute -top-0.5 -right-0.5 rounded-full bg-[#8B0073] flex items-center justify-center text-white font-bold"
         style={{ width: size * 0.35, height: size * 0.35, fontSize: size * 0.18 }}
       >
         +
@@ -215,7 +215,7 @@ export default function AiAssistant() {
           {/* Icon */}
           <Sparkles size={22} className="text-[#0D1117] relative z-10" />
           {/* IA badge */}
-          <span className="absolute -top-1 -right-1 bg-[#EC4899] text-white font-black rounded-full flex items-center justify-center z-20" style={{ fontSize: 7, width: 16, height: 16, letterSpacing: -0.5 }}>
+          <span className="absolute -top-1 -right-1 bg-[#8B0073] text-white font-black rounded-full flex items-center justify-center z-20" style={{ fontSize: 7, width: 16, height: 16, letterSpacing: -0.5 }}>
             IA
           </span>
         </motion.button>

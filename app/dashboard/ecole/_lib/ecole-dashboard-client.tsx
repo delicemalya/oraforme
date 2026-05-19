@@ -158,7 +158,7 @@ function DirectionView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
           <QuickAction icon={CalendarCheck} label="Marquer les présences"  href="/dashboard/ecole/scolarite"                    color="#0D2147" />
           <QuickAction icon={Award}         label="Valider un diplôme"     href="/dashboard/ecole/direction"                    color="#8B0073" />
           <QuickAction icon={FileText}      label="Générer un bulletin"    href="/dashboard/ecole/scolarite"                    color="#0D2147" />
-          <QuickAction icon={Settings2}     label="Paramètres académiques" href="/dashboard/ecole/parametres-academiques"       color="#EF4444" />
+          <QuickAction icon={Settings2}     label="Paramètres académiques" href="/dashboard/ecole/parametres-academiques"       color="#F01F38" />
         </div>
       </motion.div>
     </div>
@@ -391,8 +391,8 @@ function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
 
       <motion.div {...fade(1)} className="p-5 bg-[#161B22] border border-[#21262D] rounded-xl">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-lg bg-[#EC4899]/15 flex items-center justify-center">
-            <Activity size={16} className="text-[#EC4899]" />
+          <div className="w-9 h-9 rounded-lg bg-[#8B0073]/15 flex items-center justify-center">
+            <Activity size={16} className="text-[#8B0073]" />
           </div>
           <div>
             <div className="text-sm font-semibold text-[#E6EDF3]">Suivi en temps réel</div>
@@ -401,7 +401,7 @@ function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         </div>
         <Link
           href="/dashboard/ecole/espace-parent"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#EC4899]/10 text-[#EC4899] text-sm font-medium hover:bg-[#EC4899]/15 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#8B0073]/10 text-[#8B0073] text-sm font-medium hover:bg-[#8B0073]/15 transition-colors"
         >
           Accéder à l&apos;espace parent <ChevronRight size={14} />
         </Link>
@@ -453,7 +453,7 @@ function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
         <p className="text-sm text-[#8B949E]">{nomEcole}</p>
       </motion.div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits" value={k.nbEtudiants}    color="#EF4444" href="/dashboard/ecole/scolarite" />
+        <StatCard i={1} icon={GraduationCap} label="Étudiants inscrits" value={k.nbEtudiants}    color="#F01F38" href="/dashboard/ecole/scolarite" />
         <StatCard i={2} icon={Users}         label="Enseignants"        value={k.nbEnseignants}  color="#F0A30A" href="/dashboard/ecole/rh" />
         <StatCard i={3} icon={BookOpen}      label="Examens à venir"    value={k.nbExamensAvenir}color="#F07900" href="/dashboard/ecole/scolarite" />
         <StatCard i={4} icon={Award}         label="Diplômes en attente"value="—"               color="#8B0073" href="/dashboard/ecole/direction" />
@@ -461,7 +461,7 @@ function DaacView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
       <motion.div {...fade(5)}>
         <SectionTitle title="Actions académiques" />
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-          <QuickAction icon={Award}         label="Diplômes & soutenances"  href="/dashboard/ecole/direction"                  color="#EF4444" />
+          <QuickAction icon={Award}         label="Diplômes & soutenances"  href="/dashboard/ecole/direction"                  color="#F01F38" />
           <QuickAction icon={BookOpen}      label="Programmes & sessions"   href="/dashboard/ecole/scolarite"                  color="#F07900" />
           <QuickAction icon={FileText}      label="Attestations"            href="/dashboard/ecole/scolarite"                  color="#0D2147" />
           <QuickAction icon={BarChart2}     label="Statistiques académiques" href="/dashboard/ecole/direction"                 color="#8B0073" />
@@ -481,10 +481,10 @@ const ROLE_BADGE: Record<EcoleRole, { label: string; color: string }> = {
   SCOLARITE:          { label: 'Scolarité',           color: '#0D2147' },
   RH_PAIE:            { label: 'RH & Paie',          color: '#8B0073' },
   FORMATEUR:          { label: 'Formateur',           color: '#0D2147' },
-  ETUDIANT:           { label: 'Étudiant',            color: '#EC4899' },
+  ETUDIANT:           { label: 'Étudiant',            color: '#8B0073' },
   PARENT:             { label: 'Parent',              color: '#F97316' },
   DTI:                { label: 'DTI',                 color: '#84CC16' },
-  DAAC:               { label: 'DAAC',                color: '#EF4444' },
+  DAAC:               { label: 'DAAC',                color: '#F01F38' },
 }
 
 export default function EcoleDashboardClient({

@@ -32,7 +32,7 @@ async function getEcoleRole(): Promise<{ role: string | null; email: string | nu
 
 // ── Dossier étudiant partagé ──────────────────────────────────────────────────
 
-function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
+function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0073' }: {
   etudiant: Etudiant; onBack: () => void; accentColor?: string
 }) {
   const [notes,     setNotes]     = useState<Note[]>([])
@@ -112,7 +112,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-3">
-            <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#2EA043" />
+            <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#0D2147" />
             <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
             <KpiCard label="Absences"         value={totalAbs}                            color="#F01F38" sub={`${justifiedAbs} justifiées`} />
             <KpiCard label="Alertes"          value={nbAlerts}                            color="#F0A30A" sub="non lues" />
@@ -199,9 +199,9 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
                         <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-white">{p.libelle}</td>
                         <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                        <td className="px-4 py-2.5 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
+                        <td className="px-4 py-2.5 font-semibold text-[#0D2147]">{fmt(p.montant)} FCFA</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#2EA043', background: '#2EA04318' } : { color: '#F0A30A', background: '#F0A30A18' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#0D2147', background: '#0D214718' } : { color: '#F0A30A', background: '#F0A30A18' }}>
                             {p.statut === 'paye' ? 'Payé' : 'En attente'}
                           </span>
                         </td>
@@ -228,7 +228,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#EC4899' }: {
                         <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
                         <td className="px-4 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04318' } : { color: '#F01F38', background: '#F01F3818' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#0D2147', background: '#0D214718' } : { color: '#F01F38', background: '#F01F3818' }}>
                             {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                           </span>
                         </td>
@@ -339,7 +339,7 @@ export default function EspaceParentPage() {
               </button>
             )}
           </div>
-          <DossierEtudiant etudiant={selected} onBack={() => setSelected(null)} accentColor="#EC4899" />
+          <DossierEtudiant etudiant={selected} onBack={() => setSelected(null)} accentColor="#8B0073" />
         </div>
       )
     }
@@ -365,14 +365,14 @@ export default function EspaceParentPage() {
             <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{children.length} enfant{children.length > 1 ? 's' : ''}</p>
             {children.map(etu => (
               <button key={etu.id} onClick={() => setSelected(etu)}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] hover:border-[#EC4899]/30 hover:bg-[#EC4899]/[0.04] text-left transition-all group">
+                className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] hover:border-[#8B0073]/30 hover:bg-[#8B0073]/[0.04] text-left transition-all group">
                 <Avatar nom={etu.nom} prenom={etu.prenom} photoUrl={etu.photo_url} size={44} />
                 <div className="flex-1">
                   <p className="text-sm font-bold text-white">{etu.prenom} {etu.nom}</p>
                   <p className="text-xs text-[#8B949E]">{etu.numero_id} · {etu.classe ?? NIVEAUX.find(n => n.value === etu.niveau)?.label} · {etu.annee_scolaire}</p>
                   <div className="mt-1"><StatutBadge statut={etu.statut} /></div>
                 </div>
-                <ChevronRight size={16} className="text-[#8B949E] group-hover:text-[#EC4899] transition-colors" />
+                <ChevronRight size={16} className="text-[#8B949E] group-hover:text-[#8B0073] transition-colors" />
               </button>
             ))}
           </div>
@@ -389,7 +389,7 @@ export default function EspaceParentPage() {
           <h1 className="text-xl font-bold text-white">Espace Parent</h1>
           <p className="text-xs text-[#8B949E] mt-0.5">Administration · Dossier famille</p>
         </div>
-        <DossierEtudiant etudiant={selected} onBack={() => { setSelected(null); setResults([]) }} accentColor="#EC4899" />
+        <DossierEtudiant etudiant={selected} onBack={() => { setSelected(null); setResults([]) }} accentColor="#8B0073" />
       </div>
     )
   }
@@ -401,12 +401,12 @@ export default function EspaceParentPage() {
         <p className="text-xs text-[#8B949E] mt-0.5">Recherche par téléphone, email, nom du parent ou de l&apos;enfant</p>
       </div>
 
-      <div className="rounded-xl border border-[#EC4899]/20 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
+      <div className="rounded-xl border border-[#8B0073]/20 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
             <input
-              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#EC4899]/50"
+              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#8B0073]/50"
               placeholder="Tél, email parent, nom de l'enfant…"
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -414,7 +414,7 @@ export default function EspaceParentPage() {
             />
           </div>
           <button onClick={searchByParent} disabled={searching || !search.trim()}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#EC4899', color: '#fff' }}>
+            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#8B0073', color: '#fff' }}>
             {searching ? <Loader2 className="animate-spin" size={14} /> : <Search size={14} />} Rechercher
           </button>
         </div>
@@ -439,7 +439,7 @@ export default function EspaceParentPage() {
                 </div>
               </div>
               <StatutBadge statut={e.statut} />
-              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#EC4899] transition-colors" />
+              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#8B0073] transition-colors" />
             </button>
           ))}
         </div>

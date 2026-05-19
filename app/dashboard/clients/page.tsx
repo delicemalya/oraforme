@@ -18,7 +18,7 @@ interface Client {
   created_at: string
 }
 
-const AVATAR_COLORS = ['#F0A30A', '#F07900', '#0D2147', '#8B0073', '#EC4899', '#F97316', '#0D2147', '#EF4444']
+const AVATAR_COLORS = ['#F0A30A', '#F07900', '#0D2147', '#8B0073', '#8B0073', '#F97316', '#0D2147', '#F01F38']
 function avatarColor(nom: string) { return AVATAR_COLORS[nom.charCodeAt(0) % AVATAR_COLORS.length] }
 function initials(nom: string) { return nom.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() }
 function fmtDate(d: string) { return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) }

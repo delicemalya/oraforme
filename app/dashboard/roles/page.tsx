@@ -41,7 +41,7 @@ const ECOLE_MODULES: ModuleDef[] = [
   { key: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,         color: '#0D2147' },
   { key: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA & Trésorerie',   icon: Calculator,    color: '#8B0073' },
   { key: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap, color: '#0D2147' },
-  { key: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake,color: '#EC4899' },
+  { key: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake,color: '#8B0073' },
   { key: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,           color: '#F97316' },
 ]
 
@@ -60,7 +60,7 @@ const GENERIC_MODULES: ModuleDef[] = [
 // Couleurs proposées pour les rôles
 const ROLE_COLORS = [
   '#F07900', '#0D2147', '#8B0073', '#F0A30A',
-  '#EC4899', '#0D2147', '#F97316', '#F01F38', '#84CC16',
+  '#8B0073', '#0D2147', '#F97316', '#F01F38', '#84CC16',
 ]
 
 // ── Toggle ────────────────────────────────────────────────────────────────────
@@ -212,13 +212,13 @@ export default function RolesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Shield size={20} className="text-amber-400" /> Gestion des rôles
+            <Shield size={20} className="text-[#F07900]" /> Gestion des rôles
           </h1>
           <p className="text-sm text-white/40 mt-0.5">Créez des rôles personnalisés et définissez leurs accès aux modules.</p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-amber-400 text-sm hover:bg-amber-500/30 transition"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#F07900] text-sm hover:bg-amber-500/30 transition"
         >
           <Plus size={14} /> Nouveau rôle
         </button>
@@ -238,7 +238,7 @@ export default function RolesPage() {
               className="bg-[#161B22] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md space-y-4"
             >
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Shield size={16} className="text-amber-400" />
+                <Shield size={16} className="text-[#F07900]" />
                 {editingRole ? 'Modifier le rôle' : 'Nouveau rôle'}
               </h2>
 
@@ -276,7 +276,7 @@ export default function RolesPage() {
               <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <div>
                   <p className="text-sm text-white/80 font-medium flex items-center gap-2">
-                    <TrendingUp size={14} className="text-green-400" /> Accès données financières
+                    <TrendingUp size={14} className="text-[#A8C4E4]" /> Accès données financières
                   </p>
                   <p className="text-[11px] text-white/35 mt-0.5">Direction Générale, RAF uniquement</p>
                 </div>
@@ -289,7 +289,7 @@ export default function RolesPage() {
                 </button>
                 <button
                   onClick={saveRole} disabled={!form.name.trim() || saving}
-                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-amber-400 disabled:opacity-40 transition flex items-center justify-center gap-2"
+                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#F07900] disabled:opacity-40 transition flex items-center justify-center gap-2"
                 >
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                   {editingRole ? 'Enregistrer' : 'Créer'}
@@ -332,7 +332,7 @@ export default function RolesPage() {
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-white truncate">{role.name}</div>
                   <div className="text-[10px] text-white/30 flex items-center gap-1.5">
-                    {role.is_financial && <span className="text-green-400">● Financier</span>}
+                    {role.is_financial && <span className="text-[#A8C4E4]">● Financier</span>}
                     {role.description && <span className="truncate">{role.description}</span>}
                   </div>
                 </div>
@@ -418,7 +418,7 @@ export default function RolesPage() {
                 <div className="mt-5 flex justify-end">
                   <button
                     onClick={saveRolePerms} disabled={saving}
-                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-amber-400 disabled:opacity-40 transition"
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#F07900] disabled:opacity-40 transition"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     Enregistrer les accès

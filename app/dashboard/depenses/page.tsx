@@ -25,13 +25,13 @@ const CATEGORIES = [
   { id: 'loyer',        label: '🏠 Loyer & Charges locatives',    color: '#8B0073' },
   { id: 'electricite',  label: '💡 Électricité & Eau',           color: '#F0A30A' },
   { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#F07900' },
-  { id: 'salaires',     label: '👥 Salaires & RH',               color: '#EC4899' },
+  { id: 'salaires',     label: '👥 Salaires & RH',               color: '#8B0073' },
   { id: 'fournitures',  label: '🛒 Achats & Fournitures',        color: '#0D2147' },
   { id: 'sante',        label: '🏥 Santé & Assurances',          color: '#0D2147' },
   { id: 'taxes',        label: '📊 Taxes & Impôts',              color: '#F01F38' },
   { id: 'maintenance',  label: '🔧 Maintenance & Réparations',   color: '#84CC16' },
-  { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#F59E0B' },
-  { id: 'voyages',      label: '✈️ Voyages & Déplacements',      color: '#EF4444' },
+  { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#F07900' },
+  { id: 'voyages',      label: '✈️ Voyages & Déplacements',      color: '#F01F38' },
   { id: 'autre',        label: '📦 Autre',                       color: '#484F58' },
 ]
 
@@ -182,10 +182,10 @@ export default function DepensesPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total période',       value: fmtFCFA(totalMois),   gradient: 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)', icon: TrendingDown },
-          { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: 'linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)', icon: Receipt },
+          { label: 'Total période',       value: fmtFCFA(totalMois),   gradient: 'linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F01F38 100%)', icon: TrendingDown },
+          { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: 'linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F07900 100%)', icon: Receipt },
           { label: 'Moyenne par jour',    value: fmtFCFA(moyJour),     gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', icon: Receipt },
-          { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)' : 'linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)', icon: varPct > 0 ? TrendingUp : TrendingDown },
+          { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? 'linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F01F38 100%)' : 'linear-gradient(135deg,#071535 0%,#0D2147 50%,#1A3570 100%)', icon: varPct > 0 ? TrendingUp : TrendingDown },
         ].map(k => {
           const Icon = k.icon
           return (

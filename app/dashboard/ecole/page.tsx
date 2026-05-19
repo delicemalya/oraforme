@@ -122,7 +122,7 @@ function RevenueCard({
     <motion.div {...fade(i)} whileHover={{ y: -3, scale: 1.015 }} transition={{ duration: 0.2 }}>
       <Link href="/dashboard/ecole/comptabilite" className="block">
         <div className="relative rounded-2xl p-4 sm:p-5 overflow-hidden flex flex-col justify-between"
-          style={{ background: 'linear-gradient(135deg, #065F46, #10B981)', minHeight: 156 }}>
+          style={{ background: 'linear-gradient(135deg, #071535, #1A3570)', minHeight: 156 }}>
           <div className="absolute inset-0 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse at 80% 15%, rgba(255,255,255,0.18) 0%, transparent 58%)' }} />
           <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10 pointer-events-none" />
@@ -137,7 +137,7 @@ function RevenueCard({
               {(['jour', 'semaine', 'mois'] as const).map(p => (
                 <button key={p} onClick={e => { e.preventDefault(); e.stopPropagation(); setPeriod(p) }}
                   className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
-                    period === p ? 'bg-white text-[#065F46] shadow' : 'text-white/70 hover:text-white'
+                    period === p ? 'bg-white text-[#071535] shadow' : 'text-white/70 hover:text-white'
                   }`}>
                   {p === 'jour' ? 'Jour' : p === 'semaine' ? '7j' : 'Mois'}
                 </button>
@@ -322,9 +322,9 @@ export default function EcoleOverviewPage() {
           {/* Quick stats in hero */}
           <div className="flex gap-3 flex-shrink-0 flex-wrap">
             {[
-              { label: 'Recouvrement',     value: `${recoveryRate}%`,          color: recoveryRate >= 80 ? 'text-[#10B981]' : 'text-[#F59E0B]' },
-              { label: 'Sessions actives', value: d.sessionsEnCours,           color: 'text-[#3B82F6]' },
-              { label: 'Impayés',          value: `${d.nbImpayes} dossiers`,   color: d.nbImpayes > 0 ? 'text-[#EF4444]' : 'text-[#10B981]' },
+              { label: 'Recouvrement',     value: `${recoveryRate}%`,          color: recoveryRate >= 80 ? 'text-[#1A3570]' : 'text-[#F07900]' },
+              { label: 'Sessions actives', value: d.sessionsEnCours,           color: 'text-[#8B0073]' },
+              { label: 'Impayés',          value: `${d.nbImpayes} dossiers`,   color: d.nbImpayes > 0 ? 'text-[#F01F38]' : 'text-[#1A3570]' },
             ].map(s => (
               <div key={s.label} className="bg-white/[0.07] border border-white/10 rounded-2xl px-4 py-3 text-center min-w-[110px]">
                 <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1.5">{s.label}</p>
@@ -358,7 +358,7 @@ export default function EcoleOverviewPage() {
           label="Agents"
           value={nbAgents}
           sub={`${d.nbEmployes} employés · ${d.nbStaff} staff direction`}
-          gradient="linear-gradient(135deg, #1E40AF, #3B82F6)"
+          gradient="linear-gradient(135deg, #1E40AF, #8B0073)"
           href="/dashboard/ecole/rh"
           badge="Personnel"
           badgeVariant="neutral"
@@ -396,7 +396,7 @@ export default function EcoleOverviewPage() {
           value={`${fmt(d.depensesJour)}`}
           sub={`FCFA de dépenses aujourd'hui`}
           gradient={d.depensesJour > 100000
-            ? 'linear-gradient(135deg, #991B1B, #EF4444)'
+            ? 'linear-gradient(135deg, #991B1B, #F01F38)'
             : 'linear-gradient(135deg, #374151, #6B7280)'}
           href="/dashboard/ecole/tresorerie"
           badge="Dépenses"
@@ -451,7 +451,7 @@ export default function EcoleOverviewPage() {
             <div className="flex items-baseline justify-between mb-2">
               <p className="text-5xl font-black tracking-tight text-white">{recoveryRate}%</p>
               <span className="text-[11px] font-bold" style={{
-                color: recoveryRate >= 80 ? '#10B981' : recoveryRate >= 50 ? '#F59E0B' : '#EF4444'
+                color: recoveryRate >= 80 ? '#1A3570' : recoveryRate >= 50 ? '#F07900' : '#F01F38'
               }}>
                 {recoveryRate >= 80 ? '✓ En bonne voie' : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
               </span>
@@ -459,7 +459,7 @@ export default function EcoleOverviewPage() {
             <div className="h-2 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,0.07)' }}>
               <div className="h-full rounded-full transition-all duration-700" style={{
                 width: `${recoveryRate}%`,
-                background: recoveryRate >= 80 ? 'linear-gradient(90deg,#10B981,#34D399)' : 'linear-gradient(90deg,#F59E0B,#FBBF24)',
+                background: recoveryRate >= 80 ? 'linear-gradient(90deg,#1A3570,#1A3570)' : 'linear-gradient(90deg,#F07900,#F07900)',
                 boxShadow: `0 0 10px ${recoveryRate >= 80 ? 'rgba(16,185,129,0.45)' : 'rgba(245,158,11,0.45)'}`,
               }} />
             </div>
@@ -486,10 +486,10 @@ export default function EcoleOverviewPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
           {[
             { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,   color: '#8B0073', sub: 'Journal OHADA' },
-            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,        color: '#3B82F6', sub: 'Personnel & salaires' },
+            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,        color: '#8B0073', sub: 'Personnel & salaires' },
             { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,  color: '#F97316', sub: 'Permissions' },
-            { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap,color: '#10B981', sub: 'Inscriptions & frais' },
-            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,   color: '#EF4444', sub: 'Direction & rapports' },
+            { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap,color: '#1A3570', sub: 'Inscriptions & frais' },
+            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,   color: '#F01F38', sub: 'Direction & rapports' },
           ].map(({ label, href, color, icon: Icon, sub }) => (
             <Link key={href} href={href}
               className="flex items-center gap-3 p-3.5 rounded-xl border border-[#21262D] bg-[#161B22] hover:border-[#30363D] hover:bg-[#21262D] transition-all group">
@@ -553,11 +553,11 @@ export default function EcoleOverviewPage() {
                       {new Date(p.created_at).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-[13px] font-bold text-[#10B981] font-mono">+{fmt(p.montant)} FCFA</span>
+                      <span className="text-[13px] font-bold text-[#1A3570] font-mono">+{fmt(p.montant)} FCFA</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#10B981]/10 text-[#10B981]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#1A3570]/10 text-[#1A3570]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1A3570]" />
                         {p.methode?.replace(/_/g, ' ') ?? 'Espèces'}
                       </span>
                     </td>
@@ -572,9 +572,9 @@ export default function EcoleOverviewPage() {
       {/* ── Alertes (si impayés) ─────────────────────────────────────────────── */}
       {d.nbImpayes > 0 && (
         <motion.div {...fade(10)}
-          className="rounded-2xl p-4 flex gap-3 items-start border border-[#F59E0B]/20"
+          className="rounded-2xl p-4 flex gap-3 items-start border border-[#F07900]/20"
           style={{ background: 'rgba(245,158,11,0.08)' }}>
-          <AlertTriangle size={17} className="text-[#F59E0B] shrink-0 mt-0.5" />
+          <AlertTriangle size={17} className="text-[#F07900] shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-bold text-[#E6EDF3]">Impayés en attente</p>
             <p className="text-[11px] text-white/45 mt-1">

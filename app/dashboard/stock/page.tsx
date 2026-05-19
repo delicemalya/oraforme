@@ -329,10 +329,10 @@ export default function StockPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Valeur du stock', value: fmtFCFA(valeurTotale),      gradient: 'linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)', Icon: TrendingUp },
+          { label: 'Valeur du stock', value: fmtFCFA(valeurTotale),      gradient: 'linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F07900 100%)', Icon: TrendingUp },
           { label: 'Produits',         value: products.length.toString(), gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', Icon: Package },
-          { label: 'En alerte',        value: alertes.length.toString(),  gradient: alertes.length > 0 ? 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)' : 'linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)', Icon: AlertTriangle },
-          { label: 'Fournisseurs',     value: suppliers.length.toString(),gradient: 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 50%,#8B0073 100%)', Icon: Users2 },
+          { label: 'En alerte',        value: alertes.length.toString(),  gradient: alertes.length > 0 ? 'linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F01F38 100%)' : 'linear-gradient(135deg,#071535 0%,#0D2147 50%,#1A3570 100%)', Icon: AlertTriangle },
+          { label: 'Fournisseurs',     value: suppliers.length.toString(),gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', Icon: Users2 },
         ].map(k => (
           <div key={k.label} className="relative rounded-xl p-4 overflow-hidden" style={{ background: k.gradient }}>
             <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.10) 0%, transparent 60%)' }} />

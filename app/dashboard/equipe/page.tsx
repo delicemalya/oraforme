@@ -54,7 +54,7 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
     { id: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,          color: '#0D2147' },
     { id: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA',                icon: Calculator,     color: '#8B0073' },
     { id: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap,  color: '#0D2147' },
-    { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#EC4899' },
+    { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#8B0073' },
     { id: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,            color: '#F97316' },
   ],
   restaurant: [
@@ -78,7 +78,7 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
     { id: 'tresorerie',   label: 'Trésorerie',   sublabel: '',          icon: Wallet,    color: '#8B0073' },
     { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#8B0073' },
     { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#0D2147' },
-    { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#EC4899' },
+    { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#8B0073' },
     { id: 'transport',    label: 'Transport',    sublabel: '',          icon: Truck,     color: '#F97316' },
     { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#0D2147' },
   ],
@@ -88,7 +88,7 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
 
 function RoleBadge({ role }: { role: Role }) {
   const cfg = {
-    owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+    owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-[#F07900] border-amber-500/20' },
     admin:  { label: 'Administrateur', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
     membre: { label: 'Membre',         cls: 'bg-white/5 text-white/40 border-white/10' },
   }
@@ -312,7 +312,7 @@ export default function EquipePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <UsersRound size={20} className="text-amber-400" />
+            <UsersRound size={20} className="text-[#F07900]" />
             Gestion de l'équipe
           </h1>
           <p className="text-sm text-white/40 mt-0.5">
@@ -321,7 +321,7 @@ export default function EquipePage() {
         </div>
         <button
           onClick={() => setInviteOpen(true)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-amber-400 text-sm hover:bg-amber-500/30 transition"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#F07900] text-sm hover:bg-amber-500/30 transition"
         >
           <Plus size={14} />
           Inviter un membre
@@ -346,7 +346,7 @@ export default function EquipePage() {
               className="bg-[#161B22] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md"
             >
               <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
-                <Send size={16} className="text-amber-400" />
+                <Send size={16} className="text-[#F07900]" />
                 Inviter un membre
               </h2>
 
@@ -391,7 +391,7 @@ export default function EquipePage() {
 
                 {inviteMsg && (
                   <div className={`flex items-center gap-2 text-sm rounded-lg px-3 py-2 ${
-                    inviteMsg.ok ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                    inviteMsg.ok ? 'bg-[#0D2147]/10 text-[#A8C4E4]' : 'bg-red-500/10 text-red-400'
                   }`}>
                     {inviteMsg.ok ? <Check size={14} /> : <X size={14} />}
                     {inviteMsg.text}
@@ -409,7 +409,7 @@ export default function EquipePage() {
                 <button
                   onClick={sendInvite}
                   disabled={!inviteEmail.trim() || inviting}
-                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-amber-400 disabled:opacity-40 transition flex items-center justify-center gap-2"
+                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#F07900] disabled:opacity-40 transition flex items-center justify-center gap-2"
                 >
                   {inviting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                   Envoyer
@@ -440,7 +440,7 @@ export default function EquipePage() {
                 }`}
               >
                 <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
-                  <span className="text-xs font-bold text-amber-400">
+                  <span className="text-xs font-bold text-[#F07900]">
                     {(member.prenom?.[0] ?? member.nom?.[0] ?? '?').toUpperCase()}
                   </span>
                 </div>
@@ -482,7 +482,7 @@ export default function EquipePage() {
             </div>
           ) : selected.role === 'owner' ? (
             <div className="flex flex-col items-center justify-center h-64 bg-white/[0.02] border border-white/[0.06] rounded-xl text-center">
-              <Shield size={28} className="text-amber-400/40 mb-3" />
+              <Shield size={28} className="text-[#F07900]/40 mb-3" />
               <p className="text-sm text-white/50 font-medium">
                 {selected.prenom} {selected.nom}
               </p>
@@ -497,7 +497,7 @@ export default function EquipePage() {
               <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center">
-                    <span className="text-sm font-bold text-amber-400">
+                    <span className="text-sm font-bold text-[#F07900]">
                       {(selected.prenom?.[0] ?? '?').toUpperCase()}
                     </span>
                   </div>
@@ -605,7 +605,7 @@ export default function EquipePage() {
                   <button
                     onClick={savePerms}
                     disabled={saving}
-                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-amber-400 disabled:opacity-40 transition"
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#F07900] disabled:opacity-40 transition"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     Enregistrer les permissions

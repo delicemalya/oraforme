@@ -52,7 +52,7 @@ function InsightCard({ icon: Icon, label, value, sub, color, trend }: {
   color: string; trend?: 'up' | 'down' | 'warn'
 }) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : AlertTriangle
-  const trendColor = trend === 'up' ? 'text-green-400' : trend === 'down' ? 'text-red-400' : 'text-amber-400'
+  const trendColor = trend === 'up' ? 'text-[#A8C4E4]' : trend === 'down' ? 'text-red-400' : 'text-[#F07900]'
   return (
     <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 flex items-start gap-3">
       <div className="p-2 rounded-lg shrink-0" style={{ background: `${color}22` }}>
@@ -300,12 +300,12 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
               trend={ctx.actifs > ctx.suspendus ? 'up' : 'warn'}
             />
             <InsightCard
-              icon={CreditCard} label="Revenus (année)" color="#2EA043"
+              icon={CreditCard} label="Revenus (année)" color="#0D2147"
               value={fmt(ctx.revenusAnnee)} sub="paiements scolaires"
               trend="up"
             />
             <InsightCard
-              icon={AlertTriangle} label="Taux suspension" color="#F59E0B"
+              icon={AlertTriangle} label="Taux suspension" color="#F07900"
               value={`${tauxSuspension}%`} sub={`${ctx.suspendus} élèves bloqués`}
               trend={parseFloat(tauxSuspension) > 10 ? 'warn' : 'up'}
             />
@@ -409,7 +409,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
           {/* Context status */}
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${ctx ? 'bg-green-400' : 'bg-amber-400'} animate-pulse`} />
+              <div className={`w-2 h-2 rounded-full ${ctx ? 'bg-[#1A3570]' : 'bg-[#F07900]'} animate-pulse`} />
               <span className="text-xs text-white/50">
                 {ctx ? 'Contexte actif' : 'Sans contexte'}
               </span>

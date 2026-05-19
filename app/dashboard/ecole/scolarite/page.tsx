@@ -104,7 +104,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
 
   const kpis = [
     { label: 'Total',     value: etudiants.length,                                    color: '#F07900' },
-    { label: 'Actifs',    value: etudiants.filter(e => e.statut === 'actif').length,   color: '#2EA043' },
+    { label: 'Actifs',    value: etudiants.filter(e => e.statut === 'actif').length,   color: '#0D2147' },
     { label: 'Suspendus', value: etudiants.filter(e => e.statut === 'suspendu').length,color: '#F0A30A' },
     { label: 'Diplômés',  value: etudiants.filter(e => e.statut === 'diplome').length, color: '#8B0073' },
   ]
@@ -457,7 +457,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
             </div>
             <div className="text-right">
               <p className="text-[10px] text-[#8B949E]">Total payé</p>
-              <p className="text-lg font-bold text-[#2EA043]">{fmt(totalPaye)} FCFA</p>
+              <p className="text-lg font-bold text-[#0D2147]">{fmt(totalPaye)} FCFA</p>
             </div>
           </div>
 
@@ -511,7 +511,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
                 </select>
               </div>
             </div>
-            <button onClick={addPaiement} disabled={saving || !paieForm.libelle || !paieForm.montant} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#2EA043', color: '#fff' }}>
+            <button onClick={addPaiement} disabled={saving || !paieForm.libelle || !paieForm.montant} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#0D2147', color: '#fff' }}>
               {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer le paiement
             </button>
           </div>
@@ -527,7 +527,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
                       <td className="px-3 py-2 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                       <td className="px-3 py-2 text-white">{p.libelle}</td>
                       <td className="px-3 py-2 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                      <td className="px-3 py-2 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
+                      <td className="px-3 py-2 font-semibold text-[#0D2147]">{fmt(p.montant)} FCFA</td>
                       <td className="px-3 py-2 flex items-center gap-1.5">
                         <button onClick={() => selectedEtu && printReceipt(selectedEtu, p, nomEcole)} className="text-[#484F58] hover:text-[#F07900]"><Printer size={11} /></button>
                         <button onClick={() => delPaiement(p.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={11} /></button>
@@ -793,7 +793,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
         <KpiCard label="Total événements" value={planning.length} color="#F07900" />
-        <KpiCard label="À venir" value={planning.filter(p => p.date_debut >= today).length} color="#2EA043" />
+        <KpiCard label="À venir" value={planning.filter(p => p.date_debut >= today).length} color="#0D2147" />
         <KpiCard label="Examens" value={planning.filter(p => p.type === 'examen').length} color="#F01F38" />
       </div>
 
@@ -965,7 +965,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
         <div className="flex-1 min-w-0 space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <KpiCard label="Total absences"  value={totalAbs}            color="#F07900" />
-            <KpiCard label="Justifiées"      value={justified}           color="#2EA043" />
+            <KpiCard label="Justifiées"      value={justified}           color="#0D2147" />
             <KpiCard label="Non justifiées"  value={totalAbs - justified} color="#F01F38" />
           </div>
 
@@ -1009,7 +1009,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
                       <td className="px-3 py-2.5 text-white">{a.matiere ?? '—'}</td>
                       <td className="px-3 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
                       <td className="px-3 py-2.5">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#2EA043', background: '#2EA04320' } : { color: '#F01F38', background: '#F01F3820' }}>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#0D2147', background: '#0D214720' } : { color: '#F01F38', background: '#F01F3820' }}>
                           {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                         </span>
                       </td>

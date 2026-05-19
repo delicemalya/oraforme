@@ -49,9 +49,9 @@ const T1 = '#F0F4FF'
 const T2 = '#8E9AB8'
 const T3 = '#4A5572'
 const GREEN  = '#0D2147'
-const RED    = '#EF4444'
+const RED    = '#F01F38'
 const BLUE   = '#8B0073'
-const PURPLE = '#A855F7'
+const PURPLE = '#8B0073'
 
 const fmtN   = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
 const fmtD   = (d: string | null | undefined) =>

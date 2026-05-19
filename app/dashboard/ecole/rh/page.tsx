@@ -1742,7 +1742,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
         {toast && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-            style={{ background: toast.ok ? 'linear-gradient(135deg,#065F46,#0D2147)' : 'linear-gradient(135deg,#7f1d1d,#dc2626)' }}>
+            style={{ background: toast.ok ? 'linear-gradient(135deg,#071535,#0D2147)' : 'linear-gradient(135deg,#7f1d1d,#dc2626)' }}>
             {toast.ok ? <Check size={14} /> : <AlertCircle size={14} />} {toast.msg}
           </motion.div>
         )}
@@ -2014,7 +2014,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
                   )}
                   {h.statut === 'validated' && (
                     <button onClick={() => marquerPaye(h)} disabled={saving === h.id}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)', color: '#fff' }}>
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#071535,#0D2147)', color: '#fff' }}>
                       {saving === h.id ? <Loader2 size={10} className="animate-spin" /> : <DollarSign size={10} />} Payer
                     </button>
                   )}
@@ -2028,7 +2028,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
       {toast && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-          style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)' }}>
+          style={{ background: 'linear-gradient(135deg,#071535,#0D2147)' }}>
           <Check size={14} /> {toast}
         </motion.div>
       )}

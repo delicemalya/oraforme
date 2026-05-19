@@ -3,7 +3,8 @@
 * { box-sizing: border-box; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   BASE — Thème sombre permanent (couleurs de marque)
+   BASE — Thème sombre permanent · Palette marque Oraforme
+   Rouge #F01F38 · Orange #F07900 · Violet #8B0073 · Navy #0D2147
 ════════════════════════════════════════════════════════════════════════════ */
 
 body {
@@ -15,9 +16,15 @@ body {
 #dashboard-shell { background: #0D1117; }
 #main-content    { background: #0D1117; color: #E6EDF3; }
 
-/* Inputs / Selects / Textareas */
+/* ── Typographie globale ── */
+h1, h2, h3, h4, h5, h6 { color: #E6EDF3; }
+p { color: #E6EDF3; }
+label { color: #8B949E; }
+a { color: inherit; }
+
+/* ── Inputs ── */
 input, textarea, select {
-  background-color: #21262D;
+  background-color: #161B22;
   border-color: #30363D;
   color: #E6EDF3;
 }
@@ -26,47 +33,70 @@ select option { background-color: #21262D; color: #E6EDF3; }
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: #8B0073;
-  box-shadow: 0 0 0 2px rgba(139,0,115,0.25);
+  box-shadow: 0 0 0 2px rgba(139,0,115,0.22);
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
   -webkit-text-fill-color: #E6EDF3;
-  -webkit-box-shadow: 0 0 0 1000px #21262D inset;
+  -webkit-box-shadow: 0 0 0 1000px #161B22 inset;
   caret-color: #E6EDF3;
 }
 
-/* Sélection */
-::selection { background: #8B007344; color: #FFFFFF; }
+/* ── Sélection ── */
+::selection { background: rgba(139,0,115,0.35); color: #FFFFFF; }
 
-/* Scrollbar */
+/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #161B22; }
+::-webkit-scrollbar-track { background: #0D1117; }
 ::-webkit-scrollbar-thumb { background: #30363D; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #8B0073; }
 
-/* Ombres */
-#main-content .shadow-xl  { box-shadow: 0 2px 16px rgba(0,0,0,0.4); }
-#main-content .shadow-2xl { box-shadow: 0 4px 32px rgba(0,0,0,0.5); }
+/* ── Ombres ── */
+.shadow-xl  { box-shadow: 0 2px 16px rgba(0,0,0,0.5) !important; }
+.shadow-2xl { box-shadow: 0 4px 32px rgba(0,0,0,0.6) !important; }
 
-/* Header blanc (src encore blanc) → fond sombre */
-header { background-color: #161B22 !important; border-color: #30363D !important; }
-header .bg-white { background-color: #21262D !important; }
-header .border-\[#E2E8F0\] { border-color: #30363D !important; }
-header .text-\[#111827\] { color: #E6EDF3 !important; }
-header .text-\[#4B5563\] { color: #8B949E !important; }
-header .text-\[#6B7280\] { color: #8B949E !important; }
-header .text-\[#9CA3AF\] { color: #484F58 !important; }
-header .hover\:bg-\[#F0F4FF\]:hover { background-color: #21262D !important; }
-header .hover\:text-\[#4B5563\]:hover { color: #E6EDF3 !important; }
-header input { background-color: #0D1117 !important; border-color: #30363D !important; color: #E6EDF3 !important; }
+/* ══════════════════════════════════════════════════════════════════════════
+   HEADER — force fond sombre (source encore partiellement blanc)
+══════════════════════════════════════════════════════════════════════════ */
+header {
+  background-color: #161B22 !important;
+  border-color: #30363D !important;
+}
+header * { color: #E6EDF3; }
+header .bg-white,
+header [class*="bg-white"] { background-color: #21262D !important; }
+header input,
+header textarea { background-color: #0D1117 !important; border-color: #30363D !important; color: #E6EDF3 !important; }
 header input::placeholder { color: #484F58 !important; }
-
-/* Dropdowns du header */
-header .absolute.bg-white,
-header .absolute.bg-white.border { background-color: #1C2128 !important; border-color: #30363D !important; }
-header .absolute .text-\[#4B5563\] { color: #8B949E !important; }
-header .absolute .text-\[#111827\] { color: #E6EDF3 !important; }
+header .absolute { background-color: #1C2128 !important; border-color: #30363D !important; }
+header .absolute * { color: #E6EDF3 !important; }
 header .absolute .hover\:bg-\[#F0F4FF\]:hover { background-color: #21262D !important; }
-header .absolute .hover\:text-\[#111827\]:hover { color: #E6EDF3 !important; }
-header .absolute .border-\[#EEF2FF\] { border-color: #30363D !important; }
+/* logo/badge accents keep their brand color */
+header [style*="#8B0073"],
+header [style*="#F0A30A"],
+header [style*="#F01F38"],
+header [style*="#F07900"] { color: inherit !important; }
+header .text-\[#F0A30A\] { color: #F0A30A !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COULEURS TAILWIND — overrides pour garantir texte blanc partout
+══════════════════════════════════════════════════════════════════════════ */
+
+/* Empêche les classes gray/neutral Tailwind de mettre du texte sombre */
+.text-gray-900, .text-gray-800, .text-gray-700 { color: #E6EDF3 !important; }
+.text-gray-600, .text-gray-500 { color: #8B949E !important; }
+.text-gray-400, .text-gray-300 { color: #484F58 !important; }
+.text-neutral-900, .text-neutral-800 { color: #E6EDF3 !important; }
+.text-neutral-600, .text-neutral-500 { color: #8B949E !important; }
+.text-black { color: #E6EDF3 !important; }
+
+/* bg-white et variantes → carte sombre */
+#main-content .bg-white { background-color: #161B22 !important; }
+#main-content [class*="bg-white/"] { /* keep opacity */ }
+#main-content .bg-gray-50,
+#main-content .bg-gray-100 { background-color: #161B22 !important; }
+
+/* Borders grises → border sombre */
+#main-content .border-gray-200,
+#main-content .border-gray-100 { border-color: #30363D !important; }

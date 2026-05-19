@@ -793,7 +793,7 @@ export default function TresoreriePage() {
             {/* Encaissements ce mois */}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
               className="relative rounded-2xl p-4 overflow-hidden"
-              style={{ background: 'linear-gradient(135deg,#0a2318 0%,#0e3320 50%,#166534 100%)' }}>
+              style={{ background: 'linear-gradient(135deg,#071535 0%,#0D2147 60%,#1A3570 100%)' }}>
               <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
               <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
                 <TrendingUp size={14} className="text-white" />
@@ -806,7 +806,7 @@ export default function TresoreriePage() {
             {/* Décaissements ce mois */}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
               className="relative rounded-2xl p-4 overflow-hidden"
-              style={{ background: 'linear-gradient(135deg,#2d0a0a 0%,#4a1010 50%,#7f1d1d 100%)' }}>
+              style={{ background: 'linear-gradient(135deg,#7A0000 0%,#C5001E 60%,#F01F38 100%)' }}>
               <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
               <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
                 <TrendingDown size={14} className="text-white" />
@@ -819,7 +819,7 @@ export default function TresoreriePage() {
             {/* Solde net */}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
               className="relative rounded-2xl p-4 overflow-hidden"
-              style={{ background: soldeGlobal >= 0 ? 'linear-gradient(135deg,#0e1a10 0%,#1a3020 50%,#0D2147 100%)' : 'linear-gradient(135deg,#1a0d0d 0%,#2d0a0a 50%,#7f1d1d 100%)' }}>
+              style={{ background: soldeGlobal >= 0 ? 'linear-gradient(135deg,#071535 0%,#0D2147 60%,#1A3570 100%)' : 'linear-gradient(135deg,#7A0000 0%,#C5001E 60%,#F01F38 100%)' }}>
               <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
               <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
                 <Wallet size={14} className="text-white" />
@@ -1309,7 +1309,7 @@ export default function TresoreriePage() {
           {caisseTab === 'apercu' && selectedCaisse && caisses.length > 0 && (
             <div className="space-y-4">
               <div className="relative rounded-2xl p-6 overflow-hidden"
-                style={{ background: 'linear-gradient(135deg,#1a1200 0%,#2a1e00 50%,#3d2c00 100%)' }}>
+                style={{ background: 'linear-gradient(135deg,#7A3800 0%,#C06000 60%,#F07900 100%)' }}>
                 <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(240,163,10,0.15) 0%,transparent 60%)' }} />
                 <div className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-[#F0A30A]/20 flex items-center justify-center">
                   <Archive size={18} className="text-[#F0A30A]" />

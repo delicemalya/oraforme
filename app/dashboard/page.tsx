@@ -14,7 +14,7 @@ const MODULE_LABELS: Record<string, string> = {
 
 const MODULE_COLORS = [
   '#F0A30A', '#F07900', '#0D2147', '#8B0073',
-  '#EC4899', '#0D2147', '#F59E0B', '#EF4444', '#84CC16', '#F97316',
+  '#8B0073', '#0D2147', '#F07900', '#F01F38', '#84CC16', '#F97316',
 ]
 
 export default async function DashboardPage() {

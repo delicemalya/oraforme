@@ -233,7 +233,7 @@ export default function RapportsPage() {
       {/* Header */}
       <motion.div {...fadeUp(0)} className="flex items-center justify-between pt-1 flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#071535,#0D2147)' }}>
             <BarChart2 size={18} className="text-white" />
           </div>
           <div>
@@ -279,14 +279,14 @@ export default function RapportsPage() {
             <div className="space-y-5">
               <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
                 <KpiCard i={1} label="Recettes totales"   value={fmtFCFA(data.totalEntrees)} sub="Encaissements exercice"
-                  color="linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)" icon={TrendingUp} trend={marge > 0 ? marge : undefined} />
+                  color="linear-gradient(135deg,#071535 0%,#0D2147 50%,#1A3570 100%)" icon={TrendingUp} trend={marge > 0 ? marge : undefined} />
                 <KpiCard i={2} label="Charges totales"    value={fmtFCFA(totalCharges)}       sub="Toutes dépenses"
-                  color="linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)"  icon={TrendingDown} />
+                  color="linear-gradient(135deg,#7A0000 0%,#A00018 50%,#F01F38 100%)"  icon={TrendingDown} />
                 <KpiCard i={3} label="Résultat net"       value={fmtFCFA(resultatNet)}        sub={`Marge ${marge}%`}
-                  color={resultatNet >= 0 ? 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)' : 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 50%,#8B0073 100%)'}
+                  color={resultatNet >= 0 ? 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)' : 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)'}
                   icon={resultatNet >= 0 ? ArrowUpRight : ArrowDownRight} trend={marge} />
                 <KpiCard i={4} label="Taux de paiement"  value={`${txPaiement}%`}            sub={`${data.nbFacturesPayees}/${data.nbFactures} factures`}
-                  color="linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)"  icon={CheckCircle} />
+                  color="linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F07900 100%)"  icon={CheckCircle} />
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -647,7 +647,7 @@ export default function RapportsPage() {
               <div className="relative">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#78350F,#D97706)' }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#7A3800,#C06000)' }}>
                       <Sparkles size={16} className="text-white" />
                     </div>
                     <div>

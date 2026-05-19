@@ -79,7 +79,7 @@ function Toast({ msg, onClose }: { msg: string; onClose: () => void }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-      style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)' }}>
+      style={{ background: 'linear-gradient(135deg,#071535,#0D2147)' }}>
       <CheckCircle size={15} />{msg}
     </motion.div>
   )
@@ -253,7 +253,7 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
     { label: 'Heures payées',    value: payeeHeures,   color: '#0D2147', sub: `sur ${totalHeures}h total` },
     { label: 'Cours publiés',    value: nbCours,       color: '#8B0073', sub: 'cours numériques' },
     { label: 'Devoirs actifs',   value: nbDevoirs,     color: '#F0A30A', sub: 'en cours' },
-    { label: 'Net cumulé',       value: `${fmt(totalNet)} FCFA`, color: '#EC4899', sub: 'tous bulletins' },
+    { label: 'Net cumulé',       value: `${fmt(totalNet)} FCFA`, color: '#8B0073', sub: 'tous bulletins' },
   ]
 
   const pending = heures.filter(h => h.statut === 'declare')
@@ -451,7 +451,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-bold text-white">Devoirs ({devoirs.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#78350F,#D97706)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#7A3800,#C06000)', color: '#fff' }}>
           <Plus size={12} /> Nouveau devoir
         </button>
       </div>
@@ -482,7 +482,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] hover:text-white border border-white/[0.06]">Annuler</button>
-              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#78350F,#D97706)', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#7A3800,#C06000)', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
             </div>
@@ -497,7 +497,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
           </div>
         ) : devoirs.map(d => (
           <motion.div key={d.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] hover:border-white/10 group" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: d.statut === 'ouvert' ? 'linear-gradient(135deg,#78350F,#D97706)' : 'rgba(255,255,255,0.06)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: d.statut === 'ouvert' ? 'linear-gradient(135deg,#7A3800,#C06000)' : 'rgba(255,255,255,0.06)' }}>
               <ClipboardList size={14} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -619,7 +619,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-bold text-white">Examens ({exams.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#4C1D95,#7C3AED)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0073)', color: '#fff' }}>
           <Plus size={12} /> Nouvel examen
         </button>
       </div>
@@ -653,7 +653,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             <FI label="Date de l'examen" value={form.date_exam} onChange={v => setForm(p => ({ ...p, date_exam: v }))} type="date" />
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
-              <button onClick={save} disabled={saving || !form.nom.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#4C1D95,#7C3AED)', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.nom.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0073)', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
             </div>
@@ -668,7 +668,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
           </div>
         ) : exams.map(ex => (
           <motion.div key={ex.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] hover:border-white/10 group cursor-pointer" style={{ background: 'rgba(255,255,255,0.02)' }} onClick={() => openGrades(ex)}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg,#4C1D95,#7C3AED)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0073)' }}>
               <GraduationCap size={14} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -746,7 +746,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
 
       <div className="flex items-center justify-between">
         <p className="text-sm font-bold text-white">Historique ({heures.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#071535,#0D2147)', color: '#fff' }}>
           <Plus size={12} /> Déclarer heures
         </button>
       </div>
@@ -766,7 +766,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
-              <button onClick={save} disabled={saving || !form.heures || !form.date_declaration} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.heures || !form.date_declaration} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#071535,#0D2147)', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Déclarer
               </button>
             </div>
@@ -826,7 +826,7 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
           </div>
         ) : bulletins.map(b => (
           <motion.div key={b.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: b.statut === 'payee' ? 'linear-gradient(135deg,#065F46,#0D2147)' : 'rgba(255,255,255,0.06)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: b.statut === 'payee' ? 'linear-gradient(135deg,#071535,#0D2147)' : 'rgba(255,255,255,0.06)' }}>
               <DollarSign size={14} className="text-white" />
             </div>
             <div className="flex-1">
