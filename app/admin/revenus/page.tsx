@@ -64,7 +64,7 @@ export default async function AdminRevenusPage() {
         {[
           { label: 'MRR', value: fmtFCFA(totalMRR), sub: 'Revenus récurrents mensuels', color: '#F01F38' },
           { label: 'ARR', value: fmtFCFA(totalARR), sub: 'Revenus annuels récurrents', color: '#F0A30A' },
-          { label: 'CA Clients', value: fmtFCFA(caClients), sub: 'Facturé par les clients', color: '#2EA043' },
+          { label: 'CA Clients', value: fmtFCFA(caClients), sub: 'Facturé par les clients', color: '#0D2147' },
           { label: 'ARPU', value: fmtFCFA(tenants.length > 0 ? totalMRR / tenants.length : 0), sub: 'Revenu moyen/client/mois', color: '#F07900' },
         ].map(k => (
           <div key={k.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">

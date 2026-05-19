@@ -233,7 +233,7 @@ export default function RapportsPage() {
       {/* Header */}
       <motion.div {...fadeUp(0)} className="flex items-center justify-between pt-1 flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#065F46,#059669)' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)' }}>
             <BarChart2 size={18} className="text-white" />
           </div>
           <div>
@@ -259,7 +259,7 @@ export default function RapportsPage() {
           return (
             <button key={i} onClick={() => setTab(i)}
               className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === i ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                tab === i ? 'bg-[#0D2147]/10 text-[#0D2147]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
               }`}>
               <Icon size={11} />{t}
             </button>
@@ -279,11 +279,11 @@ export default function RapportsPage() {
             <div className="space-y-5">
               <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
                 <KpiCard i={1} label="Recettes totales"   value={fmtFCFA(data.totalEntrees)} sub="Encaissements exercice"
-                  color="linear-gradient(135deg,#065F46 0%,#059669 50%,#10B981 100%)" icon={TrendingUp} trend={marge > 0 ? marge : undefined} />
+                  color="linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)" icon={TrendingUp} trend={marge > 0 ? marge : undefined} />
                 <KpiCard i={2} label="Charges totales"    value={fmtFCFA(totalCharges)}       sub="Toutes dépenses"
                   color="linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)"  icon={TrendingDown} />
                 <KpiCard i={3} label="Résultat net"       value={fmtFCFA(resultatNet)}        sub={`Marge ${marge}%`}
-                  color={resultatNet >= 0 ? 'linear-gradient(135deg,#1E3A5F 0%,#1D4ED8 50%,#3B82F6 100%)' : 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 50%,#8B0073 100%)'}
+                  color={resultatNet >= 0 ? 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)' : 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 50%,#8B0073 100%)'}
                   icon={resultatNet >= 0 ? ArrowUpRight : ArrowDownRight} trend={marge} />
                 <KpiCard i={4} label="Taux de paiement"  value={`${txPaiement}%`}            sub={`${data.nbFacturesPayees}/${data.nbFactures} factures`}
                   color="linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)"  icon={CheckCircle} />
@@ -296,7 +296,7 @@ export default function RapportsPage() {
                   </h2>
                   <div className="space-y-3">
                     {[
-                      { label: 'Recettes brutes',     val: totalProduits,       color: '#2EA043', pct: 100 },
+                      { label: 'Recettes brutes',     val: totalProduits,       color: '#0D2147', pct: 100 },
                       { label: 'Achats & stock',       val: data.achatsTotal,    color: '#F01F38', pct: totalProduits > 0 ? (data.achatsTotal / totalProduits) * 100 : 0 },
                       { label: 'Masse salariale',      val: data.salairesTotal,  color: '#8B0073', pct: totalProduits > 0 ? (data.salairesTotal / totalProduits) * 100 : 0 },
                       { label: 'Charges locatives',    val: data.loyerTotal,     color: '#F97316', pct: totalProduits > 0 ? (data.loyerTotal / totalProduits) * 100 : 0 },
@@ -316,9 +316,9 @@ export default function RapportsPage() {
                   </div>
                   <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[#21262D]">
                     {[
-                      { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#2EA043' : '#F0A30A' },
+                      { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#0D2147' : '#F0A30A' },
                       { label: 'Employés', val: data.nbEmployes.toString(), color: '#F07900' },
-                      { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#2EA043' : marge >= 10 ? '#F0A30A' : '#F01F38' },
+                      { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#0D2147' : marge >= 10 ? '#F0A30A' : '#F01F38' },
                     ].map(s => (
                       <div key={s.label} className="bg-[#0D1117] border border-[#21262D] rounded-xl p-3 text-center">
                         <p className="text-[10px] text-[#484F58] mb-1 uppercase tracking-wide">{s.label}</p>
@@ -331,7 +331,7 @@ export default function RapportsPage() {
                 <div className="space-y-4">
                   <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#1E3A5F,#1D4ED8)' }}>
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0073)' }}>
                         <Users size={14} className="text-white" />
                       </div>
                       <p className="text-sm font-bold text-[#E6EDF3]">Ressources Humaines</p>
@@ -407,13 +407,13 @@ export default function RapportsPage() {
                 <Section
                   title="PRODUITS D'EXPLOITATION"
                   rows={[
-                    { label: '707 — Ventes factures',          value: data.ventesFactures,   color: '#2EA043' },
-                    { label: '706 — Prestations de services',  value: data.prestations,       color: '#2EA043' },
-                    { label: '708/709 — Autres produits',      value: data.autresProduits,    color: '#2EA043' },
+                    { label: '707 — Ventes factures',          value: data.ventesFactures,   color: '#0D2147' },
+                    { label: '706 — Prestations de services',  value: data.prestations,       color: '#0D2147' },
+                    { label: '708/709 — Autres produits',      value: data.autresProduits,    color: '#0D2147' },
                   ]}
                   total={totalProduits}
                   totalLabel="TOTAL PRODUITS"
-                  totalColor="#2EA043"
+                  totalColor="#0D2147"
                 />
                 <Section
                   title="CHARGES D'EXPLOITATION"
@@ -433,26 +433,26 @@ export default function RapportsPage() {
               </div>
 
               {/* Résultat net */}
-              <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#2EA043]/40 bg-[#2EA043]/5' : 'border-[#F01F38]/40 bg-[#F01F38]/5'}`}>
+              <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#0D2147]/40 bg-[#0D2147]/5' : 'border-[#F01F38]/40 bg-[#F01F38]/5'}`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-[#8B949E]">
                       {resultatNet >= 0 ? 'BÉNÉFICE NET' : 'PERTE NETTE'} — EXERCICE {data.annee}
                     </p>
-                    <p className="text-3xl font-bold mt-1" style={{ color: resultatNet >= 0 ? '#2EA043' : '#F01F38' }}>
+                    <p className="text-3xl font-bold mt-1" style={{ color: resultatNet >= 0 ? '#0D2147' : '#F01F38' }}>
                       {fmtFCFA(Math.abs(resultatNet))}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-[#484F58]">Marge nette</p>
-                    <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#2EA043' : marge >= 10 ? '#F0A30A' : '#F01F38' }}>
+                    <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#0D2147' : marge >= 10 ? '#F0A30A' : '#F01F38' }}>
                       {marge}%
                     </p>
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {[
-                    { label: 'Produits', value: fmtFCFA(totalProduits), color: '#2EA043' },
+                    { label: 'Produits', value: fmtFCFA(totalProduits), color: '#0D2147' },
                     { label: 'Charges',  value: fmtFCFA(totalCharges),  color: '#F01F38' },
                     { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#F07900' : '#F01F38' },
                   ].map(r => (
@@ -486,7 +486,7 @@ export default function RapportsPage() {
                     title="CAPITAUX PROPRES"
                     rows={[
                       { label: 'Report à nouveau (N-1)',  value: data.openingBalance,  color: '#8B0073' },
-                      { label: 'Résultat de l\'exercice', value: resultatNet,           color: resultatNet >= 0 ? '#2EA043' : '#F01F38' },
+                      { label: 'Résultat de l\'exercice', value: resultatNet,           color: resultatNet >= 0 ? '#0D2147' : '#F01F38' },
                     ]}
                     total={data.openingBalance + resultatNet}
                     totalLabel="TOTAL CAPITAUX PROPRES"
@@ -532,7 +532,7 @@ export default function RapportsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
                   { label: 'Solde ouverture', value: data.openingBalance,    color: '#8B0073', icon: Wallet },
-                  { label: 'Variation nette', value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#2EA043' : '#F01F38', icon: Activity },
+                  { label: 'Variation nette', value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#0D2147' : '#F01F38', icon: Activity },
                   { label: 'Solde clôture',  value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#F07900' : '#F01F38', icon: Wallet },
                 ].map((k, i) => (
                   <motion.div key={k.label} {...fadeUp(i)} className="bg-[#161B22] border border-[#30363D] rounded-xl p-5 flex items-center gap-4">
@@ -550,14 +550,14 @@ export default function RapportsPage() {
               <Section
                 title="FLUX D'EXPLOITATION"
                 rows={[
-                  { label: 'Encaissements clients',          value: data.totalEntrees,   color: '#2EA043' },
+                  { label: 'Encaissements clients',          value: data.totalEntrees,   color: '#0D2147' },
                   { label: 'Décaissements fournisseurs',     value: -data.achatsTotal,   color: '#F01F38' },
                   { label: 'Décaissements salaires & CNSS',  value: -(data.salairesTotal + data.cnssTotal), color: '#F01F38' },
                   { label: 'Décaissements charges diverses', value: -(data.loyerTotal + data.carburantTotal + data.taxesTotal + data.autresCharges), color: '#F01F38' },
                 ]}
                 total={data.totalEntrees - data.totalSorties}
                 totalLabel="FLUX NET D'EXPLOITATION"
-                totalColor={(data.totalEntrees - data.totalSorties) >= 0 ? '#2EA043' : '#F01F38'}
+                totalColor={(data.totalEntrees - data.totalSorties) >= 0 ? '#0D2147' : '#F01F38'}
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

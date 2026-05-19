@@ -51,36 +51,36 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
   ecole: [
     { id: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,     color: '#F0A30A' },
     { id: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,      color: '#F07900' },
-    { id: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,          color: '#2EA043' },
+    { id: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,          color: '#0D2147' },
     { id: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA',                icon: Calculator,     color: '#8B0073' },
-    { id: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap,  color: '#06B6D4' },
+    { id: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap,  color: '#0D2147' },
     { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#EC4899' },
     { id: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,            color: '#F97316' },
   ],
   restaurant: [
     { id: 'pos',        label: 'Caisse POS',  sublabel: 'Ventes',     icon: ChefHat,   color: '#F0A30A' },
-    { id: 'stock',      label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#2EA043' },
+    { id: 'stock',      label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0D2147' },
     { id: 'rh',         label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F07900' },
     { id: 'tresorerie', label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0073' },
     { id: 'miaa',       label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F97316' },
   ],
   commerce: [
     { id: 'facturation', label: 'Facturation', sublabel: 'Devis',      icon: FileText,  color: '#F0A30A' },
-    { id: 'stock',       label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#2EA043' },
+    { id: 'stock',       label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0D2147' },
     { id: 'rh',          label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F07900' },
     { id: 'tresorerie',  label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0073' },
     { id: 'miaa',        label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F97316' },
   ],
   default: [
     { id: 'facturation',  label: 'Facturation',  sublabel: '',          icon: FileText,  color: '#F0A30A' },
-    { id: 'stock',        label: 'Stock',        sublabel: '',          icon: Package,   color: '#2EA043' },
+    { id: 'stock',        label: 'Stock',        sublabel: '',          icon: Package,   color: '#0D2147' },
     { id: 'rh',           label: 'RH',           sublabel: '',          icon: Users,     color: '#F07900' },
     { id: 'tresorerie',   label: 'Trésorerie',   sublabel: '',          icon: Wallet,    color: '#8B0073' },
     { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#8B0073' },
-    { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#06B6D4' },
+    { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#0D2147' },
     { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#EC4899' },
     { id: 'transport',    label: 'Transport',    sublabel: '',          icon: Truck,     color: '#F97316' },
-    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#06B6D4' },
+    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#0D2147' },
   ],
 }
 
@@ -108,7 +108,7 @@ function Toggle({ checked, onChange, disabled }: {
       onClick={() => !disabled && onChange(!checked)}
       disabled={disabled}
       className={`relative w-8 h-4 rounded-full transition-colors ${
-        checked ? 'bg-[#2EA043]' : 'bg-white/10'
+        checked ? 'bg-[#0D2147]' : 'bg-white/10'
       } ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
     >
       <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${

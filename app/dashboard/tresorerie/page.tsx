@@ -105,7 +105,7 @@ const CATS_SORTIE = [
 ]
 
 const MODES = [
-  { value: 'especes',      label: 'Espèces',      icon: Banknote,   color: '#2EA043' },
+  { value: 'especes',      label: 'Espèces',      icon: Banknote,   color: '#0D2147' },
   { value: 'virement',     label: 'Virement',     icon: Building2,  color: '#F07900' },
   { value: 'cheque',       label: 'Chèque',       icon: FileText,   color: '#8B0073' },
   { value: 'airtel_money', label: 'Airtel Money', icon: Smartphone, color: '#F97316' },
@@ -718,7 +718,7 @@ export default function TresoreriePage() {
         {toast && (
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
             className="fixed top-5 right-5 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-sm font-medium"
-            style={{ background: toast.ok ? '#0D1117' : '#1A0D0D', borderColor: toast.ok ? '#2EA043' : '#F01F38', color: toast.ok ? '#2EA043' : '#F01F38' }}>
+            style={{ background: toast.ok ? '#0D1117' : '#1A0D0D', borderColor: toast.ok ? '#0D2147' : '#F01F38', color: toast.ok ? '#0D2147' : '#F01F38' }}>
             {toast.ok ? <CheckCircle size={15} /> : <AlertCircle size={15} />}
             {toast.msg}
           </motion.div>
@@ -733,7 +733,7 @@ export default function TresoreriePage() {
         </div>
         <div className="flex gap-2">
           <button onClick={() => setModal('encaisser')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 transition-colors">
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0D2147]/15 text-[#0D2147] border border-[#0D2147]/30 hover:bg-[#0D2147]/25 transition-colors">
             <ArrowUpCircle size={13} /> Encaisser
           </button>
           <button onClick={() => setModal('decaisser')}
@@ -819,7 +819,7 @@ export default function TresoreriePage() {
             {/* Solde net */}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
               className="relative rounded-2xl p-4 overflow-hidden"
-              style={{ background: soldeGlobal >= 0 ? 'linear-gradient(135deg,#0e1a10 0%,#1a3020 50%,#2EA043 100%)' : 'linear-gradient(135deg,#1a0d0d 0%,#2d0a0a 50%,#7f1d1d 100%)' }}>
+              style={{ background: soldeGlobal >= 0 ? 'linear-gradient(135deg,#0e1a10 0%,#1a3020 50%,#0D2147 100%)' : 'linear-gradient(135deg,#1a0d0d 0%,#2d0a0a 50%,#7f1d1d 100%)' }}>
               <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 10%,rgba(255,255,255,0.08) 0%,transparent 60%)' }} />
               <div className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
                 <Wallet size={14} className="text-white" />
@@ -850,7 +850,7 @@ export default function TresoreriePage() {
                       <p className="text-xs text-[#E6EDF3]">{c.intitule}</p>
                       <p className="text-[10px] text-[#484F58]">{c.banque}</p>
                     </div>
-                    <span className={`text-xs font-bold ${c.solde >= 0 ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{fmtFCFA(c.solde)}</span>
+                    <span className={`text-xs font-bold ${c.solde >= 0 ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>{fmtFCFA(c.solde)}</span>
                   </div>
                 ))}
               </div>
@@ -887,7 +887,7 @@ export default function TresoreriePage() {
                   tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />
                 <Tooltip contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
                   formatter={(v: any, n: any) => [fmtFCFA(Number(v ?? 0)), n]} />
-                <Bar dataKey="entrées" fill="#2EA043" radius={[2, 2, 0, 0]} maxBarSize={12} />
+                <Bar dataKey="entrées" fill="#0D2147" radius={[2, 2, 0, 0]} maxBarSize={12} />
                 <Bar dataKey="sorties" fill="#F01F38" radius={[2, 2, 0, 0]} maxBarSize={12} />
                 <Line type="monotone" dataKey="solde" name="Solde cumulé" stroke="#F07900" strokeWidth={2} dot={false} />
               </ComposedChart>
@@ -908,9 +908,9 @@ export default function TresoreriePage() {
               <div className="divide-y divide-[#21262D]">
                 {transactions.slice(0, 20).map(t => (
                   <div key={t.id} className="flex items-center gap-3 px-5 py-2.5 hover:bg-[#21262D]/30 transition-colors">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${t.type === 'entree' ? 'bg-[#2EA043]/10' : 'bg-[#F01F38]/10'}`}>
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${t.type === 'entree' ? 'bg-[#0D2147]/10' : 'bg-[#F01F38]/10'}`}>
                       {t.type === 'entree'
-                        ? <ArrowUpCircle size={13} className="text-[#2EA043]" />
+                        ? <ArrowUpCircle size={13} className="text-[#0D2147]" />
                         : <ArrowDownCircle size={13} className="text-[#F01F38]" />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -918,7 +918,7 @@ export default function TresoreriePage() {
                       <p className="text-[10px] text-[#484F58]">{t.categorie}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className={`text-xs font-bold ${t.type === 'entree' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
+                      <p className={`text-xs font-bold ${t.type === 'entree' ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>
                         {t.type === 'entree' ? '+' : '−'}{fmtFCFA(t.montant)}
                       </p>
                       <p className="text-[10px] text-[#484F58]">{fmtDate(t.date)}</p>
@@ -971,7 +971,7 @@ export default function TresoreriePage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {comptesBancaires.map((c, i) => {
-                  const colors = ['#F07900', '#2EA043', '#8B0073', '#F0A30A', '#F97316']
+                  const colors = ['#F07900', '#0D2147', '#8B0073', '#F0A30A', '#F97316']
                   const col = colors[i % colors.length]
                   return (
                     <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -1097,7 +1097,7 @@ export default function TresoreriePage() {
                             <td className="px-4 py-2.5 text-[#484F58]">{fmtDate(ch.date_emission)}</td>
                             <td className="px-4 py-2.5">
                               {ch.statut === 'en_attente' && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F0A30A]/10 text-[#F0A30A] font-semibold flex items-center gap-1 w-fit"><Clock size={9} />En attente</span>}
-                              {ch.statut === 'encaisse'   && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#2EA043]/10 text-[#2EA043] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Encaissé</span>}
+                              {ch.statut === 'encaisse'   && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#0D2147]/10 text-[#0D2147] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Encaissé</span>}
                               {ch.statut === 'rejete'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F01F38]/10 text-[#F01F38] font-semibold flex items-center gap-1 w-fit"><AlertTriangle size={9} />Rejeté</span>}
                               {ch.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#484F58] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
                             </td>
@@ -1106,7 +1106,7 @@ export default function TresoreriePage() {
                                 <div className="flex gap-1">
                                   {chequeType === 'recu' && (
                                     <button onClick={() => encaisserCheque(ch)} disabled={saving}
-                                      className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 disabled:opacity-50">
+                                      className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#0D2147]/15 text-[#0D2147] border border-[#0D2147]/30 hover:bg-[#0D2147]/25 disabled:opacity-50">
                                       Encaisser
                                     </button>
                                   )}
@@ -1220,7 +1220,7 @@ export default function TresoreriePage() {
                             <td className="px-4 py-2.5 text-[#484F58]">{v.reference ?? '—'}</td>
                             <td className="px-4 py-2.5">
                               {v.statut === 'en_attente' && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F0A30A]/10 text-[#F0A30A] font-semibold flex items-center gap-1 w-fit"><Clock size={9} />En attente</span>}
-                              {v.statut === 'execute'    && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#2EA043]/10 text-[#2EA043] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Exécuté</span>}
+                              {v.statut === 'execute'    && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#0D2147]/10 text-[#0D2147] font-semibold flex items-center gap-1 w-fit"><CheckCircle size={9} />Exécuté</span>}
                               {v.statut === 'rejete'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F01F38]/10 text-[#F01F38] font-semibold flex items-center gap-1 w-fit"><AlertTriangle size={9} />Rejeté</span>}
                               {v.statut === 'annule'     && <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#484F58]/10 text-[#484F58] font-semibold flex items-center gap-1 w-fit"><XCircle size={9} />Annulé</span>}
                             </td>
@@ -1228,7 +1228,7 @@ export default function TresoreriePage() {
                               {v.statut === 'en_attente' && (
                                 <div className="flex gap-1">
                                   <button onClick={() => updateVirementStatut(v.id, 'execute')} disabled={saving}
-                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 disabled:opacity-50">
+                                    className="px-2 py-1 rounded-lg text-[10px] font-semibold bg-[#0D2147]/15 text-[#0D2147] border border-[#0D2147]/30 hover:bg-[#0D2147]/25 disabled:opacity-50">
                                     Exécuter
                                   </button>
                                   <button onClick={() => updateVirementStatut(v.id, 'annule')}
@@ -1329,9 +1329,9 @@ export default function TresoreriePage() {
                       <p className="text-[#F01F38] text-lg font-bold">−{fmtFCFA(depAuj)}</p>
                       <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'depense').length} opération(s)</p>
                     </div>
-                    <div className="bg-[#161B22] border border-[#2EA043]/20 rounded-xl p-4">
+                    <div className="bg-[#161B22] border border-[#0D2147]/20 rounded-xl p-4">
                       <p className="text-[10px] text-[#484F58] mb-1">Approvisionnements</p>
-                      <p className="text-[#2EA043] text-lg font-bold">+{fmtFCFA(appAuj)}</p>
+                      <p className="text-[#0D2147] text-lg font-bold">+{fmtFCFA(appAuj)}</p>
                       <p className="text-[10px] text-[#484F58] mt-0.5">{todayOps.filter(o => o.type === 'approvisionnement').length} opération(s)</p>
                     </div>
                   </div>
@@ -1343,7 +1343,7 @@ export default function TresoreriePage() {
                   <Minus size={15} /> Dépense
                 </button>
                 <button onClick={() => { setOpType('approvisionnement'); setCaisseTab('operations') }}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#2EA043]/30 bg-[#2EA043]/10 text-[#2EA043] text-sm font-semibold transition-colors hover:bg-[#2EA043]/20">
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[#0D2147]/30 bg-[#0D2147]/10 text-[#0D2147] text-sm font-semibold transition-colors hover:bg-[#0D2147]/20">
                   <Plus size={15} /> Approvisionnement
                 </button>
               </div>
@@ -1362,7 +1362,7 @@ export default function TresoreriePage() {
                 </button>
                 <button onClick={() => setOpType('approvisionnement')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                    opType === 'approvisionnement' ? 'bg-[#2EA043] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                    opType === 'approvisionnement' ? 'bg-[#0D2147] text-white' : 'text-[#8B949E] hover:text-[#E6EDF3]'
                   }`}>
                   <Plus size={14} /> Approvisionnement
                 </button>
@@ -1412,10 +1412,10 @@ export default function TresoreriePage() {
                 </div>
                 {fOp.montant && parseFloat(fOp.montant) > 0 && (
                   <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
-                    opType === 'depense' ? 'bg-[#F01F38]/10 border-[#F01F38]/20' : 'bg-[#2EA043]/10 border-[#2EA043]/20'
+                    opType === 'depense' ? 'bg-[#F01F38]/10 border-[#F01F38]/20' : 'bg-[#0D2147]/10 border-[#0D2147]/20'
                   }`}>
                     <span className="text-xs text-[#8B949E]">Solde après opération</span>
-                    <span className={`text-sm font-bold ${opType === 'depense' ? 'text-[#F01F38]' : 'text-[#2EA043]'}`}>
+                    <span className={`text-sm font-bold ${opType === 'depense' ? 'text-[#F01F38]' : 'text-[#0D2147]'}`}>
                       {fmtFCFA(opType === 'depense'
                         ? selectedCaisse.solde - parseFloat(fOp.montant)
                         : selectedCaisse.solde + parseFloat(fOp.montant))}
@@ -1424,7 +1424,7 @@ export default function TresoreriePage() {
                 )}
                 <button onClick={saveCaisseOp} disabled={saving || !fOp.montant}
                   className={`w-full py-3 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 text-white ${
-                    opType === 'depense' ? 'bg-[#F01F38]' : 'bg-[#2EA043]'
+                    opType === 'depense' ? 'bg-[#F01F38]' : 'bg-[#0D2147]'
                   }`}>
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   {opType === 'depense' ? 'Enregistrer la dépense' : "Enregistrer l'approvisionnement"}
@@ -1461,7 +1461,7 @@ export default function TresoreriePage() {
                           <td className="px-4 py-2.5 text-[#8B949E]">{fmtDate(op.date)}</td>
                           <td className="px-4 py-2.5">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                              op.type === 'depense' ? 'bg-[#F01F38]/10 text-[#F01F38]' : 'bg-[#2EA043]/10 text-[#2EA043]'
+                              op.type === 'depense' ? 'bg-[#F01F38]/10 text-[#F01F38]' : 'bg-[#0D2147]/10 text-[#0D2147]'
                             }`}>
                               {op.type === 'depense' ? 'Dépense' : 'Approv.'}
                             </span>
@@ -1469,7 +1469,7 @@ export default function TresoreriePage() {
                           <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[140px] truncate">{op.motif ?? '—'}</td>
                           <td className="px-4 py-2.5 text-[#8B949E]">{op.beneficiaire ?? '—'}</td>
                           <td className="px-4 py-2.5 text-[#484F58]">{op.reference_piece ?? '—'}</td>
-                          <td className={`px-4 py-2.5 font-bold ${op.type === 'depense' ? 'text-[#F01F38]' : 'text-[#2EA043]'}`}>
+                          <td className={`px-4 py-2.5 font-bold ${op.type === 'depense' ? 'text-[#F01F38]' : 'text-[#0D2147]'}`}>
                             {op.type === 'depense' ? '−' : '+'}{fmtFCFA(op.montant)}
                           </td>
                           <td className="px-4 py-2.5">
@@ -1521,7 +1521,7 @@ export default function TresoreriePage() {
                     {toClose.map(o => (
                       <div key={o.id} className="flex justify-between text-[10px] py-0.5">
                         <span className="text-[#8B949E]">{o.motif ?? o.type}</span>
-                        <span className={o.type === 'depense' ? 'text-[#F01F38]' : 'text-[#2EA043]'}>
+                        <span className={o.type === 'depense' ? 'text-[#F01F38]' : 'text-[#0D2147]'}>
                           {o.type === 'depense' ? '−' : '+'}{fmtFCFA(o.montant)}
                         </span>
                       </div>
@@ -1627,7 +1627,7 @@ export default function TresoreriePage() {
                   className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#F07900]/40 bg-[#F07900]/10 text-[#F07900] text-xs font-semibold hover:bg-[#F07900]/20 transition-colors">
                   <Upload size={13} /> Choisir un fichier CSV
                 </button>
-                {csvRows.length > 0 && <span className="text-xs text-[#2EA043] font-semibold">{csvRows.length} lignes détectées</span>}
+                {csvRows.length > 0 && <span className="text-xs text-[#0D2147] font-semibold">{csvRows.length} lignes détectées</span>}
               </div>
               <p className="text-[10px] text-[#484F58] mt-1">Colonnes attendues : Date, Libellé, Débit, Crédit (ou Montant). Séparateur ; ou ,</p>
             </div>
@@ -1638,7 +1638,7 @@ export default function TresoreriePage() {
               <div className="px-5 py-3 border-b border-[#30363D] flex items-center justify-between">
                 <h3 className="text-xs font-semibold text-[#E6EDF3]">Aperçu — {csvRows.length} lignes</h3>
                 <button onClick={importReleve} disabled={importingSaving || !csvCompte}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#2EA043]/15 text-[#2EA043] border border-[#2EA043]/30 hover:bg-[#2EA043]/25 disabled:opacity-50 transition-colors">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0D2147]/15 text-[#0D2147] border border-[#0D2147]/30 hover:bg-[#0D2147]/25 disabled:opacity-50 transition-colors">
                   {importingSaving ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={12} />}
                   Importer {csvRows.length} lignes
                 </button>
@@ -1658,11 +1658,11 @@ export default function TresoreriePage() {
                         <td className="px-4 py-2 text-[#8B949E]">{fmtDate(r.date)}</td>
                         <td className="px-4 py-2 text-[#E6EDF3] max-w-[200px] truncate">{r.libelle}</td>
                         <td className="px-4 py-2">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.type === 'credit' ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'bg-[#F01F38]/10 text-[#F01F38]'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.type === 'credit' ? 'bg-[#0D2147]/10 text-[#0D2147]' : 'bg-[#F01F38]/10 text-[#F01F38]'}`}>
                             {r.type === 'credit' ? 'Crédit' : 'Débit'}
                           </span>
                         </td>
-                        <td className={`px-4 py-2 font-bold ${r.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
+                        <td className={`px-4 py-2 font-bold ${r.type === 'credit' ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>
                           {r.type === 'credit' ? '+' : '−'}{fmtFCFA(r.montant)}
                         </td>
                       </tr>
@@ -1696,7 +1696,7 @@ export default function TresoreriePage() {
             )}
             <div className="ml-auto text-xs text-[#484F58]">
               {releveLignes.filter(l => l.statut === 'non_rapproche').length} en attente ·{' '}
-              <span className="text-[#2EA043]">{releveLignes.filter(l => l.statut === 'rapproche').length} rapprochés</span>
+              <span className="text-[#0D2147]">{releveLignes.filter(l => l.statut === 'rapproche').length} rapprochés</span>
             </div>
           </div>
 
@@ -1708,8 +1708,8 @@ export default function TresoreriePage() {
             </div>
           ) : releveLignes.filter(l => l.statut === 'non_rapproche').length === 0 ? (
             <div className="bg-[#161B22] border border-[#30363D] rounded-2xl p-12 text-center">
-              <CheckCheck size={28} className="mx-auto mb-3 text-[#2EA043]" />
-              <p className="text-[#2EA043] text-sm font-semibold">Tout est rapproché !</p>
+              <CheckCheck size={28} className="mx-auto mb-3 text-[#0D2147]" />
+              <p className="text-[#0D2147] text-sm font-semibold">Tout est rapproché !</p>
               <p className="text-[#484F58] text-xs mt-1">Aucune ligne en attente pour ce compte.</p>
             </div>
           ) : (
@@ -1724,15 +1724,15 @@ export default function TresoreriePage() {
                   {releveLignes.filter(l => l.statut === 'non_rapproche').map(ligne => (
                     <div key={ligne.id} onClick={() => setRapprochLigne(l => l?.id === ligne.id ? null : ligne)}
                       className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${rapprochLigne?.id === ligne.id ? 'bg-[#F07900]/10 border-l-2 border-[#F07900]' : 'hover:bg-[#21262D]/50'}`}>
-                      <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${ligne.type === 'credit' ? 'bg-[#2EA043]/10' : 'bg-[#F01F38]/10'}`}>
-                        {ligne.type === 'credit' ? <ArrowUpCircle size={12} className="text-[#2EA043]" /> : <ArrowDownCircle size={12} className="text-[#F01F38]" />}
+                      <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${ligne.type === 'credit' ? 'bg-[#0D2147]/10' : 'bg-[#F01F38]/10'}`}>
+                        {ligne.type === 'credit' ? <ArrowUpCircle size={12} className="text-[#0D2147]" /> : <ArrowDownCircle size={12} className="text-[#F01F38]" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-[#E6EDF3] truncate">{ligne.libelle}</p>
                         <p className="text-[10px] text-[#484F58]">{fmtDate(ligne.date)}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
+                        <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>
                           {ligne.type === 'credit' ? '+' : '−'}{fmtFCFA(ligne.montant)}
                         </p>
                         <button onClick={e => { e.stopPropagation(); ignorerLigne(ligne.id) }}
@@ -1778,13 +1778,13 @@ export default function TresoreriePage() {
                         const isSelected = rapprochTx?.id === tx.id
                         return (
                           <div key={tx.id} onClick={() => setRapprochTx(t => t?.id === tx.id ? null : tx)}
-                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isSelected ? 'bg-[#2EA043]/10 border-l-2 border-[#2EA043]' : 'hover:bg-[#21262D]/50'}`}>
+                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isSelected ? 'bg-[#0D2147]/10 border-l-2 border-[#0D2147]' : 'hover:bg-[#21262D]/50'}`}>
                             {isSuggestion && <span className="w-1.5 h-1.5 rounded-full bg-[#F0A30A] shrink-0" title="Suggestion" />}
                             <div className="flex-1 min-w-0">
                               <p className="text-xs text-[#E6EDF3] truncate">{tx.description}</p>
                               <p className="text-[10px] text-[#484F58]">{tx.categorie} · {fmtDate(tx.date)}</p>
                             </div>
-                            <p className={`text-xs font-bold shrink-0 ${tx.type === 'entree' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{fmtFCFA(tx.montant)}</p>
+                            <p className={`text-xs font-bold shrink-0 ${tx.type === 'entree' ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>{fmtFCFA(tx.montant)}</p>
                           </div>
                         )
                       })
@@ -1794,7 +1794,7 @@ export default function TresoreriePage() {
                 {rapprochLigne && rapprochTx && (
                   <div className="px-4 py-3 border-t border-[#30363D]">
                     <button onClick={() => rapprocher(rapprochLigne, rapprochTx)} disabled={rapprochSaving}
-                      className="w-full py-2.5 rounded-xl text-sm font-semibold bg-[#2EA043] text-white disabled:opacity-50 flex items-center justify-center gap-2">
+                      className="w-full py-2.5 rounded-xl text-sm font-semibold bg-[#0D2147] text-white disabled:opacity-50 flex items-center justify-center gap-2">
                       {rapprochSaving ? <Loader2 size={13} className="animate-spin" /> : <Link2 size={13} />}
                       Rapprocher ces deux éléments
                     </button>
@@ -1808,17 +1808,17 @@ export default function TresoreriePage() {
           {releveLignes.filter(l => l.statut === 'rapproche').length > 0 && (
             <div className="bg-[#161B22] border border-[#30363D] rounded-2xl overflow-hidden">
               <div className="px-4 py-3 border-b border-[#30363D]">
-                <p className="text-xs font-semibold text-[#2EA043]">Lignes rapprochées — {releveLignes.filter(l => l.statut === 'rapproche').length}</p>
+                <p className="text-xs font-semibold text-[#0D2147]">Lignes rapprochées — {releveLignes.filter(l => l.statut === 'rapproche').length}</p>
               </div>
               <div className="divide-y divide-[#21262D]">
                 {releveLignes.filter(l => l.statut === 'rapproche').slice(0, 20).map(ligne => (
                   <div key={ligne.id} className="flex items-center gap-3 px-4 py-2.5">
-                    <CheckCheck size={14} className="text-[#2EA043] shrink-0" />
+                    <CheckCheck size={14} className="text-[#0D2147] shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-[#8B949E] truncate">{ligne.libelle}</p>
                       <p className="text-[10px] text-[#484F58]">{fmtDate(ligne.date)}</p>
                     </div>
-                    <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{ligne.type === 'credit' ? '+' : '−'}{fmtFCFA(ligne.montant)}</p>
+                    <p className={`text-xs font-bold ${ligne.type === 'credit' ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>{ligne.type === 'credit' ? '+' : '−'}{fmtFCFA(ligne.montant)}</p>
                   </div>
                 ))}
               </div>
@@ -1874,11 +1874,11 @@ export default function TresoreriePage() {
               </div>
               <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
                 <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Solde prévu J+{previsionDays}</p>
-                <p className={`text-lg font-bold ${endSolde >= 0 ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>{fmtFCFA(endSolde)}</p>
+                <p className={`text-lg font-bold ${endSolde >= 0 ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>{fmtFCFA(endSolde)}</p>
               </div>
               <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
                 <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Entrées/jour (moy.)</p>
-                <p className="text-lg font-bold text-[#2EA043]">{fmtFCFA(Math.round(dailyE))}</p>
+                <p className="text-lg font-bold text-[#0D2147]">{fmtFCFA(Math.round(dailyE))}</p>
               </div>
               <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">
                 <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-1">Sorties/jour (moy.)</p>
@@ -1896,9 +1896,9 @@ export default function TresoreriePage() {
               </div>
             )}
             {trend > 0 && (
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#2EA043]/10 border border-[#2EA043]/20">
-                <TrendingUp size={16} className="text-[#2EA043] shrink-0" />
-                <p className="text-xs text-[#2EA043]">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0D2147]/10 border border-[#0D2147]/20">
+                <TrendingUp size={16} className="text-[#0D2147] shrink-0" />
+                <p className="text-xs text-[#0D2147]">
                   Tendance positive — votre trésorerie devrait augmenter de <strong>{fmtFCFA(trend)}</strong> sur {previsionDays} jours.
                 </p>
               </div>
@@ -1916,7 +1916,7 @@ export default function TresoreriePage() {
                     tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
                   <Tooltip contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
                     formatter={(v: any, n: any) => [fmtFCFA(Number(v ?? 0)), n]} />
-                  <Bar dataKey="entrees" name="Entrées" fill="#2EA04340" radius={[2,2,0,0]} maxBarSize={8} />
+                  <Bar dataKey="entrees" name="Entrées" fill="#0D214740" radius={[2,2,0,0]} maxBarSize={8} />
                   <Bar dataKey="sorties" name="Sorties" fill="#F01F3840" radius={[2,2,0,0]} maxBarSize={8} />
                   <Line type="monotone" dataKey="solde" name="Solde prévu" stroke="#F07900" strokeWidth={2}
                     strokeDasharray="6 3" dot={false} />
@@ -1942,10 +1942,10 @@ export default function TresoreriePage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/70" onClick={() => setModal(null)} />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#161B22] border border-[#2EA043]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+              className="relative bg-[#161B22] border border-[#0D2147]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-[#2EA043]/20 flex items-center justify-center">
-                  <ArrowUpCircle size={20} className="text-[#2EA043]" />
+                <div className="w-10 h-10 rounded-xl bg-[#0D2147]/20 flex items-center justify-center">
+                  <ArrowUpCircle size={20} className="text-[#0D2147]" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-[#E6EDF3]">Encaisser</h3>
@@ -1974,7 +1974,7 @@ export default function TresoreriePage() {
                 <div>
                   <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
                   <select value={fEnc.categorie} onChange={e => setFEnc(f => ({ ...f, categorie: e.target.value }))}
-                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#2EA043]/50">
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#0D2147]/50">
                     {CATS_ENTREE.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
@@ -1982,25 +1982,25 @@ export default function TresoreriePage() {
                   <label className="text-xs text-[#8B949E] mb-1 block">Description</label>
                   <input value={fEnc.description} onChange={e => setFEnc(f => ({ ...f, description: e.target.value }))}
                     placeholder="Ex: Paiement client KALALA…"
-                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#2EA043]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#0D2147]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
                     <input type="number" value={fEnc.montant} onChange={e => setFEnc(f => ({ ...f, montant: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#2EA043]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#0D2147]/50" />
                   </div>
                   <div>
                     <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
                     <input type="date" value={fEnc.date} onChange={e => setFEnc(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#2EA043]/50" />
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] outline-none focus:border-[#0D2147]/50" />
                   </div>
                 </div>
                 {fEnc.montant && parseInt(fEnc.montant) > 0 && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#2EA043]/10 border border-[#2EA043]/20">
-                    <ArrowUpCircle size={14} className="text-[#2EA043]" />
-                    <span className="text-[#2EA043] text-sm font-bold">+ {fmtFCFA(parseInt(fEnc.montant))}</span>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0D2147]/10 border border-[#0D2147]/20">
+                    <ArrowUpCircle size={14} className="text-[#0D2147]" />
+                    <span className="text-[#0D2147] text-sm font-bold">+ {fmtFCFA(parseInt(fEnc.montant))}</span>
                   </div>
                 )}
               </div>
@@ -2009,7 +2009,7 @@ export default function TresoreriePage() {
                 <button onClick={() => setModal(null)}
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-[#21262D] border border-[#30363D] text-[#8B949E]">Annuler</button>
                 <button onClick={saveEncaisser} disabled={saving || !fEnc.description || !fEnc.montant}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#2EA043] text-white">
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2 bg-[#0D2147] text-white">
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   Enregistrer
                 </button>

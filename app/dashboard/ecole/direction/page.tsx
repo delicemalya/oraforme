@@ -89,7 +89,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
   }
 
   const kpis = [
-    { label: 'Revenu du mois',   value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#2EA043' },
+    { label: 'Revenu du mois',   value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#0D2147' },
     { label: 'Revenu de l\'année', value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#F07900' },
     { label: 'Étudiants',        value: etudiants.filter(e => e.statut === 'actif').length, color: '#F0A30A' },
     { label: 'Impayés',          value: statsLoading ? '…' : impayeCount,                  color: '#F01F38' },
@@ -103,7 +103,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
 
       <div className="grid grid-cols-3 gap-4">
         <KpiCard label="Enseignants actifs" value={enseignants.filter(e => e.statut === 'actif').length} color="#8B0073" />
-        <KpiCard label="Classes" value={classes.length} color="#06B6D4" />
+        <KpiCard label="Classes" value={classes.length} color="#0D2147" />
         <KpiCard label="Diplômés" value={etudiants.filter(e => e.statut === 'diplome').length} color="#8B0073" />
       </div>
 
@@ -167,7 +167,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
                     <td className="px-4 py-2.5 text-white">{etu ? `${etu.prenom} ${etu.nom}` : '—'}</td>
                     <td className="px-4 py-2.5 text-[#8B949E]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#0D2147]">{fmt(p.montant)} FCFA</td>
                   </tr>
                 )
               })}
@@ -218,7 +218,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total encaissé" value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#2EA043" />
+        <KpiCard label="Total encaissé" value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#0D2147" />
         <KpiCard label="Nb paiements"   value={loading ? '…' : paiements.length}         color="#F07900" />
         <KpiCard label="Moyenne/paiement" value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#F0A30A" />
       </div>
@@ -259,7 +259,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
                     <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-white">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#2EA043]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#0D2147]">{fmt(p.montant)} FCFA</td>
                   </tr>
                 ))}
               </tbody>

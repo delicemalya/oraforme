@@ -395,7 +395,7 @@ export default function ComptabilitePage() {
                     <td className="px-4 py-2.5">
                       <span className={`text-xs px-2 py-0.5 rounded border ${
                         e.type === 'recette'
-                          ? 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30'
+                          ? 'text-[#0D2147] bg-[#0D2147]/10 border-[#0D2147]/30'
                           : 'text-[#F01F38] bg-[#F01F38]/10 border-[#F01F38]/30'
                       }`}>{e.type}</span>
                     </td>
@@ -443,7 +443,7 @@ export default function ComptabilitePage() {
                       </td>
                       <td className="px-4 py-2.5 text-[#E6EDF3] max-w-[180px] truncate">{e.libelle}</td>
                       <td className="px-4 py-2.5">
-                        <span className="font-mono text-[11px] text-[#2EA043] bg-[#2EA043]/10 px-2 py-0.5 rounded">
+                        <span className="font-mono text-[11px] text-[#0D2147] bg-[#0D2147]/10 px-2 py-0.5 rounded">
                           {e.debit_account}
                         </span>
                         <p className="text-[10px] text-[#484F58] mt-0.5 max-w-[120px] truncate">
@@ -512,20 +512,20 @@ export default function ComptabilitePage() {
                         <td className="px-4 py-2.5">
                           <span className={`text-[10px] px-2 py-0.5 rounded ${
                             gl.account_type === 'tresorerie' ? 'bg-[#F07900]/10 text-[#F07900]' :
-                            gl.account_type === 'produit'    ? 'bg-[#2EA043]/10 text-[#2EA043]' :
+                            gl.account_type === 'produit'    ? 'bg-[#0D2147]/10 text-[#0D2147]' :
                             gl.account_type === 'charge'     ? 'bg-[#F01F38]/10 text-[#F01F38]' :
                             gl.account_type === 'actif'      ? 'bg-[#F0A30A]/10 text-[#F0A30A]' :
                             'bg-[#8957E5]/10 text-[#8957E5]'
                           }`}>{gl.account_type}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-right text-[#2EA043] font-mono text-xs whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-right text-[#0D2147] font-mono text-xs whitespace-nowrap">
                           {fmtFCFA(gl.total_debit)}
                         </td>
                         <td className="px-4 py-2.5 text-right text-[#F01F38] font-mono text-xs whitespace-nowrap">
                           {fmtFCFA(gl.total_credit)}
                         </td>
                         <td className="px-4 py-2.5 text-right font-semibold whitespace-nowrap" style={{
-                          color: gl.solde > 0 ? '#2EA043' : gl.solde < 0 ? '#F01F38' : '#484F58'
+                          color: gl.solde > 0 ? '#0D2147' : gl.solde < 0 ? '#F01F38' : '#484F58'
                         }}>
                           {gl.solde >= 0 ? '' : '-'}{fmtFCFA(Math.abs(gl.solde))}
                         </td>
@@ -536,7 +536,7 @@ export default function ComptabilitePage() {
                       <td className="px-4 py-3" colSpan={3}>
                         <span className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">Totaux</span>
                       </td>
-                      <td className="px-4 py-3 text-right font-bold text-[#2EA043] whitespace-nowrap">
+                      <td className="px-4 py-3 text-right font-bold text-[#0D2147] whitespace-nowrap">
                         {fmtFCFA(grandLivre.reduce((s, g) => s + g.total_debit, 0))}
                       </td>
                       <td className="px-4 py-3 text-right font-bold text-[#F01F38] whitespace-nowrap">
@@ -574,7 +574,7 @@ export default function ComptabilitePage() {
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <Tooltip contentStyle={{ background: '#161B22', border: '1px solid #30363D', borderRadius: 8, fontSize: 12 }} formatter={(v: any) => [fmtFCFA(Number(v ?? 0)), '']} />
                 <Legend wrapperStyle={{ fontSize: 11, color: '#8B949E' }} />
-                <Bar dataKey="Recettes" fill="#2EA043" radius={[3, 3, 0, 0]} maxBarSize={32} />
+                <Bar dataKey="Recettes" fill="#0D2147" radius={[3, 3, 0, 0]} maxBarSize={32} />
                 <Bar dataKey="Dépenses" fill="#F01F38" radius={[3, 3, 0, 0]} maxBarSize={32} />
               </BarChart>
             </ResponsiveContainer>
@@ -585,12 +585,12 @@ export default function ComptabilitePage() {
             </h2>
             <div className="space-y-3">
               {[
-                { label: 'Recettes HT',                         value: fmtFCFA(reportRecettes),   color: '#2EA043' },
+                { label: 'Recettes HT',                         value: fmtFCFA(reportRecettes),   color: '#0D2147' },
                 { label: 'TVA collectée (18%)',                  value: fmtFCFA(reportTVA),        color: '#8B949E' },
                 { label: "Contribution d'Appui (5% TVA)",        value: fmtFCFA(reportCA),         color: '#8B949E' },
                 { label: 'Recettes TTC',                        value: fmtFCFA(reportRecTTC),     color: '#F0A30A' },
                 { label: 'Dépenses totales',                    value: fmtFCFA(reportDepenses),   color: '#F01F38' },
-                { label: 'Bénéfice brut',                       value: fmtFCFA(reportBenef),      color: reportBenef >= 0 ? '#2EA043' : '#F01F38' },
+                { label: 'Bénéfice brut',                       value: fmtFCFA(reportBenef),      color: reportBenef >= 0 ? '#0D2147' : '#F01F38' },
               ].map(r => (
                 <div key={r.label} className="flex items-center justify-between border-b border-[#21262D] pb-2 last:border-0">
                   <span className="text-sm text-[#8B949E]">{r.label}</span>
@@ -702,7 +702,7 @@ export default function ComptabilitePage() {
             {/* KPIs */}
             <div className="grid grid-cols-4 gap-3">
               {[
-                { label: 'Crédits totaux',    value: fmtFCFA(totalCredit), color: '#2EA043' },
+                { label: 'Crédits totaux',    value: fmtFCFA(totalCredit), color: '#0D2147' },
                 { label: 'Débits totaux',     value: fmtFCFA(totalDebit),  color: '#F01F38' },
                 { label: 'Non rapprochés',    value: nbNonRap,             color: '#F0A30A' },
                 { label: 'Écarts détectés',   value: nbEcart,              color: '#F01F38' },
@@ -753,15 +753,15 @@ export default function ComptabilitePage() {
                           <td className="px-4 py-2.5 font-mono text-[11px] text-[#E6EDF3]">{r.reference}</td>
                           <td className="px-4 py-2.5 text-[#8B949E] text-xs max-w-[160px] truncate">{r.libelle ?? '—'}</td>
                           <td className="px-4 py-2.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${r.type === 'credit' ? 'bg-[#2EA043]/10 text-[#2EA043]' : 'bg-[#F01F38]/10 text-[#F01F38]'}`}>
+                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${r.type === 'credit' ? 'bg-[#0D2147]/10 text-[#0D2147]' : 'bg-[#F01F38]/10 text-[#F01F38]'}`}>
                               {r.type === 'credit' ? '↑ Crédit' : '↓ Débit'}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-right font-semibold whitespace-nowrap" style={{ color: r.type === 'credit' ? '#2EA043' : '#F01F38' }}>
+                          <td className="px-4 py-2.5 text-right font-semibold whitespace-nowrap" style={{ color: r.type === 'credit' ? '#0D2147' : '#F01F38' }}>
                             {fmtFCFA(r.montant)}
                           </td>
                           <td className="px-4 py-2.5">
-                            {r.statut === 'rapproche'     && <span className="flex items-center gap-1 text-[10px] text-[#2EA043]"><CheckCircle size={10} /> Rapproché</span>}
+                            {r.statut === 'rapproche'     && <span className="flex items-center gap-1 text-[10px] text-[#0D2147]"><CheckCircle size={10} /> Rapproché</span>}
                             {r.statut === 'non_rapproche' && <span className="flex items-center gap-1 text-[10px] text-[#F0A30A]"><Circle size={10} /> En attente</span>}
                             {r.statut === 'ecart'         && <span className="flex items-center gap-1 text-[10px] text-[#F01F38]"><AlertTriangle size={10} /> Écart</span>}
                           </td>
@@ -769,7 +769,7 @@ export default function ComptabilitePage() {
                             <div className="flex items-center gap-1">
                               {r.statut !== 'rapproche' && (
                                 <button onClick={() => updateRapStatut(r.id, 'rapproche')}
-                                  className="px-2 py-1 rounded text-[10px] bg-[#2EA043]/10 text-[#2EA043] hover:bg-[#2EA043]/20 transition-colors" title="Marquer rapproché">
+                                  className="px-2 py-1 rounded text-[10px] bg-[#0D2147]/10 text-[#0D2147] hover:bg-[#0D2147]/20 transition-colors" title="Marquer rapproché">
                                   ✓
                                 </button>
                               )}
@@ -824,7 +824,7 @@ export default function ComptabilitePage() {
                     <div className="flex gap-2">
                       {(['credit', 'debit'] as const).map(t => (
                         <button key={t} onClick={() => setRapForm(f => ({ ...f, type: t }))}
-                          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${rapForm.type === t ? t === 'credit' ? 'bg-[#2EA043] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#21262D] text-[#8B949E]'}`}>
+                          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${rapForm.type === t ? t === 'credit' ? 'bg-[#0D2147] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#21262D] text-[#8B949E]'}`}>
                           {t === 'credit' ? '↑ Crédit' : '↓ Débit'}
                         </button>
                       ))}
@@ -880,7 +880,7 @@ export default function ComptabilitePage() {
                 {(['recette', 'depense'] as const).map(t => (
                   <button key={t} onClick={() => setForm(f => ({ ...f, type: t, categorie: t === 'recette' ? CATS_RECETTE[0] : CATS_DEPENSE[0] }))}
                     className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      form.type === t ? t === 'recette' ? 'bg-[#2EA043] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#21262D] text-[#8B949E]'
+                      form.type === t ? t === 'recette' ? 'bg-[#0D2147] text-white' : 'bg-[#F01F38] text-white' : 'bg-[#21262D] text-[#8B949E]'
                     }`}>
                     {t === 'recette' ? '+ Recette' : '− Dépense'}
                   </button>

@@ -3,7 +3,7 @@ import { fmtFCFA } from '@/lib/admin-config'
 import { Activity, TrendingDown, ArrowUpRight, ArrowDownRight, AlertTriangle, CheckCircle2 } from 'lucide-react'
 
 const TYPE_STYLE = {
-  entree: { label: 'Entrée', color: '#2EA043', bg: '#2EA04310', border: '#2EA04330', icon: ArrowUpRight },
+  entree: { label: 'Entrée', color: '#0D2147', bg: '#0D214710', border: '#0D214730', icon: ArrowUpRight },
   sortie: { label: 'Sortie', color: '#F01F38', bg: '#F01F3810', border: '#F01F3830', icon: ArrowDownRight },
 }
 
@@ -124,7 +124,7 @@ export default async function AdminActivitePage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
           <p className="text-xs font-semibold text-[#484F58] uppercase tracking-wider mb-3">Entrées aujourd'hui</p>
-          <p className="text-2xl font-bold text-[#2EA043]">{fmtFCFA(todayIn)}</p>
+          <p className="text-2xl font-bold text-[#0D2147]">{fmtFCFA(todayIn)}</p>
           <p className="text-xs text-[#484F58] mt-1">{todayTx.filter(t => t.type === 'entree').length} transactions</p>
         </div>
         <div className="bg-[#161B22] border border-[#30363D] rounded-xl p-5">
@@ -216,7 +216,7 @@ export default async function AdminActivitePage() {
             )}
             {tenantRows.map(t => {
               const RISK = {
-                ok:     { color: '#2EA043', icon: CheckCircle2, label: 'Actif' },
+                ok:     { color: '#0D2147', icon: CheckCircle2, label: 'Actif' },
                 warn:   { color: '#F0A30A', icon: AlertTriangle, label: '+7j sans activité' },
                 danger: { color: '#F01F38', icon: TrendingDown,  label: t.lastDate ? '+21j inactif' : 'Jamais utilisé' },
               }
@@ -268,7 +268,7 @@ export default async function AdminActivitePage() {
               )}
               {tenantRows.map(t => {
                 const RISK_BADGE = {
-                  ok:     'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30',
+                  ok:     'text-[#0D2147] bg-[#0D2147]/10 border-[#0D2147]/30',
                   warn:   'text-[#F0A30A] bg-[#F0A30A]/10 border-[#F0A30A]/30',
                   danger: 'text-[#F01F38] bg-[#F01F38]/10 border-[#F01F38]/30',
                 }

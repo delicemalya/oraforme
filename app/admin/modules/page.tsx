@@ -48,7 +48,7 @@ export default async function AdminModulesPage() {
                 </div>
                 <div className={`text-xs px-2 py-0.5 rounded border font-medium ${
                   m.clientsAvec > 0
-                    ? 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30'
+                    ? 'text-[#0D2147] bg-[#0D2147]/10 border-[#0D2147]/30'
                     : 'text-[#484F58] bg-[#21262D] border-[#30363D]'
                 }`}>
                   {m.clientsAvec > 0 ? 'Actif' : 'Inactif'}

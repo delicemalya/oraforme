@@ -58,7 +58,7 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 const STATUT_HEURE: Record<TeacherHour['statut'], { label: string; color: string; bg: string }> = {
   declare:   { label: 'Déclaré',  color: '#F0A30A', bg: '#F0A30A18' },
   validated: { label: 'Validé',   color: '#F07900', bg: '#F0790018' },
-  paye:      { label: 'Payé',     color: '#2EA043', bg: '#2EA04318' },
+  paye:      { label: 'Payé',     color: '#0D2147', bg: '#0D214718' },
 }
 
 // ── Small badge ───────────────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ function Toast({ msg, onClose }: { msg: string; onClose: () => void }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-      style={{ background: 'linear-gradient(135deg,#065F46,#059669)' }}>
+      style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)' }}>
       <CheckCircle size={15} />{msg}
     </motion.div>
   )
@@ -216,7 +216,7 @@ export default function EspaceFormateurPage() {
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? 'text-white shadow' : 'text-[#8B949E] hover:text-white'}`}
-              style={active ? { background: 'linear-gradient(135deg,#1E3A5F,#1D4ED8)' } : {}}>
+              style={active ? { background: 'linear-gradient(135deg,#4A0040,#8B0073)' } : {}}>
               <Icon size={12} />{t.label}
             </button>
           )
@@ -250,7 +250,7 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
 }) {
   const kpis = [
     { label: 'Heures déclarées', value: totalHeures,   color: '#F07900', sub: `${valideeHeures}h validées` },
-    { label: 'Heures payées',    value: payeeHeures,   color: '#2EA043', sub: `sur ${totalHeures}h total` },
+    { label: 'Heures payées',    value: payeeHeures,   color: '#0D2147', sub: `sur ${totalHeures}h total` },
     { label: 'Cours publiés',    value: nbCours,       color: '#8B0073', sub: 'cours numériques' },
     { label: 'Devoirs actifs',   value: nbDevoirs,     color: '#F0A30A', sub: 'en cours' },
     { label: 'Net cumulé',       value: `${fmt(totalNet)} FCFA`, color: '#EC4899', sub: 'tous bulletins' },
@@ -287,7 +287,7 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
           {[
             { label: 'Déclarées', value: heures.filter(h => h.statut === 'declare').reduce((s, h) => s + h.heures, 0), color: '#F0A30A' },
             { label: 'Validées',  value: heures.filter(h => h.statut === 'validated').reduce((s, h) => s + h.heures, 0), color: '#F07900' },
-            { label: 'Payées',    value: heures.filter(h => h.statut === 'paye').reduce((s, h) => s + h.heures, 0), color: '#2EA043' },
+            { label: 'Payées',    value: heures.filter(h => h.statut === 'paye').reduce((s, h) => s + h.heures, 0), color: '#0D2147' },
           ].map(row => (
             <div key={row.label} className="flex items-center gap-3">
               <div className="w-20 text-[10px] text-[#8B949E]">{row.label}</div>
@@ -344,7 +344,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-bold text-white">Cours numériques ({cours.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#1D4ED8,#3B82F6)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#8B0073,#8B0073)', color: '#fff' }}>
           <Plus size={12} /> Nouveau cours
         </button>
       </div>
@@ -375,7 +375,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] hover:text-white border border-white/[0.06] hover:border-white/10">Annuler</button>
-              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#1D4ED8,#3B82F6)', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#8B0073,#8B0073)', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
             </div>
@@ -390,14 +390,14 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
           </div>
         ) : cours.map(c => (
           <motion.div key={c.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] hover:border-white/10 transition-colors group" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: c.statut === 'publie' ? 'linear-gradient(135deg,#1D4ED8,#3B82F6)' : 'rgba(255,255,255,0.06)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: c.statut === 'publie' ? 'linear-gradient(135deg,#8B0073,#8B0073)' : 'rgba(255,255,255,0.06)' }}>
               <BookOpen size={14} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-white truncate">{c.titre}</p>
               <p className="text-[10px] text-[#8B949E]">{c.matiere ?? '—'} {c.niveau ? `· ${c.niveau}` : ''}</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[#2EA043]/20 text-[#2EA043]' : 'bg-white/[0.06] text-[#8B949E]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[#0D2147]/20 text-[#0D2147]' : 'bg-white/[0.06] text-[#8B949E]'}`}>
               {c.statut === 'publie' ? 'Publié' : 'Brouillon'}
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -740,13 +740,13 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
         {[
           { label: 'En attente',  value: `${byStatut.declare.reduce((s, h) => s + h.heures, 0)}h`,   color: '#F0A30A', count: byStatut.declare.length },
           { label: 'Validées',   value: `${byStatut.validated.reduce((s, h) => s + h.heures, 0)}h`,  color: '#F07900', count: byStatut.validated.length },
-          { label: 'Payées',     value: `${byStatut.paye.reduce((s, h) => s + h.heures, 0)}h`,       color: '#2EA043', count: byStatut.paye.length },
+          { label: 'Payées',     value: `${byStatut.paye.reduce((s, h) => s + h.heures, 0)}h`,       color: '#0D2147', count: byStatut.paye.length },
         ].map(k => <KpiCard key={k.label} label={k.label} value={k.value} sub={`${k.count} déclaration${k.count > 1 ? 's' : ''}`} color={k.color} />)}
       </div>
 
       <div className="flex items-center justify-between">
         <p className="text-sm font-bold text-white">Historique ({heures.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#065F46,#059669)', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)', color: '#fff' }}>
           <Plus size={12} /> Déclarer heures
         </button>
       </div>
@@ -754,7 +754,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="rounded-xl border border-[#2EA043]/30 p-4 space-y-3" style={{ background: 'rgba(46,160,67,0.06)' }}>
+            className="rounded-xl border border-[#0D2147]/30 p-4 space-y-3" style={{ background: 'rgba(46,160,67,0.06)' }}>
             <div className="grid grid-cols-3 gap-3">
               <FI label="Heures *" value={form.heures} onChange={v => setForm(p => ({ ...p, heures: v }))} type="number" />
               <FI label="Matière" value={form.matiere} onChange={v => setForm(p => ({ ...p, matiere: v }))} />
@@ -766,7 +766,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
-              <button onClick={save} disabled={saving || !form.heures || !form.date_declaration} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#065F46,#059669)', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.heures || !form.date_declaration} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg,#065F46,#0D2147)', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Déclarer
               </button>
             </div>
@@ -813,7 +813,7 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total net reçu"   value={`${fmt(totalNet)} FCFA`}  color="#2EA043" />
+        <KpiCard label="Total net reçu"   value={`${fmt(totalNet)} FCFA`}  color="#0D2147" />
         <KpiCard label="Total brut"       value={`${fmt(totalBrut)} FCFA`} color="#F07900" />
         <KpiCard label="Bulletins payés"  value={`${nbPayes}/${bulletins.length}`} color="#8B0073" />
       </div>
@@ -826,14 +826,14 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
           </div>
         ) : bulletins.map(b => (
           <motion.div key={b.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: b.statut === 'payee' ? 'linear-gradient(135deg,#065F46,#059669)' : 'rgba(255,255,255,0.06)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: b.statut === 'payee' ? 'linear-gradient(135deg,#065F46,#0D2147)' : 'rgba(255,255,255,0.06)' }}>
               <DollarSign size={14} className="text-white" />
             </div>
             <div className="flex-1">
               <p className="text-xs font-semibold text-white">{MOIS[b.mois - 1]} {b.annee}</p>
               <p className="text-[10px] text-[#8B949E]">Brut : {fmt(b.brut)} · Net : {fmt(b.net)} FCFA</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[#2EA043]/20 text-[#2EA043]' : b.statut === 'validee' ? 'bg-[#F07900]/20 text-[#F07900]' : 'bg-[#F0A30A]/20 text-[#F0A30A]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[#0D2147]/20 text-[#0D2147]' : b.statut === 'validee' ? 'bg-[#F07900]/20 text-[#F07900]' : 'bg-[#F0A30A]/20 text-[#F0A30A]'}`}>
               {b.statut === 'payee' ? 'Payé' : b.statut === 'validee' ? 'Validé' : 'Généré'}
             </span>
           </motion.div>

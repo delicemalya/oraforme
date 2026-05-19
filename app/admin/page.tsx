@@ -124,7 +124,7 @@ export default async function AdminPage() {
           sub={`Top: ${moduleRevData[0]?.module ?? '—'}`}
         />
         <KpiCard
-          icon={Users} label="Utilisateurs" color="#2EA043"
+          icon={Users} label="Utilisateurs" color="#0D2147"
           value={nbUsers.toString()}
           sub={`${nbClients > 0 ? (nbUsers / nbClients).toFixed(1) : 0} user/client`}
         />

@@ -309,8 +309,8 @@ export default function StockPage() {
 
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-[#0D1117] border-[#2EA043]/40 text-[#E6EDF3]' : 'bg-[#0D1117] border-red-500/40 text-red-300'}`}>
-          {toast.ok ? <Check size={14} className="text-[#2EA043]" /> : <X size={14} className="text-red-400" />}
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-[#0D1117] border-[#0D2147]/40 text-[#E6EDF3]' : 'bg-[#0D1117] border-red-500/40 text-red-300'}`}>
+          {toast.ok ? <Check size={14} className="text-[#0D2147]" /> : <X size={14} className="text-red-400" />}
           {toast.msg}
         </div>
       )}
@@ -330,8 +330,8 @@ export default function StockPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Valeur du stock', value: fmtFCFA(valeurTotale),      gradient: 'linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)', Icon: TrendingUp },
-          { label: 'Produits',         value: products.length.toString(), gradient: 'linear-gradient(135deg,#1E3A5F 0%,#1D4ED8 50%,#3B82F6 100%)', Icon: Package },
-          { label: 'En alerte',        value: alertes.length.toString(),  gradient: alertes.length > 0 ? 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)' : 'linear-gradient(135deg,#065F46 0%,#059669 50%,#10B981 100%)', Icon: AlertTriangle },
+          { label: 'Produits',         value: products.length.toString(), gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', Icon: Package },
+          { label: 'En alerte',        value: alertes.length.toString(),  gradient: alertes.length > 0 ? 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)' : 'linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)', Icon: AlertTriangle },
           { label: 'Fournisseurs',     value: suppliers.length.toString(),gradient: 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 50%,#8B0073 100%)', Icon: Users2 },
         ].map(k => (
           <div key={k.label} className="relative rounded-xl p-4 overflow-hidden" style={{ background: k.gradient }}>

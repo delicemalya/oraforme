@@ -49,7 +49,7 @@ interface EntrepriseConfig {
 const STATUT_CONFIG: Record<StatutFac, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   brouillon: { label: 'Brouillon',  color: '#8B949E', bg: '#8B949E18', icon: Clock },
   envoyee:   { label: 'Envoyée',    color: '#F07900', bg: '#F0790018', icon: Send },
-  payee:     { label: 'Payée',      color: '#2EA043', bg: '#2EA04318', icon: CheckCircle },
+  payee:     { label: 'Payée',      color: '#0D2147', bg: '#0D214718', icon: CheckCircle },
   retard:    { label: 'En retard',  color: '#F01F38', bg: '#F01F3818', icon: AlertTriangle },
   annulee:   { label: 'Annulée',   color: '#484F58', bg: '#48495818', icon: XCircle },
 }
@@ -422,7 +422,7 @@ export default function FacturationPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#F07900"  icon={FileText} />
-        <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#2EA043"  icon={CheckCircle} />
+        <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#0D2147"  icon={CheckCircle} />
         <KpiCard label="En attente"      value={fmt(totalEnAttente)} color="#F0A30A"  icon={Clock} />
         <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#F01F38"  icon={AlertTriangle} />
       </div>

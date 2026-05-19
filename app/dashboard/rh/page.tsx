@@ -55,14 +55,14 @@ interface Conge {
 // ── Constantes ─────────────────────────────────────────────────────────────────
 
 const CONTRAT_STYLES: Record<Contrat, { label: string; color: string; bg: string }> = {
-  cdi:       { label: 'CDI',       color: '#2EA043', bg: '#2EA04318' },
+  cdi:       { label: 'CDI',       color: '#0D2147', bg: '#0D214718' },
   cdd:       { label: 'CDD',       color: '#F07900', bg: '#F0790018' },
   stage:     { label: 'Stage',     color: '#F0A30A', bg: '#F0A30A18' },
   freelance: { label: 'Freelance', color: '#8B0073', bg: '#8B007318' },
 }
 
 const STATUT_STYLES: Record<Statut, { label: string; color: string; bg: string }> = {
-  actif:    { label: 'Actif',     color: '#2EA043', bg: '#2EA04318' },
+  actif:    { label: 'Actif',     color: '#0D2147', bg: '#0D214718' },
   conge:    { label: 'En congé',  color: '#F07900', bg: '#F0790018' },
   malade:   { label: 'Malade',    color: '#F0A30A', bg: '#F0A30A18' },
   licencie: { label: 'Licencié', color: '#F01F38', bg: '#F01F3818' },
@@ -183,8 +183,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
       {/* KPIs hero gradient */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Effectif actif',    val: employes.filter(e=>e.statut==='actif').length,        gradient: 'linear-gradient(135deg,#065F46 0%,#059669 50%,#10B981 100%)',  icon: Users },
-          { label: 'En congé / Malade', val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, gradient: 'linear-gradient(135deg,#1E3A5F 0%,#1D4ED8 50%,#3B82F6 100%)', icon: Calendar },
+          { label: 'Effectif actif',    val: employes.filter(e=>e.statut==='actif').length,        gradient: 'linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)',  icon: Users },
+          { label: 'En congé / Malade', val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', icon: Calendar },
           { label: 'Masse salariale',   val: `${fmt(masseBrute)} F`,                               gradient: 'linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)',   icon: TrendingUp },
           { label: 'Charge patronale',  val: `${fmt(masseBrute * TAUX_CNSS_PATRONAL)} F`,          gradient: 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)',  icon: AlertTriangle },
         ].map(k => {
@@ -282,7 +282,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                       <td className="px-4 py-3"><ContratBadge contrat={e.contrat} /></td>
                       <td className="px-4 py-3"><StatutBadge statut={e.statut} /></td>
                       <td className="px-4 py-3 text-xs text-[#E6EDF3] font-semibold">{fmt(e.salaire_base)} F</td>
-                      <td className="px-4 py-3 text-xs font-bold text-[#2EA043]">{fmt(calc.net)} F</td>
+                      <td className="px-4 py-3 text-xs font-bold text-[#0D2147]">{fmt(calc.net)} F</td>
                       <td className="px-4 py-3 text-right" onClick={ev => ev.stopPropagation()}>
                         <button onClick={() => handleDelete(e.id)} className="text-[#484F58] hover:text-red-400 transition-colors p-1">
                           <Trash2 size={13} />
@@ -392,7 +392,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                         <div className="flex justify-between text-xs"><span className="text-[#8B949E]">IRPP progressif</span><span className="text-red-400">−{fmt(irpp)} FCFA</span></div>
                         <div className="flex justify-between font-bold text-sm pt-2 border-t border-[#21262D]">
                           <span className="text-[#E6EDF3]">Net à payer</span>
-                          <span className="text-[#2EA043]">{fmt(net)} FCFA</span>
+                          <span className="text-[#0D2147]">{fmt(net)} FCFA</span>
                         </div>
                         <div className="flex justify-between text-xs pt-1">
                           <span className="text-[#484F58]">Charge patronale CNSS (14,16%)</span>
@@ -554,7 +554,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                       <p className="text-[#484F58] font-semibold mb-2">Aperçu calcul paie</p>
                       <div className="flex justify-between"><span className="text-[#8B949E]">CNSS salarié</span><span className="text-red-400">−{fmt(cnss)} F</span></div>
                       <div className="flex justify-between"><span className="text-[#8B949E]">IRPP</span><span className="text-red-400">−{fmt(irpp)} F</span></div>
-                      <div className="flex justify-between font-bold border-t border-[#21262D] pt-1"><span className="text-[#E6EDF3]">Net</span><span className="text-[#2EA043]">{fmt(net)} F</span></div>
+                      <div className="flex justify-between font-bold border-t border-[#21262D] pt-1"><span className="text-[#E6EDF3]">Net</span><span className="text-[#0D2147]">{fmt(net)} F</span></div>
                     </div>
                   )
                 })()}
@@ -622,7 +622,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
 
   const STATUT_CONGE: Record<string, { label: string; color: string }> = {
     en_attente: { label: 'En attente', color: '#F0A30A' },
-    approuve:   { label: 'Approuvé',  color: '#2EA043' },
+    approuve:   { label: 'Approuvé',  color: '#0D2147' },
     refuse:     { label: 'Refusé',   color: '#F01F38' },
   }
 
@@ -726,7 +726,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: st.color, backgroundColor: `${st.color}18` }}>{st.label}</span>
                   {c.statut === 'en_attente' && (
                     <>
-                      <button onClick={() => approuver(c.id, 'approuve')} className="p-1 rounded text-[#2EA043] hover:bg-[#2EA043]/10 transition-colors"><Check size={14} /></button>
+                      <button onClick={() => approuver(c.id, 'approuve')} className="p-1 rounded text-[#0D2147] hover:bg-[#0D2147]/10 transition-colors"><Check size={14} /></button>
                       <button onClick={() => approuver(c.id, 'refuse')} className="p-1 rounded text-red-400 hover:bg-red-400/10 transition-colors"><X size={14} /></button>
                     </>
                   )}
@@ -782,8 +782,8 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
       <p className="text-sm text-[#8B949E]">{alerts.length} alerte{alerts.length !== 1 ? 's' : ''} active{alerts.length !== 1 ? 's' : ''}</p>
       {alerts.length === 0 ? (
         <div className="text-center py-12">
-          <div className="w-12 h-12 rounded-full bg-[#2EA043]/10 flex items-center justify-center mx-auto mb-3">
-            <Check size={22} className="text-[#2EA043]" />
+          <div className="w-12 h-12 rounded-full bg-[#0D2147]/10 flex items-center justify-center mx-auto mb-3">
+            <Check size={22} className="text-[#0D2147]" />
           </div>
           <p className="text-sm text-[#8B949E]">Aucune alerte RH active. Tout est en ordre.</p>
         </div>
@@ -832,7 +832,7 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {[
           { label: 'Masse salariale brute',    val: `${fmt(masseBrute)} FCFA`,  color: '#F0A30A', sub: 'employés actifs' },
-          { label: 'Masse salariale nette',     val: `${fmt(masseNette)} FCFA`,  color: '#2EA043', sub: 'après CNSS + IRPP' },
+          { label: 'Masse salariale nette',     val: `${fmt(masseNette)} FCFA`,  color: '#0D2147', sub: 'après CNSS + IRPP' },
           { label: 'Charges patronales CNSS',   val: `${fmt(massePatro)} FCFA`,  color: '#F01F38', sub: '14,16% plafonné' },
           { label: 'Coût total employeur',      val: `${fmt(masseBrute + massePatro)} FCFA`, color: '#8B0073', sub: 'brut + charges' },
           { label: 'Congés pris (période)',     val: `${totalJoursConges} jours`,color: '#F07900', sub: `${congesApprouves.length} demande(s)` },

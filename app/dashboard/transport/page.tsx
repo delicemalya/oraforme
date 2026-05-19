@@ -39,7 +39,7 @@ type Course = {
 }
 
 const STATUTS_CHAUFFEUR: Record<string, { label: string; color: string; bg: string }> = {
-  actif:     { label: 'Disponible', color: '#2EA043', bg: '#2EA04318' },
+  actif:     { label: 'Disponible', color: '#0D2147', bg: '#0D214718' },
   inactif:   { label: 'Inactif',    color: '#484F58', bg: '#484F5818' },
   en_course: { label: 'En course',  color: '#F0A30A', bg: '#F0A30A18' },
 }
@@ -47,7 +47,7 @@ const STATUTS_CHAUFFEUR: Record<string, { label: string; color: string; bg: stri
 const STATUTS_COURSE: Record<string, { label: string; color: string; bg: string }> = {
   en_attente: { label: 'En attente', color: '#F07900', bg: '#F0790018' },
   en_cours:   { label: 'En cours',   color: '#F0A30A', bg: '#F0A30A18' },
-  terminee:   { label: 'Terminée',   color: '#2EA043', bg: '#2EA04318' },
+  terminee:   { label: 'Terminée',   color: '#0D2147', bg: '#0D214718' },
   annulee:    { label: 'Annulée',    color: '#F01F38', bg: '#F01F3818' },
 }
 
@@ -212,8 +212,8 @@ export default function TransportPage() {
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 auto-rows-[120px]">
         {[
-          { label: 'Total courses', value: totalCourses, icon: Navigation, grad: 'linear-gradient(135deg,#065F46,#059669,#10B981)', i: 0 },
-          { label: 'Terminées', value: coursesTerminees, icon: CheckCircle, grad: 'linear-gradient(135deg,#1E3A5F,#1D4ED8,#3B82F6)', i: 1 },
+          { label: 'Total courses', value: totalCourses, icon: Navigation, grad: 'linear-gradient(135deg,#065F46,#0D2147,#1A3570)', i: 0 },
+          { label: 'Terminées', value: coursesTerminees, icon: CheckCircle, grad: 'linear-gradient(135deg,#4A0040,#8B0073,#8B0073)', i: 1 },
           { label: "Chiffre d'affaires", value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: 'linear-gradient(135deg,#78350F,#D97706,#F59E0B)', i: 2 },
           { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: 'linear-gradient(135deg,#4C1D95,#7C3AED,#8B0073)', i: 3 },
         ].map(k => {
@@ -311,7 +311,7 @@ export default function TransportPage() {
                         </td>
                         <td className="px-4 py-3 hidden sm:table-cell">
                           <div className="flex items-center gap-1 text-[11px] text-[#8B949E]">
-                            <MapPin size={10} className="text-[#2EA043]" /> {c.depart}
+                            <MapPin size={10} className="text-[#0D2147]" /> {c.depart}
                           </div>
                           <div className="flex items-center gap-1 text-[11px] text-[#8B949E]">
                             <MapPin size={10} className="text-[#F01F38]" /> {c.arrivee}
@@ -345,7 +345,7 @@ export default function TransportPage() {
                             {c.statut === 'en_cours' && (
                               <button
                                 onClick={() => updateStatutCourse(c.id, 'terminee', c.chauffeur_id)}
-                                className="text-[10px] px-2 py-1 rounded-lg bg-[#2EA043]/10 text-[#2EA043] hover:bg-[#2EA043]/20 transition-all"
+                                className="text-[10px] px-2 py-1 rounded-lg bg-[#0D2147]/10 text-[#0D2147] hover:bg-[#0D2147]/20 transition-all"
                               >
                                 Terminer
                               </button>
@@ -442,7 +442,7 @@ export default function TransportPage() {
         <motion.div {...fadeUp(1)} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {[
-              { label: 'Taux de réussite', value: totalCourses > 0 ? `${Math.round((coursesTerminees / totalCourses) * 100)}%` : '—', icon: TrendingUp, color: '#2EA043' },
+              { label: 'Taux de réussite', value: totalCourses > 0 ? `${Math.round((coursesTerminees / totalCourses) * 100)}%` : '—', icon: TrendingUp, color: '#0D2147' },
               { label: 'Courses en attente', value: courses.filter(c => c.statut === 'en_attente').length, icon: Clock, color: '#F07900' },
               { label: 'Courses annulées', value: courses.filter(c => c.statut === 'annulee').length, icon: AlertCircle, color: '#F01F38' },
             ].map((s, i) => {

@@ -19,7 +19,7 @@ interface Notification {
 const TYPE_CONFIG = {
   info:    { icon: Info,          color: '#F07900', bg: '#F0790015' },
   warning: { icon: AlertTriangle, color: '#F0A30A', bg: '#F0A30A15' },
-  success: { icon: CheckCircle,   color: '#2EA043', bg: '#2EA04315' },
+  success: { icon: CheckCircle,   color: '#0D2147', bg: '#0D214715' },
   error:   { icon: XCircle,       color: '#F01F38', bg: '#F01F3815' },
 }
 

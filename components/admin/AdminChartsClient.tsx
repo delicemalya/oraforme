@@ -11,7 +11,7 @@ type GrowthData = { date: string; inscriptions: number }
 
 const RED = '#F01F38'
 const ORANGE = '#F0A30A'
-const GREEN = '#2EA043'
+const GREEN = '#0D2147'
 const BLUE = '#F07900'
 
 function CustomTooltip({ active, payload, label }: {

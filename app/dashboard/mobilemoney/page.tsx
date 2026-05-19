@@ -103,8 +103,8 @@ export default function MobileMoneyPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#2EA043]/10 border border-[#2EA043]/20 flex items-center justify-center">
-          <Smartphone size={18} className="text-[#2EA043]" />
+        <div className="w-10 h-10 rounded-xl bg-[#0D2147]/10 border border-[#0D2147]/20 flex items-center justify-center">
+          <Smartphone size={18} className="text-[#0D2147]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#E6EDF3]">Mobile Money</h1>
@@ -127,7 +127,7 @@ export default function MobileMoneyPage() {
               </div>
               <span className="text-xs text-[#484F58]">{w.num}</span>
             </div>
-            <p className={`text-2xl font-bold ${w.solde >= 0 ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
+            <p className={`text-2xl font-bold ${w.solde >= 0 ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>
               {fmtFCFA(w.solde)}
             </p>
             <p className="text-xs text-[#484F58] mt-1">Solde estimé</p>
@@ -138,7 +138,7 @@ export default function MobileMoneyPage() {
       {/* KPIs */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Total reçu', value: fmtFCFA(totalRecu), color: '#2EA043' },
+          { label: 'Total reçu', value: fmtFCFA(totalRecu), color: '#0D2147' },
           { label: 'Total envoyé', value: fmtFCFA(totalEnvoi), color: '#F01F38' },
           { label: 'Frais payés', value: fmtFCFA(totalFrais), color: '#8B949E' },
         ].map(k => (
@@ -152,7 +152,7 @@ export default function MobileMoneyPage() {
       {/* Actions */}
       <div className="flex flex-wrap gap-3">
         <button onClick={() => { setForm(f => ({ ...f, type: 'reception' })); setModal('recevoir') }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#2EA043]/10 border border-[#2EA043]/30 text-[#2EA043] text-sm font-medium hover:bg-[#2EA043]/20 transition-colors">
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0D2147]/10 border border-[#0D2147]/30 text-[#0D2147] text-sm font-medium hover:bg-[#0D2147]/20 transition-colors">
           <ArrowDownLeft size={15} /> Recevoir paiement
         </button>
         <button onClick={() => { setForm(f => ({ ...f, type: 'envoi' })); setModal('envoyer') }}
@@ -184,13 +184,13 @@ export default function MobileMoneyPage() {
                   <p className="text-xs text-[#484F58]">{OP_LABELS[t.operateur]} · {t.reference}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className={`text-sm font-semibold ${t.type === 'reception' ? 'text-[#2EA043]' : 'text-[#F01F38]'}`}>
+                  <p className={`text-sm font-semibold ${t.type === 'reception' ? 'text-[#0D2147]' : 'text-[#F01F38]'}`}>
                     {t.type === 'reception' ? '+' : '-'}{fmtFCFA(t.montant)}
                   </p>
                   {t.frais > 0 && <p className="text-xs text-[#484F58]">Frais : {fmtFCFA(t.frais)}</p>}
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded border ${
-                  t.statut === 'confirme' ? 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30'
+                  t.statut === 'confirme' ? 'text-[#0D2147] bg-[#0D2147]/10 border-[#0D2147]/30'
                   : 'text-[#8B949E] bg-[#21262D] border-[#30363D]'
                 }`}>{t.statut}</span>
               </div>
@@ -233,7 +233,7 @@ export default function MobileMoneyPage() {
                   <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
                   <input type="number" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#2EA043]/50" />
+                    className="w-full bg-[#0D1117] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#E6EDF3] placeholder-[#484F58] outline-none focus:border-[#0D2147]/50" />
                   {form.type === 'envoi' && form.montant && (
                     <p className="text-xs text-[#8B949E] mt-1">
                       Frais : {fmtFCFA(Math.round(parseInt(form.montant||'0') * (FRAIS[form.operateur] ?? 0.01)))}
@@ -257,14 +257,14 @@ export default function MobileMoneyPage() {
                   </>
                 )}
                 {modal === 'recevoir' && form.montant && (
-                  <div className="bg-[#2EA043]/5 border border-[#2EA043]/20 rounded-lg p-3">
+                  <div className="bg-[#0D2147]/5 border border-[#0D2147]/20 rounded-lg p-3">
                     <p className="text-xs text-[#8B949E] mb-2">Partagez cette référence de paiement :</p>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 text-sm text-[#2EA043] font-mono bg-[#0D1117] rounded px-2 py-1">
+                      <code className="flex-1 text-sm text-[#0D2147] font-mono bg-[#0D1117] rounded px-2 py-1">
                         PAY-{form.operateur.toUpperCase()}-{form.montant}FCFA
                       </code>
                       <button onClick={() => copyToClipboard(`PAY-${form.operateur.toUpperCase()}-${form.montant}FCFA`)}
-                        className="p-1.5 text-[#8B949E] hover:text-[#2EA043] transition-colors">
+                        className="p-1.5 text-[#8B949E] hover:text-[#0D2147] transition-colors">
                         {copied ? <Check size={13} /> : <Copy size={13} />}
                       </button>
                     </div>
@@ -278,7 +278,7 @@ export default function MobileMoneyPage() {
                   Annuler
                 </button>
                 <button onClick={save} disabled={saving || !form.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#2EA043] text-white hover:bg-[#2EA043]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#0D2147] text-white hover:bg-[#0D2147]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   Confirmer
                 </button>

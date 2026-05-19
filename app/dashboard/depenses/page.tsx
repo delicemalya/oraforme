@@ -26,8 +26,8 @@ const CATEGORIES = [
   { id: 'electricite',  label: '💡 Électricité & Eau',           color: '#F0A30A' },
   { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#F07900' },
   { id: 'salaires',     label: '👥 Salaires & RH',               color: '#EC4899' },
-  { id: 'fournitures',  label: '🛒 Achats & Fournitures',        color: '#2EA043' },
-  { id: 'sante',        label: '🏥 Santé & Assurances',          color: '#06B6D4' },
+  { id: 'fournitures',  label: '🛒 Achats & Fournitures',        color: '#0D2147' },
+  { id: 'sante',        label: '🏥 Santé & Assurances',          color: '#0D2147' },
   { id: 'taxes',        label: '📊 Taxes & Impôts',              color: '#F01F38' },
   { id: 'maintenance',  label: '🔧 Maintenance & Réparations',   color: '#84CC16' },
   { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#F59E0B' },
@@ -184,8 +184,8 @@ export default function DepensesPage() {
         {[
           { label: 'Total période',       value: fmtFCFA(totalMois),   gradient: 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)', icon: TrendingDown },
           { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: 'linear-gradient(135deg,#78350F 0%,#D97706 50%,#F59E0B 100%)', icon: Receipt },
-          { label: 'Moyenne par jour',    value: fmtFCFA(moyJour),     gradient: 'linear-gradient(135deg,#1E3A5F 0%,#1D4ED8 50%,#3B82F6 100%)', icon: Receipt },
-          { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)' : 'linear-gradient(135deg,#065F46 0%,#059669 50%,#10B981 100%)', icon: varPct > 0 ? TrendingUp : TrendingDown },
+          { label: 'Moyenne par jour',    value: fmtFCFA(moyJour),     gradient: 'linear-gradient(135deg,#4A0040 0%,#8B0073 50%,#8B0073 100%)', icon: Receipt },
+          { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? 'linear-gradient(135deg,#7C1D1D 0%,#B91C1C 50%,#EF4444 100%)' : 'linear-gradient(135deg,#065F46 0%,#0D2147 50%,#1A3570 100%)', icon: varPct > 0 ? TrendingUp : TrendingDown },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -371,9 +371,9 @@ export default function DepensesPage() {
                     <BookOpen size={10} /> Écriture OHADA (auto-calculée)
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
-                    <div className="bg-[#0D1117] border border-[#2EA043]/20 rounded-lg px-3 py-2">
+                    <div className="bg-[#0D1117] border border-[#0D2147]/20 rounded-lg px-3 py-2">
                       <p className="text-[#484F58] mb-0.5">Débit</p>
-                      <p className="text-[#2EA043] font-semibold">{form.debit_account}</p>
+                      <p className="text-[#0D2147] font-semibold">{form.debit_account}</p>
                       <p className="text-[#484F58] text-[9px] truncate">{accountLabel(form.debit_account)}</p>
                     </div>
                     <div className="bg-[#0D1117] border border-[#F01F38]/20 rounded-lg px-3 py-2">

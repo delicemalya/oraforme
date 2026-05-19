@@ -29,16 +29,18 @@ export default function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [langOpen,     setLangOpen]     = useState(false)
   const [locale,       setLocale]       = useState<Locale>('fr')
-  const [theme,        setTheme]        = useState<'dark' | 'light'>('light')
+  const [theme,        setTheme]        = useState<'dark' | 'light'>('dark')
 
   // Company name comes from TenantContext — always in sync with current session
   const nomEntreprise = tenant?.nomEntreprise ?? null
 
   useEffect(() => {
     setLocale(getStoredLocale())
-    const stored = (localStorage.getItem('oraforme_theme') as 'dark' | 'light') ?? 'light'
-    setTheme(stored)
-    document.documentElement.setAttribute('data-theme', stored)
+    const stored = localStorage.getItem('oraforme_theme') as 'dark' | 'light' | null
+    const effective: 'dark' | 'light' = stored === 'light' ? 'light' : 'dark'
+    setTheme(effective)
+    document.documentElement.setAttribute('data-theme', effective)
+    localStorage.setItem('oraforme_theme', effective)
   }, [])
 
   // Company logo — initial fetch + live update via CustomEvent from Paramètres page

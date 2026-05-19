@@ -247,7 +247,7 @@ export default function AiAssistant() {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-[#E6EDF3]">✨ MIAA+ — Assistant Intelligent</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2EA043] animate-pulse shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0D2147] animate-pulse shrink-0" />
                     <p className="text-[10px] text-[#8B949E] truncate">Module : {MODULE_LABELS[currentModule] ?? currentModule}</p>
                   </div>
                 </div>

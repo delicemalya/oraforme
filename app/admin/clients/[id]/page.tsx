@@ -28,7 +28,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
   const mrr = (tenant.modules_actifs ?? []).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
 
   const STATUT_COLORS: Record<string, string> = {
-    payee: 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30',
+    payee: 'text-[#0D2147] bg-[#0D2147]/10 border-[#0D2147]/30',
     envoyee: 'text-[#F07900] bg-[#F07900]/10 border-[#F07900]/30',
     brouillon: 'text-[#8B949E] bg-[#21262D] border-[#30363D]',
     annulee: 'text-[#F01F38] bg-[#F01F38]/10 border-[#F01F38]/30',
@@ -60,7 +60,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         {[
           { icon: Building2, label: 'Plan', value: tenant.plan ?? '—', color: '#F0A30A' },
           { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#F07900' },
-          { icon: FileText, label: 'CA généré', value: fmtFCFA(caGenere), color: '#2EA043' },
+          { icon: FileText, label: 'CA généré', value: fmtFCFA(caGenere), color: '#0D2147' },
           { icon: Users, label: 'MRR estimé', value: fmtFCFA(mrr), color: '#F01F38' },
         ].map(c => (
           <div key={c.label} className="bg-[#161B22] border border-[#30363D] rounded-xl p-4">

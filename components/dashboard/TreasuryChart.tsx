@@ -48,7 +48,7 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
           <p className="text-[10px] text-[#484F58] mt-0.5">Entrées · Sorties · Solde cumulé</p>
         </div>
         <div className="flex gap-3 text-[10px]">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#2EA043] inline-block" />Entrées</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0D2147] inline-block" />Entrées</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F01F38] inline-block" />Sorties</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F0A30A] inline-block" />Solde</span>
         </div>
@@ -63,8 +63,8 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
           <ComposedChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="gradEntrees" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#2EA043" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#2EA043" stopOpacity={0} />
+                <stop offset="0%" stopColor="#0D2147" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#0D2147" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="gradSolde" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#F0A30A" stopOpacity={0.2} />
@@ -75,7 +75,7 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
             <XAxis dataKey="mois" tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="entrees" name="Entrées" fill="#2EA043" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
+            <Bar dataKey="entrees" name="Entrées" fill="#0D2147" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
             <Bar dataKey="sorties" name="Sorties" fill="#F01F38" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
             <Area type="monotone" dataKey="solde" name="Solde" stroke="#F0A30A" strokeWidth={2.5} fill="url(#gradSolde)" dot={false} activeDot={{ r: 5, fill: '#F0A30A' }} />
           </ComposedChart>

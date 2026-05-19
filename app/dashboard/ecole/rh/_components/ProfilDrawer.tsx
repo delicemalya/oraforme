@@ -48,9 +48,9 @@ const GOLD_BDR = 'rgba(244,180,0,0.28)'
 const T1 = '#F0F4FF'
 const T2 = '#8E9AB8'
 const T3 = '#4A5572'
-const GREEN  = '#22C55E'
+const GREEN  = '#0D2147'
 const RED    = '#EF4444'
-const BLUE   = '#3B82F6'
+const BLUE   = '#8B0073'
 const PURPLE = '#A855F7'
 
 const fmtN   = (n: number) => new Intl.NumberFormat('fr-FR').format(n)

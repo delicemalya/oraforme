@@ -17,10 +17,10 @@ interface Message { role: 'user' | 'bot'; text: string; ts?: number }
 const CAPABILITIES = [
   { icon: Calculator, label: 'Calculs fiscaux',       desc: 'TVA 18%, CA 5%, CNSS, IRPP Congo',       color: '#F0A30A' },
   { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#F07900' },
-  { icon: FileText,   label: 'Génération documents',  desc: 'Factures, bulletins de paie, rapports',   color: '#2EA043' },
+  { icon: FileText,   label: 'Génération documents',  desc: 'Factures, bulletins de paie, rapports',   color: '#0D2147' },
   { icon: Bell,       label: 'Alertes intelligentes', desc: 'Impayés, stock bas, échéances',            color: '#F01F38' },
   { icon: Cog,        label: 'Automatisation',        desc: 'Workflows, relances, rappels',             color: '#8B0073' },
-  { icon: Globe,      label: 'Multilingue',           desc: 'Français, English, Lingala',              color: '#06B6D4' },
+  { icon: Globe,      label: 'Multilingue',           desc: 'Français, English, Lingala',              color: '#0D2147' },
 ]
 
 // ── Quick actions by category ─────────────────────────────────────────────────
@@ -200,7 +200,7 @@ export default function MIAAPage() {
               <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#F0A30A20', color: '#F0A30A' }}>IA</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2EA043] animate-pulse shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0D2147] animate-pulse shrink-0" />
               <p className="text-[10px] text-[#8B949E] truncate">
                 {entreprise ? `${entreprise} · ` : ''}oraforme ERP · Spécialisé Congo-Brazzaville
               </p>

@@ -187,7 +187,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
   }
 
   const STATUT_CFG = {
-    en_cours: { label: 'En cours', color: '#2EA043', bg: '#2EA04318' },
+    en_cours: { label: 'En cours', color: '#0D2147', bg: '#0D214718' },
     cloture:  { label: 'Clôturée', color: '#F0A30A', bg: '#F0A30A18' },
     archive:  { label: 'Archivée', color: '#484F58', bg: '#48445818' },
   } as const
@@ -196,7 +196,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
-          <KpiCard label="Sessions actives" value={sessions.filter(s => s.statut === 'en_cours').length} color="#2EA043" />
+          <KpiCard label="Sessions actives" value={sessions.filter(s => s.statut === 'en_cours').length} color="#0D2147" />
           <KpiCard label="Total sessions" value={sessions.length} color="#F07900" />
         </div>
         <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#F0A30A] text-[#0D1117]">
@@ -632,8 +632,8 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <KpiCard label="Attestations émises" value={attestations.length} color="#06B6D4" />
-        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#06B6D4', color: '#0D1117' }}>
+        <KpiCard label="Attestations émises" value={attestations.length} color="#0D2147" />
+        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#0D2147', color: '#0D1117' }}>
           <Plus size={13} /> Émettre une attestation
         </button>
       </div>
@@ -641,8 +641,8 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="rounded-xl border border-[#06B6D4]/20 p-4 space-y-3" style={{ background: 'rgba(6,182,212,0.04)' }}>
-            <p className="text-xs font-bold text-[#06B6D4]">Nouvelle attestation</p>
+            className="rounded-xl border border-[#0D2147]/20 p-4 space-y-3" style={{ background: 'rgba(6,182,212,0.04)' }}>
+            <p className="text-xs font-bold text-[#0D2147]">Nouvelle attestation</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-[#8B949E] mb-1">Étudiant *</label>
@@ -661,7 +661,7 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
               <FI label="Motif / observations" value={form.motif} onChange={v => setForm(p => ({ ...p, motif: v }))} />
             </div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving || !form.etudiant_id} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#06B6D4', color: '#0D1117' }}>
+              <button onClick={save} disabled={saving || !form.etudiant_id} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#0D2147', color: '#0D1117' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <ScrollText size={12} />} Émettre
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
@@ -684,12 +684,12 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
                 return (
                   <tr key={a.id} className="border-t border-white/[0.04] hover:bg-white/[0.02]">
                     <Td>{e ? <div className="flex items-center gap-2"><Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={24} /><span className="text-white">{e.prenom} {e.nom}</span></div> : <span className="text-[#484F58]">—</span>}</Td>
-                    <Td className="text-[#06B6D4] text-[11px]">{TYPES_ATTESTATION.find(t => t.value === a.type_attestation)?.label}</Td>
+                    <Td className="text-[#0D2147] text-[11px]">{TYPES_ATTESTATION.find(t => t.value === a.type_attestation)?.label}</Td>
                     <Td><span className="text-[10px] font-mono text-[#8B949E]">{a.numero_ref ?? '—'}</span></Td>
                     <Td className="text-[#8B949E]">{a.annee_scolaire ?? '—'}</Td>
                     <Td className="text-[#8B949E]">{new Date(a.date_emission).toLocaleDateString('fr-FR')}</Td>
                     <Td>
-                      <button onClick={() => print(a)} className="text-[#484F58] hover:text-[#06B6D4] transition-colors" title="Imprimer">
+                      <button onClick={() => print(a)} className="text-[#484F58] hover:text-[#0D2147] transition-colors" title="Imprimer">
                         <Printer size={13} />
                       </button>
                     </Td>
@@ -825,7 +825,7 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
                           <button onClick={() => updateStatut(d.id, 'valide')} className="text-[10px] px-2 py-0.5 rounded border border-[#F07900]/30 text-[#F07900] hover:bg-[#F07900]/10 transition-colors">Valider</button>
                         )}
                         {d.statut === 'valide' && (
-                          <button onClick={() => updateStatut(d.id, 'delivre')} className="text-[10px] px-2 py-0.5 rounded border border-[#2EA043]/30 text-[#2EA043] hover:bg-[#2EA043]/10 transition-colors">Délivrer</button>
+                          <button onClick={() => updateStatut(d.id, 'delivre')} className="text-[10px] px-2 py-0.5 rounded border border-[#0D2147]/30 text-[#0D2147] hover:bg-[#0D2147]/10 transition-colors">Délivrer</button>
                         )}
                         {e && <button onClick={() => printDiploma(e, d, nomEcole)} className="text-[#484F58] hover:text-[#8B0073] transition-colors" title="Imprimer"><Printer size={12} /></button>}
                       </div>
@@ -901,7 +901,7 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
           <KpiCard label="Soutenances à venir" value={upcoming.length} color="#F07900" />
-          <KpiCard label="Passées" value={past.filter(d => d.statut === 'passe').length} color="#2EA043" />
+          <KpiCard label="Passées" value={past.filter(d => d.statut === 'passe').length} color="#0D2147" />
         </div>
         <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#F07900] text-white">
           <Plus size={13} /> Planifier une soutenance
@@ -1007,7 +1007,7 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
                       </>
                     )}
                     {d.statut === 'en_cours' && (
-                      <button onClick={() => setEditNote({ id: d.id, note: '', mention: '' })} className="text-[10px] px-2 py-1 rounded border border-[#2EA043]/30 text-[#2EA043] hover:bg-[#2EA043]/10 transition-colors">Saisir résultat</button>
+                      <button onClick={() => setEditNote({ id: d.id, note: '', mention: '' })} className="text-[10px] px-2 py-1 rounded border border-[#0D2147]/30 text-[#0D2147] hover:bg-[#0D2147]/10 transition-colors">Saisir résultat</button>
                     )}
                   </div>
                 </div>

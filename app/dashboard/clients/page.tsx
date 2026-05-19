@@ -18,7 +18,7 @@ interface Client {
   created_at: string
 }
 
-const AVATAR_COLORS = ['#F0A30A', '#F07900', '#2EA043', '#8B0073', '#EC4899', '#F97316', '#06B6D4', '#EF4444']
+const AVATAR_COLORS = ['#F0A30A', '#F07900', '#0D2147', '#8B0073', '#EC4899', '#F97316', '#0D2147', '#EF4444']
 function avatarColor(nom: string) { return AVATAR_COLORS[nom.charCodeAt(0) % AVATAR_COLORS.length] }
 function initials(nom: string) { return nom.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() }
 function fmtDate(d: string) { return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) }
@@ -133,7 +133,7 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
             className="fixed top-4 right-4 z-50 bg-[#161B22] border border-[#30363D] rounded-xl px-4 py-3 text-sm text-[#E6EDF3] shadow-2xl flex items-center gap-2"
           >
-            <CheckCircle size={14} className="text-[#2EA043]" /> {toast}
+            <CheckCircle size={14} className="text-[#0D2147]" /> {toast}
           </motion.div>
         )}
       </AnimatePresence>
@@ -159,7 +159,7 @@ export default function ClientsPage() {
       {/* KPI row */}
       <motion.div {...fadeUp(1)} className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <KpiCard label="Total clients"    value={clients.length}   sub="Dans votre base"         icon={Users}      color="#F07900" />
-        <KpiCard label="Nouveaux ce mois" value={newThisMonth}     sub="Ajoutés en mai"          icon={TrendingUp} color="#2EA043" />
+        <KpiCard label="Nouveaux ce mois" value={newThisMonth}     sub="Ajoutés en mai"          icon={TrendingUp} color="#0D2147" />
         <KpiCard label="Avec email"       value={clients.filter(c => c.email).length} sub="Contactables par mail" icon={Mail} color="#8B0073" />
       </motion.div>
 

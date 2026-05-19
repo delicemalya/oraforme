@@ -161,7 +161,7 @@ export default function AnalyticsPage() {
       <motion.div {...fadeUp(0)} className="flex items-center justify-between flex-wrap gap-3 pt-1">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg,#1E3A5F,#1D4ED8)' }}>
+            style={{ background: 'linear-gradient(135deg,#4A0040,#8B0073)' }}>
             <Activity size={18} className="text-white" />
           </div>
           <div>
@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex-1 min-w-fit py-2 px-2.5 rounded-lg text-[10px] font-semibold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === t.id ? 'bg-[#1D4ED8]/15 text-[#F07900]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
+                tab === t.id ? 'bg-[#8B0073]/15 text-[#F07900]' : 'text-[#8B949E] hover:text-[#E6EDF3]'
               }`}>
               <Icon size={11} />{t.label}
             </button>
@@ -215,13 +215,13 @@ export default function AnalyticsPage() {
                     value={fmtFCFA(data.financial.soldeTresorerie)}
                     sub={`+${fmtFCFA(data.financial.totalEntrees)} / -${fmtFCFA(data.financial.totalSorties)}`}
                     color={data.financial.soldeTresorerie >= 0
-                      ? 'linear-gradient(135deg,#065F46,#059669)'
+                      ? 'linear-gradient(135deg,#065F46,#0D2147)'
                       : 'linear-gradient(135deg,#7C1D1D,#B91C1C)'}
                     trend={data.financial.txPaiement} />
                   <KpiCard i={2} label="Effectif actif" icon={Users}
                     value={String(data.rh.nbActifs)}
                     sub={`${data.rh.nbConges} en congé`}
-                    color="linear-gradient(135deg,#1E3A5F,#1D4ED8)"
+                    color="linear-gradient(135deg,#4A0040,#8B0073)"
                     alert={data.rh.contratsExpirant30 > 0} />
                   <KpiCard i={3} label="Stock" icon={Package}
                     value={fmtFCFA(data.stock.valeurStock)}
@@ -235,11 +235,11 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Main trend */}
-                <ChartCard title="Flux de trésorerie mensuel" icon={TrendingUp} iconColor="#2EA043">
+                <ChartCard title="Flux de trésorerie mensuel" icon={TrendingUp} iconColor="#0D2147">
                   <BiTrendChart
                     data={data.charts.monthlyTrend}
                     series={[
-                      { dataKey: 'entrees',     color: '#2EA043', label: 'Encaissements' },
+                      { dataKey: 'entrees',     color: '#0D2147', label: 'Encaissements' },
                       { dataKey: 'sorties',     color: '#F01F38', label: 'Décaissements' },
                     ]}
                     height={230}
@@ -271,7 +271,7 @@ export default function AnalyticsPage() {
                   <ChartCard title="Automatisation" icon={Zap} iconColor="#F07900">
                     <div className="space-y-3">
                       {[
-                        { label: 'Tâches terminées',  val: data.automation.tasksDone,  color: '#2EA043' },
+                        { label: 'Tâches terminées',  val: data.automation.tasksDone,  color: '#0D2147' },
                         { label: 'En attente',         val: data.automation.tasksPend,  color: '#F0A30A' },
                         { label: 'En erreur',          val: data.automation.tasksError, color: '#F01F38' },
                         { label: 'Notifications',      val: data.automation.nbNotifs,   color: '#F07900' },
@@ -284,12 +284,12 @@ export default function AnalyticsPage() {
                       ))}
                     </div>
                     <button onClick={runAutomation} disabled={running}
-                      className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold bg-[#1D4ED8]/15 text-[#F07900] hover:bg-[#1D4ED8]/25 transition-colors disabled:opacity-50">
+                      className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold bg-[#8B0073]/15 text-[#F07900] hover:bg-[#8B0073]/25 transition-colors disabled:opacity-50">
                       {running ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
                       {running ? 'Vérification…' : 'Lancer les vérifications'}
                     </button>
                     {runResult && (
-                      <p className="mt-2 text-[10px] text-[#2EA043] bg-[#2EA043]/10 rounded-lg px-3 py-2">{runResult}</p>
+                      <p className="mt-2 text-[10px] text-[#0D2147] bg-[#0D2147]/10 rounded-lg px-3 py-2">{runResult}</p>
                     )}
                   </ChartCard>
 
@@ -338,7 +338,7 @@ export default function AnalyticsPage() {
                       )}
                       {!data.rh.contratsExpirant30 && !data.stock.articlesRupture && !data.stock.articlesCritiques && !data.financial.totalCreances && !data.automation.notifUnread && (
                         <div className="flex flex-col items-center py-6 gap-2">
-                          <CheckCircle size={20} className="text-[#2EA043]" />
+                          <CheckCircle size={20} className="text-[#0D2147]" />
                           <p className="text-xs text-[#484F58]">Aucune alerte active</p>
                         </div>
                       )}
@@ -357,7 +357,7 @@ export default function AnalyticsPage() {
                   {[
                     { label: 'Encaissements',  val: data.financial.totalEntrees,    color: '#065F46', icon: TrendingUp  },
                     { label: 'Décaissements',  val: data.financial.totalSorties,    color: '#7C1D1D', icon: TrendingDown },
-                    { label: 'Trésorerie net', val: data.financial.soldeTresorerie, color: '#1E3A5F', icon: Wallet       },
+                    { label: 'Trésorerie net', val: data.financial.soldeTresorerie, color: '#4A0040', icon: Wallet       },
                     { label: 'Créances',       val: data.financial.totalCreances,   color: '#4C1D95', icon: FileText     },
                   ].map((k, i) => (
                     <KpiCard key={k.label} i={i + 1} label={k.label} value={fmtFCFA(k.val)}
@@ -370,7 +370,7 @@ export default function AnalyticsPage() {
                   <BiTrendChart
                     data={data.charts.monthlyTrend}
                     series={[
-                      { dataKey: 'entrees',     color: '#2EA043', label: 'Encaissements' },
+                      { dataKey: 'entrees',     color: '#0D2147', label: 'Encaissements' },
                       { dataKey: 'sorties',     color: '#F01F38', label: 'Décaissements' },
                       { dataKey: 'facturation', color: '#F07900', label: 'Facturation HT' },
                     ]}
@@ -401,7 +401,7 @@ export default function AnalyticsPage() {
                   <ChartCard title="Indicateurs clés" icon={Activity} iconColor="#8B0073">
                     <div className="space-y-4 pt-2">
                       {[
-                        { label: 'Taux de paiement', val: `${data.financial.txPaiement}%`, color: data.financial.txPaiement >= 80 ? '#2EA043' : '#F0A30A', pct: data.financial.txPaiement },
+                        { label: 'Taux de paiement', val: `${data.financial.txPaiement}%`, color: data.financial.txPaiement >= 80 ? '#0D2147' : '#F0A30A', pct: data.financial.txPaiement },
                         { label: 'Factures payées',   val: `${data.financial.nbFactPay}/${data.financial.nbFactures}`, color: '#F07900', pct: data.financial.nbFactures > 0 ? (data.financial.nbFactPay / data.financial.nbFactures) * 100 : 0 },
                         { label: 'Recettes scolarité',val: fmtFCFA(data.financial.totalScol), color: '#8B0073', pct: data.financial.totalEntrees > 0 ? (data.financial.totalScol / data.financial.totalEntrees) * 100 : 0 },
                       ].map(r => (
@@ -431,10 +431,10 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                   <KpiCard i={1} label="Employés actifs" icon={Users}
                     value={String(data.rh.nbActifs)} sub={`/${data.rh.nbTotal} total`}
-                    color="linear-gradient(135deg,#065F46,#059669)" />
+                    color="linear-gradient(135deg,#065F46,#0D2147)" />
                   <KpiCard i={2} label="En congé" icon={Clock}
                     value={String(data.rh.nbConges)} sub="collaborateurs"
-                    color="linear-gradient(135deg,#1E3A5F,#1D4ED8)" />
+                    color="linear-gradient(135deg,#4A0040,#8B0073)" />
                   <KpiCard i={3} label="Masse salariale" icon={Wallet}
                     value={fmtFCFA(data.rh.masseSal)} sub="exercice"
                     color="linear-gradient(135deg,#4C1D95,#7C3AED)" />
@@ -454,14 +454,14 @@ export default function AnalyticsPage() {
 
                 <div className="bg-[#161B22] border border-[#21262D] rounded-2xl overflow-hidden">
                   <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#21262D]">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#1D4ED8]/20">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#8B0073]/20">
                       <Users size={13} className="text-[#F07900]" />
                     </div>
                     <span className="text-xs font-bold text-[#E6EDF3] uppercase tracking-wider">Répartition effectif</span>
                   </div>
                   <div className="p-5 grid grid-cols-3 gap-4">
                     {[
-                      { label: 'Actifs',    val: data.rh.nbActifs,  color: '#2EA043', pct: data.rh.nbTotal > 0 ? (data.rh.nbActifs / data.rh.nbTotal) * 100 : 0 },
+                      { label: 'Actifs',    val: data.rh.nbActifs,  color: '#0D2147', pct: data.rh.nbTotal > 0 ? (data.rh.nbActifs / data.rh.nbTotal) * 100 : 0 },
                       { label: 'En congé', val: data.rh.nbConges,   color: '#F07900', pct: data.rh.nbTotal > 0 ? (data.rh.nbConges / data.rh.nbTotal) * 100 : 0 },
                       { label: 'Autres',   val: data.rh.nbTotal - data.rh.nbActifs - data.rh.nbConges, color: '#6B7280', pct: data.rh.nbTotal > 0 ? ((data.rh.nbTotal - data.rh.nbActifs - data.rh.nbConges) / data.rh.nbTotal) * 100 : 0 },
                     ].map(r => (
@@ -492,10 +492,10 @@ export default function AnalyticsPage() {
                     color="linear-gradient(135deg,#4C1D95,#7C3AED)" />
                   <KpiCard i={2} label="Recettes scolarité" icon={Wallet}
                     value={fmtFCFA(data.ecole.totalScol)} sub="paiements reçus"
-                    color="linear-gradient(135deg,#065F46,#059669)" />
+                    color="linear-gradient(135deg,#065F46,#0D2147)" />
                   <KpiCard i={3} label="Automation notifications" icon={Bell}
                     value={String(data.automation.nbNotifs)} sub={`${data.automation.notifUnread} non lue(s)`}
-                    color="linear-gradient(135deg,#1E3A5F,#1D4ED8)" />
+                    color="linear-gradient(135deg,#4A0040,#8B0073)" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -508,10 +508,10 @@ export default function AnalyticsPage() {
                     />
                   </ChartCard>
 
-                  <ChartCard title="Recettes scolarité par mois" icon={Wallet} iconColor="#2EA043">
+                  <ChartCard title="Recettes scolarité par mois" icon={Wallet} iconColor="#0D2147">
                     <BiBarChart
                       data={data.charts.scolParMois}
-                      series={[{ dataKey: 'montant', color: '#059669', label: 'Scolarité' }]}
+                      series={[{ dataKey: 'montant', color: '#0D2147', label: 'Scolarité' }]}
                       height={200}
                     />
                   </ChartCard>
@@ -539,7 +539,7 @@ export default function AnalyticsPage() {
                   <KpiCard i={4} label="Articles OK" icon={CheckCircle}
                     value={String(Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques))}
                     sub="en stock suffisant"
-                    color="linear-gradient(135deg,#065F46,#059669)" />
+                    color="linear-gradient(135deg,#065F46,#0D2147)" />
                 </div>
 
                 {/* Top articles */}
@@ -576,13 +576,13 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Stock health donut */}
-                <ChartCard title="Santé du stock" icon={Activity} iconColor="#059669">
+                <ChartCard title="Santé du stock" icon={Activity} iconColor="#0D2147">
                   {data.stock.nbArticles > 0 ? (
                     <div className="flex items-center gap-6">
                       <div className="flex-1">
                         <BiDonutChart
                           data={[
-                            { name: 'OK',      value: Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques), color: '#2EA043' },
+                            { name: 'OK',      value: Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques), color: '#0D2147' },
                             { name: 'Critique', value: data.stock.articlesCritiques, color: '#F97316' },
                             { name: 'Rupture',  value: data.stock.articlesRupture,   color: '#F01F38' },
                           ].filter(d => d.value > 0)}
@@ -591,7 +591,7 @@ export default function AnalyticsPage() {
                       </div>
                       <div className="space-y-3">
                         {[
-                          { label: 'En stock', color: '#2EA043', val: Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques) },
+                          { label: 'En stock', color: '#0D2147', val: Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques) },
                           { label: 'Critique',  color: '#F97316', val: data.stock.articlesCritiques },
                           { label: 'Rupture',   color: '#F01F38', val: data.stock.articlesRupture },
                         ].map(r => (
@@ -618,7 +618,7 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                   <KpiCard i={1} label="Tâches terminées" icon={CheckCircle}
                     value={String(data.automation.tasksDone)} sub={`${year}`}
-                    color="linear-gradient(135deg,#065F46,#059669)" />
+                    color="linear-gradient(135deg,#065F46,#0D2147)" />
                   <KpiCard i={2} label="En attente" icon={Clock}
                     value={String(data.automation.tasksPend)} sub="à traiter"
                     color="linear-gradient(135deg,#78350F,#D97706)"
@@ -629,14 +629,14 @@ export default function AnalyticsPage() {
                     alert={data.automation.tasksError > 0} />
                   <KpiCard i={4} label="Notifications" icon={Bell}
                     value={String(data.automation.nbNotifs)} sub={`${data.automation.notifUnread} non lue(s)`}
-                    color="linear-gradient(135deg,#1E3A5F,#1D4ED8)" />
+                    color="linear-gradient(135deg,#4A0040,#8B0073)" />
                 </div>
 
                 {/* Run checks panel */}
                 <div className="bg-[#161B22] border border-[#21262D] rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#1D4ED8]/20">
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#8B0073]/20">
                         <Zap size={16} className="text-[#F07900]" />
                       </div>
                       <div>
@@ -646,14 +646,14 @@ export default function AnalyticsPage() {
                     </div>
                     <button onClick={runAutomation} disabled={running}
                       className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-                      style={{ background: 'linear-gradient(135deg,#1D4ED8,#3B82F6)', color: '#fff' }}>
+                      style={{ background: 'linear-gradient(135deg,#8B0073,#8B0073)', color: '#fff' }}>
                       {running ? <Loader2 size={13} className="animate-spin" /> : <Zap size={13} />}
                       {running ? 'Vérification en cours…' : 'Lancer maintenant'}
                     </button>
                   </div>
                   {runResult && (
-                    <div className="bg-[#2EA043]/10 border border-[#2EA043]/20 rounded-xl px-4 py-3">
-                      <p className="text-xs text-[#2EA043]">{runResult}</p>
+                    <div className="bg-[#0D2147]/10 border border-[#0D2147]/20 rounded-xl px-4 py-3">
+                      <p className="text-xs text-[#0D2147]">{runResult}</p>
                     </div>
                   )}
                   <div className="mt-4 grid grid-cols-3 gap-3">
@@ -676,7 +676,7 @@ export default function AnalyticsPage() {
                   {(data.automation.tasksDone + data.automation.tasksPend + data.automation.tasksError) > 0 ? (
                     <BiDonutChart
                       data={[
-                        { name: 'Terminées', value: data.automation.tasksDone,  color: '#2EA043' },
+                        { name: 'Terminées', value: data.automation.tasksDone,  color: '#0D2147' },
                         { name: 'En attente', value: data.automation.tasksPend, color: '#F0A30A' },
                         { name: 'Erreurs',    value: data.automation.tasksError,color: '#F01F38' },
                       ].filter(d => d.value > 0)}
