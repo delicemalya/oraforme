@@ -82,28 +82,63 @@ function getGreeting(nom: string): string {
     : `${salut} ! Je suis **MIAA+**, l'assistant IA d'oraforme. Posez-moi vos questions sur la gestion de votre entreprise.`
 }
 
-// ── Logo MIAA+ (stylisé comme le logo bleu/chat/rose+) ────────────────────────
+// ── Logo MIAA+ ────────────────────────────────────────────────────────────────
 
 function MIAALogo({ size = 32 }: { size?: number }) {
+  const badgeSize = size * 0.36
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      {/* Outer blue ring */}
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{ background: '#3B7EC8', padding: 2 }}
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ width: '100%', height: '100%' }}
       >
-        {/* White ring gap */}
-        <div className="w-full h-full rounded-full bg-white/20 p-0.5">
-          {/* Inner blue circle */}
-          <div className="w-full h-full rounded-full bg-[#3B7EC8] flex items-center justify-center">
-            <span style={{ fontSize: size * 0.35, lineHeight: 1 }}>🐱</span>
-          </div>
-        </div>
-      </div>
+        {/* Outer blue ring */}
+        <circle cx="50" cy="50" r="48" fill="#3B7EC8" />
+        {/* White gap ring */}
+        <circle cx="50" cy="50" r="36" fill="white" />
+        {/* Inner dark-blue circle */}
+        <circle cx="50" cy="50" r="30" fill="#2E6BAA" />
+
+        {/* ── Cat face (white line-art) ── */}
+        {/* Head */}
+        <circle cx="50" cy="54" r="18" stroke="white" strokeWidth="2.4" fill="none" />
+        {/* Left ear */}
+        <path d="M35 40 L29 28 L42 36" stroke="white" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+        {/* Right ear */}
+        <path d="M60 35 L67 24 L71 37" stroke="white" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+        {/* Left eye */}
+        <circle cx="42" cy="51" r="3.2" stroke="white" strokeWidth="1.8" fill="none" />
+        <circle cx="42" cy="51" r="1.1" fill="white" />
+        {/* Right eye */}
+        <circle cx="58" cy="51" r="3.2" stroke="white" strokeWidth="1.8" fill="none" />
+        <circle cx="58" cy="51" r="1.1" fill="white" />
+        {/* Nose dot */}
+        <circle cx="50" cy="58" r="1.4" fill="white" />
+        {/* Snout pointing right */}
+        <path d="M50 58 L58 55" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
+        {/* Left whiskers */}
+        <line x1="18" y1="53" x2="36" y2="57" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="18" y1="58" x2="36" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="18" y1="63" x2="36" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Right whiskers */}
+        <line x1="82" y1="53" x2="64" y2="57" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="82" y1="58" x2="64" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="82" y1="63" x2="64" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+
       {/* Pink + badge */}
       <div
-        className="absolute -top-0.5 -right-0.5 rounded-full bg-[#8B0070] flex items-center justify-center text-white font-bold"
-        style={{ width: size * 0.35, height: size * 0.35, fontSize: size * 0.18 }}
+        className="absolute rounded-full flex items-center justify-center text-white font-bold"
+        style={{
+          width: badgeSize, height: badgeSize,
+          background: '#D63B8E',
+          top: -badgeSize * 0.15, right: -badgeSize * 0.15,
+          fontSize: badgeSize * 0.6,
+          lineHeight: 1,
+          boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+        }}
       >
         +
       </div>
