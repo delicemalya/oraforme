@@ -150,14 +150,14 @@ function buildEmailHtml({ tenantName, recipientName, docLabel, pdfUrl, message }
 <body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;margin:0">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
     <div style="background:#142850;padding:24px 32px">
-      <h1 style="color:#F08900;margin:0;font-size:20px">${tenantName}</h1>
+      <h1 style="color:#F51E33;margin:0;font-size:20px">${tenantName}</h1>
       <p style="color:#8B949E;margin:4px 0 0;font-size:13px">${docLabel}</p>
     </div>
     <div style="padding:32px">
       <p style="color:#333;font-size:15px">Cher(e) <strong>${recipientName}</strong>,</p>
       <p style="color:#555;font-size:14px;line-height:1.6">${message}</p>
       <div style="text-align:center;margin:32px 0">
-        <a href="${pdfUrl}" style="display:inline-block;padding:14px 32px;background:#F08900;color:#000;text-decoration:none;border-radius:6px;font-weight:bold;font-size:14px">
+        <a href="${pdfUrl}" style="display:inline-block;padding:14px 32px;background:#F51E33;color:#000;text-decoration:none;border-radius:6px;font-weight:bold;font-size:14px">
           📄 Télécharger ${docLabel}
         </a>
       </div>

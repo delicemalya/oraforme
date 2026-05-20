@@ -10,9 +10,9 @@ type ModuleRevData = { module: string; clients: number; mrr: number }
 type GrowthData = { date: string; inscriptions: number }
 
 const RED = '#F51E33'
-const ORANGE = '#F08900'
+const ORANGE = '#F51E33'
 const GREEN = '#142850'
-const BLUE = '#F08900'
+const BLUE = '#F51E33'
 
 function CustomTooltip({ active, payload, label }: {
   active?: boolean
@@ -21,8 +21,8 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-lg p-3 text-xs shadow-xl">
-      <p className="text-[#8B949E] mb-1.5">{label}</p>
+    <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-3 text-xs shadow-xl">
+      <p className="text-[var(--text-secondary)] mb-1.5">{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color }}>
           {p.name}: <span className="font-semibold">{

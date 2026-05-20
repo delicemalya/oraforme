@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Admin header */}
-        <header className="h-14 bg-[#0f1e3d] border-b border-[#30363D] flex items-center px-4 lg:px-6 shrink-0">
+        <header className="h-14 bg-[var(--card-bg)] border-b border-[var(--border)] flex items-center px-4 lg:px-6 shrink-0">
           <div className="w-8 lg:hidden shrink-0" />
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-[#F51E33] animate-pulse" />
@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <div className="w-7 h-7 rounded-full bg-[#F51E33]/20 border border-[#F51E33]/30 flex items-center justify-center">
               <span className="text-[#F51E33] text-xs font-bold">A</span>
             </div>
-            <span className="text-sm text-[#8B949E] hidden sm:block">{user.email}</span>
+            <span className="text-sm text-[var(--text-secondary)] hidden sm:block">{user.email}</span>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto">

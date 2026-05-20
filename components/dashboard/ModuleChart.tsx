@@ -9,7 +9,7 @@ export default function ModuleChart({ data, title }: { data: Entry[]; title: str
 
   const normalizedData = data.map(d => ({
     ...d,
-    color: d.color === '#142850' ? '#F08900' : d.color,
+    color: d.color === '#142850' ? '#F51E33' : d.color,
   }))
 
   return (

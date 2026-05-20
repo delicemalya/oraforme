@@ -24,7 +24,7 @@ function timeAgo(d: string) {
 
 const STATUT: Record<string, { label: string; color: string; Icon: React.ElementType; action: string }> = {
   brouillon: { label: 'Brouillon',  color: '#8B949E', Icon: Clock,        action: 'créé un brouillon' },
-  envoyee:   { label: 'Envoyée',   color: '#F08900', Icon: Send,         action: 'envoyé une facture' },
+  envoyee:   { label: 'Envoyée',   color: '#F51E33', Icon: Send,         action: 'envoyé une facture' },
   payee:     { label: 'Payée',     color: '#142850', Icon: CheckCircle,  action: 'reçu un paiement' },
   annulee:   { label: 'Annulée',  color: '#F51E33', Icon: FileText,     action: 'annulé une facture' },
 }
@@ -38,10 +38,10 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
     return (
       <div className="flex flex-col items-center justify-center py-10 gap-2">
         <div className="w-10 h-10 rounded-full bg-[#1a2d50] flex items-center justify-center">
-          <FileText size={18} className="text-[#484F58]" />
+          <FileText size={18} className="text-[var(--text-secondary)]" />
         </div>
-        <p className="text-xs text-[#484F58]">Aucune activité récente</p>
-        <Link href="/dashboard/facturation" className="text-xs text-[#F08900] hover:underline mt-1">
+        <p className="text-xs text-[var(--text-secondary)]">Aucune activité récente</p>
+        <Link href="/dashboard/facturation" className="text-xs text-[#F51E33] hover:underline mt-1">
           Créer une facture →
         </Link>
       </div>
@@ -62,7 +62,7 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.38, delay: i * 0.06, ease: [0.23, 1, 0.32, 1] }}
-            className="flex items-start gap-3 py-3 border-b border-[#1a2d50] last:border-0 hover:bg-[#1a2d50]/30 px-1 -mx-1 rounded-lg transition-colors"
+            className="flex items-start gap-3 py-3 border-b border-[var(--border)] last:border-0 hover:bg-white/5/30 px-1 -mx-1 rounded-lg transition-colors"
           >
             {/* Colored avatar */}
             <div
@@ -77,12 +77,12 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Icon size={10} style={{ color: st.color }} className="shrink-0" />
                 <span className="text-[10px]" style={{ color: st.color }}>{st.action}</span>
-                <span className="text-[10px] text-[#30363D]">·</span>
-                <span className="text-[10px] font-semibold text-[#8B949E]">{fmt(item.total)} FCFA</span>
+                <span className="text-[10px] text-[var(--text-secondary)]">·</span>
+                <span className="text-[10px] font-semibold text-[var(--text-secondary)]">{fmt(item.total)} FCFA</span>
               </div>
             </div>
 
-            <span className="text-[10px] text-[#484F58] shrink-0 mt-0.5 whitespace-nowrap">
+            <span className="text-[10px] text-[var(--text-secondary)] shrink-0 mt-0.5 whitespace-nowrap">
               {timeAgo(item.created_at)}
             </span>
           </motion.div>

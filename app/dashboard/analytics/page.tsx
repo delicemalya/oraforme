@@ -91,8 +91,8 @@ function ChartCard({ title, icon: Icon, iconColor, children, className = '' }: {
   title: string; icon: React.ElementType; iconColor: string; children: React.ReactNode; className?: string
 }) {
   return (
-    <div className={`bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl overflow-hidden ${className}`}>
-      <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1a2d50]">
+    <div className={`bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl overflow-hidden ${className}`}>
+      <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[var(--border)]">
         <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: iconColor + '22' }}>
           <Icon size={13} style={{ color: iconColor }} />
         </div>
@@ -166,29 +166,29 @@ export default function AnalyticsPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[#FFFFFF]">Analytics & BI</h1>
-            <p className="text-xs text-[#484F58]">Intelligence économique · Exercice {year}</p>
+            <p className="text-xs text-[var(--text-secondary)]">Intelligence économique · Exercice {year}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="bg-[#0f1e3d] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+            className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <button onClick={load}
-            className="p-2 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
+            className="p-2 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
       </motion.div>
 
       {/* ── Tabs ── */}
-      <div className="flex gap-1 bg-[#0f1e3d] border border-[#30363D] rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1 overflow-x-auto">
         {TABS.map(t => {
           const Icon = t.icon
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex-1 min-w-fit py-2 px-2.5 rounded-lg text-[10px] font-semibold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === t.id ? 'bg-[#8B0070]/15 text-[#F08900]' : 'text-[#8B949E] hover:text-[#FFFFFF]'
+                tab === t.id ? 'bg-[#8B0070]/15 text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
               }`}>
               <Icon size={11} />{t.label}
             </button>
@@ -197,7 +197,7 @@ export default function AnalyticsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-24 text-[#8B949E]">
+        <div className="flex items-center justify-center py-24 text-[var(--text-secondary)]">
           <Loader2 size={20} className="animate-spin mr-2" /> Chargement des analytics…
         </div>
       ) : data ? (
@@ -249,7 +249,7 @@ export default function AnalyticsPage() {
                 {/* 3-col summary */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   {/* Factures donut */}
-                  <ChartCard title="Statut factures" icon={FileText} iconColor="#F08900">
+                  <ChartCard title="Statut factures" icon={FileText} iconColor="#F51E33">
                     {data.charts.facturesByStatus.length > 0 ? (
                       <>
                         <BiDonutChart data={data.charts.facturesByStatus} height={160} />
@@ -263,18 +263,18 @@ export default function AnalyticsPage() {
                         </div>
                       </>
                     ) : (
-                      <p className="text-xs text-[#484F58] text-center py-8">Aucune facture</p>
+                      <p className="text-xs text-[var(--text-secondary)] text-center py-8">Aucune facture</p>
                     )}
                   </ChartCard>
 
                   {/* Automation status */}
-                  <ChartCard title="Automatisation" icon={Zap} iconColor="#F08900">
+                  <ChartCard title="Automatisation" icon={Zap} iconColor="#F51E33">
                     <div className="space-y-3">
                       {[
                         { label: 'Tâches terminées',  val: data.automation.tasksDone,  color: '#142850' },
-                        { label: 'En attente',         val: data.automation.tasksPend,  color: '#F08900' },
+                        { label: 'En attente',         val: data.automation.tasksPend,  color: '#F51E33' },
                         { label: 'En erreur',          val: data.automation.tasksError, color: '#F51E33' },
-                        { label: 'Notifications',      val: data.automation.nbNotifs,   color: '#F08900' },
+                        { label: 'Notifications',      val: data.automation.nbNotifs,   color: '#F51E33' },
                         { label: 'Non lues',           val: data.automation.notifUnread,color: '#8B0070' },
                       ].map(r => (
                         <div key={r.label} className="flex items-center justify-between">
@@ -284,12 +284,12 @@ export default function AnalyticsPage() {
                       ))}
                     </div>
                     <button onClick={runAutomation} disabled={running}
-                      className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold bg-[#8B0070]/15 text-[#F08900] hover:bg-[#8B0070]/25 transition-colors disabled:opacity-50">
+                      className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold bg-[#8B0070]/15 text-[#F51E33] hover:bg-[#8B0070]/25 transition-colors disabled:opacity-50">
                       {running ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
                       {running ? 'Vérification…' : 'Lancer les vérifications'}
                     </button>
                     {runResult && (
-                      <p className="mt-2 text-[10px] text-[#142850] bg-[#142850]/10 rounded-lg px-3 py-2">{runResult}</p>
+                      <p className="mt-2 text-[10px] text-[#F51E33] bg-[#142850]/10 rounded-lg px-3 py-2">{runResult}</p>
                     )}
                   </ChartCard>
 
@@ -297,8 +297,8 @@ export default function AnalyticsPage() {
                   <ChartCard title="Alertes actives" icon={AlertTriangle} iconColor="#F51E33">
                     <div className="space-y-2">
                       {data.rh.contratsExpirant30 > 0 && (
-                        <div className="flex items-start gap-2 bg-[#F08900]/10 rounded-xl p-2.5">
-                          <Clock size={12} className="text-[#F08900] mt-0.5 shrink-0" />
+                        <div className="flex items-start gap-2 bg-[#F51E33]/10 rounded-xl p-2.5">
+                          <Clock size={12} className="text-[#F51E33] mt-0.5 shrink-0" />
                           <p className="text-[10px] text-[#FFFFFF]">
                             <b>{data.rh.contratsExpirant30}</b> contrat(s) expirant dans 30 jours
                           </p>
@@ -313,8 +313,8 @@ export default function AnalyticsPage() {
                         </div>
                       )}
                       {data.stock.articlesCritiques > 0 && (
-                        <div className="flex items-start gap-2 bg-[#F08900]/10 rounded-xl p-2.5">
-                          <AlertTriangle size={12} className="text-[#F08900] mt-0.5 shrink-0" />
+                        <div className="flex items-start gap-2 bg-[#F51E33]/10 rounded-xl p-2.5">
+                          <AlertTriangle size={12} className="text-[#F51E33] mt-0.5 shrink-0" />
                           <p className="text-[10px] text-[#FFFFFF]">
                             <b>{data.stock.articlesCritiques}</b> article(s) en stock critique
                           </p>
@@ -329,8 +329,8 @@ export default function AnalyticsPage() {
                         </div>
                       )}
                       {data.automation.notifUnread > 0 && (
-                        <div className="flex items-start gap-2 bg-[#F08900]/10 rounded-xl p-2.5">
-                          <Bell size={12} className="text-[#F08900] mt-0.5 shrink-0" />
+                        <div className="flex items-start gap-2 bg-[#F51E33]/10 rounded-xl p-2.5">
+                          <Bell size={12} className="text-[#F51E33] mt-0.5 shrink-0" />
                           <p className="text-[10px] text-[#FFFFFF]">
                             <b>{data.automation.notifUnread}</b> notification(s) non lue(s)
                           </p>
@@ -338,8 +338,8 @@ export default function AnalyticsPage() {
                       )}
                       {!data.rh.contratsExpirant30 && !data.stock.articlesRupture && !data.stock.articlesCritiques && !data.financial.totalCreances && !data.automation.notifUnread && (
                         <div className="flex flex-col items-center py-6 gap-2">
-                          <CheckCircle size={20} className="text-[#142850]" />
-                          <p className="text-xs text-[#484F58]">Aucune alerte active</p>
+                          <CheckCircle size={20} className="text-[#F51E33]" />
+                          <p className="text-xs text-[var(--text-secondary)]">Aucune alerte active</p>
                         </div>
                       )}
                     </div>
@@ -366,20 +366,20 @@ export default function AnalyticsPage() {
                   ))}
                 </div>
 
-                <ChartCard title="Évolution mensuelle — Facturation vs Trésorerie" icon={TrendingUp} iconColor="#F08900">
+                <ChartCard title="Évolution mensuelle — Facturation vs Trésorerie" icon={TrendingUp} iconColor="#F51E33">
                   <BiTrendChart
                     data={data.charts.monthlyTrend}
                     series={[
                       { dataKey: 'entrees',     color: '#142850', label: 'Encaissements' },
                       { dataKey: 'sorties',     color: '#F51E33', label: 'Décaissements' },
-                      { dataKey: 'facturation', color: '#F08900', label: 'Facturation HT' },
+                      { dataKey: 'facturation', color: '#F51E33', label: 'Facturation HT' },
                     ]}
                     height={250}
                   />
                 </ChartCard>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <ChartCard title="Statut des factures" icon={FileText} iconColor="#F08900">
+                  <ChartCard title="Statut des factures" icon={FileText} iconColor="#F51E33">
                     {data.charts.facturesByStatus.length > 0 ? (
                       <>
                         <BiDonutChart data={data.charts.facturesByStatus} height={180} />
@@ -388,21 +388,21 @@ export default function AnalyticsPage() {
                             <div key={s.name} className="flex items-center justify-between px-1">
                               <div className="flex items-center gap-2">
                                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
-                                <span className="text-xs text-[#8B949E]">{s.name}</span>
+                                <span className="text-xs text-[var(--text-secondary)]">{s.name}</span>
                               </div>
                               <span className="text-xs font-bold text-[#FFFFFF]">{s.value}</span>
                             </div>
                           ))}
                         </div>
                       </>
-                    ) : <p className="text-xs text-[#484F58] text-center py-8">Aucune facture</p>}
+                    ) : <p className="text-xs text-[var(--text-secondary)] text-center py-8">Aucune facture</p>}
                   </ChartCard>
 
                   <ChartCard title="Indicateurs clés" icon={Activity} iconColor="#8B0070">
                     <div className="space-y-4 pt-2">
                       {[
-                        { label: 'Taux de paiement', val: `${data.financial.txPaiement}%`, color: data.financial.txPaiement >= 80 ? '#142850' : '#F08900', pct: data.financial.txPaiement },
-                        { label: 'Factures payées',   val: `${data.financial.nbFactPay}/${data.financial.nbFactures}`, color: '#F08900', pct: data.financial.nbFactures > 0 ? (data.financial.nbFactPay / data.financial.nbFactures) * 100 : 0 },
+                        { label: 'Taux de paiement', val: `${data.financial.txPaiement}%`, color: data.financial.txPaiement >= 80 ? '#142850' : '#F51E33', pct: data.financial.txPaiement },
+                        { label: 'Factures payées',   val: `${data.financial.nbFactPay}/${data.financial.nbFactures}`, color: '#F51E33', pct: data.financial.nbFactures > 0 ? (data.financial.nbFactPay / data.financial.nbFactures) * 100 : 0 },
                         { label: 'Recettes scolarité',val: fmtFCFA(data.financial.totalScol), color: '#8B0070', pct: data.financial.totalEntrees > 0 ? (data.financial.totalScol / data.financial.totalEntrees) * 100 : 0 },
                       ].map(r => (
                         <div key={r.label}>
@@ -452,28 +452,28 @@ export default function AnalyticsPage() {
                   />
                 </ChartCard>
 
-                <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl overflow-hidden">
-                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1a2d50]">
+                <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl overflow-hidden">
+                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[var(--border)]">
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#8B0070]/20">
-                      <Users size={13} className="text-[#F08900]" />
+                      <Users size={13} className="text-[#F51E33]" />
                     </div>
                     <span className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">Répartition effectif</span>
                   </div>
                   <div className="p-5 grid grid-cols-3 gap-4">
                     {[
                       { label: 'Actifs',    val: data.rh.nbActifs,  color: '#142850', pct: data.rh.nbTotal > 0 ? (data.rh.nbActifs / data.rh.nbTotal) * 100 : 0 },
-                      { label: 'En congé', val: data.rh.nbConges,   color: '#F08900', pct: data.rh.nbTotal > 0 ? (data.rh.nbConges / data.rh.nbTotal) * 100 : 0 },
+                      { label: 'En congé', val: data.rh.nbConges,   color: '#F51E33', pct: data.rh.nbTotal > 0 ? (data.rh.nbConges / data.rh.nbTotal) * 100 : 0 },
                       { label: 'Autres',   val: data.rh.nbTotal - data.rh.nbActifs - data.rh.nbConges, color: '#6B7280', pct: data.rh.nbTotal > 0 ? ((data.rh.nbTotal - data.rh.nbActifs - data.rh.nbConges) / data.rh.nbTotal) * 100 : 0 },
                     ].map(r => (
                       <div key={r.label} className="text-center">
                         <p className="text-2xl font-bold mb-1" style={{ color: r.color }}>{r.val}</p>
-                        <p className="text-[10px] text-[#484F58] mb-2">{r.label}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] mb-2">{r.label}</p>
                         <div className="h-1 bg-[#1a2d50] rounded-full overflow-hidden">
                           <motion.div className="h-full rounded-full" style={{ background: r.color }}
                             initial={{ width: 0 }} animate={{ width: `${Math.min(r.pct, 100)}%` }}
                             transition={{ duration: 0.8 }} />
                         </div>
-                        <p className="text-[9px] text-[#484F58] mt-1">{Math.round(r.pct)}%</p>
+                        <p className="text-[9px] text-[var(--text-secondary)] mt-1">{Math.round(r.pct)}%</p>
                       </div>
                     ))}
                   </div>
@@ -543,34 +543,34 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Top articles */}
-                <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl overflow-hidden">
-                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1a2d50]">
+                <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl overflow-hidden">
+                  <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[var(--border)]">
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#C06000]/20">
                       <Package size={13} className="text-[#C06000]" />
                     </div>
                     <span className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">Top articles par valeur</span>
                   </div>
-                  <div className="divide-y divide-[#1a2d50]">
+                  <div className="divide-y divide-[var(--border)]">
                     {data.stock.topArticles.length > 0 ? data.stock.topArticles.map((a, i) => {
                       const pct = data.stock.valeurStock > 0 ? (a.valeur / data.stock.valeurStock) * 100 : 0
                       return (
                         <div key={i} className="px-5 py-3.5">
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-sm text-[#FFFFFF] font-medium truncate pr-4">{a.nom}</span>
-                            <span className="text-xs font-bold text-[#F08900] shrink-0">{fmtFCFA(a.valeur)}</span>
+                            <span className="text-xs font-bold text-[#F51E33] shrink-0">{fmtFCFA(a.valeur)}</span>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="flex-1 h-1 bg-[#1a2d50] rounded-full overflow-hidden">
-                              <motion.div className="h-full rounded-full bg-[#F08900]"
+                              <motion.div className="h-full rounded-full bg-[#F51E33]"
                                 initial={{ width: 0 }} animate={{ width: `${Math.min(pct, 100)}%` }}
                                 transition={{ duration: 0.7, delay: i * 0.1 }} />
                             </div>
-                            <span className="text-[10px] text-[#484F58] shrink-0">{a.quantite} unités</span>
+                            <span className="text-[10px] text-[var(--text-secondary)] shrink-0">{a.quantite} unités</span>
                           </div>
                         </div>
                       )
                     }) : (
-                      <p className="text-xs text-[#484F58] text-center py-8">Aucun article en stock</p>
+                      <p className="text-xs text-[var(--text-secondary)] text-center py-8">Aucun article en stock</p>
                     )}
                   </div>
                 </div>
@@ -583,7 +583,7 @@ export default function AnalyticsPage() {
                         <BiDonutChart
                           data={[
                             { name: 'OK',      value: Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques), color: '#142850' },
-                            { name: 'Critique', value: data.stock.articlesCritiques, color: '#F08900' },
+                            { name: 'Critique', value: data.stock.articlesCritiques, color: '#F51E33' },
                             { name: 'Rupture',  value: data.stock.articlesRupture,   color: '#F51E33' },
                           ].filter(d => d.value > 0)}
                           height={180}
@@ -592,19 +592,19 @@ export default function AnalyticsPage() {
                       <div className="space-y-3">
                         {[
                           { label: 'En stock', color: '#142850', val: Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques) },
-                          { label: 'Critique',  color: '#F08900', val: data.stock.articlesCritiques },
+                          { label: 'Critique',  color: '#F51E33', val: data.stock.articlesCritiques },
                           { label: 'Rupture',   color: '#F51E33', val: data.stock.articlesRupture },
                         ].map(r => (
                           <div key={r.label} className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded-full" style={{ background: r.color }} />
-                            <span className="text-xs text-[#8B949E]">{r.label}</span>
+                            <span className="text-xs text-[var(--text-secondary)]">{r.label}</span>
                             <span className="text-xs font-bold ml-auto" style={{ color: r.color }}>{r.val}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-[#484F58] text-center py-6">Aucun article</p>
+                    <p className="text-xs text-[var(--text-secondary)] text-center py-6">Aucun article</p>
                   )}
                 </ChartCard>
               </div>
@@ -633,15 +633,15 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Run checks panel */}
-                <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#8B0070]/20">
-                        <Zap size={16} className="text-[#F08900]" />
+                        <Zap size={16} className="text-[#F51E33]" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#FFFFFF]">Moteur d'automatisation</p>
-                        <p className="text-xs text-[#484F58]">Contrats expirants · Factures impayées · Alertes stock</p>
+                        <p className="text-xs text-[var(--text-secondary)]">Contrats expirants · Factures impayées · Alertes stock</p>
                       </div>
                     </div>
                     <button onClick={runAutomation} disabled={running}
@@ -653,19 +653,19 @@ export default function AnalyticsPage() {
                   </div>
                   {runResult && (
                     <div className="bg-[#142850]/10 border border-[#142850]/20 rounded-xl px-4 py-3">
-                      <p className="text-xs text-[#142850]">{runResult}</p>
+                      <p className="text-xs text-[#F51E33]">{runResult}</p>
                     </div>
                   )}
                   <div className="mt-4 grid grid-cols-3 gap-3">
                     {[
-                      { label: 'Contrats expirants', val: data.rh.contratsExpirant30, color: '#F08900', desc: 'dans 30 jours' },
+                      { label: 'Contrats expirants', val: data.rh.contratsExpirant30, color: '#F51E33', desc: 'dans 30 jours' },
                       { label: 'Factures en retard', val: data.financial.nbFactures - data.financial.nbFactPay, color: '#F51E33', desc: 'non payées' },
-                      { label: 'Stock critique',     val: data.stock.articlesRupture + data.stock.articlesCritiques, color: '#F08900', desc: 'à réapprovisionner' },
+                      { label: 'Stock critique',     val: data.stock.articlesRupture + data.stock.articlesCritiques, color: '#F51E33', desc: 'à réapprovisionner' },
                     ].map(r => (
-                      <div key={r.label} className="bg-[#142850] border border-[#1a2d50] rounded-xl p-3 text-center">
+                      <div key={r.label} className="bg-[#142850] border border-[var(--border)] rounded-xl p-3 text-center">
                         <p className="text-2xl font-bold mb-1" style={{ color: r.color }}>{r.val}</p>
                         <p className="text-[10px] font-semibold text-[#FFFFFF]">{r.label}</p>
-                        <p className="text-[9px] text-[#484F58] mt-0.5">{r.desc}</p>
+                        <p className="text-[9px] text-[var(--text-secondary)] mt-0.5">{r.desc}</p>
                       </div>
                     ))}
                   </div>
@@ -677,13 +677,13 @@ export default function AnalyticsPage() {
                     <BiDonutChart
                       data={[
                         { name: 'Terminées', value: data.automation.tasksDone,  color: '#142850' },
-                        { name: 'En attente', value: data.automation.tasksPend, color: '#F08900' },
+                        { name: 'En attente', value: data.automation.tasksPend, color: '#F51E33' },
                         { name: 'Erreurs',    value: data.automation.tasksError,color: '#F51E33' },
                       ].filter(d => d.value > 0)}
                       height={200}
                     />
                   ) : (
-                    <p className="text-xs text-[#484F58] text-center py-8">Aucune tâche planifiée</p>
+                    <p className="text-xs text-[var(--text-secondary)] text-center py-8">Aucune tâche planifiée</p>
                   )}
                 </ChartCard>
               </div>

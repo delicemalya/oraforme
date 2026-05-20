@@ -1,6 +1,6 @@
 export default function SkeletonCard() {
   return (
-    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4 overflow-hidden">
+    <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4 overflow-hidden">
       <div className="flex items-start justify-between mb-3">
         <div className="w-9 h-9 rounded-xl bg-[#1a2d50] animate-pulse" />
         <div className="w-14 h-4 rounded-full bg-[#1a2d50] animate-pulse" />

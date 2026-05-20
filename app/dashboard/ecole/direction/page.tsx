@@ -90,8 +90,8 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
 
   const kpis = [
     { label: 'Revenu du mois',   value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#142850' },
-    { label: 'Revenu de l\'année', value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#F08900' },
-    { label: 'Étudiants',        value: etudiants.filter(e => e.statut === 'actif').length, color: '#F08900' },
+    { label: 'Revenu de l\'année', value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#F51E33' },
+    { label: 'Étudiants',        value: etudiants.filter(e => e.statut === 'actif').length, color: '#F51E33' },
     { label: 'Impayés',          value: statsLoading ? '…' : impayeCount,                  color: '#F51E33' },
   ]
 
@@ -113,7 +113,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
             <AlertTriangle size={14} className="text-[#F51E33]" />
             <p className="text-xs font-bold text-[#F51E33]">Gestion des impayés</p>
           </div>
-          <p className="text-xs text-[#8B949E] leading-relaxed">
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             Suspendre automatiquement les étudiants actifs sans paiement cette année. Un code de déblocage est généré pour chacun.
           </p>
           <button onClick={autoBlock} disabled={blocking || impayeCount === 0 || statsLoading}
@@ -125,9 +125,9 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
         </div>
 
         <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider mb-3">Effectifs par classe</p>
+          <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Effectifs par classe</p>
           {classes.length === 0 ? (
-            <p className="text-xs text-[#484F58]">Aucune classe configurée.</p>
+            <p className="text-xs text-[var(--text-secondary)]">Aucune classe configurée.</p>
           ) : (
             <div className="space-y-2">
               {classes.map(c => {
@@ -137,10 +137,10 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
                   <div key={c.id}>
                     <div className="flex justify-between text-[10px] mb-0.5">
                       <span className="text-white">{c.nom}</span>
-                      <span className="text-[#8B949E]">{nb}/{c.nb_places}</span>
+                      <span className="text-[var(--text-secondary)]">{nb}/{c.nb_places}</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-white/[0.06]">
-                      <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: pct > 90 ? '#F51E33' : '#F08900' }} />
+                      <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: pct > 90 ? '#F51E33' : '#F51E33' }} />
                     </div>
                   </div>
                 )
@@ -153,21 +153,21 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
       {recentPaie.length > 0 && (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Derniers paiements</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Derniers paiements</p>
           </div>
           <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Étudiant', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Étudiant', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
             <tbody>
               {recentPaie.map(p => {
                 const etu = etudiants.find(e => e.id === p.etudiant_id)
                 return (
                   <tr key={p.id} className="border-t border-white/[0.04]">
-                    <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-white">{etu ? `${etu.prenom} ${etu.nom}` : '—'}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{p.libelle}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#142850]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{p.libelle}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
                   </tr>
                 )
               })}
@@ -211,7 +211,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1 w-fit">
         {([['mois', 'Ce mois'], ['annee', 'Cette année'], ['tout', 'Tout']] as const).map(([k, l]) => (
           <button key={k} onClick={() => setPeriode(k)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-            style={{ background: periode === k ? '#F08900' : 'transparent', color: periode === k ? '#fff' : '#8B949E' }}>
+            style={{ background: periode === k ? '#F51E33' : 'transparent', color: periode === k ? '#fff' : '#8B949E' }}>
             {l}
           </button>
         ))}
@@ -219,13 +219,13 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
 
       <div className="grid grid-cols-3 gap-3">
         <KpiCard label="Total encaissé" value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#142850" />
-        <KpiCard label="Nb paiements"   value={loading ? '…' : paiements.length}         color="#F08900" />
-        <KpiCard label="Moyenne/paiement" value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#F08900" />
+        <KpiCard label="Nb paiements"   value={loading ? '…' : paiements.length}         color="#F51E33" />
+        <KpiCard label="Moyenne/paiement" value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#F51E33" />
       </div>
 
       {Object.keys(byMethod).length > 0 && (
         <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider mb-3">Répartition par mode de paiement</p>
+          <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Répartition par mode de paiement</p>
           <div className="space-y-2">
             {Object.entries(byMethod).sort((a, b) => b[1] - a[1]).map(([method, amount]) => {
               const pct = totalPaye > 0 ? (amount / totalPaye) * 100 : 0
@@ -233,10 +233,10 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
                 <div key={method}>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-white capitalize">{method.replace('_', ' ')}</span>
-                    <span className="text-[#8B949E]">{fmt(amount)} FCFA ({pct.toFixed(0)}%)</span>
+                    <span className="text-[var(--text-secondary)]">{fmt(amount)} FCFA ({pct.toFixed(0)}%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-white/[0.06]">
-                    <div className="h-2 rounded-full bg-[#F08900]" style={{ width: `${pct}%` }} />
+                    <div className="h-2 rounded-full bg-[#F51E33]" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )
@@ -248,18 +248,18 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       {!loading && paiements.length > 0 && (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">Historique</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Historique</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {paiements.slice(0, 50).map(p => (
                   <tr key={p.id} className="border-t border-white/[0.04]">
-                    <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-white">{p.libelle}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#142850]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
                   </tr>
                 ))}
               </tbody>
@@ -304,7 +304,7 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
   const today     = new Date().toISOString().slice(0, 10)
   const displayed = planning.filter(p => filterType === 'tous' || p.type === filterType)
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={18} /></div>
 
   return (
     <div className="space-y-4">
@@ -312,23 +312,23 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
         <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1">
           {(['tous', 'examen', 'conge_scolaire', 'evenement', 'conseil', 'autre'] as const).map(t => (
             <button key={t} onClick={() => setFilterType(t)} className="px-2.5 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: filterType === t ? '#F08900' : 'transparent', color: filterType === t ? '#fff' : '#8B949E' }}>
+              style={{ background: filterType === t ? '#F51E33' : 'transparent', color: filterType === t ? '#fff' : '#8B949E' }}>
               {t === 'tous' ? 'Tous' : TYPE_EVENT[t as TypeEvent]?.label ?? t}
             </button>
           ))}
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={13} /> Programmer
         </button>
       </div>
 
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F08900]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {(Object.entries(TYPE_EVENT) as [TypeEvent, { label: string }][]).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
@@ -336,22 +336,22 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
               <FI label="Date début *" value={form.date_debut} onChange={v => setForm(p => ({ ...p, date_debut: v }))} type="date" />
               <FI label="Date fin"     value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
               <div className="col-span-2">
-                <label className="block text-xs text-[#8B949E] mb-1">Description</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Description</label>
                 <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" />
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucun événement planifié.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun événement planifié.</div>
       ) : (
         <div className="space-y-2">
           {displayed.map(p => {
@@ -364,13 +364,13 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
                     <p className="text-sm font-semibold text-white">{p.titre}</p>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: t.color, background: t.bg }}>{t.label}</span>
                   </div>
-                  {p.description && <p className="text-[11px] text-[#8B949E] mt-0.5">{p.description}</p>}
-                  <p className="text-[10px] text-[#484F58] mt-1">
+                  {p.description && <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">{p.description}</p>}
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-1">
                     {new Date(p.date_debut + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
                     {p.date_fin && ` → ${new Date(p.date_fin + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`}
                   </p>
                 </div>
-                <button onClick={() => del(p.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={12} /></button>
+                <button onClick={() => del(p.id)} className="text-[var(--text-secondary)] hover:text-red-400"><Trash2 size={12} /></button>
               </div>
             )
           })}
@@ -417,7 +417,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#8B0070]/30 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Étudiant *</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Étudiant *</label>
                 <select value={form.etudiant_id} onChange={e => setForm(p => ({ ...p, etudiant_id: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   <option value="">— Choisir —</option>
                   {etudiants.map(e => <option key={e.id} value={e.id}>{e.prenom} {e.nom} ({e.numero_id})</option>)}
@@ -432,19 +432,19 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
               <button onClick={add} disabled={saving || !form.etudiant_id || !form.montant || !form.libelle} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Accorder
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {bourses.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucune bourse accordée.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune bourse accordée.</div>
       ) : (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Étudiant', 'Libellé', 'Montant', 'Date'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Étudiant', 'Libellé', 'Montant', 'Date'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {bourses.map(b => {
                   const etu = etudiants.find(e => e.id === b.etudiant_id)
@@ -456,11 +456,11 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
                             <Avatar nom={etu.nom} prenom={etu.prenom} photoUrl={etu.photo_url} size={24} />
                             <span className="text-white">{etu.prenom} {etu.nom}</span>
                           </div>
-                        ) : <span className="text-[#484F58]">—</span>}
+                        ) : <span className="text-[var(--text-secondary)]">—</span>}
                       </td>
-                      <td className="px-4 py-2.5 text-[#8B949E]">{b.libelle}</td>
+                      <td className="px-4 py-2.5 text-[var(--text-secondary)]">{b.libelle}</td>
                       <td className="px-4 py-2.5 font-semibold text-[#8B0070]">{fmt(b.montant)} FCFA</td>
-                      <td className="px-4 py-2.5 text-[#8B949E]">{new Date(b.created_at).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(b.created_at).toLocaleDateString('fr-FR')}</td>
                     </tr>
                   )
                 })}
@@ -502,17 +502,17 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#142850' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#142850' }}>
           <Plus size={13} /> Ajouter un partenaire
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F08900]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {['entreprise', 'ong', 'gouvernement', 'universite', 'autre'].map(t => <option key={t} value={t} className="capitalize">{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                 </select>
@@ -521,16 +521,16 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
               <FI label="Description" value={form.description} onChange={v => setForm(p => ({ ...p, description: v }))} placeholder="Type de partenariat…" />
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#142850' }}>
+              <button onClick={add} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#142850' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
       {partenaires.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucun partenaire enregistré.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun partenaire enregistré.</div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {partenaires.map(p => (
@@ -538,11 +538,11 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-bold text-white">{p.nom}</p>
-                  <p className="text-[10px] text-[#8B949E] mt-0.5 capitalize">{p.type}</p>
-                  {p.contact && <p className="text-[10px] text-[#F08900] mt-1">{p.contact}</p>}
-                  {p.description && <p className="text-[10px] text-[#8B949E] mt-1">{p.description}</p>}
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 capitalize">{p.type}</p>
+                  {p.contact && <p className="text-[10px] text-[#F51E33] mt-1">{p.contact}</p>}
+                  {p.description && <p className="text-[10px] text-[var(--text-secondary)] mt-1">{p.description}</p>}
                 </div>
-                <button onClick={() => del(p.id)} className="text-[#484F58] hover:text-red-400"><Trash2 size={12} /></button>
+                <button onClick={() => del(p.id)} className="text-[var(--text-secondary)] hover:text-red-400"><Trash2 size={12} /></button>
               </div>
             </div>
           ))}
@@ -591,13 +591,13 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
             <div className="space-y-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Destinataires</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Destinataires</label>
                 <select value={form.cible} onChange={e => setForm(p => ({ ...p, cible: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {['tous', 'etudiants', 'parents', 'enseignants'].map(c => <option key={c} value={c} className="capitalize">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Message *</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Message *</label>
                 <textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} rows={3} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" placeholder="Rédigez votre annonce…" />
               </div>
             </div>
@@ -605,14 +605,14 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
               <button onClick={add} disabled={saving || !form.titre || !form.message} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Megaphone size={12} />} Publier
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {annonces.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucune annonce publiée.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune annonce publiée.</div>
       ) : (
         <div className="space-y-3">
           {annonces.map(a => (
@@ -623,10 +623,10 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
                     <p className="text-sm font-semibold text-white">{a.titre}</p>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#8B0070]/10 text-[#8B0070] font-bold capitalize">{a.cible}</span>
                   </div>
-                  <p className="text-xs text-[#8B949E] leading-relaxed">{a.message}</p>
-                  <p className="text-[10px] text-[#484F58] mt-2">{new Date(a.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{a.message}</p>
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-2">{new Date(a.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
                 </div>
-                <button onClick={() => del(a.id)} className="text-[#484F58] hover:text-red-400 ml-3 shrink-0"><Trash2 size={12} /></button>
+                <button onClick={() => del(a.id)} className="text-[var(--text-secondary)] hover:text-red-400 ml-3 shrink-0"><Trash2 size={12} /></button>
               </div>
             </div>
           ))}
@@ -667,7 +667,7 @@ export default function DirectionPage() {
   useEffect(() => { load() }, [load])
 
   if (tenantLoading || loading) return (
-    <div className="flex items-center justify-center h-64 text-[#8B949E]">
+    <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
       <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
     </div>
   )
@@ -677,9 +677,9 @@ export default function DirectionPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Direction Générale</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">{nomEcole}</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole}</p>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors"><RefreshCw size={14} /></button>
+        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white transition-colors"><RefreshCw size={14} /></button>
       </div>
 
       <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 w-fit flex-wrap">
@@ -688,7 +688,7 @@ export default function DirectionPage() {
           return (
             <button key={t.id} onClick={() => setSubTab(t.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#F08900' : 'transparent', color: subTab === t.id ? '#fff' : '#8B949E' }}>
+              style={{ background: subTab === t.id ? '#F51E33' : 'transparent', color: subTab === t.id ? '#fff' : '#8B949E' }}>
               <Icon size={12} /> {t.label}
             </button>
           )

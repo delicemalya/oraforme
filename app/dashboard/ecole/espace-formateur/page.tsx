@@ -56,8 +56,8 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 ]
 
 const STATUT_HEURE: Record<TeacherHour['statut'], { label: string; color: string; bg: string }> = {
-  declare:   { label: 'Déclaré',  color: '#F08900', bg: '#F0890018' },
-  validated: { label: 'Validé',   color: '#F08900', bg: '#F0890018' },
+  declare:   { label: 'Déclaré',  color: '#F51E33', bg: '#F51E3318' },
+  validated: { label: 'Validé',   color: '#F51E33', bg: '#F51E3318' },
   paye:      { label: 'Payé',     color: '#142850', bg: '#14285018' },
 }
 
@@ -173,7 +173,7 @@ export default function EspaceFormateurPage() {
 
   if (tenantLoading || loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-[#8B949E]">
+      <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
         <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
       </div>
     )
@@ -182,9 +182,9 @@ export default function EspaceFormateurPage() {
   if (!enseignant) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
-        <AlertCircle size={32} className="text-[#F08900]" />
+        <AlertCircle size={32} className="text-[#F51E33]" />
         <p className="text-white font-semibold">Profil formateur non trouvé</p>
-        <p className="text-[#8B949E] text-sm max-w-sm">
+        <p className="text-[var(--text-secondary)] text-sm max-w-sm">
           Votre adresse email n&apos;est pas liée à un formateur dans cette école.<br/>
           Contactez l&apos;administration.
         </p>
@@ -200,10 +200,10 @@ export default function EspaceFormateurPage() {
           <Avatar nom={enseignant.nom} prenom={enseignant.prenom} photoUrl={null} size={40} />
           <div>
             <h1 className="text-xl font-bold text-white">{enseignant.prenom} {enseignant.nom}</h1>
-            <p className="text-xs text-[#8B949E]">{enseignant.matiere ?? 'Formateur'} · Espace Personnel</p>
+            <p className="text-xs text-[var(--text-secondary)]">{enseignant.matiere ?? 'Formateur'} · Espace Personnel</p>
           </div>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-white/[0.06] hover:bg-white/[0.04] text-[#8B949E] hover:text-white transition-colors">
+        <button onClick={load} className="p-2 rounded-lg border border-white/[0.06] hover:bg-white/[0.04] text-[var(--text-secondary)] hover:text-white transition-colors">
           <Loader2 size={14} />
         </button>
       </div>
@@ -215,7 +215,7 @@ export default function EspaceFormateurPage() {
           const active = tab === t.id
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? 'text-white shadow' : 'text-[#8B949E] hover:text-white'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? 'text-white shadow' : 'text-[var(--text-secondary)] hover:text-white'}`}
               style={active ? { background: '#8B0070' } : {}}>
               <Icon size={12} />{t.label}
             </button>
@@ -249,10 +249,10 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
   totalNet: number; nbCours: number; nbDevoirs: number; heures: TeacherHour[]
 }) {
   const kpis = [
-    { label: 'Heures déclarées', value: totalHeures,   color: '#F08900', sub: `${valideeHeures}h validées` },
+    { label: 'Heures déclarées', value: totalHeures,   color: '#F51E33', sub: `${valideeHeures}h validées` },
     { label: 'Heures payées',    value: payeeHeures,   color: '#142850', sub: `sur ${totalHeures}h total` },
     { label: 'Cours publiés',    value: nbCours,       color: '#8B0070', sub: 'cours numériques' },
-    { label: 'Devoirs actifs',   value: nbDevoirs,     color: '#F08900', sub: 'en cours' },
+    { label: 'Devoirs actifs',   value: nbDevoirs,     color: '#F51E33', sub: 'en cours' },
     { label: 'Net cumulé',       value: `${fmt(totalNet)} FCFA`, color: '#8B0070', sub: 'tous bulletins' },
   ]
 
@@ -265,16 +265,16 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
       </div>
 
       {pending.length > 0 && (
-        <div className="rounded-xl border border-[#F08900]/30 p-4" style={{ background: 'rgba(240,163,10,0.06)' }}>
+        <div className="rounded-xl border border-[#F51E33]/30 p-4" style={{ background: 'rgba(240,163,10,0.06)' }}>
           <div className="flex items-center gap-2 mb-3">
-            <Clock size={14} className="text-[#F08900]" />
-            <p className="text-xs font-bold text-[#F08900] uppercase tracking-wider">{pending.length} déclaration{pending.length > 1 ? 's' : ''} en attente de validation</p>
+            <Clock size={14} className="text-[#F51E33]" />
+            <p className="text-xs font-bold text-[#F51E33] uppercase tracking-wider">{pending.length} déclaration{pending.length > 1 ? 's' : ''} en attente de validation</p>
           </div>
           <div className="space-y-2">
             {pending.slice(0, 5).map(h => (
               <div key={h.id} className="flex items-center justify-between text-xs">
                 <span className="text-white">{h.matiere ?? 'Non précisé'} · {h.heures}h</span>
-                <span className="text-[#8B949E]">{new Date(h.date_declaration).toLocaleDateString('fr-FR')}</span>
+                <span className="text-[var(--text-secondary)]">{new Date(h.date_declaration).toLocaleDateString('fr-FR')}</span>
               </div>
             ))}
           </div>
@@ -282,15 +282,15 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
       )}
 
       <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider mb-3">Résumé des heures</p>
+        <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Résumé des heures</p>
         <div className="space-y-2">
           {[
-            { label: 'Déclarées', value: heures.filter(h => h.statut === 'declare').reduce((s, h) => s + h.heures, 0), color: '#F08900' },
-            { label: 'Validées',  value: heures.filter(h => h.statut === 'validated').reduce((s, h) => s + h.heures, 0), color: '#F08900' },
+            { label: 'Déclarées', value: heures.filter(h => h.statut === 'declare').reduce((s, h) => s + h.heures, 0), color: '#F51E33' },
+            { label: 'Validées',  value: heures.filter(h => h.statut === 'validated').reduce((s, h) => s + h.heures, 0), color: '#F51E33' },
             { label: 'Payées',    value: heures.filter(h => h.statut === 'paye').reduce((s, h) => s + h.heures, 0), color: '#142850' },
           ].map(row => (
             <div key={row.label} className="flex items-center gap-3">
-              <div className="w-20 text-[10px] text-[#8B949E]">{row.label}</div>
+              <div className="w-20 text-[10px] text-[var(--text-secondary)]">{row.label}</div>
               <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
                 <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, totalHeures > 0 ? (row.value / totalHeures) * 100 : 0)}%`, background: row.color }} />
               </div>
@@ -352,7 +352,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="rounded-xl border border-[#F08900]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.06)' }}>
+            className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.06)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre du cours *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <FI label="Matière" value={form.matiere} onChange={v => setForm(p => ({ ...p, matiere: v }))} />
@@ -360,21 +360,21 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Niveau (ex: Licence 2)" value={form.niveau} onChange={v => setForm(p => ({ ...p, niveau: v }))} />
               <div>
-                <label className="block text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-1">Statut</label>
+                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Statut</label>
                 <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as 'brouillon'|'publie' }))}
-                  className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#F08900]/50">
+                  className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#F51E33]/50">
                   <option value="brouillon">Brouillon</option>
                   <option value="publie">Publié</option>
                 </select>
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-1">Description</label>
+              <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Description</label>
               <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3}
                 className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Contenu, objectifs, plan…" />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] hover:text-white border border-white/[0.06] hover:border-white/10">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-white border border-white/[0.06] hover:border-white/10">Annuler</button>
               <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
@@ -385,7 +385,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
 
       <div className="space-y-2">
         {cours.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-[#8B949E]">
+          <div className="flex flex-col items-center justify-center h-32 text-[var(--text-secondary)]">
             <Video size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucun cours créé</p>
           </div>
         ) : cours.map(c => (
@@ -395,14 +395,14 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-white truncate">{c.titre}</p>
-              <p className="text-[10px] text-[#8B949E]">{c.matiere ?? '—'} {c.niveau ? `· ${c.niveau}` : ''}</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">{c.matiere ?? '—'} {c.niveau ? `· ${c.niveau}` : ''}</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[#142850]/20 text-[#142850]' : 'bg-white/[0.06] text-[#8B949E]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[#142850]/20 text-[#F51E33]' : 'bg-white/[0.06] text-[var(--text-secondary)]'}`}>
               {c.statut === 'publie' ? 'Publié' : 'Brouillon'}
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => toggleStatut(c)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[#8B949E] hover:text-white"><Check size={12} /></button>
-              <button onClick={() => del(c.id)} className="p-1.5 rounded-lg hover:bg-[#F51E33]/10 text-[#8B949E] hover:text-[#F51E33]"><Trash2 size={12} /></button>
+              <button onClick={() => toggleStatut(c)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[var(--text-secondary)] hover:text-white"><Check size={12} /></button>
+              <button onClick={() => del(c.id)} className="p-1.5 rounded-lg hover:bg-[#F51E33]/10 text-[var(--text-secondary)] hover:text-[#F51E33]"><Trash2 size={12} /></button>
             </div>
           </motion.div>
         ))}
@@ -451,7 +451,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-bold text-white">Devoirs ({devoirs.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={12} /> Nouveau devoir
         </button>
       </div>
@@ -459,14 +459,14 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="rounded-xl border border-[#F08900]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.06)' }}>
+            className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.06)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre du devoir *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <FI label="Matière" value={form.matiere} onChange={v => setForm(p => ({ ...p, matiere: v }))} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-1">Classe</label>
+                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Classe</label>
                 <select value={form.classe} onChange={e => setForm(p => ({ ...p, classe: e.target.value }))}
                   className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                   <option value="">Toutes les classes</option>
@@ -476,13 +476,13 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
               <FI label="Date de remise" value={form.date_remise} onChange={v => setForm(p => ({ ...p, date_remise: v }))} type="date" />
             </div>
             <div>
-              <label className="block text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-1">Consignes</label>
+              <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Consignes</label>
               <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3}
                 className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Instructions détaillées…" />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] hover:text-white border border-white/[0.06]">Annuler</button>
-              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-white border border-white/[0.06]">Annuler</button>
+              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
             </div>
@@ -492,24 +492,24 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
 
       <div className="space-y-2">
         {devoirs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-[#8B949E]">
+          <div className="flex flex-col items-center justify-center h-32 text-[var(--text-secondary)]">
             <ClipboardList size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucun devoir créé</p>
           </div>
         ) : devoirs.map(d => (
           <motion.div key={d.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] hover:border-white/10 group" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: d.statut === 'ouvert' ? '#F08900' : 'rgba(255,255,255,0.06)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: d.statut === 'ouvert' ? '#F51E33' : 'rgba(255,255,255,0.06)' }}>
               <ClipboardList size={14} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-white truncate">{d.titre}</p>
-              <p className="text-[10px] text-[#8B949E]">{d.matiere ?? '—'} {d.classe ? `· ${d.classe}` : ''} {d.date_remise ? `· Remise: ${new Date(d.date_remise).toLocaleDateString('fr-FR')}` : ''}</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">{d.matiere ?? '—'} {d.classe ? `· ${d.classe}` : ''} {d.date_remise ? `· Remise: ${new Date(d.date_remise).toLocaleDateString('fr-FR')}` : ''}</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${d.statut === 'ouvert' ? 'bg-[#F08900]/20 text-[#F08900]' : 'bg-white/[0.06] text-[#8B949E]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${d.statut === 'ouvert' ? 'bg-[#F51E33]/20 text-[#F51E33]' : 'bg-white/[0.06] text-[var(--text-secondary)]'}`}>
               {d.statut === 'ouvert' ? 'Ouvert' : 'Clôturé'}
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              {d.statut === 'ouvert' && <button onClick={() => cloture(d.id)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[#8B949E] hover:text-white"><Check size={12} /></button>}
-              <button onClick={() => del(d.id)} className="p-1.5 rounded-lg hover:bg-[#F51E33]/10 text-[#8B949E] hover:text-[#F51E33]"><Trash2 size={12} /></button>
+              {d.statut === 'ouvert' && <button onClick={() => cloture(d.id)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[var(--text-secondary)] hover:text-white"><Check size={12} /></button>}
+              <button onClick={() => del(d.id)} className="p-1.5 rounded-lg hover:bg-[#F51E33]/10 text-[var(--text-secondary)] hover:text-[#F51E33]"><Trash2 size={12} /></button>
             </div>
           </motion.div>
         ))}
@@ -580,21 +580,21 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
   if (selectedEx) {
     return (
       <div className="space-y-4">
-        <button onClick={() => setSelectedEx(null)} className="flex items-center gap-1.5 text-xs text-[#8B949E] hover:text-white">
+        <button onClick={() => setSelectedEx(null)} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-white">
           <ChevronRight size={12} className="rotate-180" /> Retour aux examens
         </button>
-        <div className="rounded-xl border border-[#F08900]/30 p-4" style={{ background: 'rgba(56,139,253,0.06)' }}>
+        <div className="rounded-xl border border-[#F51E33]/30 p-4" style={{ background: 'rgba(56,139,253,0.06)' }}>
           <p className="text-sm font-bold text-white">{selectedEx.nom}</p>
-          <p className="text-xs text-[#8B949E] mt-0.5">{TYPES_EXAM.find(t => t.value === selectedEx.type_exam)?.label} · /{ selectedEx.note_max} pts · Coeff. {selectedEx.coefficient}</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{TYPES_EXAM.find(t => t.value === selectedEx.type_exam)?.label} · /{ selectedEx.note_max} pts · Coeff. {selectedEx.coefficient}</p>
         </div>
         {loadingG ? (
-          <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
+          <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={18} /></div>
         ) : (
           <div className="space-y-2">
             <div className="grid grid-cols-4 gap-2 px-3 py-1">
-              <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider col-span-2">Étudiant</p>
-              <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Note /{selectedEx.note_max}</p>
-              <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-wider">Absent</p>
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider col-span-2">Étudiant</p>
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Note /{selectedEx.note_max}</p>
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Absent</p>
             </div>
             {grades.map(g => (
               <div key={g.etudiant_id} className="grid grid-cols-4 gap-2 items-center p-3 rounded-xl border border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
@@ -631,7 +631,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom de l'examen *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
-                <label className="block text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-1">Type</label>
+                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Type</label>
                 <select value={form.type_exam} onChange={e => setForm(p => ({ ...p, type_exam: e.target.value as Exam['type_exam'] }))}
                   className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                   {TYPES_EXAM.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -640,7 +640,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-1">Classe</label>
+                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Classe</label>
                 <select value={form.classe_id} onChange={e => setForm(p => ({ ...p, classe_id: e.target.value }))}
                   className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                   <option value="">Toutes</option>
@@ -652,7 +652,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             </div>
             <FI label="Date de l'examen" value={form.date_exam} onChange={v => setForm(p => ({ ...p, date_exam: v }))} type="date" />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
               <button onClick={save} disabled={saving || !form.nom.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
@@ -663,7 +663,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
 
       <div className="space-y-2">
         {exams.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-[#8B949E]">
+          <div className="flex flex-col items-center justify-center h-32 text-[var(--text-secondary)]">
             <GraduationCap size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucun examen créé</p>
           </div>
         ) : exams.map(ex => (
@@ -673,9 +673,9 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-white truncate">{ex.nom}</p>
-              <p className="text-[10px] text-[#8B949E]">{TYPES_EXAM.find(t => t.value === ex.type_exam)?.label} · /{ ex.note_max} pts · Coeff. {ex.coefficient}</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">{TYPES_EXAM.find(t => t.value === ex.type_exam)?.label} · /{ ex.note_max} pts · Coeff. {ex.coefficient}</p>
             </div>
-            <ChevronRight size={14} className="text-[#8B949E] group-hover:text-white transition-colors" />
+            <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-white transition-colors" />
           </motion.div>
         ))}
       </div>
@@ -738,8 +738,8 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'En attente',  value: `${byStatut.declare.reduce((s, h) => s + h.heures, 0)}h`,   color: '#F08900', count: byStatut.declare.length },
-          { label: 'Validées',   value: `${byStatut.validated.reduce((s, h) => s + h.heures, 0)}h`,  color: '#F08900', count: byStatut.validated.length },
+          { label: 'En attente',  value: `${byStatut.declare.reduce((s, h) => s + h.heures, 0)}h`,   color: '#F51E33', count: byStatut.declare.length },
+          { label: 'Validées',   value: `${byStatut.validated.reduce((s, h) => s + h.heures, 0)}h`,  color: '#F51E33', count: byStatut.validated.length },
           { label: 'Payées',     value: `${byStatut.paye.reduce((s, h) => s + h.heures, 0)}h`,       color: '#142850', count: byStatut.paye.length },
         ].map(k => <KpiCard key={k.label} label={k.label} value={k.value} sub={`${k.count} déclaration${k.count > 1 ? 's' : ''}`} color={k.color} />)}
       </div>
@@ -765,7 +765,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
               <FI label="Description" value={form.description} onChange={v => setForm(p => ({ ...p, description: v }))} />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
               <button onClick={save} disabled={saving || !form.heures || !form.date_declaration} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Déclarer
               </button>
@@ -776,7 +776,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
 
       <div className="space-y-2">
         {heures.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-[#8B949E]">
+          <div className="flex flex-col items-center justify-center h-32 text-[var(--text-secondary)]">
             <Clock size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucune heure déclarée</p>
           </div>
         ) : heures.map(h => (
@@ -786,11 +786,11 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-white">{h.heures}h · {h.matiere ?? 'Non précisé'}</p>
-              <p className="text-[10px] text-[#8B949E]">{new Date(h.date_declaration).toLocaleDateString('fr-FR')} {h.periode ? `· ${h.periode}` : ''}</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">{new Date(h.date_declaration).toLocaleDateString('fr-FR')} {h.periode ? `· ${h.periode}` : ''}</p>
             </div>
             <Badge statut={h.statut} />
             {h.statut === 'declare' && (
-              <button onClick={() => del(h.id)} className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-[#F51E33]/10 text-[#8B949E] hover:text-[#F51E33] transition-all">
+              <button onClick={() => del(h.id)} className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-[#F51E33]/10 text-[var(--text-secondary)] hover:text-[#F51E33] transition-all">
                 <Trash2 size={12} />
               </button>
             )}
@@ -814,15 +814,15 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
         <KpiCard label="Total net reçu"   value={`${fmt(totalNet)} FCFA`}  color="#142850" />
-        <KpiCard label="Total brut"       value={`${fmt(totalBrut)} FCFA`} color="#F08900" />
+        <KpiCard label="Total brut"       value={`${fmt(totalBrut)} FCFA`} color="#F51E33" />
         <KpiCard label="Bulletins payés"  value={`${nbPayes}/${bulletins.length}`} color="#8B0070" />
       </div>
 
       <div className="space-y-2">
         {bulletins.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-[#8B949E]">
+          <div className="flex flex-col items-center justify-center h-32 text-[var(--text-secondary)]">
             <DollarSign size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucun bulletin trouvé</p>
-            <p className="text-[10px] text-[#484F58] mt-1">Votre email doit être lié à un employé dans le module RH</p>
+            <p className="text-[10px] text-[var(--text-secondary)] mt-1">Votre email doit être lié à un employé dans le module RH</p>
           </div>
         ) : bulletins.map(b => (
           <motion.div key={b.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
@@ -831,9 +831,9 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
             </div>
             <div className="flex-1">
               <p className="text-xs font-semibold text-white">{MOIS[b.mois - 1]} {b.annee}</p>
-              <p className="text-[10px] text-[#8B949E]">Brut : {fmt(b.brut)} · Net : {fmt(b.net)} FCFA</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">Brut : {fmt(b.brut)} · Net : {fmt(b.net)} FCFA</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[#142850]/20 text-[#142850]' : b.statut === 'validee' ? 'bg-[#F08900]/20 text-[#F08900]' : 'bg-[#F08900]/20 text-[#F08900]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[#142850]/20 text-[#F51E33]' : b.statut === 'validee' ? 'bg-[#F51E33]/20 text-[#F51E33]' : 'bg-[#F51E33]/20 text-[#F51E33]'}`}>
               {b.statut === 'payee' ? 'Payé' : b.statut === 'validee' ? 'Validé' : 'Généré'}
             </span>
           </motion.div>

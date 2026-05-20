@@ -79,15 +79,15 @@ export default async function AdminPage() {
     icon: React.ElementType; label: string; value: string; sub?: string; color: string
   }) {
     return (
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">{label}</p>
+          <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{label}</p>
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: color + '20' }}>
             <Icon size={15} style={{ color }} />
           </div>
         </div>
         <p className="text-2xl font-bold text-[#FFFFFF] mb-1">{value}</p>
-        {sub && <p className="text-xs text-[#484F58]">{sub}</p>}
+        {sub && <p className="text-xs text-[var(--text-secondary)]">{sub}</p>}
       </div>
     )
   }
@@ -102,7 +102,7 @@ export default async function AdminPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#FFFFFF]">Vue globale</h1>
-          <p className="text-xs text-[#484F58]">Tableau de bord oraforme — données en temps réel</p>
+          <p className="text-xs text-[var(--text-secondary)]">Tableau de bord oraforme — données en temps réel</p>
         </div>
       </div>
 
@@ -114,12 +114,12 @@ export default async function AdminPage() {
           sub={newClientsThisMonth > 0 ? `+${newClientsThisMonth} ce mois` : 'Aucun nouveau ce mois'}
         />
         <KpiCard
-          icon={DollarSign} label="MRR plateforme" color="#F08900"
+          icon={DollarSign} label="MRR plateforme" color="#F51E33"
           value={fmtFCFA(totalMRR)}
           sub={`CA total généré: ${fmtFCFA(totalCA)}`}
         />
         <KpiCard
-          icon={Package} label="Modules vendus" color="#F08900"
+          icon={Package} label="Modules vendus" color="#F51E33"
           value={totalModulesSold.toString()}
           sub={`Top: ${moduleRevData[0]?.module ?? '—'}`}
         />
@@ -134,31 +134,31 @@ export default async function AdminPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Module revenue bar chart */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[#FFFFFF]">Revenus par module (MRR)</h2>
-            <span className="text-xs text-[#F08900] font-bold">{fmtFCFA(totalMRR)}/mois</span>
+            <span className="text-xs text-[#F51E33] font-bold">{fmtFCFA(totalMRR)}/mois</span>
           </div>
           <ModuleRevenueChart data={moduleRevData} />
         </div>
 
         {/* Growth line chart */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[#FFFFFF]">Croissance clients (30 jours)</h2>
-            <span className="text-xs text-[#8B949E]">{nbClients} total</span>
+            <span className="text-xs text-[var(--text-secondary)]">{nbClients} total</span>
           </div>
           <GrowthChart data={growthData} />
         </div>
       </div>
 
       {/* Module breakdown detail */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Détail revenus par module</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {moduleRevData.map(m => (
-            <div key={m.module} className="bg-[#142850] border border-[#1a2d50] rounded-lg p-3">
-              <p className="text-xs text-[#8B949E] truncate mb-1">{m.module}</p>
+            <div key={m.module} className="bg-[#142850] border border-[var(--border)] rounded-lg p-3">
+              <p className="text-xs text-[var(--text-secondary)] truncate mb-1">{m.module}</p>
               <p className="text-sm font-bold text-[#FFFFFF]">{m.clients} client{m.clients > 1 ? 's' : ''}</p>
               <p className="text-xs text-[#F51E33] font-medium mt-0.5">{fmtFCFA(m.mrr)}/mois</p>
             </div>
@@ -167,7 +167,7 @@ export default async function AdminPage() {
       </div>
 
       {/* Clients table */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Tous les clients</h2>
         <AdminClientsTable tenants={tenantRows} />
       </div>

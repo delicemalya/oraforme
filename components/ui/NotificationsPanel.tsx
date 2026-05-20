@@ -17,8 +17,8 @@ interface Notification {
 }
 
 const TYPE_CONFIG = {
-  info:    { icon: Info,          color: '#F08900', bg: '#F0890015' },
-  warning: { icon: AlertTriangle, color: '#F08900', bg: '#F0890015' },
+  info:    { icon: Info,          color: '#F51E33', bg: '#F51E3315' },
+  warning: { icon: AlertTriangle, color: '#F51E33', bg: '#F51E3315' },
   success: { icon: CheckCircle,   color: '#142850', bg: '#14285015' },
   error:   { icon: XCircle,       color: '#F51E33', bg: '#F51E3315' },
 }
@@ -88,7 +88,7 @@ export default function NotificationsPanel() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[#0f1e3d] border border-[#30363D] text-[#8B949E] hover:border-[#F08900] hover:text-[#FFFFFF] transition-all"
+        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#F51E33] hover:text-[#FFFFFF] transition-all"
       >
         <Bell size={15} />
         {unread > 0 && (
@@ -105,10 +105,10 @@ export default function NotificationsPanel() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.96 }}
             transition={{ duration: 0.18 }}
-            className="absolute right-0 top-full mt-2 z-50 w-[340px] bg-[#0f1e3d] border border-[#30363D] rounded-2xl shadow-2xl overflow-hidden"
+            className="absolute right-0 top-full mt-2 z-50 w-[340px] bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#30363D]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-[#FFFFFF]">Notifications</h3>
                 {unread > 0 && (
@@ -117,11 +117,11 @@ export default function NotificationsPanel() {
               </div>
               <div className="flex items-center gap-2">
                 {unread > 0 && (
-                  <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-[#8B949E] hover:text-[#F08900] transition-colors">
+                  <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-[var(--text-secondary)] hover:text-[#F51E33] transition-colors">
                     <CheckCheck size={12} /> Tout lire
                   </button>
                 )}
-                <button onClick={() => setOpen(false)} className="text-[#484F58] hover:text-[#8B949E] transition-colors">
+                <button onClick={() => setOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors">
                   <X size={14} />
                 </button>
               </div>
@@ -130,11 +130,11 @@ export default function NotificationsPanel() {
             {/* List */}
             <div className="max-h-[420px] overflow-y-auto">
               {loading ? (
-                <div className="px-4 py-8 text-center text-xs text-[#484F58]">Chargement...</div>
+                <div className="px-4 py-8 text-center text-xs text-[var(--text-secondary)]">Chargement...</div>
               ) : notifs.length === 0 ? (
                 <div className="px-4 py-12 text-center">
-                  <Bell size={24} className="text-[#30363D] mx-auto mb-3" />
-                  <p className="text-sm text-[#484F58]">Aucune notification</p>
+                  <Bell size={24} className="text-[var(--text-secondary)] mx-auto mb-3" />
+                  <p className="text-sm text-[var(--text-secondary)]">Aucune notification</p>
                 </div>
               ) : (
                 notifs.map((n) => {
@@ -144,8 +144,8 @@ export default function NotificationsPanel() {
                     <div
                       key={n.id}
                       onClick={() => { markRead(n.id); if (n.link) setOpen(false) }}
-                      className={`flex items-start gap-3 px-4 py-3.5 border-b border-[#1a2d50] cursor-pointer transition-colors hover:bg-[#1a2d50] ${
-                        !n.read ? 'bg-[#F0890004]' : ''
+                      className={`flex items-start gap-3 px-4 py-3.5 border-b border-[var(--border)] cursor-pointer transition-colors hover:bg-white/5 ${
+                        !n.read ? 'bg-[#F51E3304]' : ''
                       }`}
                     >
                       <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: cfg.bg }}>
@@ -153,16 +153,16 @@ export default function NotificationsPanel() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <p className={`text-xs font-semibold leading-tight ${n.read ? 'text-[#8B949E]' : 'text-[#FFFFFF]'}`}>
+                          <p className={`text-xs font-semibold leading-tight ${n.read ? 'text-[var(--text-secondary)]' : 'text-[#FFFFFF]'}`}>
                             {n.title}
                           </p>
-                          {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#F08900] shrink-0 mt-1" />}
+                          {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#F51E33] shrink-0 mt-1" />}
                         </div>
-                        {n.message && <p className="text-[10px] text-[#484F58] mt-0.5 line-clamp-2">{n.message}</p>}
+                        {n.message && <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 line-clamp-2">{n.message}</p>}
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-[9px] text-[#484F58]">{timeAgo(n.created_at)}</span>
+                          <span className="text-[9px] text-[var(--text-secondary)]">{timeAgo(n.created_at)}</span>
                           {n.link && (
-                            <Link href={n.link} className="text-[9px] text-[#F08900] flex items-center gap-0.5 hover:underline">
+                            <Link href={n.link} className="text-[9px] text-[#F51E33] flex items-center gap-0.5 hover:underline">
                               Voir <ExternalLink size={8} />
                             </Link>
                           )}

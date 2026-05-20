@@ -61,10 +61,10 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
   })
 
   const kpis = [
-    { label: 'Total',       value: employes.length,                                              color: '#F08900' },
+    { label: 'Total',       value: employes.length,                                              color: '#F51E33' },
     { label: 'Actifs',      value: employes.filter(e => e.statut === 'actif').length,            color: '#142850' },
     { label: 'Formateurs',  value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#8B0070' },
-    { label: 'Temporaires', value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#F08900' },
+    { label: 'Temporaires', value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#F51E33' },
   ]
 
   return (
@@ -75,24 +75,24 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
 
       <div className="flex items-center gap-2 justify-between">
         <div className="relative">
-          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-52"
             placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <button onClick={() => setShowWizard(true)}
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold"
-          style={{ background: '#F08900', color: '#fff' }}>
+          style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={13} /> Nouvel employé
         </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
+        <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={18} /></div>
       ) : displayed.length === 0 ? (
-        <div className="text-center py-16 text-[#8B949E] text-xs space-y-2">
+        <div className="text-center py-16 text-[var(--text-secondary)] text-xs space-y-2">
           <Users2 size={32} className="mx-auto opacity-20" />
           <p className="font-medium">Aucun employé enregistré</p>
-          <p className="text-[#484F58]">Créez un dossier complet avec le formulaire intelligent multi-étapes.</p>
+          <p className="text-[var(--text-secondary)]">Créez un dossier complet avec le formulaire intelligent multi-étapes.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -101,11 +101,11 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
             const sc = e.statut === 'actif'
               ? { color: '#F51E33', bg: 'rgba(245,30,51,0.15)', border: '1px solid #F51E33', label: 'ACTIF' }
               : e.statut === 'suspendu'
-              ? { color: '#F08900', bg: 'rgba(240,137,0,0.15)', border: '1px solid #F08900', label: 'SUSPENDU' }
+              ? { color: '#F51E33', bg: 'rgba(245,30,51,0.15)', border: '1px solid #F51E33', label: 'SUSPENDU' }
               : { color: 'rgba(255,255,255,0.6)', bg: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', label: (e.statut ?? 'INACTIF').toUpperCase() }
             return (
               <motion.div key={e.id} layout
-                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-[#F08900] hover:-translate-y-0.5 transition-all"
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-[#F51E33] hover:-translate-y-0.5 transition-all"
                 style={{ background: 'rgba(255,255,255,0.06)' }}>
 
                 {/* Status */}
@@ -120,17 +120,17 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
                       : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={64} avatarIndex={idx} />}
                   </div>
                   <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.postnom ? e.postnom + ' ' : ''}{e.nom}</p>
-                  <p className="text-[11px] text-[#8B949E] mt-0.5 capitalize">{e.poste}</p>
+                  <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 capitalize">{e.poste}</p>
                 </div>
 
                 {/* Département + Contrat */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
                   <div>
-                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Département</p>
+                    <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Département</p>
                     <p className="text-[10px] text-white mt-0.5 truncate">{e.departement ?? '—'}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Depuis</p>
+                    <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Depuis</p>
                     <p className="text-[10px] text-white mt-0.5">
                       {e.date_debut_contrat ? new Date(e.date_debut_contrat + 'T00:00:00').toLocaleDateString('fr-FR') : '—'}
                     </p>
@@ -141,23 +141,23 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
                 <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
                   {e.email_pro && (
                     <div className="flex items-center gap-2">
-                      <Mail size={11} className="text-[#484F58] shrink-0" />
-                      <p className="text-[11px] text-[#8B949E] truncate">{e.email_pro}</p>
+                      <Mail size={11} className="text-[var(--text-secondary)] shrink-0" />
+                      <p className="text-[11px] text-[var(--text-secondary)] truncate">{e.email_pro}</p>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <DollarSign size={11} className="text-[#F08900] shrink-0" />
-                    <p className="text-[11px] font-semibold" style={{ color: '#F08900' }}>{fmt(brut)} FCFA/mois</p>
+                    <DollarSign size={11} className="text-[#F51E33] shrink-0" />
+                    <p className="text-[11px] font-semibold" style={{ color: '#F51E33' }}>{fmt(brut)} FCFA/mois</p>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-1 mt-auto">
-                  <span className="text-[9px] font-medium capitalize px-2 py-1 rounded-lg border border-white/[0.06] text-[#8B949E]">{e.type_employe}</span>
+                  <span className="text-[9px] font-medium capitalize px-2 py-1 rounded-lg border border-white/[0.06] text-[var(--text-secondary)]">{e.type_employe}</span>
                   <button
                     onClick={() => setProfil({ type: 'employe', data: e as unknown as EmployeFull })}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
-                    style={{ background: '#F08900' }}>
+                    style={{ background: '#F51E33' }}>
                     Voir le profil
                   </button>
                 </div>
@@ -186,7 +186,7 @@ function InfoItem({ icon: Icon, label, value, color = '#8B949E' }: { icon: React
         <Icon size={11} style={{ color }} />
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] text-[#484F58] uppercase tracking-wider">{label}</p>
+        <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">{label}</p>
         <p className="text-xs font-medium text-white mt-0.5 break-all">{value}</p>
       </div>
     </div>
@@ -292,14 +292,14 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
   }
 
   const kpis = [
-    { label: 'Total',        value: enseignants.length,                                                                  color: '#F08900' },
+    { label: 'Total',        value: enseignants.length,                                                                  color: '#F51E33' },
     { label: 'Employés',     value: enseignants.filter(e => ((e as any).type_enseignant ?? 'employe') === 'employe').length,  color: '#142850' },
-    { label: 'Prestataires', value: enseignants.filter(e => (e as any).type_enseignant === 'prestataire').length,        color: '#F08900' },
-    { label: 'En congé',     value: enseignants.filter(e => e.statut === 'conge').length,                               color: '#F08900' },
+    { label: 'Prestataires', value: enseignants.filter(e => (e as any).type_enseignant === 'prestataire').length,        color: '#F51E33' },
+    { label: 'En congé',     value: enseignants.filter(e => e.statut === 'conge').length,                               color: '#F51E33' },
   ]
 
   const SEL = 'w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none'
-  const SEC = 'text-[10px] font-semibold text-[#484F58] uppercase tracking-wider mb-2 mt-1'
+  const SEC = 'text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2 mt-1'
 
   return (
     <div className="space-y-4">
@@ -313,18 +313,18 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
             {([['tous', 'Tous'], ['employe', 'Employés'], ['prestataire', 'Prestataires']] as const).map(([k, l]) => (
               <button key={k} onClick={() => setFilterType(k)}
                 className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-                style={{ background: filterType === k ? '#F08900' : 'transparent',
+                style={{ background: filterType === k ? '#F51E33' : 'transparent',
                          color: filterType === k ? '#fff' : 'rgba(255,255,255,0.5)' }}>
                 {l}
               </button>
             ))}
           </div>
           <div className="relative">
-            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={13} /> Ajouter
         </button>
       </div>
@@ -343,13 +343,13 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
               <p className={SEC}>Type de relation</p>
               <div className="flex gap-2">
                 {([['employe', 'Enseignant Employé', 'CDI/CDD/Vacataire/Stagiaire — paie mensuelle', '#8B0070'],
-                   ['prestataire', 'Prestataire', 'Payé à l\'heure via Trésorerie', '#F08900']] as const).map(([val, label, desc, color]) => (
+                   ['prestataire', 'Prestataire', 'Payé à l\'heure via Trésorerie', '#F51E33']] as const).map(([val, label, desc, color]) => (
                   <button key={val} type="button" onClick={() => setForm(p => ({ ...p, type_enseignant: val, type_contrat: '', salaire: '' }))}
                     className="flex-1 rounded-xl border p-3 text-left transition-all"
                     style={{ borderColor: form.type_enseignant === val ? color : 'rgba(255,255,255,0.08)',
                              background: form.type_enseignant === val ? `${color}12` : 'transparent' }}>
                     <p className="text-xs font-bold" style={{ color: form.type_enseignant === val ? color : '#8B949E' }}>{label}</p>
-                    <p className="text-[10px] text-[#484F58] mt-0.5">{desc}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{desc}</p>
                   </button>
                 ))}
               </div>
@@ -360,15 +360,15 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.08] bg-white/[0.04] flex items-center justify-center shrink-0">
                 {photoPreview
                   ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
-                  : <Camera size={22} className="text-[#484F58]" />}
+                  : <Camera size={22} className="text-[var(--text-secondary)]" />}
               </div>
               <div>
-                <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[#8B949E] hover:text-white hover:border-white/[0.15] transition-all">
+                <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[var(--text-secondary)] hover:text-white hover:border-white/[0.15] transition-all">
                   <Upload size={12} />
                   {photoPreview ? 'Changer' : 'Ajouter une photo'}
                   <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
                 </label>
-                <p className="text-[10px] text-[#484F58] mt-1">JPG, PNG · max 2 Mo</p>
+                <p className="text-[10px] text-[var(--text-secondary)] mt-1">JPG, PNG · max 2 Mo</p>
               </div>
             </div>
 
@@ -380,7 +380,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                 <FI label="Nom *"             value={form.nom}     onChange={v => setForm(p => ({ ...p, nom: v }))} />
                 <FI label="Matière enseignée" value={form.matiere} onChange={v => setForm(p => ({ ...p, matiere: v }))} placeholder="Mathématiques…" />
                 <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Statut</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Statut</label>
                   <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as StatutEnseignant }))} className={SEL}>
                     <option value="actif">Actif</option>
                     <option value="conge">En congé</option>
@@ -405,7 +405,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
               {form.type_enseignant === 'employe' ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-[#8B949E] mb-1">Type de contrat</label>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Type de contrat</label>
                     <select value={form.type_contrat} onChange={e => setForm(p => ({ ...p, type_contrat: e.target.value }))} className={SEL}>
                       <option value="">— Choisir —</option>
                       {CONTRATS_ENS.map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
@@ -413,7 +413,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                   </div>
                   <FI label="Salaire mensuel (FCFA)" value={form.salaire} onChange={v => setForm(p => ({ ...p, salaire: v }))} type="number" placeholder="0" />
                   <div>
-                    <label className="block text-xs text-[#8B949E] mb-1">Taux horaire (optionnel)</label>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Taux horaire (optionnel)</label>
                     <select value={form.taux_horaire} onChange={e => setForm(p => ({ ...p, taux_horaire: e.target.value }))} className={SEL}>
                       <option value="">— Non rémunéré à l&apos;heure —</option>
                       {TAUX_HORAIRES.map(t => <option key={t} value={t}>{new Intl.NumberFormat('fr-FR').format(t)} FCFA/h</option>)}
@@ -423,14 +423,14 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-[#8B949E] mb-1">Taux horaire (FCFA/h) *</label>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Taux horaire (FCFA/h) *</label>
                     <select value={form.taux_horaire} onChange={e => setForm(p => ({ ...p, taux_horaire: e.target.value }))} className={SEL}>
                       <option value="">— Obligatoire —</option>
                       {TAUX_HORAIRES.map(t => <option key={t} value={t}>{new Intl.NumberFormat('fr-FR').format(t)} FCFA/h</option>)}
                     </select>
                   </div>
                   <div className="flex items-end pb-1">
-                    <p className="text-[11px] text-[#F08900] bg-[#F08900]/10 rounded-lg px-3 py-2">
+                    <p className="text-[11px] text-[#F51E33] bg-[#F51E33]/10 rounded-lg px-3 py-2">
                       Payé via Trésorerie → Prestataire
                     </p>
                   </div>
@@ -443,7 +443,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
               <p className={SEC}>Mobile Money</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Opérateur</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Opérateur</label>
                   <select value={form.mobile_money_type} onChange={e => setForm(p => ({ ...p, mobile_money_type: e.target.value }))} className={SEL}>
                     <option value="">— Aucun —</option>
                     {MOBILE_MONEY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -458,7 +458,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
               <p className={SEC}>Informations bancaires</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Banque</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Banque</label>
                   <select value={form.banque} onChange={e => setForm(p => ({ ...p, banque: e.target.value }))} className={SEL}>
                     <option value="">— Aucune —</option>
                     {BANQUES.map(b => <option key={b} value={b}>{b}</option>)}
@@ -477,10 +477,10 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
             </div>
 
             <div className="flex gap-2 pt-1">
-              <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => { setShowForm(false); setForm(EMPTY_ENS_FORM); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => { setShowForm(false); setForm(EMPTY_ENS_FORM); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -488,7 +488,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
 
       {/* ── Grille de cartes Enseignants ──────────────────────────────────── */}
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucun enseignant enregistré.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun enseignant enregistré.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {displayed.map(e => {
@@ -507,8 +507,8 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                 {/* Type badge */}
                 <span className="absolute top-3 left-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
                   style={isPresta
-                    ? { color: '#F08900', background: 'rgba(249,115,22,0.15)' }
-                    : { color: '#F08900', background: 'rgba(56,139,253,0.12)' }}>
+                    ? { color: '#F51E33', background: 'rgba(249,115,22,0.15)' }
+                    : { color: '#F51E33', background: 'rgba(56,139,253,0.12)' }}>
                   {isPresta ? 'Prestataire' : tc ? tc.toUpperCase() : 'Employé'}
                 </span>
 
@@ -525,29 +525,29 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                       : <Avatar nom={e.nom} prenom={e.prenom} photoUrl={null} size={64} />}
                   </div>
                   <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.nom}</p>
-                  <p className="text-[11px] text-[#8B949E] mt-0.5">{e.matiere ?? 'Matière non définie'}</p>
+                  <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">{e.matiere ?? 'Matière non définie'}</p>
                 </div>
 
                 {/* Rémunération */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
                   {isPresta ? (
                     <div className="col-span-2">
-                      <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Taux horaire</p>
-                      <p className="text-sm mt-0.5 font-bold" style={{ color: '#F08900' }}>
+                      <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Taux horaire</p>
+                      <p className="text-sm mt-0.5 font-bold" style={{ color: '#F51E33' }}>
                         {e.taux_horaire ? `${fmt(e.taux_horaire)} FCFA/h` : '—'}
                       </p>
                     </div>
                   ) : (
                     <>
                       <div>
-                        <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Mensuel</p>
-                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F08900' }}>
+                        <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Mensuel</p>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F51E33' }}>
                           {e.salaire_mensuel ? `${fmt(e.salaire_mensuel)} F` : '—'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Horaire</p>
-                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F08900' }}>
+                        <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Horaire</p>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F51E33' }}>
                           {e.taux_horaire ? `${fmt(e.taux_horaire)} F/h` : '—'}
                         </p>
                       </div>
@@ -558,17 +558,17 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                 {/* Contact */}
                 <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
                   <div className="flex items-center gap-2">
-                    <Mail size={11} className="text-[#484F58] shrink-0" />
-                    <p className="text-[11px] text-[#8B949E] truncate">{e.email ?? '—'}</p>
+                    <Mail size={11} className="text-[var(--text-secondary)] shrink-0" />
+                    <p className="text-[11px] text-[var(--text-secondary)] truncate">{e.email ?? '—'}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone size={11} className="text-[#484F58] shrink-0" />
-                    <p className="text-[11px] text-[#8B949E]">{e.telephone ?? '—'}</p>
+                    <Phone size={11} className="text-[var(--text-secondary)] shrink-0" />
+                    <p className="text-[11px] text-[var(--text-secondary)]">{e.telephone ?? '—'}</p>
                   </div>
                   {e.mobile_money_type && e.mobile_money_numero && (
                     <div className="flex items-center gap-2">
-                      <Smartphone size={11} className="shrink-0" style={{ color: '#F08900' }} />
-                      <p className="text-[11px] truncate" style={{ color: '#F08900' }}>{e.mobile_money_type} · {e.mobile_money_numero}</p>
+                      <Smartphone size={11} className="shrink-0" style={{ color: '#F51E33' }} />
+                      <p className="text-[11px] truncate" style={{ color: '#F51E33' }}>{e.mobile_money_type} · {e.mobile_money_numero}</p>
                     </div>
                   )}
                 </div>
@@ -576,14 +576,14 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                 {/* Actions */}
                 <div className="flex gap-2 pt-1 mt-auto">
                   <button onClick={() => del(e.id)}
-                    className="p-2 rounded-lg border border-white/[0.06] text-[#484F58] hover:text-red-400 hover:border-red-400/30 transition-all"
+                    className="p-2 rounded-lg border border-white/[0.06] text-[var(--text-secondary)] hover:text-red-400 hover:border-red-400/30 transition-all"
                     title="Supprimer">
                     <Trash2 size={12} />
                   </button>
                   <button
                     onClick={() => setProfil({ type: 'enseignant', data: e })}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
-                    style={{ background: '#F08900' }}>
+                    style={{ background: '#F51E33' }}>
                     Voir le profil
                   </button>
                 </div>
@@ -643,7 +643,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
     'Autre',
   ]
   const SEL = 'w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none'
-  const SEC = 'text-[10px] font-semibold text-[#484F58] uppercase tracking-wider mb-2 mt-1'
+  const SEC = 'text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2 mt-1'
 
   const load = useCallback(async () => {
     const { data } = await supabase.from('staff_ecole').select('*').eq('tenant_id', tenantId).order('nom')
@@ -708,7 +708,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
   })
 
   const kpis = [
-    { label: 'Total',    value: staff.length,                                    color: '#F08900' },
+    { label: 'Total',    value: staff.length,                                    color: '#F51E33' },
     { label: 'Actifs',   value: staff.filter(s => s.statut === 'actif').length,  color: '#142850' },
     { label: 'Inactifs', value: staff.filter(s => s.statut === 'inactif').length,color: '#8B949E' },
   ]
@@ -721,10 +721,10 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
 
       <div className="flex items-center gap-2 justify-between">
         <div className="relative">
-          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-52" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={13} /> Ajouter un agent
         </button>
       </div>
@@ -742,15 +742,15 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.08] bg-white/[0.04] flex items-center justify-center shrink-0">
                 {photoPreview
                   ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
-                  : <Camera size={22} className="text-[#484F58]" />}
+                  : <Camera size={22} className="text-[var(--text-secondary)]" />}
               </div>
               <div>
-                <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[#8B949E] hover:text-white hover:border-white/[0.15] transition-all">
+                <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[var(--text-secondary)] hover:text-white hover:border-white/[0.15] transition-all">
                   <Upload size={12} />
                   {photoPreview ? 'Changer' : 'Ajouter une photo'}
                   <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
                 </label>
-                <p className="text-[10px] text-[#484F58] mt-1">JPG, PNG · max 2 Mo</p>
+                <p className="text-[10px] text-[var(--text-secondary)] mt-1">JPG, PNG · max 2 Mo</p>
               </div>
             </div>
 
@@ -761,14 +761,14 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                 <FI label="Prénom" value={form.prenom} onChange={v => setForm(p => ({ ...p, prenom: v }))} />
                 <FI label="Nom *"  value={form.nom}    onChange={v => setForm(p => ({ ...p, nom: v }))} />
                 <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Poste *</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Poste *</label>
                   <select value={form.poste} onChange={e => setForm(p => ({ ...p, poste: e.target.value }))} className={SEL}>
                     <option value="">— Choisir —</option>
                     {POSTES.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Statut</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Statut</label>
                   <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value }))} className={SEL}>
                     <option value="actif">Actif</option>
                     <option value="inactif">Inactif</option>
@@ -799,7 +799,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
               <p className={SEC}>Mobile Money</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Opérateur</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Opérateur</label>
                   <select value={form.mobile_money_type} onChange={e => setForm(p => ({ ...p, mobile_money_type: e.target.value }))} className={SEL}>
                     <option value="">— Aucun —</option>
                     {MOBILE_MONEY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -814,7 +814,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
               <p className={SEC}>Informations bancaires</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-[#8B949E] mb-1">Banque</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Banque</label>
                   <select value={form.banque} onChange={e => setForm(p => ({ ...p, banque: e.target.value }))} className={SEL}>
                     <option value="">— Aucune —</option>
                     {BANQUES.map(b => <option key={b} value={b}>{b}</option>)}
@@ -833,10 +833,10 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
             </div>
 
             <div className="flex gap-2 pt-1">
-              <button onClick={save} disabled={saving || !form.nom || !form.poste} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.nom || !form.poste} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => { setShowForm(false); setForm(EMPTY_STAFF); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => { setShowForm(false); setForm(EMPTY_STAFF); setPhotoFile(null); setPhotoPreview(null) }} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -844,7 +844,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
 
       {/* ── Grille de cartes Staff ────────────────────────────────────────── */}
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucun agent enregistré.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun agent enregistré.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {displayed.map(s => {
@@ -853,7 +853,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
               : { color: 'rgba(255,255,255,0.6)', bg: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', label: 'INACTIF' }
             return (
               <motion.div key={s.id} layout
-                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-[#F08900] hover:-translate-y-0.5 transition-all"
+                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-[#F51E33] hover:-translate-y-0.5 transition-all"
                 style={{ background: 'rgba(255,255,255,0.06)' }}>
 
                 {/* Status badge */}
@@ -868,29 +868,29 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                       : <Avatar nom={s.nom} prenom={s.prenom || '?'} photoUrl={null} size={64} />}
                   </div>
                   <p className="text-sm font-bold text-white leading-tight">{s.prenom} {s.nom}</p>
-                  <p className="text-[11px] text-[#8B949E] mt-0.5">{s.poste}</p>
+                  <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">{s.poste}</p>
                 </div>
 
                 {/* Salaire */}
                 <div className="pt-2 border-t border-white/[0.06] text-center">
-                  <p className="text-[9px] text-[#484F58] uppercase tracking-wide">Salaire mensuel</p>
-                  <p className="text-sm font-bold mt-0.5" style={{ color: '#F08900' }}>{fmt(s.salaire)} FCFA</p>
+                  <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Salaire mensuel</p>
+                  <p className="text-sm font-bold mt-0.5" style={{ color: '#F51E33' }}>{fmt(s.salaire)} FCFA</p>
                 </div>
 
                 {/* Contact */}
                 <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
                   <div className="flex items-center gap-2">
-                    <Mail size={11} className="text-[#484F58] shrink-0" />
-                    <p className="text-[11px] text-[#8B949E] truncate">{s.email ?? '—'}</p>
+                    <Mail size={11} className="text-[var(--text-secondary)] shrink-0" />
+                    <p className="text-[11px] text-[var(--text-secondary)] truncate">{s.email ?? '—'}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone size={11} className="text-[#484F58] shrink-0" />
-                    <p className="text-[11px] text-[#8B949E]">{s.telephone ?? '—'}</p>
+                    <Phone size={11} className="text-[var(--text-secondary)] shrink-0" />
+                    <p className="text-[11px] text-[var(--text-secondary)]">{s.telephone ?? '—'}</p>
                   </div>
                   {s.mobile_money_type && s.mobile_money_numero && (
                     <div className="flex items-center gap-2">
-                      <Smartphone size={11} className="shrink-0" style={{ color: '#F08900' }} />
-                      <p className="text-[11px] truncate" style={{ color: '#F08900' }}>{s.mobile_money_type} · {s.mobile_money_numero}</p>
+                      <Smartphone size={11} className="shrink-0" style={{ color: '#F51E33' }} />
+                      <p className="text-[11px] truncate" style={{ color: '#F51E33' }}>{s.mobile_money_type} · {s.mobile_money_numero}</p>
                     </div>
                   )}
                 </div>
@@ -898,14 +898,14 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                 {/* Actions */}
                 <div className="flex gap-2 pt-1 mt-auto">
                   <button onClick={() => del(s.id)}
-                    className="p-2 rounded-lg border border-white/[0.06] text-[#484F58] hover:text-red-400 hover:border-red-400/30 transition-all"
+                    className="p-2 rounded-lg border border-white/[0.06] text-[var(--text-secondary)] hover:text-red-400 hover:border-red-400/30 transition-all"
                     title="Supprimer">
                     <Trash2 size={12} />
                   </button>
                   <button
                     onClick={() => setProfil({ type: 'staff', data: s as unknown as StaffFull })}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
-                    style={{ background: '#F08900' }}>
+                    style={{ background: '#F51E33' }}>
                     Voir le profil
                   </button>
                 </div>
@@ -951,7 +951,7 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
   }
 
   const STATUT_COLORS: Record<string, { color: string; bg: string; border: string }> = {
-    en_attente: { color: '#F08900', bg: 'rgba(240,137,0,0.15)',   border: '1px solid #F08900' },
+    en_attente: { color: '#F51E33', bg: 'rgba(245,30,51,0.15)',   border: '1px solid #F51E33' },
     approuve:   { color: '#FFFFFF', bg: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' },
     refuse:     { color: '#F51E33', bg: 'rgba(245,30,51,0.15)',   border: '1px solid #F51E33' },
   }
@@ -959,23 +959,23 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={13} /> Demande de congé
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F08900]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Employé *</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Employé *</label>
                 <select value={form.employe_id} onChange={e => setForm(p => ({ ...p, employe_id: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   <option value="">— Choisir —</option>
                   {enseignants.map(e => <option key={e.id} value={e.id}>{e.prenom} {e.nom}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
                 <select value={form.type_conge} onChange={e => setForm(p => ({ ...p, type_conge: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {['annuel', 'maladie', 'maternite', 'paternite', 'sans_solde'].map(t => <option key={t} value={t} className="capitalize">{t.replace('_', ' ')}</option>)}
                 </select>
@@ -987,20 +987,20 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.employe_id || !form.date_debut || !form.date_fin} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
+              <button onClick={add} disabled={saving || !form.employe_id || !form.date_debut || !form.date_fin} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Soumettre
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
       {conges.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucune demande de congé.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune demande de congé.</div>
       ) : (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Employé', 'Type', 'Période', 'Motif', 'Statut', 'Actions'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Employé', 'Type', 'Période', 'Motif', 'Statut', 'Actions'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
             <tbody>
               {conges.map(c => {
                 const ens = enseignants.find(e => e.id === c.employe_id)
@@ -1008,9 +1008,9 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
                 return (
                   <tr key={c.id} className="border-t border-white/[0.04]">
                     <td className="px-4 py-2.5 text-white">{ens ? `${ens.prenom} ${ens.nom}` : '—'}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E] capitalize">{c.type_conge.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{new Date(c.date_debut + 'T00:00:00').toLocaleDateString('fr-FR')} → {new Date(c.date_fin + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{c.motif ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{c.type_conge.replace('_', ' ')}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(c.date_debut + 'T00:00:00').toLocaleDateString('fr-FR')} → {new Date(c.date_fin + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{c.motif ?? '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: sc.color, background: sc.bg }}>{c.statut.replace('_', ' ')}</span>
                     </td>
@@ -1549,10 +1549,10 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex gap-3 flex-wrap">
           <KpiCard label="Total salaires payés" value={fmt(totalNet) + ' FCFA'} color="#142850" />
-          <KpiCard label="Bulletins émis" value={paies.length} color="#F08900" />
+          <KpiCard label="Bulletins émis" value={paies.length} color="#F51E33" />
         </div>
         <button onClick={() => setShowLogo(!showLogo)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[var(--text-secondary)] hover:text-white transition-colors">
           <Upload size={12} /> Logo bulletin
         </button>
       </div>
@@ -1560,12 +1560,12 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       {showLogo && (
         <div className="flex items-end gap-2 p-3 rounded-xl border border-white/[0.08]" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <div className="flex-1">
-            <label className="block text-xs text-[#8B949E] mb-1">URL du logo (bulletins de paie)</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">URL du logo (bulletins de paie)</label>
             <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-[#484F58] focus:outline-none"
               placeholder="https://…" value={logoInput} onChange={e => setLogoInput(e.target.value)} />
           </div>
           <button onClick={() => { setLogoUrl(logoInput); localStorage.setItem(`logo_${tenantId}`, logoInput); setShowLogo(false) }}
-            className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1" style={{ background: '#F08900', color: '#fff' }}>
+            className="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1" style={{ background: '#F51E33', color: '#fff' }}>
             <Check size={12} /> OK
           </button>
         </div>
@@ -1578,7 +1578,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
         {/* Sélection agent + période */}
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs text-[#8B949E] mb-1">Agent *</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Agent *</label>
             <select value={agent?.id ?? ''} onChange={e => handleAgentSelect(e.target.value)}
               className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none">
               <option value="">— Sélectionner —</option>
@@ -1590,7 +1590,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
             </select>
           </div>
           <div>
-            <label className="block text-xs text-[#8B949E] mb-1">Mois</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Mois</label>
             <select value={form.mois} onChange={e => setForm(p => ({ ...p, mois: Number(e.target.value) }))}
               className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none">
               {MOIS.slice(1).map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
@@ -1612,14 +1612,14 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                   <p className="text-sm font-bold text-white">
                     {agent.prenom}{agent.postnom ? ' ' + agent.postnom : ''} {agent.nom}
                   </p>
-                  <p className="text-[10px] text-[#8B949E]">
+                  <p className="text-[10px] text-[var(--text-secondary)]">
                     {agent.poste} · {agent.type_agent === 'employe' ? 'Employé' : 'Staff'}
                   </p>
                 </div>
-                <div className="text-right text-[10px] text-[#484F58]">
+                <div className="text-right text-[10px] text-[var(--text-secondary)]">
                   {agent.banque && <p>{agent.banque} — {agent.rib ?? '—'}</p>}
                   {!agent.banque && agent.mobile_money_type && (
-                    <p style={{ color: '#F08900' }}>{agent.mobile_money_type} · {agent.mobile_money_numero}</p>
+                    <p style={{ color: '#F51E33' }}>{agent.mobile_money_type} · {agent.mobile_money_numero}</p>
                   )}
                   {agent.numero_cnss && <p className="mt-0.5">CNSS: {agent.numero_cnss}</p>}
                 </div>
@@ -1644,29 +1644,29 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
               {/* Récapitulatif calcul */}
               <div className="rounded-xl overflow-hidden border border-white/[0.06] grid grid-cols-3 divide-x divide-white/[0.06]">
                 <div className="p-3 text-center">
-                  <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">Salaire brut</p>
-                  <p className="text-base font-bold text-white mt-0.5">{fmt(brut)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
+                  <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Salaire brut</p>
+                  <p className="text-base font-bold text-white mt-0.5">{fmt(brut)} <span className="text-[9px] text-[var(--text-secondary)]">FCFA</span></p>
                 </div>
                 <div className="p-3 text-center">
-                  <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">CNSS 8%</p>
-                  <p className="text-base font-bold mt-0.5" style={{ color: '#F51E33' }}>−{fmt(retenues)} <span className="text-[9px] text-[#484F58]">FCFA</span></p>
+                  <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">CNSS 8%</p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#F51E33' }}>−{fmt(retenues)} <span className="text-[9px] text-[var(--text-secondary)]">FCFA</span></p>
                 </div>
                 <div className="p-3 text-center" style={{ background: 'rgba(46,160,67,0.06)' }}>
-                  <p className="text-[10px] text-[#8B949E] uppercase tracking-wider">Net à payer</p>
-                  <p className="text-base font-bold mt-0.5" style={{ color: '#F08900' }}>{fmt(net)} <span className="text-[9px] text-white/40">FCFA</span></p>
+                  <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Net à payer</p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#F51E33' }}>{fmt(net)} <span className="text-[9px] text-white/40">FCFA</span></p>
                 </div>
               </div>
 
               {/* Boutons de paiement */}
               <div>
-                <p className="text-[10px] text-[#8B949E] uppercase tracking-wider mb-2">Payer via</p>
+                <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">Payer via</p>
                 <div className="grid grid-cols-4 gap-2">
                   {MODES_PAIE.map(m => {
                     const Icon = m.icon
                     return (
                       <button key={m.id} onClick={() => payer(m.id)} disabled={paying}
                         className="flex flex-col items-center gap-1.5 py-4 rounded-xl border font-semibold transition-all disabled:opacity-40 text-[11px]"
-                        style={{ background: 'rgba(240,137,0,0.08)', borderColor: 'rgba(240,137,0,0.3)', color: '#F08900' }}>
+                        style={{ background: 'rgba(245,30,51,0.08)', borderColor: 'rgba(245,30,51,0.3)', color: '#F51E33' }}>
                         {paying ? <Loader2 size={16} className="animate-spin" /> : <Icon size={16} />}
                         {m.label}
                       </button>
@@ -1679,7 +1679,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
         </AnimatePresence>
 
         {!agent && (
-          <div className="text-center py-8 text-[#484F58] text-xs">
+          <div className="text-center py-8 text-[var(--text-secondary)] text-xs">
             Sélectionnez un agent pour accéder à sa fiche de paie
           </div>
         )}
@@ -1687,18 +1687,18 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
 
       {/* ── Historique ──────────────────────────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-xs font-semibold text-[#8B949E] uppercase tracking-wider">Historique des paiements</p>
+        <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Historique des paiements</p>
         {loading ? (
-          <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[#8B949E]" size={16} /></div>
+          <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={16} /></div>
         ) : paies.length === 0 ? (
-          <div className="text-center py-10 text-[#8B949E] text-xs">Aucun bulletin émis.</div>
+          <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucun bulletin émis.</div>
         ) : (
           <div className="rounded-xl border border-white/[0.06] overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
                   {['Agent', 'Période', 'Brut', 'Retenues', 'Net', 'Mode', 'Statut', ''].map(h => (
-                    <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E] whitespace-nowrap">{h}</th>
+                    <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)] whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -1712,19 +1712,19 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                       style={isJ ? { background: 'rgba(46,160,67,0.05)' } : {}}>
                       <td className="px-4 py-2.5">
                         <p className="text-white font-medium">{nom}</p>
-                        {a && <p className="text-[9px] text-[#484F58]">{a.poste}</p>}
+                        {a && <p className="text-[9px] text-[var(--text-secondary)]">{a.poste}</p>}
                       </td>
-                      <td className="px-4 py-2.5 text-[#8B949E]">{MOIS[p.mois]} {p.annee}</td>
-                      <td className="px-4 py-2.5 text-[#8B949E]">{fmt(p.salaire_base + p.primes)}</td>
+                      <td className="px-4 py-2.5 text-[var(--text-secondary)]">{MOIS[p.mois]} {p.annee}</td>
+                      <td className="px-4 py-2.5 text-[var(--text-secondary)]">{fmt(p.salaire_base + p.primes)}</td>
                       <td className="px-4 py-2.5 text-[#F51E33]">−{fmt(p.retenues)}</td>
                       <td className="px-4 py-2.5 font-bold text-white">{fmt(p.net)} FCFA</td>
-                      <td className="px-4 py-2.5 text-[#484F58] capitalize">{(p.mode_paiement ?? '—').replace('_', ' ')}</td>
+                      <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{(p.mode_paiement ?? '—').replace('_', ' ')}</td>
                       <td className="px-4 py-2.5">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: '#FFFFFF', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' }}>Payé</span>
                       </td>
                       <td className="px-4 py-2.5">
                         <button onClick={() => downloadBulletin(p)} title="Télécharger bulletin"
-                          className="flex items-center gap-1 px-2 py-1 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white transition-all text-[10px]">
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white transition-all text-[10px]">
                           <Printer size={10} /> Bulletin
                         </button>
                       </td>
@@ -1787,53 +1787,53 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
           <KpiCard label="Postes ouverts" value={postes.filter(p => p.statut === 'ouvert').length} color="#142850" />
           <KpiCard label="Postes fermés"  value={postes.filter(p => p.statut === 'ferme').length}  color="#8B949E" />
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F08900', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={13} /> Ouvrir un poste
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F08900]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre du poste *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} placeholder="Prof de Mathématiques…" />
               <div>
-                <label className="block text-xs text-[#8B949E] mb-1">Département</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Département</label>
                 <select value={form.departement} onChange={e => setForm(p => ({ ...p, departement: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
                   {['Enseignement', 'Administration', 'Maintenance', 'Sécurité', 'Autre'].map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-xs text-[#8B949E] mb-1">Description</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Description</label>
                 <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" placeholder="Profil recherché, qualifications…" />
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.titre} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
+              <button onClick={add} disabled={saving || !form.titre} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Créer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[#8B949E] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
       {postes.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucun poste de recrutement.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun poste de recrutement.</div>
       ) : (
         <div className="space-y-2">
           {postes.map(p => (
             <div key={p.id} className="rounded-xl border border-white/[0.06] p-4 flex items-start gap-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-              <AlertCircle size={14} className="mt-0.5 shrink-0" style={{ color: p.statut === 'ouvert' ? '#F08900' : 'rgba(255,255,255,0.35)' }} />
+              <AlertCircle size={14} className="mt-0.5 shrink-0" style={{ color: p.statut === 'ouvert' ? '#F51E33' : 'rgba(255,255,255,0.35)' }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-white">{p.titre}</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'ouvert' ? { color: '#F08900', background: 'rgba(240,137,0,0.15)', border: '1px solid #F08900' } : { color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'ouvert' ? { color: '#F51E33', background: 'rgba(245,30,51,0.15)', border: '1px solid #F51E33' } : { color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
                     {p.statut === 'ouvert' ? 'Ouvert' : 'Fermé'}
                   </span>
                 </div>
-                <p className="text-[10px] text-[#8B949E] mt-0.5">{p.departement}</p>
-                {p.description && <p className="text-[11px] text-[#8B949E] mt-1">{p.description}</p>}
+                <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{p.departement}</p>
+                {p.description && <p className="text-[11px] text-[var(--text-secondary)] mt-1">{p.description}</p>}
               </div>
-              <button onClick={() => toggleStatut(p.id, p.statut)} className="text-[10px] px-3 py-1.5 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors">
+              <button onClick={() => toggleStatut(p.id, p.statut)} className="text-[10px] px-3 py-1.5 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white transition-colors">
                 {p.statut === 'ouvert' ? 'Fermer' : 'Rouvrir'}
               </button>
             </div>
@@ -1951,14 +1951,14 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
 
   const displayed = filter === 'tous' ? heures : heures.filter(h => h.statut === filter)
   const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
-    declare:   { label: 'Déclaré',  color: '#F08900', bg: '#F0890018' },
-    validated: { label: 'Validé',   color: '#F08900', bg: '#F0890018' },
+    declare:   { label: 'Déclaré',  color: '#F51E33', bg: '#F51E3318' },
+    validated: { label: 'Validé',   color: '#F51E33', bg: '#F51E3318' },
     paye:      { label: 'Payé',     color: '#FFFFFF', bg: 'rgba(255,255,255,0.08)' },
   }
 
   const kpis = [
-    { label: 'En attente', value: heures.filter(h => h.statut === 'declare').length,   color: '#F08900' },
-    { label: 'Validées',   value: heures.filter(h => h.statut === 'validated').length, color: '#F08900' },
+    { label: 'En attente', value: heures.filter(h => h.statut === 'declare').length,   color: '#F51E33' },
+    { label: 'Validées',   value: heures.filter(h => h.statut === 'validated').length, color: '#F51E33' },
     { label: 'Payées',     value: heures.filter(h => h.statut === 'paye').length,      color: '#142850' },
     { label: 'Total heures', value: heures.reduce((s, h) => s + h.heures, 0),          color: '#8B0070' },
   ]
@@ -1973,19 +1973,19 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
       <div className="flex gap-1">
         {(['tous', 'declare', 'validated', 'paye'] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === f ? 'text-white' : 'text-[#8B949E] hover:text-white border border-white/[0.06]'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === f ? 'text-white' : 'text-[var(--text-secondary)] hover:text-white border border-white/[0.06]'}`}
             style={filter === f ? { background: f === 'tous' ? '#30363D' : STATUT_CFG[f]?.color ?? '#30363D' } : {}}>
             {f === 'tous' ? 'Toutes' : STATUT_CFG[f]?.label}
           </button>
         ))}
-        <button onClick={load} className="ml-auto p-2 rounded-lg border border-white/[0.06] text-[#8B949E] hover:text-white">
+        <button onClick={load} className="ml-auto p-2 rounded-lg border border-white/[0.06] text-[var(--text-secondary)] hover:text-white">
           <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
         </button>
       </div>
 
       {/* List */}
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[#8B949E] text-xs">Aucune déclaration{filter !== 'tous' ? ` avec ce statut` : ''}.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune déclaration{filter !== 'tous' ? ` avec ce statut` : ''}.</div>
       ) : (
         <div className="space-y-2">
           {displayed.map(h => {
@@ -1998,10 +1998,10 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-white">{ens ? `${ens.prenom} ${ens.nom}` : 'Formateur inconnu'}</p>
-                  <p className="text-[10px] text-[#8B949E]">
+                  <p className="text-[10px] text-[var(--text-secondary)]">
                     {h.heures}h · {h.matiere ?? '—'} · {new Date(h.date_declaration).toLocaleDateString('fr-FR')}
                     {h.periode ? ` · ${h.periode}` : ''}
-                    {' · '}<span style={{ color: '#F08900' }}>{new Intl.NumberFormat('fr-FR').format(h.heures * (ens?.taux_horaire ?? 5000))} FCFA</span>
+                    {' · '}<span style={{ color: '#F51E33' }}>{new Intl.NumberFormat('fr-FR').format(h.heures * (ens?.taux_horaire ?? 5000))} FCFA</span>
                   </p>
                 </div>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: cfg.color, background: cfg.bg }}>{cfg.label}</span>
@@ -2014,7 +2014,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
                   )}
                   {h.statut === 'validated' && (
                     <button onClick={() => marquerPaye(h)} disabled={saving === h.id}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: '#F08900', color: '#fff' }}>
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                       {saving === h.id ? <Loader2 size={10} className="animate-spin" /> : <DollarSign size={10} />} Payer
                     </button>
                   )}
@@ -2061,7 +2061,7 @@ export default function RhPage() {
   useEffect(() => { load() }, [load])
 
   if (tenantLoading || loading) return (
-    <div className="flex items-center justify-center h-64 text-[#8B949E]">
+    <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
       <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
     </div>
   )
@@ -2071,9 +2071,9 @@ export default function RhPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">RH & Paie</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">{nomEcole} · {enseignants.length} enseignant(s)</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {enseignants.length} enseignant(s)</p>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white transition-colors"><RefreshCw size={14} /></button>
+        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white transition-colors"><RefreshCw size={14} /></button>
       </div>
 
       <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 w-fit flex-wrap">

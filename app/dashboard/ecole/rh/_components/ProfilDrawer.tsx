@@ -39,16 +39,16 @@ export type ProfilPerson =
 
 // ── Tokens ────────────────────────────────────────────────────────────────────
 
-const G  = '#F08900'
+const G  = '#F51E33'
 const BG = '#1a2f50'
 const CARD    = 'rgba(255,255,255,0.06)'
 const BORDER  = 'rgba(255,255,255,0.12)'
-const ORG_DIM = 'rgba(240,137,0,0.15)'
-const ORG_BDR = 'rgba(240,137,0,0.28)'
+const ORG_DIM = 'rgba(245,30,51,0.15)'
+const ORG_BDR = 'rgba(245,30,51,0.28)'
 const T1 = '#FFFFFF'
 const T2 = 'rgba(255,255,255,0.55)'
 const T3 = 'rgba(255,255,255,0.4)'
-const GREEN  = '#F08900'
+const GREEN  = '#F51E33'
 const RED    = '#F51E33'
 const BLUE   = '#8B0070'
 const PURPLE = '#8B0070'
@@ -63,7 +63,7 @@ function Avatar({ name, size = 78 }: { name: string; size?: number }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: '#F08900',
+      background: '#F51E33',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size / 2.5, fontWeight: 800, color: '#FFFFFF',
     }}>
@@ -192,7 +192,7 @@ function ProfilEmploye({ d }: { d: EmployeFull }) {
           {d.prime_rendement > 0 && <PayRow label="Prime rendement"  value={`+${fmtN(d.prime_rendement)} FCFA`} color={GREEN} mono />}
           {d.taux_horaire && d.taux_horaire > 0 && <PayRow label="Taux horaire" value={`${fmtN(d.taux_horaire)} FCFA/h`} color={BLUE} mono />}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(240,137,0,0.25)`, marginTop: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginTop: 10 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE BRUT</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(brut)} FCFA</span>
         </div>
@@ -264,7 +264,7 @@ function ProfilEnseignant({ d }: { d: Enseignant }) {
           {d.taux_horaire    != null && <PayRow label="Taux horaire"    value={`${fmtN(d.taux_horaire)} FCFA/h`}  color={BLUE} mono />}
         </div>
         {d.salaire_mensuel != null && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(240,137,0,0.25)`, marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginTop: 10 }}>
             <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>TOTAL MENSUEL</span>
             <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire_mensuel)} FCFA</span>
           </div>
@@ -379,7 +379,7 @@ function ProfilStaff({ d }: { d: StaffFull }) {
       </Card>
 
       <Card title="Paiement" icon="💳">
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(240,137,0,0.25)`, marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginBottom: 12 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE MENSUEL</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire)} FCFA</span>
         </div>
@@ -453,7 +453,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
         }}>
 
         {/* Orange accent line top */}
-        <div style={{ height: 2, background: '#F08900', flexShrink: 0 }} />
+        <div style={{ height: 2, background: '#F51E33', flexShrink: 0 }} />
 
         {/* ── Profile header ─────────────────────────────────────────────── */}
         <div style={{
@@ -515,7 +515,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
 
             {/* Modifier button */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
-              <button style={{ padding: '8px 16px', borderRadius: 9, background: '#F08900', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>
+              <button style={{ padding: '8px 16px', borderRadius: 9, background: '#F51E33', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>
                 ✏️ Modifier
               </button>
               <button style={{ padding: '7px 16px', borderRadius: 9, background: CARD, color: T2, fontWeight: 600, fontSize: 12, border: `1px solid ${BORDER}`, cursor: 'pointer' }}>

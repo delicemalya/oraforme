@@ -43,12 +43,12 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="w-full max-w-md text-center">
-          <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-10">
+          <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-10">
             <div className="w-14 h-14 rounded-full bg-[#2EA043]/10 flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={28} className="text-[#2EA043]" />
             </div>
             <h2 className="text-lg font-bold text-[#FFFFFF] mb-2">Mot de passe mis à jour</h2>
-            <p className="text-sm text-[#8B949E]">Vous allez être redirigé vers votre tableau de bord...</p>
+            <p className="text-sm text-[var(--text-secondary)]">Vous allez être redirigé vers votre tableau de bord...</p>
           </div>
         </div>
       </div>
@@ -64,13 +64,13 @@ export default function ResetPasswordPage() {
           <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
         </div>
 
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-8">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-8">
           <h1 className="text-base font-semibold text-[#FFFFFF] mb-1">Nouveau mot de passe</h1>
-          <p className="text-sm text-[#8B949E] mb-6">Choisissez un mot de passe sécurisé d&apos;au moins 8 caractères.</p>
+          <p className="text-sm text-[var(--text-secondary)] mb-6">Choisissez un mot de passe sécurisé d&apos;au moins 8 caractères.</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-[#8B949E]">Nouveau mot de passe</label>
+              <label className="text-sm font-medium text-[var(--text-secondary)]">Nouveau mot de passe</label>
               <input
                 type="password"
                 placeholder="Min. 8 caractères"
@@ -78,11 +78,11 @@ export default function ResetPasswordPage() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F08900] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-[#8B949E]">Confirmer le mot de passe</label>
+              <label className="text-sm font-medium text-[var(--text-secondary)]">Confirmer le mot de passe</label>
               <input
                 type="password"
                 placeholder="••••••••"
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F08900] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
               />
             </div>
 
@@ -103,8 +103,8 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold text-[#142850] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ background: '#F08900' }}
+              className="w-full py-2.5 rounded-lg text-sm font-semibold text-[#F51E33] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: '#F51E33' }}
             >
               {loading ? 'Enregistrement...' : 'Enregistrer le nouveau mot de passe'}
             </button>

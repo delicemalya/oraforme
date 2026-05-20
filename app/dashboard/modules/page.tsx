@@ -88,12 +88,12 @@ export default function ModulesMarketplacePage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#F08900]/10 border border-[#F08900]/20 flex items-center justify-center">
-            <Store size={18} className="text-[#F08900]" />
+          <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
+            <Store size={18} className="text-[#F51E33]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-[#FFFFFF]">Modules</h1>
-            <p className="text-xs text-[#484F58]">
+            <p className="text-xs text-[var(--text-secondary)]">
               {activeList.length} actif{activeList.length > 1 ? 's' : ''} · {fmtFCFA(mrrTotal)}/mois
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function ModulesMarketplacePage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-40 bg-[#0f1e3d] border border-[#30363D] rounded-xl animate-pulse" />
+            <div key={i} className="h-40 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -111,7 +111,7 @@ export default function ModulesMarketplacePage() {
           {/* Active modules */}
           {activeList.length > 0 && (
             <div>
-              <p className="text-xs text-[#484F58] uppercase tracking-wider mb-3 px-1">Modules actifs</p>
+              <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-3 px-1">Modules actifs</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {activeList.map(m => (
                   <ModuleCard
@@ -128,7 +128,7 @@ export default function ModulesMarketplacePage() {
           {/* Inactive modules */}
           {inactiveList.length > 0 && (
             <div>
-              <p className="text-xs text-[#484F58] uppercase tracking-wider mb-3 px-1">Modules disponibles</p>
+              <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-3 px-1">Modules disponibles</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {inactiveList.map(m => (
                   <ModuleCard
@@ -159,9 +159,9 @@ export default function ModulesMarketplacePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+              className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
             >
-              <button onClick={() => setConfirm(null)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]">
+              <button onClick={() => setConfirm(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]">
                 <X size={16} />
               </button>
               <div className="text-3xl mb-3">{MODULE_ICONS[confirm.id]}</div>
@@ -169,19 +169,19 @@ export default function ModulesMarketplacePage() {
                 {confirm.action === 'activate' ? 'Activer' : 'Désactiver'} {MODULE_LABELS[confirm.id]} ?
               </h3>
               {confirm.action === 'activate' ? (
-                <p className="text-sm text-[#8B949E] mb-5">
+                <p className="text-sm text-[var(--text-secondary)] mb-5">
                   Ce module sera immédiatement accessible dans votre sidebar.
-                  Tarif : <span className="text-[#F08900] font-medium">{fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois</span>
+                  Tarif : <span className="text-[#F51E33] font-medium">{fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois</span>
                 </p>
               ) : (
-                <p className="text-sm text-[#8B949E] mb-5">
+                <p className="text-sm text-[var(--text-secondary)] mb-5">
                   Le module sera retiré de votre sidebar. Vos données sont conservées.
                 </p>
               )}
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirm(null)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] transition-colors"
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors"
                 >
                   Annuler
                 </button>
@@ -189,7 +189,7 @@ export default function ModulesMarketplacePage() {
                   onClick={() => toggleModule(confirm.id, confirm.action)}
                   className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     confirm.action === 'activate'
-                      ? 'bg-[#F08900] text-[#142850] hover:bg-[#F08900]/90'
+                      ? 'bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90'
                       : 'bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] hover:bg-[#F51E33]/20'
                   }`}
                 >
@@ -231,32 +231,32 @@ function ModuleCard({
   onAction: () => void
 }) {
   return (
-    <div className={`bg-[#0f1e3d] border rounded-xl p-5 transition-all ${
-      m.active ? 'border-[#2EA043]/30' : 'border-[#30363D] hover:border-[#484F58]'
+    <div className={`bg-[var(--card-bg)] border rounded-xl p-5 transition-all ${
+      m.active ? 'border-[#2EA043]/30' : 'border-[var(--border)] hover:border-[#484F58]'
     }`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{m.icon}</span>
           <div>
             <p className="text-sm font-semibold text-[#FFFFFF]">{m.label}</p>
-            <p className="text-xs text-[#F08900] font-medium">{fmtFCFA(m.price)}/mois</p>
+            <p className="text-xs text-[#F51E33] font-medium">{fmtFCFA(m.price)}/mois</p>
           </div>
         </div>
         {m.active
           ? <CheckCircle size={16} className="text-[#2EA043] shrink-0 mt-0.5" />
-          : <Lock size={14} className="text-[#484F58] shrink-0 mt-0.5" />
+          : <Lock size={14} className="text-[var(--text-secondary)] shrink-0 mt-0.5" />
         }
       </div>
 
-      <p className="text-xs text-[#8B949E] mb-4 leading-relaxed line-clamp-2">{m.desc}</p>
+      <p className="text-xs text-[var(--text-secondary)] mb-4 leading-relaxed line-clamp-2">{m.desc}</p>
 
       <button
         onClick={onAction}
         disabled={toggling}
         className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
           m.active
-            ? 'bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#F51E33] hover:border-[#F51E33]/30'
-            : 'bg-[#F08900] text-[#142850] hover:bg-[#F08900]/90'
+            ? 'bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#F51E33] hover:border-[#F51E33]/30'
+            : 'bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90'
         }`}
       >
         {toggling

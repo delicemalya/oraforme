@@ -70,83 +70,83 @@ const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
 
 const SECTOR_NAV: Record<string, NavItem[]> = {
   ecole: [
-    { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F08900' },
+    { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F51E33' },
     { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#F51E33' },
     { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#8B0070' },
     { id: 'comptabilite',           label: 'Comptabilité',           sublabel: 'Journal OHADA',            icon: Calculator,     href: '/dashboard/ecole/comptabilite',           color: '#142850' },
     { id: 'tresorerie',             label: 'Trésorerie',             sublabel: 'Wallets & encaissements',  icon: Wallet,         href: '/dashboard/tresorerie',                   color: '#142850' },
-    { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F08900' },
+    { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F51E33' },
     { id: 'espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           icon: BookOpen,       href: '/dashboard/ecole/espace-formateur',       color: '#142850' },
     { id: 'espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              icon: GraduationCap,  href: '/dashboard/ecole/espace-etudiant',        color: '#142850' },
     { id: 'espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi de mes enfants',     icon: HeartHandshake, href: '/dashboard/ecole/espace-parent',          color: '#8B0070' },
     { id: 'parametres-academiques', label: 'Paramètres académ.',     sublabel: 'LMD & mentions',           icon: Settings,       href: '/dashboard/ecole/parametres-academiques', color: '#8B949E' },
-    { id: 'miaa',                   label: 'MIAA+',                  sublabel: 'IA scolaire',              icon: Bot,            href: '/dashboard/ecole/miaa',                   color: '#F08900' },
+    { id: 'miaa',                   label: 'MIAA+',                  sublabel: 'IA scolaire',              icon: Bot,            href: '/dashboard/ecole/miaa',                   color: '#F51E33' },
   ],
   restaurant: [
-    { id: 'pos',        label: 'Caisse POS',   sublabel: 'Ventes & commandes', icon: ChefHat,   href: '/dashboard/restaurant',  color: '#F08900' },
+    { id: 'pos',        label: 'Caisse POS',   sublabel: 'Ventes & commandes', icon: ChefHat,   href: '/dashboard/restaurant',  color: '#F51E33' },
     { id: 'stock',      label: 'Stock',        sublabel: 'Inventaire',         icon: Package,   href: '/dashboard/stock',       color: '#142850' },
     { id: 'rh',         label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,     href: '/dashboard/rh',          color: '#8B0070' },
     { id: 'tresorerie', label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',       label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
+    { id: 'miaa',       label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
   ],
   commerce: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   href: '/dashboard/stock',       color: '#142850' },
     { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     href: '/dashboard/rh',          color: '#8B0070' },
     { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
   ],
   supermarche: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Caisse & ventes',   icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Caisse & ventes',   icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',       label: 'Stock',        sublabel: 'Rayons & inventaire',icon: Package,    href: '/dashboard/stock',       color: '#142850' },
     { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#142850' },
     { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#8B0070' },
     { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
   ],
   boisson: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Ventes & livraisons',icon: FileText,   href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Ventes & livraisons',icon: FileText,   href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire boissons',icon: Package,    href: '/dashboard/stock',       color: '#142850' },
     { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#142850' },
     { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#8B0070' },
     { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
   ],
   transport_public: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Lignes & voyageurs', icon: Truck,       href: '/dashboard/transport',  color: '#F08900' },
+    { id: 'transport',   label: 'Transport',    sublabel: 'Lignes & voyageurs', icon: Truck,       href: '/dashboard/transport',  color: '#F51E33' },
     { id: 'facturation', label: 'Facturation',  sublabel: 'Billets & recettes', icon: FileText,    href: '/dashboard/facturation', color: '#8B0070' },
     { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs & agents',icon: Users,       href: '/dashboard/rh',         color: '#142850' },
     { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',       color: '#F08900' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',       color: '#F51E33' },
   ],
   sante: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Consultations',      icon: FileText,  href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Consultations',      icon: FileText,  href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel médical',  icon: Users,     href: '/dashboard/rh',          color: '#142850' },
     { id: 'stock',       label: 'Pharmacie',    sublabel: 'Médicaments',        icon: Package,   href: '/dashboard/stock',       color: '#8B0070' },
     { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
   ],
   transport: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Flotte & courses',  icon: Truck,     href: '/dashboard/transport',   color: '#F08900' },
+    { id: 'transport',   label: 'Transport',    sublabel: 'Flotte & courses',  icon: Truck,     href: '/dashboard/transport',   color: '#F51E33' },
     { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#8B0070' },
     { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs',        icon: Users,     href: '/dashboard/rh',          color: '#142850' },
     { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F08900' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
   ],
   hotel: [
-    { id: 'hotel',       label: 'Hébergement',  sublabel: 'Réservations',       icon: Hotel,       href: '/dashboard/hotel',       color: '#F08900' },
+    { id: 'hotel',       label: 'Hébergement',  sublabel: 'Réservations',       icon: Hotel,       href: '/dashboard/hotel',       color: '#F51E33' },
     { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',   icon: FileText,    href: '/dashboard/facturation', color: '#8B0070' },
     { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#142850' },
     { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F08900' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F51E33' },
   ],
   boutique: [
-    { id: 'facturation',  label: 'Caisse & Ventes', sublabel: 'Factures & reçus',  icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Caisse & Ventes', sublabel: 'Factures & reçus',  icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
     { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
     { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   btp: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & travaux',    icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & travaux',    icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',        label: 'Stock chantier',   sublabel: 'Matériaux',          icon: Package,     href: '/dashboard/stock',       color: '#142850' },
     { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
     { id: 'rh',           label: 'RH & Équipes',    sublabel: 'Personnel chantier', icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
@@ -154,13 +154,13 @@ const SECTOR_NAV: Record<string, NavItem[]> = {
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   cabinet: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & honoraires', icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & honoraires', icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
-    { id: 'miaa',         label: 'MIAA+',            sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F08900' },
+    { id: 'miaa',         label: 'MIAA+',            sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F51E33' },
   ],
   petrole: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Ventes & contrats',  icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Ventes & contrats',  icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
     { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
     { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
@@ -168,7 +168,7 @@ const SECTOR_NAV: Record<string, NavItem[]> = {
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   ong: [
-    { id: 'facturation',  label: 'Projets & Budget', sublabel: 'Rapports bailleurs', icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Projets & Budget', sublabel: 'Rapports bailleurs', icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'depenses',     label: 'Dépenses',         sublabel: 'Suivi des charges',  icon: Receipt,     href: '/dashboard/depenses',    color: '#142850' },
     { id: 'stock',        label: 'Stock & Matériel', sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
     { id: 'rh',           label: 'RH & Bénévoles',  sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
@@ -176,13 +176,13 @@ const SECTOR_NAV: Record<string, NavItem[]> = {
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   banque: [
-    { id: 'facturation',  label: 'Comptes clients',  sublabel: 'Prêts & épargne',    icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Comptes clients',  sublabel: 'Prêts & épargne',    icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA & reporting',  icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
     { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#142850' },
     { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Liquidités',         icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
   ],
   pharmacie: [
-    { id: 'facturation',  label: 'Caisse',           sublabel: 'Ventes & ordonnances',icon: FileText,   href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Caisse',           sublabel: 'Ventes & ordonnances',icon: FileText,   href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',        label: 'Stock médicaments',sublabel: 'Inventaire & péremption',icon: Package, href: '/dashboard/stock',       color: '#142850' },
     { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
     { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
@@ -190,10 +190,10 @@ const SECTOR_NAV: Record<string, NavItem[]> = {
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
   ],
   agriculture: [
-    { id: 'facturation',  label: 'Ventes & Récoltes',sublabel: 'Clients & marchés',  icon: FileText,    href: '/dashboard/facturation', color: '#F08900' },
+    { id: 'facturation',  label: 'Ventes & Récoltes',sublabel: 'Clients & marchés',  icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
     { id: 'stock',        label: 'Stock & Cheptel',  sublabel: 'Inventaire agricole',icon: Package,     href: '/dashboard/stock',       color: '#142850' },
     { id: 'achats',       label: 'Achats & Intrants',sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
-    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Charges exploitation',icon: Receipt,    href: '/dashboard/depenses',    color: '#F08900' },
+    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Charges exploitation',icon: Receipt,    href: '/dashboard/depenses',    color: '#F51E33' },
     { id: 'rh',           label: 'RH & Paie',       sublabel: 'Saisonniers & agents',icon: Users,      href: '/dashboard/rh',          color: '#8B0070' },
     { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
@@ -400,7 +400,7 @@ export default function Sidebar() {
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
                 active
-                  ? 'border-[#F08900] bg-white/10 text-white font-medium rounded-r-lg'
+                  ? 'border-[#F51E33] bg-white/10 text-white font-medium rounded-r-lg'
                   : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
               }`}
             >

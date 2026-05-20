@@ -4,20 +4,20 @@
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DESIGN SYSTEM ORAFORME — Palette marque stricte · Zéro dégradé
-   Navy #142850 · Rouge #F51E33 · Orange #F08900 · Violet #8B0070
+   Navy #142850 · Rouge #F51E33 · Orange #F51E33 · Violet #8B0070
 ════════════════════════════════════════════════════════════════════════════ */
 
 :root {
   --color-navy:   #142850;
   --color-red:    #F51E33;
-  --color-orange: #F08900;
+  --color-orange: #F51E33;
   --color-violet: #8B0070;
   --color-white:  #FFFFFF;
   --color-black:  #0D0D0D;
   /* Aliases spec */
   --navy:    #142850;
   --red:     #F51E33;
-  --orange:  #F08900;
+  --orange:  #F51E33;
   --violet:  #8B0070;
   --white60: rgba(255,255,255,0.6);
   --white20: rgba(255,255,255,0.12);
@@ -181,8 +181,8 @@ body.light-mode header {
 }
 body.light-mode header * { color: #0F1724 !important; }
 /* Exceptions — éléments orange conservent leur couleur */
-body.light-mode header [class*="text-\[#F08900\]"] { color: #F08900 !important; }
-body.light-mode header [class*="bg-\[#F08900\]"]   { background-color: #F08900 !important; }
+body.light-mode header [class*="text-\[#F51E33\]"] { color: #F51E33 !important; }
+body.light-mode header [class*="bg-\[#F51E33\]"]   { background-color: #F51E33 !important; }
 /* Search bar */
 body.light-mode header .flex.items-center.gap-2 {
   background-color: #F0F1F5 !important;
@@ -291,7 +291,7 @@ body.light-mode #main-content select option { background-color: #FFFFFF; color: 
 
 /* ── Badges statut (light mode) ─────────────────────────────────────── */
 body.light-mode #main-content .bg-red-500\/10     { background-color: rgba(245,30,51,0.10) !important; }
-body.light-mode #main-content .bg-orange-500\/10  { background-color: rgba(240,137,0,0.10) !important; }
+body.light-mode #main-content .bg-orange-500\/10  { background-color: rgba(245,30,51,0.10) !important; }
 
 /* ── Scrollbar ──────────────────────────────────────────────────────── */
 body.light-mode ::-webkit-scrollbar-track  { background: #EEF0FA; }
@@ -303,4 +303,4 @@ body.light-mode .shadow-xl  { box-shadow: 0 2px 16px rgba(15,23,36,0.10) !import
 body.light-mode .shadow-2xl { box-shadow: 0 4px 32px rgba(15,23,36,0.14) !important; }
 
 /* ── Hover states ──────────────────────────────────────────────────── */
-body.light-mode #main-content .hover\:border-\[\#F08900\]:hover { border-color: #F08900 !important; }
+body.light-mode #main-content .hover\:border-\[\#F51E33\]:hover { border-color: #F51E33 !important; }

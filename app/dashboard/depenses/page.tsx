@@ -21,16 +21,16 @@ type Depense = {
 type CostCenter = { id: string; code: string; nom: string }
 
 const CATEGORIES = [
-  { id: 'carburant',    label: '🚗 Carburant & Transport',       color: '#F08900' },
+  { id: 'carburant',    label: '🚗 Carburant & Transport',       color: '#F51E33' },
   { id: 'loyer',        label: '🏠 Loyer & Charges locatives',    color: '#8B0070' },
-  { id: 'electricite',  label: '💡 Électricité & Eau',           color: '#F08900' },
-  { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#F08900' },
+  { id: 'electricite',  label: '💡 Électricité & Eau',           color: '#F51E33' },
+  { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#F51E33' },
   { id: 'salaires',     label: '👥 Salaires & RH',               color: '#8B0070' },
   { id: 'fournitures',  label: '🛒 Achats & Fournitures',        color: '#142850' },
   { id: 'sante',        label: '🏥 Santé & Assurances',          color: '#142850' },
   { id: 'taxes',        label: '📊 Taxes & Impôts',              color: '#F51E33' },
   { id: 'maintenance',  label: '🔧 Maintenance & Réparations',   color: '#84CC16' },
-  { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#F08900' },
+  { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#F51E33' },
   { id: 'voyages',      label: '✈️ Voyages & Déplacements',      color: '#F51E33' },
   { id: 'autre',        label: '📦 Autre',                       color: '#484F58' },
 ]
@@ -154,15 +154,15 @@ export default function DepensesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F08900]/10 border border-[#F08900]/20 flex items-center justify-center">
-          <Receipt size={18} className="text-[#F08900]" />
+        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
+          <Receipt size={18} className="text-[#F51E33]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#FFFFFF]">Dépenses & Charges</h1>
-          <p className="text-xs text-[#484F58]">Suivi de toutes vos dépenses par catégorie</p>
+          <p className="text-xs text-[var(--text-secondary)]">Suivi de toutes vos dépenses par catégorie</p>
         </div>
         <button onClick={() => setShowModal(true)}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F08900] text-[#142850] text-sm font-medium hover:bg-[#F08900]/90 transition-colors">
+          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F51E33] text-[#F51E33] text-sm font-medium hover:bg-[#F51E33]/90 transition-colors">
           <Plus size={15} /> Dépense
         </button>
       </div>
@@ -172,7 +172,7 @@ export default function DepensesPage() {
         {[{ label: '7 jours', days: 7 }, { label: '30 jours', days: 30 }, { label: '90 jours', days: 90 }].map(p => (
           <button key={p.days} onClick={() => setPeriode(p.days)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              periode === p.days ? 'bg-[#F08900]/10 text-[#F08900] border border-[#F08900]/30' : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
+              periode === p.days ? 'bg-[#F51E33]/10 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
             }`}>
             {p.label}
           </button>
@@ -183,7 +183,7 @@ export default function DepensesPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total période',       value: fmtFCFA(totalMois),   gradient: '#F51E33', icon: TrendingDown },
-          { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: '#F08900', icon: Receipt },
+          { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: '#F51E33', icon: Receipt },
           { label: 'Moyenne par jour',    value: fmtFCFA(moyJour),     gradient: '#8B0070', icon: Receipt },
           { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? '#F51E33' : '#142850', icon: varPct > 0 ? TrendingUp : TrendingDown },
         ].map(k => {
@@ -211,10 +211,10 @@ export default function DepensesPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Pie chart */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Répartition par catégorie</h2>
           {byCat.length === 0 ? (
-            <p className="text-sm text-[#484F58] text-center py-12">Aucune dépense sur la période</p>
+            <p className="text-sm text-[var(--text-secondary)] text-center py-12">Aucune dépense sur la période</p>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -233,13 +233,13 @@ export default function DepensesPage() {
         </div>
 
         {/* Top categories */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Top catégories</h2>
           <div className="space-y-3">
             {byCat.slice(0, 6).map(c => (
               <div key={c.name}>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-[#8B949E] truncate">{c.name}</span>
+                  <span className="text-[var(--text-secondary)] truncate">{c.name}</span>
                   <span className="text-[#FFFFFF] font-medium ml-2 shrink-0">
                     {fmtFCFA(c.value)} ({totalMois > 0 ? Math.round((c.value / totalMois) * 100) : 0}%)
                   </span>
@@ -249,44 +249,44 @@ export default function DepensesPage() {
                 </div>
               </div>
             ))}
-            {byCat.length === 0 && <p className="text-sm text-[#484F58] text-center py-6">Aucune dépense</p>}
+            {byCat.length === 0 && <p className="text-sm text-[var(--text-secondary)] text-center py-6">Aucune dépense</p>}
           </div>
         </div>
       </div>
 
       {/* Liste */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#30363D] flex items-center justify-between">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[#FFFFFF]">Liste des dépenses</h2>
-          <span className="text-xs text-[#484F58]">{filtered.length} dépense{filtered.length > 1 ? 's' : ''}</span>
+          <span className="text-xs text-[var(--text-secondary)]">{filtered.length} dépense{filtered.length > 1 ? 's' : ''}</span>
         </div>
         {loading ? (
-          <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[#484F58]" /></div>
+          <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[var(--text-secondary)]" /></div>
         ) : filtered.length === 0 ? (
-          <div className="p-10 text-center text-[#484F58] text-sm">Aucune dépense sur la période</div>
+          <div className="p-10 text-center text-[var(--text-secondary)] text-sm">Aucune dépense sur la période</div>
         ) : (
-          <div className="divide-y divide-[#1a2d50]">
+          <div className="divide-y divide-[var(--border)]">
             {filtered.slice(0, 50).map(d => {
               const cat = CATEGORIES.find(c => c.id === d.categorie)
               return (
-                <div key={d.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[#1a2d50]/30 group">
+                <div key={d.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/5/30 group">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-[#1a2d50] text-base">
                     {cat?.label.split(' ')[0] ?? '📦'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-[#FFFFFF] truncate">{d.description}</p>
-                    <p className="text-xs text-[#484F58]">{cat?.label.split(' ').slice(1).join(' ') ?? d.categorie} · {d.mode_paiement}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{cat?.label.split(' ').slice(1).join(' ') ?? d.categorie} · {d.mode_paiement}</p>
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-sm font-semibold text-[#F51E33]">-{fmtFCFA(d.montant)}</p>
-                    <p className="text-xs text-[#484F58]">
+                    <p className="text-xs text-[var(--text-secondary)]">
                       {new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                     </p>
                   </div>
                   <button
                     onClick={() => deleteDepense(d.id)}
                     disabled={deleting === d.id}
-                    className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[#484F58] hover:text-[#F51E33] hover:bg-[#F51E33]/10 transition-all"
+                    className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[#F51E33] hover:bg-[#F51E33]/10 transition-all"
                     title="Supprimer"
                   >
                     {deleting === d.id
@@ -307,88 +307,88 @@ export default function DepensesPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60" onClick={() => setShowModal(false)} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
-              <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-[#484F58] hover:text-[#8B949E]"><X size={16} /></button>
+              className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+              <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
               <h3 className="text-base font-bold text-[#FFFFFF] mb-4">Nouvelle dépense</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-1 block">Catégorie</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Catégorie</label>
                   <select value={form.categorie} onChange={e => {
                     const cat = e.target.value
                     const [d, c] = CAT_ACCOUNTS[cat] ?? ['651000', '571000']
                     setForm(f => ({ ...f, categorie: cat, debit_account: d, credit_account: c }))
                   }}
-                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                     {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-1 block">Description</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Description</label>
                   <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                     placeholder="Description de la dépense..."
-                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/50" />
+                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#8B949E] mb-1 block">Montant (FCFA)</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA)</label>
                     <input type="number" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/50" />
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[#8B949E] mb-1 block">Date</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
                     <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-1 block">Mode de paiement</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Mode de paiement</label>
                   <select value={form.mode_paiement} onChange={e => setForm(f => ({ ...f, mode_paiement: e.target.value }))}
-                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                     {MODES.map(m => <option key={m}>{m}</option>)}
                   </select>
                 </div>
                 {costCenters.length > 0 && (
                   <div>
-                    <label className="text-xs text-[#8B949E] mb-1 block">Centre de coût (facultatif)</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Centre de coût (facultatif)</label>
                     <select value={form.cost_center_id} onChange={e => setForm(f => ({ ...f, cost_center_id: e.target.value }))}
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                       <option value="">— Aucun centre —</option>
                       {costCenters.map(cc => <option key={cc.id} value={cc.id}>{cc.code} — {cc.nom}</option>)}
                     </select>
                   </div>
                 )}
                 <div>
-                  <label className="text-xs text-[#8B949E] mb-1 block">Réf. pièce (facultatif)</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Réf. pièce (facultatif)</label>
                   <input value={form.reference_piece} onChange={e => setForm(f => ({ ...f, reference_piece: e.target.value }))}
                     placeholder="Ex: FAC-2025-001, BON-42..."
-                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/50" />
+                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
                 </div>
 
                 {/* Écriture OHADA */}
-                <div className="border-t border-[#30363D] pt-3">
+                <div className="border-t border-[var(--border)] pt-3">
                   <p className="text-[10px] text-[#6E7681] uppercase tracking-wider mb-2 flex items-center gap-1">
                     <BookOpen size={10} /> Écriture OHADA (auto-calculée)
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
                     <div className="bg-[#142850] border border-[#142850]/20 rounded-lg px-3 py-2">
-                      <p className="text-[#484F58] mb-0.5">Débit</p>
-                      <p className="text-[#142850] font-semibold">{form.debit_account}</p>
-                      <p className="text-[#484F58] text-[9px] truncate">{accountLabel(form.debit_account)}</p>
+                      <p className="text-[var(--text-secondary)] mb-0.5">Débit</p>
+                      <p className="text-[#F51E33] font-semibold">{form.debit_account}</p>
+                      <p className="text-[var(--text-secondary)] text-[9px] truncate">{accountLabel(form.debit_account)}</p>
                     </div>
                     <div className="bg-[#142850] border border-[#F51E33]/20 rounded-lg px-3 py-2">
-                      <p className="text-[#484F58] mb-0.5">Crédit</p>
+                      <p className="text-[var(--text-secondary)] mb-0.5">Crédit</p>
                       <p className="text-[#F51E33] font-semibold">{form.credit_account}</p>
-                      <p className="text-[#484F58] text-[9px] truncate">{accountLabel(form.credit_account)}</p>
+                      <p className="text-[var(--text-secondary)] text-[9px] truncate">{accountLabel(form.credit_account)}</p>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[#30363D] text-[#8B949E]">Annuler</button>
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
                 <button onClick={save} disabled={saving || !form.description || !form.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#F08900] text-[#142850] hover:bg-[#F08900]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                   {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
                 </button>
               </div>

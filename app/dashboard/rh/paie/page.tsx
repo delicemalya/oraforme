@@ -220,9 +220,9 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
         <Icon size={16} style={{ color }} />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] text-[#8B949E] mb-0.5">{label}</p>
+        <p className="text-[11px] text-[var(--text-secondary)] mb-0.5">{label}</p>
         <p className="text-lg font-bold text-white truncate">{value}</p>
-        {sub && <p className="text-[10px] text-[#8B949E] mt-0.5">{sub}</p>}
+        {sub && <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{sub}</p>}
       </div>
     </motion.div>
   )
@@ -232,8 +232,8 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
 
 function StatutBulletin({ statut }: { statut: string }) {
   const MAP: Record<string, { label: string; color: string; bg: string }> = {
-    generee: { label: 'Générée',  color: '#F08900', bg: '#F0890018' },
-    validee: { label: 'Validée',  color: '#F08900', bg: '#F0890018' },
+    generee: { label: 'Générée',  color: '#F51E33', bg: '#F51E3318' },
+    validee: { label: 'Validée',  color: '#F51E33', bg: '#F51E3318' },
     payee:   { label: 'Payée',    color: '#2EA043', bg: '#2EA04318' },
   }
   const s = MAP[statut] ?? MAP.generee
@@ -257,7 +257,7 @@ function NumInput({ value, onChange, disabled }: {
       onChange={e => onChange(Number(e.target.value) || 0)}
       disabled={disabled}
       className="w-24 bg-white/[0.06] border border-white/10 rounded-md px-2 py-1 text-xs text-white text-right
-                 focus:outline-none focus:border-[#F08900]/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                 focus:outline-none focus:border-[#F51E33]/60 disabled:opacity-40 disabled:cursor-not-allowed"
     />
   )
 }
@@ -458,7 +458,7 @@ export default function PaiePage() {
 
   if (loadingTenant) {
     return (
-      <div className="flex items-center justify-center h-64 text-[#8B949E]">
+      <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
         <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
       </div>
     )
@@ -470,7 +470,7 @@ export default function PaiePage() {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Gestion de la Paie</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             Congo-Brazzaville · CNSS 5,04 % / 14,16 % · IRPP progressif
           </p>
         </div>
@@ -479,19 +479,19 @@ export default function PaiePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={prevMois}
-            className="p-1.5 rounded-md border border-white/10 text-[#8B949E] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-white/10 text-[var(--text-secondary)] hover:text-white hover:border-white/20 transition-colors"
           >
             <ChevronLeft size={14} />
           </button>
           <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5">
-            <Calendar size={13} className="text-[#F08900]" />
+            <Calendar size={13} className="text-[#F51E33]" />
             <select
               value={mois}
               onChange={e => setMois(Number(e.target.value))}
               className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
             >
               {MOIS_LABELS.slice(1).map((m, i) => (
-                <option key={i+1} value={i+1} className="bg-[#0f1e3d]">{m}</option>
+                <option key={i+1} value={i+1} className="bg-[var(--card-bg)]">{m}</option>
               ))}
             </select>
             <select
@@ -500,19 +500,19 @@ export default function PaiePage() {
               className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
             >
               {[2023, 2024, 2025, 2026].map(y => (
-                <option key={y} value={y} className="bg-[#0f1e3d]">{y}</option>
+                <option key={y} value={y} className="bg-[var(--card-bg)]">{y}</option>
               ))}
             </select>
           </div>
           <button
             onClick={nextMois}
-            className="p-1.5 rounded-md border border-white/10 text-[#8B949E] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-white/10 text-[var(--text-secondary)] hover:text-white hover:border-white/20 transition-colors"
           >
             <ChevronRight size={14} />
           </button>
           <button
             onClick={load}
-            className="p-1.5 rounded-md border border-white/10 text-[#8B949E] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-white/10 text-[var(--text-secondary)] hover:text-white hover:border-white/20 transition-colors"
           >
             <RefreshCw size={13} />
           </button>
@@ -528,9 +528,9 @@ export default function PaiePage() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-3 bg-[#F08900]/10 border border-[#F08900]/30 rounded-xl px-4 py-3">
-              <AlertTriangle size={15} className="text-[#F08900] shrink-0" />
-              <p className="text-sm text-[#F08900]">
+            <div className="flex items-center gap-3 bg-[#F51E33]/10 border border-[#F51E33]/30 rounded-xl px-4 py-3">
+              <AlertTriangle size={15} className="text-[#F51E33] shrink-0" />
+              <p className="text-sm text-[#F51E33]">
                 La paie de <strong>{MOIS_LABELS[mois]} {annee}</strong> n&apos;a pas encore été générée.
                 Vérifiez les primes et heures supplémentaires puis cliquez sur &quot;Générer toutes les paies&quot;.
               </p>
@@ -545,7 +545,7 @@ export default function PaiePage() {
           label="Masse salariale brute"
           value={`${fmt(totalBrut)} FCFA`}
           sub={`${rows.length} employés actifs`}
-          color="#F08900"
+          color="#F51E33"
           icon={DollarSign}
         />
         <KpiCard
@@ -559,7 +559,7 @@ export default function PaiePage() {
           label="Charges patronales CNSS"
           value={`${fmt(totalPatro)} FCFA`}
           sub="Taux 14,16 % plafonné"
-          color="#F08900"
+          color="#F51E33"
           icon={Building2}
         />
         <KpiCard
@@ -582,10 +582,10 @@ export default function PaiePage() {
           style={{
             background: saved
               ? '#238636'
-              : '#F08900',
+              : '#F51E33',
             boxShadow: saved
               ? '0 0 20px #2EA04340'
-              : '0 0 20px #F0890040',
+              : '0 0 20px #F51E3340',
           }}
         >
           {saving ? (
@@ -600,11 +600,11 @@ export default function PaiePage() {
 
       {/* Tableau principal */}
       {loading ? (
-        <div className="flex items-center justify-center h-32 text-[#8B949E]">
+        <div className="flex items-center justify-center h-32 text-[var(--text-secondary)]">
           <Loader2 className="animate-spin mr-2" size={16} /> Chargement de la paie…
         </div>
       ) : rows.length === 0 ? (
-        <div className="text-center py-16 text-[#8B949E]">
+        <div className="text-center py-16 text-[var(--text-secondary)]">
           <Users size={32} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">Aucun employé actif trouvé.</p>
         </div>
@@ -614,17 +614,17 @@ export default function PaiePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Employé</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Base</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Primes</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider min-w-[160px]">Heures sup</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Brut</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">CNSS sal.</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">IRPP</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider text-[#2EA043]">Net</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Patro.</th>
-                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Statut</th>
-                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[#8B949E] uppercase tracking-wider">Actions</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Employé</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Base</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Primes</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider min-w-[160px]">Heures sup</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Brut</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">CNSS sal.</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">IRPP</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-[#2EA043]">Net</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Patro.</th>
+                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Statut</th>
+                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -650,13 +650,13 @@ export default function PaiePage() {
                         </div>
                         <div>
                           <p className="text-white text-xs font-medium leading-tight">{row.nom}</p>
-                          <p className="text-[#8B949E] text-[10px]">{row.poste}</p>
+                          <p className="text-[var(--text-secondary)] text-[10px]">{row.poste}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Base */}
-                    <td className="px-3 py-3 text-right text-xs text-[#8B949E]">
+                    <td className="px-3 py-3 text-right text-xs text-[var(--text-secondary)]">
                       {fmt(row.salaire_base)}
                     </td>
 
@@ -677,7 +677,7 @@ export default function PaiePage() {
                           onChange={v => updateRow(row.employe_id, 'heures_sup', v)}
                           disabled={row.statut === 'payee'}
                         />
-                        <span className="text-[10px] text-[#8B949E]">×</span>
+                        <span className="text-[10px] text-[var(--text-secondary)]">×</span>
                         <NumInput
                           value={row.taux_horaire}
                           onChange={v => updateRow(row.employe_id, 'taux_horaire', v)}
@@ -697,7 +697,7 @@ export default function PaiePage() {
                     </td>
 
                     {/* IRPP */}
-                    <td className="px-3 py-3 text-right text-xs text-[#F08900]">
+                    <td className="px-3 py-3 text-right text-xs text-[#F51E33]">
                       −{fmt(row.irpp)}
                     </td>
 
@@ -707,7 +707,7 @@ export default function PaiePage() {
                     </td>
 
                     {/* Patronal */}
-                    <td className="px-3 py-3 text-right text-xs text-[#8B949E]">
+                    <td className="px-3 py-3 text-right text-xs text-[var(--text-secondary)]">
                       {fmt(row.cnss_patronal)}
                     </td>
 
@@ -718,12 +718,12 @@ export default function PaiePage() {
                         onChange={e => updateStatut(row.employe_id, e.target.value as 'generee' | 'validee' | 'payee')}
                         className="bg-transparent text-[10px] focus:outline-none cursor-pointer"
                         style={{
-                          color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#F08900' : '#F08900',
+                          color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#F51E33' : '#F51E33',
                         }}
                       >
-                        <option value="generee"  className="bg-[#0f1e3d] text-[#F08900]">Générée</option>
-                        <option value="validee"  className="bg-[#0f1e3d] text-[#F08900]">Validée</option>
-                        <option value="payee"    className="bg-[#0f1e3d] text-[#2EA043]">Payée</option>
+                        <option value="generee"  className="bg-[var(--card-bg)] text-[#F51E33]">Générée</option>
+                        <option value="validee"  className="bg-[var(--card-bg)] text-[#F51E33]">Validée</option>
+                        <option value="payee"    className="bg-[var(--card-bg)] text-[#2EA043]">Payée</option>
                       </select>
                     </td>
 
@@ -733,7 +733,7 @@ export default function PaiePage() {
                         onClick={() => printBulletin(row, mois, annee, entreprise)}
                         title="Imprimer le bulletin"
                         className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium
-                                   bg-white/[0.06] hover:bg-white/[0.12] text-[#8B949E] hover:text-white
+                                   bg-white/[0.06] hover:bg-white/[0.12] text-[var(--text-secondary)] hover:text-white
                                    border border-white/10 transition-colors"
                       >
                         <Printer size={11} />
@@ -750,10 +750,10 @@ export default function PaiePage() {
                   <td className="px-4 py-3 text-xs font-bold text-white">
                     TOTAUX ({rows.length} employés)
                   </td>
-                  <td className="px-3 py-3 text-right text-xs text-[#8B949E] font-semibold">
+                  <td className="px-3 py-3 text-right text-xs text-[var(--text-secondary)] font-semibold">
                     {fmt(rows.reduce((s, r) => s + r.salaire_base, 0))}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs text-[#8B949E] font-semibold">
+                  <td className="px-3 py-3 text-right text-xs text-[var(--text-secondary)] font-semibold">
                     {fmt(rows.reduce((s, r) => s + r.primes, 0))}
                   </td>
                   <td />
@@ -763,13 +763,13 @@ export default function PaiePage() {
                   <td className="px-3 py-3 text-right text-xs font-bold text-[#F51E33]">
                     −{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F08900]">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[#F51E33]">
                     −{fmt(totalIRPP)}
                   </td>
                   <td className="px-3 py-3 text-right text-xs font-bold text-[#2EA043]">
                     {fmt(totalNet)}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs font-bold text-[#8B949E]">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[var(--text-secondary)]">
                     {fmt(totalPatro)}
                   </td>
                   <td colSpan={2} />
@@ -790,24 +790,24 @@ export default function PaiePage() {
         >
           <div className="col-span-full md:col-span-2 rounded-xl border border-white/[0.06] p-4"
                style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-xs text-[#8B949E] mb-3 font-semibold uppercase tracking-wider">
+            <p className="text-xs text-[var(--text-secondary)] mb-3 font-semibold uppercase tracking-wider">
               Récapitulatif — {MOIS_LABELS[mois]} {annee}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div>
-                <p className="text-[10px] text-[#8B949E]">Brut total</p>
+                <p className="text-[10px] text-[var(--text-secondary)]">Brut total</p>
                 <p className="font-bold text-white">{fmt(totalBrut)} FCFA</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#8B949E]">CNSS salarié total</p>
+                <p className="text-[10px] text-[var(--text-secondary)]">CNSS salarié total</p>
                 <p className="font-bold text-[#F51E33]">{fmt(rows.reduce((s, r) => s + r.cnss_salarie, 0))} FCFA</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#8B949E]">IRPP total</p>
-                <p className="font-bold text-[#F08900]">{fmt(totalIRPP)} FCFA</p>
+                <p className="text-[10px] text-[var(--text-secondary)]">IRPP total</p>
+                <p className="font-bold text-[#F51E33]">{fmt(totalIRPP)} FCFA</p>
               </div>
               <div>
-                <p className="text-[10px] text-[#8B949E]">Net à payer</p>
+                <p className="text-[10px] text-[var(--text-secondary)]">Net à payer</p>
                 <p className="font-bold text-[#2EA043]">{fmt(totalNet)} FCFA</p>
               </div>
             </div>
@@ -815,10 +815,10 @@ export default function PaiePage() {
 
           <div className="rounded-xl border border-[#2EA043]/30 p-4 flex flex-col justify-between"
                style={{ background: 'rgba(46,160,67,0.06)' }}>
-            <p className="text-xs text-[#8B949E] font-semibold uppercase tracking-wider mb-2">Coût employeur total</p>
+            <p className="text-xs text-[var(--text-secondary)] font-semibold uppercase tracking-wider mb-2">Coût employeur total</p>
             <div>
               <p className="text-2xl font-bold text-white">{fmt(totalCout)}</p>
-              <p className="text-xs text-[#8B949E]">FCFA · dont CNSS patro {fmt(totalPatro)} FCFA</p>
+              <p className="text-xs text-[var(--text-secondary)]">FCFA · dont CNSS patro {fmt(totalPatro)} FCFA</p>
             </div>
             <button
               onClick={genererToutesPaies}

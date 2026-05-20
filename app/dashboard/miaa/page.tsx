@@ -15,8 +15,8 @@ interface Message { role: 'user' | 'bot'; text: string; ts?: number }
 // ── Capabilities ──────────────────────────────────────────────────────────────
 
 const CAPABILITIES = [
-  { icon: Calculator, label: 'Calculs fiscaux',       desc: 'TVA 18%, CA 5%, CNSS, IRPP Congo',       color: '#F08900' },
-  { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#F08900' },
+  { icon: Calculator, label: 'Calculs fiscaux',       desc: 'TVA 18%, CA 5%, CNSS, IRPP Congo',       color: '#F51E33' },
+  { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#F51E33' },
   { icon: FileText,   label: 'Génération documents',  desc: 'Factures, bulletins de paie, rapports',   color: '#142850' },
   { icon: Bell,       label: 'Alertes intelligentes', desc: 'Impayés, stock bas, échéances',            color: '#F51E33' },
   { icon: Cog,        label: 'Automatisation',        desc: 'Workflows, relances, rappels',             color: '#8B0070' },
@@ -189,19 +189,19 @@ export default function MIAAPage() {
     <div className="flex flex-col lg:flex-row gap-5 h-[calc(100vh-120px)] min-h-[600px]">
 
       {/* ── LEFT: Chat ──────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col bg-[#0f1e3d] border border-[#30363D] rounded-2xl overflow-hidden min-h-0">
+      <div className="flex-1 flex flex-col bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl overflow-hidden min-h-0">
 
         {/* Chat Header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#30363D] shrink-0" style={{ background: '#142850' }}>
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)] shrink-0" style={{ background: '#142850' }}>
           <MIAALogo size={40} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="text-sm font-bold text-[#FFFFFF]">✨ MIAA+ — Assistant Intelligent</h1>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#F0890020', color: '#F08900' }}>IA</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#F51E3320', color: '#F51E33' }}>IA</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#142850] animate-pulse shrink-0" />
-              <p className="text-[10px] text-[#8B949E] truncate">
+              <p className="text-[10px] text-[var(--text-secondary)] truncate">
                 {entreprise ? `${entreprise} · ` : ''}oraforme ERP · Spécialisé Congo-Brazzaville
               </p>
             </div>
@@ -209,7 +209,7 @@ export default function MIAAPage() {
           <button
             onClick={clearChat}
             title="Nouvelle conversation"
-            className="p-2 text-[#484F58] hover:text-[#8B949E] hover:bg-[#1a2d50] rounded-lg transition-colors"
+            className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] hover:bg-white/5 rounded-lg transition-colors"
           >
             <Trash2 size={14} />
           </button>
@@ -234,10 +234,10 @@ export default function MIAAPage() {
                 <div
                   className={`max-w-[78%] text-xs px-3.5 py-2.5 rounded-2xl leading-relaxed ${
                     m.role === 'user'
-                      ? 'rounded-br-sm font-semibold text-[#142850]'
-                      : 'rounded-bl-sm text-[#FFFFFF] border-l-2 border-[#F08900]/50'
+                      ? 'rounded-br-sm font-semibold text-[#F51E33]'
+                      : 'rounded-bl-sm text-[#FFFFFF] border-l-2 border-[#F51E33]/50'
                   }`}
-                  style={m.role === 'user' ? { background: '#F08900' } : { background: '#1C2128' }}
+                  style={m.role === 'user' ? { background: '#F51E33' } : { background: '#1C2128' }}
                   dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
                 />
               </motion.div>
@@ -252,16 +252,16 @@ export default function MIAAPage() {
               className="flex justify-start gap-2.5"
             >
               <div className="shrink-0 mt-1"><MIAALogo size={24} /></div>
-              <div className="bg-[#1C2128] rounded-2xl rounded-bl-sm px-3.5 py-2.5 flex items-center gap-1.5 border-l-2 border-[#F08900]/50">
+              <div className="bg-[#1C2128] rounded-2xl rounded-bl-sm px-3.5 py-2.5 flex items-center gap-1.5 border-l-2 border-[#F51E33]/50">
                 {[0, 1, 2].map(i => (
                   <motion.span
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-[#F08900]/60"
+                    className="w-1.5 h-1.5 rounded-full bg-[#F51E33]/60"
                     animate={{ opacity: [0.3, 1, 0.3] }}
                     transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
                   />
                 ))}
-                <span className="text-[9px] text-[#484F58] ml-1">MIAA+ est en train d&apos;écrire…</span>
+                <span className="text-[9px] text-[var(--text-secondary)] ml-1">MIAA+ est en train d&apos;écrire…</span>
               </div>
             </motion.div>
           )}
@@ -275,7 +275,7 @@ export default function MIAAPage() {
               <button
                 key={s}
                 onClick={() => send(s)}
-                className="text-[11px] text-[#8B949E] hover:text-[#FFFFFF] bg-[#142850] hover:bg-[#1a2d50] border border-[#1a2d50] hover:border-[#F08900]/40 rounded-full px-3 py-1 transition-all"
+                className="text-[11px] text-[var(--text-secondary)] hover:text-[#FFFFFF] bg-[#142850] hover:bg-white/5 border border-[var(--border)] hover:border-[#F51E33]/40 rounded-full px-3 py-1 transition-all"
               >
                 {s}
               </button>
@@ -284,7 +284,7 @@ export default function MIAAPage() {
         )}
 
         {/* Input bar */}
-        <div className="flex items-center gap-2.5 px-4 py-3.5 border-t border-[#30363D] shrink-0">
+        <div className="flex items-center gap-2.5 px-4 py-3.5 border-t border-[var(--border)] shrink-0">
           <input
             ref={inputRef}
             value={input}
@@ -292,16 +292,16 @@ export default function MIAAPage() {
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
             placeholder="Posez votre question à MIAA+… (Entrée pour envoyer)"
             disabled={loading}
-            className="flex-1 bg-[#142850] border border-[#30363D] rounded-xl px-4 py-2 text-xs text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/50 transition-colors disabled:opacity-50"
+            className="flex-1 bg-[#142850] border border-[var(--border)] rounded-xl px-4 py-2 text-xs text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50 transition-colors disabled:opacity-50"
           />
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => send(input)}
             disabled={loading || !input.trim()}
             className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors shrink-0 disabled:opacity-40"
-            style={{ background: '#F08900' }}
+            style={{ background: '#F51E33' }}
           >
-            {loading ? <Loader2 size={14} className="text-[#142850] animate-spin" /> : <Send size={14} className="text-[#142850]" />}
+            {loading ? <Loader2 size={14} className="text-[#F51E33] animate-spin" /> : <Send size={14} className="text-[#F51E33]" />}
           </motion.button>
         </div>
       </div>
@@ -310,9 +310,9 @@ export default function MIAAPage() {
       <div className="lg:w-72 flex flex-col gap-4 overflow-y-auto">
 
         {/* Capabilities */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-4">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
           <p className="text-xs font-bold text-[#FFFFFF] mb-3 flex items-center gap-2">
-            <Sparkles size={13} className="text-[#F08900]" /> Capacités MIAA+
+            <Sparkles size={13} className="text-[#F51E33]" /> Capacités MIAA+
           </p>
           <div className="grid grid-cols-2 gap-2">
             {CAPABILITIES.map(cap => {
@@ -326,7 +326,7 @@ export default function MIAAPage() {
                 >
                   <Icon size={14} style={{ color: cap.color }} className="mb-1.5" />
                   <p className="text-[10px] font-semibold text-[#FFFFFF] leading-tight">{cap.label}</p>
-                  <p className="text-[9px] text-[#8B949E] mt-0.5 leading-tight">{cap.desc}</p>
+                  <p className="text-[9px] text-[var(--text-secondary)] mt-0.5 leading-tight">{cap.desc}</p>
                 </motion.div>
               )
             })}
@@ -334,7 +334,7 @@ export default function MIAAPage() {
         </div>
 
         {/* Quick actions by category */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-4 flex-1">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4 flex-1">
           <p className="text-xs font-bold text-[#FFFFFF] mb-3">Questions rapides</p>
           <div className="space-y-2">
             {QUICK_CATEGORIES.map((cat, ci) => (
@@ -343,10 +343,10 @@ export default function MIAAPage() {
                   onClick={() => setExpandedCat(expandedCat === ci ? null : ci)}
                   className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-white/[0.03] transition-colors"
                 >
-                  <span className="text-xs font-medium text-[#8B949E]">{cat.label}</span>
+                  <span className="text-xs font-medium text-[var(--text-secondary)]">{cat.label}</span>
                   {expandedCat === ci
-                    ? <ChevronUp size={12} className="text-[#484F58]" />
-                    : <ChevronDown size={12} className="text-[#484F58]" />
+                    ? <ChevronUp size={12} className="text-[var(--text-secondary)]" />
+                    : <ChevronDown size={12} className="text-[var(--text-secondary)]" />
                   }
                 </button>
                 <AnimatePresence>
@@ -363,7 +363,7 @@ export default function MIAAPage() {
                           <button
                             key={a}
                             onClick={() => send(a)}
-                            className="w-full text-left text-[10px] text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50] px-2 py-1.5 rounded-lg transition-all"
+                            className="w-full text-left text-[10px] text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5 px-2 py-1.5 rounded-lg transition-all"
                           >
                             {a}
                           </button>
@@ -378,24 +378,24 @@ export default function MIAAPage() {
         </div>
 
         {/* Config hint */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl p-4">
-          <p className="text-[10px] font-semibold text-[#8B949E] uppercase tracking-wider mb-2">Configuration</p>
-          <div className="space-y-2 text-[10px] text-[#484F58]">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
+          <p className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Configuration</p>
+          <div className="space-y-2 text-[10px] text-[var(--text-secondary)]">
             <div className="flex justify-between">
               <span>Modèle IA</span>
-              <span className="text-[#8B949E]">Claude Haiku 4.5</span>
+              <span className="text-[var(--text-secondary)]">Claude Haiku 4.5</span>
             </div>
             <div className="flex justify-between">
               <span>Langue</span>
-              <span className="text-[#8B949E]">Français 🇫🇷</span>
+              <span className="text-[var(--text-secondary)]">Français 🇫🇷</span>
             </div>
             <div className="flex justify-between">
               <span>Contexte</span>
-              <span className="text-[#8B949E]">Congo-Brazzaville</span>
+              <span className="text-[var(--text-secondary)]">Congo-Brazzaville</span>
             </div>
             <div className="flex justify-between">
               <span>Modules actifs</span>
-              <span className="text-[#F08900]">{modulesActifs.length}</span>
+              <span className="text-[#F51E33]">{modulesActifs.length}</span>
             </div>
           </div>
         </div>

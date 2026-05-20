@@ -104,17 +104,17 @@ export default function Header() {
   }
 
   return (
-    <header className="h-14 bg-[#0f1e3d] border-b border-[#30363D] flex items-center px-4 lg:px-6 gap-3 shrink-0">
+    <header className="h-14 bg-[var(--card-bg)] border-b border-[var(--border)] flex items-center px-4 lg:px-6 gap-3 shrink-0">
       <div className="w-8 lg:hidden shrink-0" />
 
       <div className="flex-1 max-w-sm">
-        <div className="flex items-center gap-2 bg-[#142850] border border-[#30363D] rounded-lg px-3 py-1.5">
-          <Search size={13} className="text-[#484F58] shrink-0" />
+        <div className="flex items-center gap-2 bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-1.5">
+          <Search size={13} className="text-[var(--text-secondary)] shrink-0" />
           <input
             placeholder="Rechercher..."
-            className="bg-transparent text-sm text-[#8B949E] placeholder-[#484F58] outline-none flex-1 w-0 min-w-0"
+            className="bg-transparent text-sm text-[var(--text-secondary)] placeholder-[#484F58] outline-none flex-1 w-0 min-w-0"
           />
-          <kbd className="hidden sm:block text-[10px] text-[#484F58] border border-[#30363D] rounded px-1 shrink-0">⌘K</kbd>
+          <kbd className="hidden sm:block text-[10px] text-[var(--text-secondary)] border border-[var(--border)] rounded px-1 shrink-0">⌘K</kbd>
         </div>
       </div>
 
@@ -131,11 +131,11 @@ export default function Header() {
           />
         ) : (
           // Pas de logo : badge texte avec fond jaune
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#F08900]/10 border border-[#F08900]/20 shrink-0">
-            <div className="w-5 h-5 rounded-md bg-[#F08900] flex items-center justify-center shrink-0">
-              <span className="text-[10px] font-black text-[#142850]">{nomEntreprise.charAt(0).toUpperCase()}</span>
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#F51E33]/10 border border-[#F51E33]/20 shrink-0">
+            <div className="w-5 h-5 rounded-md bg-[#F51E33] flex items-center justify-center shrink-0">
+              <span className="text-[10px] font-black text-[#F51E33]">{nomEntreprise.charAt(0).toUpperCase()}</span>
             </div>
-            <span className="text-xs font-semibold text-[#F08900] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
+            <span className="text-xs font-semibold text-[#F51E33] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
           </div>
         )
       )}
@@ -146,8 +146,8 @@ export default function Header() {
           href="/dashboard/equipe"
           className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
             pathname === '/dashboard/equipe'
-              ? 'bg-[#F08900]/10 text-[#F08900]'
-              : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
+              ? 'bg-[#F51E33]/10 text-[#F51E33]'
+              : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
           }`}
         >
           <UsersRound size={14} />
@@ -161,7 +161,7 @@ export default function Header() {
         <button
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
-          className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#1a2d50]"
+          className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors rounded-lg hover:bg-white/5"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
@@ -171,10 +171,10 @@ export default function Header() {
           <button
             onClick={() => setLangOpen(!langOpen)}
             title="Changer de langue"
-            className="p-2 text-[#484F58] hover:text-[#8B949E] transition-colors rounded-lg hover:bg-[#1a2d50] flex items-center gap-1"
+            className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors rounded-lg hover:bg-white/5 flex items-center gap-1"
           >
             <Globe size={16} />
-            <span className="hidden sm:block text-[10px] font-bold text-[#484F58]">
+            <span className="hidden sm:block text-[10px] font-bold text-[var(--text-secondary)]">
               {locale.toUpperCase()}
             </span>
           </button>
@@ -182,22 +182,22 @@ export default function Header() {
           {langOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setLangOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-40 bg-[#0f1e3d] border border-[#30363D] rounded-xl shadow-xl z-20 py-1 overflow-hidden">
-                <p className="text-[9px] font-bold text-[#484F58] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
+              <div className="absolute right-0 top-full mt-1 w-40 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+                <p className="text-[9px] font-bold text-[var(--text-secondary)] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
                 {DISPLAY_LOCALES.map(l => (
                   <button
                     key={l}
                     onClick={() => handleLocaleChange(l)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left ${
                       locale === l
-                        ? 'text-[#F08900] bg-[#F08900]/5'
-                        : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
+                        ? 'text-[#F51E33] bg-[#F51E33]/5'
+                        : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
                     }`}
                   >
                     <span className="text-base">{LOCALE_FLAGS[l]}</span>
                     <span className="text-xs font-medium">{LOCALE_LABELS[l]}</span>
                     {locale === l && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F08900]" />
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F51E33]" />
                     )}
                   </button>
                 ))}
@@ -212,28 +212,28 @@ export default function Header() {
         <div className="relative ml-1">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#1a2d50] transition-colors"
+            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-white/5 transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-[#F08900]/20 border border-[#F08900]/30 flex items-center justify-center shrink-0">
-              <span className="text-[#F08900] text-xs font-bold">{initials}</span>
+            <div className="w-7 h-7 rounded-full bg-[#F51E33]/20 border border-[#F51E33]/30 flex items-center justify-center shrink-0">
+              <span className="text-[#F51E33] text-xs font-bold">{initials}</span>
             </div>
             <span className="text-sm text-[#FFFFFF] hidden sm:block max-w-[96px] truncate">{userName}</span>
-            <ChevronDown size={12} className="text-[#484F58] hidden sm:block" />
+            <ChevronDown size={12} className="text-[var(--text-secondary)] hidden sm:block" />
           </button>
 
           {dropdownOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-44 bg-[#0f1e3d] border border-[#30363D] rounded-lg shadow-xl z-20 py-1">
-                <div className="px-3 py-2 border-b border-[#1a2d50]">
+              <div className="absolute right-0 top-full mt-1 w-44 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-xl z-20 py-1">
+                <div className="px-3 py-2 border-b border-[var(--border)]">
                   <p className="text-xs font-medium text-[#FFFFFF] truncate">{userName}</p>
                   {nomEntreprise && (
-                    <p className="text-[10px] text-[#484F58] truncate">{nomEntreprise}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] truncate">{nomEntreprise}</p>
                   )}
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#8B949E] hover:text-red-400 hover:bg-red-500/5 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-500/5 transition-colors"
                 >
                   <LogOut size={14} />
                   Déconnexion

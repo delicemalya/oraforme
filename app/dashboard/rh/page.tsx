@@ -56,15 +56,15 @@ interface Conge {
 
 const CONTRAT_STYLES: Record<Contrat, { label: string; color: string; bg: string }> = {
   cdi:       { label: 'CDI',       color: '#142850', bg: '#14285018' },
-  cdd:       { label: 'CDD',       color: '#F08900', bg: '#F0890018' },
-  stage:     { label: 'Stage',     color: '#F08900', bg: '#F0890018' },
+  cdd:       { label: 'CDD',       color: '#F51E33', bg: '#F51E3318' },
+  stage:     { label: 'Stage',     color: '#F51E33', bg: '#F51E3318' },
   freelance: { label: 'Freelance', color: '#8B0070', bg: '#8B007018' },
 }
 
 const STATUT_STYLES: Record<Statut, { label: string; color: string; bg: string }> = {
   actif:    { label: 'Actif',     color: '#142850', bg: '#14285018' },
-  conge:    { label: 'En congé',  color: '#F08900', bg: '#F0890018' },
-  malade:   { label: 'Malade',    color: '#F08900', bg: '#F0890018' },
+  conge:    { label: 'En congé',  color: '#F51E33', bg: '#F51E3318' },
+  malade:   { label: 'Malade',    color: '#F51E33', bg: '#F51E3318' },
   licencie: { label: 'Licencié', color: '#F51E33', bg: '#F51E3318' },
   retraite: { label: 'Retraité', color: '#8B949E', bg: '#8B949E18' },
 }
@@ -185,7 +185,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
         {[
           { label: 'Effectif actif',    val: employes.filter(e=>e.statut==='actif').length,        gradient: '#142850',  icon: Users },
           { label: 'En congé / Malade', val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, gradient: '#8B0070', icon: Calendar },
-          { label: 'Masse salariale',   val: `${fmt(masseBrute)} F`,                               gradient: '#F08900',   icon: TrendingUp },
+          { label: 'Masse salariale',   val: `${fmt(masseBrute)} F`,                               gradient: '#F51E33',   icon: TrendingUp },
           { label: 'Charge patronale',  val: `${fmt(masseBrute * TAUX_CNSS_PATRONAL)} F`,          gradient: '#F51E33',  icon: AlertTriangle },
         ].map(k => {
           const Icon = k.icon
@@ -219,8 +219,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
               onClick={() => setFilterStatut(s)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 filterStatut === s
-                  ? 'bg-[#F08900] text-[#142850]'
-                  : 'bg-[#0f1e3d] border border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
+                  ? 'bg-[#F51E33] text-[#F51E33]'
+                  : 'bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
               }`}
             >
               {s === 'tous' ? 'Tous' : STATUT_STYLES[s as Statut]?.label ?? s}
@@ -230,7 +230,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-3 py-2 bg-[#F08900] text-[#142850] rounded-lg text-xs font-bold"
+          className="flex items-center gap-2 px-3 py-2 bg-[#F51E33] text-[#F51E33] rounded-lg text-xs font-bold"
         >
           <Plus size={13} /> Ajouter un employé
         </motion.button>
@@ -238,22 +238,22 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
       {/* Employee list */}
       {displayed.length === 0 ? (
-        <div className="text-center py-14 text-[#484F58]">
+        <div className="text-center py-14 text-[var(--text-secondary)]">
           <Users size={36} className="mx-auto mb-3 opacity-40" />
           <p className="text-sm">Aucun employé dans cette catégorie.</p>
         </div>
       ) : (
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#1a2d50]">
+                <tr className="border-b border-[var(--border)]">
                   {['Employé','Code agent','Poste','Contrat','Statut','Brut mensuel','Net estimé',''].map(h => (
-                    <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-[#484F58] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1a2d50]">
+              <tbody className="divide-y divide-[var(--border)]">
                 {displayed.map((e, i) => {
                   const calc = calcNet(e.salaire_base)
                   return (
@@ -262,7 +262,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }}
-                      className="hover:bg-[#1a2d50]/50 transition-colors cursor-pointer"
+                      className="hover:bg-white/5/50 transition-colors cursor-pointer"
                       onClick={() => setSelected(e)}
                     >
                       <td className="px-4 py-3">
@@ -274,17 +274,17 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="font-mono text-[10px] text-[#F08900] bg-[#F08900]/10 px-2 py-0.5 rounded">
+                        <span className="font-mono text-[10px] text-[#F51E33] bg-[#F51E33]/10 px-2 py-0.5 rounded">
                           {e.agent_code ?? '—'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#8B949E]">{e.poste || '—'}</td>
+                      <td className="px-4 py-3 text-xs text-[var(--text-secondary)]">{e.poste || '—'}</td>
                       <td className="px-4 py-3"><ContratBadge contrat={e.contrat} /></td>
                       <td className="px-4 py-3"><StatutBadge statut={e.statut} /></td>
                       <td className="px-4 py-3 text-xs text-[#FFFFFF] font-semibold">{fmt(e.salaire_base)} F</td>
-                      <td className="px-4 py-3 text-xs font-bold text-[#142850]">{fmt(calc.net)} F</td>
+                      <td className="px-4 py-3 text-xs font-bold text-[#F51E33]">{fmt(calc.net)} F</td>
                       <td className="px-4 py-3 text-right" onClick={ev => ev.stopPropagation()}>
-                        <button onClick={() => handleDelete(e.id)} className="text-[#484F58] hover:text-red-400 transition-colors p-1">
+                        <button onClick={() => handleDelete(e.id)} className="text-[var(--text-secondary)] hover:text-red-400 transition-colors p-1">
                           <Trash2 size={13} />
                         </button>
                       </td>
@@ -313,7 +313,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-              className="fixed right-0 top-0 h-full w-full max-w-md bg-[#0f1e3d] border-l border-[#30363D] z-50 overflow-y-auto"
+              className="fixed right-0 top-0 h-full w-full max-w-md bg-[var(--card-bg)] border-l border-[var(--border)] z-50 overflow-y-auto"
             >
               <div className="p-6 space-y-5">
                 {/* Header */}
@@ -324,10 +324,10 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     </div>
                     <div>
                       <h2 className="text-base font-bold text-[#FFFFFF]">{selected.nom}</h2>
-                      <p className="text-xs text-[#8B949E]">{selected.poste || 'Aucun poste'}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{selected.poste || 'Aucun poste'}</p>
                     </div>
                   </div>
-                  <button onClick={() => setSelected(null)} className="text-[#484F58] hover:text-[#8B949E] p-1">
+                  <button onClick={() => setSelected(null)} className="text-[var(--text-secondary)] hover:text-[var(--text-secondary)] p-1">
                     <X size={18} />
                   </button>
                 </div>
@@ -336,14 +336,14 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 <div className="flex gap-2 flex-wrap">
                   <StatutBadge statut={selected.statut} />
                   <ContratBadge contrat={selected.contrat} />
-                  <span className="text-[10px] text-[#484F58] border border-[#1a2d50] rounded-full px-2 py-0.5">
+                  <span className="text-[10px] text-[var(--text-secondary)] border border-[var(--border)] rounded-full px-2 py-0.5">
                     {selected.solde_conges ?? 26} j congés
                   </span>
                 </div>
 
                 {/* Change status */}
                 <div>
-                  <p className="text-xs font-bold text-[#8B949E] mb-2">Changer le statut</p>
+                  <p className="text-xs font-bold text-[var(--text-secondary)] mb-2">Changer le statut</p>
                   <div className="grid grid-cols-3 gap-2">
                     {(Object.keys(STATUT_STYLES) as Statut[]).map(s => (
                       <button
@@ -351,8 +351,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                         onClick={() => updateStatut(selected.id, s)}
                         className={`py-1.5 rounded-lg text-[10px] font-bold transition-all ${
                           selected.statut === s
-                            ? 'ring-1 ring-[#F08900] text-[#F08900] bg-[#F08900]/10'
-                            : 'border border-[#30363D] text-[#8B949E] hover:border-[#484F58]'
+                            ? 'ring-1 ring-[#F51E33] text-[#F51E33] bg-[#F51E33]/10'
+                            : 'border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
                         }`}
                       >
                         {STATUT_STYLES[s].label}
@@ -374,29 +374,29 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     ['Fin de contrat', selected.date_fin_contrat ? new Date(selected.date_fin_contrat).toLocaleDateString('fr-FR') : '—'],
                   ].map(([k, v]) => (
                     <div key={k} className="flex justify-between items-start bg-[#142850] rounded-lg px-3 py-2">
-                      <span className="text-xs text-[#484F58]">{k}</span>
+                      <span className="text-xs text-[var(--text-secondary)]">{k}</span>
                       <span className="text-xs text-[#FFFFFF] text-right max-w-[55%]">{v}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Payroll preview */}
-                <div className="bg-[#142850] border border-[#1a2d50] rounded-xl p-4 space-y-2">
-                  <p className="text-xs font-bold text-[#8B949E] mb-3">Calcul de paie</p>
+                <div className="bg-[#142850] border border-[var(--border)] rounded-xl p-4 space-y-2">
+                  <p className="text-xs font-bold text-[var(--text-secondary)] mb-3">Calcul de paie</p>
                   {(() => {
                     const { cnss, irpp, net, patro } = calcNet(selected.salaire_base)
                     return (
                       <>
-                        <div className="flex justify-between text-xs"><span className="text-[#8B949E]">Salaire brut</span><span className="font-semibold text-[#FFFFFF]">{fmt(selected.salaire_base)} FCFA</span></div>
-                        <div className="flex justify-between text-xs"><span className="text-[#8B949E]">CNSS salarié (5,04%)</span><span className="text-red-400">−{fmt(cnss)} FCFA</span></div>
-                        <div className="flex justify-between text-xs"><span className="text-[#8B949E]">IRPP progressif</span><span className="text-red-400">−{fmt(irpp)} FCFA</span></div>
-                        <div className="flex justify-between font-bold text-sm pt-2 border-t border-[#1a2d50]">
+                        <div className="flex justify-between text-xs"><span className="text-[var(--text-secondary)]">Salaire brut</span><span className="font-semibold text-[#FFFFFF]">{fmt(selected.salaire_base)} FCFA</span></div>
+                        <div className="flex justify-between text-xs"><span className="text-[var(--text-secondary)]">CNSS salarié (5,04%)</span><span className="text-red-400">−{fmt(cnss)} FCFA</span></div>
+                        <div className="flex justify-between text-xs"><span className="text-[var(--text-secondary)]">IRPP progressif</span><span className="text-red-400">−{fmt(irpp)} FCFA</span></div>
+                        <div className="flex justify-between font-bold text-sm pt-2 border-t border-[var(--border)]">
                           <span className="text-[#FFFFFF]">Net à payer</span>
-                          <span className="text-[#142850]">{fmt(net)} FCFA</span>
+                          <span className="text-[#F51E33]">{fmt(net)} FCFA</span>
                         </div>
                         <div className="flex justify-between text-xs pt-1">
-                          <span className="text-[#484F58]">Charge patronale CNSS (14,16%)</span>
-                          <span className="text-[#484F58]">{fmt(patro)} FCFA</span>
+                          <span className="text-[var(--text-secondary)]">Charge patronale CNSS (14,16%)</span>
+                          <span className="text-[var(--text-secondary)]">{fmt(patro)} FCFA</span>
                         </div>
                       </>
                     )
@@ -405,8 +405,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 {selected.notes && (
                   <div className="bg-[#142850] rounded-lg p-3">
-                    <p className="text-[10px] text-[#484F58] mb-1">Notes</p>
-                    <p className="text-xs text-[#8B949E]">{selected.notes}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] mb-1">Notes</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{selected.notes}</p>
                   </div>
                 )}
 
@@ -414,7 +414,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 <div className="flex gap-2">
                   <Link
                     href="/dashboard/rh/paie"
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#F08900]/10 border border-[#F08900]/20 text-[#F08900] rounded-lg text-xs font-semibold hover:bg-[#F08900]/20 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#F51E33]/10 border border-[#F51E33]/20 text-[#F51E33] rounded-lg text-xs font-semibold hover:bg-[#F51E33]/20 transition-colors"
                   >
                     <FileText size={12} /> Générer bulletin
                   </Link>
@@ -442,10 +442,10 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
               exit={{ opacity: 0, scale: 0.95 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <div className="bg-[#0f1e3d] border border-[#30363D] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
+              <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base font-bold text-[#FFFFFF]">Nouvel employé</h2>
-                  <button onClick={() => setShowForm(false)} className="text-[#484F58] hover:text-[#8B949E]"><X size={18} /></button>
+                  <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={18} /></button>
                 </div>
 
                 {[
@@ -455,19 +455,19 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                   { label: 'N° CNSS', key: 'cnss', placeholder: '1234567' },
                 ].map(f => (
                   <div key={f.key}>
-                    <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">{f.label}</label>
+                    <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">{f.label}</label>
                     <input
                       value={(form as Record<string, string>)[f.key]}
                       onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                       placeholder={f.placeholder}
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/40 transition-colors"
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/40 transition-colors"
                     />
                   </div>
                 ))}
                 <div>
-                  <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Poste / Fonction</label>
+                  <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Poste / Fonction</label>
                   <select value={form.poste} onChange={e => setForm(p => ({ ...p, poste: e.target.value }))}
-                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40 transition-colors">
+                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40 transition-colors">
                     <option value="">— Sélectionner —</option>
                     <optgroup label="Restaurant">
                       <option>Gérant / Directeur</option>
@@ -491,80 +491,80 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Type contrat</label>
+                    <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Type contrat</label>
                     <select value={form.contrat} onChange={e => setForm(p => ({ ...p, contrat: e.target.value as Contrat }))}
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                       {Object.entries(CONTRAT_STYLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Salaire brut (FCFA)</label>
+                    <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Salaire brut (FCFA)</label>
                     <input type="number" value={form.salaire_base}
                       onChange={e => setForm(p => ({ ...p, salaire_base: e.target.value }))}
                       placeholder="150000"
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/40 transition-colors" />
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/40 transition-colors" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Date d'embauche</label>
+                    <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Date d'embauche</label>
                     <input type="date" value={form.date_embauche}
                       onChange={e => setForm(p => ({ ...p, date_embauche: e.target.value }))}
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40" />
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40" />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Date naissance</label>
+                    <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Date naissance</label>
                     <input type="date" value={form.date_naissance}
                       onChange={e => setForm(p => ({ ...p, date_naissance: e.target.value }))}
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40" />
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40" />
                   </div>
                 </div>
 
                 {form.contrat === 'cdd' || form.contrat === 'stage' ? (
                   <div>
-                    <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Fin de contrat</label>
+                    <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Fin de contrat</label>
                     <input type="date" value={form.date_fin_contrat}
                       onChange={e => setForm(p => ({ ...p, date_fin_contrat: e.target.value }))}
-                      className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40" />
+                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40" />
                   </div>
                 ) : null}
 
                 <div>
-                  <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Ville de travail</label>
+                  <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Ville de travail</label>
                   <select value={form.ville} onChange={e => setForm(p => ({ ...p, ville: e.target.value }))}
-                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40">
+                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40">
                     <option value="PNR">Pointe-Noire</option>
                     <option value="BZV">Brazzaville</option>
                   </select>
-                  <p className="text-[10px] text-[#484F58] mt-1">Le code agent sera généré automatiquement (ex : ORA-{new Date().getFullYear()}-{form.ville}-0001)</p>
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-1">Le code agent sera généré automatiquement (ex : ORA-{new Date().getFullYear()}-{form.ville}-0001)</p>
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Notes internes</label>
+                  <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Notes internes</label>
                   <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
                     rows={2} placeholder="Observations..."
-                    className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none resize-none focus:border-[#F08900]/40 transition-colors" />
+                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none resize-none focus:border-[#F51E33]/40 transition-colors" />
                 </div>
 
                 {form.salaire_base && Number(form.salaire_base) > 0 && (() => {
                   const { cnss, irpp, net } = calcNet(Number(form.salaire_base))
                   return (
                     <div className="bg-[#142850] rounded-lg p-3 text-xs space-y-1">
-                      <p className="text-[#484F58] font-semibold mb-2">Aperçu calcul paie</p>
-                      <div className="flex justify-between"><span className="text-[#8B949E]">CNSS salarié</span><span className="text-red-400">−{fmt(cnss)} F</span></div>
-                      <div className="flex justify-between"><span className="text-[#8B949E]">IRPP</span><span className="text-red-400">−{fmt(irpp)} F</span></div>
-                      <div className="flex justify-between font-bold border-t border-[#1a2d50] pt-1"><span className="text-[#FFFFFF]">Net</span><span className="text-[#142850]">{fmt(net)} F</span></div>
+                      <p className="text-[var(--text-secondary)] font-semibold mb-2">Aperçu calcul paie</p>
+                      <div className="flex justify-between"><span className="text-[var(--text-secondary)]">CNSS salarié</span><span className="text-red-400">−{fmt(cnss)} F</span></div>
+                      <div className="flex justify-between"><span className="text-[var(--text-secondary)]">IRPP</span><span className="text-red-400">−{fmt(irpp)} F</span></div>
+                      <div className="flex justify-between font-bold border-t border-[var(--border)] pt-1"><span className="text-[#FFFFFF]">Net</span><span className="text-[#F51E33]">{fmt(net)} F</span></div>
                     </div>
                   )
                 })()}
 
                 <div className="flex gap-3 pt-2">
-                  <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 border border-[#30363D] text-[#8B949E] rounded-lg text-sm hover:border-[#484F58] transition-colors">
+                  <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 border border-[var(--border)] text-[var(--text-secondary)] rounded-lg text-sm hover:border-[#484F58] transition-colors">
                     Annuler
                   </button>
                   <motion.button whileTap={{ scale: 0.96 }} onClick={handleSave} disabled={saving || !form.nom.trim()}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#F08900] text-[#142850] rounded-lg text-sm font-bold disabled:opacity-50">
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#F51E33] text-[#F51E33] rounded-lg text-sm font-bold disabled:opacity-50">
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     {saving ? 'Enregistrement...' : 'Ajouter'}
                   </motion.button>
@@ -621,7 +621,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
   }
 
   const STATUT_CONGE: Record<string, { label: string; color: string }> = {
-    en_attente: { label: 'En attente', color: '#F08900' },
+    en_attente: { label: 'En attente', color: '#F51E33' },
     approuve:   { label: 'Approuvé',  color: '#142850' },
     refuse:     { label: 'Refusé',   color: '#F51E33' },
   }
@@ -636,9 +636,9 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[#8B949E]">{conges.length} demande{conges.length !== 1 ? 's' : ''} de congé</p>
+        <p className="text-sm text-[var(--text-secondary)]">{conges.length} demande{conges.length !== 1 ? 's' : ''} de congé</p>
         <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-3 py-2 bg-[#F08900] text-[#142850] rounded-lg text-xs font-bold">
+          className="flex items-center gap-2 px-3 py-2 bg-[#F51E33] text-[#F51E33] rounded-lg text-xs font-bold">
           <Plus size={13} /> Nouvelle demande
         </motion.button>
       </div>
@@ -649,48 +649,48 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
             initial={{ opacity: 0, y: -10, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 space-y-4 overflow-hidden"
+            className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 space-y-4 overflow-hidden"
           >
             <h3 className="text-sm font-bold text-[#FFFFFF]">Demande de congé</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Employé *</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Employé *</label>
                 <select value={form.employe_id} onChange={e => setForm(p => ({ ...p, employe_id: e.target.value }))}
-                  className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                  className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                   <option value="">Sélectionner...</option>
                   {employes.filter(e => e.statut === 'actif').map(e => <option key={e.id} value={e.id}>{e.nom}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Type de congé</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Type de congé</label>
                 <select value={form.type_conge} onChange={e => setForm(p => ({ ...p, type_conge: e.target.value as TypeConge }))}
-                  className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                  className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Date début</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Date début</label>
                 <input type="date" value={form.date_debut} onChange={e => setForm(p => ({ ...p, date_debut: e.target.value }))}
-                  className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40" />
+                  className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">
-                  Date fin {joursForm > 0 && <span className="text-[#F08900]">({joursForm} jours)</span>}
+                <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">
+                  Date fin {joursForm > 0 && <span className="text-[#F51E33]">({joursForm} jours)</span>}
                 </label>
                 <input type="date" value={form.date_fin} onChange={e => setForm(p => ({ ...p, date_fin: e.target.value }))}
-                  className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F08900]/40" />
+                  className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40" />
               </div>
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#8B949E] mb-1.5 block">Motif (optionnel)</label>
+              <label className="text-xs font-semibold text-[var(--text-secondary)] mb-1.5 block">Motif (optionnel)</label>
               <input value={form.motif} onChange={e => setForm(p => ({ ...p, motif: e.target.value }))}
                 placeholder="Motif de la demande..."
-                className="w-full bg-[#142850] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F08900]/40" />
+                className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/40" />
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-xs text-[#8B949E] hover:text-[#FFFFFF] transition-colors">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">Annuler</button>
               <motion.button whileTap={{ scale: 0.96 }} onClick={handleSave} disabled={saving || !form.employe_id || joursForm < 1}
-                className="flex items-center gap-2 px-4 py-2 bg-[#F08900] text-[#142850] rounded-lg text-xs font-bold disabled:opacity-50">
+                className="flex items-center gap-2 px-4 py-2 bg-[#F51E33] text-[#F51E33] rounded-lg text-xs font-bold disabled:opacity-50">
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                 Soumettre
               </motion.button>
@@ -700,7 +700,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
       </AnimatePresence>
 
       {conges.length === 0 ? (
-        <div className="text-center py-12 text-[#484F58]">
+        <div className="text-center py-12 text-[var(--text-secondary)]">
           <Calendar size={36} className="mx-auto mb-3 opacity-40" />
           <p className="text-sm">Aucune demande de congé enregistrée.</p>
         </div>
@@ -711,22 +711,22 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
             const st = STATUT_CONGE[c.statut] ?? STATUT_CONGE.en_attente
             return (
               <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4 flex items-center gap-4">
+                className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4 flex items-center gap-4">
                 <div className="w-9 h-9 rounded-full bg-[#8B0070]/15 flex items-center justify-center text-xs font-bold text-[#8B0070] shrink-0">
                   {emp?.nom?.charAt(0) ?? 'E'}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[#FFFFFF]">{emp?.nom ?? 'Employé inconnu'}</p>
-                  <p className="text-xs text-[#8B949E]">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     {TYPE_LABELS[c.type_conge]} · {new Date(c.date_debut).toLocaleDateString('fr-FR')} → {new Date(c.date_fin).toLocaleDateString('fr-FR')} · <span className="font-semibold">{c.nb_jours} j</span>
                   </p>
-                  {c.motif && <p className="text-xs text-[#484F58] mt-0.5">"{c.motif}"</p>}
+                  {c.motif && <p className="text-xs text-[var(--text-secondary)] mt-0.5">"{c.motif}"</p>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: st.color, backgroundColor: `${st.color}18` }}>{st.label}</span>
                   {c.statut === 'en_attente' && (
                     <>
-                      <button onClick={() => approuver(c.id, 'approuve')} className="p-1 rounded text-[#142850] hover:bg-[#142850]/10 transition-colors"><Check size={14} /></button>
+                      <button onClick={() => approuver(c.id, 'approuve')} className="p-1 rounded text-[#F51E33] hover:bg-[#142850]/10 transition-colors"><Check size={14} /></button>
                       <button onClick={() => approuver(c.id, 'refuse')} className="p-1 rounded text-red-400 hover:bg-red-400/10 transition-colors"><X size={14} /></button>
                     </>
                   )}
@@ -773,19 +773,19 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
 
   const COLORS = {
     danger:  { text: '#F51E33', bg: '#F51E3310', border: '#F51E3325' },
-    warning: { text: '#F08900', bg: '#F0890010', border: '#F0890025' },
-    info:    { text: '#F08900', bg: '#F0890010', border: '#F0890025' },
+    warning: { text: '#F51E33', bg: '#F51E3310', border: '#F51E3325' },
+    info:    { text: '#F51E33', bg: '#F51E3310', border: '#F51E3325' },
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-[#8B949E]">{alerts.length} alerte{alerts.length !== 1 ? 's' : ''} active{alerts.length !== 1 ? 's' : ''}</p>
+      <p className="text-sm text-[var(--text-secondary)]">{alerts.length} alerte{alerts.length !== 1 ? 's' : ''} active{alerts.length !== 1 ? 's' : ''}</p>
       {alerts.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-12 h-12 rounded-full bg-[#142850]/10 flex items-center justify-center mx-auto mb-3">
-            <Check size={22} className="text-[#142850]" />
+            <Check size={22} className="text-[#F51E33]" />
           </div>
-          <p className="text-sm text-[#8B949E]">Aucune alerte RH active. Tout est en ordre.</p>
+          <p className="text-sm text-[var(--text-secondary)]">Aucune alerte RH active. Tout est en ordre.</p>
         </div>
       ) : (
         alerts.map((a, i) => {
@@ -798,7 +798,7 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
               <AlertTriangle size={14} style={{ color: c.text }} className="shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold" style={{ color: c.text }}>{a.emp.nom} — {a.msg}</p>
-                <p className="text-xs text-[#8B949E] mt-0.5">{a.sub}</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">{a.sub}</p>
               </div>
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ color: c.text, backgroundColor: `${c.text}20` }}>
                 {a.type === 'danger' ? 'URGENT' : a.type === 'warning' ? 'ATTENTION' : 'INFO'}
@@ -831,28 +831,28 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
       {/* Global stats */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {[
-          { label: 'Masse salariale brute',    val: `${fmt(masseBrute)} FCFA`,  color: '#F08900', sub: 'employés actifs' },
+          { label: 'Masse salariale brute',    val: `${fmt(masseBrute)} FCFA`,  color: '#F51E33', sub: 'employés actifs' },
           { label: 'Masse salariale nette',     val: `${fmt(masseNette)} FCFA`,  color: '#142850', sub: 'après CNSS + IRPP' },
           { label: 'Charges patronales CNSS',   val: `${fmt(massePatro)} FCFA`,  color: '#F51E33', sub: '14,16% plafonné' },
           { label: 'Coût total employeur',      val: `${fmt(masseBrute + massePatro)} FCFA`, color: '#8B0070', sub: 'brut + charges' },
-          { label: 'Congés pris (période)',     val: `${totalJoursConges} jours`,color: '#F08900', sub: `${congesApprouves.length} demande(s)` },
+          { label: 'Congés pris (période)',     val: `${totalJoursConges} jours`,color: '#F51E33', sub: `${congesApprouves.length} demande(s)` },
           { label: 'Effectif total',            val: employes.length,            color: '#FFFFFF', sub: `${actifs.length} actifs` },
         ].map(k => (
-          <div key={k.label} className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4">
-            <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-2">{k.label}</p>
+          <div key={k.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4">
+            <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{k.label}</p>
             <p className="text-base font-bold" style={{ color: k.color }}>{k.val}</p>
-            <p className="text-[10px] text-[#484F58] mt-1">{k.sub}</p>
+            <p className="text-[10px] text-[var(--text-secondary)] mt-1">{k.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Breakdown by contract */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h3 className="text-sm font-bold text-[#FFFFFF] mb-4">Répartition par type de contrat</h3>
         <div className="space-y-3">
           {parContrat.map(({ label, count, color }) => (
             <div key={label} className="flex items-center gap-3">
-              <span className="text-xs text-[#8B949E] w-20 shrink-0">{label}</span>
+              <span className="text-xs text-[var(--text-secondary)] w-20 shrink-0">{label}</span>
               <div className="flex-1 h-2 bg-[#1a2d50] rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
@@ -870,13 +870,13 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
 
       {/* Quick links */}
       <div className="grid grid-cols-2 gap-3">
-        <Link href="/dashboard/rh/paie" className="flex items-center gap-3 p-4 bg-[#0f1e3d] border border-[#30363D] rounded-xl hover:border-[#F08900]/40 transition-colors">
-          <div className="w-9 h-9 rounded-lg bg-[#F08900]/15 flex items-center justify-center"><FileText size={16} className="text-[#F08900]" /></div>
-          <div><p className="text-sm font-semibold text-[#FFFFFF]">Traitement de la paie</p><p className="text-xs text-[#484F58]">Générer les bulletins</p></div>
+        <Link href="/dashboard/rh/paie" className="flex items-center gap-3 p-4 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl hover:border-[#F51E33]/40 transition-colors">
+          <div className="w-9 h-9 rounded-lg bg-[#F51E33]/15 flex items-center justify-center"><FileText size={16} className="text-[#F51E33]" /></div>
+          <div><p className="text-sm font-semibold text-[#FFFFFF]">Traitement de la paie</p><p className="text-xs text-[var(--text-secondary)]">Générer les bulletins</p></div>
         </Link>
-        <Link href="/dashboard/rh/recrutement" className="flex items-center gap-3 p-4 bg-[#0f1e3d] border border-[#30363D] rounded-xl hover:border-[#F08900]/40 transition-colors">
-          <div className="w-9 h-9 rounded-lg bg-[#F08900]/15 flex items-center justify-center"><Briefcase size={16} className="text-[#F08900]" /></div>
-          <div><p className="text-sm font-semibold text-[#FFFFFF]">Recrutement IA</p><p className="text-xs text-[#484F58]">Analyser les CVs</p></div>
+        <Link href="/dashboard/rh/recrutement" className="flex items-center gap-3 p-4 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl hover:border-[#F51E33]/40 transition-colors">
+          <div className="w-9 h-9 rounded-lg bg-[#F51E33]/15 flex items-center justify-center"><Briefcase size={16} className="text-[#F51E33]" /></div>
+          <div><p className="text-sm font-semibold text-[#FFFFFF]">Recrutement IA</p><p className="text-xs text-[var(--text-secondary)]">Analyser les CVs</p></div>
         </Link>
       </div>
     </div>
@@ -927,7 +927,7 @@ export default function RHPage() {
   })()
 
   if (tenantLoading || loading) {
-    return <div className="flex items-center justify-center h-64"><Loader2 size={28} className="text-[#F08900] animate-spin" /></div>
+    return <div className="flex items-center justify-center h-64"><Loader2 size={28} className="text-[#F51E33] animate-spin" /></div>
   }
 
   return (
@@ -936,22 +936,22 @@ export default function RHPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-[#FFFFFF]">Ressources Humaines</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             {employes.length} employé{employes.length !== 1 ? 's' : ''} · {conges.filter(c=>c.statut==='en_attente').length} demande{conges.filter(c=>c.statut==='en_attente').length !== 1 ? 's' : ''} en attente
           </p>
         </div>
         <div className="flex gap-2">
-          <Link href="/dashboard/rh/paie" className="flex items-center gap-1.5 px-3 py-2 border border-[#30363D] text-[#8B949E] rounded-lg text-xs font-semibold hover:border-[#F08900]/40 hover:text-[#F08900] transition-colors">
+          <Link href="/dashboard/rh/paie" className="flex items-center gap-1.5 px-3 py-2 border border-[var(--border)] text-[var(--text-secondary)] rounded-lg text-xs font-semibold hover:border-[#F51E33]/40 hover:text-[#F51E33] transition-colors">
             <FileText size={13} /> Paie
           </Link>
-          <Link href="/dashboard/rh/recrutement" className="flex items-center gap-1.5 px-3 py-2 border border-[#30363D] text-[#8B949E] rounded-lg text-xs font-semibold hover:border-[#F08900]/40 hover:text-[#F08900] transition-colors">
+          <Link href="/dashboard/rh/recrutement" className="flex items-center gap-1.5 px-3 py-2 border border-[var(--border)] text-[var(--text-secondary)] rounded-lg text-xs font-semibold hover:border-[#F51E33]/40 hover:text-[#F51E33] transition-colors">
             <Briefcase size={13} /> Recrutement
           </Link>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#0f1e3d] border border-[#30363D] rounded-xl p-1">
+      <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1">
         {TABS.map(tab => {
           const Icon = tab.icon
           return (
@@ -959,13 +959,13 @@ export default function RHPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all flex-1 justify-center ${
-                activeTab === tab.id ? 'bg-[#F08900] text-[#142850]' : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
+                activeTab === tab.id ? 'bg-[#F51E33] text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
               }`}
             >
               <Icon size={13} />
               <span className="hidden sm:inline">{tab.label}</span>
               {tab.id === 'alertes' && nbAlertes > 0 && (
-                <span className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center ${activeTab === 'alertes' ? 'bg-[#142850] text-[#F08900]' : 'bg-[#F51E33] text-white'}`}>
+                <span className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center ${activeTab === 'alertes' ? 'bg-[#142850] text-[#F51E33]' : 'bg-[#F51E33] text-white'}`}>
                   {nbAlertes}
                 </span>
               )}

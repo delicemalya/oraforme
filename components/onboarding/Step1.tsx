@@ -131,7 +131,7 @@ export default function Step1() {
                 >
                   {sector.name}
                 </h2>
-                <p className="text-xs text-[#484F58] mt-1.5 leading-relaxed">{sector.desc}</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-1.5 leading-relaxed">{sector.desc}</p>
 
                 {/* Checkmark badge */}
                 <AnimatePresence>
@@ -171,7 +171,7 @@ export default function Step1() {
                 ✨
               </div>
               <div>
-                <p className="text-[10px] text-[#484F58] uppercase tracking-widest mb-0.5 font-medium">MIAA+ Intelligence</p>
+                <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest mb-0.5 font-medium">MIAA+ Intelligence</p>
                 <p className="text-sm text-[#C9D1D9]">
                   Espace{" "}
                   <span className="text-yellow-400 font-semibold">{selected}</span>{" "}
@@ -195,7 +195,7 @@ export default function Step1() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-xs text-[#30363D] text-center"
+              className="text-xs text-[var(--text-secondary)] text-center"
             >
               Sélectionnez un secteur pour continuer
             </motion.p>
@@ -216,8 +216,8 @@ export default function Step1() {
           disabled={!selected}
           className={`relative px-10 py-3.5 rounded-2xl font-semibold text-sm overflow-hidden transition-all duration-400
             ${selected
-              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#142850] shadow-[0_8px_32px_rgba(250,204,21,0.3)] cursor-pointer"
-              : "bg-white/[0.04] text-[#30363D] border border-white/[0.07] cursor-default"
+              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#F51E33] shadow-[0_8px_32px_rgba(250,204,21,0.3)] cursor-pointer"
+              : "bg-white/[0.04] text-[var(--text-secondary)] border border-white/[0.07] cursor-default"
             }`}
         >
           {/* Shimmer on active */}

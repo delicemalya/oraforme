@@ -42,7 +42,7 @@ export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount
   if (alerts.length === 0) return null
 
   const COLORS = {
-    warning: { text: '#F08900', bg: '#F089000C', border: '#F0890028' },
+    warning: { text: '#F51E33', bg: '#F51E330C', border: '#F51E3328' },
     danger:  { text: '#F51E33', bg: '#F51E330C', border: '#F51E3328' },
   }
 
@@ -65,12 +65,12 @@ export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-semibold" style={{ color: c.text }}>{a.message}</span>
                 {a.sub && (
-                  <span className="text-xs text-[#8B949E] ml-2 hidden sm:inline">{a.sub}</span>
+                  <span className="text-xs text-[var(--text-secondary)] ml-2 hidden sm:inline">{a.sub}</span>
                 )}
               </div>
               <button
                 onClick={() => setAlerts(prev => prev.filter(x => x.id !== a.id))}
-                className="text-[#484F58] hover:text-[#8B949E] transition-colors shrink-0 p-0.5 rounded"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors shrink-0 p-0.5 rounded"
               >
                 <X size={13} />
               </button>

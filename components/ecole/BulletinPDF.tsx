@@ -38,7 +38,7 @@ export interface BulletinPDFData {
 }
 
 // Colors
-const GOLD   = '#F08900'
+const GOLD   = '#F51E33'
 const BLACK  = '#111111'
 const GRAY   = '#6B7280'
 const LGRAY  = '#F9FAFB'
@@ -211,10 +211,10 @@ export function BulletinPDF({ data }: { data: BulletinPDFData }) {
             <Text style={[s.resultSub, { color: moyColor }]}>/ {max}</Text>
           </View>
           {data.rang && (
-            <View style={[s.resultBox, { backgroundColor: '#F0890015', borderWidth: 1.5, borderColor: '#F08900' }]}>
-              <Text style={[s.resultLabel, { color: '#F08900' }]}>Rang de classe</Text>
-              <Text style={[s.resultValue, { color: '#F08900' }]}>{data.rang}</Text>
-              {data.effectif_classe && <Text style={[s.resultSub, { color: '#F08900' }]}>/ {data.effectif_classe} élèves</Text>}
+            <View style={[s.resultBox, { backgroundColor: '#F51E3315', borderWidth: 1.5, borderColor: '#F51E33' }]}>
+              <Text style={[s.resultLabel, { color: '#F51E33' }]}>Rang de classe</Text>
+              <Text style={[s.resultValue, { color: '#F51E33' }]}>{data.rang}</Text>
+              {data.effectif_classe && <Text style={[s.resultSub, { color: '#F51E33' }]}>/ {data.effectif_classe} élèves</Text>}
             </View>
           )}
           <View style={[s.resultBox, { backgroundColor: GOLD + '15', borderWidth: 1.5, borderColor: GOLD }]}>

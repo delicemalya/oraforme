@@ -13,8 +13,8 @@ const MODULE_LABELS: Record<string, string> = {
 }
 
 const MODULE_COLORS = [
-  '#F08900', '#F08900', '#142850', '#8B0070',
-  '#8B0070', '#142850', '#F08900', '#F51E33', '#84CC16', '#F08900',
+  '#F51E33', '#F51E33', '#142850', '#8B0070',
+  '#8B0070', '#142850', '#F51E33', '#F51E33', '#84CC16', '#F51E33',
 ]
 
 export default async function DashboardPage() {
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
     moduleBreakdown = totalInvoices > 0
       ? ([
           { name: 'Payées',     value: counts.payee,    color: '#142850' },
-          { name: 'Envoyées',   value: counts.envoyee,  color: '#F08900' },
+          { name: 'Envoyées',   value: counts.envoyee,  color: '#F51E33' },
           { name: 'Brouillons', value: counts.brouillon,color: '#484F58' },
           { name: 'Annulées',   value: counts.annulee,  color: '#F51E33' },
         ] as { name: string; value: number; color: string }[]).filter(d => d.value > 0)

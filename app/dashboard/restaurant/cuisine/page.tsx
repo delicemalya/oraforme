@@ -35,8 +35,8 @@ const NEXT_STATUS: Partial<Record<StatutCmd, StatutCmd>> = {
 }
 
 const STATUS_CONFIG: Partial<Record<StatutCmd, { label: string; color: string; bg: string; border: string }>> = {
-  en_attente:    { label: 'En attente',     color: '#F08900', bg: '#F0890018', border: '#F0890040' },
-  en_preparation:{ label: 'En préparation', color: '#F08900', bg: '#F0890018', border: '#F0890040' },
+  en_attente:    { label: 'En attente',     color: '#F51E33', bg: '#F51E3318', border: '#F51E3340' },
+  en_preparation:{ label: 'En préparation', color: '#F51E33', bg: '#F51E3318', border: '#F51E3340' },
   pret:          { label: 'Prêt à servir',  color: '#2EA043', bg: '#2EA04318', border: '#2EA04340' },
   livre:         { label: 'Livré',          color: '#8B0070', bg: '#8B007018', border: '#8B007040' },
 }
@@ -86,7 +86,7 @@ export default function CuisinePage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin text-[#F08900]" size={28} />
+        <Loader2 className="animate-spin text-[#F51E33]" size={28} />
       </div>
     )
   }
@@ -96,19 +96,19 @@ export default function CuisinePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#F08900]/15 flex items-center justify-center">
-            <ChefHat size={20} className="text-[#F08900]" />
+          <div className="w-10 h-10 rounded-xl bg-[#F51E33]/15 flex items-center justify-center">
+            <ChefHat size={20} className="text-[#F51E33]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Écran Cuisine</h1>
-            <p className="text-xs text-[#8B949E]">
+            <p className="text-xs text-[var(--text-secondary)]">
               {commandes.length} commande(s) active(s) · Mise à jour auto toutes les 10s
             </p>
           </div>
         </div>
         <button
           onClick={load}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white hover:border-white/20 text-xs transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white hover:border-white/20 text-xs transition-colors"
         >
           <RefreshCw size={13} /> Actualiser
         </button>
@@ -116,7 +116,7 @@ export default function CuisinePage() {
 
       {/* Columns */}
       {commandes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-[#8B949E]">
+        <div className="flex flex-col items-center justify-center h-64 text-[var(--text-secondary)]">
           <ChefHat size={40} className="opacity-20 mb-3" />
           <p className="text-sm">Aucune commande en attente</p>
           <p className="text-xs mt-1 opacity-60">La liste s&apos;actualise automatiquement</p>
@@ -163,12 +163,12 @@ export default function CuisinePage() {
                               <p className="text-sm font-bold text-white">
                                 {cmd.table_num ? `Table ${cmd.table_num}` : (cmd.client_nom || 'Client')}
                               </p>
-                              <p className="text-xs text-[#8B949E] capitalize">
+                              <p className="text-xs text-[var(--text-secondary)] capitalize">
                                 {cmd.mode?.replace('_', ' ')}
                                 {cmd.source === 'en_ligne' && ' · 🌐 En ligne'}
                               </p>
                             </div>
-                            <div className="flex items-center gap-1 text-[#8B949E] text-xs">
+                            <div className="flex items-center gap-1 text-[var(--text-secondary)] text-xs">
                               <Clock size={11} />
                               <span>{timeAgo(cmd.created_at)}</span>
                             </div>
@@ -179,7 +179,7 @@ export default function CuisinePage() {
                             {(cmd.items as CmdItem[]).map((item, i) => (
                               <div key={i} className="flex items-center justify-between">
                                 <span className="text-sm text-white">
-                                  <span className="font-bold text-[#F08900] mr-1">{item.quantite}×</span>
+                                  <span className="font-bold text-[#F51E33] mr-1">{item.quantite}×</span>
                                   {item.nom}
                                 </span>
                               </div>
@@ -187,7 +187,7 @@ export default function CuisinePage() {
                           </div>
 
                           {cmd.note_client && (
-                            <p className="text-xs text-[#F08900] bg-[#F08900]/10 rounded-lg px-2.5 py-1.5">
+                            <p className="text-xs text-[#F51E33] bg-[#F51E33]/10 rounded-lg px-2.5 py-1.5">
                               📝 {cmd.note_client}
                             </p>
                           )}
@@ -217,7 +217,7 @@ export default function CuisinePage() {
                   </AnimatePresence>
 
                   {cmds.length === 0 && (
-                    <div className="text-center py-8 text-[#484F58] text-xs border border-dashed border-white/[0.06] rounded-xl">
+                    <div className="text-center py-8 text-[var(--text-secondary)] text-xs border border-dashed border-white/[0.06] rounded-xl">
                       Aucune commande
                     </div>
                   )}

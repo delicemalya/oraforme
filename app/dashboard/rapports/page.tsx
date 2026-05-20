@@ -84,7 +84,7 @@ function KpiCard({ label, value, sub, color, icon: Icon, trend, i }: {
   )
 }
 
-function Section({ title, rows, total, totalLabel, totalColor = '#F08900' }: {
+function Section({ title, rows, total, totalLabel, totalColor = '#F51E33' }: {
   title: string
   rows: { label: string; value: number; color?: string; indent?: boolean }[]
   total: number
@@ -92,21 +92,21 @@ function Section({ title, rows, total, totalLabel, totalColor = '#F08900' }: {
   totalColor?: string
 }) {
   return (
-    <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 border-b border-[#30363D] bg-[#142850]/50">
+    <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-[var(--border)] bg-[#142850]/50">
         <h3 className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">{title}</h3>
       </div>
-      <div className="divide-y divide-[#1a2d50]">
+      <div className="divide-y divide-[var(--border)]">
         {rows.map((r, i) => (
           <div key={i} className={`flex justify-between items-center px-5 py-2.5 ${r.indent ? 'pl-8' : ''}`}>
-            <span className="text-sm text-[#8B949E]">{r.label}</span>
+            <span className="text-sm text-[var(--text-secondary)]">{r.label}</span>
             <span className="text-sm font-semibold" style={{ color: r.color ?? '#FFFFFF' }}>
               {fmtFCFA(r.value)}
             </span>
           </div>
         ))}
       </div>
-      <div className="px-5 py-3 border-t border-[#30363D] bg-[#142850]/50 flex justify-between items-center">
+      <div className="px-5 py-3 border-t border-[var(--border)] bg-[#142850]/50 flex justify-between items-center">
         <span className="text-sm font-bold text-[#FFFFFF]">{totalLabel}</span>
         <span className="text-base font-bold" style={{ color: totalColor }}>{fmtFCFA(total)}</span>
       </div>
@@ -238,28 +238,28 @@ export default function RapportsPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[#FFFFFF]">Rapports Financiers</h1>
-            <p className="text-xs text-[#484F58]">ERP · {nomEntreprise} · {moisLabel}</p>
+            <p className="text-xs text-[var(--text-secondary)]">ERP · {nomEntreprise} · {moisLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <select value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))}
-            className="bg-[#0f1e3d] border border-[#30363D] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+            className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <button onClick={load} className="p-2 rounded-lg bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
+          <button onClick={load} className="p-2 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
             <RefreshCw size={14} />
           </button>
         </div>
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#0f1e3d] border border-[#30363D] rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1 overflow-x-auto">
         {TABS.map((t, i) => {
           const Icon = TAB_ICONS[i]
           return (
             <button key={i} onClick={() => setTab(i)}
               className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === i ? 'bg-[#142850]/10 text-[#142850]' : 'text-[#8B949E] hover:text-[#FFFFFF]'
+                tab === i ? 'bg-[#142850]/10 text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
               }`}>
               <Icon size={11} />{t}
             </button>
@@ -268,7 +268,7 @@ export default function RapportsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-[#8B949E]">
+        <div className="flex items-center justify-center py-20 text-[var(--text-secondary)]">
           <Loader2 size={22} className="animate-spin mr-2" /> Chargement des données…
         </div>
       ) : data ? (
@@ -286,25 +286,25 @@ export default function RapportsPage() {
                   color={resultatNet >= 0 ? 'linear-gradient(135deg,#4A0040 0%,#8B0070 50%,#8B0070 100%)' : 'linear-gradient(135deg,#4A0040 0%,#8B0070 50%,#8B0070 100%)'}
                   icon={resultatNet >= 0 ? ArrowUpRight : ArrowDownRight} trend={marge} />
                 <KpiCard i={4} label="Taux de paiement"  value={`${txPaiement}%`}            sub={`${data.nbFacturesPayees}/${data.nbFactures} factures`}
-                  color="linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F08900 100%)"  icon={CheckCircle} />
+                  color="linear-gradient(135deg,#7A3800 0%,#C06000 50%,#F51E33 100%)"  icon={CheckCircle} />
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <div className="xl:col-span-2 bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                <div className="xl:col-span-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                   <h2 className="text-sm font-bold text-[#FFFFFF] mb-4 flex items-center gap-2">
-                    <FileText size={14} className="text-[#F08900]" /> Détail financier — {data.annee}
+                    <FileText size={14} className="text-[#F51E33]" /> Détail financier — {data.annee}
                   </h2>
                   <div className="space-y-3">
                     {[
                       { label: 'Recettes brutes',     val: totalProduits,       color: '#142850', pct: 100 },
                       { label: 'Achats & stock',       val: data.achatsTotal,    color: '#F51E33', pct: totalProduits > 0 ? (data.achatsTotal / totalProduits) * 100 : 0 },
                       { label: 'Masse salariale',      val: data.salairesTotal,  color: '#8B0070', pct: totalProduits > 0 ? (data.salairesTotal / totalProduits) * 100 : 0 },
-                      { label: 'Charges locatives',    val: data.loyerTotal,     color: '#F08900', pct: totalProduits > 0 ? (data.loyerTotal / totalProduits) * 100 : 0 },
-                      { label: 'Résultat net',         val: resultatNet,         color: resultatNet >= 0 ? '#F08900' : '#F51E33', pct: totalProduits > 0 ? Math.abs(resultatNet / totalProduits) * 100 : 0 },
+                      { label: 'Charges locatives',    val: data.loyerTotal,     color: '#F51E33', pct: totalProduits > 0 ? (data.loyerTotal / totalProduits) * 100 : 0 },
+                      { label: 'Résultat net',         val: resultatNet,         color: resultatNet >= 0 ? '#F51E33' : '#F51E33', pct: totalProduits > 0 ? Math.abs(resultatNet / totalProduits) * 100 : 0 },
                     ].map(row => (
                       <div key={row.label}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-[#8B949E]">{row.label}</span>
+                          <span className="text-xs text-[var(--text-secondary)]">{row.label}</span>
                           <span className="text-xs font-bold" style={{ color: row.color }}>{fmtFCFA(row.val)}</span>
                         </div>
                         <div className="h-1.5 bg-[#1a2d50] rounded-full overflow-hidden">
@@ -314,14 +314,14 @@ export default function RapportsPage() {
                       </div>
                     ))}
                   </div>
-                  <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[#1a2d50]">
+                  <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[var(--border)]">
                     {[
-                      { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#142850' : '#F08900' },
-                      { label: 'Employés', val: data.nbEmployes.toString(), color: '#F08900' },
-                      { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#142850' : marge >= 10 ? '#F08900' : '#F51E33' },
+                      { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#142850' : '#F51E33' },
+                      { label: 'Employés', val: data.nbEmployes.toString(), color: '#F51E33' },
+                      { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#142850' : marge >= 10 ? '#F51E33' : '#F51E33' },
                     ].map(s => (
-                      <div key={s.label} className="bg-[#142850] border border-[#1a2d50] rounded-xl p-3 text-center">
-                        <p className="text-[10px] text-[#484F58] mb-1 uppercase tracking-wide">{s.label}</p>
+                      <div key={s.label} className="bg-[#142850] border border-[var(--border)] rounded-xl p-3 text-center">
+                        <p className="text-[10px] text-[var(--text-secondary)] mb-1 uppercase tracking-wide">{s.label}</p>
                         <p className="text-base font-bold" style={{ color: s.color }}>{s.val}</p>
                       </div>
                     ))}
@@ -329,7 +329,7 @@ export default function RapportsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                  <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0070)' }}>
                         <Users size={14} className="text-white" />
@@ -337,21 +337,21 @@ export default function RapportsPage() {
                       <p className="text-sm font-bold text-[#FFFFFF]">Ressources Humaines</p>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between py-2 border-b border-[#1a2d50]">
-                        <span className="text-xs text-[#8B949E]">Effectif</span>
-                        <span className="text-sm font-bold text-[#F08900]">{data.nbEmployes}</span>
+                      <div className="flex justify-between py-2 border-b border-[var(--border)]">
+                        <span className="text-xs text-[var(--text-secondary)]">Effectif</span>
+                        <span className="text-sm font-bold text-[#F51E33]">{data.nbEmployes}</span>
                       </div>
-                      <div className="flex justify-between py-2 border-b border-[#1a2d50]">
-                        <span className="text-xs text-[#8B949E]">Masse salariale</span>
+                      <div className="flex justify-between py-2 border-b border-[var(--border)]">
+                        <span className="text-xs text-[var(--text-secondary)]">Masse salariale</span>
                         <span className="text-sm font-bold text-[#8B0070]">{fmtFCFA(data.salairesTotal)}</span>
                       </div>
                       <div className="flex justify-between py-2">
-                        <span className="text-xs text-[#8B949E]">Charges CNSS</span>
-                        <span className="text-sm font-bold text-[#F08900]">{fmtFCFA(data.cnssTotal)}</span>
+                        <span className="text-xs text-[var(--text-secondary)]">Charges CNSS</span>
+                        <span className="text-sm font-bold text-[#F51E33]">{fmtFCFA(data.cnssTotal)}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                  <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                     <p className="text-xs font-bold text-[#FFFFFF] mb-3 uppercase tracking-wide">Exports</p>
                     <div className="space-y-2">
                       {[
@@ -360,12 +360,12 @@ export default function RapportsPage() {
                         { label: 'Rapport TVA Congo', note: 'Onglet TVA' },
                       ].map(e => (
                         <button key={e.label} onClick={() => e.note === 'Onglet TVA' ? setTab(4) : undefined}
-                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[#1a2d50] hover:border-[#30363D] hover:bg-[#1a2d50] transition-all group text-left">
+                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--border)] hover:bg-white/5 transition-all group text-left">
                           <div className="flex items-center gap-2">
-                            <Download size={12} className="text-[#484F58] group-hover:text-[#F08900] transition-colors" />
-                            <span className="text-xs text-[#8B949E] group-hover:text-[#FFFFFF] transition-colors">{e.label}</span>
+                            <Download size={12} className="text-[var(--text-secondary)] group-hover:text-[#F51E33] transition-colors" />
+                            <span className="text-xs text-[var(--text-secondary)] group-hover:text-[#FFFFFF] transition-colors">{e.label}</span>
                           </div>
-                          <span className="text-[10px] text-[#484F58]">{e.note}</span>
+                          <span className="text-[10px] text-[var(--text-secondary)]">{e.note}</span>
                         </button>
                       ))}
                     </div>
@@ -376,19 +376,19 @@ export default function RapportsPage() {
               {data.caResto > 0 && (() => {
                 const fiscal = calculerTVACongo(data.caResto)
                 return (
-                  <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5">
+                  <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                     <h2 className="text-sm font-bold text-[#FFFFFF] mb-4 flex items-center gap-2">
-                      <ChefHat size={14} className="text-[#F08900]" /> Restaurant — {data.annee}
+                      <ChefHat size={14} className="text-[#F51E33]" /> Restaurant — {data.annee}
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { label: 'CA TTC Restaurant', val: fmtFCFA(data.caResto),   color: '#F08900' },
-                        { label: 'CA HT',              val: fmtFCFA(fiscal.ht),      color: '#F08900' },
+                        { label: 'CA TTC Restaurant', val: fmtFCFA(data.caResto),   color: '#F51E33' },
+                        { label: 'CA HT',              val: fmtFCFA(fiscal.ht),      color: '#F51E33' },
                         { label: 'TVA collectée (18%)',val: fmtFCFA(fiscal.tva),     color: '#8B0070' },
                         { label: 'CA (5% TVA)',         val: fmtFCFA(fiscal.ca),      color: '#F51E33' },
                       ].map(k => (
-                        <div key={k.label} className="bg-[#142850] border border-[#1a2d50] rounded-xl p-4">
-                          <p className="text-[10px] text-[#484F58] uppercase tracking-wider mb-2">{k.label}</p>
+                        <div key={k.label} className="bg-[#142850] border border-[var(--border)] rounded-xl p-4">
+                          <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{k.label}</p>
                           <p className="text-base font-bold" style={{ color: k.color }}>{k.val}</p>
                         </div>
                       ))}
@@ -402,7 +402,7 @@ export default function RapportsPage() {
           {/* ── TAB 1 : Compte de résultat ── */}
           {tab === 1 && (
             <div className="space-y-4">
-              <p className="text-xs text-[#484F58]">Exercice {data.annee} · OHADA / Plan comptable congolais</p>
+              <p className="text-xs text-[var(--text-secondary)]">Exercice {data.annee} · OHADA / Plan comptable congolais</p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Section
                   title="PRODUITS D'EXPLOITATION"
@@ -436,7 +436,7 @@ export default function RapportsPage() {
               <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#142850]/40 bg-[#142850]/5' : 'border-[#F51E33]/40 bg-[#F51E33]/5'}`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-[#8B949E]">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
                       {resultatNet >= 0 ? 'BÉNÉFICE NET' : 'PERTE NETTE'} — EXERCICE {data.annee}
                     </p>
                     <p className="text-3xl font-bold mt-1" style={{ color: resultatNet >= 0 ? '#142850' : '#F51E33' }}>
@@ -444,8 +444,8 @@ export default function RapportsPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-[#484F58]">Marge nette</p>
-                    <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#142850' : marge >= 10 ? '#F08900' : '#F51E33' }}>
+                    <p className="text-xs text-[var(--text-secondary)]">Marge nette</p>
+                    <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#142850' : marge >= 10 ? '#F51E33' : '#F51E33' }}>
                       {marge}%
                     </p>
                   </div>
@@ -454,10 +454,10 @@ export default function RapportsPage() {
                   {[
                     { label: 'Produits', value: fmtFCFA(totalProduits), color: '#142850' },
                     { label: 'Charges',  value: fmtFCFA(totalCharges),  color: '#F51E33' },
-                    { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#F08900' : '#F51E33' },
+                    { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#F51E33' : '#F51E33' },
                   ].map(r => (
                     <div key={r.label} className="bg-[#142850]/60 rounded-xl p-3 text-center">
-                      <p className="text-[10px] text-[#484F58] mb-1">{r.label}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] mb-1">{r.label}</p>
                       <p className="text-sm font-bold" style={{ color: r.color }}>{r.value}</p>
                     </div>
                   ))}
@@ -469,17 +469,17 @@ export default function RapportsPage() {
           {/* ── TAB 2 : Bilan ── */}
           {tab === 2 && (
             <div className="space-y-4">
-              <p className="text-xs text-[#484F58]">Bilan simplifié au 31/12/{data.annee} — OHADA</p>
+              <p className="text-xs text-[var(--text-secondary)]">Bilan simplifié au 31/12/{data.annee} — OHADA</p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Section
                   title="ACTIF"
                   rows={[
-                    { label: 'Trésorerie (caisse + banque)',  value: data.soldeTresorerie,       color: '#F08900' },
-                    { label: 'Créances clients (à recevoir)', value: data.clientsCreances,       color: '#F08900' },
+                    { label: 'Trésorerie (caisse + banque)',  value: data.soldeTresorerie,       color: '#F51E33' },
+                    { label: 'Créances clients (à recevoir)', value: data.clientsCreances,       color: '#F51E33' },
                   ]}
                   total={Math.max(0, data.soldeTresorerie) + data.clientsCreances}
                   totalLabel="TOTAL ACTIF"
-                  totalColor="#F08900"
+                  totalColor="#F51E33"
                 />
                 <div className="space-y-3">
                   <Section
@@ -496,8 +496,8 @@ export default function RapportsPage() {
                     title="DETTES"
                     rows={[
                       { label: 'Fournisseurs (à payer)',       value: data.dettesFournisseurs, color: '#F51E33' },
-                      { label: 'Dettes sociales (CNSS)',       value: data.cnssTotal,          color: '#F08900' },
-                      { label: 'TVA collectée à reverser',     value: data.tvaCollectee + data.caCollecte, color: '#F08900' },
+                      { label: 'Dettes sociales (CNSS)',       value: data.cnssTotal,          color: '#F51E33' },
+                      { label: 'TVA collectée à reverser',     value: data.tvaCollectee + data.caCollecte, color: '#F51E33' },
                     ]}
                     total={data.dettesFournisseurs + data.cnssTotal + data.tvaCollectee + data.caCollecte}
                     totalLabel="TOTAL DETTES"
@@ -507,15 +507,15 @@ export default function RapportsPage() {
               </div>
 
               {/* Équilibre */}
-              <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4">
+              <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Scale size={16} className="text-[#F08900]" />
+                    <Scale size={16} className="text-[#F51E33]" />
                     <span className="text-sm font-bold text-[#FFFFFF]">Vérification équilibre</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-[#484F58]">Actif — Passif</p>
-                    <p className="text-sm font-bold text-[#8B949E]">
+                    <p className="text-xs text-[var(--text-secondary)]">Actif — Passif</p>
+                    <p className="text-sm font-bold text-[var(--text-secondary)]">
                       (bilan simplifié — hors immobilisations)
                     </p>
                   </div>
@@ -527,20 +527,20 @@ export default function RapportsPage() {
           {/* ── TAB 3 : Flux de trésorerie ── */}
           {tab === 3 && (
             <div className="space-y-4">
-              <p className="text-xs text-[#484F58]">Flux de trésorerie — Exercice {data.annee}</p>
+              <p className="text-xs text-[var(--text-secondary)]">Flux de trésorerie — Exercice {data.annee}</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
                   { label: 'Solde ouverture', value: data.openingBalance,    color: '#8B0070', icon: Wallet },
                   { label: 'Variation nette', value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#142850' : '#F51E33', icon: Activity },
-                  { label: 'Solde clôture',  value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#F08900' : '#F51E33', icon: Wallet },
+                  { label: 'Solde clôture',  value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#F51E33' : '#F51E33', icon: Wallet },
                 ].map((k, i) => (
-                  <motion.div key={k.label} {...fadeUp(i)} className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5 flex items-center gap-4">
+                  <motion.div key={k.label} {...fadeUp(i)} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: k.color + '20' }}>
                       <k.icon size={18} style={{ color: k.color }} />
                     </div>
                     <div>
-                      <p className="text-xs text-[#484F58] mb-0.5">{k.label}</p>
+                      <p className="text-xs text-[var(--text-secondary)] mb-0.5">{k.label}</p>
                       <p className="text-lg font-bold" style={{ color: k.color }}>{fmtFCFA(k.value)}</p>
                     </div>
                   </motion.div>
@@ -561,13 +561,13 @@ export default function RapportsPage() {
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
-                  <h3 className="text-xs font-bold text-[#484F58] uppercase tracking-wider mb-3">FLUX D'INVESTISSEMENT</h3>
-                  <p className="text-sm text-[#484F58] text-center py-4">Non suivi dans cet exercice</p>
+                <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
+                  <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">FLUX D'INVESTISSEMENT</h3>
+                  <p className="text-sm text-[var(--text-secondary)] text-center py-4">Non suivi dans cet exercice</p>
                 </div>
-                <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
-                  <h3 className="text-xs font-bold text-[#484F58] uppercase tracking-wider mb-3">FLUX DE FINANCEMENT</h3>
-                  <p className="text-sm text-[#484F58] text-center py-4">Non suivi dans cet exercice</p>
+                <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
+                  <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">FLUX DE FINANCEMENT</h3>
+                  <p className="text-sm text-[var(--text-secondary)] text-center py-4">Non suivi dans cet exercice</p>
                 </div>
               </div>
             </div>
@@ -581,14 +581,14 @@ export default function RapportsPage() {
             const fiscalResto = data.caResto > 0 ? calculerTVACongo(data.caResto) : null
             return (
               <div className="space-y-4">
-                <p className="text-xs text-[#484F58]">Rapport TVA Congo DRC — Exercice {data.annee}</p>
+                <p className="text-xs text-[var(--text-secondary)]">Rapport TVA Congo DRC — Exercice {data.annee}</p>
 
                 <Section
                   title="TVA COLLECTÉE — Sur factures"
                   rows={[
                     { label: 'Base imposable HT',          value: data.ventesFactures,  color: '#FFFFFF' },
                     { label: 'TVA 18% collectée',          value: tvaTotal,             color: '#8B0070' },
-                    { label: "Contribution d'Appui (5%)",  value: caTotal,              color: '#F08900' },
+                    { label: "Contribution d'Appui (5%)",  value: caTotal,              color: '#F51E33' },
                   ]}
                   total={totalDGI}
                   totalLabel="TOTAL TVA + CA À REVERSER"
@@ -602,7 +602,7 @@ export default function RapportsPage() {
                       { label: 'CA TTC restaurant',      value: data.caResto,       color: '#FFFFFF' },
                       { label: 'CA HT (base imposable)', value: fiscalResto.ht,     color: '#FFFFFF' },
                       { label: 'TVA 18% collectée',      value: fiscalResto.tva,    color: '#8B0070' },
-                      { label: "CA (5% TVA)",            value: fiscalResto.ca,     color: '#F08900' },
+                      { label: "CA (5% TVA)",            value: fiscalResto.ca,     color: '#F51E33' },
                     ]}
                     total={fiscalResto.tva + fiscalResto.ca}
                     totalLabel="TOTAL TVA RESTO À REVERSER"
@@ -611,8 +611,8 @@ export default function RapportsPage() {
                 )}
 
                 {/* Récap DGI */}
-                <div className="bg-[#F08900]/5 border-2 border-[#F08900]/30 rounded-2xl p-6">
-                  <h3 className="text-sm font-bold text-[#F08900] mb-4 uppercase tracking-wider">
+                <div className="bg-[#F51E33]/5 border-2 border-[#F51E33]/30 rounded-2xl p-6">
+                  <h3 className="text-sm font-bold text-[#F51E33] mb-4 uppercase tracking-wider">
                     Déclaration DGI — {data.annee}
                   </h3>
                   <div className="space-y-3">
@@ -622,13 +622,13 @@ export default function RapportsPage() {
                       { label: 'TVA nette à reverser',         value: tvaTotal + (fiscalResto?.tva ?? 0) },
                       { label: "Contribution d'Appui (CA)",    value: caTotal + (fiscalResto?.ca ?? 0) },
                     ].map(r => (
-                      <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#F08900]/10 last:border-0">
-                        <span className="text-sm text-[#8B949E]">{r.label}</span>
-                        <span className="text-sm font-bold text-[#F08900]">{fmtFCFA(r.value)}</span>
+                      <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#F51E33]/10 last:border-0">
+                        <span className="text-sm text-[var(--text-secondary)]">{r.label}</span>
+                        <span className="text-sm font-bold text-[#F51E33]">{fmtFCFA(r.value)}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-[#F08900]/30 flex justify-between items-center">
+                  <div className="mt-4 pt-4 border-t border-[#F51E33]/30 flex justify-between items-center">
                     <span className="text-base font-bold text-[#FFFFFF]">TOTAL À PAYER À LA DGI</span>
                     <span className="text-xl font-bold text-[#F51E33]">
                       {fmtFCFA(totalDGI + (fiscalResto?.tva ?? 0) + (fiscalResto?.ca ?? 0))}
@@ -641,9 +641,9 @@ export default function RapportsPage() {
 
           {/* ── TAB 5 : Analyse MIAA+ ── */}
           {tab === 5 && (
-            <div className="bg-[#0f1e3d] border border-[#1a2d50] rounded-2xl p-5 overflow-hidden relative">
+            <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5 overflow-hidden relative">
               <div className="absolute top-0 right-0 w-48 h-48 opacity-5 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, #F08900 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
+                style={{ background: 'radial-gradient(circle, #F51E33 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
               <div className="relative">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
@@ -652,31 +652,31 @@ export default function RapportsPage() {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-[#FFFFFF]">Analyse MIAA+</p>
-                      <p className="text-[10px] text-[#484F58]">Powered by Claude · {nomEntreprise} · {data.annee}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)]">Powered by Claude · {nomEntreprise} · {data.annee}</p>
                     </div>
                   </div>
                   <button onClick={genererAnalyse} disabled={aiLoading}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg,#F08900,#d4880a)', color: '#142850' }}>
+                    style={{ background: 'linear-gradient(135deg,#F51E33,#d4880a)', color: '#142850' }}>
                     {aiLoading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
                     {aiText ? 'Régénérer' : 'Générer'}
                   </button>
                 </div>
                 {!aiText && !aiLoading && (
-                  <div className="border border-dashed border-[#30363D] rounded-xl p-8 text-center">
-                    <Sparkles size={24} className="mx-auto mb-3 text-[#F08900] opacity-40" />
-                    <p className="text-sm text-[#8B949E]">MIAA+ analyse vos données et génère une analyse financière complète</p>
-                    <p className="text-xs text-[#484F58] mt-1">Compte de résultat · Trésorerie · Créances · Recommandations</p>
+                  <div className="border border-dashed border-[var(--border)] rounded-xl p-8 text-center">
+                    <Sparkles size={24} className="mx-auto mb-3 text-[#F51E33] opacity-40" />
+                    <p className="text-sm text-[var(--text-secondary)]">MIAA+ analyse vos données et génère une analyse financière complète</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-1">Compte de résultat · Trésorerie · Créances · Recommandations</p>
                   </div>
                 )}
                 {aiLoading && (
-                  <div className="flex items-center gap-3 text-[#8B949E] py-6 px-2">
-                    <Loader2 size={16} className="animate-spin text-[#F08900]" />
+                  <div className="flex items-center gap-3 text-[var(--text-secondary)] py-6 px-2">
+                    <Loader2 size={16} className="animate-spin text-[#F51E33]" />
                     <span className="text-sm">MIAA+ rédige votre analyse financière complète…</span>
                   </div>
                 )}
                 {aiText && !aiLoading && (
-                  <div className="bg-[#142850] border-l-2 border-[#F08900]/60 rounded-r-xl p-5 text-sm text-[#FFFFFF] leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-[#142850] border-l-2 border-[#F51E33]/60 rounded-r-xl p-5 text-sm text-[#FFFFFF] leading-relaxed whitespace-pre-wrap">
                     {aiText}
                   </div>
                 )}

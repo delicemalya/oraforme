@@ -58,14 +58,14 @@ interface Config {
 
 const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
   brouillon: { label: 'BROUILLON', color: '#8B949E', bg: '#8B949E20' },
-  envoyee:   { label: 'ENVOYÉE',   color: '#F08900', bg: '#F0890020' },
-  envoye:    { label: 'ENVOYÉE',   color: '#F08900', bg: '#F0890020' },
+  envoyee:   { label: 'ENVOYÉE',   color: '#F51E33', bg: '#F51E3320' },
+  envoye:    { label: 'ENVOYÉE',   color: '#F51E33', bg: '#F51E3320' },
   payee:     { label: 'PAYÉE',     color: '#2EA043', bg: '#2EA04320' },
   retard:    { label: 'EN RETARD', color: '#F51E33', bg: '#F51E3320' },
   annulee:   { label: 'ANNULÉE',  color: '#484F58', bg: '#48495820' },
 }
 
-const GOLD = '#F08900'
+const GOLD = '#F51E33'
 
 function fmt(n: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n))
@@ -179,7 +179,7 @@ export default function InvoicePreviewPage() {
 
   if (loading) return (
     <div className="fixed inset-0 z-50 bg-[#142850] flex items-center justify-center">
-      <Loader2 className="animate-spin text-[#F08900]" size={32} />
+      <Loader2 className="animate-spin text-[#F51E33]" size={32} />
     </div>
   )
 
@@ -187,7 +187,7 @@ export default function InvoicePreviewPage() {
     <div className="fixed inset-0 z-50 bg-[#142850] flex flex-col items-center justify-center gap-4">
       <AlertTriangle size={40} className="text-red-400" />
       <p className="text-white font-semibold">Facture introuvable</p>
-      <button onClick={() => router.back()} className="text-sm text-[#8B949E] hover:text-white">← Retour</button>
+      <button onClick={() => router.back()} className="text-sm text-[var(--text-secondary)] hover:text-white">← Retour</button>
     </div>
   )
 
@@ -214,7 +214,7 @@ export default function InvoicePreviewPage() {
 
         {/* ── TOP ACTION BAR ────────────────────────────────────────────────── */}
         <div id="preview-bar" className="h-14 shrink-0 flex items-center px-4 gap-3 border-b border-white/[0.06]" style={{ background: '#0f1e3d' }}>
-          <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[#8B949E] hover:text-white text-sm transition-colors shrink-0">
+          <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-white text-sm transition-colors shrink-0">
             <ArrowLeft size={15} /> Retour
           </button>
           <div className="h-4 w-px bg-white/10 shrink-0" />
@@ -225,26 +225,26 @@ export default function InvoicePreviewPage() {
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0" style={{ color: statutCfg.color, background: statutCfg.bg }}>
               {statutCfg.label}
             </span>
-            <span className="text-xs text-[#8B949E] truncate hidden sm:block">· {clientName}</span>
+            <span className="text-xs text-[var(--text-secondary)] truncate hidden sm:block">· {clientName}</span>
           </div>
 
           {/* Zoom */}
           <div className="flex items-center gap-0.5 bg-white/[0.04] border border-white/[0.08] rounded-lg px-1 py-1 shrink-0">
-            <button onClick={() => setZoom(z => Math.max(0.4, parseFloat((z - 0.1).toFixed(1))))} className="p-1 rounded text-[#8B949E] hover:text-white transition-colors"><ZoomOut size={14} /></button>
-            <button onClick={() => setZoom(1.0)} className="text-xs text-[#8B949E] hover:text-white px-2 font-mono w-10 text-center transition-colors">{Math.round(zoom * 100)}%</button>
-            <button onClick={() => setZoom(z => Math.min(2.0, parseFloat((z + 0.1).toFixed(1))))} className="p-1 rounded text-[#8B949E] hover:text-white transition-colors"><ZoomIn size={14} /></button>
+            <button onClick={() => setZoom(z => Math.max(0.4, parseFloat((z - 0.1).toFixed(1))))} className="p-1 rounded text-[var(--text-secondary)] hover:text-white transition-colors"><ZoomOut size={14} /></button>
+            <button onClick={() => setZoom(1.0)} className="text-xs text-[var(--text-secondary)] hover:text-white px-2 font-mono w-10 text-center transition-colors">{Math.round(zoom * 100)}%</button>
+            <button onClick={() => setZoom(z => Math.min(2.0, parseFloat((z + 0.1).toFixed(1))))} className="p-1 rounded text-[var(--text-secondary)] hover:text-white transition-colors"><ZoomIn size={14} /></button>
           </div>
           <div className="h-4 w-px bg-white/10 shrink-0" />
 
           {/* Print */}
-          <button onClick={() => window.print()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] text-[#8B949E] hover:text-white text-xs transition-colors shrink-0">
+          <button onClick={() => window.print()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white text-xs transition-colors shrink-0">
             <Printer size={13} /> Imprimer
           </button>
 
           {/* Send */}
           <motion.button onClick={handleSend} disabled={sending || sent} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-60 shrink-0"
-            style={{ background: sent ? '#2EA04320' : '#F0890015', color: sent ? '#2EA043' : '#F08900', border: `1px solid ${sent ? '#2EA04340' : '#F0890030'}` }}
+            style={{ background: sent ? '#2EA04320' : '#F51E3315', color: sent ? '#2EA043' : '#F51E33', border: `1px solid ${sent ? '#2EA04340' : '#F51E3330'}` }}
           >
             {sending ? <Loader2 className="animate-spin" size={13} /> : sent ? <Check size={13} /> : <Send size={13} />}
             {sent ? 'Envoyée !' : 'Envoyer'}

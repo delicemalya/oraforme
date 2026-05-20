@@ -76,19 +76,19 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
             <Avatar nom={etudiant.nom} prenom={etudiant.prenom} photoUrl={etudiant.photo_url} size={56} />
             <div>
               <h2 className="text-lg font-bold text-white">{etudiant.prenom} {etudiant.nom}</h2>
-              <p className="text-xs text-[#8B949E] mt-0.5">{etudiant.numero_id} · {etudiant.classe ?? NIVEAUX.find(n => n.value === etudiant.niveau)?.label} · {etudiant.annee_scolaire}</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">{etudiant.numero_id} · {etudiant.classe ?? NIVEAUX.find(n => n.value === etudiant.niveau)?.label} · {etudiant.annee_scolaire}</p>
               <div className="mt-1"><StatutBadge statut={etudiant.statut} /></div>
             </div>
           </div>
-          <button onClick={onBack} className="px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[#8B949E] hover:text-white">
+          <button onClick={onBack} className="px-3 py-2 rounded-lg text-xs border border-white/[0.08] text-[var(--text-secondary)] hover:text-white">
             ← Retour
           </button>
         </div>
         <div className="mt-4 pt-4 border-t border-white/[0.06]">
           <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: accentColor }}>Contacts</p>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            {etudiant.nom_pere && <span className="text-[#8B949E]">Père : <span className="text-white">{etudiant.nom_pere}</span></span>}
-            {etudiant.nom_mere && <span className="text-[#8B949E]">Mère : <span className="text-white">{etudiant.nom_mere}</span></span>}
+            {etudiant.nom_pere && <span className="text-[var(--text-secondary)]">Père : <span className="text-white">{etudiant.nom_pere}</span></span>}
+            {etudiant.nom_mere && <span className="text-[var(--text-secondary)]">Mère : <span className="text-white">{etudiant.nom_mere}</span></span>}
             {etudiant.tel_parent && <a href={`tel:${etudiant.tel_parent}`} className="flex items-center gap-1 hover:underline" style={{ color: accentColor }}><Phone size={10} />{etudiant.tel_parent}</a>}
             {etudiant.email_parent && <a href={`mailto:${etudiant.email_parent}`} className="flex items-center gap-1 hover:underline" style={{ color: accentColor }}><Mail size={10} />{etudiant.email_parent}</a>}
           </div>
@@ -102,20 +102,20 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
             <AlertCircle size={16} className="text-[#F51E33]" />
             <p className="text-sm font-bold text-[#F51E33]">Accès suspendu — solde impayé détecté</p>
           </div>
-          <p className="text-xs text-[#8B949E] mt-1 ml-6">Veuillez vous rapprocher de l&apos;administration pour régulariser la situation.</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-1 ml-6">Veuillez vous rapprocher de l&apos;administration pour régulariser la situation.</p>
         </div>
       )}
 
       {/* KPIs */}
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
+        <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={18} /></div>
       ) : (
         <>
           <div className="grid grid-cols-4 gap-3">
             <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#142850" />
             <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
             <KpiCard label="Absences"         value={totalAbs}                            color="#F51E33" sub={`${justifiedAbs} justifiées`} />
-            <KpiCard label="Alertes"          value={nbAlerts}                            color="#F08900" sub="non lues" />
+            <KpiCard label="Alertes"          value={nbAlerts}                            color="#F51E33" sub="non lues" />
           </div>
 
           {/* Tabs */}
@@ -133,7 +133,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
                   style={{ background: activeTab === t.id ? accentColor : 'transparent', color: activeTab === t.id ? '#fff' : '#8B949E' }}>
                   <Icon size={12} /> {t.label}
                   {t.count > 0 && activeTab !== t.id && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/[0.08] text-[#8B949E]">{t.count}</span>
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/[0.08] text-[var(--text-secondary)]">{t.count}</span>
                   )}
                 </button>
               )
@@ -144,7 +144,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
           {activeTab === 'notes' && (
             <div className="space-y-4">
               {notes.length === 0 ? (
-                <div className="text-center py-10 text-[#8B949E] text-xs">Aucune note disponible.</div>
+                <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune note disponible.</div>
               ) : PERIODES.map(p => {
                 const pNotes = notes.filter(n => n.periode === p.value)
                 if (pNotes.length === 0) return null
@@ -153,7 +153,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
                 return (
                   <div key={p.value} className="rounded-xl border border-white/[0.06] overflow-hidden">
                     <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                      <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{p.label}</p>
+                      <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{p.label}</p>
                       {moy !== null && men && (
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-white">{moy.toFixed(2)} / 20</span>
@@ -162,7 +162,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
                       )}
                     </div>
                     <table className="w-full text-xs">
-                      <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Note', '/Max', 'Moy /20', 'Coeff.'].map(h => <th key={h} className="text-left px-4 py-2 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+                      <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Note', '/Max', 'Moy /20', 'Coeff.'].map(h => <th key={h} className="text-left px-4 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                       <tbody>
                         {pNotes.map(n => {
                           const moy20 = (n.note / n.note_max) * 20
@@ -171,9 +171,9 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
                             <tr key={n.id} className="border-t border-white/[0.04]">
                               <td className="px-4 py-2.5 font-medium text-white">{n.matiere}</td>
                               <td className="px-4 py-2.5 font-bold text-white">{n.note}</td>
-                              <td className="px-4 py-2.5 text-[#8B949E]">{n.note_max}</td>
+                              <td className="px-4 py-2.5 text-[var(--text-secondary)]">{n.note_max}</td>
                               <td className="px-4 py-2.5"><span className="font-bold px-1.5 py-0.5 rounded text-[10px]" style={{ color: m.color, background: m.color + '20' }}>{moy20.toFixed(2)}</span></td>
-                              <td className="px-4 py-2.5 text-[#8B949E]">{n.coefficient}</td>
+                              <td className="px-4 py-2.5 text-[var(--text-secondary)]">{n.coefficient}</td>
                             </tr>
                           )
                         })}
@@ -188,20 +188,20 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
           {/* Paiements */}
           {activeTab === 'paiements' && (
             paiements.length === 0 ? (
-              <div className="text-center py-10 text-[#8B949E] text-xs">Aucun paiement enregistré.</div>
+              <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucun paiement enregistré.</div>
             ) : (
               <div className="rounded-xl border border-white/[0.06] overflow-hidden">
                 <table className="w-full text-xs">
-                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Mode', 'Montant', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Mode', 'Montant', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                   <tbody>
                     {paiements.map(p => (
                       <tr key={p.id} className="border-t border-white/[0.04]">
-                        <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+                        <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-white">{p.libelle}</td>
-                        <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                        <td className="px-4 py-2.5 font-semibold text-[#142850]">{fmt(p.montant)} FCFA</td>
+                        <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
+                        <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F08900', background: '#F0890018' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
                             {p.statut === 'paye' ? 'Payé' : 'En attente'}
                           </span>
                         </td>
@@ -216,17 +216,17 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
           {/* Absences */}
           {activeTab === 'absences' && (
             absences.length === 0 ? (
-              <div className="text-center py-10 text-[#8B949E] text-xs">Aucune absence enregistrée.</div>
+              <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune absence enregistrée.</div>
             ) : (
               <div className="rounded-xl border border-white/[0.06] overflow-hidden">
                 <table className="w-full text-xs">
-                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                   <tbody>
                     {absences.map(a => (
                       <tr key={a.id} className="border-t border-white/[0.04]">
-                        <td className="px-4 py-2.5 text-[#8B949E]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+                        <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
-                        <td className="px-4 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
+                        <td className="px-4 py-2.5 text-[var(--text-secondary)]">{a.motif ?? '—'}</td>
                         <td className="px-4 py-2.5">
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
                             {a.justifiee ? 'Justifiée' : 'Non justifiée'}
@@ -243,20 +243,20 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#8B0070' }: {
           {/* Alertes / Notifications */}
           {activeTab === 'alertes' && (
             notifs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-[#8B949E]">
+              <div className="flex flex-col items-center justify-center py-12 text-[var(--text-secondary)]">
                 <CheckCircle size={28} className="mb-2 opacity-30" />
                 <p className="text-xs">Aucune alerte pour cet enfant</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {notifs.map(n => (
-                  <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#F08900]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(240,163,10,0.04)' }}>
+                  <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#F51E33]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(240,163,10,0.04)' }}>
                     <div className="flex items-start gap-2">
-                      <Bell size={12} className={n.read ? 'text-[#8B949E]' : 'text-[#F08900]'} />
+                      <Bell size={12} className={n.read ? 'text-[var(--text-secondary)]' : 'text-[#F51E33]'} />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-white">{n.titre}</p>
-                        <p className="text-[10px] text-[#8B949E] mt-0.5">{n.message}</p>
-                        <p className="text-[10px] text-[#484F58] mt-1">{new Date(n.created_at).toLocaleDateString('fr-FR')}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{n.message}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] mt-1">{new Date(n.created_at).toLocaleDateString('fr-FR')}</p>
                       </div>
                     </div>
                   </div>
@@ -320,7 +320,7 @@ export default function EspaceParentPage() {
   }
 
   if (tenantLoading || initLoading) {
-    return <div className="flex items-center justify-center h-64 text-[#8B949E]"><Loader2 className="animate-spin mr-2" size={18} /> Chargement…</div>
+    return <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]"><Loader2 className="animate-spin mr-2" size={18} /> Chargement…</div>
   }
 
   // ── Vue PARENT ────────────────────────────────────────────────────────────────
@@ -331,10 +331,10 @@ export default function EspaceParentPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-white">Espace Parent</h1>
-              <p className="text-xs text-[#8B949E] mt-0.5">Dossier de votre enfant</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">Dossier de votre enfant</p>
             </div>
             {children.length > 1 && (
-              <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-xs text-[#8B949E] hover:text-white border border-white/[0.06] px-3 py-2 rounded-lg">
+              <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-white border border-white/[0.06] px-3 py-2 rounded-lg">
                 <ChevronRight size={12} className="rotate-180" /> Mes enfants
               </button>
             )}
@@ -348,31 +348,31 @@ export default function EspaceParentPage() {
       <div className="space-y-5">
         <div>
           <h1 className="text-xl font-bold text-white">Espace Parent</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">Suivi de vos enfants</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Suivi de vos enfants</p>
         </div>
 
         {children.length === 0 ? (
-          <div className="rounded-xl border border-[#F08900]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(240,163,10,0.04)' }}>
-            <AlertCircle size={32} className="text-[#F08900] mb-3" />
+          <div className="rounded-xl border border-[#F51E33]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(240,163,10,0.04)' }}>
+            <AlertCircle size={32} className="text-[#F51E33] mb-3" />
             <p className="text-sm font-semibold text-white mb-1">Aucun enfant trouvé</p>
-            <p className="text-xs text-[#8B949E] max-w-sm">
+            <p className="text-xs text-[var(--text-secondary)] max-w-sm">
               Aucun étudiant n&apos;est associé à l&apos;email <strong className="text-white">{userEmail}</strong>.<br/>
               Contactez l&apos;administration pour lier votre compte à votre enfant.
             </p>
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{children.length} enfant{children.length > 1 ? 's' : ''}</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{children.length} enfant{children.length > 1 ? 's' : ''}</p>
             {children.map(etu => (
               <button key={etu.id} onClick={() => setSelected(etu)}
                 className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] hover:border-[#8B0070]/30 hover:bg-[#8B0070]/[0.04] text-left transition-all group">
                 <Avatar nom={etu.nom} prenom={etu.prenom} photoUrl={etu.photo_url} size={44} />
                 <div className="flex-1">
                   <p className="text-sm font-bold text-white">{etu.prenom} {etu.nom}</p>
-                  <p className="text-xs text-[#8B949E]">{etu.numero_id} · {etu.classe ?? NIVEAUX.find(n => n.value === etu.niveau)?.label} · {etu.annee_scolaire}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{etu.numero_id} · {etu.classe ?? NIVEAUX.find(n => n.value === etu.niveau)?.label} · {etu.annee_scolaire}</p>
                   <div className="mt-1"><StatutBadge statut={etu.statut} /></div>
                 </div>
-                <ChevronRight size={16} className="text-[#8B949E] group-hover:text-[#8B0070] transition-colors" />
+                <ChevronRight size={16} className="text-[var(--text-secondary)] group-hover:text-[#8B0070] transition-colors" />
               </button>
             ))}
           </div>
@@ -387,7 +387,7 @@ export default function EspaceParentPage() {
       <div className="space-y-5">
         <div>
           <h1 className="text-xl font-bold text-white">Espace Parent</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">Administration · Dossier famille</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Administration · Dossier famille</p>
         </div>
         <DossierEtudiant etudiant={selected} onBack={() => { setSelected(null); setResults([]) }} accentColor="#8B0070" />
       </div>
@@ -398,13 +398,13 @@ export default function EspaceParentPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold text-white">Espace Parent</h1>
-        <p className="text-xs text-[#8B949E] mt-0.5">Recherche par téléphone, email, nom du parent ou de l&apos;enfant</p>
+        <p className="text-xs text-[var(--text-secondary)] mt-0.5">Recherche par téléphone, email, nom du parent ou de l&apos;enfant</p>
       </div>
 
       <div className="rounded-xl border border-[#8B0070]/20 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
               className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#8B0070]/50"
               placeholder="Tél, email parent, nom de l'enfant…"
@@ -423,7 +423,7 @@ export default function EspaceParentPage() {
       {results.length > 0 && (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{results.length} résultat(s)</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{results.length} résultat(s)</p>
           </div>
           {results.map(e => (
             <button key={e.id} onClick={() => setSelected(e)}
@@ -431,22 +431,22 @@ export default function EspaceParentPage() {
               <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={36} />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-white">{e.prenom} {e.nom}</p>
-                <p className="text-xs text-[#8B949E]">{e.numero_id} · {e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
-                <div className="flex gap-3 mt-1 text-[10px] text-[#484F58]">
+                <p className="text-xs text-[var(--text-secondary)]">{e.numero_id} · {e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
+                <div className="flex gap-3 mt-1 text-[10px] text-[var(--text-secondary)]">
                   {e.nom_pere && <span>Père : {e.nom_pere}</span>}
                   {e.nom_mere && <span>Mère : {e.nom_mere}</span>}
                   {e.tel_parent && <span className="flex items-center gap-0.5"><Phone size={9} /> {e.tel_parent}</span>}
                 </div>
               </div>
               <StatutBadge statut={e.statut} />
-              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#8B0070] transition-colors" />
+              <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-[#8B0070] transition-colors" />
             </button>
           ))}
         </div>
       )}
 
       {!searching && results.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-[#484F58]">
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--text-secondary)]">
           <HeartHandshake size={40} className="mb-4 opacity-20" />
           <p className="text-sm">Recherchez un parent ou un élève</p>
         </div>

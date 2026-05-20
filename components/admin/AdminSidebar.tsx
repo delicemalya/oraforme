@@ -36,7 +36,7 @@ export default function AdminSidebar() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Header */}
-      <div className="px-4 py-4 border-b border-[#30363D] shrink-0">
+      <div className="px-4 py-4 border-b border-[var(--border)] shrink-0">
         <div className="flex items-center gap-2 mb-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="oraforme" className="w-7 h-7 shrink-0" />
@@ -51,7 +51,7 @@ export default function AdminSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-2 py-3 overflow-y-auto space-y-0.5">
-        <p className="text-xs text-[#484F58] uppercase tracking-wider px-3 pt-1 pb-2">Panneau de contrôle</p>
+        <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider px-3 pt-1 pb-2">Panneau de contrôle</p>
         {NAV.map(item => {
           const Icon = item.icon
           const active = isActive(item.href, item.exact)
@@ -63,7 +63,7 @@ export default function AdminSidebar() {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 active
                   ? 'bg-[#F51E33]/10 text-[#F51E33] font-medium'
-                  : 'text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50]'
+                  : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
               }`}
             >
               <Icon size={15} className="shrink-0" />
@@ -75,18 +75,18 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="px-2 py-3 border-t border-[#30363D] shrink-0 space-y-0.5">
+      <div className="px-2 py-3 border-t border-[var(--border)] shrink-0 space-y-0.5">
         <Link
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8B949E] hover:text-[#FFFFFF] hover:bg-[#1a2d50] transition-all"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5 transition-all"
         >
           <LayoutDashboard size={15} className="shrink-0" />
           <span>Mon dashboard</span>
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8B949E] hover:text-red-400 hover:bg-red-500/5 transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-500/5 transition-all"
         >
           <LogOut size={15} className="shrink-0" />
           Déconnexion
@@ -98,13 +98,13 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[#0f1e3d] border-r border-[#30363D] h-screen sticky top-0">
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[var(--card-bg)] border-r border-[var(--border)] h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
       {/* Mobile trigger */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#0f1e3d] border border-[#30363D] text-[#8B949E]"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)]"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -113,7 +113,7 @@ export default function AdminSidebar() {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="w-56 bg-[#0f1e3d] border-r border-[#30363D] h-full">
+          <div className="w-56 bg-[var(--card-bg)] border-r border-[var(--border)] h-full">
             <SidebarContent />
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setMobileOpen(false)} />

@@ -66,15 +66,15 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
             }}
             labelStyle={{ color: 'var(--text-secondary)', marginBottom: 4 }}
             formatter={(val) => [`${fmtFull(Number(val))} FCFA`, 'Revenus']}
-            cursor={{ stroke: 'rgba(240,137,0,0.2)', strokeWidth: 1 }}
+            cursor={{ stroke: 'rgba(245,30,51,0.2)', strokeWidth: 1 }}
           />
           <Line
             type="monotone"
             dataKey="montant"
-            stroke="#F08900"
+            stroke="#F51E33"
             strokeWidth={2}
-            dot={hasData ? { fill: '#F08900', r: 3, strokeWidth: 0 } : false}
-            activeDot={{ r: 5, fill: '#F08900', stroke: 'rgba(240,137,0,0.25)', strokeWidth: 6 }}
+            dot={hasData ? { fill: '#F51E33', r: 3, strokeWidth: 0 } : false}
+            activeDot={{ r: 5, fill: '#F51E33', stroke: 'rgba(245,30,51,0.25)', strokeWidth: 6 }}
             isAnimationActive
             animationDuration={900}
             animationEasing="ease-out"

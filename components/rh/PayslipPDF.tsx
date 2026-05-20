@@ -35,13 +35,13 @@ export interface PayslipData {
   mode_paiement?: string
 }
 
-const GOLD  = '#F08900'
+const GOLD  = '#F51E33'
 const BLACK = '#111111'
 const GRAY  = '#6B7280'
 const LGRAY = '#F9FAFB'
 const WHITE = '#FFFFFF'
 const MGRAY = '#374151'
-const BLUE  = '#F08900'
+const BLUE  = '#F51E33'
 
 const s = StyleSheet.create({
   page: { padding: 40, backgroundColor: WHITE, fontFamily: 'Helvetica', fontSize: 9, color: BLACK },

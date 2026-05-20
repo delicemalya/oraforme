@@ -61,7 +61,7 @@ export interface Absence {
 
 export const STATUT_ETU: Record<StatutEtu, { label: string; color: string; bg: string }> = {
   actif:    { label: 'Actif',    color: '#FFFFFF', bg: 'rgba(255,255,255,0.12)' },
-  suspendu: { label: 'Suspendu', color: '#F08900', bg: 'rgba(240,137,0,0.15)' },
+  suspendu: { label: 'Suspendu', color: '#F51E33', bg: 'rgba(245,30,51,0.15)' },
   banni:    { label: 'Banni',    color: '#F51E33', bg: 'rgba(245,30,51,0.15)' },
   diplome:  { label: 'Diplômé', color: '#8B0070', bg: 'rgba(139,0,112,0.15)' },
 }
@@ -85,21 +85,21 @@ export const PERIODES: { value: Periode; label: string }[] = [
 
 export const MENTIONS = [
   { min: 16, label: 'Très Bien',  color: '#8B0070' },
-  { min: 14, label: 'Bien',        color: '#F08900' },
+  { min: 14, label: 'Bien',        color: '#F51E33' },
   { min: 12, label: 'Assez Bien', color: '#8B0070' },
-  { min: 10, label: 'Passable',   color: '#F08900' },
+  { min: 10, label: 'Passable',   color: '#F51E33' },
   { min: 0,  label: 'Insuffisant',color: '#F51E33' },
 ]
 
 export const STATUT_ENS: Record<StatutEnseignant, { label: string; color: string; bg: string }> = {
   actif:   { label: 'Actif',    color: '#FFFFFF', bg: 'rgba(255,255,255,0.12)' },
-  conge:   { label: 'En congé', color: '#F08900', bg: 'rgba(240,137,0,0.15)' },
+  conge:   { label: 'En congé', color: '#F51E33', bg: 'rgba(245,30,51,0.15)' },
   inactif: { label: 'Inactif',  color: '#FFFFFF', bg: 'rgba(255,255,255,0.06)' },
 }
 
 export const TYPE_EVENT: Record<TypeEvent, { label: string; color: string; bg: string }> = {
   examen:         { label: 'Examen',    color: '#F51E33', bg: '#F51E3318' },
-  conge_scolaire: { label: 'Congé',     color: '#F08900', bg: '#F0890018' },
+  conge_scolaire: { label: 'Congé',     color: '#F51E33', bg: '#F51E3318' },
   evenement:      { label: 'Événement', color: '#8B0070', bg: 'rgba(139,0,112,0.15)' },
   conseil:        { label: 'Conseil',   color: '#8B0070', bg: '#8B007018' },
   autre:          { label: 'Autre',     color: '#8B949E', bg: '#8B949E18' },
@@ -269,15 +269,15 @@ export const TYPES_ATTESTATION: { value: Attestation['type_attestation']; label:
 ]
 
 export const STATUT_DIPLOME: Record<Diploma['statut'], { label: string; color: string; bg: string }> = {
-  en_attente: { label: 'En attente', color: '#F08900', bg: '#F0890018' },
-  valide:     { label: 'Validé',     color: '#F08900', bg: '#F0890018' },
+  en_attente: { label: 'En attente', color: '#F51E33', bg: '#F51E3318' },
+  valide:     { label: 'Validé',     color: '#F51E33', bg: '#F51E3318' },
   delivre:    { label: 'Délivré',    color: '#142850', bg: '#14285018' },
   revoque:    { label: 'Révoqué',    color: '#F51E33', bg: '#F51E3318' },
 }
 
 export const STATUT_DEFENSE: Record<Defense['statut'], { label: string; color: string; bg: string }> = {
-  planifie: { label: 'Planifiée',  color: '#F08900', bg: '#F0890018' },
-  en_cours: { label: 'En cours',   color: '#F08900', bg: '#F0890018' },
+  planifie: { label: 'Planifiée',  color: '#F51E33', bg: '#F51E3318' },
+  en_cours: { label: 'En cours',   color: '#F51E33', bg: '#F51E3318' },
   passe:    { label: 'Passée',     color: '#142850', bg: '#14285018' },
   reporte:  { label: 'Reportée',   color: '#8B0070', bg: '#8B007018' },
   annule:   { label: 'Annulée',    color: '#F51E33', bg: '#F51E3318' },
@@ -285,9 +285,9 @@ export const STATUT_DEFENSE: Record<Defense['statut'], { label: string; color: s
 
 export const MENTIONS_DIPLOME: { value: string; label: string; color: string }[] = [
   { value: 'excellent',   label: 'Excellent',    color: '#142850' },
-  { value: 'tres_bien',   label: 'Très Bien',    color: '#F08900' },
+  { value: 'tres_bien',   label: 'Très Bien',    color: '#F51E33' },
   { value: 'bien',        label: 'Bien',          color: '#8B0070' },
-  { value: 'assez_bien',  label: 'Assez Bien',   color: '#F08900' },
+  { value: 'assez_bien',  label: 'Assez Bien',   color: '#F51E33' },
   { value: 'passable',    label: 'Passable',      color: '#F51E33' },
 ]
 
@@ -415,7 +415,7 @@ export function StatutBadge({ statut }: { statut: StatutEtu }) {
   )
 }
 
-const AVATAR_PALETTE = ['#F08900', '#F51E33', '#8B0070']
+const AVATAR_PALETTE = ['#F51E33', '#F51E33', '#8B0070']
 
 export function Avatar({ nom, prenom, photoUrl, size = 32, avatarIndex }: { nom: string; prenom: string; photoUrl: string | null; size?: number; avatarIndex?: number }) {
   if (photoUrl) {
@@ -438,22 +438,22 @@ export function FI({ label, value, onChange, placeholder, type = 'text' }: {
 }) {
   return (
     <div>
-      <label className="block text-xs text-[#8B949E] mb-1">{label}</label>
+      <label className="block text-xs text-[var(--text-secondary)] mb-1">{label}</label>
       <input
         type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F08900]/50"
+        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50"
       />
     </div>
   )
 }
 
 export function KpiCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
-  const isPrimary = color === '#F08900'
+  const isPrimary = color === '#F51E33'
   return (
     <div className="relative rounded-xl overflow-hidden" style={{
       padding: '20px 24px',
-      background: isPrimary ? '#F08900' : 'rgba(255,255,255,0.06)',
+      background: isPrimary ? '#F51E33' : 'rgba(255,255,255,0.06)',
       border: isPrimary ? 'none' : '1px solid rgba(255,255,255,0.12)',
     }}>
       <div className="relative">
@@ -467,7 +467,7 @@ export function KpiCard({ label, value, sub, color }: { label: string; value: st
 
 export function EmptyState({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-[#484F58]">
+    <div className="flex flex-col items-center justify-center py-16 text-[var(--text-secondary)]">
       <Icon size={32} className="mb-3 opacity-30" />
       <p className="text-sm">{message}</p>
     </div>

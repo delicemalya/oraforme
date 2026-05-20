@@ -54,7 +54,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
   const mention        = moyenneGlobale !== null ? getMention(moyenneGlobale) : null
   const nbAlerts       = notifs.filter(n => !n.read).length
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#8B949E]" size={18} /></div>
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={18} /></div>
 
   return (
     <div className="space-y-4">
@@ -64,7 +64,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           <Avatar nom={etudiant.nom} prenom={etudiant.prenom} photoUrl={etudiant.photo_url} size={56} />
           <div className="flex-1">
             <h2 className="text-lg font-bold text-white">{etudiant.prenom} {etudiant.nom}</h2>
-            <p className="text-xs text-[#8B949E] mt-0.5">{etudiant.numero_id} · {etudiant.classe ?? NIVEAUX.find(n => n.value === etudiant.niveau)?.label} · {etudiant.annee_scolaire}</p>
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">{etudiant.numero_id} · {etudiant.classe ?? NIVEAUX.find(n => n.value === etudiant.niveau)?.label} · {etudiant.annee_scolaire}</p>
             <div className="mt-1"><StatutBadge statut={etudiant.statut} /></div>
           </div>
           {isAdmin && onToggleBlock && (
@@ -77,7 +77,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         </div>
         {isAdmin && etudiant.statut === 'suspendu' && etudiant.code_deblocage && (
           <div className="mt-3 pt-3 border-t border-white/[0.06]">
-            <p className="text-[10px] text-[#8B949E]">Code de déblocage : <span className="font-mono font-bold text-[#F08900]">{etudiant.code_deblocage}</span></p>
+            <p className="text-[10px] text-[var(--text-secondary)]">Code de déblocage : <span className="font-mono font-bold text-[#F51E33]">{etudiant.code_deblocage}</span></p>
           </div>
         )}
       </div>
@@ -88,7 +88,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           <AlertCircle size={16} className="text-[#F51E33] shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-bold text-[#F51E33]">Accès suspendu</p>
-            <p className="text-xs text-[#8B949E] mt-0.5">Un solde impayé a été détecté. Régularisez votre situation auprès de l&apos;administration.</p>
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">Un solde impayé a été détecté. Régularisez votre situation auprès de l&apos;administration.</p>
           </div>
         </div>
       )}
@@ -98,7 +98,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#142850" />
         <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
         <KpiCard label="Absences"         value={totalAbs}                               color="#F51E33" sub={`${justifiedAbs} justifiées`} />
-        <KpiCard label="Alertes"          value={nbAlerts}                               color="#F08900" sub="non lues" />
+        <KpiCard label="Alertes"          value={nbAlerts}                               color="#F51E33" sub="non lues" />
       </div>
 
       {/* Tabs */}
@@ -115,7 +115,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
               style={{ background: activeTab === t.id ? '#142850' : 'transparent', color: activeTab === t.id ? '#fff' : '#8B949E' }}>
               <Icon size={12} />{t.label}
-              {t.count > 0 && activeTab !== t.id && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] bg-white/[0.08] text-[#8B949E]">{t.count}</span>}
+              {t.count > 0 && activeTab !== t.id && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] bg-white/[0.08] text-[var(--text-secondary)]">{t.count}</span>}
             </button>
           )
         })}
@@ -125,7 +125,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {activeTab === 'notes' && (
         <div className="space-y-4">
           {notes.length === 0 ? (
-            <div className="text-center py-10 text-[#8B949E] text-xs">Aucune note enregistrée.</div>
+            <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune note enregistrée.</div>
           ) : PERIODES.map(p => {
             const pNotes = notes.filter(n => n.periode === p.value)
             if (pNotes.length === 0) return null
@@ -134,7 +134,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
             return (
               <div key={p.value} className="rounded-xl border border-white/[0.06] overflow-hidden">
                 <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{p.label}</p>
+                  <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{p.label}</p>
                   {moy !== null && men && (
                     <div className="flex items-center gap-2">
                       <TrendingUp size={12} style={{ color: men.color }} />
@@ -144,7 +144,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
                   )}
                 </div>
                 <table className="w-full text-xs">
-                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Type', 'Note', '/Max', 'Moy /20', 'Coeff.', 'Mention'].map(h => <th key={h} className="text-left px-4 py-2 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Type', 'Note', '/Max', 'Moy /20', 'Coeff.', 'Mention'].map(h => <th key={h} className="text-left px-4 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                   <tbody>
                     {pNotes.map(n => {
                       const moy20 = (n.note / n.note_max) * 20
@@ -152,11 +152,11 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
                       return (
                         <tr key={n.id} className="border-t border-white/[0.04]">
                           <td className="px-4 py-2.5 font-medium text-white">{n.matiere}</td>
-                          <td className="px-4 py-2.5 text-[#8B949E] capitalize">{n.type_note}</td>
+                          <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{n.type_note}</td>
                           <td className="px-4 py-2.5 font-bold text-white">{n.note}</td>
-                          <td className="px-4 py-2.5 text-[#8B949E]">{n.note_max}</td>
+                          <td className="px-4 py-2.5 text-[var(--text-secondary)]">{n.note_max}</td>
                           <td className="px-4 py-2.5"><span className="font-bold px-1.5 py-0.5 rounded text-[10px]" style={{ color: m.color, background: m.color + '20' }}>{moy20.toFixed(2)}</span></td>
-                          <td className="px-4 py-2.5 text-[#8B949E]">{n.coefficient}</td>
+                          <td className="px-4 py-2.5 text-[var(--text-secondary)]">{n.coefficient}</td>
                           <td className="px-4 py-2.5"><span className="text-[10px]" style={{ color: m.color }}>{m.label}</span></td>
                         </tr>
                       )
@@ -172,20 +172,20 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {/* Paiements */}
       {activeTab === 'paiements' && (
         paiements.length === 0 ? (
-          <div className="text-center py-10 text-[#8B949E] text-xs">Aucun paiement enregistré.</div>
+          <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucun paiement enregistré.</div>
         ) : (
           <div className="rounded-xl border border-white/[0.06] overflow-hidden">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Mode', 'Montant', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Mode', 'Montant', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {paiements.map(p => (
                   <tr key={p.id} className="border-t border-white/[0.04]">
-                    <td className="px-4 py-2.5 text-[#8B949E]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-white">{p.libelle}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#142850]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
                     <td className="px-4 py-2.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F08900', background: '#F0890018' }}>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
                         {p.statut === 'paye' ? 'Payé' : 'En attente'}
                       </span>
                     </td>
@@ -200,17 +200,17 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {/* Absences */}
       {activeTab === 'absences' && (
         absences.length === 0 ? (
-          <div className="text-center py-10 text-[#8B949E] text-xs">Aucune absence enregistrée.</div>
+          <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune absence enregistrée.</div>
         ) : (
           <div className="rounded-xl border border-white/[0.06] overflow-hidden">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[#8B949E]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {absences.map(a => (
                   <tr key={a.id} className="border-t border-white/[0.04]">
-                    <td className="px-4 py-2.5 text-[#8B949E]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
-                    <td className="px-4 py-2.5 text-[#8B949E]">{a.motif ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{a.motif ?? '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
                         {a.justifiee ? 'Justifiée' : 'Non justifiée'}
@@ -227,7 +227,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {/* Alertes */}
       {activeTab === 'alertes' && (
         notifs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-[#8B949E]">
+          <div className="flex flex-col items-center justify-center py-12 text-[var(--text-secondary)]">
             <CheckCircle size={28} className="mb-2 opacity-30" />
             <p className="text-xs">Aucune notification</p>
           </div>
@@ -236,11 +236,11 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
             {notifs.map(n => (
               <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#142850]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(6,182,212,0.04)' }}>
                 <div className="flex items-start gap-2">
-                  <Bell size={12} className={n.read ? 'text-[#8B949E]' : 'text-[#142850]'} />
+                  <Bell size={12} className={n.read ? 'text-[var(--text-secondary)]' : 'text-[#F51E33]'} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-white">{n.titre}</p>
-                    <p className="text-[10px] text-[#8B949E] mt-0.5">{n.message}</p>
-                    <p className="text-[10px] text-[#484F58] mt-1">{new Date(n.created_at).toLocaleDateString('fr-FR')}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{n.message}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-1">{new Date(n.created_at).toLocaleDateString('fr-FR')}</p>
                   </div>
                 </div>
               </div>
@@ -384,7 +384,7 @@ export default function EspaceEtudiantPage() {
 
   if (tenantLoading || initLoading || autoLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-[#8B949E] gap-3">
+      <div className="flex flex-col items-center justify-center h-64 text-[var(--text-secondary)] gap-3">
         <Loader2 className="animate-spin" size={24} />
         <p className="text-sm">{autoLoading ? 'Chargement de votre dossier…' : 'Chargement…'}</p>
       </div>
@@ -400,9 +400,9 @@ export default function EspaceEtudiantPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-white">Mon Dossier</h1>
-              <p className="text-xs text-[#8B949E] mt-0.5">Résultats, paiements, absences</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">Résultats, paiements, absences</p>
             </div>
-            <button onClick={() => { setSelected(null); localStorage.removeItem(STORAGE_KEY) }} className="px-3 py-2 rounded-lg text-xs border border-white/[0.06] text-[#8B949E] hover:text-white">
+            <button onClick={() => { setSelected(null); localStorage.removeItem(STORAGE_KEY) }} className="px-3 py-2 rounded-lg text-xs border border-white/[0.06] text-[var(--text-secondary)] hover:text-white">
               Changer de compte
             </button>
           </div>
@@ -415,7 +415,7 @@ export default function EspaceEtudiantPage() {
       <div className="space-y-5">
         <div>
           <h1 className="text-xl font-bold text-white">Espace Étudiant</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">Accédez à votre dossier scolaire</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Accédez à votre dossier scolaire</p>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -424,7 +424,7 @@ export default function EspaceEtudiantPage() {
             <User size={28} className="text-white" />
           </div>
           <h2 className="text-lg font-bold text-white mb-1">Accès à mon dossier</h2>
-          <p className="text-xs text-[#8B949E] mb-6 max-w-sm">Entrez votre numéro étudiant (visible sur votre carte ou attestation d&apos;inscription)</p>
+          <p className="text-xs text-[var(--text-secondary)] mb-6 max-w-sm">Entrez votre numéro étudiant (visible sur votre carte ou attestation d&apos;inscription)</p>
           <div className="flex gap-2 w-full max-w-sm">
             <input
               className="flex-1 px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#142850]/50 text-center font-mono tracking-widest"
@@ -455,9 +455,9 @@ export default function EspaceEtudiantPage() {
       <div className="space-y-5">
         <div>
           <h1 className="text-xl font-bold text-white">Espace Étudiant</h1>
-          <p className="text-xs text-[#8B949E] mt-0.5">Administration · Dossier élève</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Administration · Dossier élève</p>
         </div>
-        <button onClick={() => { setSelected(null); setAdminResults([]) }} className="flex items-center gap-1.5 text-xs text-[#8B949E] hover:text-white">
+        <button onClick={() => { setSelected(null); setAdminResults([]) }} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-white">
           <ChevronRight size={12} className="rotate-180" /> Retour à la recherche
         </button>
         <DossierEtudiant etudiant={selected} notes={notes} paiements={paiements} absences={absences} notifs={notifs} loading={loadingData} blocking={blocking} onToggleBlock={toggleBlock} isAdmin={true} />
@@ -469,13 +469,13 @@ export default function EspaceEtudiantPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold text-white">Espace Étudiant</h1>
-        <p className="text-xs text-[#8B949E] mt-0.5">Accédez au dossier complet d&apos;un étudiant — résultats, paiements, absences</p>
+        <p className="text-xs text-[var(--text-secondary)] mt-0.5">Accédez au dossier complet d&apos;un étudiant — résultats, paiements, absences</p>
       </div>
 
       <div className="rounded-xl border border-[#142850]/20 p-4 space-y-3" style={{ background: 'rgba(6,182,212,0.04)' }}>
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B949E]" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
               className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#142850]/50"
               placeholder="N° étudiant, nom, prénom…"
@@ -494,7 +494,7 @@ export default function EspaceEtudiantPage() {
       {adminResults.length > 0 && (
         <div className="rounded-xl border border-white/[0.06] overflow-hidden">
           <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-xs font-bold text-[#8B949E] uppercase tracking-wider">{adminResults.length} résultat(s)</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{adminResults.length} résultat(s)</p>
           </div>
           {adminResults.map(e => (
             <button key={e.id} onClick={() => loadStudentData(e)}
@@ -502,17 +502,17 @@ export default function EspaceEtudiantPage() {
               <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={36} />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-white">{e.prenom} {e.nom}</p>
-                <p className="text-xs text-[#8B949E]">{e.numero_id} · {e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{e.numero_id} · {e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
               </div>
               <StatutBadge statut={e.statut} />
-              <ChevronRight size={14} className="text-[#8B949E] group-hover:text-[#142850] transition-colors" />
+              <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-[#F51E33] transition-colors" />
             </button>
           ))}
         </div>
       )}
 
       {!adminSearching && adminResults.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-[#484F58]">
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--text-secondary)]">
           <GraduationCap size={40} className="mb-4 opacity-20" />
           <p className="text-sm">Recherchez un étudiant par nom ou numéro</p>
         </div>

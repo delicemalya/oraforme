@@ -32,11 +32,11 @@ export default async function AdminClientsPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[#FFFFFF]">Clients</h1>
-          <p className="text-xs text-[#484F58]">{tenantRows.length} entreprise{tenantRows.length > 1 ? 's' : ''} inscrite{tenantRows.length > 1 ? 's' : ''}</p>
+          <p className="text-xs text-[var(--text-secondary)]">{tenantRows.length} entreprise{tenantRows.length > 1 ? 's' : ''} inscrite{tenantRows.length > 1 ? 's' : ''}</p>
         </div>
       </div>
 
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <AdminClientsTable tenants={tenantRows} />
       </div>
     </div>

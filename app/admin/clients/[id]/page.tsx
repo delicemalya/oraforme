@@ -28,9 +28,9 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
   const mrr = (tenant.modules_actifs ?? []).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
 
   const STATUT_COLORS: Record<string, string> = {
-    payee: 'text-[#142850] bg-[#142850]/10 border-[#142850]/30',
-    envoyee: 'text-[#F08900] bg-[#F08900]/10 border-[#F08900]/30',
-    brouillon: 'text-[#8B949E] bg-[#1a2d50] border-[#30363D]',
+    payee: 'text-[#F51E33] bg-[#142850]/10 border-[#142850]/30',
+    envoyee: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
+    brouillon: 'text-[var(--text-secondary)] bg-[#1a2d50] border-[var(--border)]',
     annulee: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
   }
 
@@ -39,16 +39,16 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
       {/* Back + header */}
       <div className="flex items-center gap-4">
-        <Link href="/admin" className="text-[#8B949E] hover:text-[#FFFFFF] transition-colors">
+        <Link href="/admin" className="text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
           <ArrowLeft size={18} />
         </Link>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-[#FFFFFF]">{tenant.nom_entreprise}</h1>
-          <p className="text-xs text-[#484F58] font-mono">{tenant.id}</p>
+          <p className="text-xs text-[var(--text-secondary)] font-mono">{tenant.id}</p>
         </div>
         <a
           href={`mailto:${profiles[0] ? '' : ''}`}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[#30363D] text-[#8B949E] hover:text-[#FFFFFF] transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors"
         >
           <Mail size={14} />
           Contacter
@@ -58,13 +58,13 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       {/* Info cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: Building2, label: 'Plan', value: tenant.plan ?? '—', color: '#F08900' },
-          { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#F08900' },
+          { icon: Building2, label: 'Plan', value: tenant.plan ?? '—', color: '#F51E33' },
+          { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#F51E33' },
           { icon: FileText, label: 'CA généré', value: fmtFCFA(caGenere), color: '#142850' },
           { icon: Users, label: 'MRR estimé', value: fmtFCFA(mrr), color: '#F51E33' },
         ].map(c => (
-          <div key={c.label} className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-4">
-            <p className="text-xs text-[#484F58] uppercase tracking-wider mb-2">{c.label}</p>
+          <div key={c.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4">
+            <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2">{c.label}</p>
             <div className="flex items-center gap-2">
               <c.icon size={15} style={{ color: c.color }} />
               <span className="text-base font-bold text-[#FFFFFF] truncate">{c.value}</span>
@@ -76,51 +76,51 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Modules actifs */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4 flex items-center gap-2">
             <Package size={14} className="text-[#F51E33]" />
             Modules actifs
           </h2>
           <div className="space-y-2">
             {(tenant.modules_actifs ?? []).map((m: string) => (
-              <div key={m} className="flex items-center justify-between px-3 py-2 bg-[#142850] rounded-lg border border-[#1a2d50]">
+              <div key={m} className="flex items-center justify-between px-3 py-2 bg-[#142850] rounded-lg border border-[var(--border)]">
                 <span className="text-sm text-[#FFFFFF]">{MODULE_LABELS[m] ?? m}</span>
-                <span className="text-xs text-[#F08900] font-medium">{fmtFCFA(MODULE_PRICES[m] ?? 0)}/mois</span>
+                <span className="text-xs text-[#F51E33] font-medium">{fmtFCFA(MODULE_PRICES[m] ?? 0)}/mois</span>
               </div>
             ))}
             {(tenant.modules_actifs ?? []).length === 0 && (
-              <p className="text-sm text-[#484F58] text-center py-4">Aucun module actif</p>
+              <p className="text-sm text-[var(--text-secondary)] text-center py-4">Aucun module actif</p>
             )}
           </div>
         </div>
 
         {/* Utilisateurs */}
-        <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4 flex items-center gap-2">
             <Users size={14} className="text-[#F51E33]" />
             Utilisateurs ({profiles.length})
           </h2>
           <div className="space-y-2">
             {profiles.map(p => (
-              <div key={p.id} className="flex items-center gap-3 px-3 py-2 bg-[#142850] rounded-lg border border-[#1a2d50]">
-                <div className="w-7 h-7 rounded-full bg-[#F08900]/20 border border-[#F08900]/30 flex items-center justify-center shrink-0">
-                  <span className="text-[#F08900] text-xs font-bold">
+              <div key={p.id} className="flex items-center gap-3 px-3 py-2 bg-[#142850] rounded-lg border border-[var(--border)]">
+                <div className="w-7 h-7 rounded-full bg-[#F51E33]/20 border border-[#F51E33]/30 flex items-center justify-center shrink-0">
+                  <span className="text-[#F51E33] text-xs font-bold">
                     {(p.prenom || p.nom || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-[#FFFFFF] truncate">{[p.prenom, p.nom].filter(Boolean).join(' ') || '—'}</p>
-                  <p className="text-xs text-[#484F58]">{p.role ?? 'user'}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{p.role ?? 'user'}</p>
                 </div>
               </div>
             ))}
-            {profiles.length === 0 && <p className="text-sm text-[#484F58] text-center py-4">Aucun utilisateur</p>}
+            {profiles.length === 0 && <p className="text-sm text-[var(--text-secondary)] text-center py-4">Aucun utilisateur</p>}
           </div>
         </div>
       </div>
 
       {/* Factures récentes */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4 flex items-center gap-2">
           <FileText size={14} className="text-[#F51E33]" />
           Factures récentes ({factures.length})
@@ -128,27 +128,27 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#30363D]">
-                <th className="text-left py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Client</th>
-                <th className="text-right py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Montant</th>
-                <th className="text-left py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Statut</th>
-                <th className="text-left py-2 px-3 text-xs text-[#484F58] uppercase tracking-wider font-semibold">Date</th>
+              <tr className="border-b border-[var(--border)]">
+                <th className="text-left py-2 px-3 text-xs text-[var(--text-secondary)] uppercase tracking-wider font-semibold">Client</th>
+                <th className="text-right py-2 px-3 text-xs text-[var(--text-secondary)] uppercase tracking-wider font-semibold">Montant</th>
+                <th className="text-left py-2 px-3 text-xs text-[var(--text-secondary)] uppercase tracking-wider font-semibold">Statut</th>
+                <th className="text-left py-2 px-3 text-xs text-[var(--text-secondary)] uppercase tracking-wider font-semibold">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1a2d50]">
+            <tbody className="divide-y divide-[var(--border)]">
               {factures.length === 0 && (
-                <tr><td colSpan={4} className="text-center py-8 text-[#484F58]">Aucune facture</td></tr>
+                <tr><td colSpan={4} className="text-center py-8 text-[var(--text-secondary)]">Aucune facture</td></tr>
               )}
               {factures.map(f => (
-                <tr key={f.id} className="hover:bg-[#1a2d50]/30 transition-colors">
+                <tr key={f.id} className="hover:bg-white/5/30 transition-colors">
                   <td className="py-2.5 px-3 text-[#FFFFFF] truncate max-w-[180px]">{f.client_nom ?? '—'}</td>
-                  <td className="py-2.5 px-3 text-right font-medium text-[#F08900]">{fmtFCFA(f.total ?? 0)}</td>
+                  <td className="py-2.5 px-3 text-right font-medium text-[#F51E33]">{fmtFCFA(f.total ?? 0)}</td>
                   <td className="py-2.5 px-3">
                     <span className={`text-xs px-2 py-0.5 rounded border ${STATUT_COLORS[f.statut] ?? STATUT_COLORS.brouillon}`}>
                       {f.statut}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 text-[#8B949E] text-xs whitespace-nowrap">
+                  <td className="py-2.5 px-3 text-[var(--text-secondary)] text-xs whitespace-nowrap">
                     {new Date(f.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </td>
                 </tr>
@@ -159,7 +159,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       </div>
 
       {/* Informations tenant */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Informations</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
@@ -168,7 +168,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
             { label: 'Inscription', value: new Date(tenant.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) },
           ].map(r => (
             <div key={r.label}>
-              <p className="text-xs text-[#484F58] uppercase tracking-wider mb-1">{r.label}</p>
+              <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-1">{r.label}</p>
               <p className="text-sm text-[#FFFFFF] font-medium">{r.value}</p>
             </div>
           ))}

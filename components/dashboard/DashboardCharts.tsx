@@ -20,7 +20,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Donut chart */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">{donutTitle}</h3>
         {donutData.length > 0 ? (
           <>
@@ -59,7 +59,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
               {donutData.map((d, i) => (
                 <div key={i} className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                  <span className="text-[11px] text-[#8B949E]">{d.name}</span>
+                  <span className="text-[11px] text-[var(--text-secondary)]">{d.name}</span>
                   <span className="text-[11px] font-semibold" style={{ color: d.color }}>{d.value}</span>
                 </div>
               ))}
@@ -67,14 +67,14 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
           </>
         ) : (
           <div className="h-[190px] flex flex-col items-center justify-center gap-2">
-            <div className="w-16 h-16 rounded-full border-4 border-[#1a2d50] border-dashed" />
-            <p className="text-xs text-[#484F58]">Aucune donnée</p>
+            <div className="w-16 h-16 rounded-full border-4 border-[var(--border)] border-dashed" />
+            <p className="text-xs text-[var(--text-secondary)]">Aucune donnée</p>
           </div>
         )}
       </div>
 
       {/* Bar chart */}
-      <div className="bg-[#0f1e3d] border border-[#30363D] rounded-xl p-5">
+      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">Activité — 7 derniers jours</h3>
         <ResponsiveContainer width="100%" height={190}>
           <BarChart data={barData} margin={{ top: 4, right: 0, left: -24, bottom: 0 }}>
@@ -102,7 +102,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
               cursor={{ fill: '#1a2d50', radius: 4 }}
               formatter={(val) => [val, 'Factures']}
             />
-            <Bar dataKey="factures" fill="#F08900" radius={[4, 4, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="factures" fill="#F51E33" radius={[4, 4, 0, 0]} maxBarSize={32} />
           </BarChart>
         </ResponsiveContainer>
       </div>
