@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import {
   CheckCircle, ArrowRight, Star, BarChart3, Wallet, Users, Package,
