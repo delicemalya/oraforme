@@ -137,14 +137,14 @@ export default function LandingPage() {
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
         background: `${N}f0`, backdropFilter: 'blur(12px)',
         borderBottom: '1px solid rgba(255,255,255,0.08)',
-        height: 68,
+        height: 100,
         display: 'flex', alignItems: 'center',
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="Oraforme" style={{ width: 32, height: 32 }} />
+            <img src="/logo-icon.png" alt="Oraforme" style={{ width: 80, height: 80 }} />
             <span style={{ fontSize: 20, fontWeight: 800, color: W, letterSpacing: '-0.5px' }}>oraforme</span>
           </div>
 
