@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -87,7 +87,7 @@ function getGreeting(nom: string): string {
 function MIAALogo({ size = 32 }: { size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src="/logo.png" alt="MIAA+" className="shrink-0 rounded-full" style={{ width: size, height: size, objectFit: 'cover' }} />
+    <img src="/logo-icon.png" alt="MIAA+" className="shrink-0 rounded-full" style={{ width: size, height: size, objectFit: 'cover' }} />
   )
 }
 

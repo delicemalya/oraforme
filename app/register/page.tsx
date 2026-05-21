@@ -135,7 +135,7 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="oraforme" className="w-8 h-8" />
+            <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8" />
             <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
           </div>
           <p className="text-[var(--text-secondary)] text-sm">Créez votre espace entreprise</p>

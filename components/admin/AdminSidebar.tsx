@@ -39,7 +39,7 @@ export default function AdminSidebar() {
       <div className="px-4 py-4 border-b border-[var(--border)] shrink-0">
         <div className="flex items-center gap-2 mb-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="oraforme" className="w-7 h-7 shrink-0" />
+          <img src="/logo-icon.png" alt="oraforme" className="w-7 h-7 shrink-0" />
           <span className="text-base font-bold text-[#FFFFFF]">oraforme</span>
         </div>
         <div className="flex items-center gap-1.5">

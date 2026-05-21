@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -69,7 +69,7 @@ const QUICK_CATEGORIES = [
 function MIAALogo({ size = 40 }: { size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src="/logo.png" alt="MIAA+" className="shrink-0 rounded-full" style={{ width: size, height: size, objectFit: 'cover' }} />
+    <img src="/logo-icon.png" alt="MIAA+" className="shrink-0 rounded-full" style={{ width: size, height: size, objectFit: 'cover' }} />
   )
 }
 
