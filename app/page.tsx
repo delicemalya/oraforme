@@ -142,11 +142,8 @@ export default function LandingPage() {
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="Oraforme" style={{ width: 80, height: 80, borderRadius: '50%' }} />
-            <span style={{ fontSize: 20, fontWeight: 800, color: W, letterSpacing: '-0.5px' }}>oraforme</span>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Oraforme" style={{ height: 60, width: 'auto' }} />
 
           {/* Nav links */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden md:flex">
