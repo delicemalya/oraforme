@@ -144,7 +144,7 @@ export default function LandingPage() {
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="Oraforme" style={{ width: 80, height: 80 }} />
+            <img src="/logo-icon.png" alt="Oraforme" style={{ width: 80, height: 80, borderRadius: '50%' }} />
             <span style={{ fontSize: 20, fontWeight: 800, color: W, letterSpacing: '-0.5px' }}>oraforme</span>
           </div>
 
