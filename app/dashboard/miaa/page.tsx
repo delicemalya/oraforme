@@ -68,20 +68,24 @@ const QUICK_CATEGORIES = [
 
 function MIAALogo({ size = 40 }: { size?: number }) {
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <div className="absolute inset-0 rounded-full" style={{ background: '#3B7EC8', padding: 2 }}>
-        <div className="w-full h-full rounded-full bg-white/20 p-0.5">
-          <div className="w-full h-full rounded-full bg-[#3B7EC8] flex items-center justify-center">
-            <span style={{ fontSize: size * 0.36, lineHeight: 1 }}>🐱</span>
-          </div>
-        </div>
-      </div>
-      <div
-        className="absolute -top-0.5 -right-0.5 rounded-full bg-[#8B0070] flex items-center justify-center text-white font-bold"
-        style={{ width: size * 0.34, height: size * 0.34, fontSize: size * 0.17 }}
-      >
-        +
-      </div>
+    <div className="shrink-0" style={{ width: size, height: size }}>
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
+        <circle cx="50" cy="50" r="50" fill="#F51E33"/>
+        <circle cx="50" cy="50" r="43" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2" strokeDasharray="3.5 2.5" fill="none"/>
+        <circle cx="50" cy="57" r="24" stroke="white" strokeWidth="2.5" fill="none"/>
+        <path d="M31 43 L27 27 L41 35" stroke="white" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" fill="none"/>
+        <path d="M63 38 L69 23 L75 37" stroke="white" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" fill="none"/>
+        <path d="M39 53 Q43 48 47 53" stroke="white" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+        <path d="M53 53 Q57 48 61 53" stroke="white" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+        <path d="M50 59 L48 62 L52 62 Z" fill="white"/>
+        <path d="M46 64 Q48 68 50 66 Q52 68 54 64" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <line x1="15" y1="57" x2="37" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="14" y1="63" x2="37" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="15" y1="69" x2="37" y2="66" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="85" y1="57" x2="63" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="86" y1="63" x2="63" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="85" y1="69" x2="63" y2="66" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
     </div>
   )
 }

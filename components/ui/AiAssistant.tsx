@@ -85,63 +85,25 @@ function getGreeting(nom: string): string {
 // ── Logo MIAA+ ────────────────────────────────────────────────────────────────
 
 function MIAALogo({ size = 32 }: { size?: number }) {
-  const badgeSize = size * 0.36
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ width: '100%', height: '100%' }}
-      >
-        {/* Outer blue ring */}
-        <circle cx="50" cy="50" r="48" fill="#3B7EC8" />
-        {/* White gap ring */}
-        <circle cx="50" cy="50" r="36" fill="white" />
-        {/* Inner dark-blue circle */}
-        <circle cx="50" cy="50" r="30" fill="#2E6BAA" />
-
-        {/* ── Cat face (white line-art) ── */}
-        {/* Head */}
-        <circle cx="50" cy="54" r="18" stroke="white" strokeWidth="2.4" fill="none" />
-        {/* Left ear */}
-        <path d="M35 40 L29 28 L42 36" stroke="white" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-        {/* Right ear */}
-        <path d="M60 35 L67 24 L71 37" stroke="white" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-        {/* Left eye */}
-        <circle cx="42" cy="51" r="3.2" stroke="white" strokeWidth="1.8" fill="none" />
-        <circle cx="42" cy="51" r="1.1" fill="white" />
-        {/* Right eye */}
-        <circle cx="58" cy="51" r="3.2" stroke="white" strokeWidth="1.8" fill="none" />
-        <circle cx="58" cy="51" r="1.1" fill="white" />
-        {/* Nose dot */}
-        <circle cx="50" cy="58" r="1.4" fill="white" />
-        {/* Snout pointing right */}
-        <path d="M50 58 L58 55" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
-        {/* Left whiskers */}
-        <line x1="18" y1="53" x2="36" y2="57" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="18" y1="58" x2="36" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="18" y1="63" x2="36" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        {/* Right whiskers */}
-        <line x1="82" y1="53" x2="64" y2="57" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="82" y1="58" x2="64" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="82" y1="63" x2="64" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+    <div className="shrink-0" style={{ width: size, height: size }}>
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
+        <circle cx="50" cy="50" r="50" fill="#F51E33"/>
+        <circle cx="50" cy="50" r="43" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2" strokeDasharray="3.5 2.5" fill="none"/>
+        <circle cx="50" cy="57" r="24" stroke="white" strokeWidth="2.5" fill="none"/>
+        <path d="M31 43 L27 27 L41 35" stroke="white" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" fill="none"/>
+        <path d="M63 38 L69 23 L75 37" stroke="white" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" fill="none"/>
+        <path d="M39 53 Q43 48 47 53" stroke="white" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+        <path d="M53 53 Q57 48 61 53" stroke="white" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+        <path d="M50 59 L48 62 L52 62 Z" fill="white"/>
+        <path d="M46 64 Q48 68 50 66 Q52 68 54 64" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <line x1="15" y1="57" x2="37" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="14" y1="63" x2="37" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="15" y1="69" x2="37" y2="66" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="85" y1="57" x2="63" y2="60" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="86" y1="63" x2="63" y2="63" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="85" y1="69" x2="63" y2="66" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
-
-      {/* Pink + badge */}
-      <div
-        className="absolute rounded-full flex items-center justify-center text-white font-bold"
-        style={{
-          width: badgeSize, height: badgeSize,
-          background: '#D63B8E',
-          top: -badgeSize * 0.15, right: -badgeSize * 0.15,
-          fontSize: badgeSize * 0.6,
-          lineHeight: 1,
-          boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
-        }}
-      >
-        +
-      </div>
     </div>
   )
 }
