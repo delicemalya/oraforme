@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -117,7 +117,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="oraforme" className="w-8 h-8" />
+            <img src="/logo.png" alt="oraforme" className="w-8 h-8" />
             <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
           </div>
           <p className="text-[var(--text-secondary)] text-sm">Connectez-vous à votre espace</p>

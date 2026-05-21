@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -60,7 +60,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="oraforme" className="w-8 h-8 mx-auto mb-2" />
+          <img src="/logo.png" alt="oraforme" className="w-8 h-8 mx-auto mb-2" />
           <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
         </div>
 

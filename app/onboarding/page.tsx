@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -69,7 +69,7 @@ export default function OnboardingPage() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="oraforme" className="w-8 h-8" />
+            <img src="/logo.png" alt="oraforme" className="w-8 h-8" />
             <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
           </div>
 

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import {
@@ -144,7 +144,7 @@ export default function LandingPage() {
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="Oraforme" style={{ width: 32, height: 32 }} />
+            <img src="/logo.png" alt="Oraforme" style={{ width: 32, height: 32 }} />
             <span style={{ fontSize: 20, fontWeight: 800, color: W, letterSpacing: '-0.5px' }}>oraforme</span>
           </div>
 
@@ -571,7 +571,7 @@ export default function LandingPage() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.svg" alt="Oraforme" style={{ width: 28, height: 28 }} />
+                <img src="/logo.png" alt="Oraforme" style={{ width: 28, height: 28 }} />
                 <span style={{ fontSize: 18, fontWeight: 800, color: W }}>oraforme</span>
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.7, maxWidth: 280, marginBottom: 20 }}>

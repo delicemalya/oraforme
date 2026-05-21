@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -363,7 +363,7 @@ export default function Sidebar() {
       <div className="border-b border-white/10 shrink-0">
         <div className="px-4 py-3 flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="oraforme" style={{ width: 34, height: 34, flexShrink: 0 }} />
+          <img src="/logo.png" alt="oraforme" style={{ width: 34, height: 34, flexShrink: 0 }} />
           <span style={{ fontSize: 17, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.3px' }}>oraforme</span>
         </div>
         {/* Badge rôle */}
