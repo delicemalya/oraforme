@@ -4,16 +4,16 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import {
-  AreaChart, Area, BarChart, Bar, LineChart, Line,
+  AreaChart, Area, BarChart, Bar, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, PieChart, Pie, Cell,
+  ResponsiveContainer,
 } from 'recharts'
 import {
   TrendingUp, TrendingDown, Minus,
-  DollarSign, CreditCard, Wallet, Banknote,
+  DollarSign, Wallet,
   Building2, Smartphone, Users, ArrowUpRight,
   ArrowDownRight, RefreshCw, Calendar, Download,
-  AlertCircle, CheckCircle2, Clock, ChevronRight,
+  AlertCircle, Clock, ChevronRight,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -161,7 +161,6 @@ export default function FinancePage() {
       { data: txPrev },
       { data: banques },
       { data: caisses },
-      { data: depenses },
     ] = await Promise.all([
       supabase
         .from('transactions')
@@ -192,12 +191,6 @@ export default function FinancePage() {
         .select('nom, solde')
         .eq('tenant_id', tenantId)
         .eq('actif', true),
-      supabase
-        .from('depenses')
-        .select('montant, categorie, statut')
-        .eq('tenant_id', tenantId)
-        .gte('date_depense', startYear)
-        .lte('date_depense', endYear),
     ])
 
     // ── Agrégats annuels ──────────────────────────────────────────────────────
@@ -347,6 +340,7 @@ export default function FinancePage() {
     setLoading(false)
   }, [tenantId, currentYear, currentMonth])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   const TRESO_COLORS = {
