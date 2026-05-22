@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -70,133 +70,133 @@ const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
 
 const SECTOR_NAV: Record<string, NavItem[]> = {
   ecole: [
-    { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F51E33' },
-    { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#F51E33' },
-    { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#8B0070' },
-    { id: 'comptabilite',           label: 'Comptabilité',           sublabel: 'Journal OHADA',            icon: Calculator,     href: '/dashboard/ecole/comptabilite',           color: '#142850' },
-    { id: 'tresorerie',             label: 'Trésorerie',             sublabel: 'Wallets & encaissements',  icon: Wallet,         href: '/dashboard/tresorerie',                   color: '#142850' },
-    { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F51E33' },
-    { id: 'espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           icon: BookOpen,       href: '/dashboard/ecole/espace-formateur',       color: '#142850' },
-    { id: 'espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              icon: GraduationCap,  href: '/dashboard/ecole/espace-etudiant',        color: '#142850' },
-    { id: 'espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi de mes enfants',     icon: HeartHandshake, href: '/dashboard/ecole/espace-parent',          color: '#8B0070' },
-    { id: 'parametres-academiques', label: 'Paramètres académ.',     sublabel: 'LMD & mentions',           icon: Settings,       href: '/dashboard/ecole/parametres-academiques', color: '#8B949E' },
-    { id: 'miaa',                   label: 'MIAA+',                  sublabel: 'IA scolaire',              icon: Bot,            href: '/dashboard/ecole/miaa',                   color: '#F51E33' },
+    { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F59E0B' },
+    { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#F59E0B' },
+    { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#64748B' },
+    { id: 'comptabilite',           label: 'Comptabilité',           sublabel: 'Journal OHADA',            icon: Calculator,     href: '/dashboard/ecole/comptabilite',           color: '#64748B' },
+    { id: 'tresorerie',             label: 'Trésorerie',             sublabel: 'Wallets & encaissements',  icon: Wallet,         href: '/dashboard/tresorerie',                   color: '#64748B' },
+    { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F59E0B' },
+    { id: 'espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           icon: BookOpen,       href: '/dashboard/ecole/espace-formateur',       color: '#64748B' },
+    { id: 'espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              icon: GraduationCap,  href: '/dashboard/ecole/espace-etudiant',        color: '#64748B' },
+    { id: 'espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi de mes enfants',     icon: HeartHandshake, href: '/dashboard/ecole/espace-parent',          color: '#64748B' },
+    { id: 'parametres-academiques', label: 'Paramètres académ.',     sublabel: 'LMD & mentions',           icon: Settings,       href: '/dashboard/ecole/parametres-academiques', color: '#94A3B8' },
+    { id: 'miaa',                   label: 'MIAA+',                  sublabel: 'IA scolaire',              icon: Bot,            href: '/dashboard/ecole/miaa',                   color: '#F59E0B' },
   ],
   restaurant: [
-    { id: 'pos',        label: 'Caisse POS',   sublabel: 'Ventes & commandes', icon: ChefHat,   href: '/dashboard/restaurant',  color: '#F51E33' },
-    { id: 'stock',      label: 'Stock',        sublabel: 'Inventaire',         icon: Package,   href: '/dashboard/stock',       color: '#142850' },
-    { id: 'rh',         label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,     href: '/dashboard/rh',          color: '#8B0070' },
-    { id: 'tresorerie', label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',       label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
+    { id: 'pos',        label: 'Caisse POS',   sublabel: 'Ventes & commandes', icon: ChefHat,   href: '/dashboard/restaurant',  color: '#F59E0B' },
+    { id: 'stock',      label: 'Stock',        sublabel: 'Inventaire',         icon: Package,   href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'rh',         label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie', label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'miaa',       label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
   ],
   commerce: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   href: '/dashboard/stock',       color: '#142850' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     href: '/dashboard/rh',          color: '#8B0070' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
   ],
   supermarche: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Caisse & ventes',   icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Rayons & inventaire',icon: Package,    href: '/dashboard/stock',       color: '#142850' },
-    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#142850' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#8B0070' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Caisse & ventes',    icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',       label: 'Stock',        sublabel: 'Rayons & inventaire', icon: Package,    href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',        icon: ShoppingCart,href: '/dashboard/achats',     color: '#64748B' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',           icon: Users,       href: '/dashboard/rh',         color: '#64748B' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie', color: '#64748B' },
   ],
   boisson: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Ventes & livraisons',icon: FileText,   href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire boissons',icon: Package,    href: '/dashboard/stock',       color: '#142850' },
-    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',     color: '#142850' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',         color: '#8B0070' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Ventes & livraisons', icon: FileText,   href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire boissons', icon: Package,    href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',        icon: ShoppingCart,href: '/dashboard/achats',     color: '#64748B' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',           icon: Users,       href: '/dashboard/rh',         color: '#64748B' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie', color: '#64748B' },
   ],
   transport_public: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Lignes & voyageurs', icon: Truck,       href: '/dashboard/transport',  color: '#F51E33' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Billets & recettes', icon: FileText,    href: '/dashboard/facturation', color: '#8B0070' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs & agents',icon: Users,       href: '/dashboard/rh',         color: '#142850' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie', color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',       color: '#F51E33' },
+    { id: 'transport',   label: 'Transport',    sublabel: 'Lignes & voyageurs',  icon: Truck,       href: '/dashboard/transport',  color: '#F59E0B' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Billets & recettes',  icon: FileText,    href: '/dashboard/facturation', color: '#64748B' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs & agents', icon: Users,       href: '/dashboard/rh',         color: '#64748B' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie', color: '#64748B' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,         href: '/dashboard/miaa',       color: '#F59E0B' },
   ],
   sante: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Consultations',      icon: FileText,  href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel médical',  icon: Users,     href: '/dashboard/rh',          color: '#142850' },
-    { id: 'stock',       label: 'Pharmacie',    sublabel: 'Médicaments',        icon: Package,   href: '/dashboard/stock',       color: '#8B0070' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Consultations',       icon: FileText,  href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel médical',   icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'stock',       label: 'Pharmacie',    sublabel: 'Médicaments',         icon: Package,   href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
   ],
   transport: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Flotte & courses',  icon: Truck,     href: '/dashboard/transport',   color: '#F51E33' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#8B0070' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs',        icon: Users,     href: '/dashboard/rh',          color: '#142850' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F51E33' },
+    { id: 'transport',   label: 'Transport',    sublabel: 'Flotte & courses',    icon: Truck,     href: '/dashboard/transport',   color: '#F59E0B' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',    icon: FileText,  href: '/dashboard/facturation', color: '#64748B' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs',          icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
   ],
   hotel: [
-    { id: 'hotel',       label: 'Hébergement',  sublabel: 'Réservations',       icon: Hotel,       href: '/dashboard/hotel',       color: '#F51E33' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',   icon: FileText,    href: '/dashboard/facturation', color: '#8B0070' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#142850' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F51E33' },
+    { id: 'hotel',       label: 'Hébergement',  sublabel: 'Réservations',        icon: Hotel,       href: '/dashboard/hotel',       color: '#F59E0B' },
+    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',    icon: FileText,    href: '/dashboard/facturation', color: '#64748B' },
+    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',           icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,         href: '/dashboard/miaa',        color: '#F59E0B' },
   ],
   boutique: [
-    { id: 'facturation',  label: 'Caisse & Ventes', sublabel: 'Factures & reçus',  icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'facturation',  label: 'Caisse & Ventes', sublabel: 'Factures & reçus',  icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
   ],
   btp: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & travaux',    icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',        label: 'Stock chantier',   sublabel: 'Matériaux',          icon: Package,     href: '/dashboard/stock',       color: '#142850' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
-    { id: 'rh',           label: 'RH & Équipes',    sublabel: 'Personnel chantier', icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & travaux',    icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',        label: 'Stock chantier',   sublabel: 'Matériaux',          icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
+    { id: 'rh',           label: 'RH & Équipes',    sublabel: 'Personnel chantier', icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
   ],
   cabinet: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & honoraires', icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
-    { id: 'miaa',         label: 'MIAA+',            sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F51E33' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & honoraires', icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
+    { id: 'miaa',         label: 'MIAA+',            sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F59E0B' },
   ],
   petrole: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Ventes & contrats',  icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'facturation',  label: 'Facturation',      sublabel: 'Ventes & contrats',  icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
   ],
   ong: [
-    { id: 'facturation',  label: 'Projets & Budget', sublabel: 'Rapports bailleurs', icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Suivi des charges',  icon: Receipt,     href: '/dashboard/depenses',    color: '#142850' },
-    { id: 'stock',        label: 'Stock & Matériel', sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#142850' },
-    { id: 'rh',           label: 'RH & Bénévoles',  sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'facturation',  label: 'Projets & Budget', sublabel: 'Rapports bailleurs', icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Suivi des charges',  icon: Receipt,     href: '/dashboard/depenses',    color: '#64748B' },
+    { id: 'stock',        label: 'Stock & Matériel', sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'rh',           label: 'RH & Bénévoles',  sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
   ],
   banque: [
-    { id: 'facturation',  label: 'Comptes clients',  sublabel: 'Prêts & épargne',    icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA & reporting',  icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#142850' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Liquidités',         icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
+    { id: 'facturation',  label: 'Comptes clients',  sublabel: 'Prêts & épargne',    icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA & reporting',  icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Liquidités',         icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
   ],
   pharmacie: [
-    { id: 'facturation',  label: 'Caisse',           sublabel: 'Ventes & ordonnances',icon: FileText,   href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',        label: 'Stock médicaments',sublabel: 'Inventaire & péremption',icon: Package, href: '/dashboard/stock',       color: '#142850' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#8B0070' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'facturation',  label: 'Caisse',           sublabel: 'Ventes & ordonnances', icon: FileText,  href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',        label: 'Stock médicaments',sublabel: 'Inventaire & péremption',icon: Package, href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',         icon: ShoppingCart,href: '/dashboard/achats',    color: '#64748B' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',             icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',                icon: Calculator,href: '/dashboard/comptabilite',color: '#64748B' },
   ],
   agriculture: [
-    { id: 'facturation',  label: 'Ventes & Récoltes',sublabel: 'Clients & marchés',  icon: FileText,    href: '/dashboard/facturation', color: '#F51E33' },
-    { id: 'stock',        label: 'Stock & Cheptel',  sublabel: 'Inventaire agricole',icon: Package,     href: '/dashboard/stock',       color: '#142850' },
-    { id: 'achats',       label: 'Achats & Intrants',sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#142850' },
-    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Charges exploitation',icon: Receipt,    href: '/dashboard/depenses',    color: '#F51E33' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Saisonniers & agents',icon: Users,      href: '/dashboard/rh',          color: '#8B0070' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#8B0070' },
+    { id: 'facturation',  label: 'Ventes & Récoltes',sublabel: 'Clients & marchés',   icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
+    { id: 'stock',        label: 'Stock & Cheptel',  sublabel: 'Inventaire agricole', icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
+    { id: 'achats',       label: 'Achats & Intrants',sublabel: 'Fournisseurs',        icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
+    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Charges exploitation',icon: Receipt,     href: '/dashboard/depenses',    color: '#F59E0B' },
+    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Saisonniers & agents',icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
+    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',               icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
   ],
 }
 
@@ -226,7 +226,6 @@ export default function Sidebar() {
   const pathname = usePathname()
   const { t }    = useLocale()
 
-  // ── Tenant data from context (reactive to auth changes) ────────────────────
   const { tenant, loading: tenantLoading } = useTenantContext()
 
   const nomEntreprise = tenant?.nomEntreprise ?? null
@@ -235,18 +234,13 @@ export default function Sidebar() {
   const ecoleRole     = tenant?.ecoleRole     ?? null
   const isSuperAdmin  = tenant?.isSuperAdmin  ?? false
 
-  // ── Local sidebar-only state ───────────────────────────────────────────────
-  const [mobileOpen,  setMobileOpen]  = useState(false)
+  const [mobileOpen,    setMobileOpen]    = useState(false)
   const [modulesActifs, setModulesActifs] = useState<string[]>([])
   const [permissions,   setPermissions]   = useState<Record<string, ModulePermission>>({})
   const [permsLoaded,   setPermsLoaded]   = useState(false)
 
-  // ── Permissions & modules — reload whenever the logged-in user changes ──────
-  // Depending on tenant.userId means this re-runs automatically when
-  // TenantContext detects a session change (cross-tab or sequential login).
   useEffect(() => {
     if (!tenant) {
-      // No session — reset sidebar permissions state
       setModulesActifs([])
       setPermissions({})
       setPermsLoaded(true)
@@ -254,20 +248,17 @@ export default function Sidebar() {
     }
 
     if (tenant.role === 'owner') {
-      // Owners see all modules, no permission table needed
       setModulesActifs(ALL_MODULES.map(m => m.id))
       setPermissions({})
       setPermsLoaded(true)
       return
     }
 
-    // Non-owner: fetch tenant_modules + user_permissions for this specific user
     let cancelled = false
 
     async function loadPerms() {
       setPermsLoaded(false)
 
-      // Modules (only relevant for non-sector tenants; sector nav is fixed)
       if (!tenant!.secteur) {
         const { data: tmRows } = await supabase
           .from('tenant_modules')
@@ -284,7 +275,6 @@ export default function Sidebar() {
         }
       }
 
-      // Permissions
       const { data: perms } = await supabase
         .from('user_permissions')
         .select('module_key, can_view, can_edit, can_delete')
@@ -314,8 +304,8 @@ export default function Sidebar() {
     tenant?.profileId,
   ]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loaded    = !tenantLoading && permsLoaded
-  const isOwner   = role === 'owner'
+  const loaded  = !tenantLoading && permsLoaded
+  const isOwner = role === 'owner'
 
   function isActive(href: string, exact = false) {
     return exact ? pathname === href : pathname.startsWith(href)
@@ -323,12 +313,8 @@ export default function Sidebar() {
 
   async function handleLogout() {
     await supabase.auth.signOut()
-    // TenantContext fires onAuthStateChange(SIGNED_OUT) → window.location.replace('/login')
-    // Hard-navigate here as immediate safety net.
     window.location.href = '/login'
   }
-
-  // ── Résolution de la navigation selon secteur + permissions ────────────────
 
   const rawSectorItems = secteur ? (SECTOR_NAV[secteur] ?? null) : null
 
@@ -354,25 +340,32 @@ export default function Sidebar() {
   const businessActiveModules = allActiveModules.filter(m => !CORE_MODULE_IDS.has(m.id))
   const inactiveModules       = ALL_MODULES.filter(m => !modulesActifs.includes(m.id))
 
+  // ── Shared class helpers ────────────────────────────────────────────────────
+
+  const navActive   = 'border-[#F59E0B] bg-amber-50 text-amber-700 font-semibold'
+  const navInactive = 'border-transparent text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+  const navBase     = 'flex items-center gap-3 px-3 rounded-lg text-sm transition-all duration-200 border-l-4'
+  const iconActive  = 'text-amber-700'
+  const iconInactive= 'text-[#94A3B8]'
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Logo */}
-      <div className="border-b border-white/10 shrink-0">
+      <div className="border-b border-[#E2E8F0] shrink-0">
         <div className="px-4 py-3 flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-icon.png" alt="oraforme" style={{ width: 34, height: 34, flexShrink: 0 }} />
-          <span style={{ fontSize: 17, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.3px' }}>oraforme</span>
+          <span style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.3px' }}>oraforme</span>
         </div>
-        {/* Badge rôle */}
         {role && role !== 'owner' && (
           <div className="px-4 pb-2">
             <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
               role === 'admin'
-                ? 'bg-blue-500/15 text-blue-400'
-                : 'bg-white/5 text-white/50'
+                ? 'bg-blue-100 text-blue-600'
+                : 'bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0]'
             }`}>
               {role === 'admin' ? 'Administrateur' : 'Membre'}
             </span>
@@ -383,63 +376,53 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 px-2 py-3 overflow-y-auto space-y-0.5">
 
-        {/* Direction Générale — s'adapte au secteur */}
+        {/* Dashboard */}
         {(() => {
           const hasSector = loaded && !!sectorNav
-          const href  = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
-          const label = t('nav.dashboard')
-          const sub   = hasSector ? t('nav.directionSub') : null
+          const href   = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
+          const label  = t('nav.dashboard')
+          const sub    = hasSector ? t('nav.directionSub') : null
           const active = isActive(href, true)
           return (
             <Link
               href={href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
-                active
-                  ? 'border-[#F51E33] bg-white/10 text-white font-medium rounded-r-lg'
-                  : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-              }`}
+              className={`${navBase} py-2.5 ${active ? navActive : navInactive}`}
             >
-              <LayoutDashboard size={15} className="shrink-0" />
+              <LayoutDashboard size={15} className={`shrink-0 ${active ? iconActive : iconInactive}`} />
               <div className="flex-1 min-w-0">
                 <div className="truncate">{label}</div>
-                {sub && <div className="text-[10px] text-white/40 truncate">{sub}</div>}
+                {sub && <div className="text-[10px] text-[#94A3B8] truncate">{sub}</div>}
               </div>
             </Link>
           )
         })()}
 
-        {/* ── Navigation SECTEUR ───────────────────────────────────────────── */}
+        {/* ── Sector navigation ─────────────────────────────────────────────── */}
         {loaded && sectorNav && (
           <>
             {coreNavItems.length > 0 && (
               <>
-                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">
+                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">
                   {CORE_SECTION_LABEL}
                 </p>
                 {coreNavItems.map(item => {
-                  const Icon = item.icon
+                  const Icon   = item.icon
                   const active = isActive(item.href, item.exact)
-                  const canEdit = isOwner || permissions[item.id]?.can_edit
+                  const canEdit= isOwner || permissions[item.id]?.can_edit
                   return (
                     <Link
                       key={item.id}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group border-l-4 ${
-                        active
-                          ? 'border-white bg-white/[0.08] text-white font-medium'
-                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-                      }`}
+                      className={`${navBase} py-2 ${active ? navActive : navInactive}`}
                     >
-                      <Icon size={15} className={`shrink-0 transition-colors ${active ? 'text-white' : 'text-white/50'}`} />
+                      <Icon size={15} className={`shrink-0 transition-colors ${active ? iconActive : iconInactive}`} />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate text-white">
-                          {item.label}
-                        </div>
-                        <div className="text-[10px] text-white/40 truncate flex items-center gap-1">
+                        <div className="text-sm font-medium leading-tight truncate">{item.label}</div>
+                        <div className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1">
                           {item.sublabel}
-                          {!isOwner && !canEdit && <Lock size={8} className="text-white/25" />}
+                          {!isOwner && !canEdit && <Lock size={8} className="text-[#CBD5E1]" />}
                         </div>
                       </div>
                     </Link>
@@ -450,32 +433,26 @@ export default function Sidebar() {
 
             {businessNavItems.length > 0 && (
               <>
-                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">
+                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">
                   {SECTOR_LABEL[secteur!] ?? secteur}
                 </p>
                 {businessNavItems.map(item => {
-                  const Icon = item.icon
+                  const Icon   = item.icon
                   const active = isActive(item.href, item.exact)
-                  const canEdit = isOwner || permissions[item.id]?.can_edit
+                  const canEdit= isOwner || permissions[item.id]?.can_edit
                   return (
                     <Link
                       key={item.id}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group border-l-4 ${
-                        active
-                          ? 'border-white bg-white/[0.08] text-white font-medium'
-                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-                      }`}
+                      className={`${navBase} py-2 ${active ? navActive : navInactive}`}
                     >
-                      <Icon size={15} className={`shrink-0 transition-colors ${active ? 'text-white' : 'text-white/50'}`} />
+                      <Icon size={15} className={`shrink-0 transition-colors ${active ? iconActive : iconInactive}`} />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate text-white">
-                          {item.label}
-                        </div>
-                        <div className="text-[10px] text-white/40 truncate flex items-center gap-1">
+                        <div className="text-sm font-medium leading-tight truncate">{item.label}</div>
+                        <div className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1">
                           {item.sublabel}
-                          {!isOwner && !canEdit && <Lock size={8} className="text-white/25" />}
+                          {!isOwner && !canEdit && <Lock size={8} className="text-[#CBD5E1]" />}
                         </div>
                       </div>
                     </Link>
@@ -485,32 +462,28 @@ export default function Sidebar() {
             )}
 
             {sectorNav.length === 0 && (
-              <p className="text-xs text-white/50 px-3 py-2">Aucun module assigné.</p>
+              <p className="text-xs text-[#94A3B8] px-3 py-2">Aucun module assigné.</p>
             )}
           </>
         )}
 
-        {/* ── Navigation GÉNÉRIQUE (pas de secteur) ───────────────────────── */}
+        {/* ── Generic navigation ────────────────────────────────────────────── */}
         {loaded && !sectorNav && (
           <>
             {coreActiveModules.length > 0 && (
               <>
-                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">{CORE_SECTION_LABEL}</p>
+                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">{CORE_SECTION_LABEL}</p>
                 {coreActiveModules.map(mod => {
-                  const Icon = mod.icon
+                  const Icon   = mod.icon
                   const active = isActive(mod.href)
                   return (
                     <Link
                       key={mod.id}
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
-                        active
-                          ? 'border-white bg-white/[0.08] text-white font-medium'
-                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-                      }`}
+                      className={`${navBase} py-2.5 ${active ? navActive : navInactive}`}
                     >
-                      <Icon size={15} className="shrink-0" />
+                      <Icon size={15} className={`shrink-0 ${active ? iconActive : iconInactive}`} />
                       <span className="truncate">{mod.label}</span>
                     </Link>
                   )
@@ -520,22 +493,18 @@ export default function Sidebar() {
 
             {businessActiveModules.length > 0 && (
               <>
-                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
+                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
                 {businessActiveModules.map(mod => {
-                  const Icon = mod.icon
+                  const Icon   = mod.icon
                   const active = isActive(mod.href)
                   return (
                     <Link
                       key={mod.id}
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
-                        active
-                          ? 'border-white bg-white/[0.08] text-white font-medium'
-                          : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-                      }`}
+                      className={`${navBase} py-2.5 ${active ? navActive : navInactive}`}
                     >
-                      <Icon size={15} className="shrink-0" />
+                      <Icon size={15} className={`shrink-0 ${active ? iconActive : iconInactive}`} />
                       <span className="truncate">{mod.label}</span>
                     </Link>
                   )
@@ -545,7 +514,7 @@ export default function Sidebar() {
 
             {isOwner && inactiveModules.length > 0 && (
               <>
-                <p className="text-xs text-white/50 uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.inactive')}</p>
+                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.inactive')}</p>
                 {inactiveModules.map(mod => {
                   const Icon = mod.icon
                   return (
@@ -554,11 +523,11 @@ export default function Sidebar() {
                       href={mod.href}
                       onClick={() => setMobileOpen(false)}
                       title={`Accéder à ${mod.label}`}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/35 hover:text-white/65 hover:bg-white/[0.04] transition-all duration-200 group"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#CBD5E1] hover:text-[#94A3B8] hover:bg-[#F8FAFC] transition-all duration-200 group"
                     >
-                      <Icon size={15} className="shrink-0 group-hover:text-white/65" />
+                      <Icon size={15} className="shrink-0" />
                       <span className="truncate flex-1">{mod.label}</span>
-                      <span className="text-[8px] font-bold border border-white/10 text-white/25 group-hover:border-white/20 group-hover:text-white/40 rounded px-1 py-0.5 shrink-0 transition-colors">
+                      <span className="text-[8px] font-bold border border-[#E2E8F0] text-[#94A3B8] group-hover:border-[#CBD5E1] group-hover:text-[#64748B] rounded px-1 py-0.5 shrink-0 transition-colors">
                         ACTIVER
                       </span>
                     </Link>
@@ -572,27 +541,22 @@ export default function Sidebar() {
         {!loaded && (
           <div className="space-y-1 pt-2">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-9 rounded-lg bg-white/10 animate-pulse mx-1" />
+              <div key={i} className="h-9 rounded-lg bg-[#F1F5F9] animate-pulse mx-1" />
             ))}
           </div>
         )}
       </nav>
 
-      {/* Bas */}
-      <div className="px-2 py-3 border-t border-white/10 shrink-0 space-y-0.5">
-
+      {/* Bottom */}
+      <div className="px-2 py-3 border-t border-[#E2E8F0] shrink-0 space-y-0.5">
 
         {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
           <Link
             href="/dashboard/roles"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
-              isActive('/dashboard/roles')
-                ? 'border-white bg-white/[0.08] text-white font-medium'
-                : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-            }`}
+            className={`${navBase} py-2.5 ${isActive('/dashboard/roles') ? navActive : navInactive}`}
           >
-            <ShieldCheck size={15} className="shrink-0" />
+            <ShieldCheck size={15} className={`shrink-0 ${isActive('/dashboard/roles') ? iconActive : iconInactive}`} />
             <span>{t('nav.roles')}</span>
           </Link>
         )}
@@ -601,13 +565,9 @@ export default function Sidebar() {
           <Link
             href="/dashboard/modules"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
-              isActive('/dashboard/modules')
-                ? 'border-white bg-white/[0.08] text-white font-medium'
-                : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-            }`}
+            className={`${navBase} py-2.5 ${isActive('/dashboard/modules') ? navActive : navInactive}`}
           >
-            <Store size={15} className="shrink-0" />
+            <Store size={15} className={`shrink-0 ${isActive('/dashboard/modules') ? iconActive : iconInactive}`} />
             <span>{t('nav.modules')}</span>
           </Link>
         )}
@@ -616,13 +576,9 @@ export default function Sidebar() {
           <Link
             href="/dashboard/analytics"
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
-              isActive('/dashboard/analytics')
-                ? 'border-white bg-white/[0.08] text-white font-medium'
-                : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-            }`}
+            className={`${navBase} py-2.5 ${isActive('/dashboard/analytics') ? navActive : navInactive}`}
           >
-            <Activity size={15} className="shrink-0" />
+            <Activity size={15} className={`shrink-0 ${isActive('/dashboard/analytics') ? iconActive : iconInactive}`} />
             <span>Analytics & BI</span>
           </Link>
         )}
@@ -630,13 +586,9 @@ export default function Sidebar() {
         <Link
           href="/dashboard/parametres"
           onClick={() => setMobileOpen(false)}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-4 ${
-            isActive('/dashboard/parametres')
-              ? 'border-white bg-white/[0.08] text-white font-medium'
-              : 'border-transparent text-white/65 hover:text-white hover:bg-white/[0.06]'
-          }`}
+          className={`${navBase} py-2.5 ${isActive('/dashboard/parametres') ? navActive : navInactive}`}
         >
-          <Settings size={15} className="shrink-0" />
+          <Settings size={15} className={`shrink-0 ${isActive('/dashboard/parametres') ? iconActive : iconInactive}`} />
           <span>Paramètres</span>
         </Link>
 
@@ -644,17 +596,17 @@ export default function Sidebar() {
           <Link
             href="/admin"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#F51E33] hover:bg-[#F51E33]/10 transition-all duration-200"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#DC2626] hover:bg-red-50 transition-all duration-200"
           >
             <ShieldAlert size={15} className="shrink-0" />
             <span>Admin oraforme</span>
-            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F51E33] animate-pulse" />
+            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#DC2626] animate-pulse" />
           </Link>
         )}
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/65 hover:text-[#F51E33] hover:bg-[#F51E33]/5 transition-all duration-200"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#64748B] hover:text-red-500 hover:bg-red-50 transition-all duration-200"
         >
           <LogOut size={15} className="shrink-0" />
           Déconnexion
@@ -665,12 +617,12 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-[#142850] border-r border-white/10 h-screen sticky top-0">
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-white border-r border-[#E2E8F0] h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#142850] border border-white/10 text-white"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white border border-[#E2E8F0] text-[#0F172A] shadow-sm"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -678,10 +630,10 @@ export default function Sidebar() {
 
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="w-56 bg-[#142850] border-r border-white/10 h-full">
+          <div className="w-56 bg-white border-r border-[#E2E8F0] h-full">
             <SidebarContent />
           </div>
-          <div className="flex-1 bg-black/50" onClick={() => setMobileOpen(false)} />
+          <div className="flex-1 bg-black/40" onClick={() => setMobileOpen(false)} />
         </div>
       )}
     </>

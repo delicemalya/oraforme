@@ -29,21 +29,19 @@ export default function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [langOpen,     setLangOpen]     = useState(false)
   const [locale,       setLocale]       = useState<Locale>('fr')
-  const [theme,        setTheme]        = useState<'dark' | 'light'>('dark')
+  const [theme,        setTheme]        = useState<'dark' | 'light'>('light')
 
-  // Company name comes from TenantContext — always in sync with current session
   const nomEntreprise = tenant?.nomEntreprise ?? null
 
   useEffect(() => {
     setLocale(getStoredLocale())
     const stored = localStorage.getItem('oraforme-theme') as 'dark' | 'light' | null
-    const effective: 'dark' | 'light' = stored === 'light' ? 'light' : 'dark'
+    const effective: 'dark' | 'light' = stored === 'dark' ? 'dark' : 'light'
     setTheme(effective)
     document.body.classList.toggle('light-mode', effective === 'light')
     localStorage.setItem('oraforme-theme', effective)
   }, [])
 
-  // Company logo — initial fetch + live update via CustomEvent from Paramètres page
   useEffect(() => {
     if (!tenant?.tenantId) { setLogoUrl(null); return }
     supabase
@@ -61,7 +59,6 @@ export default function Header() {
     return () => window.removeEventListener('oraforme:config-saved', onConfigSaved)
   }, [tenant?.tenantId])
 
-  // User display name — derived from auth profile (display only, not tenant-sensitive)
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
@@ -80,12 +77,10 @@ export default function Header() {
         setUserName(email.split('@')[0])
       }
     })
-  }, [tenant?.userId]) // re-run when the logged-in user changes
+  }, [tenant?.userId])
 
   async function handleLogout() {
     await supabase.auth.signOut()
-    // TenantContext's onAuthStateChange(SIGNED_OUT) triggers window.location.replace('/login').
-    // Hard-navigate here as a safety net in case the context fires late.
     window.location.href = '/login'
   }
 
@@ -104,24 +99,23 @@ export default function Header() {
   }
 
   return (
-    <header className="h-14 bg-[var(--card-bg)] border-b border-[var(--border)] flex items-center px-4 lg:px-6 gap-3 shrink-0">
+    <header className="h-14 bg-white border-b border-[#E2E8F0] flex items-center px-4 lg:px-6 gap-3 shrink-0">
       <div className="w-8 lg:hidden shrink-0" />
 
       <div className="flex-1 max-w-sm">
-        <div className="flex items-center gap-2 bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-1.5">
-          <Search size={13} className="text-[var(--text-secondary)] shrink-0" />
+        <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-3 py-1.5">
+          <Search size={13} className="text-[#94A3B8] shrink-0" />
           <input
             placeholder="Rechercher..."
-            className="bg-transparent text-sm text-[var(--text-secondary)] placeholder-[#484F58] outline-none flex-1 w-0 min-w-0"
+            className="bg-transparent text-sm text-[#0F172A] placeholder-[#94A3B8] outline-none flex-1 w-0 min-w-0"
           />
-          <kbd className="hidden sm:block text-[10px] text-[var(--text-secondary)] border border-[var(--border)] rounded px-1 shrink-0">⌘K</kbd>
+          <kbd className="hidden sm:block text-[10px] text-[#94A3B8] border border-[#E2E8F0] rounded px-1 shrink-0">⌘K</kbd>
         </div>
       </div>
 
-      {/* Logo entreprise client — après la barre de recherche */}
+      {/* Logo entreprise client */}
       {nomEntreprise && (
         logoUrl ? (
-          // Logo uploadé : image seule, sans fond ni bordure
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logoUrl}
@@ -130,24 +124,23 @@ export default function Header() {
             style={{ width: 180, height: 36, objectFit: 'contain', display: 'block' }}
           />
         ) : (
-          // Pas de logo : badge texte avec fond jaune
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#F51E33]/10 border border-[#F51E33]/20 shrink-0">
-            <div className="w-5 h-5 rounded-md bg-[#F51E33] flex items-center justify-center shrink-0">
-              <span className="text-[10px] font-black text-[#F51E33]">{nomEntreprise.charAt(0).toUpperCase()}</span>
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-100 shrink-0">
+            <div className="w-5 h-5 rounded-md bg-[#F59E0B] flex items-center justify-center shrink-0">
+              <span className="text-[10px] font-black text-white">{nomEntreprise.charAt(0).toUpperCase()}</span>
             </div>
-            <span className="text-xs font-semibold text-[#F51E33] tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
+            <span className="text-xs font-semibold text-amber-700 tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
           </div>
         )
       )}
 
-      {/* Équipe — déplacé du sidebar vers la navbar */}
+      {/* Équipe */}
       {canSeeTeam && (
         <Link
           href="/dashboard/equipe"
           className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
             pathname === '/dashboard/equipe'
-              ? 'bg-[#F51E33]/10 text-[#F51E33]'
-              : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
+              ? 'bg-amber-50 text-amber-700'
+              : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
           }`}
         >
           <UsersRound size={14} />
@@ -161,7 +154,7 @@ export default function Header() {
         <button
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
-          className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors rounded-lg hover:bg-white/5"
+          className="p-2 text-[#64748B] hover:text-[#0F172A] transition-colors rounded-lg hover:bg-[#F8FAFC]"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
@@ -171,10 +164,10 @@ export default function Header() {
           <button
             onClick={() => setLangOpen(!langOpen)}
             title="Changer de langue"
-            className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors rounded-lg hover:bg-white/5 flex items-center gap-1"
+            className="p-2 text-[#64748B] hover:text-[#0F172A] transition-colors rounded-lg hover:bg-[#F8FAFC] flex items-center gap-1"
           >
             <Globe size={16} />
-            <span className="hidden sm:block text-[10px] font-bold text-[var(--text-secondary)]">
+            <span className="hidden sm:block text-[10px] font-bold text-[#64748B]">
               {locale.toUpperCase()}
             </span>
           </button>
@@ -182,22 +175,22 @@ export default function Header() {
           {langOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setLangOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-40 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl shadow-xl z-20 py-1 overflow-hidden">
-                <p className="text-[9px] font-bold text-[var(--text-secondary)] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-20 py-1 overflow-hidden">
+                <p className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
                 {DISPLAY_LOCALES.map(l => (
                   <button
                     key={l}
                     onClick={() => handleLocaleChange(l)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left ${
                       locale === l
-                        ? 'text-[#F51E33] bg-[#F51E33]/5'
-                        : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
+                        ? 'text-amber-700 bg-amber-50'
+                        : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
                     }`}
                   >
                     <span className="text-base">{LOCALE_FLAGS[l]}</span>
                     <span className="text-xs font-medium">{LOCALE_LABELS[l]}</span>
                     {locale === l && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F51E33]" />
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-500" />
                     )}
                   </button>
                 ))}
@@ -212,28 +205,28 @@ export default function Header() {
         <div className="relative ml-1">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-white/5 transition-colors"
+            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#F8FAFC] transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-[#F51E33]/20 border border-[#F51E33]/30 flex items-center justify-center shrink-0">
-              <span className="text-[#F51E33] text-xs font-bold">{initials}</span>
+            <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
+              <span className="text-amber-700 text-xs font-bold">{initials}</span>
             </div>
-            <span className="text-sm text-[#FFFFFF] hidden sm:block max-w-[96px] truncate">{userName}</span>
-            <ChevronDown size={12} className="text-[var(--text-secondary)] hidden sm:block" />
+            <span className="text-sm text-[#0F172A] hidden sm:block max-w-[96px] truncate">{userName}</span>
+            <ChevronDown size={12} className="text-[#94A3B8] hidden sm:block" />
           </button>
 
           {dropdownOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-44 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-xl z-20 py-1">
-                <div className="px-3 py-2 border-b border-[var(--border)]">
-                  <p className="text-xs font-medium text-[#FFFFFF] truncate">{userName}</p>
+              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-[#E2E8F0] rounded-lg shadow-lg z-20 py-1">
+                <div className="px-3 py-2 border-b border-[#E2E8F0]">
+                  <p className="text-xs font-medium text-[#0F172A] truncate">{userName}</p>
                   {nomEntreprise && (
-                    <p className="text-[10px] text-[var(--text-secondary)] truncate">{nomEntreprise}</p>
+                    <p className="text-[10px] text-[#64748B] truncate">{nomEntreprise}</p>
                   )}
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-500/5 transition-colors"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#64748B] hover:text-red-500 hover:bg-red-50 transition-colors"
                 >
                   <LogOut size={14} />
                   Déconnexion

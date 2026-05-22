@@ -3,304 +3,86 @@
 * { box-sizing: border-box; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DESIGN SYSTEM ORAFORME — Palette marque stricte · Zéro dégradé
-   Navy #142850 · Rouge #F51E33 · Orange #F51E33 · Violet #8B0070
+   DESIGN SYSTEM ORAFORME — SaaS Light Theme
+   Background #F8FAFC · Sidebar/Topbar #FFFFFF · Primary #F59E0B
 ════════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --color-navy:   #142850;
-  --color-red:    #F51E33;
-  --color-orange: #F51E33;
-  --color-violet: #8B0070;
-  --color-white:  #FFFFFF;
-  --color-black:  #0D0D0D;
-  /* Aliases spec */
-  --navy:    #142850;
-  --red:     #F51E33;
-  --orange:  #F51E33;
-  --violet:  #8B0070;
-  --white60: rgba(255,255,255,0.6);
-  --white20: rgba(255,255,255,0.12);
-  /* Dashboard design tokens — dark mode */
-  --card-bg:        rgba(255,255,255,0.05);
-  --border:         rgba(255,255,255,0.1);
-  --text-primary:   #FFFFFF;
-  --text-secondary: rgba(255,255,255,0.5);
+  /* Surfaces */
+  --color-bg:              #F8FAFC;
+  --color-surface:         #FFFFFF;
+  --color-surface-alt:     #F8FAFC;
+
+  /* Borders */
+  --color-border:          #E2E8F0;
+  --color-border-strong:   #CBD5E1;
+
+  /* Text */
+  --color-text:            #0F172A;
+  --color-text-secondary:  #64748B;
+  --color-text-muted:      #94A3B8;
+
+  /* Brand primary (amber) */
+  --color-primary:         #F59E0B;
+  --color-primary-hover:   #D97706;
+  --color-primary-light:   #FEF3C7;
+
+  /* Semantic */
+  --color-blue:            #2563EB;
+  --color-green:           #16A34A;
+  --color-red:             #DC2626;
+  --color-orange:          #F97316;
+
+  /* Legacy aliases — used by components via var() */
+  --card-bg:               #FFFFFF;
+  --border:                #E2E8F0;
+  --text-primary:          #0F172A;
+  --text-secondary:        #64748B;
 }
 
 body {
-  background: var(--color-navy);
-  color: var(--color-white);
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: var(--font-geist), Arial, sans-serif;
 }
 
-#dashboard-shell { background: var(--color-navy); }
-#main-content    { background: var(--color-navy); color: var(--color-white); }
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
 
-/* ── Typographie globale ── */
-h1, h2, h3, h4, h5, h6 { color: var(--color-white); }
-p { color: var(--color-white); }
-label { color: rgba(255,255,255,0.6); }
-a { color: inherit; }
+/* ── Selection ── */
+::selection { background: rgba(245,158,11,0.18); color: var(--color-text); }
 
 /* ── Inputs ── */
 input, textarea, select {
-  background-color: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.15);
-  color: var(--color-white);
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
 }
-input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.3); }
-select option { background-color: #0f1e3d; color: var(--color-white); }
+input::placeholder, textarea::placeholder { color: var(--color-text-muted); }
+select option { background-color: var(--color-surface); color: var(--color-text); }
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--color-violet);
-  box-shadow: 0 0 0 2px rgba(139,0,112,0.25);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--color-white);
-  -webkit-box-shadow: 0 0 0 1000px #0f1e3d inset;
-  caret-color: var(--color-white);
+  -webkit-text-fill-color: var(--color-text);
+  -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
+  caret-color: var(--color-text);
 }
 
-/* ── Sélection ── */
-::selection { background: rgba(139,0,112,0.35); color: var(--color-white); }
+/* ── Shadows ── */
+.shadow-xl  { box-shadow: 0 4px 24px rgba(15,23,42,0.07) !important; }
+.shadow-2xl { box-shadow: 0 8px 40px rgba(15,23,42,0.10) !important; }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--color-navy); }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-violet); }
-
-/* ── Ombres — neutres, aucune couleur ── */
-.shadow-xl  { box-shadow: 0 2px 16px rgba(0,0,0,0.4) !important; }
-.shadow-2xl { box-shadow: 0 4px 32px rgba(0,0,0,0.5) !important; }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   HEADER — fond navy
-══════════════════════════════════════════════════════════════════════════ */
-header {
-  background-color: var(--color-navy) !important;
-  border-color: rgba(255,255,255,0.1) !important;
-}
-header * { color: var(--color-white); }
-header .bg-white,
-header [class*="bg-white"] { background-color: rgba(255,255,255,0.06) !important; }
-header input,
-header textarea {
-  background-color: rgba(255,255,255,0.06) !important;
-  border-color: rgba(255,255,255,0.15) !important;
-  color: var(--color-white) !important;
-}
-header input::placeholder { color: rgba(255,255,255,0.3) !important; }
-header .absolute { background-color: #0f1e3d !important; border-color: rgba(255,255,255,0.1) !important; }
-header .absolute * { color: var(--color-white) !important; }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   COULEURS TAILWIND — tout texte blanc sur fond sombre
-══════════════════════════════════════════════════════════════════════════ */
-.text-gray-900, .text-gray-800, .text-gray-700 { color: var(--color-white) !important; }
-.text-gray-600, .text-gray-500 { color: rgba(255,255,255,0.6) !important; }
-.text-gray-400, .text-gray-300 { color: rgba(255,255,255,0.4) !important; }
-.text-neutral-900, .text-neutral-800 { color: var(--color-white) !important; }
-.text-neutral-600, .text-neutral-500 { color: rgba(255,255,255,0.6) !important; }
-.text-black { color: var(--color-white) !important; }
-
-/* bg-white → fond navy subtil */
-#main-content .bg-white { background-color: rgba(255,255,255,0.04) !important; }
-#main-content .bg-gray-50,
-#main-content .bg-gray-100 { background-color: rgba(255,255,255,0.04) !important; }
-
-/* Borders → blanc semi-transparent */
-#main-content .border-gray-200,
-#main-content .border-gray-100 { border-color: rgba(255,255,255,0.1) !important; }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   ANIMATIONS DE SÉLECTION — sidebar & cards
-══════════════════════════════════════════════════════════════════════════ */
-.nav-item {
-  transition: all 0.15s ease;
-  border-left: 4px solid transparent;
-}
-.nav-item.active {
-  border-left: 4px solid var(--orange);
-  background: rgba(255,255,255,0.10);
-  opacity: 1;
-  border-radius: 0 8px 8px 0;
-}
-.nav-item:not(.active) { opacity: 0.6; }
-.nav-item:not(.active):hover {
-  opacity: 1;
-  background: rgba(255,255,255,0.06);
-  color: #FFFFFF;
-  transition: 0.15s;
-}
-
-/* Employee/module card hover */
-.kpi-card {
-  transition: all 0.2s ease;
-}
+/* ── KPI card hover ── */
+.kpi-card { transition: all 0.2s ease; }
 .kpi-card:hover {
   transform: translateY(-2px);
-  filter: brightness(1.1);
+  box-shadow: 0 8px 24px rgba(15,23,42,0.09);
 }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   LIGHT MODE — body.light-mode
-   Sidebar reste #142850 · Fond → #EEF0FA · Cards → #FFFFFF + ombre
-══════════════════════════════════════════════════════════════════════════ */
-
-body.light-mode {
-  background: #EEF0FA !important;
-  color: #0F1724 !important;
-  transition: background 0.3s ease, color 0.3s ease;
-  /* Dashboard design tokens — light mode */
-  --card-bg:        #FFFFFF;
-  --border:         rgba(0,0,0,0.08);
-  --text-primary:   #0D0D0D;
-  --text-secondary: rgba(0,0,0,0.45);
-}
-
-/* Shell & main */
-body.light-mode #dashboard-shell { background: #EEF0FA !important; }
-body.light-mode #main-content    { background: #EEF0FA !important; color: #0F1724 !important; }
-body.light-mode main             { background: #EEF0FA; }
-
-/* ── Sidebar — INCHANGÉE (reste #142850 + texte blanc) ── */
-body.light-mode aside                    { background: #142850 !important; }
-body.light-mode aside,
-body.light-mode aside *                  { color: #FFFFFF !important; }
-body.light-mode .lg\:hidden.fixed.bg-\[\#142850\] { background: #142850 !important; }
-
-/* ── Header ─────────────────────────────────────────────────────────────── */
-body.light-mode header {
-  background-color: #FFFFFF !important;
-  border-color: rgba(0,0,0,0.07) !important;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.07) !important;
-}
-body.light-mode header * { color: #0F1724 !important; }
-/* Exceptions — éléments orange conservent leur couleur */
-body.light-mode header [class*="text-\[#F51E33\]"] { color: #F51E33 !important; }
-body.light-mode header [class*="bg-\[#F51E33\]"]   { background-color: #F51E33 !important; }
-/* Search bar */
-body.light-mode header .flex.items-center.gap-2 {
-  background-color: #F0F1F5 !important;
-  border-color: rgba(0,0,0,0.1) !important;
-}
-body.light-mode header input {
-  background-color: transparent !important;
-  color: #0F1724 !important;
-}
-body.light-mode header input::placeholder { color: rgba(0,0,0,0.35) !important; }
-/* Dropdown panels du header */
-body.light-mode header .absolute {
-  background-color: #FFFFFF !important;
-  border-color: rgba(0,0,0,0.08) !important;
-  box-shadow: 0 4px 16px rgba(15,23,36,0.12) !important;
-}
-body.light-mode header .absolute * { color: #0F1724 !important; }
-
-/* ── Typographie main content ─────────────────────────────────────────── */
-body.light-mode #main-content h1,
-body.light-mode #main-content h2,
-body.light-mode #main-content h3,
-body.light-mode #main-content h4,
-body.light-mode #main-content h5,
-body.light-mode #main-content h6 { color: #0F1724 !important; }
-body.light-mode #main-content p   { color: #0F1724; }
-body.light-mode #main-content label { color: rgba(15,23,36,0.5) !important; }
-
-/* Tailwind text-white → noir dans main */
-body.light-mode #main-content .text-white { color: #0F1724 !important; }
-/* Variantes d'opacité → secondaire */
-body.light-mode #main-content [class*="text-white\/"] { color: rgba(15,23,36,0.45) !important; }
-/* Tailwind grays */
-body.light-mode .text-gray-900,
-body.light-mode .text-gray-800,
-body.light-mode .text-gray-700 { color: #0F1724 !important; }
-body.light-mode .text-gray-600,
-body.light-mode .text-gray-500 { color: rgba(15,23,36,0.5) !important; }
-body.light-mode .text-gray-400,
-body.light-mode .text-gray-300 { color: rgba(15,23,36,0.4) !important; }
-body.light-mode .text-black     { color: #0F1724 !important; }
-
-/* ── Cards — blanc pur + ombre douce (style SaaS) ─────────────────────── */
-body.light-mode #main-content [class*="bg-white\/"],
-body.light-mode #main-content .bg-white {
-  background-color: #FFFFFF !important;
-  box-shadow: 0 1px 8px rgba(15,23,36,0.08), 0 0 0 1px rgba(15,23,36,0.04) !important;
-  border-color: transparent !important;
-}
-/* Fonds navy codés en dur → blanc + ombre */
-body.light-mode #main-content .bg-\[\#142850\],
-body.light-mode #main-content .bg-\[\#0f1e3d\],
-body.light-mode #main-content .bg-\[\#1a2d50\] {
-  background-color: #FFFFFF !important;
-  box-shadow: 0 1px 8px rgba(15,23,36,0.08), 0 0 0 1px rgba(15,23,36,0.04) !important;
-}
-body.light-mode #main-content .bg-gray-50,
-body.light-mode #main-content .bg-gray-100 {
-  background-color: #FFFFFF !important;
-  box-shadow: 0 1px 8px rgba(15,23,36,0.08), 0 0 0 1px rgba(15,23,36,0.04) !important;
-}
-/* inline style rgba(255,255,255,0.xx) → blanc + ombre */
-body.light-mode #main-content [style*="rgba(255,255,255,0.06)"],
-body.light-mode #main-content [style*="rgba(255,255,255,0.04)"],
-body.light-mode #main-content [style*="rgba(255,255,255,0.025)"],
-body.light-mode #main-content [style*="rgba(255,255,255,0.02)"],
-body.light-mode #main-content [style*="rgba(255,255,255,0.03)"] {
-  background: #FFFFFF !important;
-  box-shadow: 0 1px 8px rgba(15,23,36,0.08), 0 0 0 1px rgba(15,23,36,0.04) !important;
-}
-/* fond navy codé inline → blanc + ombre */
-body.light-mode #main-content [style*="background: '#142850'"],
-body.light-mode #main-content [style*="background:'#142850'"] {
-  background-color: #FFFFFF !important;
-  box-shadow: 0 1px 8px rgba(15,23,36,0.08), 0 0 0 1px rgba(15,23,36,0.04) !important;
-}
-/* Cards violet (#8B0070) → neutres en light mode */
-body.light-mode #main-content [style*="#8B0070"] {
-  background: #FFFFFF !important;
-  color: #0F1724 !important;
-  box-shadow: 0 1px 8px rgba(15,23,36,0.08), 0 0 0 1px rgba(15,23,36,0.04) !important;
-}
-
-/* ── Borders ─────────────────────────────────────────────────────────── */
-body.light-mode #main-content [class*="border-white"] { border-color: rgba(15,23,36,0.08) !important; }
-body.light-mode #main-content .border-gray-200,
-body.light-mode #main-content .border-gray-100        { border-color: rgba(15,23,36,0.08) !important; }
-
-/* ── Inputs ──────────────────────────────────────────────────────────── */
-body.light-mode #main-content input,
-body.light-mode #main-content select,
-body.light-mode #main-content textarea {
-  background-color: #FFFFFF !important;
-  border-color: rgba(15,23,36,0.12) !important;
-  color: #0F1724 !important;
-}
-body.light-mode #main-content input::placeholder,
-body.light-mode #main-content textarea::placeholder { color: rgba(15,23,36,0.35) !important; }
-body.light-mode #main-content input:focus,
-body.light-mode #main-content select:focus,
-body.light-mode #main-content textarea:focus {
-  border-color: #8B0070 !important;
-  box-shadow: 0 0 0 2px rgba(139,0,112,0.18) !important;
-}
-body.light-mode #main-content select option { background-color: #FFFFFF; color: #0F1724; }
-
-/* ── Badges statut (light mode) ─────────────────────────────────────── */
-body.light-mode #main-content .bg-red-500\/10     { background-color: rgba(245,30,51,0.10) !important; }
-body.light-mode #main-content .bg-orange-500\/10  { background-color: rgba(245,30,51,0.10) !important; }
-
-/* ── Scrollbar ──────────────────────────────────────────────────────── */
-body.light-mode ::-webkit-scrollbar-track  { background: #EEF0FA; }
-body.light-mode ::-webkit-scrollbar-thumb  { background: rgba(15,23,36,0.15); }
-body.light-mode ::-webkit-scrollbar-thumb:hover { background: #8B0070; }
-
-/* ── Shadows en light mode ─────────────────────────────────────────── */
-body.light-mode .shadow-xl  { box-shadow: 0 2px 16px rgba(15,23,36,0.10) !important; }
-body.light-mode .shadow-2xl { box-shadow: 0 4px 32px rgba(15,23,36,0.14) !important; }
-
-/* ── Hover states ──────────────────────────────────────────────────── */
-body.light-mode #main-content .hover\:border-\[\#F51E33\]:hover { border-color: #F51E33 !important; }
