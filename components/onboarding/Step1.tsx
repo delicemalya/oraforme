@@ -58,7 +58,7 @@ export default function Step1() {
         </motion.div>
 
         <h1 className="text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight">
-          <span className="text-[#FFFFFF]">Votre espace prêt en</span>
+          <span className="text-[var(--text)]">Votre espace prêt en</span>
           <br />
           <span className="bg-gradient-to-r from-yellow-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">
             30 secondes
@@ -165,7 +165,7 @@ export default function Step1() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ type: "spring", stiffness: 320, damping: 26 }}
-              className="flex items-center gap-3 bg-[#142850] border border-yellow-400/20 rounded-2xl px-5 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+              className="flex items-center gap-3 bg-[var(--surface)] border border-yellow-400/20 rounded-2xl px-5 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
             >
               <div className="w-8 h-8 rounded-xl bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center text-sm shrink-0">
                 ✨

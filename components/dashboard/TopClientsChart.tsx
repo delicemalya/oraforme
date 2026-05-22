@@ -24,7 +24,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-3 shadow-2xl text-xs">
-      <p className="text-[#FFFFFF] font-semibold mb-1 truncate max-w-[160px]">{label}</p>
+      <p className="text-[var(--text)] font-semibold mb-1 truncate max-w-[160px]">{label}</p>
       <p className="text-[#F51E33]">{fmtFull(payload[0].value)}</p>
       {payload[0].payload.count && (
         <p className="text-[var(--text-secondary)] mt-0.5">{payload[0].payload.count} facture(s)</p>
@@ -40,7 +40,7 @@ export default function TopClientsChart({ data }: { data: ClientRevenue[] }) {
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-bold text-[#FFFFFF]">Top 5 Clients</h3>
+          <h3 className="text-sm font-bold text-[var(--text)]">Top 5 Clients</h3>
           <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Par chiffre d'affaires ce mois</p>
         </div>
       </div>
@@ -72,7 +72,7 @@ export default function TopClientsChart({ data }: { data: ClientRevenue[] }) {
                   </span>
                   <span className="text-[var(--text-secondary)] truncate max-w-[120px]">{c.nom}</span>
                 </div>
-                <span className="text-[#FFFFFF] font-semibold">{fmtFull(c.montant)}</span>
+                <span className="text-[var(--text)] font-semibold">{fmtFull(c.montant)}</span>
               </div>
             ))}
           </div>

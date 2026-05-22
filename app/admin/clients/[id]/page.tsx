@@ -28,9 +28,9 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
   const mrr = (tenant.modules_actifs ?? []).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
 
   const STATUT_COLORS: Record<string, string> = {
-    payee: 'text-[#F51E33] bg-[#142850]/10 border-[#142850]/30',
+    payee: 'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30',
     envoyee: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
-    brouillon: 'text-[var(--text-secondary)] bg-[#1a2d50] border-[var(--border)]',
+    brouillon: 'text-[var(--text-secondary)] bg-[var(--surface-alt)] border-[var(--border)]',
     annulee: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
   }
 
@@ -39,16 +39,16 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
       {/* Back + header */}
       <div className="flex items-center gap-4">
-        <Link href="/admin" className="text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+        <Link href="/admin" className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
           <ArrowLeft size={18} />
         </Link>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-[#FFFFFF]">{tenant.nom_entreprise}</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">{tenant.nom_entreprise}</h1>
           <p className="text-xs text-[var(--text-secondary)] font-mono">{tenant.id}</p>
         </div>
         <a
           href={`mailto:${profiles[0] ? '' : ''}`}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
         >
           <Mail size={14} />
           Contacter
@@ -67,7 +67,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
             <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2">{c.label}</p>
             <div className="flex items-center gap-2">
               <c.icon size={15} style={{ color: c.color }} />
-              <span className="text-base font-bold text-[#FFFFFF] truncate">{c.value}</span>
+              <span className="text-base font-bold text-[var(--text)] truncate">{c.value}</span>
             </div>
           </div>
         ))}
@@ -77,14 +77,14 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
         {/* Modules actifs */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
             <Package size={14} className="text-[#F51E33]" />
             Modules actifs
           </h2>
           <div className="space-y-2">
             {(tenant.modules_actifs ?? []).map((m: string) => (
-              <div key={m} className="flex items-center justify-between px-3 py-2 bg-[#142850] rounded-lg border border-[var(--border)]">
-                <span className="text-sm text-[#FFFFFF]">{MODULE_LABELS[m] ?? m}</span>
+              <div key={m} className="flex items-center justify-between px-3 py-2 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
+                <span className="text-sm text-[var(--text)]">{MODULE_LABELS[m] ?? m}</span>
                 <span className="text-xs text-[#F51E33] font-medium">{fmtFCFA(MODULE_PRICES[m] ?? 0)}/mois</span>
               </div>
             ))}
@@ -96,20 +96,20 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
         {/* Utilisateurs */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
             <Users size={14} className="text-[#F51E33]" />
             Utilisateurs ({profiles.length})
           </h2>
           <div className="space-y-2">
             {profiles.map(p => (
-              <div key={p.id} className="flex items-center gap-3 px-3 py-2 bg-[#142850] rounded-lg border border-[var(--border)]">
+              <div key={p.id} className="flex items-center gap-3 px-3 py-2 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
                 <div className="w-7 h-7 rounded-full bg-[#F51E33]/20 border border-[#F51E33]/30 flex items-center justify-center shrink-0">
                   <span className="text-[#F51E33] text-xs font-bold">
                     {(p.prenom || p.nom || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#FFFFFF] truncate">{[p.prenom, p.nom].filter(Boolean).join(' ') || '—'}</p>
+                  <p className="text-sm text-[var(--text)] truncate">{[p.prenom, p.nom].filter(Boolean).join(' ') || '—'}</p>
                   <p className="text-xs text-[var(--text-secondary)]">{p.role ?? 'user'}</p>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
       {/* Factures récentes */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4 flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
           <FileText size={14} className="text-[#F51E33]" />
           Factures récentes ({factures.length})
         </h2>
@@ -141,7 +141,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
               )}
               {factures.map(f => (
                 <tr key={f.id} className="hover:bg-white/5/30 transition-colors">
-                  <td className="py-2.5 px-3 text-[#FFFFFF] truncate max-w-[180px]">{f.client_nom ?? '—'}</td>
+                  <td className="py-2.5 px-3 text-[var(--text)] truncate max-w-[180px]">{f.client_nom ?? '—'}</td>
                   <td className="py-2.5 px-3 text-right font-medium text-[#F51E33]">{fmtFCFA(f.total ?? 0)}</td>
                   <td className="py-2.5 px-3">
                     <span className={`text-xs px-2 py-0.5 rounded border ${STATUT_COLORS[f.statut] ?? STATUT_COLORS.brouillon}`}>
@@ -160,7 +160,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
       {/* Informations tenant */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Informations</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Informations</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
             { label: 'NIF', value: tenant.nif ?? '—' },
@@ -169,7 +169,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
           ].map(r => (
             <div key={r.label}>
               <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-1">{r.label}</p>
-              <p className="text-sm text-[#FFFFFF] font-medium">{r.value}</p>
+              <p className="text-sm text-[var(--text)] font-medium">{r.value}</p>
             </div>
           ))}
         </div>

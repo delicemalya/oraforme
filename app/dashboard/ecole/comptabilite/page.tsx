@@ -519,7 +519,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               <div className="col-span-2 md:col-span-1">
                 <label className="text-[10px] text-white/40 mb-1 block">Type</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
+                  className="w-full bg-[var(--surface-alt)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
                   <option value="entree">Entrée (recette)</option>
                   <option value="sortie">Sortie (dépense)</option>
                 </select>
@@ -527,23 +527,23 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Montant (FCFA)</label>
                 <input type="number" value={form.montant} onChange={e => setForm(p => ({ ...p, montant: e.target.value }))}
-                  placeholder="0" className="w-full bg-[#1a2d50] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                  placeholder="0" className="w-full bg-[var(--surface-alt)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
               </div>
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Date</label>
                 <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                  className="w-full bg-[var(--surface-alt)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
               </div>
               <div className="col-span-2">
                 <label className="text-[10px] text-white/40 mb-1 block">Libellé</label>
                 <input value={form.label} onChange={e => setForm(p => ({ ...p, label: e.target.value }))}
                   placeholder="ex: Paiement frais de scolarité — Janvier"
-                  className="w-full bg-[#1a2d50] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                  className="w-full bg-[var(--surface-alt)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none" />
               </div>
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Compte OHADA</label>
                 <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
+                  className="w-full bg-[var(--surface-alt)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
                   {COMPTES_OHADA.map(c => (
                     <option key={c.code} value={c.code}>{c.code} — {c.label.substring(0, 30)}</option>
                   ))}
@@ -552,7 +552,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Mode de paiement</label>
                 <select value={form.mode_paiement} onChange={e => setForm(p => ({ ...p, mode_paiement: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
+                  className="w-full bg-[var(--surface-alt)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white outline-none">
                   <option value="especes">Espèces</option>
                   <option value="virement">Virement</option>
                   <option value="mobile_money">Mobile Money</option>
@@ -777,7 +777,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
           })}
         </div>
         <div className="flex items-center gap-4 mt-3 border-t border-white/[0.06] pt-3">
-          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#142850]" /><span className="text-[10px] text-[var(--text-secondary)]">Recettes</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[var(--surface)]" /><span className="text-[10px] text-[var(--text-secondary)]">Recettes</span></div>
           <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#F51E33]" /><span className="text-[10px] text-[var(--text-secondary)]">Dépenses</span></div>
           <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm border border-dashed border-[#8B0070] bg-[#8B0070]/20" /><span className="text-[10px] text-[var(--text-secondary)]">Prévision</span></div>
         </div>

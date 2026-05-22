@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex h-screen bg-[#142850] overflow-hidden">
+    <div className="flex h-screen bg-[var(--surface)] overflow-hidden">
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Admin header */}
@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="w-8 lg:hidden shrink-0" />
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-[#F51E33] animate-pulse" />
-            <span className="text-sm font-medium text-[#FFFFFF]">Panneau Super Admin</span>
+            <span className="text-sm font-medium text-[var(--text)]">Panneau Super Admin</span>
           </div>
           <div className="ml-auto flex items-center gap-2">
             <div className="w-7 h-7 rounded-full bg-[#F51E33]/20 border border-[#F51E33]/30 flex items-center justify-center">

@@ -40,7 +40,7 @@ export default function AdminSidebar() {
         <div className="flex items-center gap-2 mb-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-icon.png" alt="oraforme" className="w-7 h-7 shrink-0" />
-          <span className="text-base font-bold text-[#FFFFFF]">oraforme</span>
+          <span className="text-base font-bold text-[var(--text)]">oraforme</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] bg-[#F51E33]/20 text-[#F51E33] border border-[#F51E33]/30 rounded px-1.5 py-0.5 font-bold tracking-wider">
@@ -63,7 +63,7 @@ export default function AdminSidebar() {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 active
                   ? 'bg-[#F51E33]/10 text-[#F51E33] font-medium'
-                  : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5'
               }`}
             >
               <Icon size={15} className="shrink-0" />
@@ -79,7 +79,7 @@ export default function AdminSidebar() {
         <Link
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5 transition-all"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5 transition-all"
         >
           <LayoutDashboard size={15} className="shrink-0" />
           <span>Mon dashboard</span>

@@ -38,10 +38,10 @@ export default function ForgotPasswordPage() {
             <div className="w-14 h-14 rounded-full bg-[#2EA043]/10 flex items-center justify-center mx-auto mb-5">
               <MailCheck size={28} className="text-[#2EA043]" />
             </div>
-            <h2 className="text-lg font-bold text-[#FFFFFF] mb-2">Email envoyé</h2>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-2">Email envoyé</h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
               Un lien de réinitialisation a été envoyé à{' '}
-              <span className="text-[#FFFFFF] font-medium">{email}</span>.
+              <span className="text-[var(--text)] font-medium">{email}</span>.
               Vérifiez votre boîte mail (et le dossier spam).
             </p>
             <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[#F51E33] hover:underline">
@@ -59,12 +59,12 @@ export default function ForgotPasswordPage() {
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8 mx-auto mb-2" />
-          <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
+          <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
           <p className="text-[var(--text-secondary)] text-sm mt-1">Réinitialiser votre mot de passe</p>
         </div>
 
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-8">
-          <h1 className="text-base font-semibold text-[#FFFFFF] mb-1">Mot de passe oublié ?</h1>
+          <h1 className="text-base font-semibold text-[var(--text)] mb-1">Mot de passe oublié ?</h1>
           <p className="text-sm text-[var(--text-secondary)] mb-6">
             Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
           </p>
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
               />
             </div>
 

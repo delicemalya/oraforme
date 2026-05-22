@@ -4,85 +4,230 @@
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DESIGN SYSTEM ORAFORME — SaaS Light Theme
-   Background #F8FAFC · Sidebar/Topbar #FFFFFF · Primary #F59E0B
+   Background #F5F7FB · Surface #FFFFFF · Primary #F59E0B
+   Police : Inter · Inspiré de Linear / Stripe / ProTime
 ════════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Surfaces */
-  --color-bg:              #F8FAFC;
-  --color-surface:         #FFFFFF;
-  --color-surface-alt:     #F8FAFC;
+  /* ── Surfaces ── */
+  --bg:              #F5F7FB;
+  --surface:         #FFFFFF;
+  --surface-alt:     #F9FAFB;
+  --surface-hover:   #F3F4F6;
 
-  /* Borders */
-  --color-border:          #E2E8F0;
-  --color-border-strong:   #CBD5E1;
+  /* ── Borders ── */
+  --border:          #E5E7EB;
+  --border-strong:   #D1D5DB;
 
-  /* Text */
-  --color-text:            #0F172A;
-  --color-text-secondary:  #64748B;
-  --color-text-muted:      #94A3B8;
+  /* ── Text ── */
+  --text:            #111827;
+  --text-secondary:  #6B7280;
+  --text-muted:      #9CA3AF;
+  --text-disabled:   #D1D5DB;
 
-  /* Brand primary (amber) */
-  --color-primary:         #F59E0B;
-  --color-primary-hover:   #D97706;
-  --color-primary-light:   #FEF3C7;
+  /* ── Brand primaire (amber) ── */
+  --primary:         #F59E0B;
+  --primary-hover:   #D97706;
+  --primary-light:   #FEF3C7;
+  --primary-text:    #92400E;
 
-  /* Semantic */
-  --color-blue:            #2563EB;
-  --color-green:           #16A34A;
-  --color-red:             #DC2626;
-  --color-orange:          #F97316;
+  /* ── Sémantique ── */
+  --success:         #10B981;
+  --success-light:   #D1FAE5;
+  --success-text:    #065F46;
 
-  /* Legacy aliases — used by components via var() */
-  --card-bg:               #FFFFFF;
-  --border:                #E2E8F0;
-  --text-primary:          #0F172A;
-  --text-secondary:        #64748B;
+  --warning:         #F59E0B;
+  --warning-light:   #FEF3C7;
+  --warning-text:    #92400E;
+
+  --danger:          #EF4444;
+  --danger-light:    #FEE2E2;
+  --danger-text:     #991B1B;
+
+  --info:            #3B82F6;
+  --info-light:      #DBEAFE;
+  --info-text:       #1E40AF;
+
+  /* ── Aliases legacy (compatibilité composants existants) ── */
+  --color-bg:              var(--bg);
+  --color-surface:         var(--surface);
+  --color-surface-alt:     var(--surface-alt);
+  --color-border:          var(--border);
+  --color-border-strong:   var(--border-strong);
+  --color-text:            var(--text);
+  --color-text-secondary:  var(--text-secondary);
+  --color-text-muted:      var(--text-muted);
+  --color-primary:         var(--primary);
+  --color-primary-hover:   var(--primary-hover);
+  --color-primary-light:   var(--primary-light);
+  --color-blue:            var(--info);
+  --color-green:           var(--success);
+  --color-red:             var(--danger);
+  --card-bg:               var(--surface);
+  --text-primary:          var(--text);
+  --border-color:          var(--border);
 }
 
+/* ── Base ── */
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-geist), Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+/* ── Scrollbar fine ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ── Selection ── */
-::selection { background: rgba(245,158,11,0.18); color: var(--color-text); }
+/* ── Sélection ── */
+::selection { background: #FEF3C7; color: var(--text); }
 
-/* ── Inputs ── */
+/* ── Inputs — thème clair ── */
 input, textarea, select {
-  background-color: var(--color-surface);
-  border-color: var(--color-border);
-  color: var(--color-text);
+  background-color: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  border-radius: 0.5rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-input::placeholder, textarea::placeholder { color: var(--color-text-muted); }
-select option { background-color: var(--color-surface); color: var(--color-text); }
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+select option { background-color: var(--surface); color: var(--text); }
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--color-text);
+  -webkit-text-fill-color: var(--text);
   -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
-  caret-color: var(--color-text);
+  caret-color: var(--text);
 }
 
-/* ── Shadows ── */
-.shadow-xl  { box-shadow: 0 4px 24px rgba(15,23,42,0.07) !important; }
-.shadow-2xl { box-shadow: 0 8px 40px rgba(15,23,42,0.10) !important; }
+/* ── Ombres ── */
+.shadow-card { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+.shadow-md   { box-shadow: 0 4px 12px rgba(0,0,0,0.07) !important; }
+.shadow-lg   { box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important; }
+.shadow-xl   { box-shadow: 0 12px 32px rgba(0,0,0,0.10) !important; }
 
 /* ── KPI card hover ── */
-.kpi-card { transition: all 0.2s ease; }
+.kpi-card { transition: all 0.18s ease; }
 .kpi-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(15,23,42,0.09);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.09);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPOSANTS GLOBAUX — classes réutilisables
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Bouton primaire */
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.5rem 1rem; border-radius: 0.5rem;
+  background: var(--primary); color: #fff; font-weight: 600; font-size: 0.875rem;
+  border: none; cursor: pointer; transition: background 0.15s, transform 0.1s;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Bouton secondaire */
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.5rem 1rem; border-radius: 0.5rem;
+  background: var(--surface); color: var(--text-secondary);
+  border: 1px solid var(--border); font-weight: 500; font-size: 0.875rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-secondary:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface-alt); }
+
+/* Bouton danger */
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.5rem 1rem; border-radius: 0.5rem;
+  background: var(--danger-light); color: var(--danger-text);
+  border: 1px solid var(--danger); font-weight: 600; font-size: 0.875rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-danger:hover { background: var(--danger); color: #fff; }
+
+/* Card standard */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+/* Badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.125rem 0.625rem; border-radius: 9999px;
+  font-size: 0.6875rem; font-weight: 600;
+}
+.badge-amber  { background: var(--primary-light); color: var(--primary-text); }
+.badge-green  { background: var(--success-light); color: var(--success-text); }
+.badge-red    { background: var(--danger-light);  color: var(--danger-text);  }
+.badge-blue   { background: var(--info-light);    color: var(--info-text);    }
+.badge-gray   { background: var(--surface-alt);   color: var(--text-secondary); border: 1px solid var(--border); }
+
+/* Input standard */
+.input {
+  width: 100%; padding: 0.5rem 0.75rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 0.5rem; color: var(--text); font-size: 0.875rem;
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
+.input::placeholder { color: var(--text-muted); }
+
+/* Table */
+.table-header th {
+  padding: 0.625rem 1rem;
+  background: var(--surface-alt);
+  color: var(--text-secondary);
+  font-size: 0.6875rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+.table-row { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+.table-row:hover { background: var(--surface-alt); }
+.table-row td { padding: 0.625rem 1rem; font-size: 0.875rem; color: var(--text); }
+
+/* Toast */
+.toast-success {
+  background: var(--success); color: white;
+  padding: 0.75rem 1rem; border-radius: 0.75rem;
+  font-size: 0.875rem; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.toast-error {
+  background: var(--danger); color: white;
+  padding: 0.75rem 1rem; border-radius: 0.75rem;
+  font-size: 0.875rem; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Tab active indicator */
+.tab-active {
+  color: var(--primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Page header standard */
+.page-title {
+  font-size: 1.25rem; font-weight: 700; color: var(--text); letter-spacing: -0.025em;
+}
+.page-subtitle {
+  font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.125rem;
+}
+
+/* KPI card colorée (dark bg) — texte toujours blanc */
+.kpi-colored { color: white; }
+.kpi-colored p, .kpi-colored span { color: inherit; }

@@ -93,8 +93,8 @@ function Section({ title, rows, total, totalLabel, totalColor = '#F51E33' }: {
 }) {
   return (
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 border-b border-[var(--border)] bg-[#142850]/50">
-        <h3 className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">{title}</h3>
+      <div className="px-5 py-3 border-b border-[var(--border)] bg-[var(--surface)]/50">
+        <h3 className="text-xs font-bold text-[var(--text)] uppercase tracking-wider">{title}</h3>
       </div>
       <div className="divide-y divide-[var(--border)]">
         {rows.map((r, i) => (
@@ -106,8 +106,8 @@ function Section({ title, rows, total, totalLabel, totalColor = '#F51E33' }: {
           </div>
         ))}
       </div>
-      <div className="px-5 py-3 border-t border-[var(--border)] bg-[#142850]/50 flex justify-between items-center">
-        <span className="text-sm font-bold text-[#FFFFFF]">{totalLabel}</span>
+      <div className="px-5 py-3 border-t border-[var(--border)] bg-[var(--surface)]/50 flex justify-between items-center">
+        <span className="text-sm font-bold text-[var(--text)]">{totalLabel}</span>
         <span className="text-base font-bold" style={{ color: totalColor }}>{fmtFCFA(total)}</span>
       </div>
     </div>
@@ -237,16 +237,16 @@ export default function RapportsPage() {
             <BarChart2 size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#FFFFFF]">Rapports Financiers</h1>
+            <h1 className="text-xl font-bold text-[var(--text)]">Rapports Financiers</h1>
             <p className="text-xs text-[var(--text-secondary)]">ERP · {nomEntreprise} · {moisLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <select value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))}
-            className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+            className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <button onClick={load} className="p-2 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+          <button onClick={load} className="p-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
             <RefreshCw size={14} />
           </button>
         </div>
@@ -259,7 +259,7 @@ export default function RapportsPage() {
           return (
             <button key={i} onClick={() => setTab(i)}
               className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === i ? 'bg-[#142850]/10 text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+                tab === i ? 'bg-[var(--surface)]/10 text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
               }`}>
               <Icon size={11} />{t}
             </button>
@@ -291,7 +291,7 @@ export default function RapportsPage() {
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                 <div className="xl:col-span-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
-                  <h2 className="text-sm font-bold text-[#FFFFFF] mb-4 flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-[var(--text)] mb-4 flex items-center gap-2">
                     <FileText size={14} className="text-[#F51E33]" /> Détail financier — {data.annee}
                   </h2>
                   <div className="space-y-3">
@@ -307,7 +307,7 @@ export default function RapportsPage() {
                           <span className="text-xs text-[var(--text-secondary)]">{row.label}</span>
                           <span className="text-xs font-bold" style={{ color: row.color }}>{fmtFCFA(row.val)}</span>
                         </div>
-                        <div className="h-1.5 bg-[#1a2d50] rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                           <motion.div className="h-full rounded-full" style={{ background: row.color }}
                             initial={{ width: 0 }} animate={{ width: `${Math.min(row.pct, 100)}%` }} transition={{ duration: 0.8 }} />
                         </div>
@@ -320,7 +320,7 @@ export default function RapportsPage() {
                       { label: 'Employés', val: data.nbEmployes.toString(), color: '#F51E33' },
                       { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#142850' : marge >= 10 ? '#F51E33' : '#F51E33' },
                     ].map(s => (
-                      <div key={s.label} className="bg-[#142850] border border-[var(--border)] rounded-xl p-3 text-center">
+                      <div key={s.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 text-center">
                         <p className="text-[10px] text-[var(--text-secondary)] mb-1 uppercase tracking-wide">{s.label}</p>
                         <p className="text-base font-bold" style={{ color: s.color }}>{s.val}</p>
                       </div>
@@ -334,7 +334,7 @@ export default function RapportsPage() {
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#4A0040,#8B0070)' }}>
                         <Users size={14} className="text-white" />
                       </div>
-                      <p className="text-sm font-bold text-[#FFFFFF]">Ressources Humaines</p>
+                      <p className="text-sm font-bold text-[var(--text)]">Ressources Humaines</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between py-2 border-b border-[var(--border)]">
@@ -352,7 +352,7 @@ export default function RapportsPage() {
                     </div>
                   </div>
                   <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
-                    <p className="text-xs font-bold text-[#FFFFFF] mb-3 uppercase tracking-wide">Exports</p>
+                    <p className="text-xs font-bold text-[var(--text)] mb-3 uppercase tracking-wide">Exports</p>
                     <div className="space-y-2">
                       {[
                         { label: 'Rapport PDF', note: 'À venir' },
@@ -363,7 +363,7 @@ export default function RapportsPage() {
                           className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--border)] hover:bg-white/5 transition-all group text-left">
                           <div className="flex items-center gap-2">
                             <Download size={12} className="text-[var(--text-secondary)] group-hover:text-[#F51E33] transition-colors" />
-                            <span className="text-xs text-[var(--text-secondary)] group-hover:text-[#FFFFFF] transition-colors">{e.label}</span>
+                            <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text)] transition-colors">{e.label}</span>
                           </div>
                           <span className="text-[10px] text-[var(--text-secondary)]">{e.note}</span>
                         </button>
@@ -377,7 +377,7 @@ export default function RapportsPage() {
                 const fiscal = calculerTVACongo(data.caResto)
                 return (
                   <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
-                    <h2 className="text-sm font-bold text-[#FFFFFF] mb-4 flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-[var(--text)] mb-4 flex items-center gap-2">
                       <ChefHat size={14} className="text-[#F51E33]" /> Restaurant — {data.annee}
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -387,7 +387,7 @@ export default function RapportsPage() {
                         { label: 'TVA collectée (18%)',val: fmtFCFA(fiscal.tva),     color: '#8B0070' },
                         { label: 'CA (5% TVA)',         val: fmtFCFA(fiscal.ca),      color: '#F51E33' },
                       ].map(k => (
-                        <div key={k.label} className="bg-[#142850] border border-[var(--border)] rounded-xl p-4">
+                        <div key={k.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
                           <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{k.label}</p>
                           <p className="text-base font-bold" style={{ color: k.color }}>{k.val}</p>
                         </div>
@@ -433,7 +433,7 @@ export default function RapportsPage() {
               </div>
 
               {/* Résultat net */}
-              <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#142850]/40 bg-[#142850]/5' : 'border-[#F51E33]/40 bg-[#F51E33]/5'}`}>
+              <div className={`rounded-2xl p-6 border-2 ${resultatNet >= 0 ? 'border-[#142850]/40 bg-[var(--surface)]/5' : 'border-[#F51E33]/40 bg-[#F51E33]/5'}`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
@@ -456,7 +456,7 @@ export default function RapportsPage() {
                     { label: 'Charges',  value: fmtFCFA(totalCharges),  color: '#F51E33' },
                     { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#F51E33' : '#F51E33' },
                   ].map(r => (
-                    <div key={r.label} className="bg-[#142850]/60 rounded-xl p-3 text-center">
+                    <div key={r.label} className="bg-[var(--surface)]/60 rounded-xl p-3 text-center">
                       <p className="text-[10px] text-[var(--text-secondary)] mb-1">{r.label}</p>
                       <p className="text-sm font-bold" style={{ color: r.color }}>{r.value}</p>
                     </div>
@@ -511,7 +511,7 @@ export default function RapportsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Scale size={16} className="text-[#F51E33]" />
-                    <span className="text-sm font-bold text-[#FFFFFF]">Vérification équilibre</span>
+                    <span className="text-sm font-bold text-[var(--text)]">Vérification équilibre</span>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-[var(--text-secondary)]">Actif — Passif</p>
@@ -629,7 +629,7 @@ export default function RapportsPage() {
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t border-[#F51E33]/30 flex justify-between items-center">
-                    <span className="text-base font-bold text-[#FFFFFF]">TOTAL À PAYER À LA DGI</span>
+                    <span className="text-base font-bold text-[var(--text)]">TOTAL À PAYER À LA DGI</span>
                     <span className="text-xl font-bold text-[#F51E33]">
                       {fmtFCFA(totalDGI + (fiscalResto?.tva ?? 0) + (fiscalResto?.ca ?? 0))}
                     </span>
@@ -651,7 +651,7 @@ export default function RapportsPage() {
                       <Sparkles size={16} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#FFFFFF]">Analyse MIAA+</p>
+                      <p className="text-sm font-bold text-[var(--text)]">Analyse MIAA+</p>
                       <p className="text-[10px] text-[var(--text-secondary)]">Powered by Claude · {nomEntreprise} · {data.annee}</p>
                     </div>
                   </div>
@@ -676,7 +676,7 @@ export default function RapportsPage() {
                   </div>
                 )}
                 {aiText && !aiLoading && (
-                  <div className="bg-[#142850] border-l-2 border-[#F51E33]/60 rounded-r-xl p-5 text-sm text-[#FFFFFF] leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-[var(--surface)] border-l-2 border-[#F51E33]/60 rounded-r-xl p-5 text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap">
                     {aiText}
                   </div>
                 )}

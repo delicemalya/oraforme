@@ -82,10 +82,10 @@ function Toggle({ value, onChange, label, sub }: {
     <button
       type="button"
       onClick={() => onChange(!value)}
-      className="flex items-center justify-between w-full p-3 bg-[#142850] border border-[var(--border)] rounded-lg hover:border-[var(--border)] transition-all"
+      className="flex items-center justify-between w-full p-3 bg-[var(--surface)] border border-[var(--border)] rounded-lg hover:border-[var(--border)] transition-all"
     >
       <div className="text-left">
-        <div className="text-sm text-[#FFFFFF]">{label}</div>
+        <div className="text-sm text-[var(--text)]">{label}</div>
         {sub && <div className="text-xs text-[var(--text-secondary)] mt-0.5">{sub}</div>}
       </div>
       {value
@@ -107,7 +107,7 @@ function NumInput({ label, value, onChange, min = 0, max, step = 0.5, sub }: {
         type="number" min={min} max={max} step={step}
         value={value}
         onChange={e => onChange(parseFloat(e.target.value) || 0)}
-        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F51E33]/50"
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[#F51E33]/50"
       />
       {sub && <div className="text-[10px] text-[var(--text-secondary)] mt-1">{sub}</div>}
     </div>
@@ -140,7 +140,7 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
               className={`w-full flex items-start gap-3 p-3.5 rounded-xl border text-left transition-all ${
                 s.system_type === sys.value
                   ? 'border-[#F51E33]/60 bg-[#F51E33]/8'
-                  : 'border-[var(--border)] bg-[#142850] hover:border-[var(--border)]'
+                  : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border)]'
               }`}
             >
               <div className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${
@@ -149,7 +149,7 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
                 {s.system_type === sys.value && <div className="w-2 h-2 rounded-full bg-[#F51E33]" />}
               </div>
               <div>
-                <div className="text-sm font-semibold text-[#FFFFFF]">{sys.label}</div>
+                <div className="text-sm font-semibold text-[var(--text)]">{sys.label}</div>
                 <div className="text-xs text-[var(--text-secondary)] mt-0.5">{sys.desc}</div>
               </div>
             </button>
@@ -168,7 +168,7 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
               className={`flex-1 py-3 rounded-xl border text-sm font-semibold transition-all ${
                 s.note_sur === n
                   ? 'border-[#F51E33]/60 bg-[#F51E33]/10 text-[#F51E33]'
-                  : 'border-[var(--border)] bg-[#142850] text-[var(--text-secondary)] hover:border-[var(--border)]'
+                  : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--border)]'
               }`}
             >
               Sur {n}
@@ -217,7 +217,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
 
       <div className="space-y-2">
         {s.mentions.map((m, i) => (
-          <div key={i} className="flex items-center gap-2 p-3 bg-[#142850] border border-[var(--border)] rounded-xl">
+          <div key={i} className="flex items-center gap-2 p-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl">
             {/* Color swatch */}
             <div className="relative shrink-0">
               <div
@@ -239,7 +239,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
               value={m.label}
               onChange={e => updateMention(i, 'label', e.target.value)}
               placeholder="Label"
-              className="flex-1 bg-transparent border border-[var(--border)] rounded-lg px-2.5 py-1.5 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F51E33]/50"
+              className="flex-1 bg-transparent border border-[var(--border)] rounded-lg px-2.5 py-1.5 text-sm text-[var(--text)] focus:outline-none focus:border-[#F51E33]/50"
             />
 
             {/* Seuil min */}
@@ -251,7 +251,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
                 min={0}
                 max={s.note_sur}
                 onChange={e => updateMention(i, 'min', parseFloat(e.target.value) || 0)}
-                className="w-16 bg-transparent border border-[var(--border)] rounded-lg px-2 py-1.5 text-sm text-[#FFFFFF] text-center focus:outline-none focus:border-[#F51E33]/50"
+                className="w-16 bg-transparent border border-[var(--border)] rounded-lg px-2 py-1.5 text-sm text-[var(--text)] text-center focus:outline-none focus:border-[#F51E33]/50"
               />
             </div>
 
@@ -284,7 +284,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
       </button>
 
       {/* Aperçu trié */}
-      <div className="mt-4 p-3 bg-[#142850] border border-[var(--border)] rounded-xl">
+      <div className="mt-4 p-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl">
         <div className="text-xs text-[var(--text-secondary)] mb-2 font-semibold uppercase tracking-wider">Aperçu (ordre appliqué)</div>
         <div className="flex flex-wrap gap-2">
           {sorted.map((m, i) => (
@@ -513,7 +513,7 @@ export default function ParametresAcademiquesPage() {
           className="flex items-center justify-between"
         >
           <div>
-            <h1 className="text-xl font-bold text-[#FFFFFF]">Paramètres académiques</h1>
+            <h1 className="text-xl font-bold text-[var(--text)]">Paramètres académiques</h1>
             <p className="text-sm text-[var(--text-secondary)] mt-0.5">
               Règles LMD, mentions, compensation & rattrapage
             </p>
@@ -557,7 +557,7 @@ export default function ParametresAcademiquesPage() {
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
                 tab === t.id
                   ? 'bg-[#F51E33] text-black'
-                  : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
               }`}
             >
               <t.icon size={13} />

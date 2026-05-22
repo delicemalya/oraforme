@@ -21,7 +21,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-3 shadow-2xl text-xs">
       <div className="flex items-center gap-2 mb-1">
         <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-        <span className="text-[#FFFFFF] font-semibold">{name}</span>
+        <span className="text-[var(--text)] font-semibold">{name}</span>
       </div>
       <span className="text-[var(--text-secondary)]">{fmtFull(value)}</span>
     </div>
@@ -36,7 +36,7 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
   if (!hasData) {
     return (
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
-        <h3 className="text-sm font-bold text-[#FFFFFF] mb-1">Répartition des dépenses</h3>
+        <h3 className="text-sm font-bold text-[var(--text)] mb-1">Répartition des dépenses</h3>
         <p className="text-[10px] text-[var(--text-secondary)] mb-6">Par catégorie ce mois</p>
         <div className="h-[180px] flex items-center justify-center text-xs text-[var(--text-secondary)]">
           Aucune dépense enregistrée
@@ -49,7 +49,7 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-bold text-[#FFFFFF]">Répartition des dépenses</h3>
+          <h3 className="text-sm font-bold text-[var(--text)]">Répartition des dépenses</h3>
           <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Par catégorie ce mois · {fmtFull(total)}</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
               <span className="text-[var(--text-secondary)] truncate max-w-[120px]">{item.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[#FFFFFF] font-semibold">{fmtFull(item.value)}</span>
+              <span className="text-[var(--text)] font-semibold">{fmtFull(item.value)}</span>
               <span className="text-[var(--text-secondary)] w-8 text-right">{total > 0 ? Math.round((item.value / total) * 100) : 0}%</span>
             </div>
           </div>

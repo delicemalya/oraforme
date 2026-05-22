@@ -21,7 +21,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Donut chart */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">{donutTitle}</h3>
+        <h3 className="text-sm font-semibold text-[var(--text)] mb-4">{donutTitle}</h3>
         {donutData.length > 0 ? (
           <>
             <ResponsiveContainer width="100%" height={190}>
@@ -75,7 +75,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
 
       {/* Bar chart */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">Activité — 7 derniers jours</h3>
+        <h3 className="text-sm font-semibold text-[var(--text)] mb-4">Activité — 7 derniers jours</h3>
         <ResponsiveContainer width="100%" height={190}>
           <BarChart data={barData} margin={{ top: 4, right: 0, left: -24, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1a2d50" vertical={false} />

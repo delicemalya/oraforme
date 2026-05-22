@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div key={p.name} className="flex items-center gap-2 mb-1">
           <div className="w-2 h-2 rounded-full" style={{ background: p.color }} />
           <span className="text-[var(--text-secondary)]">{p.name}:</span>
-          <span className="text-[#FFFFFF] font-bold">{fmtFull(p.value)}</span>
+          <span className="text-[var(--text)] font-bold">{fmtFull(p.value)}</span>
         </div>
       ))}
     </div>
@@ -44,11 +44,11 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-bold text-[#FFFFFF]">Trésorerie — 12 mois</h3>
+          <h3 className="text-sm font-bold text-[var(--text)]">Trésorerie — 12 mois</h3>
           <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Entrées · Sorties · Solde cumulé</p>
         </div>
         <div className="flex gap-3 text-[10px]">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#142850] inline-block" />Entrées</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[var(--surface)] inline-block" />Entrées</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F51E33] inline-block" />Sorties</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F51E33] inline-block" />Solde</span>
         </div>

@@ -88,7 +88,7 @@ export default function NotificationsPanel() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#F51E33] hover:text-[#FFFFFF] transition-all"
+        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#F51E33] hover:text-[var(--text)] transition-all"
       >
         <Bell size={15} />
         {unread > 0 && (
@@ -110,7 +110,7 @@ export default function NotificationsPanel() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-[#FFFFFF]">Notifications</h3>
+                <h3 className="text-sm font-bold text-[var(--text)]">Notifications</h3>
                 {unread > 0 && (
                   <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#F51E33] text-white rounded-full">{unread}</span>
                 )}
@@ -153,7 +153,7 @@ export default function NotificationsPanel() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <p className={`text-xs font-semibold leading-tight ${n.read ? 'text-[var(--text-secondary)]' : 'text-[#FFFFFF]'}`}>
+                          <p className={`text-xs font-semibold leading-tight ${n.read ? 'text-[var(--text-secondary)]' : 'text-[var(--text)]'}`}>
                             {n.title}
                           </p>
                           {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#F51E33] shrink-0 mt-1" />}

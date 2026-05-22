@@ -760,7 +760,7 @@ export default function FacturationPage() {
                               className={`border-b border-white/[0.04] ${i === viewLignes.length - 1 ? 'border-0' : ''}`}
                               style={{ background: i % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent' }}
                             >
-                              <td className="px-3 py-2 text-[#FFFFFF]">{l.description}</td>
+                              <td className="px-3 py-2 text-[var(--text)]">{l.description}</td>
                               <td className="px-3 py-2 text-[var(--text-secondary)] text-right">{fmt(l.price)}</td>
                               <td className="px-3 py-2 text-[var(--text-secondary)] text-center">{l.quantity}</td>
                               <td className="px-3 py-2 text-[#F51E33] font-semibold text-right">{fmt(l.price * l.quantity)}</td>
@@ -845,7 +845,7 @@ export default function FacturationPage() {
                   {viewedFac.notes && (
                     <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
                       <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Notes</p>
-                      <p className="text-sm text-[#FFFFFF]">{viewedFac.notes}</p>
+                      <p className="text-sm text-[var(--text)]">{viewedFac.notes}</p>
                     </div>
                   )}
 

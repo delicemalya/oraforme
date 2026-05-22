@@ -362,7 +362,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Statut</label>
                 <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as 'brouillon'|'publie' }))}
-                  className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#F51E33]/50">
+                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#F51E33]/50">
                   <option value="brouillon">Brouillon</option>
                   <option value="publie">Publié</option>
                 </select>
@@ -371,7 +371,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             <div>
               <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Description</label>
               <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3}
-                className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Contenu, objectifs, plan…" />
+                className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Contenu, objectifs, plan…" />
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-white border border-white/[0.06] hover:border-white/10">Annuler</button>
@@ -397,7 +397,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
               <p className="text-xs font-semibold text-white truncate">{c.titre}</p>
               <p className="text-[10px] text-[var(--text-secondary)]">{c.matiere ?? '—'} {c.niveau ? `· ${c.niveau}` : ''}</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[#142850]/20 text-[#F51E33]' : 'bg-white/[0.06] text-[var(--text-secondary)]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[var(--surface)]/20 text-[#F51E33]' : 'bg-white/[0.06] text-[var(--text-secondary)]'}`}>
               {c.statut === 'publie' ? 'Publié' : 'Brouillon'}
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -468,7 +468,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Classe</label>
                 <select value={form.classe} onChange={e => setForm(p => ({ ...p, classe: e.target.value }))}
-                  className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                   <option value="">Toutes les classes</option>
                   {classes.map(c => <option key={c.id} value={c.nom}>{c.nom}</option>)}
                 </select>
@@ -478,7 +478,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
             <div>
               <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Consignes</label>
               <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3}
-                className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Instructions détaillées…" />
+                className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Instructions détaillées…" />
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-white border border-white/[0.06]">Annuler</button>
@@ -603,7 +603,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
                   type="number" min={0} max={selectedEx.note_max}
                   value={g.note ?? ''} disabled={g.absent}
                   onChange={e => saveGrade(g.etudiant_id, e.target.value ? Number(e.target.value) : null, g.absent)}
-                  className="w-20 bg-[#142850] border border-white/[0.08] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none disabled:opacity-40"
+                  className="w-20 bg-[var(--surface)] border border-white/[0.08] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none disabled:opacity-40"
                   placeholder="—"
                 />
                 <input type="checkbox" checked={g.absent} onChange={e => saveGrade(g.etudiant_id, g.absent ? null : g.note, e.target.checked)} className="w-4 h-4 accent-[#F51E33]" />
@@ -633,7 +633,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Type</label>
                 <select value={form.type_exam} onChange={e => setForm(p => ({ ...p, type_exam: e.target.value as Exam['type_exam'] }))}
-                  className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                   {TYPES_EXAM.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
@@ -642,7 +642,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Classe</label>
                 <select value={form.classe_id} onChange={e => setForm(p => ({ ...p, classe_id: e.target.value }))}
-                  className="w-full bg-[#142850] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                   <option value="">Toutes</option>
                   {classes.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
                 </select>
@@ -833,7 +833,7 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
               <p className="text-xs font-semibold text-white">{MOIS[b.mois - 1]} {b.annee}</p>
               <p className="text-[10px] text-[var(--text-secondary)]">Brut : {fmt(b.brut)} · Net : {fmt(b.net)} FCFA</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[#142850]/20 text-[#F51E33]' : b.statut === 'validee' ? 'bg-[#F51E33]/20 text-[#F51E33]' : 'bg-[#F51E33]/20 text-[#F51E33]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[var(--surface)]/20 text-[#F51E33]' : b.statut === 'validee' ? 'bg-[#F51E33]/20 text-[#F51E33]' : 'bg-[#F51E33]/20 text-[#F51E33]'}`}>
               {b.statut === 'payee' ? 'Payé' : b.statut === 'validee' ? 'Validé' : 'Généré'}
             </span>
           </motion.div>

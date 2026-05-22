@@ -125,12 +125,12 @@ export default function ExcelImport({ title, description, columns, onImport, tem
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-bold text-[#FFFFFF]">{title}</h3>
+          <h3 className="text-sm font-bold text-[var(--text)]">{title}</h3>
           {description && <p className="text-xs text-[var(--text-secondary)] mt-0.5">{description}</p>}
         </div>
         <button
           onClick={() => downloadCSV(generateCSVTemplate(columns), templateName ?? 'modele.csv')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-xs text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:border-[#484F58] transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-xs text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#484F58] transition-all"
         >
           <Download size={12} /> Modèle CSV
         </button>
@@ -161,12 +161,12 @@ export default function ExcelImport({ title, description, columns, onImport, tem
             />
             <div className="flex flex-col items-center gap-3">
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
-                dragging ? 'bg-[#F51E3320]' : 'bg-[#1a2d50]'
+                dragging ? 'bg-[#F51E3320]' : 'bg-[var(--surface-alt)]'
               }`}>
                 <Upload size={24} className={dragging ? 'text-[#F51E33]' : 'text-[var(--text-secondary)]'} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#FFFFFF]">
+                <p className="text-sm font-semibold text-[var(--text)]">
                   {dragging ? 'Relâchez pour charger' : 'Glissez votre fichier ici'}
                 </p>
                 <p className="text-xs text-[var(--text-secondary)] mt-1">CSV ou Excel · max 10 MB</p>
@@ -183,13 +183,13 @@ export default function ExcelImport({ title, description, columns, onImport, tem
           <motion.div key="preview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex items-center gap-2 mb-3">
               <FileSpreadsheet size={15} className="text-[#2EA043]" />
-              <span className="text-xs text-[#FFFFFF] font-medium">{file?.name}</span>
+              <span className="text-xs text-[var(--text)] font-medium">{file?.name}</span>
               <span className="text-xs text-[var(--text-secondary)]">— Aperçu ({preview.length} premières lignes)</span>
             </div>
             <div className="overflow-x-auto rounded-xl border border-[var(--border)] mb-4">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-[#1a2d50]">
+                  <tr className="bg-[var(--surface-alt)]">
                     {columns.map(c => (
                       <th key={c.key} className="px-3 py-2 text-left text-[var(--text-secondary)] font-semibold whitespace-nowrap">
                         {c.label}{c.required && <span className="text-[#F51E33] ml-0.5">*</span>}
@@ -201,7 +201,7 @@ export default function ExcelImport({ title, description, columns, onImport, tem
                   {preview.map((row, i) => (
                     <tr key={i} className="border-t border-[var(--border)] hover:bg-white/5 transition-colors">
                       {columns.map(c => (
-                        <td key={c.key} className="px-3 py-2 text-[#FFFFFF] whitespace-nowrap">
+                        <td key={c.key} className="px-3 py-2 text-[var(--text)] whitespace-nowrap">
                           {row[c.key] ?? <span className="text-[var(--text-secondary)]">—</span>}
                         </td>
                       ))}
@@ -211,7 +211,7 @@ export default function ExcelImport({ title, description, columns, onImport, tem
               </table>
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={reset} className="px-4 py-2 text-xs text-[var(--text-secondary)] bg-[#1a2d50] border border-[var(--border)] rounded-lg hover:border-[#484F58] transition-all">
+              <button onClick={reset} className="px-4 py-2 text-xs text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-lg hover:border-[#484F58] transition-all">
                 Annuler
               </button>
               <button onClick={handleImport} className="px-5 py-2 text-xs font-bold text-[#F51E33] bg-[#F51E33] rounded-lg hover:bg-[#E09000] transition-all">
@@ -225,7 +225,7 @@ export default function ExcelImport({ title, description, columns, onImport, tem
         {step === 'importing' && (
           <motion.div key="importing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
             <div className="w-12 h-12 border-2 border-[#F51E33] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-sm font-semibold text-[#FFFFFF]">Importation en cours...</p>
+            <p className="text-sm font-semibold text-[var(--text)]">Importation en cours...</p>
             <p className="text-xs text-[var(--text-secondary)] mt-1">Validation et insertion des données</p>
           </motion.div>
         )}
@@ -238,7 +238,7 @@ export default function ExcelImport({ title, description, columns, onImport, tem
                 <CheckCircle2 size={24} className="text-[#2EA043]" />
               </div>
               <div>
-                <p className="text-sm font-bold text-[#FFFFFF]">{result.success} lignes importées avec succès</p>
+                <p className="text-sm font-bold text-[var(--text)]">{result.success} lignes importées avec succès</p>
                 {result.errors.length > 0 && (
                   <p className="text-xs text-[#F51E33] mt-0.5">{result.errors.length} erreur(s) ignorée(s)</p>
                 )}

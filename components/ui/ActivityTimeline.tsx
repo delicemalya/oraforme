@@ -37,7 +37,7 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 gap-2">
-        <div className="w-10 h-10 rounded-full bg-[#1a2d50] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-[var(--surface-alt)] flex items-center justify-center">
           <FileText size={18} className="text-[var(--text-secondary)]" />
         </div>
         <p className="text-xs text-[var(--text-secondary)]">Aucune activité récente</p>
@@ -73,7 +73,7 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-[#FFFFFF] font-semibold truncate">{item.client_nom}</p>
+              <p className="text-xs text-[var(--text)] font-semibold truncate">{item.client_nom}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Icon size={10} style={{ color: st.color }} className="shrink-0" />
                 <span className="text-[10px]" style={{ color: st.color }}>{st.action}</span>

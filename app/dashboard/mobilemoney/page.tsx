@@ -103,11 +103,11 @@ export default function MobileMoneyPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#142850]/10 border border-[#142850]/20 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[var(--surface)]/10 border border-[#142850]/20 flex items-center justify-center">
           <Smartphone size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Mobile Money</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Mobile Money</h1>
           <p className="text-xs text-[var(--text-secondary)]">Airtel Money · MTN MoMo · Wave · Orange Money</p>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function MobileMoneyPage() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Smartphone size={16} style={{ color: OP_COLORS[w.op] }} />
-                <span className="text-sm font-semibold text-[#FFFFFF]">{OP_LABELS[w.op]}</span>
+                <span className="text-sm font-semibold text-[var(--text)]">{OP_LABELS[w.op]}</span>
               </div>
               <span className="text-xs text-[var(--text-secondary)]">{w.num}</span>
             </div>
@@ -152,7 +152,7 @@ export default function MobileMoneyPage() {
       {/* Actions */}
       <div className="flex flex-wrap gap-3">
         <button onClick={() => { setForm(f => ({ ...f, type: 'reception' })); setModal('recevoir') }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#142850]/10 border border-[#142850]/30 text-[#F51E33] text-sm font-medium hover:bg-[#142850]/20 transition-colors">
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--surface)]/10 border border-[#142850]/30 text-[#F51E33] text-sm font-medium hover:bg-[var(--surface)]/20 transition-colors">
           <ArrowDownLeft size={15} /> Recevoir paiement
         </button>
         <button onClick={() => { setForm(f => ({ ...f, type: 'envoi' })); setModal('envoyer') }}
@@ -164,7 +164,7 @@ export default function MobileMoneyPage() {
       {/* Transactions */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[#FFFFFF]">Historique transactions</h2>
+          <h2 className="text-sm font-semibold text-[var(--text)]">Historique transactions</h2>
           <span className="text-xs text-[var(--text-secondary)]">{txs.length} transaction{txs.length > 1 ? 's' : ''}</span>
         </div>
         {loading ? (
@@ -180,7 +180,7 @@ export default function MobileMoneyPage() {
                   <Smartphone size={13} style={{ color: OP_COLORS[t.operateur] }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#FFFFFF] truncate">{t.nom_destinataire || t.numero_destinataire || 'Transaction'}</p>
+                  <p className="text-sm text-[var(--text)] truncate">{t.nom_destinataire || t.numero_destinataire || 'Transaction'}</p>
                   <p className="text-xs text-[var(--text-secondary)]">{OP_LABELS[t.operateur]} · {t.reference}</p>
                 </div>
                 <div className="text-right shrink-0">
@@ -190,8 +190,8 @@ export default function MobileMoneyPage() {
                   {t.frais > 0 && <p className="text-xs text-[var(--text-secondary)]">Frais : {fmtFCFA(t.frais)}</p>}
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded border ${
-                  t.statut === 'confirme' ? 'text-[#F51E33] bg-[#142850]/10 border-[#142850]/30'
-                  : 'text-[var(--text-secondary)] bg-[#1a2d50] border-[var(--border)]'
+                  t.statut === 'confirme' ? 'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30'
+                  : 'text-[var(--text-secondary)] bg-[var(--surface-alt)] border-[var(--border)]'
                 }`}>{t.statut}</span>
               </div>
             ))}
@@ -208,7 +208,7 @@ export default function MobileMoneyPage() {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#FFFFFF] mb-4">
+              <h3 className="text-base font-bold text-[var(--text)] mb-4">
                 {modal === 'recevoir' ? '📥 Recevoir un paiement' : '📤 Envoyer de l\'argent'}
               </h3>
 
@@ -221,7 +221,7 @@ export default function MobileMoneyPage() {
                         className={`py-2 rounded-lg text-xs font-medium transition-colors border ${
                           form.operateur === op
                             ? 'border-current'
-                            : 'border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+                            : 'border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)]'
                         }`}
                         style={form.operateur === op ? { color: OP_COLORS[op], backgroundColor: OP_COLORS[op] + '15', borderColor: OP_COLORS[op] + '50' } : {}}>
                         {OP_LABELS[op].split(' ')[0]}
@@ -233,7 +233,7 @@ export default function MobileMoneyPage() {
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA)</label>
                   <input type="number" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#142850]/50" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#142850]/50" />
                   {form.type === 'envoi' && form.montant && (
                     <p className="text-xs text-[var(--text-secondary)] mt-1">
                       Frais : {fmtFCFA(Math.round(parseInt(form.montant||'0') * (FRAIS[form.operateur] ?? 0.01)))}
@@ -246,21 +246,21 @@ export default function MobileMoneyPage() {
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Numéro destinataire</label>
                       <input value={form.numero} onChange={e => setForm(f => ({ ...f, numero: e.target.value }))}
                         placeholder="0X XXX XXXX"
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none" />
                     </div>
                     <div>
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Nom destinataire</label>
                       <input value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))}
                         placeholder="Nom du bénéficiaire"
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none" />
                     </div>
                   </>
                 )}
                 {modal === 'recevoir' && form.montant && (
-                  <div className="bg-[#142850]/5 border border-[#142850]/20 rounded-lg p-3">
+                  <div className="bg-[var(--surface)]/5 border border-[#142850]/20 rounded-lg p-3">
                     <p className="text-xs text-[var(--text-secondary)] mb-2">Partagez cette référence de paiement :</p>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 text-sm text-[#F51E33] font-mono bg-[#142850] rounded px-2 py-1">
+                      <code className="flex-1 text-sm text-[#F51E33] font-mono bg-[var(--surface)] rounded px-2 py-1">
                         PAY-{form.operateur.toUpperCase()}-{form.montant}FCFA
                       </code>
                       <button onClick={() => copyToClipboard(`PAY-${form.operateur.toUpperCase()}-${form.montant}FCFA`)}
@@ -274,11 +274,11 @@ export default function MobileMoneyPage() {
 
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setModal(null)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                   Annuler
                 </button>
                 <button onClick={save} disabled={saving || !form.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#142850] text-white hover:bg-[#142850]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--surface)] text-white hover:bg-[var(--surface)]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   Confirmer
                 </button>

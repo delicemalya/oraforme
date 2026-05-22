@@ -115,7 +115,7 @@ export default async function AdminActivitePage() {
           <Activity size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Activité en temps réel</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Activité en temps réel</h1>
           <p className="text-xs text-[var(--text-secondary)]">Vue opérateur — toutes les entreprises abonnées</p>
         </div>
       </div>
@@ -134,7 +134,7 @@ export default async function AdminActivitePage() {
         </div>
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Activité 7 jours</p>
-          <p className="text-2xl font-bold text-[#FFFFFF]">{weekCount}</p>
+          <p className="text-2xl font-bold text-[var(--text)]">{weekCount}</p>
           <p className="text-xs text-[var(--text-secondary)] mt-1">transactions toutes entreprises</p>
         </div>
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
@@ -153,7 +153,7 @@ export default async function AdminActivitePage() {
         {/* Activity feed — 3/5 */}
         <div className="lg:col-span-3 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[#FFFFFF]">Flux d'activité</h2>
+            <h2 className="text-sm font-semibold text-[var(--text)]">Flux d'activité</h2>
             <span className="text-xs text-[var(--text-secondary)]">{recentTx.length} dernières opérations</span>
           </div>
           <div className="divide-y divide-[var(--border)] max-h-[520px] overflow-y-auto">
@@ -183,7 +183,7 @@ export default async function AdminActivitePage() {
                       <span className="text-[10px] text-[var(--text-secondary)]">·</span>
                       <span className="text-xs text-[var(--text-secondary)] truncate">{tx.categorie ?? tx.type}</span>
                     </div>
-                    <p className="text-sm text-[#FFFFFF] truncate">{tx.description || '—'}</p>
+                    <p className="text-sm text-[var(--text)] truncate">{tx.description || '—'}</p>
                   </div>
 
                   {/* Amount + time */}
@@ -202,7 +202,7 @@ export default async function AdminActivitePage() {
         {/* Tenant health — 2/5 */}
         <div className="lg:col-span-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[#FFFFFF]">Santé des clients</h2>
+            <h2 className="text-sm font-semibold text-[var(--text)]">Santé des clients</h2>
             {(inactiveCount + warnCount) > 0 && (
               <div className="flex items-center gap-1 text-[#F51E33]">
                 <AlertTriangle size={12} />
@@ -231,11 +231,11 @@ export default async function AdminActivitePage() {
                     <RIcon size={13} style={{ color: r.color }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#FFFFFF] truncate">{t.nom_entreprise}</p>
+                    <p className="text-sm font-medium text-[var(--text)] truncate">{t.nom_entreprise}</p>
                     <p className="text-xs" style={{ color: r.color }}>{r.label}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-xs text-[#FFFFFF] font-medium">{t.txCount} ops</p>
+                    <p className="text-xs text-[var(--text)] font-medium">{t.txCount} ops</p>
                     <p className="text-[10px] text-[var(--text-secondary)]">
                       {t.lastDate ? timeAgo(t.lastDate) : '—'}
                     </p>
@@ -249,7 +249,7 @@ export default async function AdminActivitePage() {
 
       {/* Tenant activity breakdown table */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Tableau de bord opérateur</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Tableau de bord opérateur</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -268,7 +268,7 @@ export default async function AdminActivitePage() {
               )}
               {tenantRows.map(t => {
                 const RISK_BADGE = {
-                  ok:     'text-[#F51E33] bg-[#142850]/10 border-[#142850]/30',
+                  ok:     'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30',
                   warn:   'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
                   danger: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
                 }
@@ -279,10 +279,10 @@ export default async function AdminActivitePage() {
                 }
                 return (
                   <tr key={t.id} className="hover:bg-white/5/30 transition-colors">
-                    <td className="py-2.5 px-3 font-medium text-[#FFFFFF] truncate max-w-[160px]">{t.nom_entreprise}</td>
+                    <td className="py-2.5 px-3 font-medium text-[var(--text)] truncate max-w-[160px]">{t.nom_entreprise}</td>
                     <td className="py-2.5 px-3 text-[var(--text-secondary)] capitalize">{t.plan ?? '—'}</td>
-                    <td className="py-2.5 px-3 text-right text-[#FFFFFF]">{(t.modules_actifs ?? []).length}</td>
-                    <td className="py-2.5 px-3 text-right font-medium text-[#FFFFFF]">{t.txCount}</td>
+                    <td className="py-2.5 px-3 text-right text-[var(--text)]">{(t.modules_actifs ?? []).length}</td>
+                    <td className="py-2.5 px-3 text-right font-medium text-[var(--text)]">{t.txCount}</td>
                     <td className="py-2.5 px-3 text-[var(--text-secondary)] text-xs">
                       {t.lastDate
                         ? new Date(t.lastDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })

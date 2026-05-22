@@ -206,7 +206,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
               onClick={() => onToggle(item)}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
                 sel ? 'bg-[#F51E33]/15 border-[#F51E33]/40 text-[#F51E33]'
-                    : 'bg-[#142850] border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
               }`}
             >
               {sel && '✓ '}{item}{typeof item === 'number' ? ' an' + (item > 1 ? 's' : '') : ''}
@@ -224,7 +224,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-3 py-2 bg-[#F51E33] text-[#F51E33] rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors"
+          className="flex items-center gap-2 px-3 py-2 bg-[var(--primary)] text-white rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors"
         >
           <Plus size={13} /> Créer une offre
         </motion.button>
@@ -238,19 +238,19 @@ function TabOffres({ tenantId, offres, onRefresh }: {
             exit={{ opacity: 0, y: -8, height: 0 }}
             className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 space-y-4 overflow-hidden"
           >
-            <h3 className="text-sm font-bold text-[#FFFFFF]">Nouvelle offre d'emploi</h3>
+            <h3 className="text-sm font-bold text-[var(--text)]">Nouvelle offre d'emploi</h3>
             <input
               value={form.titre}
               onChange={e => setForm(f => ({ ...f, titre: e.target.value }))}
               placeholder="Intitulé du poste *"
-              className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/40 transition-colors"
+              className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/40 transition-colors"
             />
             <textarea
               value={form.description}
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Description du poste..."
               rows={3}
-              className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/40 transition-colors resize-none"
+              className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/40 transition-colors resize-none"
             />
             <CheckGroup label="Niveau d'études requis" items={NIVEAUX} selected={form.niveaux}
               onToggle={v => setForm(f => ({ ...f, niveaux: toggle(f.niveaux, v as string) }))} />
@@ -261,14 +261,14 @@ function TabOffres({ tenantId, offres, onRefresh }: {
             <CheckGroup label="Mots-clés / Domaines" items={MOTS_CLES} selected={form.mots_cles}
               onToggle={v => setForm(f => ({ ...f, mots_cles: toggle(f.mots_cles, v as string) }))} />
             <div className="flex gap-2 pt-1">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                 Annuler
               </button>
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={handleCreate}
                 disabled={saving || !form.titre.trim()}
-                className="flex items-center gap-2 px-4 py-2 bg-[#F51E33] text-[#F51E33] rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors disabled:opacity-50"
               >
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                 {saving ? 'Création...' : 'Créer l\'offre'}
@@ -295,7 +295,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <p className="text-sm font-semibold text-[#FFFFFF] truncate">{o.titre}</p>
+                  <p className="text-sm font-semibold text-[var(--text)] truncate">{o.titre}</p>
                   <span className="text-[10px] font-semibold text-[#2EA043] bg-[#2EA04318] px-1.5 py-0.5 rounded-full shrink-0">
                     {o.statut}
                   </span>
@@ -408,7 +408,7 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
             <select
               value={selectedOffre}
               onChange={e => setSelectedOffre(e.target.value)}
-              className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40 appearance-none pr-8"
+              className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[#F51E33]/40 appearance-none pr-8"
             >
               <option value="all">Toutes les offres</option>
               {offres.map(o => <option key={o.id} value={o.id}>{o.titre}</option>)}
@@ -421,7 +421,7 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
         {progress > 0 && (
           <div className="flex flex-col justify-end">
             <p className="text-xs text-[var(--text-secondary)] mb-1">{progressText}</p>
-            <div className="h-2 bg-[#1a2d50] rounded-full overflow-hidden">
+            <div className="h-2 bg-[var(--surface-alt)] rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-[#F51E33] rounded-full"
                 animate={{ width: `${progress}%` }}
@@ -450,7 +450,7 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               filter === f
-                ? 'bg-[#F51E33] text-[#F51E33]'
+                ? 'bg-[var(--primary)] text-white'
                 : 'bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
             }`}
           >
@@ -497,7 +497,7 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
                           {(c.nom ?? 'C').charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-[#FFFFFF]">{c.nom}</p>
+                          <p className="text-xs font-semibold text-[var(--text)]">{c.nom}</p>
                           <p className="text-[10px] text-[var(--text-secondary)] truncate max-w-[120px]">{c.email}</p>
                         </div>
                       </div>
@@ -584,7 +584,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <h3 className="text-base font-bold text-[#FFFFFF]">{c.nom}</h3>
+                  <h3 className="text-base font-bold text-[var(--text)]">{c.nom}</h3>
                   <p className="text-xs text-[var(--text-secondary)]">
                     {c.niveau_etudes} · {c.annees_experience} an{c.annees_experience !== 1 ? 's' : ''} exp.
                   </p>
@@ -651,7 +651,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                   <a
                     href={`https://wa.me/${c.telephone.replace(/\s/g, '')}`}
                     target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#142850]/10 border border-[#2EA043]/20 text-[#2EA043] rounded-lg text-xs font-semibold hover:bg-[#142850]/20 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface)]/10 border border-[#2EA043]/20 text-[#2EA043] rounded-lg text-xs font-semibold hover:bg-[var(--surface)]/20 transition-colors"
                   >
                     <Phone size={12} /> WhatsApp
                   </a>
@@ -659,7 +659,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 <button
                   onClick={() => updateStatut(c.id, 'retenu')}
                   disabled={c.statut === 'retenu'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#142850] text-white rounded-lg text-xs font-bold hover:bg-[#071535] transition-colors disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface)] text-white rounded-lg text-xs font-bold hover:bg-[#071535] transition-colors disabled:opacity-40"
                 >
                   <Check size={12} /> Retenir
                 </button>
@@ -700,13 +700,13 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
             <Bot size={15} className="text-[#F51E33]" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-[#FFFFFF]">Configuration de l'Agent</h3>
+            <h3 className="text-sm font-bold text-[var(--text)]">Configuration de l'Agent</h3>
             <p className="text-xs text-[var(--text-secondary)]">Décisions automatiques basées sur le score IA</p>
           </div>
           <div className="ml-auto">
             <button
               onClick={() => setConfig(c => ({ ...c, actif: !c.actif }))}
-              className={`relative w-11 h-6 rounded-full transition-colors ${config.actif ? 'bg-[#142850]' : 'bg-[#30363D]'}`}
+              className={`relative w-11 h-6 rounded-full transition-colors ${config.actif ? 'bg-[var(--surface)]' : 'bg-[#30363D]'}`}
             >
               <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${config.actif ? 'translate-x-5.5 translate-x-[22px]' : 'translate-x-0.5'}`} />
             </button>
@@ -719,7 +719,7 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
             <input
               value={config.nom}
               onChange={e => setConfig(c => ({ ...c, nom: e.target.value }))}
-              className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/40 transition-colors"
+              className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[#F51E33]/40 transition-colors"
             />
           </div>
           <div>
@@ -747,7 +747,7 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                     config.action === opt.val
                       ? 'bg-[#F51E33]/15 border-[#F51E33]/40 text-[#F51E33]'
-                      : 'bg-[#142850] border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
+                      : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
                   }`}
                 >
                   {opt.label}
@@ -760,7 +760,7 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
 
       {/* Historique décisions */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h3 className="text-sm font-bold text-[#FFFFFF] mb-3">
+        <h3 className="text-sm font-bold text-[var(--text)] mb-3">
           Décisions de l'agent ({autoDecisions.length})
         </h3>
         {autoDecisions.length === 0 ? (
@@ -779,7 +779,7 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
               >
                 <ScoreBadge score={c.score} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-[#FFFFFF] truncate">{c.nom}</p>
+                  <p className="text-xs font-semibold text-[var(--text)] truncate">{c.nom}</p>
                   <p className="text-[10px] text-[var(--text-secondary)]">{c.resume_court?.slice(0, 80)}...</p>
                 </div>
                 <span className="text-[10px] text-[#2EA043] bg-[#2EA04314] px-2 py-0.5 rounded-full shrink-0">
@@ -836,7 +836,7 @@ export default function RecrutementPage() {
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-lg font-bold text-[#FFFFFF]">Recrutement IA</h1>
+        <h1 className="text-lg font-bold text-[var(--text)]">Recrutement IA</h1>
         <p className="text-xs text-[var(--text-secondary)] mt-0.5">
           Analysez vos CVs avec l'IA · {offres.length} offre{offres.length !== 1 ? 's' : ''} · {candidats.length} candidat{candidats.length !== 1 ? 's' : ''}
         </p>
@@ -853,8 +853,8 @@ export default function RecrutementPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all flex-1 justify-center ${
                 active
-                  ? 'bg-[#F51E33] text-[#F51E33]'
-                  : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5'
+                  ? 'bg-[var(--primary)] text-white'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5'
               }`}
             >
               <Icon size={13} />

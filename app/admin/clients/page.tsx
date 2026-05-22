@@ -31,7 +31,7 @@ export default async function AdminClientsPage() {
           <Building2 size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Clients</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Clients</h1>
           <p className="text-xs text-[var(--text-secondary)]">{tenantRows.length} entreprise{tenantRows.length > 1 ? 's' : ''} inscrite{tenantRows.length > 1 ? 's' : ''}</p>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { useTenantContext } from '@/lib/contexts/TenantContext'
 
 export type EcoleRole =
   | 'DIRECTION_GENERALE'
@@ -28,38 +28,31 @@ export type EcoleRole =
 
 /**
  * Client-side route guard for role-protected pages.
+ * Lit depuis TenantContext (réactif aux changements d'auth cross-tab).
  * Redirects to `fallbackPath` if the user's ecole_role is not in `allowedRoles`.
- * Owners always pass. Call at the top of a page component.
- *
- * Usage:
- *   useRoleGuard(['DIRECTION_GENERALE', 'RAF'])
- *   useRoleGuard(['ETUDIANT'], '/dashboard/ecole')
+ * Owners always pass.
  */
 export function useRoleGuard(
   allowedRoles: EcoleRole[],
   fallbackPath = '/dashboard/ecole'
 ) {
   const router = useRouter()
+  const { tenant, loading } = useTenantContext()
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) { router.replace('/login'); return }
+    if (loading) return
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, ecole_role_name')
-        .eq('user_id', user.id)
-        .maybeSingle()
+    if (!tenant) {
+      router.replace('/login')
+      return
+    }
 
-      if (!profile) { router.replace('/login'); return }
+    // Owners always pass
+    if (tenant.role === 'owner') return
 
-      // Owners always pass
-      if (profile.role === 'owner') return
-
-      const ecoleRole = profile.ecole_role_name as EcoleRole | null
-      if (!ecoleRole || !allowedRoles.includes(ecoleRole)) {
-        router.replace(fallbackPath)
-      }
-    })
-  }, [allowedRoles, fallbackPath, router])
+    const ecoleRole = tenant.ecoleRole as EcoleRole | null
+    if (!ecoleRole || !allowedRoles.includes(ecoleRole)) {
+      router.replace(fallbackPath)
+    }
+  }, [tenant, loading, allowedRoles, fallbackPath, router])
 }

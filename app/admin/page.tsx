@@ -86,7 +86,7 @@ export default async function AdminPage() {
             <Icon size={15} style={{ color }} />
           </div>
         </div>
-        <p className="text-2xl font-bold text-[#FFFFFF] mb-1">{value}</p>
+        <p className="text-2xl font-bold text-[var(--text)] mb-1">{value}</p>
         {sub && <p className="text-xs text-[var(--text-secondary)]">{sub}</p>}
       </div>
     )
@@ -101,7 +101,7 @@ export default async function AdminPage() {
           <ShieldAlert size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Vue globale</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Vue globale</h1>
           <p className="text-xs text-[var(--text-secondary)]">Tableau de bord oraforme — données en temps réel</p>
         </div>
       </div>
@@ -136,7 +136,7 @@ export default async function AdminPage() {
         {/* Module revenue bar chart */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#FFFFFF]">Revenus par module (MRR)</h2>
+            <h2 className="text-sm font-semibold text-[var(--text)]">Revenus par module (MRR)</h2>
             <span className="text-xs text-[#F51E33] font-bold">{fmtFCFA(totalMRR)}/mois</span>
           </div>
           <ModuleRevenueChart data={moduleRevData} />
@@ -145,7 +145,7 @@ export default async function AdminPage() {
         {/* Growth line chart */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#FFFFFF]">Croissance clients (30 jours)</h2>
+            <h2 className="text-sm font-semibold text-[var(--text)]">Croissance clients (30 jours)</h2>
             <span className="text-xs text-[var(--text-secondary)]">{nbClients} total</span>
           </div>
           <GrowthChart data={growthData} />
@@ -154,12 +154,12 @@ export default async function AdminPage() {
 
       {/* Module breakdown detail */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Détail revenus par module</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Détail revenus par module</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {moduleRevData.map(m => (
-            <div key={m.module} className="bg-[#142850] border border-[var(--border)] rounded-lg p-3">
+            <div key={m.module} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-3">
               <p className="text-xs text-[var(--text-secondary)] truncate mb-1">{m.module}</p>
-              <p className="text-sm font-bold text-[#FFFFFF]">{m.clients} client{m.clients > 1 ? 's' : ''}</p>
+              <p className="text-sm font-bold text-[var(--text)]">{m.clients} client{m.clients > 1 ? 's' : ''}</p>
               <p className="text-xs text-[#F51E33] font-medium mt-0.5">{fmtFCFA(m.mrr)}/mois</p>
             </div>
           ))}
@@ -168,7 +168,7 @@ export default async function AdminPage() {
 
       {/* Clients table */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Tous les clients</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Tous les clients</h2>
         <AdminClientsTable tenants={tenantRows} />
       </div>
 

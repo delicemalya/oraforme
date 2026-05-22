@@ -51,7 +51,7 @@ function FInput({ label, ...p }: React.InputHTMLAttributes<HTMLInputElement> & {
   return (
     <div>
       {label && <label className="block text-xs text-[var(--text-secondary)] mb-1.5">{label}</label>}
-      <input {...p} className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 transition-colors" />
+      <input {...p} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 transition-colors" />
     </div>
   )
 }
@@ -59,7 +59,7 @@ function FSelect({ label, children, ...p }: React.SelectHTMLAttributes<HTMLSelec
   return (
     <div>
       {label && <label className="block text-xs text-[var(--text-secondary)] mb-1.5">{label}</label>}
-      <select {...p} className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F51E33]/50 transition-colors">
+      <select {...p} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[#F51E33]/50 transition-colors">
         {children}
       </select>
     </div>
@@ -71,8 +71,8 @@ function ModalShell({ title, children, onClose }: { title: string; children: Rea
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-[#FFFFFF]">{title}</h2>
-          <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors"><X size={16} /></button>
+          <h2 className="text-base font-semibold text-[var(--text)]">{title}</h2>
+          <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"><X size={16} /></button>
         </div>
         {children}
       </div>
@@ -82,11 +82,11 @@ function ModalShell({ title, children, onClose }: { title: string; children: Rea
 function ModalActions({ onCancel, onSave, saving, label }: { onCancel: () => void; onSave: () => void; saving: boolean; label: string }) {
   return (
     <div className="flex gap-3 pt-2">
-      <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+      <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
         Annuler
       </button>
       <button onClick={onSave} disabled={saving}
-        className="flex-1 py-2.5 rounded-xl bg-[#F51E33] text-[#F51E33] text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
+        className="flex-1 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
         {saving ? 'Enregistrement…' : label}
       </button>
     </div>
@@ -309,7 +309,7 @@ export default function StockPage() {
 
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-[#142850] border-[#142850]/40 text-[#FFFFFF]' : 'bg-[#142850] border-red-500/40 text-red-300'}`}>
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm shadow-2xl border transition-all ${toast.ok ? 'bg-[var(--surface)] border-[#142850]/40 text-[var(--text)]' : 'bg-[var(--surface)] border-red-500/40 text-red-300'}`}>
           {toast.ok ? <Check size={14} className="text-[#F51E33]" /> : <X size={14} className="text-red-400" />}
           {toast.msg}
         </div>
@@ -321,7 +321,7 @@ export default function StockPage() {
           <Package size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Stock & Inventaire</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Stock & Inventaire</h1>
           <p className="text-xs text-[var(--text-secondary)]">{products.length} produits{alertes.length > 0 && <span className="ml-2 text-red-400">· {alertes.length} alerte{alertes.length > 1 ? 's' : ''}</span>}</p>
         </div>
       </div>
@@ -356,7 +356,7 @@ export default function StockPage() {
           const active = tab === t.id
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium flex-1 justify-center transition-colors ${active ? 'bg-[#F51E33] text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium flex-1 justify-center transition-colors ${active ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'}`}
             >
               <Icon size={13} /><span className="hidden sm:inline">{t.label}</span>
             </button>
@@ -371,12 +371,12 @@ export default function StockPage() {
             <div className="relative flex-1">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
               <input placeholder="Rechercher par nom, SKU…" value={search} onChange={e => setSearch(e.target.value)}
-                className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/40" />
+                className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/40" />
             </div>
             <div className="flex gap-2 flex-wrap">
               {categories.map(c => (
                 <button key={c} onClick={() => setCatFilter(c)}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${catFilter === c ? 'bg-[#F51E33]/10 text-[#F51E33] border border-[#F51E33]/30' : 'bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF]'}`}>
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${catFilter === c ? 'bg-[#F51E33]/10 text-[#F51E33] border border-[#F51E33]/30' : 'bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)]'}`}>
                   {c === 'tous' ? 'Tous' : c}
                 </button>
               ))}
@@ -388,7 +388,7 @@ export default function StockPage() {
               )}
             </div>
             <button onClick={() => setMProd(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#F51E33] text-[#F51E33] rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors shrink-0">
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors shrink-0">
               <Plus size={14} /> Ajouter
             </button>
           </div>
@@ -416,15 +416,15 @@ export default function StockPage() {
                         return (
                           <tr key={p.id} className={`group ${i < filtered.length - 1 ? 'border-b border-[var(--border)]' : ''} hover:bg-white/5/50 transition-colors`}>
                             <td className="px-4 py-3">
-                              <p className="font-medium text-[#FFFFFF]">{p.nom}</p>
+                              <p className="font-medium text-[var(--text)]">{p.nom}</p>
                               {p.sku && <p className="text-xs text-[var(--text-secondary)]">SKU : {p.sku}</p>}
                             </td>
                             <td className="px-4 py-3 text-[var(--text-secondary)] whitespace-nowrap">{p.categorie || '—'}</td>
                             <td className="px-4 py-3 text-[var(--text-secondary)]">{p.unite}</td>
-                            <td className="px-4 py-3 text-[#FFFFFF] whitespace-nowrap">{fmtFCFA(p.prix_achat)}</td>
-                            <td className="px-4 py-3 text-[#FFFFFF] whitespace-nowrap">{fmtFCFA(p.prix_vente)}</td>
+                            <td className="px-4 py-3 text-[var(--text)] whitespace-nowrap">{fmtFCFA(p.prix_achat)}</td>
+                            <td className="px-4 py-3 text-[var(--text)] whitespace-nowrap">{fmtFCFA(p.prix_vente)}</td>
                             <td className="px-4 py-3">
-                              <span className={`font-bold ${enAlerte ? 'text-red-400' : 'text-[#FFFFFF]'}`}>{p.stock_actuel}</span>
+                              <span className={`font-bold ${enAlerte ? 'text-red-400' : 'text-[var(--text)]'}`}>{p.stock_actuel}</span>
                               <span className="text-xs text-[var(--text-secondary)] ml-1">{p.unite}</span>
                             </td>
                             <td className="px-4 py-3">
@@ -492,7 +492,7 @@ export default function StockPage() {
                             {new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                             {' '}{new Date(m.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                           </td>
-                          <td className="px-4 py-3 text-[#FFFFFF] font-medium">{(m.products as { nom: string } | null)?.nom ?? '—'}</td>
+                          <td className="px-4 py-3 text-[var(--text)] font-medium">{(m.products as { nom: string } | null)?.nom ?? '—'}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${mt.bg} ${mt.color}`}>
                               <MIcon size={9} />{mt.label}
@@ -518,7 +518,7 @@ export default function StockPage() {
       {tab === 'entrepots' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => setMWarehouse(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F51E33] text-[#F51E33] rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
+            <button onClick={() => setMWarehouse(true)} className="flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
               <Plus size={14} /> Ajouter un entrepôt
             </button>
           </div>
@@ -532,7 +532,7 @@ export default function StockPage() {
                     <Warehouse size={15} className="text-[#8B0070]" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#FFFFFF]">{w.nom}</p>
+                    <p className="font-semibold text-[var(--text)]">{w.nom}</p>
                     <p className="text-xs text-[var(--text-secondary)] mt-0.5">{w.localisation || 'Aucune localisation'}</p>
                   </div>
                 </div>
@@ -546,7 +546,7 @@ export default function StockPage() {
       {tab === 'fournisseurs' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => setMSupplier(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F51E33] text-[#F51E33] rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
+            <button onClick={() => setMSupplier(true)} className="flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
               <Plus size={14} /> Ajouter un fournisseur
             </button>
           </div>
@@ -565,7 +565,7 @@ export default function StockPage() {
                 <tbody>
                   {suppliers.map((s, i) => (
                     <tr key={s.id} className={`${i < suppliers.length - 1 ? 'border-b border-[var(--border)]' : ''} hover:bg-white/5/50 transition-colors`}>
-                      <td className="px-4 py-3 font-medium text-[#FFFFFF]">{s.nom}</td>
+                      <td className="px-4 py-3 font-medium text-[var(--text)]">{s.nom}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{s.telephone || '—'}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{s.email || '—'}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{s.adresse || '—'}</td>
@@ -582,7 +582,7 @@ export default function StockPage() {
       {tab === 'achats' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <button onClick={() => setMPurchase(true)} className="flex items-center gap-2 px-4 py-2 bg-[#F51E33] text-[#F51E33] rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
+            <button onClick={() => setMPurchase(true)} className="flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-xl text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
               <Plus size={14} /> Nouvel achat
             </button>
           </div>
@@ -604,7 +604,7 @@ export default function StockPage() {
                       <td className="px-4 py-3 text-xs text-[var(--text-secondary)] whitespace-nowrap">
                         {new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-4 py-3 text-[#FFFFFF]">{(p.suppliers as { nom: string } | null)?.nom ?? 'Sans fournisseur'}</td>
+                      <td className="px-4 py-3 text-[var(--text)]">{(p.suppliers as { nom: string } | null)?.nom ?? 'Sans fournisseur'}</td>
                       <td className="px-4 py-3 font-bold text-[#F51E33]">{fmtFCFA(p.montant_total)}</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.statut === 'reçu' ? 'bg-emerald-500/10 text-emerald-400' : p.statut === 'commande' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>
@@ -689,9 +689,9 @@ export default function StockPage() {
                 })}
               </div>
             </div>
-            <div className="bg-[#142850] rounded-xl px-4 py-3 flex items-center justify-between text-sm">
+            <div className="bg-[var(--surface)] rounded-xl px-4 py-3 flex items-center justify-between text-sm">
               <span className="text-[var(--text-secondary)]">Stock actuel</span>
-              <span className="font-bold text-[#FFFFFF]">{mAdjust.stock_actuel} <span className="text-[var(--text-secondary)] font-normal">{mAdjust.unite}</span></span>
+              <span className="font-bold text-[var(--text)]">{mAdjust.stock_actuel} <span className="text-[var(--text-secondary)] font-normal">{mAdjust.unite}</span></span>
             </div>
             <FInput
               label={adjForm.type === 'ADJUSTMENT' ? 'Delta (+/−) en ' + mAdjust.unite : `Quantité (${mAdjust.unite})`}
@@ -767,10 +767,10 @@ export default function StockPage() {
                     </FSelect>
                     <input type="number" min="0" placeholder="Qté" value={item.quantite}
                       onChange={e => setPurchForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? {...it, quantite: e.target.value} : it) }))}
-                      className="bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-2 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F51E33]/50 w-full" />
+                      className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[#F51E33]/50 w-full" />
                     <input type="number" min="0" placeholder="Prix" value={item.prix}
                       onChange={e => setPurchForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? {...it, prix: e.target.value} : it) }))}
-                      className="bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-2 text-sm text-[#FFFFFF] focus:outline-none focus:border-[#F51E33]/50 w-full" />
+                      className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[#F51E33]/50 w-full" />
                     <button onClick={() => setPurchForm(f => ({ ...f, items: f.items.filter((_, i) => i !== idx) }))}
                       className="text-[var(--text-secondary)] hover:text-red-400 transition-colors pb-2 self-end"><X size={13} /></button>
                   </div>
@@ -782,7 +782,7 @@ export default function StockPage() {
               </div>
             </div>
 
-            <div className="bg-[#142850] rounded-xl px-4 py-3 flex items-center justify-between">
+            <div className="bg-[var(--surface)] rounded-xl px-4 py-3 flex items-center justify-between">
               <span className="text-sm text-[var(--text-secondary)]">Total commande</span>
               <span className="font-bold text-[#F51E33]">{fmtFCFA(purchForm.items.reduce((s, i) => s + (Number(i.quantite) || 0) * (Number(i.prix) || 0), 0))}</span>
             </div>

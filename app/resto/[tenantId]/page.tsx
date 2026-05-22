@@ -96,7 +96,7 @@ export default function PublicOrderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#142850] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--surface)] flex items-center justify-center">
         <Loader2 className="animate-spin text-[#F51E33]" size={32} />
       </div>
     )
@@ -104,7 +104,7 @@ export default function PublicOrderPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#142850] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-[var(--surface)] flex flex-col items-center justify-center p-6 text-center">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -127,9 +127,9 @@ export default function PublicOrderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#142850]">
+    <div className="min-h-screen bg-[var(--surface)]">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#142850]/95 backdrop-blur border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-[var(--surface)]/95 backdrop-blur border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ChefHat size={20} className="text-[#F51E33]" />
           <div>
@@ -148,7 +148,7 @@ export default function PublicOrderPage() {
         >
           <ShoppingCart size={16} />
           {cartCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#F51E33] text-[#F51E33] text-[10px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--primary)] text-white text-[10px] font-bold flex items-center justify-center">
               {cartCount}
             </span>
           )}

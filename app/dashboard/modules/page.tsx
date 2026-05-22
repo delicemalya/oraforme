@@ -92,7 +92,7 @@ export default function ModulesMarketplacePage() {
             <Store size={18} className="text-[#F51E33]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#FFFFFF]">Modules</h1>
+            <h1 className="text-xl font-bold text-[var(--text)]">Modules</h1>
             <p className="text-xs text-[var(--text-secondary)]">
               {activeList.length} actif{activeList.length > 1 ? 's' : ''} · {fmtFCFA(mrrTotal)}/mois
             </p>
@@ -165,7 +165,7 @@ export default function ModulesMarketplacePage() {
                 <X size={16} />
               </button>
               <div className="text-3xl mb-3">{MODULE_ICONS[confirm.id]}</div>
-              <h3 className="text-base font-bold text-[#FFFFFF] mb-1">
+              <h3 className="text-base font-bold text-[var(--text)] mb-1">
                 {confirm.action === 'activate' ? 'Activer' : 'Désactiver'} {MODULE_LABELS[confirm.id]} ?
               </h3>
               {confirm.action === 'activate' ? (
@@ -181,7 +181,7 @@ export default function ModulesMarketplacePage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirm(null)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors"
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
                 >
                   Annuler
                 </button>
@@ -189,7 +189,7 @@ export default function ModulesMarketplacePage() {
                   onClick={() => toggleModule(confirm.id, confirm.action)}
                   className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     confirm.action === 'activate'
-                      ? 'bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90'
+                      ? 'bg-[var(--primary)] text-white hover:bg-[#F51E33]/90'
                       : 'bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] hover:bg-[#F51E33]/20'
                   }`}
                 >
@@ -238,7 +238,7 @@ function ModuleCard({
         <div className="flex items-center gap-2">
           <span className="text-2xl">{m.icon}</span>
           <div>
-            <p className="text-sm font-semibold text-[#FFFFFF]">{m.label}</p>
+            <p className="text-sm font-semibold text-[var(--text)]">{m.label}</p>
             <p className="text-xs text-[#F51E33] font-medium">{fmtFCFA(m.price)}/mois</p>
           </div>
         </div>
@@ -255,8 +255,8 @@ function ModuleCard({
         disabled={toggling}
         className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
           m.active
-            ? 'bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#F51E33] hover:border-[#F51E33]/30'
-            : 'bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90'
+            ? 'bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#F51E33] hover:border-[#F51E33]/30'
+            : 'bg-[var(--primary)] text-white hover:bg-[#F51E33]/90'
         }`}
       >
         {toggling

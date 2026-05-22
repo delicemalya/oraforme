@@ -21,8 +21,8 @@ export default function Modal({ title, onClose, children }: ModalProps) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-          <h2 className="text-base font-semibold text-[#FFFFFF]">{title}</h2>
-          <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+          <h2 className="text-base font-semibold text-[var(--text)]">{title}</h2>
+          <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
             <X size={18} />
           </button>
         </div>

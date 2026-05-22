@@ -77,7 +77,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                 <Smartphone size={18} className="text-[#F51E33]" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[#FFFFFF]">Lien de paiement Mobile Money</h3>
+                <h3 className="text-sm font-bold text-[var(--text)]">Lien de paiement Mobile Money</h3>
                 <p className="text-[10px] text-[var(--text-secondary)]">Airtel Money · MTN MoMo · Wave · Orange</p>
               </div>
               <button onClick={onClose} className="ml-auto text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors">
@@ -101,7 +101,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                             onClick={() => setOperator(op.id)}
                             className={`py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
                               operator === op.id
-                                ? 'border-[#F51E33] bg-[#F51E3315] text-[#FFFFFF]'
+                                ? 'border-[#F51E33] bg-[#F51E3315] text-[var(--text)]'
                                 : 'border-[var(--border)] text-[var(--text-secondary)] hover:border-[#484F58]'
                             }`}
                             style={{ borderColor: operator === op.id ? op.color : undefined }}
@@ -121,7 +121,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                         Numéro {selectedOp.name}
                       </label>
                       <div className="flex gap-2">
-                        <span className="px-3 py-2.5 rounded-xl bg-[#1a2d50] border border-[var(--border)] text-xs text-[var(--text-secondary)] whitespace-nowrap">
+                        <span className="px-3 py-2.5 rounded-xl bg-[var(--surface-alt)] border border-[var(--border)] text-xs text-[var(--text-secondary)] whitespace-nowrap">
                           {selectedOp.prefix}
                         </span>
                         <input
@@ -129,7 +129,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                           value={phone}
                           onChange={e => setPhone(e.target.value.replace(/[^0-9\s]/g, ''))}
                           placeholder="XX XXX XXX"
-                          className="flex-1 px-3 py-2.5 rounded-xl bg-[#1a2d50] border border-[var(--border)] text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33] focus:ring-1 focus:ring-[#F51E3320] transition-all"
+                          className="flex-1 px-3 py-2.5 rounded-xl bg-[var(--surface-alt)] border border-[var(--border)] text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33] focus:ring-1 focus:ring-[#F51E3320] transition-all"
                         />
                       </div>
                     </div>
@@ -142,7 +142,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                         value={amount}
                         onChange={e => setAmount(e.target.value)}
                         placeholder="0"
-                        className="w-full px-3 py-2.5 rounded-xl bg-[#1a2d50] border border-[var(--border)] text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33] focus:ring-1 focus:ring-[#F51E3320] transition-all"
+                        className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-alt)] border border-[var(--border)] text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33] focus:ring-1 focus:ring-[#F51E3320] transition-all"
                       />
                     </div>
 
@@ -165,14 +165,14 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                 {/* CONFIRM */}
                 {step === 'confirm' && (
                   <motion.div key="confirm" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                    <div className="bg-[#1a2d50] rounded-xl p-4 space-y-2.5">
+                    <div className="bg-[var(--surface-alt)] rounded-xl p-4 space-y-2.5">
                       <div className="flex justify-between text-sm">
                         <span className="text-[var(--text-secondary)]">Opérateur</span>
-                        <span className="text-[#FFFFFF] font-semibold">{selectedOp.name}</span>
+                        <span className="text-[var(--text)] font-semibold">{selectedOp.name}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-[var(--text-secondary)]">Numéro</span>
-                        <span className="text-[#FFFFFF] font-semibold">{selectedOp.prefix} {phone}</span>
+                        <span className="text-[var(--text)] font-semibold">{selectedOp.prefix} {phone}</span>
                       </div>
                       <div className="h-px bg-[#30363D]" />
                       <div className="flex justify-between">
@@ -183,7 +183,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => setStep('form')} className="flex-1 py-2.5 text-xs text-[var(--text-secondary)] bg-[#1a2d50] border border-[var(--border)] rounded-xl hover:border-[#484F58] transition-all">
+                      <button onClick={() => setStep('form')} className="flex-1 py-2.5 text-xs text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl hover:border-[#484F58] transition-all">
                         Modifier
                       </button>
                       <button
@@ -204,10 +204,10 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                       <div className="w-12 h-12 rounded-2xl bg-[#2EA04320] flex items-center justify-center mx-auto mb-3">
                         <CheckCircle2 size={24} className="text-[#2EA043]" />
                       </div>
-                      <p className="text-sm font-bold text-[#FFFFFF]">Lien généré avec succès !</p>
+                      <p className="text-sm font-bold text-[var(--text)]">Lien généré avec succès !</p>
                       <p className="text-xs text-[var(--text-secondary)] mt-1">Partagez ce lien par SMS ou WhatsApp</p>
                     </div>
-                    <div className="flex gap-2 items-center bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5">
+                    <div className="flex gap-2 items-center bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5">
                       <span className="text-xs text-[var(--text-secondary)] flex-1 truncate">{paymentLink}</span>
                       <button
                         onClick={copyLink}
@@ -224,7 +224,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                     >
                       📲 Envoyer via WhatsApp
                     </a>
-                    <button onClick={reset} className="w-full py-2 text-xs text-[var(--text-secondary)] bg-[#1a2d50] border border-[var(--border)] rounded-xl hover:border-[#484F58] transition-all">
+                    <button onClick={reset} className="w-full py-2 text-xs text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl hover:border-[#484F58] transition-all">
                       Nouveau paiement
                     </button>
                   </motion.div>

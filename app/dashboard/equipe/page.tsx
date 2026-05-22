@@ -108,7 +108,7 @@ function Toggle({ checked, onChange, disabled }: {
       onClick={() => !disabled && onChange(!checked)}
       disabled={disabled}
       className={`relative w-8 h-4 rounded-full transition-colors ${
-        checked ? 'bg-[#142850]' : 'bg-white/10'
+        checked ? 'bg-[var(--surface)]' : 'bg-white/10'
       } ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
     >
       <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${
@@ -391,7 +391,7 @@ export default function EquipePage() {
 
                 {inviteMsg && (
                   <div className={`flex items-center gap-2 text-sm rounded-lg px-3 py-2 ${
-                    inviteMsg.ok ? 'bg-[#142850]/10 text-[#A8C4E4]' : 'bg-red-500/10 text-red-400'
+                    inviteMsg.ok ? 'bg-[var(--surface)]/10 text-[#A8C4E4]' : 'bg-red-500/10 text-red-400'
                   }`}>
                     {inviteMsg.ok ? <Check size={14} /> : <X size={14} />}
                     {inviteMsg.text}

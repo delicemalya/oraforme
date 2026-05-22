@@ -387,7 +387,7 @@ export default function ParametresPage() {
               {costCenters.map(cc => (
                 <div key={cc.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <span className="text-xs font-mono font-bold text-[#F51E33] w-12 shrink-0">{cc.code}</span>
-                  <span className="text-xs text-[#FFFFFF] flex-1 truncate">{cc.nom}</span>
+                  <span className="text-xs text-[var(--text)] flex-1 truncate">{cc.nom}</span>
                   <span className="text-[10px] text-[var(--text-secondary)] shrink-0">{CC_TYPE_LABELS[cc.type] ?? cc.type}</span>
                   <button onClick={() => deleteCostCenter(cc.id)} className="shrink-0 text-[var(--text-secondary)] hover:text-[#F51E33] transition-colors ml-1">
                     <Trash2 size={12} />

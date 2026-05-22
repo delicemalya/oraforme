@@ -187,7 +187,7 @@ export default function TransportPage() {
       {/* ── Header ── */}
       <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF] flex items-center gap-2">
+          <h1 className="text-xl font-bold text-[var(--text)] flex items-center gap-2">
             <Truck size={20} className="text-[#F51E33]" /> Transport VTC
           </h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">Gestion de flotte, courses et chauffeurs</p>
@@ -195,7 +195,7 @@ export default function TransportPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setModal('chauffeur')}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[var(--text-secondary)] bg-[var(--card-bg)] border border-[var(--border)] rounded-xl hover:border-[#484F58] hover:text-[#FFFFFF] transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[var(--text-secondary)] bg-[var(--card-bg)] border border-[var(--border)] rounded-xl hover:border-[#484F58] hover:text-[var(--text)] transition-all"
           >
             <User size={11} /> Nouveau chauffeur
           </button>
@@ -240,7 +240,7 @@ export default function TransportPage() {
             key={tab_}
             onClick={() => setTab(i)}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-              tab === i ? 'bg-[#F51E33] text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+              tab === i ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
             }`}
           >
             {tab_}
@@ -304,7 +304,7 @@ export default function TransportPage() {
                         className="border-b border-[var(--border)] hover:bg-white/5/40 transition-colors"
                       >
                         <td className="px-4 py-3">
-                          <p className="text-xs font-semibold text-[#FFFFFF]">{c.client_nom}</p>
+                          <p className="text-xs font-semibold text-[var(--text)]">{c.client_nom}</p>
                           <p className="text-[10px] text-[var(--text-secondary)] flex items-center gap-1">
                             <Phone size={9} /> {c.client_tel}
                           </p>
@@ -322,7 +322,7 @@ export default function TransportPage() {
                           <p className="text-xs text-[var(--text-secondary)]">{c.chauffeur_nom ?? '—'}</p>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <p className="text-sm font-bold text-[#FFFFFF]">{fmtFCFA(c.tarif)}</p>
+                          <p className="text-sm font-bold text-[var(--text)]">{fmtFCFA(c.tarif)}</p>
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -345,7 +345,7 @@ export default function TransportPage() {
                             {c.statut === 'en_cours' && (
                               <button
                                 onClick={() => updateStatutCourse(c.id, 'terminee', c.chauffeur_id)}
-                                className="text-[10px] px-2 py-1 rounded-lg bg-[#142850]/10 text-[#F51E33] hover:bg-[#142850]/20 transition-all"
+                                className="text-[10px] px-2 py-1 rounded-lg bg-[var(--surface)]/10 text-[#F51E33] hover:bg-[var(--surface)]/20 transition-all"
                               >
                                 Terminer
                               </button>
@@ -394,7 +394,7 @@ export default function TransportPage() {
                           <span className="text-[#F51E33] font-bold text-sm">{ch.nom.charAt(0).toUpperCase()}</span>
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-[#FFFFFF]">{ch.nom}</p>
+                          <p className="text-sm font-semibold text-[var(--text)]">{ch.nom}</p>
                           <p className="text-[10px] text-[var(--text-secondary)] flex items-center gap-1">
                             <Phone size={9} /> {ch.telephone}
                           </p>
@@ -424,7 +424,7 @@ export default function TransportPage() {
                           await supabase.from('chauffeurs').update({ statut: next }).eq('id', ch.id)
                           load()
                         }}
-                        className="flex-1 text-[10px] py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:border-[#484F58] transition-all"
+                        className="flex-1 text-[10px] py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#484F58] transition-all"
                       >
                         {ch.statut === 'actif' ? 'Désactiver' : 'Activer'}
                       </button>
@@ -453,14 +453,14 @@ export default function TransportPage() {
                     <Icon size={16} style={{ color: s.color }} />
                     <p className="text-xs text-[var(--text-secondary)]">{s.label}</p>
                   </div>
-                  <p className="text-2xl font-bold text-[#FFFFFF]">{s.value}</p>
+                  <p className="text-2xl font-bold text-[var(--text)]">{s.value}</p>
                 </motion.div>
               )
             })}
           </div>
 
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
-            <p className="text-sm font-bold text-[#FFFFFF] mb-4">Revenus par chauffeur</p>
+            <p className="text-sm font-bold text-[var(--text)] mb-4">Revenus par chauffeur</p>
             {chauffeurs.length === 0 ? (
               <p className="text-xs text-[var(--text-secondary)] text-center py-4">Aucun chauffeur</p>
             ) : (
@@ -472,9 +472,9 @@ export default function TransportPage() {
                     <div key={ch.id}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-[var(--text-secondary)]">{ch.nom}</span>
-                        <span className="text-xs font-bold text-[#FFFFFF]">{fmtFCFA(rev)}</span>
+                        <span className="text-xs font-bold text-[var(--text)]">{fmtFCFA(rev)}</span>
                       </div>
-                      <div className="h-1.5 bg-[#1a2d50] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                         <motion.div
                           className="h-full rounded-full bg-[#F51E33]"
                           initial={{ width: 0 }}
@@ -504,8 +504,8 @@ export default function TransportPage() {
               className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-lg shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-bold text-[#FFFFFF]">Nouvelle course</h2>
-                <button onClick={() => setModal(null)} className="text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+                <h2 className="text-base font-bold text-[var(--text)]">Nouvelle course</h2>
+                <button onClick={() => setModal(null)} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                   <X size={18} />
                 </button>
               </div>
@@ -513,7 +513,7 @@ export default function TransportPage() {
                 <select
                   value={cForm.chauffeur_id}
                   onChange={e => setCForm(f => ({ ...f, chauffeur_id: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF]"
+                  className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)]"
                 >
                   <option value="">Sélectionner un chauffeur</option>
                   {chauffeurs.filter(c => c.statut === 'actif').map(c => (
@@ -523,31 +523,31 @@ export default function TransportPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <input placeholder="Nom client *" value={cForm.client_nom}
                     onChange={e => setCForm(f => ({ ...f, client_nom: e.target.value }))}
-                    className="bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                    className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                   <input placeholder="Téléphone" value={cForm.client_tel}
                     onChange={e => setCForm(f => ({ ...f, client_tel: e.target.value }))}
-                    className="bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                    className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                 </div>
                 <input placeholder="Point de départ *" value={cForm.depart}
                   onChange={e => setCForm(f => ({ ...f, depart: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                  className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                 <input placeholder="Destination *" value={cForm.arrivee}
                   onChange={e => setCForm(f => ({ ...f, arrivee: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                  className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                 <div className="grid grid-cols-3 gap-3">
                   <input placeholder="Distance (km)" type="number" value={cForm.distance_km}
                     onChange={e => setCForm(f => ({ ...f, distance_km: e.target.value }))}
-                    className="bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                    className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                   <input placeholder="Tarif (FCFA) *" type="number" value={cForm.tarif}
                     onChange={e => setCForm(f => ({ ...f, tarif: e.target.value }))}
-                    className="bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                    className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                   <input type="date" value={cForm.date}
                     onChange={e => setCForm(f => ({ ...f, date: e.target.value }))}
-                    className="bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF]" />
+                    className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)]" />
                 </div>
               </div>
               <div className="flex gap-3 mt-5">
-                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-all">
+                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-all">
                   Annuler
                 </button>
                 <button
@@ -578,32 +578,32 @@ export default function TransportPage() {
               className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-bold text-[#FFFFFF]">Nouveau chauffeur</h2>
-                <button onClick={() => setModal(null)} className="text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+                <h2 className="text-base font-bold text-[var(--text)]">Nouveau chauffeur</h2>
+                <button onClick={() => setModal(null)} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                   <X size={18} />
                 </button>
               </div>
               <div className="space-y-3">
                 <input placeholder="Nom complet *" value={dForm.nom}
                   onChange={e => setDForm(f => ({ ...f, nom: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                  className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                 <input placeholder="Téléphone" value={dForm.telephone}
                   onChange={e => setDForm(f => ({ ...f, telephone: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                  className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                 <input placeholder="N° de permis" value={dForm.permis}
                   onChange={e => setDForm(f => ({ ...f, permis: e.target.value }))}
-                  className="w-full bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                  className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                 <div className="grid grid-cols-2 gap-3">
                   <input placeholder="Modèle véhicule" value={dForm.vehicule}
                     onChange={e => setDForm(f => ({ ...f, vehicule: e.target.value }))}
-                    className="bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                    className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                   <input placeholder="Plaque" value={dForm.plaque}
                     onChange={e => setDForm(f => ({ ...f, plaque: e.target.value }))}
-                    className="bg-[#1a2d50] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58]" />
+                    className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58]" />
                 </div>
               </div>
               <div className="flex gap-3 mt-5">
-                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-all">
+                <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-all">
                   Annuler
                 </button>
                 <button

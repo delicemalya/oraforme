@@ -225,9 +225,9 @@ export default function AiAssistant() {
               <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] shrink-0" style={{ background: '#142850' }}>
                 <MIAALogo size={34} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-[#FFFFFF]">✨ MIAA+ — Assistant Intelligent</p>
+                  <p className="text-xs font-bold text-[var(--text)]">✨ MIAA+ — Assistant Intelligent</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#142850] animate-pulse shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--surface)] animate-pulse shrink-0" />
                     <p className="text-[10px] text-[var(--text-secondary)] truncate">Module : {MODULE_LABELS[currentModule] ?? currentModule}</p>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export default function AiAssistant() {
                       className={`max-w-[82%] text-xs px-3 py-2 rounded-2xl leading-relaxed ${
                         m.role === 'user'
                           ? 'rounded-br-sm text-[#F51E33] font-semibold'
-                          : 'rounded-bl-sm text-[#FFFFFF] border-l-2 border-[#F51E33]/60'
+                          : 'rounded-bl-sm text-[var(--text)] border-l-2 border-[#F51E33]/60'
                       }`}
                       style={m.role === 'user'
                         ? { background: '#F51E33' }
@@ -296,7 +296,7 @@ export default function AiAssistant() {
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="text-left text-[11px] text-[var(--text-secondary)] hover:text-[#FFFFFF] bg-[#142850] hover:bg-white/5 border border-[var(--border)] hover:border-[#F51E33]/30 rounded-xl px-3 py-1.5 transition-all"
+                      className="text-left text-[11px] text-[var(--text-secondary)] hover:text-[var(--text)] bg-[var(--surface)] hover:bg-white/5 border border-[var(--border)] hover:border-[#F51E33]/30 rounded-xl px-3 py-1.5 transition-all"
                     >
                       {s}
                     </button>
@@ -312,7 +312,7 @@ export default function AiAssistant() {
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
                   placeholder="Posez votre question à MIAA+…"
                   disabled={loading}
-                  className="flex-1 bg-[#142850] border border-[var(--border)] rounded-xl px-3 py-1.5 text-xs text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50 transition-colors disabled:opacity-50"
+                  className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3 py-1.5 text-xs text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50 transition-colors disabled:opacity-50"
                 />
                 <motion.button
                   whileTap={{ scale: 0.88 }}

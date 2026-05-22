@@ -113,7 +113,7 @@ export default function AchatsPage() {
           <ShoppingCart size={18} className="text-[#8B0070]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Achats & Fournisseurs</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Achats & Fournisseurs</h1>
           <p className="text-xs text-[var(--text-secondary)]">
             {fournisseurs.length} fournisseur{fournisseurs.length > 1 ? 's' : ''} ·
             <span className="text-[#F51E33] ml-1">Dettes : {fmtFCFA(totalDu)}</span>
@@ -130,7 +130,7 @@ export default function AchatsPage() {
         {TABS.map((t, i) => (
           <button key={i} onClick={() => setTab(i)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === i ? 'bg-[#8B0070]/10 text-[#8B0070]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+              tab === i ? 'bg-[#8B0070]/10 text-[#8B0070]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
             }`}>
             {t}
             {i === 2 && debtsByFournisseur.length > 0 && (
@@ -157,7 +157,7 @@ export default function AchatsPage() {
                       <span className="text-[#8B0070] text-sm font-bold">{f.nom.charAt(0).toUpperCase()}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#FFFFFF] truncate">{f.nom}</p>
+                      <p className="text-sm font-medium text-[var(--text)] truncate">{f.nom}</p>
                       <p className="text-xs text-[var(--text-secondary)]">{f.telephone || f.contact || f.email || '—'}</p>
                     </div>
                     {dette > 0 && (
@@ -199,9 +199,9 @@ export default function AchatsPage() {
                       <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs whitespace-nowrap">
                         {new Date(a.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                       </td>
-                      <td className="px-4 py-2.5 text-[#FFFFFF] max-w-[180px] truncate">{a.description}</td>
+                      <td className="px-4 py-2.5 text-[var(--text)] max-w-[180px] truncate">{a.description}</td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs">{f?.nom ?? '—'}</td>
-                      <td className="px-4 py-2.5 font-medium text-[#FFFFFF] whitespace-nowrap">{fmtFCFA(a.montant)}</td>
+                      <td className="px-4 py-2.5 font-medium text-[var(--text)] whitespace-nowrap">{fmtFCFA(a.montant)}</td>
                       <td className="px-4 py-2.5">
                         <span className={`text-xs px-2 py-0.5 rounded border ${STATUT_COLORS[a.statut] ?? STATUT_COLORS.impaye}`}>
                           {STATUT_LABELS[a.statut] ?? a.statut}
@@ -237,7 +237,7 @@ export default function AchatsPage() {
           {debtsByFournisseur.length === 0 ? (
             <div className="p-10 text-center">
               <CheckCircle size={32} className="text-[#2EA043] mx-auto mb-3" />
-              <p className="text-sm text-[#FFFFFF] font-medium">Aucune dette fournisseur !</p>
+              <p className="text-sm text-[var(--text)] font-medium">Aucune dette fournisseur !</p>
               <p className="text-xs text-[var(--text-secondary)] mt-1">Tous vos achats sont à jour</p>
             </div>
           ) : (
@@ -248,7 +248,7 @@ export default function AchatsPage() {
                   <div key={f.id} className="px-5 py-4">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-sm font-semibold text-[#FFFFFF]">{f.nom}</p>
+                        <p className="text-sm font-semibold text-[var(--text)]">{f.nom}</p>
                         <p className="text-xs text-[var(--text-secondary)]">{factures.length} achat{factures.length > 1 ? 's' : ''} impayé{factures.length > 1 ? 's' : ''}</p>
                       </div>
                       <p className="text-base font-bold text-[#F51E33]">{fmtFCFA(f.dette)}</p>
@@ -277,7 +277,7 @@ export default function AchatsPage() {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[#FFFFFF] mb-4">
+              <h3 className="text-base font-bold text-[var(--text)] mb-4">
                 {modal === 'fournisseur' ? '+ Nouveau fournisseur' : '+ Nouvel achat'}
               </h3>
               {modal === 'fournisseur' ? (
@@ -293,11 +293,11 @@ export default function AchatsPage() {
                       <input value={fForm[field.key as keyof typeof fForm]}
                         onChange={e => setFForm(f => ({ ...f, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
                     </div>
                   ))}
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
                     <button onClick={saveFournisseur} disabled={saving || !fForm.nom}
                       className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0070] text-white hover:bg-[#8B0070]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
@@ -309,7 +309,7 @@ export default function AchatsPage() {
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Fournisseur</label>
                     <select value={aForm.fournisseur_id} onChange={e => setAForm(f => ({ ...f, fournisseur_id: e.target.value }))}
-                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
                       <option value="">Sans fournisseur</option>
                       {fournisseurs.map(f => <option key={f.id} value={f.id}>{f.nom}</option>)}
                     </select>
@@ -318,13 +318,13 @@ export default function AchatsPage() {
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Description *</label>
                     <input value={aForm.description} onChange={e => setAForm(f => ({ ...f, description: e.target.value }))}
                       placeholder="Décrivez l'achat..."
-                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
                   </div>
                   {costCenters.length > 0 && (
                     <div>
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Centre de coût (facultatif)</label>
                       <select value={aForm.cost_center_id} onChange={e => setAForm(f => ({ ...f, cost_center_id: e.target.value }))}
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
                         <option value="">— Aucun centre —</option>
                         {costCenters.map(cc => <option key={cc.id} value={cc.id}>{cc.code} — {cc.nom}</option>)}
                       </select>
@@ -335,16 +335,16 @@ export default function AchatsPage() {
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA) *</label>
                       <input type="number" value={aForm.montant} onChange={e => setAForm(f => ({ ...f, montant: e.target.value }))}
                         placeholder="0"
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
                     </div>
                     <div>
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
                       <input type="date" value={aForm.date} onChange={e => setAForm(f => ({ ...f, date: e.target.value }))}
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
                     </div>
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
                     <button onClick={saveAchat} disabled={saving || !aForm.description || !aForm.montant}
                       className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0070] text-white hover:bg-[#8B0070]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer

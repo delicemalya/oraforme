@@ -98,10 +98,10 @@ export default function RegisterPage() {
             <div className="w-14 h-14 rounded-full bg-[#F51E33]/10 flex items-center justify-center mx-auto mb-5">
               <MailCheck size={28} className="text-[#F51E33]" />
             </div>
-            <h2 className="text-lg font-bold text-[#FFFFFF] mb-2">Vérifiez votre email</h2>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-2">Vérifiez votre email</h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
               Un lien de confirmation a été envoyé à{' '}
-              <span className="text-[#FFFFFF] font-medium">{form.email}</span>.
+              <span className="text-[var(--text)] font-medium">{form.email}</span>.
               Cliquez sur ce lien pour activer votre compte et démarrer l&apos;installation.
             </p>
             <p className="text-xs text-[var(--text-secondary)] mb-6">
@@ -125,7 +125,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Back button */}
         <div className="mb-4">
-          <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+          <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M9.78 12.78a.75.75 0 0 1-1.06 0L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 1.06L6.06 8l3.72 3.72a.75.75 0 0 1 0 1.06z"/></svg>
             Se connecter
           </Link>
@@ -136,14 +136,14 @@ export default function RegisterPage() {
           <div className="inline-flex items-center gap-2 mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8" />
-            <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
+            <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
           </div>
           <p className="text-[var(--text-secondary)] text-sm">Créez votre espace entreprise</p>
         </div>
 
         {/* Card */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-8">
-          <h1 className="text-lg font-semibold text-[#FFFFFF] mb-6">Créer un compte</h1>
+          <h1 className="text-lg font-semibold text-[var(--text)] mb-6">Créer un compte</h1>
 
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
             <Input

@@ -70,7 +70,7 @@ export default function PWAInstall() {
               <Smartphone size={20} className="text-[#F51E33]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#FFFFFF]">Installer Oraforme</p>
+              <p className="text-sm font-bold text-[var(--text)]">Installer Oraforme</p>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
                 Accédez rapidement depuis votre écran d'accueil, même hors ligne.
               </p>
@@ -80,7 +80,7 @@ export default function PWAInstall() {
             </button>
           </div>
           <div className="flex gap-2 mt-3">
-            <button onClick={dismiss} className="flex-1 py-2 text-xs text-[var(--text-secondary)] bg-[#1a2d50] border border-[var(--border)] rounded-xl hover:border-[#484F58] transition-all">
+            <button onClick={dismiss} className="flex-1 py-2 text-xs text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl hover:border-[#484F58] transition-all">
               Plus tard
             </button>
             <button onClick={install} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#F51E33] bg-[#F51E33] rounded-xl hover:bg-[#E09000] transition-all">

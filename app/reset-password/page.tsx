@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
             <div className="w-14 h-14 rounded-full bg-[#2EA043]/10 flex items-center justify-center mx-auto mb-5">
               <CheckCircle size={28} className="text-[#2EA043]" />
             </div>
-            <h2 className="text-lg font-bold text-[#FFFFFF] mb-2">Mot de passe mis à jour</h2>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-2">Mot de passe mis à jour</h2>
             <p className="text-sm text-[var(--text-secondary)]">Vous allez être redirigé vers votre tableau de bord...</p>
           </div>
         </div>
@@ -61,11 +61,11 @@ export default function ResetPasswordPage() {
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8 mx-auto mb-2" />
-          <span className="text-xl font-bold text-[#FFFFFF]">oraforme</span>
+          <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
         </div>
 
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-8">
-          <h1 className="text-base font-semibold text-[#FFFFFF] mb-1">Nouveau mot de passe</h1>
+          <h1 className="text-base font-semibold text-[var(--text)] mb-1">Nouveau mot de passe</h1>
           <p className="text-sm text-[var(--text-secondary)] mb-6">Choisissez un mot de passe sécurisé d&apos;au moins 8 caractères.</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -78,7 +78,7 @@ export default function ResetPasswordPage() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[#FFFFFF] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
               />
             </div>
 

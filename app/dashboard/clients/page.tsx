@@ -34,7 +34,7 @@ function KpiCard({ label, value, sub, icon: Icon, color }: { label: string; valu
       </div>
       <div className="min-w-0">
         <p className="text-[11px] text-[var(--text-secondary)] font-medium uppercase tracking-wide mb-0.5">{label}</p>
-        <p className="text-xl font-bold text-[#FFFFFF] leading-none">{value}</p>
+        <p className="text-xl font-bold text-[var(--text)] leading-none">{value}</p>
         <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{sub}</p>
       </div>
     </div>
@@ -52,7 +52,7 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#142850] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/60 transition-colors"
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/60 transition-colors"
       />
     </div>
   )
@@ -131,7 +131,7 @@ export default function ClientsPage() {
         {toast && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="fixed top-4 right-4 z-50 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-3 text-sm text-[#FFFFFF] shadow-2xl flex items-center gap-2"
+            className="fixed top-4 right-4 z-50 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-3 text-sm text-[var(--text)] shadow-2xl flex items-center gap-2"
           >
             <CheckCircle size={14} className="text-[#F51E33]" /> {toast}
           </motion.div>
@@ -141,7 +141,7 @@ export default function ClientsPage() {
       {/* Header */}
       <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Clients</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Clients</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             {clients.length} client{clients.length !== 1 ? 's' : ''} enregistré{clients.length !== 1 ? 's' : ''}
           </p>
@@ -167,7 +167,7 @@ export default function ClientsPage() {
       <motion.div {...fadeUp(2)} className="relative max-w-sm">
         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
         <input
-          className="w-full pl-9 pr-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 transition-colors"
+          className="w-full pl-9 pr-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 transition-colors"
           placeholder="Rechercher un client…"
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -177,7 +177,7 @@ export default function ClientsPage() {
       {/* Empty state */}
       {clients.length === 0 ? (
         <motion.div {...fadeUp(3)} className="flex flex-col items-center justify-center py-20 gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-[#1a2d50] flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--surface-alt)] flex items-center justify-center">
             <Users size={28} className="text-[var(--text-secondary)]" />
           </div>
           <div className="text-center">
@@ -223,7 +223,7 @@ export default function ClientsPage() {
                         {initials(c.nom)}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#FFFFFF] leading-tight">{c.nom}</p>
+                        <p className="text-sm font-semibold text-[var(--text)] leading-tight">{c.nom}</p>
                         <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{fmtDate(c.created_at)}</p>
                       </div>
                     </div>
@@ -298,9 +298,9 @@ export default function ClientsPage() {
                     <div className="w-8 h-8 rounded-lg bg-[#F51E33]/15 flex items-center justify-center">
                       <UserPlus size={15} className="text-[#F51E33]" />
                     </div>
-                    <h2 className="text-base font-bold text-[#FFFFFF]">Nouveau client</h2>
+                    <h2 className="text-base font-bold text-[var(--text)]">Nouveau client</h2>
                   </div>
-                  <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors p-1">
+                  <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors p-1">
                     <X size={18} />
                   </button>
                 </div>
@@ -316,14 +316,14 @@ export default function ClientsPage() {
                       value={form.adresse}
                       onChange={e => setField('adresse', e.target.value)}
                       placeholder="Adresse complète"
-                      className="w-full bg-[#142850] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[#FFFFFF] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/60 transition-colors resize-none"
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/60 transition-colors resize-none"
                     />
                   </div>
 
                   <div className="flex gap-3 pt-1">
                     <button
                       onClick={() => setShowForm(false)}
-                      className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] text-sm font-medium transition-colors"
+                      className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] text-sm font-medium transition-colors"
                     >
                       Annuler
                     </button>
@@ -357,7 +357,7 @@ export default function ClientsPage() {
                 <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
                   <Trash2 size={20} className="text-red-400" />
                 </div>
-                <p className="text-sm font-bold text-[#FFFFFF] mb-1">Supprimer ce client ?</p>
+                <p className="text-sm font-bold text-[var(--text)] mb-1">Supprimer ce client ?</p>
                 <p className="text-xs text-[var(--text-secondary)] mb-5">Cette action est irréversible.</p>
                 <div className="flex gap-3">
                   <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-white text-sm font-medium transition-colors">

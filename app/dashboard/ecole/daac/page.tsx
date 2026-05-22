@@ -80,7 +80,7 @@ export default function DaacPage() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">DAAC — Direction des Affaires Académiques</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">DAAC — Direction des Affaires Académiques</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">
             Programmes, sessions, examens, délibérations, diplômes & soutenances
           </p>
@@ -103,7 +103,7 @@ export default function DaacPage() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
-                tab === t.id ? 'bg-[#F51E33] text-white' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+                tab === t.id ? 'bg-[#F51E33] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
               }`}
             >
               <t.icon size={12} />

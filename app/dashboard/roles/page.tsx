@@ -73,7 +73,7 @@ function Toggle({ checked, onChange, disabled }: {
       onClick={() => !disabled && onChange(!checked)}
       disabled={disabled}
       className={`relative w-8 h-4 rounded-full transition-colors ${
-        checked ? 'bg-[#142850]' : 'bg-white/10'
+        checked ? 'bg-[var(--surface)]' : 'bg-white/10'
       } ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
     >
       <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${checked ? 'left-4' : 'left-0.5'}`} />

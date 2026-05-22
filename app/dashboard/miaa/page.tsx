@@ -183,11 +183,11 @@ export default function MIAAPage() {
           <MIAALogo size={40} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-[#FFFFFF]">✨ MIAA+ — Assistant Intelligent</h1>
+              <h1 className="text-sm font-bold text-[var(--text)]">✨ MIAA+ — Assistant Intelligent</h1>
               <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#F51E3320', color: '#F51E33' }}>IA</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#142850] animate-pulse shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--surface)] animate-pulse shrink-0" />
               <p className="text-[10px] text-[var(--text-secondary)] truncate">
                 {entreprise ? `${entreprise} · ` : ''}oraforme ERP · Spécialisé Congo-Brazzaville
               </p>
@@ -222,7 +222,7 @@ export default function MIAAPage() {
                   className={`max-w-[78%] text-xs px-3.5 py-2.5 rounded-2xl leading-relaxed ${
                     m.role === 'user'
                       ? 'rounded-br-sm font-semibold text-[#F51E33]'
-                      : 'rounded-bl-sm text-[#FFFFFF] border-l-2 border-[#F51E33]/50'
+                      : 'rounded-bl-sm text-[var(--text)] border-l-2 border-[#F51E33]/50'
                   }`}
                   style={m.role === 'user' ? { background: '#F51E33' } : { background: '#1C2128' }}
                   dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
@@ -262,7 +262,7 @@ export default function MIAAPage() {
               <button
                 key={s}
                 onClick={() => send(s)}
-                className="text-[11px] text-[var(--text-secondary)] hover:text-[#FFFFFF] bg-[#142850] hover:bg-white/5 border border-[var(--border)] hover:border-[#F51E33]/40 rounded-full px-3 py-1 transition-all"
+                className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text)] bg-[var(--surface)] hover:bg-white/5 border border-[var(--border)] hover:border-[#F51E33]/40 rounded-full px-3 py-1 transition-all"
               >
                 {s}
               </button>
@@ -279,7 +279,7 @@ export default function MIAAPage() {
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
             placeholder="Posez votre question à MIAA+… (Entrée pour envoyer)"
             disabled={loading}
-            className="flex-1 bg-[#142850] border border-[var(--border)] rounded-xl px-4 py-2 text-xs text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50 transition-colors disabled:opacity-50"
+            className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-2 text-xs text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50 transition-colors disabled:opacity-50"
           />
           <motion.button
             whileTap={{ scale: 0.88 }}
@@ -298,7 +298,7 @@ export default function MIAAPage() {
 
         {/* Capabilities */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
-          <p className="text-xs font-bold text-[#FFFFFF] mb-3 flex items-center gap-2">
+          <p className="text-xs font-bold text-[var(--text)] mb-3 flex items-center gap-2">
             <Sparkles size={13} className="text-[#F51E33]" /> Capacités MIAA+
           </p>
           <div className="grid grid-cols-2 gap-2">
@@ -312,7 +312,7 @@ export default function MIAAPage() {
                   style={{ background: `${cap.color}08` }}
                 >
                   <Icon size={14} style={{ color: cap.color }} className="mb-1.5" />
-                  <p className="text-[10px] font-semibold text-[#FFFFFF] leading-tight">{cap.label}</p>
+                  <p className="text-[10px] font-semibold text-[var(--text)] leading-tight">{cap.label}</p>
                   <p className="text-[9px] text-[var(--text-secondary)] mt-0.5 leading-tight">{cap.desc}</p>
                 </motion.div>
               )
@@ -322,7 +322,7 @@ export default function MIAAPage() {
 
         {/* Quick actions by category */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4 flex-1">
-          <p className="text-xs font-bold text-[#FFFFFF] mb-3">Questions rapides</p>
+          <p className="text-xs font-bold text-[var(--text)] mb-3">Questions rapides</p>
           <div className="space-y-2">
             {QUICK_CATEGORIES.map((cat, ci) => (
               <div key={cat.label} className="border border-white/[0.05] rounded-xl overflow-hidden">
@@ -350,7 +350,7 @@ export default function MIAAPage() {
                           <button
                             key={a}
                             onClick={() => send(a)}
-                            className="w-full text-left text-[10px] text-[var(--text-secondary)] hover:text-[#FFFFFF] hover:bg-white/5 px-2 py-1.5 rounded-lg transition-all"
+                            className="w-full text-left text-[10px] text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5 px-2 py-1.5 rounded-lg transition-all"
                           >
                             {a}
                           </button>

@@ -54,7 +54,7 @@ export default async function AdminRevenusPage() {
           <TrendingUp size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Revenus & MRR</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Revenus & MRR</h1>
           <p className="text-xs text-[var(--text-secondary)]">Tableau de bord financier oraforme</p>
         </div>
       </div>
@@ -78,18 +78,18 @@ export default async function AdminRevenusPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">MRR par module</h2>
+          <h2 className="text-sm font-semibold text-[var(--text)] mb-4">MRR par module</h2>
           <ModuleRevenueChart data={moduleRevData} />
         </div>
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Évolution clients (12 mois)</h2>
+          <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Évolution clients (12 mois)</h2>
           <GrowthChart data={monthlyData} />
         </div>
       </div>
 
       {/* MRR par plan */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">MRR par plan tarifaire</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4">MRR par plan tarifaire</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { plan: 'starter', color: '#8B949E', label: 'Starter' },
@@ -99,16 +99,16 @@ export default async function AdminRevenusPage() {
             const nb = tenants.filter(t => t.plan === p.plan).length
             const mrr = mrrByPlan[p.plan] ?? 0
             return (
-              <div key={p.plan} className="bg-[#142850] border border-[var(--border)] rounded-xl p-4">
+              <div key={p.plan} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium" style={{ color: p.color }}>{p.label}</span>
                   <span className="text-xs text-[var(--text-secondary)]">{nb} client{nb > 1 ? 's' : ''}</span>
                 </div>
-                <p className="text-xl font-bold text-[#FFFFFF]">{fmtFCFA(mrr)}</p>
+                <p className="text-xl font-bold text-[var(--text)]">{fmtFCFA(mrr)}</p>
                 <p className="text-xs text-[var(--text-secondary)] mt-1">
                   {totalMRR > 0 ? Math.round((mrr / totalMRR) * 100) : 0}% du MRR total
                 </p>
-                <div className="h-1 bg-[#1a2d50] rounded-full mt-3 overflow-hidden">
+                <div className="h-1 bg-[var(--surface-alt)] rounded-full mt-3 overflow-hidden">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -125,18 +125,18 @@ export default async function AdminRevenusPage() {
 
       {/* Module detail table */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Détail MRR par module</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Détail MRR par module</h2>
         <div className="space-y-2">
           {moduleRevData.map(m => (
             <div key={m.module} className="flex items-center gap-3">
               <p className="text-sm text-[var(--text-secondary)] w-28 shrink-0">{m.module}</p>
-              <div className="flex-1 h-2 bg-[#1a2d50] rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#F51E33] rounded-full"
                   style={{ width: `${totalMRR > 0 ? (m.mrr / totalMRR) * 100 : 0}%` }}
                 />
               </div>
-              <p className="text-sm font-medium text-[#FFFFFF] w-32 text-right shrink-0">{fmtFCFA(m.mrr)}</p>
+              <p className="text-sm font-medium text-[var(--text)] w-32 text-right shrink-0">{fmtFCFA(m.mrr)}</p>
               <p className="text-xs text-[var(--text-secondary)] w-8 text-right shrink-0">
                 {totalMRR > 0 ? Math.round((m.mrr / totalMRR) * 100) : 0}%
               </p>

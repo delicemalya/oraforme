@@ -178,13 +178,13 @@ export default function InvoicePreviewPage() {
   // ── Loading / error states ────────────────────────────────────────────────────
 
   if (loading) return (
-    <div className="fixed inset-0 z-50 bg-[#142850] flex items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-[var(--surface)] flex items-center justify-center">
       <Loader2 className="animate-spin text-[#F51E33]" size={32} />
     </div>
   )
 
   if (!facture) return (
-    <div className="fixed inset-0 z-50 bg-[#142850] flex flex-col items-center justify-center gap-4">
+    <div className="fixed inset-0 z-50 bg-[var(--surface)] flex flex-col items-center justify-center gap-4">
       <AlertTriangle size={40} className="text-red-400" />
       <p className="text-white font-semibold">Facture introuvable</p>
       <button onClick={() => router.back()} className="text-sm text-[var(--text-secondary)] hover:text-white">← Retour</button>
@@ -210,7 +210,7 @@ export default function InvoicePreviewPage() {
         }
       `}</style>
 
-      <div className="fixed inset-0 z-50 bg-[#142850] flex flex-col">
+      <div className="fixed inset-0 z-50 bg-[var(--surface)] flex flex-col">
 
         {/* ── TOP ACTION BAR ────────────────────────────────────────────────── */}
         <div id="preview-bar" className="h-14 shrink-0 flex items-center px-4 gap-3 border-b border-white/[0.06]" style={{ background: '#0f1e3d' }}>

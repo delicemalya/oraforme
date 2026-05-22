@@ -367,7 +367,7 @@ export default function RestaurantPage() {
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[#FFFFFF] shadow-xl animate-pulse">
+        <div className="fixed top-4 right-4 z-50 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--text)] shadow-xl animate-pulse">
           {toast}
         </div>
       )}
@@ -375,7 +375,7 @@ export default function RestaurantPage() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-[#FFFFFF]">Restaurant & POS</h1>
+          <h1 className="text-2xl font-bold text-[var(--text)]">Restaurant & POS</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">
             CA du jour : <span className="text-[#F51E33] font-semibold">{fmtFCFA(caDuJour)}</span>
             {' · '}{cmdsDuJour.length} commande{cmdsDuJour.length > 1 ? 's' : ''}
@@ -383,7 +383,7 @@ export default function RestaurantPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button onClick={fetchAll} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] text-xs transition-colors">
+          <button onClick={fetchAll} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] text-xs transition-colors">
             <RefreshCw size={13} />
           </button>
           <Link href="/dashboard/restaurant/cuisine"
@@ -397,7 +397,7 @@ export default function RestaurantPage() {
       <div className="flex flex-wrap gap-1 mb-5 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-1 w-fit">
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${tab === t.key ? 'bg-[#F51E33] text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'}`}>
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${tab === t.key ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'}`}>
             {t.label}
           </button>
         ))}
@@ -431,12 +431,12 @@ export default function RestaurantPage() {
           {categories.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-4">
               <button onClick={() => setCatFilter('')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!catFilter ? 'bg-[#F51E33]/15 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] border border-[var(--border)]'}`}>
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!catFilter ? 'bg-[#F51E33]/15 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] border border-[var(--border)]'}`}>
                 Tous
               </button>
               {categories.map(cat => (
                 <button key={cat} onClick={() => setCatFilter(cat === catFilter ? '' : cat)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${catFilter === cat ? 'bg-[#F51E33]/15 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF] border border-[var(--border)]'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${catFilter === cat ? 'bg-[#F51E33]/15 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] border border-[var(--border)]'}`}>
                   {cat}
                 </button>
               ))}
@@ -461,7 +461,7 @@ export default function RestaurantPage() {
                           : 'border-[var(--border)] bg-[var(--card-bg)]/50 opacity-40 cursor-not-allowed'
                       }`}>
                       <div className="text-2xl mb-2">{item.emoji}</div>
-                      <p className="text-sm font-medium text-[#FFFFFF] leading-tight">{item.nom}</p>
+                      <p className="text-sm font-medium text-[var(--text)] leading-tight">{item.nom}</p>
                       <p className="text-xs font-bold text-[#F51E33] mt-1">{fmtFCFA(item.prix)}</p>
                       {!item.disponible && (
                         <span className="absolute top-2 right-2 text-[9px] bg-[#F51E33]/15 text-[#F51E33] px-1 py-0.5 rounded font-bold">INDISPO</span>
@@ -476,7 +476,7 @@ export default function RestaurantPage() {
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 flex flex-col h-fit sticky top-6">
               <div className="flex items-center gap-2 mb-4">
                 <ShoppingCart size={16} className="text-[#F51E33]" />
-                <h3 className="font-semibold text-[#FFFFFF] text-sm">Commande en cours</h3>
+                <h3 className="font-semibold text-[var(--text)] text-sm">Commande en cours</h3>
                 {panier.length > 0 && (
                   <button onClick={() => setPanier([])} className="ml-auto text-[var(--text-secondary)] hover:text-[#F51E33] transition-colors">
                     <Trash2 size={13} />
@@ -487,12 +487,12 @@ export default function RestaurantPage() {
               {/* Table + mode */}
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <select value={tableNum} onChange={e => setTableNum(e.target.value)}
-                  className="px-2 py-2 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[#FFFFFF] text-xs focus:outline-none focus:border-[#F51E33]">
+                  className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#F51E33]">
                   <option value="">À emporter</option>
                   {tables.map(t => <option key={t.id} value={String(t.numero)}>Table {t.numero}{t.nom ? ` — ${t.nom}` : ''}</option>)}
                 </select>
                 <select value={mode} onChange={e => setMode(e.target.value as ModeCmd)}
-                  className="px-2 py-2 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[#FFFFFF] text-xs focus:outline-none focus:border-[#F51E33]">
+                  className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#F51E33]">
                   <option value="sur_place">Sur place</option>
                   <option value="emporter">À emporter</option>
                   <option value="livraison">Livraison</option>
@@ -507,13 +507,13 @@ export default function RestaurantPage() {
                   {panier.map(item => (
                     <div key={item.nom} className="flex items-center justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-[#FFFFFF] truncate">{item.nom}</p>
+                        <p className="text-xs font-medium text-[var(--text)] truncate">{item.nom}</p>
                         <p className="text-xs text-[var(--text-secondary)]">{fmtFCFA(item.prix)}</p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
-                        <button onClick={() => changerQte(item.nom, -1)} className="w-5 h-5 rounded bg-[#1a2d50] text-[var(--text-secondary)] hover:text-[#FFFFFF] text-xs font-bold flex items-center justify-center">−</button>
-                        <span className="text-xs font-bold text-[#FFFFFF] w-5 text-center">{item.quantite}</span>
-                        <button onClick={() => changerQte(item.nom, +1)} className="w-5 h-5 rounded bg-[#1a2d50] text-[var(--text-secondary)] hover:text-[#FFFFFF] text-xs font-bold flex items-center justify-center">+</button>
+                        <button onClick={() => changerQte(item.nom, -1)} className="w-5 h-5 rounded bg-[var(--surface-alt)] text-[var(--text-secondary)] hover:text-[var(--text)] text-xs font-bold flex items-center justify-center">−</button>
+                        <span className="text-xs font-bold text-[var(--text)] w-5 text-center">{item.quantite}</span>
+                        <button onClick={() => changerQte(item.nom, +1)} className="w-5 h-5 rounded bg-[var(--surface-alt)] text-[var(--text-secondary)] hover:text-[var(--text)] text-xs font-bold flex items-center justify-center">+</button>
                       </div>
                       <span className="text-xs font-semibold text-[#F51E33] shrink-0 w-20 text-right">{fmtFCFA(item.prix * item.quantite)}</span>
                     </div>
@@ -535,7 +535,7 @@ export default function RestaurantPage() {
                       <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                         <span>CA (5% TVA)</span><span>{fmtFCFA(ca)}</span>
                       </div>
-                      <div className="flex justify-between text-sm font-bold text-[#FFFFFF] border-t border-[var(--border)] pt-1.5">
+                      <div className="flex justify-between text-sm font-bold text-[var(--text)] border-t border-[var(--border)] pt-1.5">
                         <span>Total TTC</span><span className="text-[#F51E33]">{fmtFCFA(ttc)}</span>
                       </div>
                     </div>
@@ -546,7 +546,7 @@ export default function RestaurantPage() {
                         <button key={mp.key} onClick={() => setModePaie(mp.key)}
                           style={{ borderColor: modePaie === mp.key ? mp.color : undefined, color: modePaie === mp.key ? mp.color : undefined }}
                           className={`flex-1 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
-                            modePaie === mp.key ? 'bg-opacity-10' : 'border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+                            modePaie === mp.key ? 'bg-opacity-10' : 'border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)]'
                           }`}>
                           {mp.label}
                         </button>
@@ -554,7 +554,7 @@ export default function RestaurantPage() {
                     </div>
 
                     <button onClick={passerCommande} disabled={savingCmd}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#F51E33] text-[#F51E33] text-sm font-bold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
                       {savingCmd ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
                       Valider & Imprimer reçu
                     </button>
@@ -572,7 +572,7 @@ export default function RestaurantPage() {
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-[var(--text-secondary)]">{commandes.length} commande(s) récentes</p>
             <div className="flex gap-2">
-              <button onClick={fetchAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] text-xs transition-colors">
+              <button onClick={fetchAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] text-xs transition-colors">
                 <RefreshCw size={12} /> Actualiser
               </button>
               <Link href="/dashboard/restaurant/cuisine"
@@ -592,7 +592,7 @@ export default function RestaurantPage() {
                 <div key={col.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
                   <div className="px-4 py-3 border-b border-[var(--border)] flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full" style={{ background: col.color }} />
-                    <span className="text-sm font-semibold text-[#FFFFFF]">{col.label}</span>
+                    <span className="text-sm font-semibold text-[var(--text)]">{col.label}</span>
                     <span className="ml-auto text-xs text-[var(--text-secondary)]">{cols.length}</span>
                   </div>
                   <div className="p-3 space-y-2 min-h-[200px]">
@@ -600,9 +600,9 @@ export default function RestaurantPage() {
                       <p className="text-xs text-[var(--text-secondary)] text-center pt-8">Aucune commande</p>
                     )}
                     {cols.map(cmd => (
-                      <div key={cmd.id} className="bg-[#142850] border border-[var(--border)] rounded-lg p-3">
+                      <div key={cmd.id} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-3">
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-xs font-bold text-[#FFFFFF]">
+                          <span className="text-xs font-bold text-[var(--text)]">
                             {cmd.numero_recu ?? cmd.id.slice(0,8)}
                           </span>
                           <span className="text-xs text-[var(--text-secondary)]">
@@ -611,7 +611,7 @@ export default function RestaurantPage() {
                         </div>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {(cmd.items as CmdItem[]).map((it, i) => (
-                            <span key={i} className="text-[10px] bg-[#1a2d50] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
+                            <span key={i} className="text-[10px] bg-[var(--surface-alt)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
                               {it.quantite}× {it.nom}
                             </span>
                           ))}
@@ -650,7 +650,7 @@ export default function RestaurantPage() {
         <div>
           <div className="flex justify-end mb-4">
             <button onClick={() => setShowMenuForm(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F51E33] text-[#F51E33] text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
               <Plus size={15} /> Ajouter un plat
             </button>
           </div>
@@ -672,7 +672,7 @@ export default function RestaurantPage() {
                 <tbody>
                   {menu.map((item, i) => (
                     <tr key={item.id} className={`border-b border-[var(--border)] hover:bg-white/5/50 ${i === menu.length - 1 ? 'border-0' : ''}`}>
-                      <td className="px-4 py-3"><span className="mr-2">{item.emoji}</span><span className="font-medium text-[#FFFFFF]">{item.nom}</span></td>
+                      <td className="px-4 py-3"><span className="mr-2">{item.emoji}</span><span className="font-medium text-[var(--text)]">{item.nom}</span></td>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{item.categorie || '—'}</td>
                       <td className="px-4 py-3 font-semibold text-[#F51E33]">{fmtFCFA(item.prix)}</td>
                       <td className="px-4 py-3">
@@ -697,38 +697,38 @@ export default function RestaurantPage() {
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowMenuForm(false)} />
               <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
                 <button onClick={() => setShowMenuForm(false)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
-                <h3 className="text-base font-bold text-[#FFFFFF] mb-4">Ajouter un plat</h3>
+                <h3 className="text-base font-bold text-[var(--text)] mb-4">Ajouter un plat</h3>
                 <div className="space-y-3">
                   <div className="grid grid-cols-4 gap-2">
                     <div>
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Emoji</label>
                       <input value={menuForm.emoji} onChange={e => setMenuForm(p => ({ ...p, emoji: e.target.value }))}
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none text-center" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none text-center" />
                     </div>
                     <div className="col-span-3">
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Nom du plat *</label>
                       <input value={menuForm.nom} onChange={e => setMenuForm(p => ({ ...p, nom: e.target.value }))} placeholder="Poulet Yassa"
-                        className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
                     </div>
                   </div>
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Catégorie</label>
                     <input value={menuForm.categorie} onChange={e => setMenuForm(p => ({ ...p, categorie: e.target.value }))} placeholder="Plats, Entrées, Desserts…"
-                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
                   </div>
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Prix (FCFA)</label>
                     <input type="number" value={menuForm.prix} onChange={e => setMenuForm(p => ({ ...p, prix: e.target.value }))} placeholder="3500"
-                      className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
                   </div>
                 </div>
                 <div className="flex gap-2 mt-5">
                   <button onClick={() => setShowMenuForm(false)}
-                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                     Annuler
                   </button>
                   <button onClick={saveMenuItem} disabled={savingMenu || !menuForm.nom}
-                    className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#F51E33]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                     {savingMenu && <Loader2 size={13} className="animate-spin" />}
                     Ajouter
                   </button>
@@ -743,28 +743,28 @@ export default function RestaurantPage() {
       {tab === 'tables' && (
         <div className="space-y-5">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
               <Table2 size={15} className="text-[#F51E33]" /> Ajouter une table
             </h3>
             <div className="grid grid-cols-3 gap-3 mb-3">
               <div>
                 <label className="text-xs text-[var(--text-secondary)] mb-1 block">N° Table *</label>
                 <input type="number" placeholder="1" value={tableForm.numero} onChange={e => setTableForm(p=>({...p,numero:e.target.value}))}
-                  className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
+                  className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
               </div>
               <div>
                 <label className="text-xs text-[var(--text-secondary)] mb-1 block">Nom</label>
                 <input placeholder="VIP, Terrasse…" value={tableForm.nom} onChange={e => setTableForm(p=>({...p,nom:e.target.value}))}
-                  className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
+                  className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
               </div>
               <div>
                 <label className="text-xs text-[var(--text-secondary)] mb-1 block">Capacité</label>
                 <input type="number" placeholder="4" value={tableForm.capacite} onChange={e => setTableForm(p=>({...p,capacite:e.target.value}))}
-                  className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
+                  className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
               </div>
             </div>
             <button onClick={addTable} disabled={addingTable || !tableForm.numero}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F51E33] text-[#F51E33] text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
               {addingTable ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Créer la table
             </button>
           </div>
@@ -816,7 +816,7 @@ export default function RestaurantPage() {
       {tab === 'recettes' && (
         <div className="space-y-5">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[#FFFFFF] mb-1 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[var(--text)] mb-1 flex items-center gap-2">
               <BookOpen size={15} className="text-[#F51E33]" /> Recettes — ingrédients par plat
             </h3>
             <p className="text-xs text-[var(--text-secondary)] mb-4">
@@ -826,7 +826,7 @@ export default function RestaurantPage() {
             <div className="mb-5">
               <label className="text-xs text-[var(--text-secondary)] mb-1 block">Sélectionner un plat</label>
               <select value={selectedMenuItem} onChange={e => setSelectedMenuItem(e.target.value)}
-                className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#FFFFFF] outline-none focus:border-[#F51E33]/50">
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[#F51E33]/50">
                 <option value="">— Choisir un plat du menu —</option>
                 {menu.map(m => <option key={m.id} value={m.id}>{m.emoji} {m.nom}</option>)}
               </select>
@@ -842,7 +842,7 @@ export default function RestaurantPage() {
                       Aucun ingrédient — ajoutez-en ci-dessous
                     </p>
                   ) : (
-                    <div className="bg-[#142850] rounded-xl overflow-hidden">
+                    <div className="bg-[var(--surface)] rounded-xl overflow-hidden">
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="border-b border-[var(--border)]">
@@ -854,7 +854,7 @@ export default function RestaurantPage() {
                         <tbody>
                           {recettesDuPlat.map(r => (
                             <tr key={r.id} className="border-b border-[var(--border)] last:border-0">
-                              <td className="px-3 py-2.5 font-medium text-[#FFFFFF]">{r.article_nom}</td>
+                              <td className="px-3 py-2.5 font-medium text-[var(--text)]">{r.article_nom}</td>
                               <td className="px-3 py-2.5 text-[var(--text-secondary)]">{r.quantite_par_portion}</td>
                               <td className="px-3 py-2.5 text-[var(--text-secondary)]">{r.unite}</td>
                               <td className="px-3 py-2.5">
@@ -879,7 +879,7 @@ export default function RestaurantPage() {
                       <select value={recetteForm.article_id} onChange={e => {
                         const art = stockArticles.find(a => a.id === e.target.value)
                         setRecetteForm(p => ({ ...p, article_id: e.target.value, article_nom: art?.nom || p.article_nom }))
-                      }} className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#FFFFFF] outline-none">
+                      }} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none">
                         <option value="">— Sélectionner un article —</option>
                         {stockArticles.map(a => <option key={a.id} value={a.id}>{a.nom} ({a.quantite} {a.unite})</option>)}
                       </select>
@@ -887,24 +887,24 @@ export default function RestaurantPage() {
                     <div>
                       <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Ou saisir manuellement</label>
                       <input value={recetteForm.article_nom} onChange={e => setRecetteForm(p => ({ ...p, article_nom: e.target.value, article_id: '' }))}
-                        placeholder="Nom ingrédient" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#FFFFFF] placeholder-[#484F58] outline-none" />
+                        placeholder="Nom ingrédient" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#484F58] outline-none" />
                     </div>
                     <div className="flex gap-1">
                       <div className="flex-1">
                         <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Qté</label>
                         <input type="number" step="0.01" min="0" value={recetteForm.quantite}
                           onChange={e => setRecetteForm(p => ({ ...p, quantite: e.target.value }))}
-                          placeholder="0.5" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#FFFFFF] outline-none text-right" />
+                          placeholder="0.5" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
                       </div>
                       <div className="flex-1">
                         <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Unité</label>
                         <input value={recetteForm.unite} onChange={e => setRecetteForm(p => ({ ...p, unite: e.target.value }))}
-                          placeholder="kg, L, u" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#FFFFFF] outline-none" />
+                          placeholder="kg, L, u" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none" />
                       </div>
                     </div>
                   </div>
                   <button onClick={addRecette} disabled={savingRecette || !recetteForm.article_nom.trim() || !recetteForm.quantite}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F51E33] text-[#F51E33] text-xs font-semibold disabled:opacity-50 transition-colors">
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold disabled:opacity-50 transition-colors">
                     {savingRecette ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
                     Ajouter l&apos;ingrédient
                   </button>
@@ -934,7 +934,7 @@ export default function RestaurantPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm text-[var(--text-secondary)]">{achats.length} achat(s) récent(s)</p>
             <button onClick={() => setShowAchatForm(v => !v)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F51E33] text-[#F51E33] text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
               <Plus size={15} /> Nouvel achat
             </button>
           </div>
@@ -949,17 +949,17 @@ export default function RestaurantPage() {
                 <div className="col-span-2 sm:col-span-1">
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Fournisseur *</label>
                   <input value={achatForm.fournisseur_nom} onChange={e => setAchatForm(p => ({ ...p, fournisseur_nom: e.target.value }))}
-                    placeholder="Nom du fournisseur" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                    placeholder="Nom du fournisseur" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
                 </div>
                 <div>
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
                   <input type="date" value={achatForm.date_achat} onChange={e => setAchatForm(p => ({ ...p, date_achat: e.target.value }))}
-                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
                 </div>
                 <div>
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Mode de paiement</label>
                   <select value={achatForm.mode_paiement} onChange={e => setAchatForm(p => ({ ...p, mode_paiement: e.target.value }))}
-                    className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
                     <option value="especes">Espèces</option>
                     <option value="airtel">Airtel Money</option>
                     <option value="mtn">MTN MoMo</option>
@@ -970,7 +970,7 @@ export default function RestaurantPage() {
                 <div>
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Note</label>
                   <input value={achatForm.note} onChange={e => setAchatForm(p => ({ ...p, note: e.target.value }))}
-                    placeholder="Optionnel" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none" />
+                    placeholder="Optionnel" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none" />
                 </div>
               </div>
 
@@ -992,14 +992,14 @@ export default function RestaurantPage() {
                     <div key={i} className="grid grid-cols-12 gap-2 items-center">
                       <div className="col-span-4">
                         <input value={ligne.article_nom} onChange={e => updateAchatLigne(i, 'article_nom', e.target.value)}
-                          placeholder="Ingrédient / article" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#FFFFFF] placeholder-[#484F58] outline-none" />
+                          placeholder="Ingrédient / article" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#484F58] outline-none" />
                       </div>
                       <div className="col-span-2">
                         <select value={ligne.article_id ?? ''} onChange={e => {
                           const art = stockArticles.find(a => a.id === e.target.value)
                           if (art) updateAchatLigne(i, 'article_nom', art.nom)
                           updateAchatLigne(i, 'article_id', e.target.value)
-                        }} className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-[10px] text-[#FFFFFF] outline-none">
+                        }} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-[10px] text-[var(--text)] outline-none">
                           <option value="">Stock…</option>
                           {stockArticles.map(a => <option key={a.id} value={a.id}>{a.nom}</option>)}
                         </select>
@@ -1007,12 +1007,12 @@ export default function RestaurantPage() {
                       <div className="col-span-2">
                         <input type="number" min="0" step="0.1" value={ligne.quantite || ''}
                           onChange={e => updateAchatLigne(i, 'quantite', e.target.value)}
-                          placeholder="Qté" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#FFFFFF] outline-none text-right" />
+                          placeholder="Qté" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
                       </div>
                       <div className="col-span-2">
                         <input type="number" min="0" value={ligne.prix_unitaire || ''}
                           onChange={e => updateAchatLigne(i, 'prix_unitaire', e.target.value)}
-                          placeholder="Prix" className="w-full bg-[#142850] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#FFFFFF] outline-none text-right" />
+                          placeholder="Prix" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
                       </div>
                       <div className="col-span-1 text-right">
                         <span className="text-xs font-semibold text-[#F51E33]">
@@ -1037,11 +1037,11 @@ export default function RestaurantPage() {
               </div>
 
               <div className="flex gap-2">
-                <button onClick={() => setShowAchatForm(false)} className="px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+                <button onClick={() => setShowAchatForm(false)} className="px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                   Annuler
                 </button>
                 <button onClick={saveAchat} disabled={savingAchat || !achatForm.fournisseur_nom.trim() || !achatForm.lignes.length}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
                   {savingAchat && <Loader2 size={13} className="animate-spin" />}
                   Enregistrer l&apos;achat
                 </button>
@@ -1070,7 +1070,7 @@ export default function RestaurantPage() {
                   {achats.map((a, i) => (
                     <tr key={a.id} className={`border-b border-[var(--border)] hover:bg-white/5/50 ${i === achats.length - 1 ? 'border-0' : ''}`}>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{new Date(a.date_achat).toLocaleDateString('fr-FR')}</td>
-                      <td className="px-4 py-3 font-medium text-[#FFFFFF]">{a.fournisseur_nom}</td>
+                      <td className="px-4 py-3 font-medium text-[var(--text)]">{a.fournisseur_nom}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)] capitalize">{a.mode_paiement}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{(a.lignes as AchatLigne[]).length} article(s)</td>
                       <td className="px-4 py-3 font-semibold text-[#F51E33]">{fmtFCFA(a.total)}</td>
@@ -1109,7 +1109,7 @@ export default function RestaurantPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* CA par heure */}
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">CA par heure</h3>
+              <h3 className="text-sm font-semibold text-[var(--text)] mb-4">CA par heure</h3>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={chartHeure}>
                   <XAxis dataKey="heure" tick={{ fill: '#8B949E', fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -1125,7 +1125,7 @@ export default function RestaurantPage() {
 
             {/* Répartition paiements */}
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">Répartition paiements</h3>
+              <h3 className="text-sm font-semibold text-[var(--text)] mb-4">Répartition paiements</h3>
               {chartPaie.length === 0 ? (
                 <div className="flex items-center justify-center h-40 text-[var(--text-secondary)] text-sm">Aucun paiement aujourd&apos;hui</div>
               ) : (
@@ -1146,7 +1146,7 @@ export default function RestaurantPage() {
 
           {/* Top 5 plats */}
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[#FFFFFF] mb-4">Top 5 plats du jour</h3>
+            <h3 className="text-sm font-semibold text-[var(--text)] mb-4">Top 5 plats du jour</h3>
             {topPlats.length === 0 ? (
               <p className="text-sm text-[var(--text-secondary)]">Aucune vente aujourd&apos;hui</p>
             ) : (
@@ -1154,10 +1154,10 @@ export default function RestaurantPage() {
                 {topPlats.map((p, i) => (
                   <div key={p.nom} className="flex items-center gap-3">
                     <span className="text-sm font-bold text-[var(--text-secondary)] w-5">#{i+1}</span>
-                    <div className="flex-1 bg-[#1a2d50] rounded-full h-2">
+                    <div className="flex-1 bg-[var(--surface-alt)] rounded-full h-2">
                       <div className="h-2 rounded-full bg-[#F51E33]" style={{ width: `${(p.q / topPlats[0].q) * 100}%` }} />
                     </div>
-                    <span className="text-sm text-[#FFFFFF] min-w-[120px]">{p.nom}</span>
+                    <span className="text-sm text-[var(--text)] min-w-[120px]">{p.nom}</span>
                     <span className="text-xs font-bold text-[#F51E33] w-12 text-right">{p.q}x</span>
                   </div>
                 ))}
@@ -1177,7 +1177,7 @@ export default function RestaurantPage() {
                   .slice(0, 8)
                   .map(a => (
                     <div key={a.id} className="flex items-center justify-between text-xs">
-                      <span className="text-[#FFFFFF] font-medium">{a.nom}</span>
+                      <span className="text-[var(--text)] font-medium">{a.nom}</span>
                       <span className={`font-bold ${a.quantite <= 0 ? 'text-[#F51E33]' : 'text-[#F51E33]'}`}>
                         {a.quantite <= 0 ? 'RUPTURE' : `${a.quantite} ${a.unite} (seuil : ${a.seuil_alerte})`}
                       </span>
@@ -1189,7 +1189,7 @@ export default function RestaurantPage() {
 
           {/* Clôture caisse */}
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[#FFFFFF] mb-2 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
               <AlertTriangle size={15} className="text-[#F51E33]" /> Clôture de caisse
             </h3>
             <p className="text-xs text-[var(--text-secondary)] mb-4">
@@ -1211,34 +1211,34 @@ export default function RestaurantPage() {
             <button onClick={() => setReceipt(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
             <div className="text-center mb-5">
               <CheckCircle size={40} className="text-[#F51E33] mx-auto mb-3" />
-              <h3 className="text-base font-bold text-[#FFFFFF]">Commande enregistrée !</h3>
+              <h3 className="text-base font-bold text-[var(--text)]">Commande enregistrée !</h3>
               <p className="text-sm text-[var(--text-secondary)] mt-1">Reçu N° <span className="text-[#F51E33] font-bold">{receipt.numeroRecu}</span></p>
             </div>
-            <div className="bg-[#142850] rounded-xl p-4 mb-5 space-y-2">
+            <div className="bg-[var(--surface)] rounded-xl p-4 mb-5 space-y-2">
               <div className="flex justify-between text-xs">
                 <span className="text-[var(--text-secondary)]">Sous-total HT</span>
-                <span className="text-[#FFFFFF]">{fmtFCFA(receipt.fiscal.ht)}</span>
+                <span className="text-[var(--text)]">{fmtFCFA(receipt.fiscal.ht)}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-[var(--text-secondary)]">TVA (18%)</span>
-                <span className="text-[#FFFFFF]">{fmtFCFA(receipt.fiscal.tva)}</span>
+                <span className="text-[var(--text)]">{fmtFCFA(receipt.fiscal.tva)}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-[var(--text-secondary)]">CA (5% TVA)</span>
-                <span className="text-[#FFFFFF]">{fmtFCFA(receipt.fiscal.ca)}</span>
+                <span className="text-[var(--text)]">{fmtFCFA(receipt.fiscal.ca)}</span>
               </div>
               <div className="flex justify-between text-sm font-bold border-t border-[var(--border)] pt-2">
-                <span className="text-[#FFFFFF]">Total TTC</span>
+                <span className="text-[var(--text)]">Total TTC</span>
                 <span className="text-[#F51E33]">{fmtFCFA(receipt.fiscal.ttc)}</span>
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setReceipt(null)}
-                className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+                className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                 Fermer
               </button>
               <a href={`/api/resto/receipt/${receipt.commandeId}`} target="_blank" rel="noopener noreferrer"
-                className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#F51E33] text-[#F51E33] hover:bg-[#F51E33]/90 transition-colors flex items-center justify-center gap-2">
+                className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#F51E33]/90 transition-colors flex items-center justify-center gap-2">
                 <TrendingUp size={13} /> Télécharger PDF
               </a>
             </div>

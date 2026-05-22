@@ -78,7 +78,7 @@ export function SectionMatieres({ tenantId, enseignants }: { tenantId: string; e
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <KpiCard label="Matières cataloguées" value={subjects.length} color="#F51E33" />
-        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#F51E33] text-[#F51E33]">
+        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[var(--primary)] text-white">
           <Plus size={13} /> Ajouter une matière
         </button>
       </div>
@@ -107,7 +107,7 @@ export function SectionMatieres({ tenantId, enseignants }: { tenantId: string; e
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#F51E33] text-[#F51E33] disabled:opacity-40">
+              <button onClick={save} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[var(--primary)] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
@@ -199,7 +199,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
           <KpiCard label="Sessions actives" value={sessions.filter(s => s.statut === 'en_cours').length} color="#142850" />
           <KpiCard label="Total sessions" value={sessions.length} color="#F51E33" />
         </div>
-        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[#F51E33] text-[#F51E33]">
+        <button onClick={() => setShowForm(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-[var(--primary)] text-white">
           <Plus size={13} /> Nouvelle session
         </button>
       </div>
@@ -222,7 +222,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
               <FI label="Date fin *" value={form.date_fin} onChange={v => setForm(p => ({ ...p, date_fin: v }))} type="date" />
             </div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving || !form.nom || !form.date_debut || !form.date_fin} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#F51E33] text-[#F51E33] disabled:opacity-40">
+              <button onClick={save} disabled={saving || !form.nom || !form.date_debut || !form.date_fin} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[var(--primary)] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Créer
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
@@ -825,7 +825,7 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
                           <button onClick={() => updateStatut(d.id, 'valide')} className="text-[10px] px-2 py-0.5 rounded border border-[#F51E33]/30 text-[#F51E33] hover:bg-[#F51E33]/10 transition-colors">Valider</button>
                         )}
                         {d.statut === 'valide' && (
-                          <button onClick={() => updateStatut(d.id, 'delivre')} className="text-[10px] px-2 py-0.5 rounded border border-[#142850]/30 text-[#F51E33] hover:bg-[#142850]/10 transition-colors">Délivrer</button>
+                          <button onClick={() => updateStatut(d.id, 'delivre')} className="text-[10px] px-2 py-0.5 rounded border border-[#142850]/30 text-[#F51E33] hover:bg-[var(--surface)]/10 transition-colors">Délivrer</button>
                         )}
                         {e && <button onClick={() => printDiploma(e, d, nomEcole)} className="text-[var(--text-secondary)] hover:text-[#8B0070] transition-colors" title="Imprimer"><Printer size={12} /></button>}
                       </div>
@@ -1007,7 +1007,7 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
                       </>
                     )}
                     {d.statut === 'en_cours' && (
-                      <button onClick={() => setEditNote({ id: d.id, note: '', mention: '' })} className="text-[10px] px-2 py-1 rounded border border-[#142850]/30 text-[#F51E33] hover:bg-[#142850]/10 transition-colors">Saisir résultat</button>
+                      <button onClick={() => setEditNote({ id: d.id, note: '', mention: '' })} className="text-[10px] px-2 py-1 rounded border border-[#142850]/30 text-[#F51E33] hover:bg-[var(--surface)]/10 transition-colors">Saisir résultat</button>
                     )}
                   </div>
                 </div>

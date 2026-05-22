@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import PWAInstall from '@/components/ui/PWAInstall'
 import './globals.css'
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
   title: "Oraforme — Gestion d'entreprise tout-en-un",
@@ -21,13 +21,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${geist.variable} h-full`}>
+    <html lang="fr" className={`${inter.variable} h-full`}>
       <head>
-        <meta name="theme-color" content="#F51E33" />
+        <meta name="theme-color" content="#F59E0B" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className="h-full bg-[#142850] text-[#FFFFFF] antialiased">
+      <body className="h-full bg-[#F5F7FB] text-[#111827] antialiased">
         {children}
         <PWAInstall />
       </body>

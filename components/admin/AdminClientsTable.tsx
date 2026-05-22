@@ -17,7 +17,7 @@ type TenantRow = {
 }
 
 const PLAN_COLORS: Record<string, string> = {
-  starter: 'text-[var(--text-secondary)] bg-[#1a2d50] border-[var(--border)]',
+  starter: 'text-[var(--text-secondary)] bg-[var(--surface-alt)] border-[var(--border)]',
   business: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
   premium: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
 }
@@ -40,19 +40,19 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
     <div>
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <div className="flex items-center gap-2 bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-1.5 flex-1 min-w-[180px] max-w-xs">
+        <div className="flex items-center gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-1.5 flex-1 min-w-[180px] max-w-xs">
           <Search size={13} className="text-[var(--text-secondary)] shrink-0" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher entreprise..."
-            className="bg-transparent text-sm text-[#FFFFFF] placeholder-[#484F58] outline-none flex-1"
+            className="bg-transparent text-sm text-[var(--text)] placeholder-[#484F58] outline-none flex-1"
           />
         </div>
         <select
           value={planFilter}
           onChange={e => setPlanFilter(e.target.value)}
-          className="bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-secondary)] outline-none"
+          className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-secondary)] outline-none"
         >
           <option value="all">Tous les plans</option>
           <option value="starter">Starter</option>
@@ -62,7 +62,7 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
         <select
           value={moduleFilter}
           onChange={e => setModuleFilter(e.target.value)}
-          className="bg-[#142850] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-secondary)] outline-none"
+          className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-secondary)] outline-none"
         >
           <option value="all">Tous les modules</option>
           {allModules.map(m => (
@@ -96,9 +96,9 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
               </tr>
             )}
             {filtered.map(t => (
-              <tr key={t.id} className="bg-[#142850] hover:bg-[var(--card-bg)] transition-colors">
+              <tr key={t.id} className="bg-[var(--surface)] hover:bg-[var(--card-bg)] transition-colors">
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[#FFFFFF] truncate max-w-[180px]">{t.nom_entreprise}</p>
+                  <p className="font-medium text-[var(--text)] truncate max-w-[180px]">{t.nom_entreprise}</p>
                   <p className="text-xs text-[var(--text-secondary)] font-mono truncate max-w-[180px]">{t.id.slice(0, 8)}…</p>
                 </td>
                 <td className="px-3 py-3">
@@ -109,7 +109,7 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
                 <td className="px-3 py-3">
                   <div className="flex flex-wrap gap-1 max-w-[200px]">
                     {t.modules_actifs.slice(0, 3).map(m => (
-                      <span key={m} className="text-[10px] bg-[#1a2d50] text-[var(--text-secondary)] rounded px-1.5 py-0.5">
+                      <span key={m} className="text-[10px] bg-[var(--surface-alt)] text-[var(--text-secondary)] rounded px-1.5 py-0.5">
                         {MODULE_LABELS[m] ?? m}
                       </span>
                     ))}
@@ -118,8 +118,8 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
                     )}
                   </div>
                 </td>
-                <td className="px-3 py-3 text-right text-[#FFFFFF]">{t.nb_users}</td>
-                <td className="px-3 py-3 text-right text-[#FFFFFF]">{t.nb_factures}</td>
+                <td className="px-3 py-3 text-right text-[var(--text)]">{t.nb_users}</td>
+                <td className="px-3 py-3 text-right text-[var(--text)]">{t.nb_factures}</td>
                 <td className="px-3 py-3 text-right font-medium text-[#F51E33]">{fmtFCFA(t.ca_genere)}</td>
                 <td className="px-3 py-3 text-[var(--text-secondary)] text-xs whitespace-nowrap">
                   {new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}

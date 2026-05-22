@@ -27,7 +27,7 @@ export default async function AdminModulesPage() {
           <Package size={18} className="text-[#F51E33]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[#FFFFFF]">Gestion des modules</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Gestion des modules</h1>
           <p className="text-xs text-[var(--text-secondary)]">Stats d&apos;utilisation et tarification — MRR total : {fmtFCFA(totalMRR)}/mois</p>
         </div>
       </div>
@@ -42,36 +42,36 @@ export default async function AdminModulesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{MODULE_ICONS[m.id] ?? '📦'}</span>
                   <div>
-                    <p className="text-sm font-semibold text-[#FFFFFF]">{MODULE_LABELS[m.id]}</p>
+                    <p className="text-sm font-semibold text-[var(--text)]">{MODULE_LABELS[m.id]}</p>
                     <p className="text-xs text-[#F51E33] font-medium">{fmtFCFA(price)}/mois</p>
                   </div>
                 </div>
                 <div className={`text-xs px-2 py-0.5 rounded border font-medium ${
                   m.clientsAvec > 0
-                    ? 'text-[#F51E33] bg-[#142850]/10 border-[#142850]/30'
-                    : 'text-[var(--text-secondary)] bg-[#1a2d50] border-[var(--border)]'
+                    ? 'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30'
+                    : 'text-[var(--text-secondary)] bg-[var(--surface-alt)] border-[var(--border)]'
                 }`}>
                   {m.clientsAvec > 0 ? 'Actif' : 'Inactif'}
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="bg-[#142850] rounded-lg p-2 text-center">
-                  <p className="text-lg font-bold text-[#FFFFFF]">{m.clientsAvec}</p>
+                <div className="bg-[var(--surface)] rounded-lg p-2 text-center">
+                  <p className="text-lg font-bold text-[var(--text)]">{m.clientsAvec}</p>
                   <p className="text-[10px] text-[var(--text-secondary)]">clients</p>
                 </div>
-                <div className="bg-[#142850] rounded-lg p-2 text-center">
+                <div className="bg-[var(--surface)] rounded-lg p-2 text-center">
                   <p className="text-lg font-bold text-[#F51E33]">{fmtFCFA(m.mrr).replace(' FCFA', '')}</p>
                   <p className="text-[10px] text-[var(--text-secondary)]">MRR</p>
                 </div>
-                <div className="bg-[#142850] rounded-lg p-2 text-center">
+                <div className="bg-[var(--surface)] rounded-lg p-2 text-center">
                   <p className="text-lg font-bold text-[#F51E33]">{m.penetration}%</p>
                   <p className="text-[10px] text-[var(--text-secondary)]">pénétr.</p>
                 </div>
               </div>
 
               {/* Penetration bar */}
-              <div className="h-1.5 bg-[#1a2d50] rounded-full overflow-hidden">
+              <div className="h-1.5 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#F51E33] rounded-full transition-all"
                   style={{ width: `${m.penetration}%` }}
@@ -85,7 +85,7 @@ export default async function AdminModulesPage() {
 
       {/* Summary table */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#FFFFFF] mb-4">Tableau récapitulatif</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Tableau récapitulatif</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -100,11 +100,11 @@ export default async function AdminModulesPage() {
             <tbody className="divide-y divide-[var(--border)]">
               {moduleStats.map(m => (
                 <tr key={m.id} className="hover:bg-white/5/30 transition-colors">
-                  <td className="py-2.5 px-3 font-medium text-[#FFFFFF]">
+                  <td className="py-2.5 px-3 font-medium text-[var(--text)]">
                     {MODULE_ICONS[m.id]} {MODULE_LABELS[m.id]}
                   </td>
                   <td className="py-2.5 px-3 text-right text-[var(--text-secondary)]">{fmtFCFA(MODULE_PRICES[m.id] ?? 0)}</td>
-                  <td className="py-2.5 px-3 text-right text-[#FFFFFF]">{m.clientsAvec}</td>
+                  <td className="py-2.5 px-3 text-right text-[var(--text)]">{m.clientsAvec}</td>
                   <td className="py-2.5 px-3 text-right font-medium text-[#F51E33]">{fmtFCFA(m.mrr)}</td>
                   <td className="py-2.5 px-3 text-right text-[var(--text-secondary)]">
                     {totalMRR > 0 ? Math.round((m.mrr / totalMRR) * 100) : 0}%
@@ -112,9 +112,9 @@ export default async function AdminModulesPage() {
                 </tr>
               ))}
               <tr className="border-t-2 border-[var(--border)]">
-                <td className="py-2.5 px-3 font-bold text-[#FFFFFF]" colSpan={3}>Total MRR</td>
+                <td className="py-2.5 px-3 font-bold text-[var(--text)]" colSpan={3}>Total MRR</td>
                 <td className="py-2.5 px-3 text-right font-bold text-[#F51E33]">{fmtFCFA(totalMRR)}</td>
-                <td className="py-2.5 px-3 text-right font-bold text-[#FFFFFF]">100%</td>
+                <td className="py-2.5 px-3 text-right font-bold text-[var(--text)]">100%</td>
               </tr>
             </tbody>
           </table>

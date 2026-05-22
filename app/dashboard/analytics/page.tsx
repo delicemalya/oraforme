@@ -96,7 +96,7 @@ function ChartCard({ title, icon: Icon, iconColor, children, className = '' }: {
         <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: iconColor + '22' }}>
           <Icon size={13} style={{ color: iconColor }} />
         </div>
-        <span className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">{title}</span>
+        <span className="text-xs font-bold text-[var(--text)] uppercase tracking-wider">{title}</span>
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -165,17 +165,17 @@ export default function AnalyticsPage() {
             <Activity size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#FFFFFF]">Analytics & BI</h1>
+            <h1 className="text-xl font-bold text-[var(--text)]">Analytics & BI</h1>
             <p className="text-xs text-[var(--text-secondary)]">Intelligence économique · Exercice {year}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#FFFFFF] outline-none">
+            className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <button onClick={load}
-            className="p-2 rounded-lg bg-[#1a2d50] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#FFFFFF] transition-colors">
+            className="p-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex-1 min-w-fit py-2 px-2.5 rounded-lg text-[10px] font-semibold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
-                tab === t.id ? 'bg-[#8B0070]/15 text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[#FFFFFF]'
+                tab === t.id ? 'bg-[#8B0070]/15 text-[#F51E33]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
               }`}>
               <Icon size={11} />{t.label}
             </button>
@@ -289,7 +289,7 @@ export default function AnalyticsPage() {
                       {running ? 'Vérification…' : 'Lancer les vérifications'}
                     </button>
                     {runResult && (
-                      <p className="mt-2 text-[10px] text-[#F51E33] bg-[#142850]/10 rounded-lg px-3 py-2">{runResult}</p>
+                      <p className="mt-2 text-[10px] text-[#F51E33] bg-[var(--surface)]/10 rounded-lg px-3 py-2">{runResult}</p>
                     )}
                   </ChartCard>
 
@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
                       {data.rh.contratsExpirant30 > 0 && (
                         <div className="flex items-start gap-2 bg-[#F51E33]/10 rounded-xl p-2.5">
                           <Clock size={12} className="text-[#F51E33] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#FFFFFF]">
+                          <p className="text-[10px] text-[var(--text)]">
                             <b>{data.rh.contratsExpirant30}</b> contrat(s) expirant dans 30 jours
                           </p>
                         </div>
@@ -307,7 +307,7 @@ export default function AnalyticsPage() {
                       {data.stock.articlesRupture > 0 && (
                         <div className="flex items-start gap-2 bg-[#F51E33]/10 rounded-xl p-2.5">
                           <AlertTriangle size={12} className="text-[#F51E33] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#FFFFFF]">
+                          <p className="text-[10px] text-[var(--text)]">
                             <b>{data.stock.articlesRupture}</b> article(s) en rupture de stock
                           </p>
                         </div>
@@ -315,7 +315,7 @@ export default function AnalyticsPage() {
                       {data.stock.articlesCritiques > 0 && (
                         <div className="flex items-start gap-2 bg-[#F51E33]/10 rounded-xl p-2.5">
                           <AlertTriangle size={12} className="text-[#F51E33] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#FFFFFF]">
+                          <p className="text-[10px] text-[var(--text)]">
                             <b>{data.stock.articlesCritiques}</b> article(s) en stock critique
                           </p>
                         </div>
@@ -323,7 +323,7 @@ export default function AnalyticsPage() {
                       {data.financial.totalCreances > 0 && (
                         <div className="flex items-start gap-2 bg-[#8B0070]/10 rounded-xl p-2.5">
                           <FileText size={12} className="text-[#8B0070] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#FFFFFF]">
+                          <p className="text-[10px] text-[var(--text)]">
                             Créances clients : <b>{fmtFCFA(data.financial.totalCreances)}</b>
                           </p>
                         </div>
@@ -331,7 +331,7 @@ export default function AnalyticsPage() {
                       {data.automation.notifUnread > 0 && (
                         <div className="flex items-start gap-2 bg-[#F51E33]/10 rounded-xl p-2.5">
                           <Bell size={12} className="text-[#F51E33] mt-0.5 shrink-0" />
-                          <p className="text-[10px] text-[#FFFFFF]">
+                          <p className="text-[10px] text-[var(--text)]">
                             <b>{data.automation.notifUnread}</b> notification(s) non lue(s)
                           </p>
                         </div>
@@ -390,7 +390,7 @@ export default function AnalyticsPage() {
                                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
                                 <span className="text-xs text-[var(--text-secondary)]">{s.name}</span>
                               </div>
-                              <span className="text-xs font-bold text-[#FFFFFF]">{s.value}</span>
+                              <span className="text-xs font-bold text-[var(--text)]">{s.value}</span>
                             </div>
                           ))}
                         </div>
@@ -410,7 +410,7 @@ export default function AnalyticsPage() {
                             <span className="text-xs text-[#6B7280]">{r.label}</span>
                             <span className="text-xs font-bold" style={{ color: r.color }}>{r.val}</span>
                           </div>
-                          <div className="h-1.5 bg-[#1a2d50] rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                             <motion.div className="h-full rounded-full" style={{ background: r.color }}
                               initial={{ width: 0 }} animate={{ width: `${Math.min(r.pct, 100)}%` }}
                               transition={{ duration: 0.8 }} />
@@ -457,7 +457,7 @@ export default function AnalyticsPage() {
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#8B0070]/20">
                       <Users size={13} className="text-[#F51E33]" />
                     </div>
-                    <span className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">Répartition effectif</span>
+                    <span className="text-xs font-bold text-[var(--text)] uppercase tracking-wider">Répartition effectif</span>
                   </div>
                   <div className="p-5 grid grid-cols-3 gap-4">
                     {[
@@ -468,7 +468,7 @@ export default function AnalyticsPage() {
                       <div key={r.label} className="text-center">
                         <p className="text-2xl font-bold mb-1" style={{ color: r.color }}>{r.val}</p>
                         <p className="text-[10px] text-[var(--text-secondary)] mb-2">{r.label}</p>
-                        <div className="h-1 bg-[#1a2d50] rounded-full overflow-hidden">
+                        <div className="h-1 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                           <motion.div className="h-full rounded-full" style={{ background: r.color }}
                             initial={{ width: 0 }} animate={{ width: `${Math.min(r.pct, 100)}%` }}
                             transition={{ duration: 0.8 }} />
@@ -548,7 +548,7 @@ export default function AnalyticsPage() {
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#C06000]/20">
                       <Package size={13} className="text-[#C06000]" />
                     </div>
-                    <span className="text-xs font-bold text-[#FFFFFF] uppercase tracking-wider">Top articles par valeur</span>
+                    <span className="text-xs font-bold text-[var(--text)] uppercase tracking-wider">Top articles par valeur</span>
                   </div>
                   <div className="divide-y divide-[var(--border)]">
                     {data.stock.topArticles.length > 0 ? data.stock.topArticles.map((a, i) => {
@@ -556,11 +556,11 @@ export default function AnalyticsPage() {
                       return (
                         <div key={i} className="px-5 py-3.5">
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm text-[#FFFFFF] font-medium truncate pr-4">{a.nom}</span>
+                            <span className="text-sm text-[var(--text)] font-medium truncate pr-4">{a.nom}</span>
                             <span className="text-xs font-bold text-[#F51E33] shrink-0">{fmtFCFA(a.valeur)}</span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="flex-1 h-1 bg-[#1a2d50] rounded-full overflow-hidden">
+                            <div className="flex-1 h-1 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                               <motion.div className="h-full rounded-full bg-[#F51E33]"
                                 initial={{ width: 0 }} animate={{ width: `${Math.min(pct, 100)}%` }}
                                 transition={{ duration: 0.7, delay: i * 0.1 }} />
@@ -640,7 +640,7 @@ export default function AnalyticsPage() {
                         <Zap size={16} className="text-[#F51E33]" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-[#FFFFFF]">Moteur d'automatisation</p>
+                        <p className="text-sm font-bold text-[var(--text)]">Moteur d'automatisation</p>
                         <p className="text-xs text-[var(--text-secondary)]">Contrats expirants · Factures impayées · Alertes stock</p>
                       </div>
                     </div>
@@ -652,7 +652,7 @@ export default function AnalyticsPage() {
                     </button>
                   </div>
                   {runResult && (
-                    <div className="bg-[#142850]/10 border border-[#142850]/20 rounded-xl px-4 py-3">
+                    <div className="bg-[var(--surface)]/10 border border-[#142850]/20 rounded-xl px-4 py-3">
                       <p className="text-xs text-[#F51E33]">{runResult}</p>
                     </div>
                   )}
@@ -662,9 +662,9 @@ export default function AnalyticsPage() {
                       { label: 'Factures en retard', val: data.financial.nbFactures - data.financial.nbFactPay, color: '#F51E33', desc: 'non payées' },
                       { label: 'Stock critique',     val: data.stock.articlesRupture + data.stock.articlesCritiques, color: '#F51E33', desc: 'à réapprovisionner' },
                     ].map(r => (
-                      <div key={r.label} className="bg-[#142850] border border-[var(--border)] rounded-xl p-3 text-center">
+                      <div key={r.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 text-center">
                         <p className="text-2xl font-bold mb-1" style={{ color: r.color }}>{r.val}</p>
-                        <p className="text-[10px] font-semibold text-[#FFFFFF]">{r.label}</p>
+                        <p className="text-[10px] font-semibold text-[var(--text)]">{r.label}</p>
                         <p className="text-[9px] text-[var(--text-secondary)] mt-0.5">{r.desc}</p>
                       </div>
                     ))}
