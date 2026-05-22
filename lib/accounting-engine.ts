@@ -1,5 +1,3 @@
-import { supabase } from '@/lib/supabase'
-
 export type AccountCode = string
 
 export type OhadaAccount = {
@@ -281,6 +279,7 @@ export type JournalEntryInput = {
 }
 
 export async function createJournalEntry(entry: JournalEntryInput) {
+  const { supabase } = await import('@/lib/supabase')
   const { error } = await supabase.from('journal_entries').insert({
     ...entry,
     fiscal_year: entry.fiscal_year ?? new Date(entry.date_operation).getFullYear(),
@@ -295,6 +294,7 @@ export async function setOpeningBalance(params: {
   annee: number
   solde_ouverture: number
 }) {
+  const { supabase } = await import('@/lib/supabase')
   const { error } = await supabase.from('fiscal_years').upsert(
     {
       tenant_id:       params.tenant_id,
@@ -308,6 +308,7 @@ export async function setOpeningBalance(params: {
 }
 
 export async function getOpeningBalance(tenant_id: string, annee: number): Promise<number> {
+  const { supabase } = await import('@/lib/supabase')
   const { data } = await supabase
     .from('fiscal_years')
     .select('solde_ouverture')
