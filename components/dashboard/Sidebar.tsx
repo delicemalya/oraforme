@@ -12,7 +12,7 @@ import {
   Wallet, BookOpen, ShoppingCart,
   Receipt, BarChart2, Truck,
   BookMarked, Calculator, HeartHandshake, Users, UsersRound,
-  Layers, CreditCard, Activity,
+  Layers, CreditCard, Activity, TrendingUp,
 } from 'lucide-react'
 import { CORE_MODULE_IDS, CORE_SECTION_LABEL } from '@/lib/erp-core'
 import { useState, useEffect } from 'react'
@@ -25,6 +25,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 
 const ALL_MODULES = [
   { id: 'rh',           label: 'RH & Paie',           icon: UserCheck,     href: '/dashboard/rh' },
+  { id: 'finance',      label: 'Finance',              icon: TrendingUp,    href: '/dashboard/finance' },
   { id: 'comptabilite', label: 'Comptabilité',         icon: BookOpen,      href: '/dashboard/comptabilite' },
   { id: 'tresorerie',   label: 'Trésorerie',           icon: Wallet,        href: '/dashboard/tresorerie' },
   { id: 'stock',        label: 'Stock & Inventaire',   icon: Package,       href: '/dashboard/stock' },
@@ -75,6 +76,7 @@ const SECTOR_NAV: Record<string, NavItem[]> = {
     { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#64748B' },
     { id: 'comptabilite',           label: 'Comptabilité',           sublabel: 'Journal OHADA',            icon: Calculator,     href: '/dashboard/ecole/comptabilite',           color: '#64748B' },
     { id: 'tresorerie',             label: 'Trésorerie',             sublabel: 'Wallets & encaissements',  icon: Wallet,         href: '/dashboard/tresorerie',                   color: '#64748B' },
+    { id: 'finance',               label: 'Finance',                sublabel: 'KPIs & résultats',         icon: TrendingUp,     href: '/dashboard/finance',                      color: '#F59E0B' },
     { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F59E0B' },
     { id: 'espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           icon: BookOpen,       href: '/dashboard/ecole/espace-formateur',       color: '#64748B' },
     { id: 'espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              icon: GraduationCap,  href: '/dashboard/ecole/espace-etudiant',        color: '#64748B' },
@@ -143,6 +145,7 @@ const SECTOR_NAV: Record<string, NavItem[]> = {
     { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
     { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
     { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'finance',      label: 'Finance',          sublabel: 'KPIs & résultats',   icon: TrendingUp,  href: '/dashboard/finance',     color: '#F59E0B' },
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
   ],
   btp: [
@@ -151,6 +154,7 @@ const SECTOR_NAV: Record<string, NavItem[]> = {
     { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
     { id: 'rh',           label: 'RH & Équipes',    sublabel: 'Personnel chantier', icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
     { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
+    { id: 'finance',      label: 'Finance',          sublabel: 'KPIs & résultats',   icon: TrendingUp,  href: '/dashboard/finance',     color: '#F59E0B' },
     { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
   ],
   cabinet: [
