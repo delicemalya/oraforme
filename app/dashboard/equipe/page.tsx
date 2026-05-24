@@ -90,7 +90,7 @@ function RoleBadge({ role }: { role: Role }) {
   const cfg = {
     owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-[#F51E33] border-amber-500/20' },
     admin:  { label: 'Administrateur', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
-    membre: { label: 'Membre',         cls: 'bg-white/5 text-white/40 border-white/10' },
+    membre: { label: 'Membre',         cls: 'bg-gray-100 text-[var(--text-secondary)] border-gray-200' },
   }
   const { label, cls } = cfg[role]
   return (
@@ -108,7 +108,7 @@ function Toggle({ checked, onChange, disabled }: {
       onClick={() => !disabled && onChange(!checked)}
       disabled={disabled}
       className={`relative w-8 h-4 rounded-full transition-colors ${
-        checked ? 'bg-[var(--surface)]' : 'bg-white/10'
+        checked ? 'bg-[var(--surface)]' : 'bg-gray-100'
       } ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
     >
       <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${
@@ -291,7 +291,7 @@ export default function EquipePage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin text-white/30" size={28} />
+        <Loader2 className="animate-spin text-[var(--text-secondary)]" size={28} />
       </div>
     )
   }
@@ -299,8 +299,8 @@ export default function EquipePage() {
   if (!isOwner) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
-        <Lock size={32} className="text-white/20" />
-        <p className="text-white/40 text-sm">Seul le propriétaire peut gérer l'équipe.</p>
+        <Lock size={32} className="text-gray-400" />
+        <p className="text-[var(--text-secondary)] text-sm">Seul le propriétaire peut gérer l'équipe.</p>
       </div>
     )
   }
@@ -311,11 +311,11 @@ export default function EquipePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-xl font-bold text-[#101729]flex items-center gap-2">
             <UsersRound size={20} className="text-[#F51E33]" />
             Gestion de l'équipe
           </h1>
-          <p className="text-sm text-white/40 mt-0.5">
+          <p className="text-sm text-[var(--text-secondary)] mt-0.5">
             Gérez les accès et permissions de chaque membre.
           </p>
         </div>
@@ -343,27 +343,27 @@ export default function EquipePage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-[var(--card-bg)] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md"
+              className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md"
             >
-              <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-base font-bold text-[#101729]mb-4 flex items-center gap-2">
                 <Send size={16} className="text-[#F51E33]" />
                 Inviter un membre
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-white/50 mb-1 block">Email</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Email</label>
                   <input
                     type="email"
                     value={inviteEmail}
                     onChange={e => setInviteEmail(e.target.value)}
                     placeholder="prenom.nom@exemple.com"
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 outline-none focus:border-amber-500/40"
+                    className="w-full bg-gray-100 border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729]placeholder:text-[var(--text-secondary)] outline-none focus:border-amber-500/40"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-white/50 mb-1 block">Rôle</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Rôle</label>
                   <div className="flex gap-2">
                     {(['admin', 'membre'] as const).map(r => (
                       <button
@@ -373,15 +373,15 @@ export default function EquipePage() {
                           inviteRole === r
                             ? r === 'admin'
                               ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                              : 'bg-white/10 text-white border border-white/20'
-                            : 'bg-white/[0.03] text-white/40 border border-white/[0.06]'
+                              : 'bg-gray-100 text-[#101729]border border-[var(--border)]'
+                            : 'bg-gray-50 text-[var(--text-secondary)] border border-[var(--border)]'
                         }`}
                       >
                         {r === 'admin' ? 'Administrateur' : 'Membre'}
                       </button>
                     ))}
                   </div>
-                  <p className="text-[11px] text-white/30 mt-2">
+                  <p className="text-[11px] text-[var(--text-secondary)] mt-2">
                     {inviteRole === 'admin'
                       ? "L’administrateur a accès aux modules que vous lui assignez, avec droit de modification."
                       : "Le membre a accès en lecture seule aux modules assignés."
@@ -402,7 +402,7 @@ export default function EquipePage() {
               <div className="flex gap-2 mt-6">
                 <button
                   onClick={() => setInviteOpen(false)}
-                  className="flex-1 py-2 rounded-lg bg-white/[0.04] text-white/60 text-sm hover:bg-white/[0.08] transition"
+                  className="flex-1 py-2 rounded-lg bg-gray-100 text-[var(--text-secondary)] text-sm hover:bg-gray-100 transition"
                 >
                   Annuler
                 </button>
@@ -424,9 +424,9 @@ export default function EquipePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* Colonne 1 : liste des membres */}
-        <div className="lg:col-span-1 bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-white/[0.06]">
-            <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+        <div className="lg:col-span-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-[var(--border)]">
+            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
               Membres ({members.length})
             </p>
           </div>
@@ -435,7 +435,7 @@ export default function EquipePage() {
               <button
                 key={member.id}
                 onClick={() => selectMember(member)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition hover:bg-white/[0.04] ${
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition hover:bg-gray-100 ${
                   selected?.id === member.id ? 'bg-amber-500/5 border-l-2 border-amber-500/50' : ''
                 }`}
               >
@@ -445,7 +445,7 @@ export default function EquipePage() {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-white truncate">
+                  <div className="text-sm font-medium text-[#101729]truncate">
                     {member.prenom} {member.nom}
                   </div>
                   <div className="flex items-center gap-1 flex-wrap mt-0.5">
@@ -464,7 +464,7 @@ export default function EquipePage() {
                   </div>
                 </div>
                 {member.role !== 'owner' && (
-                  <ChevronDown size={14} className={`text-white/20 shrink-0 transition-transform ${
+                  <ChevronDown size={14} className={`text-gray-400 shrink-0 transition-transform ${
                     selected?.id === member.id ? 'rotate-180' : ''
                   }`} />
                 )}
@@ -476,25 +476,25 @@ export default function EquipePage() {
         {/* Colonne 2 : permissions du membre sélectionné */}
         <div className="lg:col-span-2">
           {!selected ? (
-            <div className="flex flex-col items-center justify-center h-64 bg-white/[0.02] border border-white/[0.06] rounded-xl text-center">
-              <ShieldAlert size={28} className="text-white/15 mb-3" />
-              <p className="text-sm text-white/30">Sélectionnez un membre pour gérer ses permissions.</p>
+            <div className="flex flex-col items-center justify-center h-64 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center">
+              <ShieldAlert size={28} className="text-gray-300 mb-3" />
+              <p className="text-sm text-[var(--text-secondary)]">Sélectionnez un membre pour gérer ses permissions.</p>
             </div>
           ) : selected.role === 'owner' ? (
-            <div className="flex flex-col items-center justify-center h-64 bg-white/[0.02] border border-white/[0.06] rounded-xl text-center">
+            <div className="flex flex-col items-center justify-center h-64 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center">
               <Shield size={28} className="text-[#F51E33]/40 mb-3" />
-              <p className="text-sm text-white/50 font-medium">
+              <p className="text-sm text-[var(--text-secondary)] font-medium">
                 {selected.prenom} {selected.nom}
               </p>
-              <p className="text-xs text-white/30 mt-1">
+              <p className="text-xs text-[var(--text-secondary)] mt-1">
                 Le propriétaire a accès à tous les modules.
               </p>
             </div>
           ) : (
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
 
               {/* Header membre */}
-              <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+              <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center">
                     <span className="text-sm font-bold text-[#F51E33]">
@@ -502,7 +502,7 @@ export default function EquipePage() {
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">{selected.prenom} {selected.nom}</p>
+                    <p className="text-sm font-semibold text-[#101729]">{selected.prenom} {selected.nom}</p>
                     <RoleBadge role={selected.role} />
                   </div>
                 </div>
@@ -513,7 +513,7 @@ export default function EquipePage() {
                     <select
                       value={selected.dynamic_role_id ?? ''}
                       onChange={e => assignDynamicRole(selected, e.target.value || null)}
-                      className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-2 py-1.5 text-xs text-white/70 outline-none"
+                      className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#101729] outline-none"
                       title="Rôle métier"
                     >
                       <option value="">— Rôle métier —</option>
@@ -526,7 +526,7 @@ export default function EquipePage() {
                   <select
                     value={selected.role}
                     onChange={e => changeRole(selected, e.target.value as 'admin' | 'membre')}
-                    className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-2 py-1.5 text-xs text-white/70 outline-none"
+                    className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#101729] outline-none"
                   >
                     <option value="admin">Administrateur</option>
                     <option value="membre">Membre</option>
@@ -534,7 +534,7 @@ export default function EquipePage() {
                   {/* Retirer */}
                   <button
                     onClick={() => removeMember(selected)}
-                    className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/20 hover:text-red-400 transition"
+                    className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition"
                     title="Retirer de l'équipe"
                   >
                     <Trash2 size={14} />
@@ -545,10 +545,10 @@ export default function EquipePage() {
               {/* Grille des permissions */}
               <div className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     Accès aux modules
                   </p>
-                  <div className="flex items-center gap-4 text-[10px] text-white/30 uppercase tracking-wider">
+                  <div className="flex items-center gap-4 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">
                     <span className="flex items-center gap-1"><Eye size={10} />Voir</span>
                     <span className="flex items-center gap-1"><Edit3 size={10} />Modifier</span>
                     <span className="flex items-center gap-1"><Trash2 size={10} />Suppr.</span>
@@ -568,7 +568,7 @@ export default function EquipePage() {
                         key={mod.id}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition ${
                           hasView
-                            ? 'bg-white/[0.03] border-white/[0.06]'
+                            ? 'bg-gray-50 border-[var(--border)]'
                             : 'bg-transparent border-transparent'
                         }`}
                       >
@@ -576,8 +576,8 @@ export default function EquipePage() {
                           <Icon size={13} style={{ color: mod.color }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm text-white/80">{mod.label}</div>
-                          <div className="text-[10px] text-white/30">{mod.sublabel}</div>
+                          <div className="text-sm text-[#101729]">{mod.label}</div>
+                          <div className="text-[10px] text-[var(--text-secondary)]">{mod.sublabel}</div>
                         </div>
                         <div className="flex items-center gap-5 shrink-0">
                           <Toggle

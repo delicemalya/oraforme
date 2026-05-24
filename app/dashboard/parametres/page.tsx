@@ -52,8 +52,8 @@ const CC_TYPE_LABELS: Record<string, string> = Object.fromEntries(CC_TYPES.map(t
 
 function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
+    <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-[var(--border)] flex items-center gap-2" style={{ background: '#F9FAFB' }}>
         <Icon size={13} className="text-[#F51E33]" />
         <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{title}</span>
       </div>
@@ -71,10 +71,10 @@ function Field({ label, value, onChange, placeholder, type = 'text', full = fals
       <label className="block text-xs text-[var(--text-secondary)] mb-1">{label}</label>
       {type === 'textarea' ? (
         <textarea rows={2} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 resize-none" />
+          className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7] resize-none" />
       ) : (
         <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50" />
+          className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7]" />
       )}
     </div>
   )
@@ -264,7 +264,7 @@ export default function ParametresPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Paramètres</h1>
+          <h1 className="text-xl font-bold text-[#101729]">Paramètres</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">Configuration de l&apos;entreprise et de la facturation</p>
         </div>
         <motion.button onClick={save} disabled={saving} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
@@ -274,15 +274,15 @@ export default function ParametresPage() {
       </div>
 
       {/* ── LOGO SECTION ─────────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-        <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-[var(--border)] flex items-center gap-2" style={{ background: '#F9FAFB' }}>
           <Upload size={13} className="text-[#F51E33]" />
           <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Logo de l&apos;entreprise</span>
         </div>
         <div className="p-4">
           <div className="flex items-center gap-4">
             {/* Preview box */}
-            <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-white/[0.08]"
+            <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-[var(--border)]"
               style={{ background: cfg.logo_url ? 'transparent' : 'rgba(240,163,10,0.1)' }}>
               {cfg.logo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -296,7 +296,7 @@ export default function ParametresPage() {
 
             {/* Upload controls */}
             <div className="flex-1">
-              <p className="text-sm font-semibold text-white mb-0.5">{cfg.nom || 'Votre entreprise'}</p>
+              <p className="text-sm font-semibold text-[#101729] mb-0.5">{cfg.nom || 'Votre entreprise'}</p>
               <p className="text-xs text-[var(--text-secondary)] mb-2">{cfg.ville}{cfg.pays ? `, ${cfg.pays}` : ''}</p>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -327,10 +327,10 @@ export default function ParametresPage() {
           )}
 
           {/* URL fallback */}
-          <div className="mt-3 pt-3 border-t border-white/[0.06]">
+          <div className="mt-3 pt-3 border-t border-[var(--border)]">
             <label className="block text-xs text-[var(--text-secondary)] mb-1">Ou collez directement une URL d&apos;image</label>
             <input type="url" value={cfg.logo_url} onChange={e => set('logo_url', e.target.value)} placeholder="https://…/logo.png"
-              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50" />
+              className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7]" />
           </div>
         </div>
       </div>
@@ -364,15 +364,15 @@ export default function ParametresPage() {
         <div>
           <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Délai de paiement</label>
           <select value={cfg.delai_paiement} onChange={e => set('delai_paiement', Number(e.target.value))}
-            className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#F51E33]/50">
+            className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
             {[15, 30, 45, 60, 90].map(d => <option key={d} value={d} className="bg-[var(--card-bg)]">{d} jours</option>)}
           </select>
         </div>
       </Section>
 
       {/* ── CENTRES DE COÛTS ─────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-        <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-[var(--border)] flex items-center gap-2" style={{ background: '#F9FAFB' }}>
           <Layers size={13} className="text-[#F51E33]" />
           <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Centres de coûts</span>
           <span className="ml-auto text-[10px] text-[var(--text-secondary)]">{costCenters.length} centre{costCenters.length > 1 ? 's' : ''}</span>
@@ -385,7 +385,7 @@ export default function ParametresPage() {
           ) : (
             <div className="space-y-1.5">
               {costCenters.map(cc => (
-                <div key={cc.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                <div key={cc.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--border)]" style={{ background: '#F9FAFB' }}>
                   <span className="text-xs font-mono font-bold text-[#F51E33] w-12 shrink-0">{cc.code}</span>
                   <span className="text-xs text-[var(--text)] flex-1 truncate">{cc.nom}</span>
                   <span className="text-[10px] text-[var(--text-secondary)] shrink-0">{CC_TYPE_LABELS[cc.type] ?? cc.type}</span>
@@ -397,19 +397,19 @@ export default function ParametresPage() {
             </div>
           )}
 
-          <div className="border-t border-white/[0.06] pt-3">
+          <div className="border-t border-[var(--border)] pt-3">
             <p className="text-[10px] text-[#6E7681] uppercase tracking-wider mb-2">Ajouter un centre</p>
             <div className="grid grid-cols-3 gap-2 mb-2">
               <input value={ccForm.code} onChange={e => setCcForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
                 placeholder="Code (RH…)" maxLength={10}
-                className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50" />
+                className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7]" />
               <input value={ccForm.nom} onChange={e => setCcForm(f => ({ ...f, nom: e.target.value }))}
                 placeholder="Nom du centre"
-                className="col-span-2 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50" />
+                className="col-span-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7]" />
             </div>
             <div className="flex gap-2">
               <select value={ccForm.type} onChange={e => setCcForm(f => ({ ...f, type: e.target.value }))}
-                className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F51E33]/50">
+                className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                 {CC_TYPES.map(t => <option key={t.value} value={t.value} className="bg-[var(--card-bg)]">{t.label}</option>)}
               </select>
               <button onClick={saveCostCenter} disabled={ccSaving || !ccForm.code || !ccForm.nom}
@@ -430,11 +430,11 @@ export default function ParametresPage() {
             <FileText size={14} className="text-[#F51E33]" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white mb-1">Logique fiscale Congo-Brazzaville</p>
+            <p className="text-sm font-semibold text-[#101729] mb-1">Logique fiscale Congo-Brazzaville</p>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
               Toutes les factures appliquent automatiquement :{' '}
-              <strong className="text-white">TVA 18 %</strong> sur le HT +{' '}
-              <strong className="text-white">Centime Additionnel (CA) 5 %</strong> de la TVA.<br />
+              <strong className="text-[#101729]">TVA 18 %</strong> sur le HT +{' '}
+              <strong className="text-[#101729]">Centime Additionnel (CA) 5 %</strong> de la TVA.<br />
               Formule : TTC = HT + (HT × 0,18) + (HT × 0,18 × 0,05)
             </p>
           </div>

@@ -40,18 +40,18 @@ export type ProfilPerson =
 // ── Tokens ────────────────────────────────────────────────────────────────────
 
 const G  = '#F51E33'
-const BG = '#1a2f50'
-const CARD    = 'rgba(255,255,255,0.06)'
-const BORDER  = 'rgba(255,255,255,0.12)'
-const ORG_DIM = 'rgba(245,30,51,0.15)'
-const ORG_BDR = 'rgba(245,30,51,0.28)'
-const T1 = '#FFFFFF'
-const T2 = 'rgba(255,255,255,0.55)'
-const T3 = 'rgba(255,255,255,0.4)'
-const GREEN  = '#F51E33'
+const BG = '#FFFFFF'
+const CARD    = '#F9FAFB'
+const BORDER  = '#E5E7EB'
+const ORG_DIM = 'rgba(245,30,51,0.10)'
+const ORG_BDR = 'rgba(245,30,51,0.22)'
+const T1 = '#101729'
+const T2 = '#6B7280'
+const T3 = '#9CA3AF'
+const GREEN  = '#2EA043'
 const RED    = '#F51E33'
-const BLUE   = '#8B0070'
-const PURPLE = '#8B0070'
+const BLUE   = '#00b9a7'
+const PURPLE = '#ff7000'
 
 const fmtN   = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
 const fmtD   = (d: string | null | undefined) =>
@@ -149,7 +149,7 @@ function DocList() {
       {DOCS.map(d => (
         <div key={d.label} style={{
           display: 'flex', alignItems: 'center', gap: 12, padding: '9px 12px',
-          background: 'rgba(255,255,255,0.02)', border: `1px solid ${BORDER}`,
+          background: '#F9FAFB', border: `1px solid ${BORDER}`,
           borderRadius: 10, cursor: 'pointer',
         }}>
           <div style={{ width: 34, height: 34, borderRadius: 8, background: `${d.color}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{d.icon}</div>
@@ -192,7 +192,7 @@ function ProfilEmploye({ d }: { d: EmployeFull }) {
           {d.prime_rendement > 0 && <PayRow label="Prime rendement"  value={`+${fmtN(d.prime_rendement)} FCFA`} color={GREEN} mono />}
           {d.taux_horaire && d.taux_horaire > 0 && <PayRow label="Taux horaire" value={`${fmtN(d.taux_horaire)} FCFA/h`} color={BLUE} mono />}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginTop: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#F9FAFB', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginTop: 10 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE BRUT</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(brut)} FCFA</span>
         </div>
@@ -264,7 +264,7 @@ function ProfilEnseignant({ d }: { d: Enseignant }) {
           {d.taux_horaire    != null && <PayRow label="Taux horaire"    value={`${fmtN(d.taux_horaire)} FCFA/h`}  color={BLUE} mono />}
         </div>
         {d.salaire_mensuel != null && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#F9FAFB', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginTop: 10 }}>
             <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>TOTAL MENSUEL</span>
             <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire_mensuel)} FCFA</span>
           </div>
@@ -379,7 +379,7 @@ function ProfilStaff({ d }: { d: StaffFull }) {
       </Card>
 
       <Card title="Paiement" icon="💳">
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: '#F9FAFB', borderRadius: 10, border: `1px solid rgba(245,30,51,0.25)`, marginBottom: 12 }}>
           <span style={{ fontWeight: 700, fontSize: 13, color: T1 }}>SALAIRE MENSUEL</span>
           <span style={{ fontWeight: 800, fontSize: 16, color: G, fontFamily: "'JetBrains Mono',monospace" }}>{fmtN(d.salaire)} FCFA</span>
         </div>
@@ -476,7 +476,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
                 Actif
               </span>
             </div>
-            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: `1px solid ${BORDER}`, color: T2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, cursor: 'pointer', background: '#F3F4F6', border: `1px solid ${BORDER}`, color: T2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
               ✕
             </button>
           </div>
@@ -500,13 +500,13 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
               <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                 {phone && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: T2 }}>
-                    <span style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>📱</span>
+                    <span style={{ width: 22, height: 22, borderRadius: 6, background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>📱</span>
                     {phone}
                   </div>
                 )}
                 {email && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: T2 }}>
-                    <span style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>📧</span>
+                    <span style={{ width: 22, height: 22, borderRadius: 6, background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>📧</span>
                     {email}
                   </div>
                 )}

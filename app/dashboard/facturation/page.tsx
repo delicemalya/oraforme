@@ -77,8 +77,8 @@ function StatutBadge({ statut, size = 'sm' }: { statut: StatutFac; size?: 'sm' |
 function KpiCard({ label, value, color, icon: Icon }: { label: string; value: string; color: string; icon: React.ElementType }) {
   return (
     <motion.div
-      className="rounded-xl border border-white/[0.06] p-4 flex gap-3 items-start"
-      style={{ background: 'rgba(255,255,255,0.025)' }}
+      className="rounded-xl border border-[var(--border)] p-4 flex gap-3 items-start"
+      style={{ background: '#FFFFFF' }}
       whileHover={{ scale: 1.02, y: -1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
     >
@@ -87,13 +87,13 @@ function KpiCard({ label, value, color, icon: Icon }: { label: string; value: st
       </div>
       <div className="min-w-0">
         <p className="text-[11px] text-[var(--text-secondary)] mb-0.5">{label}</p>
-        <p className="text-base font-bold text-white truncate">{value}</p>
+        <p className="text-base font-bold text-[#101729] truncate">{value}</p>
       </div>
     </motion.div>
   )
 }
 
-function ActionBtn({ icon, title, onClick, disabled, hoverClass = 'hover:text-white' }: {
+function ActionBtn({ icon, title, onClick, disabled, hoverClass = 'hover:text-[#101729]' }: {
   icon: React.ReactNode; title: string; onClick?: () => void; disabled?: boolean; hoverClass?: string
 }) {
   return (
@@ -101,7 +101,7 @@ function ActionBtn({ icon, title, onClick, disabled, hoverClass = 'hover:text-wh
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`p-1.5 rounded hover:bg-white/[0.08] text-[var(--text-secondary)] ${hoverClass} transition-colors disabled:opacity-40`}
+      className={`p-1.5 rounded hover:bg-gray-100 text-[var(--text-secondary)] ${hoverClass} transition-colors disabled:opacity-40`}
     >
       {icon}
     </button>
@@ -119,7 +119,7 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50"
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7]"
       />
     </div>
   )
@@ -391,7 +391,7 @@ export default function FacturationPage() {
         {toast && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="fixed top-4 right-4 z-50 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-white shadow-xl"
+            className="fixed top-4 right-4 z-50 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[#101729] shadow-xl"
           >
             {toast}
           </motion.div>
@@ -401,11 +401,11 @@ export default function FacturationPage() {
       {/* Header */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Facturation</h1>
+          <h1 className="text-xl font-bold text-[#101729]">Facturation</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">TVA 18 % + CA 5 % · Congo-Brazzaville</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/dashboard/parametres" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/10 text-[var(--text-secondary)] hover:text-white hover:border-white/20 text-xs font-medium transition-colors">
+          <Link href="/dashboard/parametres" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-xs font-medium transition-colors">
             <Settings size={13} /> Paramètres
           </Link>
           <motion.button
@@ -429,7 +429,7 @@ export default function FacturationPage() {
 
       {/* Filters + Search */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
-        <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1 flex-wrap">
+        <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1 flex-wrap">
           {([
             ['toutes',    'Toutes'],
             ['brouillon', 'Brouillons'],
@@ -451,7 +451,7 @@ export default function FacturationPage() {
         <div className="relative">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
-            className="pl-8 pr-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 w-52"
+            className="pl-8 pr-3 py-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7] w-52"
             placeholder="Rechercher client, N°…"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -466,11 +466,11 @@ export default function FacturationPage() {
           <p className="text-sm">Aucune facture trouvée.</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.025)' }}>
+                <tr className="border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
                   {['N° Facture', 'Client', 'Date', 'HT', 'TVA+CA', 'TTC', 'Statut', 'Actions'].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
@@ -486,7 +486,7 @@ export default function FacturationPage() {
                       initial={{ opacity: 0, x: -6 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.03, duration: 0.25 }}
-                      className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
+                      className="border-b border-[var(--border)] hover:bg-gray-50 transition-colors group"
                     >
                       <td className="px-4 py-3">
                         <span className="text-xs font-mono font-semibold text-[#F51E33]">
@@ -494,7 +494,7 @@ export default function FacturationPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-sm font-medium text-white">{f.client_name ?? f.client_nom}</p>
+                        <p className="text-sm font-medium text-[#101729]">{f.client_name ?? f.client_nom}</p>
                         {f.client_email && <p className="text-[10px] text-[var(--text-secondary)]">{f.client_email}</p>}
                       </td>
                       <td className="px-4 py-3 text-xs text-[var(--text-secondary)] whitespace-nowrap">
@@ -512,7 +512,7 @@ export default function FacturationPage() {
                           style={{ color: STATUT_CONFIG[f.statut]?.color, background: STATUT_CONFIG[f.statut]?.bg }}
                         >
                           {Object.entries(STATUT_CONFIG).map(([k, v]) => (
-                            <option key={k} value={k} className="bg-[var(--card-bg)] text-white">{v.label}</option>
+                            <option key={k} value={k} className="bg-[var(--card-bg)] text-[#101729]">{v.label}</option>
                           ))}
                         </select>
                       </td>
@@ -552,13 +552,13 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="relative w-full max-w-4xl bg-[var(--card-bg)] border border-white/[0.08] rounded-2xl shadow-2xl mb-10"
+                className="relative w-full max-w-4xl bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl shadow-2xl mb-10"
                 initial={{ scale: 0.96, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 20 }}
                 onClick={e => e.stopPropagation()}
               >
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-                  <h2 className="text-base font-bold text-white">{editId ? 'Modifier la facture' : 'Nouvelle facture'}</h2>
-                  <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-white transition-colors"><X size={18} /></button>
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+                  <h2 className="text-base font-bold text-[#101729]">{editId ? 'Modifier la facture' : 'Nouvelle facture'}</h2>
+                  <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><X size={18} /></button>
                 </div>
 
                 <div className="p-6 space-y-6">
@@ -582,7 +582,7 @@ export default function FacturationPage() {
                       </div>
                       <div>
                         <label className="block text-xs text-[var(--text-secondary)] mb-1">Statut</label>
-                        <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#F51E33]/50">
+                        <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                           {Object.entries(STATUT_CONFIG).map(([k, v]) => <option key={k} value={k} className="bg-[var(--card-bg)]">{v.label}</option>)}
                         </select>
                       </div>
@@ -609,16 +609,16 @@ export default function FacturationPage() {
                         <motion.div
                           key={i}
                           initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }}
-                          className={`grid grid-cols-12 gap-2 items-center rounded-lg px-2 py-1.5 ${i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'}`}
+                          className={`grid grid-cols-12 gap-2 items-center rounded-lg px-2 py-1.5 ${i % 2 === 0 ? 'bg-[#F9FAFB]' : 'bg-transparent'}`}
                         >
                           <div className="col-span-5">
-                            <input className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F51E33]/50" placeholder="Description du service…" value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
+                            <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]" placeholder="Description du service…" value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
                           </div>
                           <div className="col-span-3">
-                            <input type="number" min="0" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F51E33]/50 text-right" value={l.price || ''} onChange={e => updateLigne(i, 'price', e.target.value)} />
+                            <input type="number" min="0" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] text-right" value={l.price || ''} onChange={e => updateLigne(i, 'price', e.target.value)} />
                           </div>
                           <div className="col-span-2">
-                            <input type="number" min="1" className="w-full bg-white/[0.05] border border-white/[0.06] rounded-md px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#F51E33]/50 text-center" value={l.quantity} onChange={e => updateLigne(i, 'quantity', e.target.value)} />
+                            <input type="number" min="1" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] text-center" value={l.quantity} onChange={e => updateLigne(i, 'quantity', e.target.value)} />
                           </div>
                           <div className="col-span-1 text-right">
                             <span className="text-xs font-semibold text-[#F51E33]">{fmt(l.price * l.quantity)}</span>
@@ -636,16 +636,16 @@ export default function FacturationPage() {
                   </div>
 
                   {/* Fiscal Breakdown */}
-                  <div className="border border-white/[0.08] rounded-xl overflow-hidden">
-                    <div className="px-4 py-2 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="border border-[var(--border)] rounded-xl overflow-hidden">
+                    <div className="px-4 py-2 border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
                       <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Récapitulatif fiscal · Congo-Brazzaville</span>
                     </div>
                     <div className="p-4 space-y-2">
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Sous-total HT</span><span className="text-white font-medium">{fmt(subtotalLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">TVA (18 %)</span><span className="text-white">{fmt(tvaLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA (5 % de la TVA)</span><span className="text-white">{fmt(caLive)}</span></div>
-                      <div className="border-t border-white/[0.08] pt-3 flex justify-between">
-                        <span className="text-base font-bold text-white">TOTAL TTC</span>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Sous-total HT</span><span className="text-[#101729] font-medium">{fmt(subtotalLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">TVA (18 %)</span><span className="text-[#101729]">{fmt(tvaLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA (5 % de la TVA)</span><span className="text-[#101729]">{fmt(caLive)}</span></div>
+                      <div className="border-t border-[var(--border)] pt-3 flex justify-between">
+                        <span className="text-base font-bold text-[#101729]">TOTAL TTC</span>
                         <span className="text-xl font-bold text-[#F51E33]">{fmt(ttcLive)}</span>
                       </div>
                     </div>
@@ -654,15 +654,15 @@ export default function FacturationPage() {
                   {/* Notes */}
                   <div>
                     <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Notes (optionnel)</label>
-                    <textarea rows={3} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 resize-none" placeholder="Conditions de paiement, remerciements…" value={notes} onChange={e => setNotes(e.target.value)} />
+                    <textarea rows={3} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7] resize-none" placeholder="Conditions de paiement, remerciements…" value={notes} onChange={e => setNotes(e.target.value)} />
                   </div>
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-3 pt-2">
-                    <button onClick={() => setShowForm(false)} className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-[var(--text-secondary)] hover:text-white hover:border-white/20 text-sm font-medium transition-colors">
+                    <button onClick={() => setShowForm(false)} className="px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-sm font-medium transition-colors">
                       Annuler
                     </button>
-                    <button onClick={() => handleSave('brouillon')} disabled={saving || !clientNom} className="px-4 py-2.5 rounded-xl border border-white/[0.08] text-[var(--text-secondary)] hover:text-white hover:border-white/20 text-sm font-medium transition-colors disabled:opacity-40">
+                    <button onClick={() => handleSave('brouillon')} disabled={saving || !clientNom} className="px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-sm font-medium transition-colors disabled:opacity-40">
                       {saving ? <Loader2 className="animate-spin" size={14} /> : 'Enregistrer brouillon'}
                     </button>
                     <button
@@ -691,15 +691,15 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="relative w-full max-w-2xl max-h-[90vh] bg-[var(--card-bg)] border border-white/[0.08] rounded-2xl shadow-2xl flex flex-col"
+                className="relative w-full max-w-2xl max-h-[90vh] bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl shadow-2xl flex flex-col"
                 initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
                 onClick={e => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] shrink-0">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] shrink-0">
                   <div className="flex items-center gap-3">
                     <div>
-                      <p className="text-sm font-bold text-white">{viewedFac.invoice_number ?? '—'}</p>
+                      <p className="text-sm font-bold text-[#101729]">{viewedFac.invoice_number ?? '—'}</p>
                       <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{viewedFac.client_name ?? viewedFac.client_nom}</p>
                     </div>
                     <StatutBadge statut={viewedFac.statut} size="xs" />
@@ -707,7 +707,7 @@ export default function FacturationPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => router.push(`/dashboard/factures/${viewedFac.id}/preview`)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-[var(--text-secondary)] hover:text-white text-xs font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-xs font-medium transition-colors"
                     >
                       <ExternalLink size={12} /> Aperçu
                     </button>
@@ -718,7 +718,7 @@ export default function FacturationPage() {
                     >
                       {dlLoading === viewedFac.id ? <Loader2 className="animate-spin" size={12} /> : <Download size={12} />} PDF
                     </button>
-                    <button onClick={() => setViewId(null)} className="text-[var(--text-secondary)] hover:text-white p-1 transition-colors"><X size={18} /></button>
+                    <button onClick={() => setViewId(null)} className="text-[var(--text-secondary)] hover:text-[#101729] p-1 transition-colors"><X size={18} /></button>
                   </div>
                 </div>
 
@@ -729,24 +729,24 @@ export default function FacturationPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">Client</p>
-                      <p className="font-semibold text-white text-sm">{viewedFac.client_name ?? viewedFac.client_nom}</p>
+                      <p className="font-semibold text-[#101729] text-sm">{viewedFac.client_name ?? viewedFac.client_nom}</p>
                       {viewedFac.client_address && <p className="text-xs text-[var(--text-secondary)] mt-0.5">{viewedFac.client_address}</p>}
                       {viewedFac.client_phone   && <p className="text-xs text-[var(--text-secondary)]">{viewedFac.client_phone}</p>}
                       {viewedFac.client_email   && <p className="text-xs text-[var(--text-secondary)]">{viewedFac.client_email}</p>}
                     </div>
                     <div>
                       <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">Dates</p>
-                      <p className="text-xs text-[var(--text-secondary)]">Émise le <span className="text-white">{fmtDate(viewedFac.date ?? viewedFac.created_at)}</span></p>
-                      {viewedFac.due_date && <p className="text-xs text-[var(--text-secondary)] mt-1">Échéance <span className="text-white">{fmtDate(viewedFac.due_date)}</span></p>}
+                      <p className="text-xs text-[var(--text-secondary)]">Émise le <span className="text-[#101729]">{fmtDate(viewedFac.date ?? viewedFac.created_at)}</span></p>
+                      {viewedFac.due_date && <p className="text-xs text-[var(--text-secondary)] mt-1">Échéance <span className="text-[#101729]">{fmtDate(viewedFac.due_date)}</span></p>}
                     </div>
                   </div>
 
                   {/* Lignes table */}
                   {viewLignes.length > 0 && (
-                    <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+                    <div className="rounded-xl border border-[var(--border)] overflow-hidden">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(240,163,10,0.08)' }}>
+                          <tr className="border-b border-[var(--border)]" style={{ background: 'rgba(240,163,10,0.08)' }}>
                             <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Désignation</th>
                             <th className="text-right px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Prix U.</th>
                             <th className="text-center px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Qté</th>
@@ -757,8 +757,8 @@ export default function FacturationPage() {
                           {viewLignes.map((l, i) => (
                             <tr
                               key={i}
-                              className={`border-b border-white/[0.04] ${i === viewLignes.length - 1 ? 'border-0' : ''}`}
-                              style={{ background: i % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent' }}
+                              className={`border-b border-[var(--border)] ${i === viewLignes.length - 1 ? 'border-0' : ''}`}
+                              style={{ background: i % 2 === 1 ? '#F9FAFB' : 'transparent' }}
                             >
                               <td className="px-3 py-2 text-[var(--text)]">{l.description}</td>
                               <td className="px-3 py-2 text-[var(--text-secondary)] text-right">{fmt(l.price)}</td>
@@ -776,12 +776,12 @@ export default function FacturationPage() {
                     const ht = viewedFac.subtotal ?? viewedFac.montant_ht ?? 0
                     const { tva, ca, ttc } = calculerTVACongo(ht)
                     return (
-                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 space-y-2">
-                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Sous-total HT</span><span className="text-white">{fmt(ht)}</span></div>
-                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">TVA 18 %</span><span className="text-white">{fmt(tva)}</span></div>
-                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA 5 %</span><span className="text-white">{fmt(ca)}</span></div>
-                        <div className="border-t border-white/[0.08] pt-2 flex justify-between">
-                          <span className="font-bold text-white">TOTAL TTC</span>
+                      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 space-y-2">
+                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Sous-total HT</span><span className="text-[#101729]">{fmt(ht)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">TVA 18 %</span><span className="text-[#101729]">{fmt(tva)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA 5 %</span><span className="text-[#101729]">{fmt(ca)}</span></div>
+                        <div className="border-t border-[var(--border)] pt-2 flex justify-between">
+                          <span className="font-bold text-[#101729]">TOTAL TTC</span>
                           <span className="font-bold text-[#F51E33] text-lg">{fmt(ttc)}</span>
                         </div>
                       </div>
@@ -804,7 +804,7 @@ export default function FacturationPage() {
                             style={
                               isCurrent
                                 ? { color: v.color, background: v.bg, borderColor: `${v.color}40`, cursor: 'default' }
-                                : { color: '#8B949E', background: 'transparent', borderColor: 'rgba(255,255,255,0.08)', cursor: 'pointer' }
+                                : { color: '#8B949E', background: 'transparent', borderColor: '#E5E7EB', cursor: 'pointer' }
                             }
                           >
                             <Icon size={10} /> {v.label}
@@ -818,7 +818,7 @@ export default function FacturationPage() {
                   <div>
                     <button
                       onClick={() => setShowPdfPreview(p => !p)}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/[0.08] text-[var(--text-secondary)] hover:text-white hover:border-white/[0.16] text-sm font-medium transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-sm font-medium transition-colors"
                     >
                       <span className="flex items-center gap-2"><FileText size={14} /> {showPdfPreview ? 'Masquer' : 'Afficher'} l&apos;aperçu PDF</span>
                       <span>{showPdfPreview ? '▲' : '▼'}</span>
@@ -829,7 +829,7 @@ export default function FacturationPage() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 500 }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="overflow-hidden rounded-b-xl border-x border-b border-white/[0.08]"
+                          className="overflow-hidden rounded-b-xl border-x border-b border-[var(--border)]"
                         >
                           <iframe
                             src={`/api/factures/${viewedFac.id}/pdf`}
@@ -843,7 +843,7 @@ export default function FacturationPage() {
 
                   {/* Notes */}
                   {viewedFac.notes && (
-                    <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+                    <div className="bg-[#F9FAFB] border border-[var(--border)] rounded-xl p-4">
                       <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Notes</p>
                       <p className="text-sm text-[var(--text)]">{viewedFac.notes}</p>
                     </div>
@@ -869,7 +869,7 @@ export default function FacturationPage() {
                     )}
                     <button
                       onClick={() => { setViewId(null); openEdit(viewedFac) }}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/[0.08] text-[var(--text-secondary)] hover:text-white text-xs font-medium transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-xs font-medium transition-colors"
                     >
                       <Edit3 size={13} /> Modifier
                     </button>
@@ -892,11 +892,11 @@ export default function FacturationPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="w-full max-w-sm bg-[var(--card-bg)] border border-white/[0.08] rounded-2xl shadow-2xl p-6"
+                className="w-full max-w-sm bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl shadow-2xl p-6"
                 initial={{ scale: 0.92 }} animate={{ scale: 1 }} exit={{ scale: 0.92 }}
                 onClick={e => e.stopPropagation()}
               >
-                <h3 className="text-base font-bold text-white mb-2">Confirmer le changement ?</h3>
+                <h3 className="text-base font-bold text-[#101729] mb-2">Confirmer le changement ?</h3>
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
                   Passer de{' '}
                   <span className="font-semibold" style={{ color: STATUT_CONFIG[confirmStatut.current].color }}>
@@ -910,7 +910,7 @@ export default function FacturationPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setConfirmStatut(null)}
-                    className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-[var(--text-secondary)] hover:text-white text-sm font-medium transition-colors"
+                    className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-sm font-medium transition-colors"
                   >
                     Annuler
                   </button>

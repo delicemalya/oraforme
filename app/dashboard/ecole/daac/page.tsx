@@ -103,7 +103,7 @@ export default function DaacPage() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
-                tab === t.id ? 'bg-[#F51E33] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
+                tab === t.id ? 'bg-[#00b9a7] text-white' : 'text-[var(--text-secondary)] hover:text-[#101729]'
               }`}
             >
               <t.icon size={12} />

@@ -283,7 +283,7 @@ export default function TransportPage() {
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[var(--border)]" style={{ background: 'rgba(255,255,255,.01)' }}>
+                  <tr className="border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
                     <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Client</th>
                     <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider hidden sm:table-cell">Trajet</th>
                     <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider hidden md:table-cell">Chauffeur</th>

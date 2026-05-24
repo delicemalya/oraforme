@@ -186,8 +186,8 @@ export default function InvoicePreviewPage() {
   if (!facture) return (
     <div className="fixed inset-0 z-50 bg-[var(--surface)] flex flex-col items-center justify-center gap-4">
       <AlertTriangle size={40} className="text-red-400" />
-      <p className="text-white font-semibold">Facture introuvable</p>
-      <button onClick={() => router.back()} className="text-sm text-[var(--text-secondary)] hover:text-white">← Retour</button>
+      <p className="text-[#101729] font-semibold">Facture introuvable</p>
+      <button onClick={() => router.back()} className="text-sm text-[var(--text-secondary)] hover:text-[#101729]">← Retour</button>
     </div>
   )
 

@@ -59,11 +59,11 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
   return (
     <div className="space-y-4">
       {/* Student card */}
-      <div className="rounded-xl border border-[#142850]/20 p-5" style={{ background: 'rgba(6,182,212,0.06)' }}>
+      <div className="rounded-xl border border-[#142850]/20 p-5" style={{ background: 'rgba(0,185,167,0.06)' }}>
         <div className="flex items-start gap-4">
           <Avatar nom={etudiant.nom} prenom={etudiant.prenom} photoUrl={etudiant.photo_url} size={56} />
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-white">{etudiant.prenom} {etudiant.nom}</h2>
+            <h2 className="text-lg font-bold text-[#101729]">{etudiant.prenom} {etudiant.nom}</h2>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">{etudiant.numero_id} · {etudiant.classe ?? NIVEAUX.find(n => n.value === etudiant.niveau)?.label} · {etudiant.annee_scolaire}</p>
             <div className="mt-1"><StatutBadge statut={etudiant.statut} /></div>
           </div>
@@ -76,7 +76,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           )}
         </div>
         {isAdmin && etudiant.statut === 'suspendu' && etudiant.code_deblocage && (
-          <div className="mt-3 pt-3 border-t border-white/[0.06]">
+          <div className="mt-3 pt-3 border-t border-[var(--border)]">
             <p className="text-[10px] text-[var(--text-secondary)]">Code de déblocage : <span className="font-mono font-bold text-[#F51E33]">{etudiant.code_deblocage}</span></p>
           </div>
         )}
@@ -102,7 +102,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-fit">
         {[
           { id: 'notes'     as const, label: 'Mes notes',    icon: BookOpen,      count: notes.length },
           { id: 'paiements' as const, label: 'Paiements',    icon: CreditCard,    count: paiements.length },
@@ -113,9 +113,9 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           return (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: activeTab === t.id ? '#142850' : 'transparent', color: activeTab === t.id ? '#fff' : '#8B949E' }}>
+              style={{ background: activeTab === t.id ? '#00b9a7' : 'transparent', color: activeTab === t.id ? '#fff' : 'var(--text-secondary)' }}>
               <Icon size={12} />{t.label}
-              {t.count > 0 && activeTab !== t.id && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] bg-white/[0.08] text-[var(--text-secondary)]">{t.count}</span>}
+              {t.count > 0 && activeTab !== t.id && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] bg-gray-100 text-[var(--text-secondary)]">{t.count}</span>}
             </button>
           )
         })}
@@ -132,28 +132,28 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
             const moy = calcMoyenne(notes, p.value)
             const men = moy !== null ? getMention(moy) : null
             return (
-              <div key={p.value} className="rounded-xl border border-white/[0.06] overflow-hidden">
-                <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between" style={{ background: 'rgba(255,255,255,0.02)' }}>
+              <div key={p.value} className="rounded-xl border border-[var(--border)] overflow-hidden">
+                <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between" style={{ background: '#F9FAFB' }}>
                   <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{p.label}</p>
                   {moy !== null && men && (
                     <div className="flex items-center gap-2">
                       <TrendingUp size={12} style={{ color: men.color }} />
-                      <span className="text-sm font-bold text-white">{moy.toFixed(2)} / 20</span>
+                      <span className="text-sm font-bold text-[#101729]">{moy.toFixed(2)} / 20</span>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: men.color, background: men.color + '20' }}>{men.label}</span>
                     </div>
                   )}
                 </div>
                 <table className="w-full text-xs">
-                  <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Type', 'Note', '/Max', 'Moy /20', 'Coeff.', 'Mention'].map(h => <th key={h} className="text-left px-4 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+                  <thead><tr style={{ background: '#F9FAFB' }}>{['Matière', 'Type', 'Note', '/Max', 'Moy /20', 'Coeff.', 'Mention'].map(h => <th key={h} className="text-left px-4 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                   <tbody>
                     {pNotes.map(n => {
                       const moy20 = (n.note / n.note_max) * 20
                       const m = MENTIONS.find(x => moy20 >= x.min) ?? MENTIONS[MENTIONS.length - 1]
                       return (
-                        <tr key={n.id} className="border-t border-white/[0.04]">
-                          <td className="px-4 py-2.5 font-medium text-white">{n.matiere}</td>
+                        <tr key={n.id} className="border-t border-[var(--border)]">
+                          <td className="px-4 py-2.5 font-medium text-[#101729]">{n.matiere}</td>
                           <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{n.type_note}</td>
-                          <td className="px-4 py-2.5 font-bold text-white">{n.note}</td>
+                          <td className="px-4 py-2.5 font-bold text-[#101729]">{n.note}</td>
                           <td className="px-4 py-2.5 text-[var(--text-secondary)]">{n.note_max}</td>
                           <td className="px-4 py-2.5"><span className="font-bold px-1.5 py-0.5 rounded text-[10px]" style={{ color: m.color, background: m.color + '20' }}>{moy20.toFixed(2)}</span></td>
                           <td className="px-4 py-2.5 text-[var(--text-secondary)]">{n.coefficient}</td>
@@ -174,14 +174,14 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         paiements.length === 0 ? (
           <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucun paiement enregistré.</div>
         ) : (
-          <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="rounded-xl border border-[var(--border)] overflow-hidden">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Mode', 'Montant', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: '#F9FAFB' }}>{['Date', 'Libellé', 'Mode', 'Montant', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {paiements.map(p => (
-                  <tr key={p.id} className="border-t border-white/[0.04]">
+                  <tr key={p.id} className="border-t border-[var(--border)]">
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
-                    <td className="px-4 py-2.5 text-white">{p.libelle}</td>
+                    <td className="px-4 py-2.5 text-[#101729]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
                     <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
                     <td className="px-4 py-2.5">
@@ -202,14 +202,14 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         absences.length === 0 ? (
           <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune absence enregistrée.</div>
         ) : (
-          <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="rounded-xl border border-[var(--border)] overflow-hidden">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: '#F9FAFB' }}>{['Date', 'Matière', 'Motif', 'Statut'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {absences.map(a => (
-                  <tr key={a.id} className="border-t border-white/[0.04]">
+                  <tr key={a.id} className="border-t border-[var(--border)]">
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
-                    <td className="px-4 py-2.5 text-white">{a.matiere ?? '—'}</td>
+                    <td className="px-4 py-2.5 text-[#101729]">{a.matiere ?? '—'}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{a.motif ?? '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
@@ -234,11 +234,11 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         ) : (
           <div className="space-y-2">
             {notifs.map(n => (
-              <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-white/[0.04] opacity-60' : 'border-[#142850]/30'}`} style={{ background: n.read ? 'rgba(255,255,255,0.01)' : 'rgba(6,182,212,0.04)' }}>
+              <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-[var(--border)] opacity-60' : 'border-[#00b9a7]/30'}`} style={{ background: n.read ? '#FFFFFF' : 'rgba(0,185,167,0.04)' }}>
                 <div className="flex items-start gap-2">
                   <Bell size={12} className={n.read ? 'text-[var(--text-secondary)]' : 'text-[#F51E33]'} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-white">{n.titre}</p>
+                    <p className="text-xs font-semibold text-[#101729]">{n.titre}</p>
                     <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{n.message}</p>
                     <p className="text-[10px] text-[var(--text-secondary)] mt-1">{new Date(n.created_at).toLocaleDateString('fr-FR')}</p>
                   </div>
@@ -399,10 +399,10 @@ export default function EspaceEtudiantPage() {
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-white">Mon Dossier</h1>
+              <h1 className="text-xl font-bold text-[#101729]">Mon Dossier</h1>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5">Résultats, paiements, absences</p>
             </div>
-            <button onClick={() => { setSelected(null); localStorage.removeItem(STORAGE_KEY) }} className="px-3 py-2 rounded-lg text-xs border border-white/[0.06] text-[var(--text-secondary)] hover:text-white">
+            <button onClick={() => { setSelected(null); localStorage.removeItem(STORAGE_KEY) }} className="px-3 py-2 rounded-lg text-xs border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729]">
               Changer de compte
             </button>
           </div>
@@ -414,20 +414,20 @@ export default function EspaceEtudiantPage() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-bold text-white">Espace Étudiant</h1>
+          <h1 className="text-xl font-bold text-[#101729]">Espace Étudiant</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">Accédez à votre dossier scolaire</p>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-[#142850]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(6,182,212,0.04)' }}>
+          className="rounded-xl border border-[#142850]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(0,185,167,0.04)' }}>
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: '#142850' }}>
             <User size={28} className="text-white" />
           </div>
-          <h2 className="text-lg font-bold text-white mb-1">Accès à mon dossier</h2>
+          <h2 className="text-lg font-bold text-[#101729] mb-1">Accès à mon dossier</h2>
           <p className="text-xs text-[var(--text-secondary)] mb-6 max-w-sm">Entrez votre numéro étudiant (visible sur votre carte ou attestation d&apos;inscription)</p>
           <div className="flex gap-2 w-full max-w-sm">
             <input
-              className="flex-1 px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#142850]/50 text-center font-mono tracking-widest"
+              className="flex-1 px-4 py-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-sm text-[#101729] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#00b9a7] text-center font-mono tracking-widest"
               placeholder="Ex : ETU-2024-001"
               value={studentId}
               onChange={e => { setStudentId(e.target.value); setIdError(null) }}
@@ -454,10 +454,10 @@ export default function EspaceEtudiantPage() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-bold text-white">Espace Étudiant</h1>
+          <h1 className="text-xl font-bold text-[#101729]">Espace Étudiant</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">Administration · Dossier élève</p>
         </div>
-        <button onClick={() => { setSelected(null); setAdminResults([]) }} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-white">
+        <button onClick={() => { setSelected(null); setAdminResults([]) }} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[#101729]">
           <ChevronRight size={12} className="rotate-180" /> Retour à la recherche
         </button>
         <DossierEtudiant etudiant={selected} notes={notes} paiements={paiements} absences={absences} notifs={notifs} loading={loadingData} blocking={blocking} onToggleBlock={toggleBlock} isAdmin={true} />
@@ -468,16 +468,16 @@ export default function EspaceEtudiantPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-white">Espace Étudiant</h1>
+        <h1 className="text-xl font-bold text-[#101729]">Espace Étudiant</h1>
         <p className="text-xs text-[var(--text-secondary)] mt-0.5">Accédez au dossier complet d&apos;un étudiant — résultats, paiements, absences</p>
       </div>
 
-      <div className="rounded-xl border border-[#142850]/20 p-4 space-y-3" style={{ background: 'rgba(6,182,212,0.04)' }}>
+      <div className="rounded-xl border border-[#142850]/20 p-4 space-y-3" style={{ background: 'rgba(0,185,167,0.04)' }}>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
-              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#142850]/50"
+              className="w-full pl-9 pr-4 py-2.5 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-sm text-[#101729] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#00b9a7]"
               placeholder="N° étudiant, nom, prénom…"
               value={adminSearch}
               onChange={e => setAdminSearch(e.target.value)}
@@ -492,16 +492,16 @@ export default function EspaceEtudiantPage() {
       </div>
 
       {adminResults.length > 0 && (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-          <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+          <div className="px-4 py-3 border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
             <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{adminResults.length} résultat(s)</p>
           </div>
           {adminResults.map(e => (
             <button key={e.id} onClick={() => loadStudentData(e)}
-              className="w-full flex items-center gap-3 px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.02] text-left transition-colors group">
+              className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] hover:bg-gray-50 text-left transition-colors group">
               <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={36} />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-white">{e.prenom} {e.nom}</p>
+                <p className="text-sm font-semibold text-[#101729]">{e.prenom} {e.nom}</p>
                 <p className="text-xs text-[var(--text-secondary)]">{e.numero_id} · {e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
               </div>
               <StatutBadge statut={e.statut} />

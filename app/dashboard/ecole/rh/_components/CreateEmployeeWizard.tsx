@@ -25,7 +25,7 @@ function WFI({
       </label>
       <input type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-white/[0.2] transition-colors" />
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7] transition-colors" />
     </div>
   )
 }
@@ -42,7 +42,7 @@ function WSel({
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       <select value={value} onChange={e => onChange(e.target.value)}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white/[0.2] transition-colors">
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7] transition-colors">
         <option value="">— Choisir —</option>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
@@ -244,24 +244,24 @@ export function CreateEmployeeWizard({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
         className="relative w-full max-w-3xl rounded-2xl overflow-hidden flex flex-col"
-        style={{ background: '#142850', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '92vh' }}>
+        style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', maxHeight: '92vh' }}>
 
         {/* ── Header ─────────────────────────────────────────────────────────── */}
-        <div className="shrink-0 px-6 pt-5 pb-4 border-b border-white/[0.06]">
+        <div className="shrink-0 px-6 pt-5 pb-4 border-b border-[var(--border)]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-base font-bold text-white">Créer un employé</h2>
+              <h2 className="text-base font-bold text-[#101729]">Créer un employé</h2>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5">Étape {step} / {STEPS.length} — {STEPS[step - 1].label}</p>
             </div>
-            <button onClick={onClose} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-white transition-colors">
+            <button onClick={onClose} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#101729] transition-colors">
               <X size={16} />
             </button>
           </div>
 
           {/* Progress bar */}
-          <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <div className="h-1 rounded-full overflow-hidden" style={{ background: '#E5E7EB' }}>
             <motion.div className="h-full rounded-full"
-              style={{ background: '#F51E33' }}
+              style={{ background: '#00b9a7' }}
               animate={{ width: `${pct}%` }} transition={{ duration: 0.3 }} />
           </div>
 
@@ -274,7 +274,7 @@ export function CreateEmployeeWizard({
                 <div key={n} className="flex flex-col items-center gap-1">
                   <div className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
                     style={{
-                      background: past ? '#2EA043' : active ? 'rgba(46,160,67,0.12)' : 'rgba(255,255,255,0.04)',
+                      background: past ? '#2EA043' : active ? 'rgba(46,160,67,0.12)' : '#F3F4F6',
                       border: `2px solid ${past || active ? '#2EA043' : 'transparent'}`,
                     }}>
                     {past ? <Check size={12} className="text-white" />
@@ -301,13 +301,13 @@ export function CreateEmployeeWizard({
               {step === 1 && (
                 <div className="space-y-5">
                   <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 border-2 border-white/[0.08] bg-white/[0.04] flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 border-2 border-[var(--border)] bg-gray-100 flex items-center justify-center">
                       {photoPreview
                         ? <img src={photoPreview} alt="" className="w-full h-full object-cover" />
                         : <Camera size={24} className="text-[var(--text-secondary)]" />}
                     </div>
                     <div>
-                      <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-[var(--text-secondary)] hover:text-white hover:border-white/[0.15] transition-all">
+                      <label className="cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 transition-all">
                         <Upload size={12} /> {photoPreview ? 'Changer la photo' : 'Ajouter une photo'}
                         <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
                       </label>
@@ -428,12 +428,12 @@ export function CreateEmployeeWizard({
                           className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all"
                           style={acc_.roles[r.id]
                             ? { borderColor: '#2EA043', background: 'rgba(46,160,67,0.06)' }
-                            : { borderColor: 'rgba(255,255,255,0.06)' }}>
+                            : { borderColor: '#E5E7EB' }}>
                           <div className="w-4 h-4 rounded flex items-center justify-center shrink-0 transition-all"
-                            style={{ background: acc_.roles[r.id] ? '#2EA043' : 'rgba(255,255,255,0.08)' }}>
+                            style={{ background: acc_.roles[r.id] ? '#2EA043' : '#E5E7EB' }}>
                             {acc_.roles[r.id] && <Check size={10} className="text-white" />}
                           </div>
-                          <span className="text-xs" style={{ color: acc_.roles[r.id] ? '#fff' : '#8B949E' }}>{r.label}</span>
+                          <span className="text-xs" style={{ color: acc_.roles[r.id] ? '#101729' : '#6B7280' }}>{r.label}</span>
                         </div>
                       ))}
                     </div>
@@ -446,13 +446,13 @@ export function CreateEmployeeWizard({
                         <div key={p.id} onClick={() => togglePerm(p.id)}
                           className="flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all"
                           style={acc_.permissions[p.id]
-                            ? { borderColor: '#F51E33', background: 'rgba(56,139,253,0.06)' }
-                            : { borderColor: 'rgba(255,255,255,0.04)' }}>
+                            ? { borderColor: '#00b9a7', background: 'rgba(0,185,167,0.06)' }
+                            : { borderColor: '#E5E7EB' }}>
                           <div className="w-3.5 h-3.5 rounded flex items-center justify-center shrink-0 transition-all"
-                            style={{ background: acc_.permissions[p.id] ? '#F51E33' : 'rgba(255,255,255,0.08)' }}>
+                            style={{ background: acc_.permissions[p.id] ? '#00b9a7' : '#E5E7EB' }}>
                             {acc_.permissions[p.id] && <Check size={9} className="text-white" />}
                           </div>
-                          <span className="text-xs" style={{ color: acc_.permissions[p.id] ? '#fff' : '#8B949E' }}>{p.label}</span>
+                          <span className="text-xs" style={{ color: acc_.permissions[p.id] ? '#101729' : '#6B7280' }}>{p.label}</span>
                         </div>
                       ))}
                     </div>
@@ -499,7 +499,7 @@ export function CreateEmployeeWizard({
                           className="px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all"
                           style={sal_.mode_paiement === m
                             ? { background: '#2EA043', color: '#fff' }
-                            : { background: 'rgba(255,255,255,0.04)', color: '#8B949E', border: '1px solid rgba(255,255,255,0.06)' }}>
+                            : { background: '#F3F4F6', color: '#6B7280', border: '1px solid #E5E7EB' }}>
                           {m.replace('_', ' ')}
                         </button>
                       ))}
@@ -535,16 +535,16 @@ export function CreateEmployeeWizard({
                     { label: 'Certificats',        hint: 'Formations, habilitations'          },
                   ].map(doc => (
                     <label key={doc.label}
-                      className="flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-all group"
-                      style={{ background: 'rgba(255,255,255,0.02)' }}>
+                      className="flex items-center gap-4 p-4 rounded-xl border border-[var(--border)] cursor-pointer hover:border-[#00b9a7]/30 transition-all group"
+                      style={{ background: '#FFFFFF' }}>
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(56,139,253,0.1)' }}>
                         <FileText size={16} style={{ color: '#F51E33' }} />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-white">{doc.label}</p>
+                        <p className="text-sm font-medium text-[#101729]">{doc.label}</p>
                         <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{doc.hint}</p>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[var(--text-secondary)] group-hover:text-white transition-colors">
+                      <div className="flex items-center gap-1.5 text-[var(--text-secondary)] group-hover:text-[#101729] transition-colors">
                         <Upload size={13} /><span className="text-xs">Choisir</span>
                       </div>
                       <input type="file" accept=".pdf,image/*" className="hidden" />
@@ -565,7 +565,7 @@ export function CreateEmployeeWizard({
                         <CheckCircle2 size={32} style={{ color: '#2EA043' }} />
                       </motion.div>
                       <div className="text-center">
-                        <p className="text-base font-bold text-white">Employé créé avec succès !</p>
+                        <p className="text-base font-bold text-[#101729]">Employé créé avec succès !</p>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">Dossier RH · Journal comptable · Direction notifiée</p>
                       </div>
                     </div>
@@ -573,15 +573,15 @@ export function CreateEmployeeWizard({
                     <>
                       <p className={SEC}>Récapitulatif du dossier</p>
 
-                      <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div className="rounded-xl p-4" style={{ background: '#F9FAFB', border: '1px solid #E5E7EB' }}>
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-white/[0.06] flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center">
                             {photoPreview
                               ? <img src={photoPreview} alt="" className="w-full h-full object-cover" />
                               : <User size={18} className="text-[var(--text-secondary)]" />}
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm font-bold text-white">
+                            <p className="text-sm font-bold text-[#101729]">
                               {[id_.prenom, id_.postnom, id_.nom].filter(Boolean).join(' ')}
                             </p>
                             <p className="text-xs text-[var(--text-secondary)]">
@@ -610,16 +610,16 @@ export function CreateEmployeeWizard({
                           { l: 'Nationalité',   v: id_.nationalite || '—'                             },
                         ].map(({ l, v }) => (
                           <div key={l} className="p-3 rounded-lg"
-                            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            style={{ background: '#F9FAFB', border: '1px solid #E5E7EB' }}>
                             <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wider">{l}</p>
-                            <p className="text-xs font-semibold text-white mt-0.5 truncate capitalize">{v}</p>
+                            <p className="text-xs font-semibold text-[#101729] mt-0.5 truncate capitalize">{v}</p>
                           </div>
                         ))}
                       </div>
 
                       <div className="rounded-xl p-4"
-                        style={{ background: 'rgba(56,139,253,0.05)', border: '1px solid rgba(56,139,253,0.12)' }}>
-                        <p className="text-xs font-semibold text-[#F51E33] mb-2">Workflow automatique à la création</p>
+                        style={{ background: 'rgba(0,185,167,0.05)', border: '1px solid rgba(0,185,167,0.12)' }}>
+                        <p className="text-xs font-semibold text-[#00b9a7] mb-2">Workflow automatique à la création</p>
                         <ul className="space-y-1 text-xs text-[var(--text-secondary)]">
                           <li>✓ Dossier enregistré dans RH & Paie</li>
                           <li>✓ Compte tiers créé en Comptabilité (641 — Rémunérations du personnel)</li>
@@ -640,7 +640,7 @@ export function CreateEmployeeWizard({
 
         {/* ── Footer ─────────────────────────────────────────────────────────── */}
         {!done && (
-          <div className="shrink-0 px-6 py-4 border-t border-white/[0.06]">
+          <div className="shrink-0 px-6 py-4 border-t border-[var(--border)]">
             {errMsg && (
               <div className="mb-3 px-4 py-3 rounded-xl text-xs font-medium" style={{ background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.25)', color: '#F51E33' }}>
                 ⚠ {errMsg}
@@ -648,7 +648,7 @@ export function CreateEmployeeWizard({
             )}
           <div className="flex items-center justify-between">
             <button onClick={() => step > 1 ? setStep(s => s - 1) : onClose()}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.08] hover:text-white transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)] hover:text-[#101729] transition-colors">
               <ChevronLeft size={13} /> {step > 1 ? 'Précédent' : 'Annuler'}
             </button>
 

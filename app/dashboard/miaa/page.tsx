@@ -308,7 +308,7 @@ export default function MIAAPage() {
                 <motion.div
                   key={cap.label}
                   whileHover={{ scale: 1.02 }}
-                  className="p-2.5 rounded-xl border border-white/[0.05] cursor-default"
+                  className="p-2.5 rounded-xl border border-[var(--border)] cursor-default"
                   style={{ background: `${cap.color}08` }}
                 >
                   <Icon size={14} style={{ color: cap.color }} className="mb-1.5" />
@@ -325,10 +325,10 @@ export default function MIAAPage() {
           <p className="text-xs font-bold text-[var(--text)] mb-3">Questions rapides</p>
           <div className="space-y-2">
             {QUICK_CATEGORIES.map((cat, ci) => (
-              <div key={cat.label} className="border border-white/[0.05] rounded-xl overflow-hidden">
+              <div key={cat.label} className="border border-[var(--border)] rounded-xl overflow-hidden">
                 <button
                   onClick={() => setExpandedCat(expandedCat === ci ? null : ci)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-white/[0.03] transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-gray-50 transition-colors"
                 >
                   <span className="text-xs font-medium text-[var(--text-secondary)]">{cat.label}</span>
                   {expandedCat === ci
@@ -345,7 +345,7 @@ export default function MIAAPage() {
                       transition={{ duration: 0.18 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-3 pb-2 space-y-1 border-t border-white/[0.05]">
+                      <div className="px-3 pb-2 space-y-1 border-t border-[var(--border)]">
                         {cat.actions.map(a => (
                           <button
                             key={a}

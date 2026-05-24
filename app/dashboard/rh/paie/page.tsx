@@ -211,8 +211,8 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
 }) {
   return (
     <motion.div
-      className="rounded-xl border border-white/[0.06] p-4 flex gap-3 items-start"
-      style={{ background: 'rgba(255,255,255,0.03)' }}
+      className="rounded-xl border border-[var(--border)] p-4 flex gap-3 items-start"
+      style={{ background: '#FFFFFF' }}
       whileHover={{ scale: 1.02, y: -1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
     >
@@ -221,7 +221,7 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
       </div>
       <div className="min-w-0">
         <p className="text-[11px] text-[var(--text-secondary)] mb-0.5">{label}</p>
-        <p className="text-lg font-bold text-white truncate">{value}</p>
+        <p className="text-lg font-bold text-[#101729] truncate">{value}</p>
         {sub && <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{sub}</p>}
       </div>
     </motion.div>
@@ -256,8 +256,8 @@ function NumInput({ value, onChange, disabled }: {
       value={value || ''}
       onChange={e => onChange(Number(e.target.value) || 0)}
       disabled={disabled}
-      className="w-24 bg-white/[0.06] border border-white/10 rounded-md px-2 py-1 text-xs text-white text-right
-                 focus:outline-none focus:border-[#F51E33]/60 disabled:opacity-40 disabled:cursor-not-allowed"
+      className="w-24 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1 text-xs text-[#101729] text-right
+                 focus:outline-none focus:border-[#00b9a7] disabled:opacity-40 disabled:cursor-not-allowed"
     />
   )
 }
@@ -469,7 +469,7 @@ export default function PaiePage() {
       {/* Header */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Gestion de la Paie</h1>
+          <h1 className="text-xl font-bold text-[#101729]">Gestion de la Paie</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             Congo-Brazzaville · CNSS 5,04 % / 14,16 % · IRPP progressif
           </p>
@@ -479,16 +479,16 @@ export default function PaiePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={prevMois}
-            className="p-1.5 rounded-md border border-white/10 text-[var(--text-secondary)] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 transition-colors"
           >
             <ChevronLeft size={14} />
           </button>
-          <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5">
+          <div className="flex items-center gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-1.5">
             <Calendar size={13} className="text-[#F51E33]" />
             <select
               value={mois}
               onChange={e => setMois(Number(e.target.value))}
-              className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-[#101729] text-sm font-medium focus:outline-none cursor-pointer"
             >
               {MOIS_LABELS.slice(1).map((m, i) => (
                 <option key={i+1} value={i+1} className="bg-[var(--card-bg)]">{m}</option>
@@ -497,7 +497,7 @@ export default function PaiePage() {
             <select
               value={annee}
               onChange={e => setAnnee(Number(e.target.value))}
-              className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-[#101729] text-sm font-medium focus:outline-none cursor-pointer"
             >
               {[2023, 2024, 2025, 2026].map(y => (
                 <option key={y} value={y} className="bg-[var(--card-bg)]">{y}</option>
@@ -506,13 +506,13 @@ export default function PaiePage() {
           </div>
           <button
             onClick={nextMois}
-            className="p-1.5 rounded-md border border-white/10 text-[var(--text-secondary)] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 transition-colors"
           >
             <ChevronRight size={14} />
           </button>
           <button
             onClick={load}
-            className="p-1.5 rounded-md border border-white/10 text-[var(--text-secondary)] hover:text-white hover:border-white/20 transition-colors"
+            className="p-1.5 rounded-md border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 transition-colors"
           >
             <RefreshCw size={13} />
           </button>
@@ -609,11 +609,11 @@ export default function PaiePage() {
           <p className="text-sm">Aucun employé actif trouvé.</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <tr className="border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
                   <th className="text-left px-4 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Employé</th>
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Base</th>
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Primes</th>
@@ -634,7 +634,7 @@ export default function PaiePage() {
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.04, duration: 0.3 }}
-                    className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors"
+                    className="border-b border-[var(--border)] hover:bg-gray-50 transition-colors"
                   >
                     {/* Employé */}
                     <td className="px-4 py-3">
@@ -687,7 +687,7 @@ export default function PaiePage() {
                     </td>
 
                     {/* Brut */}
-                    <td className="px-3 py-3 text-right text-xs font-semibold text-white">
+                    <td className="px-3 py-3 text-right text-xs font-semibold text-[#101729]">
                       {fmt(row.brut)}
                     </td>
 
@@ -733,8 +733,8 @@ export default function PaiePage() {
                         onClick={() => printBulletin(row, mois, annee, entreprise)}
                         title="Imprimer le bulletin"
                         className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium
-                                   bg-white/[0.06] hover:bg-white/[0.12] text-[var(--text-secondary)] hover:text-white
-                                   border border-white/10 transition-colors"
+                                   bg-[var(--surface)] hover:bg-gray-200 text-[var(--text-secondary)] hover:text-[#101729]
+                                   border border-[var(--border)] transition-colors"
                       >
                         <Printer size={11} />
                         Bulletin
@@ -746,8 +746,8 @@ export default function PaiePage() {
 
               {/* Ligne totaux */}
               <tfoot>
-                <tr style={{ background: 'rgba(255,255,255,0.04)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                  <td className="px-4 py-3 text-xs font-bold text-white">
+                <tr style={{ background: '#F9FAFB', borderTop: '1px solid #E5E7EB' }}>
+                  <td className="px-4 py-3 text-xs font-bold text-[#101729]">
                     TOTAUX ({rows.length} employés)
                   </td>
                   <td className="px-3 py-3 text-right text-xs text-[var(--text-secondary)] font-semibold">
@@ -757,7 +757,7 @@ export default function PaiePage() {
                     {fmt(rows.reduce((s, r) => s + r.primes, 0))}
                   </td>
                   <td />
-                  <td className="px-3 py-3 text-right text-xs font-bold text-white">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[#101729]">
                     {fmt(totalBrut)}
                   </td>
                   <td className="px-3 py-3 text-right text-xs font-bold text-[#F51E33]">
@@ -788,15 +788,15 @@ export default function PaiePage() {
           transition={{ delay: 0.3, duration: 0.4 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-3"
         >
-          <div className="col-span-full md:col-span-2 rounded-xl border border-white/[0.06] p-4"
-               style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="col-span-full md:col-span-2 rounded-xl border border-[var(--border)] p-4"
+               style={{ background: '#F9FAFB' }}>
             <p className="text-xs text-[var(--text-secondary)] mb-3 font-semibold uppercase tracking-wider">
               Récapitulatif — {MOIS_LABELS[mois]} {annee}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div>
                 <p className="text-[10px] text-[var(--text-secondary)]">Brut total</p>
-                <p className="font-bold text-white">{fmt(totalBrut)} FCFA</p>
+                <p className="font-bold text-[#101729]">{fmt(totalBrut)} FCFA</p>
               </div>
               <div>
                 <p className="text-[10px] text-[var(--text-secondary)]">CNSS salarié total</p>
@@ -817,7 +817,7 @@ export default function PaiePage() {
                style={{ background: 'rgba(46,160,67,0.06)' }}>
             <p className="text-xs text-[var(--text-secondary)] font-semibold uppercase tracking-wider mb-2">Coût employeur total</p>
             <div>
-              <p className="text-2xl font-bold text-white">{fmt(totalCout)}</p>
+              <p className="text-2xl font-bold text-[#101729]">{fmt(totalCout)}</p>
               <p className="text-xs text-[var(--text-secondary)]">FCFA · dont CNSS patro {fmt(totalPatro)} FCFA</p>
             </div>
             <button

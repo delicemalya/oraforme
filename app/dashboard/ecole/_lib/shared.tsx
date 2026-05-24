@@ -60,10 +60,10 @@ export interface Absence {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 export const STATUT_ETU: Record<StatutEtu, { label: string; color: string; bg: string }> = {
-  actif:    { label: 'Actif',    color: '#FFFFFF', bg: 'rgba(255,255,255,0.12)' },
-  suspendu: { label: 'Suspendu', color: '#F51E33', bg: 'rgba(245,30,51,0.15)' },
-  banni:    { label: 'Banni',    color: '#F51E33', bg: 'rgba(245,30,51,0.15)' },
-  diplome:  { label: 'Diplômé', color: '#8B0070', bg: 'rgba(139,0,112,0.15)' },
+  actif:    { label: 'Actif',    color: '#FFFFFF', bg: '#00b9a7' },
+  suspendu: { label: 'Suspendu', color: '#FFFFFF', bg: '#F51E33' },
+  banni:    { label: 'Banni',    color: '#FFFFFF', bg: '#F51E33' },
+  diplome:  { label: 'Diplômé', color: '#FFFFFF', bg: '#ff7000' },
 }
 
 export const NIVEAUX: { value: Niveau; label: string; system: 'points' | 'lmd' }[] = [
@@ -92,9 +92,9 @@ export const MENTIONS = [
 ]
 
 export const STATUT_ENS: Record<StatutEnseignant, { label: string; color: string; bg: string }> = {
-  actif:   { label: 'Actif',    color: '#FFFFFF', bg: 'rgba(255,255,255,0.12)' },
-  conge:   { label: 'En congé', color: '#F51E33', bg: 'rgba(245,30,51,0.15)' },
-  inactif: { label: 'Inactif',  color: '#FFFFFF', bg: 'rgba(255,255,255,0.06)' },
+  actif:   { label: 'Actif',    color: '#FFFFFF', bg: '#00b9a7' },
+  conge:   { label: 'En congé', color: '#FFFFFF', bg: '#ff7000' },
+  inactif: { label: 'Inactif',  color: '#6B7280', bg: '#F3F4F6' },
 }
 
 export const TYPE_EVENT: Record<TypeEvent, { label: string; color: string; bg: string }> = {
@@ -415,7 +415,7 @@ export function StatutBadge({ statut }: { statut: StatutEtu }) {
   )
 }
 
-const AVATAR_PALETTE = ['#F51E33', '#F51E33', '#8B0070']
+const AVATAR_PALETTE = ['#00b9a7', '#ff7000', '#142850']
 
 export function Avatar({ nom, prenom, photoUrl, size = 32, avatarIndex }: { nom: string; prenom: string; photoUrl: string | null; size?: number; avatarIndex?: number }) {
   if (photoUrl) {
@@ -442,24 +442,32 @@ export function FI({ label, value, onChange, placeholder, type = 'text' }: {
       <input
         type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50"
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#00b9a7]"
       />
     </div>
   )
 }
 
 export function KpiCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
-  const isPrimary = color === '#F51E33'
+  const colorMap: Record<string, string> = {
+    '#F51E33': '#00b9a7',
+    '#8B0070': '#ff7000',
+    '#F08900': '#ff7000',
+    '#142850': '#142850',
+  }
+  const bg = color ? (colorMap[color] ?? color) : null
+  const hasColorBg = !!bg
   return (
-    <div className="relative rounded-xl overflow-hidden" style={{
+    <div className="relative rounded-xl overflow-hidden kpi-card" style={{
       padding: '20px 24px',
-      background: isPrimary ? '#F51E33' : 'rgba(255,255,255,0.06)',
-      border: isPrimary ? 'none' : '1px solid rgba(255,255,255,0.12)',
+      background: hasColorBg ? bg : '#FFFFFF',
+      border: hasColorBg ? 'none' : '1px solid #E5E7EB',
+      boxShadow: hasColorBg ? '0 4px 16px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
     }}>
       <div className="relative">
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', marginBottom: 8 }}>{label}</p>
-        <p style={{ fontSize: 36, fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>{value}</p>
-        {sub && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{sub}</p>}
+        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: hasColorBg ? 'rgba(255,255,255,0.85)' : '#6B7280', textTransform: 'uppercase', marginBottom: 8 }}>{label}</p>
+        <p style={{ fontSize: 36, fontWeight: 800, color: hasColorBg ? '#FFFFFF' : '#101729', lineHeight: 1 }}>{value}</p>
+        {sub && <p style={{ fontSize: 11, color: hasColorBg ? 'rgba(255,255,255,0.7)' : '#9CA3AF', marginTop: 4 }}>{sub}</p>}
       </div>
     </div>
   )

@@ -278,7 +278,7 @@ export default function MobileMoneyPage() {
                   Annuler
                 </button>
                 <button onClick={save} disabled={saving || !form.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--surface)] text-white hover:bg-[var(--surface)]/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--surface)] text-[#101729] border border-[var(--border)] hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
                   {saving && <Loader2 size={13} className="animate-spin" />}
                   Confirmer
                 </button>

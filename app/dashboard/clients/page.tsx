@@ -360,7 +360,7 @@ export default function ClientsPage() {
                 <p className="text-sm font-bold text-[var(--text)] mb-1">Supprimer ce client ?</p>
                 <p className="text-xs text-[var(--text-secondary)] mb-5">Cette action est irréversible.</p>
                 <div className="flex gap-3">
-                  <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-white text-sm font-medium transition-colors">
+                  <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-sm font-medium transition-colors">
                     Annuler
                   </button>
                   <button onClick={() => handleDelete(deleteId)} className="flex-1 py-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 text-sm font-semibold transition-colors">

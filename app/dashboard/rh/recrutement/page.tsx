@@ -659,7 +659,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                 <button
                   onClick={() => updateStatut(c.id, 'retenu')}
                   disabled={c.statut === 'retenu'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface)] text-white rounded-lg text-xs font-bold hover:bg-[#071535] transition-colors disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#142850] text-white rounded-lg text-xs font-bold hover:bg-[#071535] transition-colors disabled:opacity-40"
                 >
                   <Check size={12} /> Retenir
                 </button>

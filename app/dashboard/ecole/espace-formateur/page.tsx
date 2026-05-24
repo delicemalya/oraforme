@@ -183,7 +183,7 @@ export default function EspaceFormateurPage() {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
         <AlertCircle size={32} className="text-[#F51E33]" />
-        <p className="text-white font-semibold">Profil formateur non trouvé</p>
+        <p className="text-[#101729] font-semibold">Profil formateur non trouvé</p>
         <p className="text-[var(--text-secondary)] text-sm max-w-sm">
           Votre adresse email n&apos;est pas liée à un formateur dans cette école.<br/>
           Contactez l&apos;administration.
@@ -199,24 +199,24 @@ export default function EspaceFormateurPage() {
         <div className="flex items-center gap-3">
           <Avatar nom={enseignant.nom} prenom={enseignant.prenom} photoUrl={null} size={40} />
           <div>
-            <h1 className="text-xl font-bold text-white">{enseignant.prenom} {enseignant.nom}</h1>
+            <h1 className="text-xl font-bold text-[#101729]">{enseignant.prenom} {enseignant.nom}</h1>
             <p className="text-xs text-[var(--text-secondary)]">{enseignant.matiere ?? 'Formateur'} · Espace Personnel</p>
           </div>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-white/[0.06] hover:bg-white/[0.04] text-[var(--text-secondary)] hover:text-white transition-colors">
+        <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] hover:bg-gray-100 text-[var(--text-secondary)] hover:text-[#101729] transition-colors">
           <Loader2 size={14} />
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl border border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <div className="flex gap-1 p-1 rounded-xl border border-[var(--border)]" style={{ background: '#FFFFFF' }}>
         {TABS.map(t => {
           const Icon = t.icon
           const active = tab === t.id
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? 'text-white shadow' : 'text-[var(--text-secondary)] hover:text-white'}`}
-              style={active ? { background: '#8B0070' } : {}}>
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? 'text-white shadow' : 'text-[var(--text-secondary)] hover:text-[#101729]'}`}
+              style={active ? { background: '#00b9a7' } : {}}>
               <Icon size={12} />{t.label}
             </button>
           )
@@ -273,7 +273,7 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
           <div className="space-y-2">
             {pending.slice(0, 5).map(h => (
               <div key={h.id} className="flex items-center justify-between text-xs">
-                <span className="text-white">{h.matiere ?? 'Non précisé'} · {h.heures}h</span>
+                <span className="text-[#101729]">{h.matiere ?? 'Non précisé'} · {h.heures}h</span>
                 <span className="text-[var(--text-secondary)]">{new Date(h.date_declaration).toLocaleDateString('fr-FR')}</span>
               </div>
             ))}
@@ -281,7 +281,7 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
         </div>
       )}
 
-      <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <div className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
         <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Résumé des heures</p>
         <div className="space-y-2">
           {[
@@ -291,10 +291,10 @@ function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, tot
           ].map(row => (
             <div key={row.label} className="flex items-center gap-3">
               <div className="w-20 text-[10px] text-[var(--text-secondary)]">{row.label}</div>
-              <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+              <div className="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden">
                 <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, totalHeures > 0 ? (row.value / totalHeures) * 100 : 0)}%`, background: row.color }} />
               </div>
-              <div className="text-xs font-bold text-white w-10 text-right">{row.value}h</div>
+              <div className="text-xs font-bold text-[#101729] w-10 text-right">{row.value}h</div>
             </div>
           ))}
         </div>
@@ -343,8 +343,8 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-bold text-white">Cours numériques ({cours.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#8B0070', color: '#fff' }}>
+        <p className="text-sm font-bold text-[#101729]">Cours numériques ({cours.length})</p>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#00b9a7', color: '#fff' }}>
           <Plus size={12} /> Nouveau cours
         </button>
       </div>
@@ -362,7 +362,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Statut</label>
                 <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as 'brouillon'|'publie' }))}
-                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#F51E33]/50">
+                  className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   <option value="brouillon">Brouillon</option>
                   <option value="publie">Publié</option>
                 </select>
@@ -371,11 +371,11 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             <div>
               <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Description</label>
               <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3}
-                className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Contenu, objectifs, plan…" />
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] resize-none" placeholder="Contenu, objectifs, plan…" />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-white border border-white/[0.06] hover:border-white/10">Annuler</button>
-              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)] hover:border-[#00b9a7]/40">Annuler</button>
+              <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#00b9a7', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
             </div>
@@ -389,19 +389,19 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             <Video size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucun cours créé</p>
           </div>
         ) : cours.map(c => (
-          <motion.div key={c.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] hover:border-white/10 transition-colors group" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: c.statut === 'publie' ? '#8B0070' : 'rgba(255,255,255,0.06)' }}>
-              <BookOpen size={14} className="text-white" />
+          <motion.div key={c.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] hover:border-[#00b9a7]/30 transition-colors group" style={{ background: '#FFFFFF' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: c.statut === 'publie' ? '#8B0070' : '#F3F4F6' }}>
+              <BookOpen size={14} className={c.statut === 'publie' ? 'text-white' : 'text-[#8B0070]'} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{c.titre}</p>
+              <p className="text-xs font-semibold text-[#101729] truncate">{c.titre}</p>
               <p className="text-[10px] text-[var(--text-secondary)]">{c.matiere ?? '—'} {c.niveau ? `· ${c.niveau}` : ''}</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[var(--surface)]/20 text-[#F51E33]' : 'bg-white/[0.06] text-[var(--text-secondary)]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${c.statut === 'publie' ? 'bg-[var(--surface)]/20 text-[#F51E33]' : 'bg-gray-100 text-[var(--text-secondary)]'}`}>
               {c.statut === 'publie' ? 'Publié' : 'Brouillon'}
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => toggleStatut(c)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[var(--text-secondary)] hover:text-white"><Check size={12} /></button>
+              <button onClick={() => toggleStatut(c)} className="p-1.5 rounded-lg hover:bg-gray-100 text-[var(--text-secondary)] hover:text-[#101729]"><Check size={12} /></button>
               <button onClick={() => del(c.id)} className="p-1.5 rounded-lg hover:bg-[#F51E33]/10 text-[var(--text-secondary)] hover:text-[#F51E33]"><Trash2 size={12} /></button>
             </div>
           </motion.div>
@@ -450,7 +450,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-bold text-white">Devoirs ({devoirs.length})</p>
+        <p className="text-sm font-bold text-[#101729]">Devoirs ({devoirs.length})</p>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
           <Plus size={12} /> Nouveau devoir
         </button>
@@ -468,7 +468,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Classe</label>
                 <select value={form.classe} onChange={e => setForm(p => ({ ...p, classe: e.target.value }))}
-                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                  className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   <option value="">Toutes les classes</option>
                   {classes.map(c => <option key={c.id} value={c.nom}>{c.nom}</option>)}
                 </select>
@@ -478,10 +478,10 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
             <div>
               <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Consignes</label>
               <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3}
-                className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none resize-none" placeholder="Instructions détaillées…" />
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] resize-none" placeholder="Instructions détaillées…" />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-white border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)]">Annuler</button>
               <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
@@ -496,19 +496,19 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
             <ClipboardList size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucun devoir créé</p>
           </div>
         ) : devoirs.map(d => (
-          <motion.div key={d.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] hover:border-white/10 group" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: d.statut === 'ouvert' ? '#F51E33' : 'rgba(255,255,255,0.06)' }}>
-              <ClipboardList size={14} className="text-white" />
+          <motion.div key={d.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] hover:border-[#00b9a7]/30 group" style={{ background: '#FFFFFF' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: d.statut === 'ouvert' ? '#F51E33' : '#F3F4F6' }}>
+              <ClipboardList size={14} className={d.statut === 'ouvert' ? 'text-white' : 'text-[#F51E33]'} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{d.titre}</p>
+              <p className="text-xs font-semibold text-[#101729] truncate">{d.titre}</p>
               <p className="text-[10px] text-[var(--text-secondary)]">{d.matiere ?? '—'} {d.classe ? `· ${d.classe}` : ''} {d.date_remise ? `· Remise: ${new Date(d.date_remise).toLocaleDateString('fr-FR')}` : ''}</p>
             </div>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${d.statut === 'ouvert' ? 'bg-[#F51E33]/20 text-[#F51E33]' : 'bg-white/[0.06] text-[var(--text-secondary)]'}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${d.statut === 'ouvert' ? 'bg-[#F51E33]/20 text-[#F51E33]' : 'bg-gray-100 text-[var(--text-secondary)]'}`}>
               {d.statut === 'ouvert' ? 'Ouvert' : 'Clôturé'}
             </span>
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              {d.statut === 'ouvert' && <button onClick={() => cloture(d.id)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[var(--text-secondary)] hover:text-white"><Check size={12} /></button>}
+              {d.statut === 'ouvert' && <button onClick={() => cloture(d.id)} className="p-1.5 rounded-lg hover:bg-gray-100 text-[var(--text-secondary)] hover:text-[#101729]"><Check size={12} /></button>}
               <button onClick={() => del(d.id)} className="p-1.5 rounded-lg hover:bg-[#F51E33]/10 text-[var(--text-secondary)] hover:text-[#F51E33]"><Trash2 size={12} /></button>
             </div>
           </motion.div>
@@ -580,11 +580,11 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
   if (selectedEx) {
     return (
       <div className="space-y-4">
-        <button onClick={() => setSelectedEx(null)} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-white">
+        <button onClick={() => setSelectedEx(null)} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[#101729]">
           <ChevronRight size={12} className="rotate-180" /> Retour aux examens
         </button>
-        <div className="rounded-xl border border-[#F51E33]/30 p-4" style={{ background: 'rgba(56,139,253,0.06)' }}>
-          <p className="text-sm font-bold text-white">{selectedEx.nom}</p>
+        <div className="rounded-xl border border-[#00b9a7]/30 p-4" style={{ background: 'rgba(0,185,167,0.06)' }}>
+          <p className="text-sm font-bold text-[#101729]">{selectedEx.nom}</p>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">{TYPES_EXAM.find(t => t.value === selectedEx.type_exam)?.label} · /{ selectedEx.note_max} pts · Coeff. {selectedEx.coefficient}</p>
         </div>
         {loadingG ? (
@@ -597,13 +597,13 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
               <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Absent</p>
             </div>
             {grades.map(g => (
-              <div key={g.etudiant_id} className="grid grid-cols-4 gap-2 items-center p-3 rounded-xl border border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                <p className="text-xs text-white col-span-2">{g.prenom} {g.nom}</p>
+              <div key={g.etudiant_id} className="grid grid-cols-4 gap-2 items-center p-3 rounded-xl border border-[var(--border)]" style={{ background: '#FFFFFF' }}>
+                <p className="text-xs text-[#101729] col-span-2">{g.prenom} {g.nom}</p>
                 <input
                   type="number" min={0} max={selectedEx.note_max}
                   value={g.note ?? ''} disabled={g.absent}
                   onChange={e => saveGrade(g.etudiant_id, e.target.value ? Number(e.target.value) : null, g.absent)}
-                  className="w-20 bg-[var(--surface)] border border-white/[0.08] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none disabled:opacity-40"
+                  className="w-20 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#101729] focus:outline-none disabled:opacity-40"
                   placeholder="—"
                 />
                 <input type="checkbox" checked={g.absent} onChange={e => saveGrade(g.etudiant_id, g.absent ? null : g.note, e.target.checked)} className="w-4 h-4 accent-[#F51E33]" />
@@ -618,8 +618,8 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-bold text-white">Examens ({exams.length})</p>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#8B0070', color: '#fff' }}>
+        <p className="text-sm font-bold text-[#101729]">Examens ({exams.length})</p>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#00b9a7', color: '#fff' }}>
           <Plus size={12} /> Nouvel examen
         </button>
       </div>
@@ -627,13 +627,13 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="rounded-xl border border-[#8B0070]/30 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.06)' }}>
+            className="rounded-xl border border-[#00b9a7]/30 p-4 space-y-3" style={{ background: 'rgba(0,185,167,0.06)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom de l'examen *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Type</label>
                 <select value={form.type_exam} onChange={e => setForm(p => ({ ...p, type_exam: e.target.value as Exam['type_exam'] }))}
-                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                  className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   {TYPES_EXAM.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
@@ -642,7 +642,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
               <div>
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Classe</label>
                 <select value={form.classe_id} onChange={e => setForm(p => ({ ...p, classe_id: e.target.value }))}
-                  className="w-full bg-[var(--surface)] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                  className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   <option value="">Toutes</option>
                   {classes.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
                 </select>
@@ -652,8 +652,8 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             </div>
             <FI label="Date de l'examen" value={form.date_exam} onChange={v => setForm(p => ({ ...p, date_exam: v }))} type="date" />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
-              <button onClick={save} disabled={saving || !form.nom.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={save} disabled={saving || !form.nom.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#00b9a7', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
             </div>
@@ -667,15 +667,15 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             <GraduationCap size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucun examen créé</p>
           </div>
         ) : exams.map(ex => (
-          <motion.div key={ex.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] hover:border-white/10 group cursor-pointer" style={{ background: 'rgba(255,255,255,0.02)' }} onClick={() => openGrades(ex)}>
+          <motion.div key={ex.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] hover:border-[#00b9a7]/30 group cursor-pointer" style={{ background: '#FFFFFF' }} onClick={() => openGrades(ex)}>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: '#8B0070' }}>
               <GraduationCap size={14} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{ex.nom}</p>
+              <p className="text-xs font-semibold text-[#101729] truncate">{ex.nom}</p>
               <p className="text-[10px] text-[var(--text-secondary)]">{TYPES_EXAM.find(t => t.value === ex.type_exam)?.label} · /{ ex.note_max} pts · Coeff. {ex.coefficient}</p>
             </div>
-            <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-white transition-colors" />
+            <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-[#00b9a7] transition-colors" />
           </motion.div>
         ))}
       </div>
@@ -745,7 +745,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-sm font-bold text-white">Historique ({heures.length})</p>
+        <p className="text-sm font-bold text-[#101729]">Historique ({heures.length})</p>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#142850', color: '#fff' }}>
           <Plus size={12} /> Déclarer heures
         </button>
@@ -765,7 +765,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
               <FI label="Description" value={form.description} onChange={v => setForm(p => ({ ...p, description: v }))} />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
               <button onClick={save} disabled={saving || !form.heures || !form.date_declaration} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Déclarer
               </button>
@@ -780,12 +780,12 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
             <Clock size={24} className="mb-2 opacity-30" /><p className="text-xs">Aucune heure déclarée</p>
           </div>
         ) : heures.map(h => (
-          <motion.div key={h.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] group" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <motion.div key={h.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] group" style={{ background: '#FFFFFF' }}>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${STATUT_HEURE[h.statut]?.color}20` }}>
               <Clock size={14} style={{ color: STATUT_HEURE[h.statut]?.color }} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white">{h.heures}h · {h.matiere ?? 'Non précisé'}</p>
+              <p className="text-xs font-semibold text-[#101729]">{h.heures}h · {h.matiere ?? 'Non précisé'}</p>
               <p className="text-[10px] text-[var(--text-secondary)]">{new Date(h.date_declaration).toLocaleDateString('fr-FR')} {h.periode ? `· ${h.periode}` : ''}</p>
             </div>
             <Badge statut={h.statut} />
@@ -825,12 +825,12 @@ function TabPaiements({ bulletins }: { bulletins: BulletinPaie[] }) {
             <p className="text-[10px] text-[var(--text-secondary)] mt-1">Votre email doit être lié à un employé dans le module RH</p>
           </div>
         ) : bulletins.map(b => (
-          <motion.div key={b.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: b.statut === 'payee' ? '#142850' : 'rgba(255,255,255,0.06)' }}>
-              <DollarSign size={14} className="text-white" />
+          <motion.div key={b.id} layout className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)]" style={{ background: '#FFFFFF' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: b.statut === 'payee' ? '#142850' : '#F3F4F6' }}>
+              <DollarSign size={14} className={b.statut === 'payee' ? 'text-white' : 'text-[var(--text-secondary)]'} />
             </div>
             <div className="flex-1">
-              <p className="text-xs font-semibold text-white">{MOIS[b.mois - 1]} {b.annee}</p>
+              <p className="text-xs font-semibold text-[#101729]">{MOIS[b.mois - 1]} {b.annee}</p>
               <p className="text-[10px] text-[var(--text-secondary)]">Brut : {fmt(b.brut)} · Net : {fmt(b.net)} FCFA</p>
             </div>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${b.statut === 'payee' ? 'bg-[var(--surface)]/20 text-[#F51E33]' : b.statut === 'validee' ? 'bg-[#F51E33]/20 text-[#F51E33]' : 'bg-[#F51E33]/20 text-[#F51E33]'}`}>

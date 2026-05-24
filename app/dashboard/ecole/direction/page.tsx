@@ -118,13 +118,13 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
           </p>
           <button onClick={autoBlock} disabled={blocking || impayeCount === 0 || statsLoading}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
-            style={{ background: '#F51E33', color: '#fff' }}>
+            style={{ background: '#00b9a7', color: '#fff' }}>
             {blocking ? <Loader2 className="animate-spin" size={12} /> : <Unlock size={12} />}
             Bloquer {impayeCount} impayé(s)
           </button>
         </div>
 
-        <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
           <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Effectifs par classe</p>
           {classes.length === 0 ? (
             <p className="text-xs text-[var(--text-secondary)]">Aucune classe configurée.</p>
@@ -136,10 +136,10 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
                 return (
                   <div key={c.id}>
                     <div className="flex justify-between text-[10px] mb-0.5">
-                      <span className="text-white">{c.nom}</span>
+                      <span className="text-[#101729]">{c.nom}</span>
                       <span className="text-[var(--text-secondary)]">{nb}/{c.nb_places}</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-white/[0.06]">
+                    <div className="h-1.5 rounded-full bg-[var(--border)]">
                       <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: pct > 90 ? '#F51E33' : '#F51E33' }} />
                     </div>
                   </div>
@@ -151,20 +151,20 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
       </div>
 
       {recentPaie.length > 0 && (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-          <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+          <div className="px-4 py-3 border-b border-[var(--border)]" style={{ background: '#FFFFFF' }}>
             <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Derniers paiements</p>
           </div>
           <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Étudiant', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+            <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Étudiant', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
             <tbody>
               {recentPaie.map(p => {
                 const etu = etudiants.find(e => e.id === p.etudiant_id)
                 return (
-                  <tr key={p.id} className="border-t border-white/[0.04]">
+                  <tr key={p.id} className="border-t border-[var(--border)]">
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
-                    <td className="px-4 py-2.5 text-white">{etu ? `${etu.prenom} ${etu.nom}` : '—'}</td>
+                    <td className="px-4 py-2.5 text-[#101729]">{etu ? `${etu.prenom} ${etu.nom}` : '—'}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
                     <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
@@ -208,10 +208,10 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-lg p-1 w-fit">
         {([['mois', 'Ce mois'], ['annee', 'Cette année'], ['tout', 'Tout']] as const).map(([k, l]) => (
           <button key={k} onClick={() => setPeriode(k)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-            style={{ background: periode === k ? '#F51E33' : 'transparent', color: periode === k ? '#fff' : '#8B949E' }}>
+            style={{ background: periode === k ? '#00b9a7' : 'transparent', color: periode === k ? '#fff' : 'var(--text-secondary)' }}>
             {l}
           </button>
         ))}
@@ -224,7 +224,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       </div>
 
       {Object.keys(byMethod).length > 0 && (
-        <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
           <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Répartition par mode de paiement</p>
           <div className="space-y-2">
             {Object.entries(byMethod).sort((a, b) => b[1] - a[1]).map(([method, amount]) => {
@@ -232,10 +232,10 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
               return (
                 <div key={method}>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-white capitalize">{method.replace('_', ' ')}</span>
+                    <span className="text-[#101729] capitalize">{method.replace('_', ' ')}</span>
                     <span className="text-[var(--text-secondary)]">{fmt(amount)} FCFA ({pct.toFixed(0)}%)</span>
                   </div>
-                  <div className="h-2 rounded-full bg-white/[0.06]">
+                  <div className="h-2 rounded-full bg-[var(--border)]">
                     <div className="h-2 rounded-full bg-[#F51E33]" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
@@ -246,18 +246,18 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       )}
 
       {!loading && paiements.length > 0 && (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-          <div className="px-4 py-3 border-b border-white/[0.06]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+          <div className="px-4 py-3 border-b border-[var(--border)]" style={{ background: '#FFFFFF' }}>
             <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Historique</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {paiements.slice(0, 50).map(p => (
-                  <tr key={p.id} className="border-t border-white/[0.04]">
+                  <tr key={p.id} className="border-t border-[var(--border)]">
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
-                    <td className="px-4 py-2.5 text-white">{p.libelle}</td>
+                    <td className="px-4 py-2.5 text-[#101729]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
                     <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
                   </tr>
@@ -309,15 +309,15 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 justify-between flex-wrap">
-        <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1">
+        <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-lg p-1">
           {(['tous', 'examen', 'conge_scolaire', 'evenement', 'conseil', 'autre'] as const).map(t => (
             <button key={t} onClick={() => setFilterType(t)} className="px-2.5 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: filterType === t ? '#F51E33' : 'transparent', color: filterType === t ? '#fff' : '#8B949E' }}>
+              style={{ background: filterType === t ? '#00b9a7' : 'transparent', color: filterType === t ? '#fff' : 'var(--text-secondary)' }}>
               {t === 'tous' ? 'Tous' : TYPE_EVENT[t as TypeEvent]?.label ?? t}
             </button>
           ))}
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#00b9a7', color: '#fff' }}>
           <Plus size={13} /> Programmer
         </button>
       </div>
@@ -329,7 +329,7 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
-                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
+                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
                   {(Object.entries(TYPE_EVENT) as [TypeEvent, { label: string }][]).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>
@@ -337,14 +337,14 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
               <FI label="Date fin"     value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
               <div className="col-span-2">
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Description</label>
-                <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" />
+                <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none resize-none" />
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#fff' }}>
+              <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#00b9a7', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -357,11 +357,11 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
           {displayed.map(p => {
             const t = TYPE_EVENT[p.type] ?? TYPE_EVENT.autre
             return (
-              <div key={p.id} className="rounded-xl border border-white/[0.06] p-4 flex items-start gap-4" style={{ background: 'rgba(255,255,255,0.02)', opacity: p.date_debut < today ? 0.5 : 1 }}>
+              <div key={p.id} className="rounded-xl border border-[var(--border)] p-4 flex items-start gap-4" style={{ background: '#FFFFFF', opacity: p.date_debut < today ? 0.5 : 1 }}>
                 <div className="rounded-lg p-2.5 shrink-0" style={{ background: t.bg }}><Calendar size={14} style={{ color: t.color }} /></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-white">{p.titre}</p>
+                    <p className="text-sm font-semibold text-[#101729]">{p.titre}</p>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: t.color, background: t.bg }}>{t.label}</span>
                   </div>
                   {p.description && <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">{p.description}</p>}
@@ -418,7 +418,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Étudiant *</label>
-                <select value={form.etudiant_id} onChange={e => setForm(p => ({ ...p, etudiant_id: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
+                <select value={form.etudiant_id} onChange={e => setForm(p => ({ ...p, etudiant_id: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
                   <option value="">— Choisir —</option>
                   {etudiants.map(e => <option key={e.id} value={e.id}>{e.prenom} {e.nom} ({e.numero_id})</option>)}
                 </select>
@@ -432,7 +432,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
               <button onClick={add} disabled={saving || !form.etudiant_id || !form.montant || !form.libelle} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Accorder
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -441,20 +441,20 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
       {bourses.length === 0 ? (
         <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune bourse accordée.</div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+        <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Étudiant', 'Libellé', 'Montant', 'Date'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: '#FFFFFF' }}>{['Étudiant', 'Libellé', 'Montant', 'Date'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {bourses.map(b => {
                   const etu = etudiants.find(e => e.id === b.etudiant_id)
                   return (
-                    <tr key={b.id} className="border-t border-white/[0.04]">
+                    <tr key={b.id} className="border-t border-[var(--border)]">
                       <td className="px-4 py-2.5">
                         {etu ? (
                           <div className="flex items-center gap-2">
                             <Avatar nom={etu.nom} prenom={etu.prenom} photoUrl={etu.photo_url} size={24} />
-                            <span className="text-white">{etu.prenom} {etu.nom}</span>
+                            <span className="text-[#101729]">{etu.prenom} {etu.nom}</span>
                           </div>
                         ) : <span className="text-[var(--text-secondary)]">—</span>}
                       </td>
@@ -502,7 +502,7 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#142850' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#ff7000', color: '#fff' }}>
           <Plus size={13} /> Ajouter un partenaire
         </button>
       </div>
@@ -513,7 +513,7 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
               <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
-                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
+                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
                   {['entreprise', 'ong', 'gouvernement', 'universite', 'autre'].map(t => <option key={t} value={t} className="capitalize">{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                 </select>
               </div>
@@ -521,10 +521,10 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
               <FI label="Description" value={form.description} onChange={v => setForm(p => ({ ...p, description: v }))} placeholder="Type de partenariat…" />
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#142850' }}>
+              <button onClick={add} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#ff7000', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -534,10 +534,10 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {partenaires.map(p => (
-            <div key={p.id} className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <div key={p.id} className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-bold text-white">{p.nom}</p>
+                  <p className="text-sm font-bold text-[#101729]">{p.nom}</p>
                   <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 capitalize">{p.type}</p>
                   {p.contact && <p className="text-[10px] text-[#F51E33] mt-1">{p.contact}</p>}
                   {p.description && <p className="text-[10px] text-[var(--text-secondary)] mt-1">{p.description}</p>}
@@ -592,20 +592,20 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Destinataires</label>
-                <select value={form.cible} onChange={e => setForm(p => ({ ...p, cible: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
+                <select value={form.cible} onChange={e => setForm(p => ({ ...p, cible: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
                   {['tous', 'etudiants', 'parents', 'enseignants'].map(c => <option key={c} value={c} className="capitalize">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Message *</label>
-                <textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} rows={3} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" placeholder="Rédigez votre annonce…" />
+                <textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} rows={3} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none resize-none" placeholder="Rédigez votre annonce…" />
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={add} disabled={saving || !form.titre || !form.message} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Megaphone size={12} />} Publier
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -616,11 +616,11 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
       ) : (
         <div className="space-y-3">
           {annonces.map(a => (
-            <div key={a.id} className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <div key={a.id} className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-semibold text-white">{a.titre}</p>
+                    <p className="text-sm font-semibold text-[#101729]">{a.titre}</p>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#8B0070]/10 text-[#8B0070] font-bold capitalize">{a.cible}</span>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{a.message}</p>
@@ -676,19 +676,19 @@ export default function DirectionPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Direction Générale</h1>
+          <h1 className="text-xl font-bold text-[#101729]">Direction Générale</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole}</p>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white transition-colors"><RefreshCw size={14} /></button>
+        <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><RefreshCw size={14} /></button>
       </div>
 
-      <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 w-fit flex-wrap">
+      <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl p-1 w-fit flex-wrap">
         {SUB_TABS.map(t => {
           const Icon = t.icon
           return (
             <button key={t.id} onClick={() => setSubTab(t.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#F51E33' : 'transparent', color: subTab === t.id ? '#fff' : '#8B949E' }}>
+              style={{ background: subTab === t.id ? '#00b9a7' : 'transparent', color: subTab === t.id ? '#fff' : 'var(--text-secondary)' }}>
               <Icon size={12} /> {t.label}
             </button>
           )

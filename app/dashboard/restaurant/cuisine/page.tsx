@@ -100,7 +100,7 @@ export default function CuisinePage() {
             <ChefHat size={20} className="text-[#F51E33]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">Écran Cuisine</h1>
+            <h1 className="text-xl font-bold text-[#101729]">Écran Cuisine</h1>
             <p className="text-xs text-[var(--text-secondary)]">
               {commandes.length} commande(s) active(s) · Mise à jour auto toutes les 10s
             </p>
@@ -108,7 +108,7 @@ export default function CuisinePage() {
         </div>
         <button
           onClick={load}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white hover:border-white/20 text-xs transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-xs transition-colors"
         >
           <RefreshCw size={13} /> Actualiser
         </button>
@@ -160,7 +160,7 @@ export default function CuisinePage() {
                           {/* Header */}
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="text-sm font-bold text-white">
+                              <p className="text-sm font-bold text-[#101729]">
                                 {cmd.table_num ? `Table ${cmd.table_num}` : (cmd.client_nom || 'Client')}
                               </p>
                               <p className="text-xs text-[var(--text-secondary)] capitalize">
@@ -178,7 +178,7 @@ export default function CuisinePage() {
                           <div className="space-y-1.5">
                             {(cmd.items as CmdItem[]).map((item, i) => (
                               <div key={i} className="flex items-center justify-between">
-                                <span className="text-sm text-white">
+                                <span className="text-sm text-[#101729]">
                                   <span className="font-bold text-[#F51E33] mr-1">{item.quantite}×</span>
                                   {item.nom}
                                 </span>
@@ -217,7 +217,7 @@ export default function CuisinePage() {
                   </AnimatePresence>
 
                   {cmds.length === 0 && (
-                    <div className="text-center py-8 text-[var(--text-secondary)] text-xs border border-dashed border-white/[0.06] rounded-xl">
+                    <div className="text-center py-8 text-[var(--text-secondary)] text-xs border border-dashed border-[var(--border)] rounded-xl">
                       Aucune commande
                     </div>
                   )}

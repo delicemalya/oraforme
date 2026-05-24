@@ -221,7 +221,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
             {/* Color swatch */}
             <div className="relative shrink-0">
               <div
-                className="w-8 h-8 rounded-lg border border-white/10 cursor-pointer"
+                className="w-8 h-8 rounded-lg border border-[var(--border)] cursor-pointer"
                 style={{ background: m.color }}
                 title="Changer la couleur"
               />
@@ -521,7 +521,7 @@ export default function ParametresAcademiquesPage() {
           <button
             onClick={save}
             disabled={saving || loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F51E33] text-black text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-all"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00b9a7] text-white text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-all"
           >
             {saving
               ? <RefreshCw size={14} className="animate-spin" />
@@ -556,7 +556,7 @@ export default function ParametresAcademiquesPage() {
               onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
                 tab === t.id
-                  ? 'bg-[#F51E33] text-black'
+                  ? 'bg-[#00b9a7] text-white'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
               }`}
             >
@@ -588,7 +588,7 @@ export default function ParametresAcademiquesPage() {
           <button
             onClick={save}
             disabled={saving || loading}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F51E33] text-black text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00b9a7] text-white text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-all"
           >
             {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
             Enregistrer les paramètres

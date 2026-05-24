@@ -782,7 +782,7 @@ export default function RestaurantPage() {
                 return (
                   <div key={t.id} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 text-center hover:border-[#F51E33]/30 transition-colors">
                     <div className="w-3 h-3 rounded-full mx-auto mb-2" style={{ background: color }} />
-                    <p className="text-base font-bold text-white mb-0.5">
+                    <p className="text-base font-bold text-[#101729] mb-0.5">
                       Table {t.numero}{t.nom ? ` — ${t.nom}` : ''}
                     </p>
                     <p className="text-xs text-[var(--text-secondary)] capitalize mb-4">{t.statut} · {t.capacite} places</p>
@@ -792,7 +792,7 @@ export default function RestaurantPage() {
                     </div>
                     <div className="space-y-2">
                       <button onClick={() => { navigator.clipboard.writeText(tableUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-white text-xs transition-colors">
+                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-xs transition-colors">
                         {copied ? <><Check size={12} className="text-[#F51E33]" /> Copié !</> : <><Copy size={12} /> Copier lien</>}
                       </button>
                       <a href={tableUrl} target="_blank" rel="noopener noreferrer"

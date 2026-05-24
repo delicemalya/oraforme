@@ -54,14 +54,14 @@ function InsightCard({ icon: Icon, label, value, sub, color, trend }: {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : AlertTriangle
   const trendColor = trend === 'up' ? 'text-[#A8C4E4]' : trend === 'down' ? 'text-red-400' : 'text-[#F51E33]'
   return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 flex items-start gap-3">
+    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start gap-3">
       <div className="p-2 rounded-lg shrink-0" style={{ background: `${color}22` }}>
         <Icon size={16} style={{ color }} />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] text-white/40 uppercase tracking-wide mb-1">{label}</div>
-        <div className="text-xl font-bold text-white">{value}</div>
-        {sub && <div className="text-[11px] text-white/50 mt-0.5">{sub}</div>}
+        <div className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wide mb-1">{label}</div>
+        <div className="text-xl font-bold text-[#101729]">{value}</div>
+        {sub && <div className="text-[11px] text-[var(--text-secondary)] mt-0.5">{sub}</div>}
       </div>
       {trend && <TrendIcon size={14} className={trendColor + ' shrink-0 mt-1'} />}
     </div>
@@ -85,8 +85,8 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
       </div>
       <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
         isUser
-          ? 'bg-orange-500/20 text-white rounded-tr-sm'
-          : 'bg-white/[0.06] text-white/90 rounded-tl-sm'
+          ? 'bg-orange-500/20 text-[#101729] rounded-tr-sm'
+          : 'bg-gray-100 text-[#101729] rounded-tl-sm'
       }`}>
         {msg.content}
       </div>
@@ -269,10 +269,10 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
             <Bot size={20} className="text-orange-400" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white flex items-center gap-2">
+            <h1 className="text-lg font-bold text-[#101729] flex items-center gap-2">
               MIAA+ <Sparkles size={14} className="text-orange-400" />
             </h1>
-            <p className="text-xs text-white/40">Assistant IA scolaire — analyse & insights en temps réel</p>
+            <p className="text-xs text-[var(--text-secondary)]">Assistant IA scolaire — analyse & insights en temps réel</p>
           </div>
         </div>
         <button
@@ -322,7 +322,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
       {/* Chat + sidebar */}
       <div className="flex gap-4 flex-1 min-h-0">
         {/* Chat area */}
-        <div className="flex flex-col flex-1 min-w-0 bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
+        <div className="flex flex-col flex-1 min-w-0 bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             <AnimatePresence initial={false}>
@@ -335,7 +335,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
                 <div className="w-7 h-7 rounded-full flex items-center justify-center bg-orange-500/30">
                   <Bot size={13} className="text-orange-400" />
                 </div>
-                <div className="bg-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
+                <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce [animation-delay:0ms]" />
                   <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce [animation-delay:150ms]" />
                   <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce [animation-delay:300ms]" />
@@ -348,13 +348,13 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
           {/* Quick prompts */}
           {!ctx && (
             <div className="px-4 pb-2">
-              <p className="text-[11px] text-white/30 mb-2 uppercase tracking-wide">Suggestions</p>
+              <p className="text-[11px] text-[var(--text-secondary)] mb-2 uppercase tracking-wide">Suggestions</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_PROMPTS.slice(0, 3).map(qp => (
                   <button
                     key={qp.label}
                     onClick={() => { if (!ctx) { loadContext().then(() => sendMessage(qp.prompt)) } else sendMessage(qp.prompt) }}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.05] text-white/60 text-xs hover:bg-white/[0.1] hover:text-white transition"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 text-[var(--text-secondary)] text-xs hover:bg-gray-200 hover:text-[#101729] transition"
                   >
                     <qp.icon size={11} />
                     {qp.label}
@@ -365,13 +365,13 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
           )}
 
           {/* Input */}
-          <div className="border-t border-white/[0.06] p-3 flex gap-2">
+          <div className="border-t border-[var(--border)] p-3 flex gap-2">
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
               placeholder={ctx ? 'Posez votre question…' : 'Chargez le contexte puis posez votre question…'}
-              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 outline-none focus:border-orange-500/40 transition"
+              className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder:text-[var(--text-muted)] outline-none focus:border-orange-500/40 transition"
             />
             <button
               onClick={() => sendMessage()}
@@ -385,10 +385,10 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
 
         {/* Sidebar: quick prompts */}
         <div className="w-56 shrink-0 hidden lg:flex flex-col gap-3">
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 flex-1">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex-1">
             <div className="flex items-center gap-2 mb-4">
               <Lightbulb size={14} className="text-orange-400" />
-              <span className="text-xs font-medium text-white/70 uppercase tracking-wide">Analyses rapides</span>
+              <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wide">Analyses rapides</span>
             </div>
             <div className="space-y-2">
               {QUICK_PROMPTS.map(qp => (
@@ -396,46 +396,46 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
                   key={qp.label}
                   onClick={() => sendMessage(qp.prompt)}
                   disabled={thinking}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] text-left transition group disabled:opacity-40"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-left transition group disabled:opacity-40"
                 >
                   <qp.icon size={13} className="text-orange-400 shrink-0" />
-                  <span className="text-xs text-white/70 group-hover:text-white transition flex-1 leading-snug">{qp.label}</span>
-                  <ChevronRight size={11} className="text-white/20 group-hover:text-white/50 shrink-0 transition" />
+                  <span className="text-xs text-[var(--text-secondary)] group-hover:text-[#101729] transition flex-1 leading-snug">{qp.label}</span>
+                  <ChevronRight size={11} className="text-[var(--text-secondary)] group-hover:text-[#101729] shrink-0 transition" />
                 </button>
               ))}
             </div>
           </div>
 
           {/* Context status */}
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${ctx ? 'bg-[#1a3570]' : 'bg-[#F51E33]'} animate-pulse`} />
-              <span className="text-xs text-white/50">
+              <div className={`w-2 h-2 rounded-full ${ctx ? 'bg-[#00b9a7]' : 'bg-[#F51E33]'} animate-pulse`} />
+              <span className="text-xs text-[var(--text-secondary)]">
                 {ctx ? 'Contexte actif' : 'Sans contexte'}
               </span>
             </div>
             {ctx && (
-              <div className="space-y-1.5 text-[11px] text-white/40">
+              <div className="space-y-1.5 text-[11px] text-[var(--text-secondary)]">
                 <div className="flex justify-between">
                   <span>Élèves</span>
-                  <span className="text-white/70">{ctx.totalEtudiants}</span>
+                  <span className="text-[#101729]">{ctx.totalEtudiants}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Notes</span>
-                  <span className="text-white/70">{ctx.notes.length}</span>
+                  <span className="text-[#101729]">{ctx.notes.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Absences</span>
-                  <span className="text-white/70">{ctx.absences.length}</span>
+                  <span className="text-[#101729]">{ctx.absences.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Paiements</span>
-                  <span className="text-white/70">{ctx.paiementsRecents.length}+</span>
+                  <span className="text-[#101729]">{ctx.paiementsRecents.length}+</span>
                 </div>
               </div>
             )}
             {!ctx && (
-              <p className="text-[11px] text-white/30 leading-relaxed">
+              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
                 Cliquez sur «Charger le contexte» pour activer l'analyse IA de vos données.
               </p>
             )}

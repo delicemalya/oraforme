@@ -194,13 +194,13 @@ export default function RolesPage() {
   const moduleDefs = secteur === 'ecole' ? ECOLE_MODULES : GENERIC_MODULES
 
   if (tenantLoading || loading) {
-    return <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-white/30" size={28} /></div>
+    return <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={28} /></div>
   }
   if (!isOwner) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3">
-        <Lock size={32} className="text-white/20" />
-        <p className="text-white/40 text-sm">Accès réservé au propriétaire.</p>
+        <Lock size={32} className="text-gray-400" />
+        <p className="text-[var(--text-secondary)] text-sm">Accès réservé au propriétaire.</p>
       </div>
     )
   }
@@ -211,10 +211,10 @@ export default function RolesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-xl font-bold text-[#101729]flex items-center gap-2">
             <Shield size={20} className="text-[#F51E33]" /> Gestion des rôles
           </h1>
-          <p className="text-sm text-white/40 mt-0.5">Créez des rôles personnalisés et définissez leurs accès aux modules.</p>
+          <p className="text-sm text-[var(--text-secondary)] mt-0.5">Créez des rôles personnalisés et définissez leurs accès aux modules.</p>
         </div>
         <button
           onClick={openCreate}
@@ -235,37 +235,37 @@ export default function RolesPage() {
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-[var(--card-bg)] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md space-y-4"
+              className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md space-y-4"
             >
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-[#101729]flex items-center gap-2">
                 <Shield size={16} className="text-[#F51E33]" />
                 {editingRole ? 'Modifier le rôle' : 'Nouveau rôle'}
               </h2>
 
               <div>
-                <label className="text-xs text-white/50 mb-1 block">Nom du rôle *</label>
+                <label className="text-xs text-[var(--text-secondary)] mb-1 block">Nom du rôle *</label>
                 <input
                   value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                   placeholder="ex: Direction Générale, RAF, Scolarité…"
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 outline-none focus:border-amber-500/40"
+                  className="w-full bg-gray-100 border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729]placeholder:text-[var(--text-secondary)] outline-none focus:border-amber-500/40"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-white/50 mb-1 block">Description</label>
+                <label className="text-xs text-[var(--text-secondary)] mb-1 block">Description</label>
                 <input
                   value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                   placeholder="ex: Responsable financier de l'établissement"
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/25 outline-none focus:border-amber-500/40"
+                  className="w-full bg-gray-100 border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729]placeholder:text-[var(--text-secondary)] outline-none focus:border-amber-500/40"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-white/50 mb-2 block">Couleur</label>
+                <label className="text-xs text-[var(--text-secondary)] mb-2 block">Couleur</label>
                 <div className="flex gap-2 flex-wrap">
                   {ROLE_COLORS.map(c => (
                     <button key={c} onClick={() => setForm(p => ({ ...p, color: c }))}
-                      className={`w-6 h-6 rounded-full transition-transform ${form.color === c ? 'ring-2 ring-white ring-offset-1 ring-offset-[#0f1e3d] scale-110' : ''}`}
+                      className={`w-6 h-6 rounded-full transition-transform ${form.color === c ? 'ring-2 ring-white ring-offset-1 ring-offset-white scale-110' : ''}`}
                       style={{ background: c }}
                     />
                   ))}
@@ -273,18 +273,18 @@ export default function RolesPage() {
               </div>
 
               {/* Accès financier */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-[var(--border)]">
                 <div>
-                  <p className="text-sm text-white/80 font-medium flex items-center gap-2">
+                  <p className="text-sm text-[#101729] font-medium flex items-center gap-2">
                     <TrendingUp size={14} className="text-[#A8C4E4]" /> Accès données financières
                   </p>
-                  <p className="text-[11px] text-white/35 mt-0.5">Direction Générale, RAF uniquement</p>
+                  <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">Direction Générale, RAF uniquement</p>
                 </div>
                 <Toggle checked={form.is_financial} onChange={v => setForm(p => ({ ...p, is_financial: v }))} />
               </div>
 
               <div className="flex gap-2 pt-2">
-                <button onClick={() => setShowForm(false)} className="flex-1 py-2 rounded-lg bg-white/[0.04] text-white/60 text-sm hover:bg-white/[0.08] transition">
+                <button onClick={() => setShowForm(false)} className="flex-1 py-2 rounded-lg bg-gray-100 text-[var(--text-secondary)] text-sm hover:bg-gray-100 transition">
                   Annuler
                 </button>
                 <button
@@ -304,24 +304,24 @@ export default function RolesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* Colonne 1 : liste des rôles */}
-        <div className="lg:col-span-1 bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-white/[0.06]">
-            <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">Rôles ({roles.length})</p>
+        <div className="lg:col-span-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-[var(--border)]">
+            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Rôles ({roles.length})</p>
           </div>
 
           {roles.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-              <Shield size={28} className="text-white/10 mb-3" />
-              <p className="text-xs text-white/30">Aucun rôle créé. Commencez par créer les rôles de votre établissement.</p>
+              <Shield size={28} className="text-gray-300 mb-3" />
+              <p className="text-xs text-[var(--text-secondary)]">Aucun rôle créé. Commencez par créer les rôles de votre établissement.</p>
             </div>
           )}
 
-          <div className="divide-y divide-white/[0.04]">
+          <div className="divide-y divide-gray-200">
             {roles.map(role => (
               <div
                 key={role.id}
-                className={`flex items-center gap-3 px-4 py-3 transition cursor-pointer hover:bg-white/[0.04] ${
-                  selected?.id === role.id ? 'bg-white/[0.04] border-l-2' : 'border-l-2 border-transparent'
+                className={`flex items-center gap-3 px-4 py-3 transition cursor-pointer hover:bg-gray-100 ${
+                  selected?.id === role.id ? 'bg-gray-100 border-l-2' : 'border-l-2 border-transparent'
                 }`}
                 style={{ borderLeftColor: selected?.id === role.id ? role.color : 'transparent' }}
                 onClick={() => selectRole(role)}
@@ -330,19 +330,19 @@ export default function RolesPage() {
                   <Shield size={13} style={{ color: role.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-white truncate">{role.name}</div>
-                  <div className="text-[10px] text-white/30 flex items-center gap-1.5">
+                  <div className="text-sm font-medium text-[#101729]truncate">{role.name}</div>
+                  <div className="text-[10px] text-[var(--text-secondary)] flex items-center gap-1.5">
                     {role.is_financial && <span className="text-[#A8C4E4]">● Financier</span>}
                     {role.description && <span className="truncate">{role.description}</span>}
                   </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button onClick={e => { e.stopPropagation(); openEdit(role) }}
-                    className="p-1.5 rounded hover:bg-white/[0.08] text-white/20 hover:text-white/60 transition">
+                    className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-[var(--text-secondary)] transition">
                     <Edit2 size={12} />
                   </button>
                   <button onClick={e => { e.stopPropagation(); deleteRole(role) }}
-                    className="p-1.5 rounded hover:bg-red-500/10 text-white/20 hover:text-red-400 transition">
+                    className="p-1.5 rounded hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition">
                     <Trash2 size={12} />
                   </button>
                 </div>
@@ -354,35 +354,35 @@ export default function RolesPage() {
         {/* Colonne 2 : permissions du rôle sélectionné */}
         <div className="lg:col-span-2">
           {!selected ? (
-            <div className="flex flex-col items-center justify-center h-64 bg-white/[0.02] border border-white/[0.06] rounded-xl text-center">
-              <Shield size={28} className="text-white/10 mb-3" />
-              <p className="text-sm text-white/30">Sélectionnez un rôle pour configurer ses accès.</p>
+            <div className="flex flex-col items-center justify-center h-64 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center">
+              <Shield size={28} className="text-gray-300 mb-3" />
+              <p className="text-sm text-[var(--text-secondary)]">Sélectionnez un rôle pour configurer ses accès.</p>
             </div>
           ) : (
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: `${selected.color}22` }}>
                     <Shield size={15} style={{ color: selected.color }} />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-white">{selected.name}</p>
-                    <p className="text-[10px] text-white/40">
+                    <p className="text-[10px] text-[var(--text-secondary)]">
                       {selected.is_financial
                         ? '✓ Accès aux données financières'
                         : '✗ Pas d\'accès aux données financières'}
                     </p>
                   </div>
                 </div>
-                <button onClick={openCreate} className="p-1.5 rounded hover:bg-white/[0.08] text-white/30 hover:text-white/60 transition">
+                <button onClick={openCreate} className="p-1.5 rounded hover:bg-gray-100 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition">
                   <Edit3 size={14} />
                 </button>
               </div>
 
               <div className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">Accès aux modules</p>
-                  <div className="flex items-center gap-4 text-[10px] text-white/30 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Accès aux modules</p>
+                  <div className="flex items-center gap-4 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">
                     <span className="flex items-center gap-1"><Eye size={10} />Voir</span>
                     <span className="flex items-center gap-1"><Edit2 size={10} />Modifier</span>
                     <span className="flex items-center gap-1"><Trash2 size={10} />Suppr.</span>
@@ -397,13 +397,13 @@ export default function RolesPage() {
                     const hasEdit    = perm?.can_edit   ?? false
                     const hasDel     = perm?.can_delete ?? false
                     return (
-                      <div key={mod.key} className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition ${hasView ? 'bg-white/[0.03] border-white/[0.06]' : 'bg-transparent border-transparent'}`}>
+                      <div key={mod.key} className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition ${hasView ? 'bg-gray-50 border-[var(--border)]' : 'bg-transparent border-transparent'}`}>
                         <div className="p-1.5 rounded-lg shrink-0" style={{ background: `${mod.color}22` }}>
                           <Icon size={13} style={{ color: mod.color }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm text-white/80">{mod.label}</div>
-                          <div className="text-[10px] text-white/30">{mod.sublabel}</div>
+                          <div className="text-sm text-[#101729]">{mod.label}</div>
+                          <div className="text-[10px] text-[var(--text-secondary)]">{mod.sublabel}</div>
                         </div>
                         <div className="flex items-center gap-5 shrink-0">
                           <Toggle checked={hasView}  onChange={v => setPerm(mod.key, 'can_view', v)} />

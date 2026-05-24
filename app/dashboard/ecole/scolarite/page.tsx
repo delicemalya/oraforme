@@ -116,7 +116,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 justify-between">
-        <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1">
+        <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1">
           {(['tous', 'actif', 'suspendu', 'banni', 'diplome'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
               style={{ background: filter === f ? '#F51E33' : 'transparent', color: filter === f ? '#142850' : '#8B949E' }}>
@@ -127,7 +127,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
-            <input className="pl-7 pr-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-lg text-xs text-white placeholder-[#484F58] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
+            <input className="pl-7 pr-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F51E33', color: '#142850' }}>
             <Plus size={13} /> Inscrire
@@ -147,8 +147,8 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
             const sc = STATUT_ETU[e.statut as StatutEtu] ?? STATUT_ETU.actif
             return (
               <motion.div key={e.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                className="rounded-xl border border-white/[0.07] p-5 relative flex flex-col gap-3 hover:border-white/[0.18] transition-all"
-                style={{ background: 'rgba(255,255,255,0.025)' }}>
+                className="rounded-xl border border-[var(--border)] p-5 relative flex flex-col gap-3 hover:border-[#00b9a7]/40 transition-all"
+                style={{ background: '#FFFFFF' }}>
 
                 {/* Status badge */}
                 <span className="absolute top-3 right-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
@@ -156,27 +156,27 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
 
                 {/* Avatar + Nom */}
                 <div className="flex flex-col items-center text-center pt-1">
-                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/[0.1] mb-2 shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[var(--border)] mb-2 shrink-0">
                     <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={64} />
                   </div>
-                  <p className="text-sm font-bold text-white leading-tight">{e.prenom} {e.nom}</p>
+                  <p className="text-sm font-bold text-[#101729] leading-tight">{e.prenom} {e.nom}</p>
                   <p className="text-[10px] font-mono text-[#8B0070] mt-0.5 bg-[#8B0070]/10 px-2 py-0.5 rounded-full">{e.numero_id}</p>
                 </div>
 
                 {/* Niveau + Classe */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-center">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)] text-center">
                   <div>
                     <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Niveau</p>
-                    <p className="text-[10px] text-white mt-0.5">{NIVEAUX.find(n => n.value === e.niveau)?.label ?? e.niveau}</p>
+                    <p className="text-[10px] text-[#101729] mt-0.5">{NIVEAUX.find(n => n.value === e.niveau)?.label ?? e.niveau}</p>
                   </div>
                   <div>
                     <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Classe</p>
-                    <p className="text-[10px] text-white mt-0.5 truncate">{e.classe ?? '—'}</p>
+                    <p className="text-[10px] text-[#101729] mt-0.5 truncate">{e.classe ?? '—'}</p>
                   </div>
                 </div>
 
                 {/* Contact parent */}
-                <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+                <div className="space-y-1.5 pt-1 border-t border-[var(--border)]">
                   {e.tel_parent && (
                     <div className="flex items-center gap-2">
                       <Phone size={11} className="text-[var(--text-secondary)] shrink-0" />
@@ -197,7 +197,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                 {/* Boutons */}
                 <div className="flex gap-2 pt-1 mt-auto">
                   <button onClick={() => del(e.id)}
-                    className="p-2 rounded-lg border border-white/[0.06] text-[var(--text-secondary)] hover:text-red-400 hover:border-red-400/30 transition-all"
+                    className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-red-400 hover:border-red-400/30 transition-all"
                     title="Supprimer">
                     <Trash2 size={12} />
                   </button>
@@ -217,14 +217,14 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
       <AnimatePresence>
         {selected && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
-            className="fixed bottom-6 right-6 z-40 w-80 rounded-2xl border border-white/[0.1] shadow-2xl overflow-hidden"
+            className="fixed bottom-6 right-6 z-40 w-80 rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden"
             style={{ background: '#0f1e3d' }}>
             <div className="p-4 space-y-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2.5">
                   <Avatar nom={selected.nom} prenom={selected.prenom} photoUrl={selected.photo_url} size={40} />
                   <div>
-                    <p className="text-sm font-bold text-white">{selected.prenom} {selected.nom}</p>
+                    <p className="text-sm font-bold text-[#101729]">{selected.prenom} {selected.nom}</p>
                     <p className="text-[10px] font-mono text-[#8B0070]">{selected.numero_id} · {selected.classe ?? selected.niveau}</p>
                   </div>
                 </div>
@@ -282,10 +282,10 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
           <>
             <motion.div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowForm(false)} />
             <motion.div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div className="w-full max-w-3xl bg-[var(--card-bg)] border border-white/[0.08] rounded-2xl shadow-2xl" initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 16 }} onClick={e => e.stopPropagation()}>
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-                  <h2 className="text-base font-bold text-white">Inscrire un étudiant</h2>
-                  <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-white"><X size={18} /></button>
+              <motion.div className="w-full max-w-3xl bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl shadow-2xl" initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 16 }} onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+                  <h2 className="text-base font-bold text-[#101729]">Inscrire un étudiant</h2>
+                  <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[#101729]"><X size={18} /></button>
                 </div>
                 <div className="p-6 grid grid-cols-2 gap-5">
                   <div className="col-span-2"><p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Informations personnelles</p></div>
@@ -294,7 +294,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   ))}
                   <div>
                     <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Niveau</label>
-                    <select value={form.niveau} onChange={e => sf('niveau', e.target.value)} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
+                    <select value={form.niveau} onChange={e => sf('niveau', e.target.value)} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                       {NIVEAUX.map(n => <option key={n.value} value={n.value} className="bg-[var(--card-bg)]">{n.label}</option>)}
                     </select>
                   </div>
@@ -302,13 +302,13 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   <FI label="Année scolaire" value={form.annee_scolaire} onChange={v => sf('annee_scolaire', v)} placeholder="2024-2025" />
                   <FI label="Photo (URL)" value={form.photo_url} onChange={v => sf('photo_url', v)} placeholder="https://…/photo.jpg" />
 
-                  <div className="col-span-2 border-t border-white/[0.06] pt-4"><p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Parents & Tuteur</p></div>
+                  <div className="col-span-2 border-t border-[var(--border)] pt-4"><p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Parents & Tuteur</p></div>
                   {([['Nom du père', 'nom_pere', ''], ['Nom de la mère', 'nom_mere', ''], ['Téléphone parent', 'tel_parent', '+242 06…'], ['Email parent', 'email_parent', ''], ['Profession', 'profession_parent', ''], ['Nom tuteur', 'nom_tuteur', ''], ['Tél tuteur', 'tel_tuteur', ''], ['Lien (ex: oncle)', 'lien_tuteur', '']] as [string,string,string][]).map(([label, key, ph]) => (
                     <FI key={key} label={label} value={(form as Record<string, string>)[key]} onChange={v => sf(key, v)} placeholder={ph} />
                   ))}
 
                   <div className="col-span-2 flex gap-3 pt-2">
-                    <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl border border-white/[0.08] text-[var(--text-secondary)] text-sm">Annuler</button>
+                    <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[#101729] text-sm">Annuler</button>
                     <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40" style={{ background: '#F51E33', color: '#142850' }}>
                       {saving ? <Loader2 className="animate-spin" size={14} /> : <><Check size={14} /> Inscrire</>}
                     </button>
@@ -426,14 +426,14 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
 
   return (
     <div className="flex gap-5">
-      <div className="w-56 shrink-0 rounded-xl border border-white/[0.06] overflow-hidden h-fit" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiants</p></div>
+      <div className="w-56 shrink-0 rounded-xl border border-[var(--border)] overflow-hidden h-fit" style={{ background: '#FFFFFF' }}>
+        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiants</p></div>
         <div className="overflow-y-auto max-h-[520px]">
           {etudiants.map(e => (
-            <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-white/[0.04] ${selectedId === e.id ? 'bg-[#F51E33]/10' : 'hover:bg-white/[0.02]'}`}>
+            <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-[var(--border)] ${selectedId === e.id ? 'bg-[#F51E33]/10' : 'hover:bg-gray-50'}`}>
               <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={26} />
               <div className="min-w-0">
-                <p className="text-xs font-medium text-white truncate">{e.prenom} {e.nom}</p>
+                <p className="text-xs font-medium text-[#101729] truncate">{e.prenom} {e.nom}</p>
                 <p className="text-[10px] text-[var(--text-secondary)]">{e.classe ?? e.niveau}</p>
               </div>
             </button>
@@ -447,11 +447,11 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
         </div>
       ) : (
         <div className="flex-1 min-w-0 space-y-4">
-          <div className="flex items-center justify-between bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="flex items-center justify-between bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <div className="flex items-center gap-3">
               <Avatar nom={selectedEtu.nom} prenom={selectedEtu.prenom} photoUrl={selectedEtu.photo_url} size={40} />
               <div>
-                <p className="text-sm font-bold text-white">{selectedEtu.prenom} {selectedEtu.nom}</p>
+                <p className="text-sm font-bold text-[#101729]">{selectedEtu.prenom} {selectedEtu.nom}</p>
                 <p className="text-xs text-[var(--text-secondary)]">{selectedEtu.numero_id} · {selectedEtu.classe ?? selectedEtu.niveau}</p>
               </div>
             </div>
@@ -461,7 +461,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
             </div>
           </div>
 
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Frais configurés</p>
               <div className="flex gap-2">
@@ -471,42 +471,42 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
             </div>
             {showNewFrais && (
               <div className="flex gap-2 mb-3">
-                <input className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-1.5 text-xs text-white" placeholder="Libellé" value={fraisForm.libelle} onChange={e => setFraisForm(p => ({ ...p, libelle: e.target.value }))} />
-                <input type="number" className="w-24 bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-1.5 text-xs text-white text-right" placeholder="Montant" value={fraisForm.montant} onChange={e => setFraisForm(p => ({ ...p, montant: e.target.value }))} />
+                <input className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729]" placeholder="Libellé" value={fraisForm.libelle} onChange={e => setFraisForm(p => ({ ...p, libelle: e.target.value }))} />
+                <input type="number" className="w-24 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] text-right" placeholder="Montant" value={fraisForm.montant} onChange={e => setFraisForm(p => ({ ...p, montant: e.target.value }))} />
                 <button onClick={addFrais} disabled={saving} className="px-3 py-1.5 rounded-md bg-[#F51E33]/15 text-[#F51E33] text-xs font-semibold"><Check size={12} /></button>
               </div>
             )}
             <div className="flex flex-wrap gap-2">
               {frais.map(f => (
-                <div key={f.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-                  <span className="text-xs text-white">{f.libelle}</span>
+                <div key={f.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+                  <span className="text-xs text-[#101729]">{f.libelle}</span>
                   <span className="text-[10px] font-bold text-[#F51E33]">{fmt(f.montant)} FCFA</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Enregistrer un paiement</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Libellé</label>
-                <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={paieForm.libelle} onChange={e => setPaieForm(p => ({ ...p, libelle: e.target.value }))} placeholder="Mensualité Octobre…" />
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={paieForm.libelle} onChange={e => setPaieForm(p => ({ ...p, libelle: e.target.value }))} placeholder="Mensualité Octobre…" />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Frais (optionnel)</label>
-                <select className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={paieForm.frais_id} onChange={e => setPaieForm(p => ({ ...p, frais_id: e.target.value, libelle: e.target.value ? frais.find(f => f.id === e.target.value)?.libelle ?? p.libelle : p.libelle }))}>
+                <select className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={paieForm.frais_id} onChange={e => setPaieForm(p => ({ ...p, frais_id: e.target.value, libelle: e.target.value ? frais.find(f => f.id === e.target.value)?.libelle ?? p.libelle : p.libelle }))}>
                   <option value="" className="bg-[var(--card-bg)]">— Manuel —</option>
                   {frais.map(f => <option key={f.id} value={f.id} className="bg-[var(--card-bg)]">{f.libelle} ({fmt(f.montant)} FCFA)</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Montant (FCFA)</label>
-                <input type="number" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-right" value={paieForm.montant} onChange={e => setPaieForm(p => ({ ...p, montant: e.target.value }))} />
+                <input type="number" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729] text-right" value={paieForm.montant} onChange={e => setPaieForm(p => ({ ...p, montant: e.target.value }))} />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Méthode</label>
-                <select className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={paieForm.methode} onChange={e => setPaieForm(p => ({ ...p, methode: e.target.value }))}>
+                <select className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={paieForm.methode} onChange={e => setPaieForm(p => ({ ...p, methode: e.target.value }))}>
                   {['especes', 'mobile_money', 'virement', 'cheque'].map(m => <option key={m} value={m} className="bg-[var(--card-bg)]">{m.replace('_', ' ')}</option>)}
                 </select>
               </div>
@@ -517,15 +517,15 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
           </div>
 
           {paiements.length > 0 && (
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-              <div className="px-4 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Historique</p></div>
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+              <div className="px-4 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Historique</p></div>
               <table className="w-full text-xs">
-                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Libellé', 'Méthode', 'Montant', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Libellé', 'Méthode', 'Montant', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                 <tbody>
                   {paiements.map(p => (
-                    <tr key={p.id} className="border-t border-white/[0.04]">
+                    <tr key={p.id} className="border-t border-[var(--border)]">
                       <td className="px-3 py-2 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
-                      <td className="px-3 py-2 text-white">{p.libelle}</td>
+                      <td className="px-3 py-2 text-[#101729]">{p.libelle}</td>
                       <td className="px-3 py-2 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
                       <td className="px-3 py-2 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
                       <td className="px-3 py-2 flex items-center gap-1.5">
@@ -585,12 +585,12 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
 
   return (
     <div className="flex gap-5">
-      <div className="w-52 shrink-0 rounded-xl border border-white/[0.06] overflow-hidden h-fit" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiant</p></div>
+      <div className="w-52 shrink-0 rounded-xl border border-[var(--border)] overflow-hidden h-fit" style={{ background: '#FFFFFF' }}>
+        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiant</p></div>
         {etudiants.map(e => (
-          <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-white/[0.04] ${selectedId === e.id ? 'bg-[#F51E33]/10' : 'hover:bg-white/[0.02]'}`}>
+          <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-[var(--border)] ${selectedId === e.id ? 'bg-[#F51E33]/10' : 'hover:bg-gray-50'}`}>
             <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={24} />
-            <p className="text-xs font-medium text-white truncate">{e.prenom} {e.nom}</p>
+            <p className="text-xs font-medium text-[#101729] truncate">{e.prenom} {e.nom}</p>
           </button>
         ))}
       </div>
@@ -602,14 +602,14 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
       ) : (
         <div className="flex-1 min-w-0 space-y-4">
           <div className="flex flex-wrap items-center gap-3 justify-between">
-            <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1">
+            <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1">
               {PERIODES.map(p => (
                 <button key={p.value} onClick={() => setPeriode(p.value)} className="px-2.5 py-1 rounded-md text-xs font-medium transition-all" style={{ background: periode === p.value ? '#F51E33' : 'transparent', color: periode === p.value ? '#142850' : '#8B949E' }}>{p.label}</button>
               ))}
             </div>
             {moyenne !== null && mention && (
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white">{moyenne.toFixed(2)} / 20</span>
+                <span className="text-sm font-bold text-[#101729]">{moyenne.toFixed(2)} / 20</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ color: mention.color, background: mention.color + '20' }}>{mention.label}</span>
                 <button onClick={() => printBulletin(selectedEtu, notes, periode, nomEcole)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F51E33]/15 border border-[#F51E33]/30 text-[#F51E33] text-xs font-semibold">
                   <Printer size={12} /> Bulletin PDF
@@ -618,30 +618,30 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
             )}
           </div>
 
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Ajouter une note</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
               <div className="sm:col-span-2">
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Matière *</label>
-                <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} placeholder="Mathématiques…" />
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} placeholder="Mathématiques…" />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Type</label>
-                <select className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={form.type_note} onChange={e => setForm(p => ({ ...p, type_note: e.target.value }))}>
+                <select className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.type_note} onChange={e => setForm(p => ({ ...p, type_note: e.target.value }))}>
                   {['devoir', 'examen', 'tp', 'oral', 'projet'].map(t => <option key={t} value={t} className="bg-[var(--card-bg)]">{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Coeff.</label>
-                <input type="number" min="0.5" step="0.5" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-center" value={form.coefficient} onChange={e => setForm(p => ({ ...p, coefficient: e.target.value }))} />
+                <input type="number" min="0.5" step="0.5" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729] text-center" value={form.coefficient} onChange={e => setForm(p => ({ ...p, coefficient: e.target.value }))} />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Note *</label>
-                <input type="number" min="0" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-right" value={form.note} onChange={e => setForm(p => ({ ...p, note: e.target.value }))} />
+                <input type="number" min="0" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729] text-right" value={form.note} onChange={e => setForm(p => ({ ...p, note: e.target.value }))} />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Sur</label>
-                <input type="number" min="10" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white text-right" value={form.note_max} onChange={e => setForm(p => ({ ...p, note_max: e.target.value }))} />
+                <input type="number" min="10" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729] text-right" value={form.note_max} onChange={e => setForm(p => ({ ...p, note_max: e.target.value }))} />
               </div>
             </div>
             <button onClick={addNote} disabled={saving || !form.matiere || !form.note} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#142850' }}>
@@ -650,18 +650,18 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
           </div>
 
           {periodeNotes.length > 0 ? (
-            <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+            <div className="rounded-xl border border-[var(--border)] overflow-hidden">
               <table className="w-full text-xs">
-                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Matière', 'Type', 'Note', '/Max', 'Coeff.', 'Moy /20', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: '#FFFFFF' }}>{['Matière', 'Type', 'Note', '/Max', 'Coeff.', 'Moy /20', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                 <tbody>
                   {periodeNotes.map(n => {
                     const moy20 = (n.note / n.note_max) * 20
                     const m = getMention(moy20)
                     return (
-                      <tr key={n.id} className="border-t border-white/[0.04]">
-                        <td className="px-3 py-2 font-medium text-white">{n.matiere}</td>
+                      <tr key={n.id} className="border-t border-[var(--border)]">
+                        <td className="px-3 py-2 font-medium text-[#101729]">{n.matiere}</td>
                         <td className="px-3 py-2 text-[var(--text-secondary)] capitalize">{n.type_note}</td>
-                        <td className="px-3 py-2 font-bold text-white">{n.note}</td>
+                        <td className="px-3 py-2 font-bold text-[#101729]">{n.note}</td>
                         <td className="px-3 py-2 text-[var(--text-secondary)]">{n.note_max}</td>
                         <td className="px-3 py-2 text-[var(--text-secondary)]">×{n.coefficient}</td>
                         <td className="px-3 py-2"><span className="font-bold px-1.5 py-0.5 rounded text-[10px]" style={{ color: m.color, background: m.color + '20' }}>{moy20.toFixed(2)}</span></td>
@@ -719,7 +719,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
               <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} placeholder="Terminale A, L1 Info…" />
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Niveau</label>
-                <select value={form.niveau} onChange={e => setForm(p => ({ ...p, niveau: e.target.value }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
+                <select value={form.niveau} onChange={e => setForm(p => ({ ...p, niveau: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   {NIVEAUX.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
                 </select>
               </div>
@@ -730,7 +730,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
               <button onClick={save} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#142850' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -742,10 +742,10 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
           {classes.map(c => {
             const niv = NIVEAUX.find(n => n.value === c.niveau)
             return (
-              <div key={c.id} className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+              <div key={c.id} className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-bold text-white">{c.nom}</p>
+                    <p className="text-sm font-bold text-[#101729]">{c.nom}</p>
                     <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{niv?.label ?? c.niveau} · {c.annee_scolaire}</p>
                   </div>
                   <button onClick={() => del(c.id)} className="text-[var(--text-secondary)] hover:text-red-400"><Trash2 size={12} /></button>
@@ -798,7 +798,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
       </div>
 
       <div className="flex items-center gap-2 justify-between flex-wrap">
-        <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-lg p-1">
+        <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1">
           {(['tous', 'examen', 'conge_scolaire', 'evenement', 'conseil', 'autre'] as const).map(t => (
             <button key={t} onClick={() => setFilterType(t)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all" style={{ background: filterType === t ? '#F51E33' : 'transparent', color: filterType === t ? '#142850' : '#8B949E' }}>
               {t === 'tous' ? 'Tous' : TYPE_EVENT[t as TypeEvent]?.label ?? t}
@@ -818,7 +818,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
-                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none">
+                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   {(Object.entries(TYPE_EVENT) as [TypeEvent, { label: string }][]).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>
@@ -826,14 +826,14 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
               <FI label="Date fin"     value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
               <div className="col-span-2">
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Description</label>
-                <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" />
+                <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7] resize-none" />
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#F51E33', color: '#142850' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-white/[0.06]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
             </div>
           </motion.div>
         )}
@@ -847,13 +847,13 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
             const t = TYPE_EVENT[p.type] ?? TYPE_EVENT.autre
             const isPast = p.date_debut < today
             return (
-              <div key={p.id} className="rounded-xl border border-white/[0.06] p-4 flex items-start gap-4" style={{ background: 'rgba(255,255,255,0.02)', opacity: isPast ? 0.55 : 1 }}>
+              <div key={p.id} className="rounded-xl border border-[var(--border)] p-4 flex items-start gap-4" style={{ background: '#FFFFFF', opacity: isPast ? 0.55 : 1 }}>
                 <div className="rounded-lg p-2.5 shrink-0" style={{ background: t.bg }}>
                   <Calendar size={14} style={{ color: t.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-semibold text-white">{p.titre}</p>
+                    <p className="text-sm font-semibold text-[#101729]">{p.titre}</p>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: t.color, background: t.bg }}>{t.label}</span>
                   </div>
                   {p.description && <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 line-clamp-1">{p.description}</p>}
@@ -944,14 +944,14 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
 
   return (
     <div className="flex gap-5">
-      <div className="w-52 shrink-0 rounded-xl border border-white/[0.06] overflow-hidden h-fit" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <div className="px-3 py-2 border-b border-white/[0.06]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiant</p></div>
+      <div className="w-52 shrink-0 rounded-xl border border-[var(--border)] overflow-hidden h-fit" style={{ background: '#FFFFFF' }}>
+        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiant</p></div>
         <div className="overflow-y-auto max-h-[480px]">
           {etudiants.map(e => (
             <button key={e.id} onClick={() => setSelectedId(e.id)}
-              className={`w-full flex items-center gap-2 px-3 py-2.5 text-left border-b border-white/[0.04] ${selectedId === e.id ? 'bg-[#F51E33]/10' : 'hover:bg-white/[0.02]'}`}>
+              className={`w-full flex items-center gap-2 px-3 py-2.5 text-left border-b border-[var(--border)] ${selectedId === e.id ? 'bg-[#F51E33]/10' : 'hover:bg-gray-50'}`}>
               <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={24} />
-              <p className="text-xs font-medium text-white truncate">{e.prenom} {e.nom}</p>
+              <p className="text-xs font-medium text-[#101729] truncate">{e.prenom} {e.nom}</p>
             </button>
           ))}
         </div>
@@ -969,20 +969,20 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
             <KpiCard label="Non justifiées"  value={totalAbs - justified} color="#F51E33" />
           </div>
 
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Enregistrer une absence</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Date *</label>
-                <input type="date" className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" value={form.date_absence} onChange={e => setForm(p => ({ ...p, date_absence: e.target.value }))} />
+                <input type="date" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.date_absence} onChange={e => setForm(p => ({ ...p, date_absence: e.target.value }))} />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Matière</label>
-                <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" placeholder="Mathématiques…" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} />
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" placeholder="Mathématiques…" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Motif</label>
-                <input className="w-full bg-white/[0.05] border border-white/[0.08] rounded-md px-2 py-2 text-xs text-white" placeholder="Maladie…" value={form.motif} onChange={e => setForm(p => ({ ...p, motif: e.target.value }))} />
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" placeholder="Maladie…" value={form.motif} onChange={e => setForm(p => ({ ...p, motif: e.target.value }))} />
               </div>
               <div className="flex items-end pb-1">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -999,14 +999,14 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
           {absences.length === 0 ? (
             <div className="text-center py-8 text-[var(--text-secondary)] text-xs">Aucune absence enregistrée.</div>
           ) : (
-            <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+            <div className="rounded-xl border border-[var(--border)] overflow-hidden">
               <table className="w-full text-xs">
-                <thead><tr style={{ background: 'rgba(255,255,255,0.02)' }}>{['Date', 'Matière', 'Motif', 'Statut', ''].map(h => <th key={h} className="text-left px-3 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Matière', 'Motif', 'Statut', ''].map(h => <th key={h} className="text-left px-3 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                 <tbody>
                   {absences.map(a => (
-                    <tr key={a.id} className="border-t border-white/[0.04]">
+                    <tr key={a.id} className="border-t border-[var(--border)]">
                       <td className="px-3 py-2.5 text-[var(--text-secondary)]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
-                      <td className="px-3 py-2.5 text-white">{a.matiere ?? '—'}</td>
+                      <td className="px-3 py-2.5 text-[#101729]">{a.matiere ?? '—'}</td>
                       <td className="px-3 py-2.5 text-[var(--text-secondary)]">{a.motif ?? '—'}</td>
                       <td className="px-3 py-2.5">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285020' } : { color: '#F51E33', background: '#F51E3320' }}>
@@ -1070,15 +1070,15 @@ export default function ScolaritePage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Scolarité</h1>
+          <h1 className="text-xl font-bold text-[#101729]">Scolarité</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {etudiants.length} étudiant(s) inscrits</p>
         </div>
-        <button onClick={load} className="p-2 rounded-lg border border-white/[0.08] text-[var(--text-secondary)] hover:text-white transition-colors">
+        <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors">
           <RefreshCw size={14} />
         </button>
       </div>
 
-      <div className="flex gap-1 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 w-fit flex-wrap">
+      <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-fit flex-wrap">
         {SUB_TABS.map(t => {
           const Icon = t.icon
           return (
