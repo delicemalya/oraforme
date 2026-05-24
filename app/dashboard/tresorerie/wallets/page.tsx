@@ -193,8 +193,10 @@ export default function WalletsPage() {
               <button key={w.id} onClick={() => setSelected(isSelected ? null : w.id)}
                 className={`w-full text-left rounded-2xl border p-4 transition-all ${isSelected ? 'ring-2' : 'hover:bg-gray-50'}`}
                 style={{
-                  background: 'var(--surface)', borderColor: isSelected ? color : 'var(--border)',
-                  ringColor: color,
+                  background: 'var(--surface)',
+                  borderColor: isSelected ? color : 'var(--border)',
+                  outline: isSelected ? `2px solid ${color}` : 'none',
+                  outlineOffset: '2px',
                 }}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold"
