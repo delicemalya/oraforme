@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
 import { MODULE_LABELS, MODULE_PRICES, MODULE_ICONS, MODULE_DESCS, fmtFCFA } from '@/lib/admin-config'
 import { Store, CheckCircle, Lock, Loader2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTenantContext } from '@/lib/contexts/TenantContext'
 
 type ModuleInfo = {
   id: string
@@ -16,28 +16,13 @@ type ModuleInfo = {
 }
 
 export default function ModulesMarketplacePage() {
-  const [modulesActifs, setModulesActifs] = useState<string[]>([])
-  const [tenantId, setTenantId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Use TenantContext as the single source of truth.
+  // After each toggle we call tenant.reload() so the Sidebar re-renders immediately.
+  const { tenant, loading, reload } = useTenantContext()
+
   const [toggling, setToggling] = useState<string | null>(null)
-  const [confirm, setConfirm] = useState<{ id: string; action: 'activate' | 'deactivate' } | null>(null)
-  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return
-      const { data } = await supabase
-        .from('profiles')
-        .select('tenant_id, tenants(modules_actifs)')
-        .eq('user_id', user.id)
-        .maybeSingle()
-
-      if (data?.tenant_id) setTenantId(data.tenant_id)
-      const t = data?.tenants as unknown as { modules_actifs: string[] } | null
-      setModulesActifs(t?.modules_actifs ?? [])
-      setLoading(false)
-    })
-  }, [])
+  const [confirm, setConfirm]   = useState<{ id: string; action: 'activate' | 'deactivate' } | null>(null)
+  const [toast, setToast]       = useState<{ msg: string; ok: boolean } | null>(null)
 
   function showToast(msg: string, ok = true) {
     setToast({ msg, ok })
@@ -55,7 +40,10 @@ export default function ModulesMarketplacePage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      setModulesActifs(data.modules_actifs)
+
+      // Reload TenantContext → Sidebar + Header update without page refresh
+      await reload()
+
       showToast(
         action === 'activate'
           ? `${MODULE_LABELS[moduleId]} activé !`
@@ -68,6 +56,8 @@ export default function ModulesMarketplacePage() {
       setToggling(null)
     }
   }
+
+  const modulesActifs = tenant?.modulesActifs ?? []
 
   const allModules: ModuleInfo[] = Object.keys(MODULE_LABELS).map(id => ({
     id,
@@ -88,8 +78,8 @@ export default function ModulesMarketplacePage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
-            <Store size={18} className="text-[#F51E33]" />
+          <div className="w-10 h-10 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20 flex items-center justify-center">
+            <Store size={18} className="text-[#F59E0B]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-[var(--text)]">Modules</h1>
@@ -103,7 +93,7 @@ export default function ModulesMarketplacePage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-40 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl animate-pulse" />
+            <div key={i} className="h-40 bg-[var(--surface)] border border-[var(--border)] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -159,9 +149,12 @@ export default function ModulesMarketplacePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+              className="relative bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
             >
-              <button onClick={() => setConfirm(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]">
+              <button
+                onClick={() => setConfirm(null)}
+                className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
+              >
                 <X size={16} />
               </button>
               <div className="text-3xl mb-3">{MODULE_ICONS[confirm.id]}</div>
@@ -171,7 +164,10 @@ export default function ModulesMarketplacePage() {
               {confirm.action === 'activate' ? (
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
                   Ce module sera immédiatement accessible dans votre sidebar.
-                  Tarif : <span className="text-[#F51E33] font-medium">{fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois</span>
+                  Tarif :{' '}
+                  <span className="text-[var(--primary)] font-medium">
+                    {fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois
+                  </span>
                 </p>
               ) : (
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
@@ -189,8 +185,8 @@ export default function ModulesMarketplacePage() {
                   onClick={() => toggleModule(confirm.id, confirm.action)}
                   className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     confirm.action === 'activate'
-                      ? 'bg-[var(--primary)] text-white hover:bg-[#F51E33]/90'
-                      : 'bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] hover:bg-[#F51E33]/20'
+                      ? 'bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)]'
+                      : 'bg-[var(--danger-light)] border border-[var(--danger)]/30 text-[var(--danger)] hover:bg-[var(--danger)]/20'
                   }`}
                 >
                   {confirm.action === 'activate' ? 'Activer' : 'Désactiver'}
@@ -210,8 +206,8 @@ export default function ModulesMarketplacePage() {
             exit={{ opacity: 0, y: 20 }}
             className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl text-sm font-medium shadow-xl border ${
               toast.ok
-                ? 'bg-[#2EA043]/10 border-[#2EA043]/30 text-[#2EA043]'
-                : 'bg-[#F51E33]/10 border-[#F51E33]/30 text-[#F51E33]'
+                ? 'bg-[var(--success-light)] border-[var(--success)]/30 text-[var(--success-text)]'
+                : 'bg-[var(--danger-light)] border-[var(--danger)]/30 text-[var(--danger-text)]'
             }`}
           >
             {toast.msg}
@@ -231,19 +227,21 @@ function ModuleCard({
   onAction: () => void
 }) {
   return (
-    <div className={`bg-[var(--card-bg)] border rounded-xl p-5 transition-all ${
-      m.active ? 'border-[#2EA043]/30' : 'border-[var(--border)] hover:border-[#484F58]'
+    <div className={`bg-[var(--surface)] border rounded-xl p-5 transition-all ${
+      m.active
+        ? 'border-[var(--success)]/30 shadow-sm'
+        : 'border-[var(--border)] hover:border-[var(--border-strong)]'
     }`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{m.icon}</span>
           <div>
             <p className="text-sm font-semibold text-[var(--text)]">{m.label}</p>
-            <p className="text-xs text-[#F51E33] font-medium">{fmtFCFA(m.price)}/mois</p>
+            <p className="text-xs text-[var(--primary)] font-medium">{fmtFCFA(m.price)}/mois</p>
           </div>
         </div>
         {m.active
-          ? <CheckCircle size={16} className="text-[#2EA043] shrink-0 mt-0.5" />
+          ? <CheckCircle size={16} className="text-[var(--success)] shrink-0 mt-0.5" />
           : <Lock size={14} className="text-[var(--text-secondary)] shrink-0 mt-0.5" />
         }
       </div>
@@ -255,8 +253,8 @@ function ModuleCard({
         disabled={toggling}
         className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
           m.active
-            ? 'bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#F51E33] hover:border-[#F51E33]/30'
-            : 'bg-[var(--primary)] text-white hover:bg-[#F51E33]/90'
+            ? 'bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--danger)] hover:border-[var(--danger)]/30'
+            : 'bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)]'
         }`}
       >
         {toggling

@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
     .from('profiles')
     .select('tenant_id, role, ecole_role_name')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
   if (!profile?.tenant_id) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
 

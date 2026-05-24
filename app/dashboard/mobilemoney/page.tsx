@@ -42,7 +42,7 @@ export default function MobileMoneyPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { data: profile } = await supabase
-      .from('profiles').select('tenant_id').eq('user_id', user.id).maybeSingle()
+      .from('profiles').select('tenant_id').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
     if (!profile?.tenant_id) return
     const { data } = await supabase
       .from('mobile_money_transactions').select('*')
@@ -60,7 +60,7 @@ export default function MobileMoneyPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); return }
     const { data: profile } = await supabase
-      .from('profiles').select('tenant_id').eq('user_id', user.id).maybeSingle()
+      .from('profiles').select('tenant_id').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
     if (!profile?.tenant_id) { setSaving(false); return }
 
     const montant = parseInt(form.montant)

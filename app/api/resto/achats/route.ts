@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
@@ -20,7 +20,7 @@ async function getAuth() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
   const { data: profile } = await supabaseAdmin
-    .from('profiles').select('tenant_id').eq('user_id', user.id).maybeSingle()
+    .from('profiles').select('tenant_id').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
   return profile?.tenant_id ? { tenantId: profile.tenant_id as string } : null
 }
 

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
     const { data: callerProfile } = await supabaseAdmin
-      .from('profiles').select('tenant_id').eq('user_id', user.id).maybeSingle()
+      .from('profiles').select('tenant_id').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
     if (!callerProfile?.tenant_id) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
 
     const body = await req.json()

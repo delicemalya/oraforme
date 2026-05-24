@@ -87,6 +87,8 @@ export async function proxy(request: NextRequest) {
         .from('profiles')
         .select('role, ecole_role_name')
         .eq('user_id', user.id)
+        .order('created_at', { ascending: true })
+        .limit(1)
         .maybeSingle()
 
       // Owners always pass

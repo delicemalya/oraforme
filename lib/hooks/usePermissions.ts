@@ -56,11 +56,13 @@ export function usePermissions(): UsePermissionsResult {
       setLoading(true)
       const permMap: Record<string, ModulePermission> = {}
 
-      // Récupérer le dynamic_role_id depuis le profil
+      // Récupérer le dynamic_role_id depuis le profil — scoped to the correct
+      // tenant so multi-tenant users get the right role assignment.
       const { data: profile } = await supabase
         .from('profiles')
         .select('dynamic_role_id')
         .eq('user_id', tenant!.userId)
+        .eq('tenant_id', tenant!.tenantId)
         .maybeSingle()
 
       if (profile?.dynamic_role_id && !cancelled) {

@@ -9,10 +9,13 @@ export async function POST(req: Request) {
   const { moduleId, action } = await req.json() as { moduleId: string; action: 'activate' | 'deactivate' }
   if (!moduleId || !action) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 
+  // CRITICAL FIX: deterministic tenant resolution for multi-tenant users
   const { data: profile } = await supabase
     .from('profiles')
     .select('tenant_id, role, tenants(modules_actifs)')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
 
   if (!profile?.tenant_id) return NextResponse.json({ error: 'No tenant' }, { status: 400 })

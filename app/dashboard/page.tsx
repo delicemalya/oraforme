@@ -13,8 +13,8 @@ const MODULE_LABELS: Record<string, string> = {
 }
 
 const MODULE_COLORS = [
-  '#F51E33', '#F51E33', '#142850', '#8B0070',
-  '#8B0070', '#142850', '#F51E33', '#F51E33', '#84CC16', '#F51E33',
+  '#F59E0B', '#2563EB', '#16A34A', '#DC2626',
+  '#8B5CF6', '#0891B2', '#EA580C', '#D97706', '#059669', '#7C3AED',
 ]
 
 export default async function DashboardPage() {
@@ -23,10 +23,15 @@ export default async function DashboardPage() {
   if (!user) redirect('/login')
 
   // ── Profil + tenant + rôle dynamique ─────────────────────────────────────
+  // CRITICAL FIX (multi-tenant isolation): same as TenantContext — order by
+  // created_at so the primary (oldest) profile wins when a user belongs to
+  // multiple tenants. Prevents "wrong company on refresh" regression.
   const { data: profile } = await supabase
     .from('profiles')
     .select('*, tenants(nom_entreprise, modules_actifs, plan, secteur_activite), dynamic_role_id, ecole_role_name')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
 
   if (!profile || !profile.tenant_id) redirect('/onboarding')
@@ -123,10 +128,10 @@ export default async function DashboardPage() {
     const totalInvoices = Object.values(counts).reduce((s, v) => s + v, 0)
     moduleBreakdown = totalInvoices > 0
       ? ([
-          { name: 'Payées',     value: counts.payee,    color: '#142850' },
-          { name: 'Envoyées',   value: counts.envoyee,  color: '#F51E33' },
-          { name: 'Brouillons', value: counts.brouillon,color: '#484F58' },
-          { name: 'Annulées',   value: counts.annulee,  color: '#F51E33' },
+          { name: 'Payées',     value: counts.payee,    color: '#16A34A' },
+          { name: 'Envoyées',   value: counts.envoyee,  color: '#2563EB' },
+          { name: 'Brouillons', value: counts.brouillon,color: '#64748B' },
+          { name: 'Annulées',   value: counts.annulee,  color: '#DC2626' },
         ] as { name: string; value: number; color: string }[]).filter(d => d.value > 0)
       : modulesActifs.map((m, i) => ({ name: MODULE_LABELS[m] ?? m, value: 1, color: MODULE_COLORS[i % MODULE_COLORS.length] }))
 

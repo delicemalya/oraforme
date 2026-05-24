@@ -133,7 +133,7 @@ export default function RapportsPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { data: profile } = await supabase
-      .from('profiles').select('tenant_id, tenants(nom_entreprise)').eq('user_id', user.id).maybeSingle()
+      .from('profiles').select('tenant_id, tenants(nom_entreprise)').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
     if (!profile?.tenant_id) return
     const tid = profile.tenant_id
     setTenantId(tid)

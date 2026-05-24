@@ -25,6 +25,8 @@ async function getEcoleRole(): Promise<{ role: string | null; email: string | nu
     .from('profiles')
     .select('ecole_role_name, role')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
   const ecoleRole = profile?.ecole_role_name ?? (profile?.role === 'owner' ? 'DIRECTION_GENERALE' : null)
   return { role: ecoleRole, email: user.email ?? null }

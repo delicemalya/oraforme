@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   if (user) {
     const { data: profile } = await supabaseAdmin
-      .from('profiles').select('tenant_id, role').eq('user_id', user.id).maybeSingle()
+      .from('profiles').select('tenant_id, role').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
     if (profile?.tenant_id) tenantId = profile.tenant_id
   } else {
     // Allow cron calls with service-key header

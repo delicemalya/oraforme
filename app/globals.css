@@ -10,20 +10,20 @@
 
 :root {
   /* ── Surfaces ── */
-  --bg:              #F5F7FB;
+  --bg:              #F8FAFC;
   --surface:         #FFFFFF;
-  --surface-alt:     #F9FAFB;
-  --surface-hover:   #F3F4F6;
+  --surface-alt:     #F8FAFC;
+  --surface-hover:   #F1F5F9;
 
   /* ── Borders ── */
-  --border:          #E5E7EB;
-  --border-strong:   #D1D5DB;
+  --border:          #E2E8F0;
+  --border-strong:   #CBD5E1;
 
   /* ── Text ── */
-  --text:            #111827;
-  --text-secondary:  #6B7280;
-  --text-muted:      #9CA3AF;
-  --text-disabled:   #D1D5DB;
+  --text:            #0F172A;
+  --text-secondary:  #64748B;
+  --text-muted:      #94A3B8;
+  --text-disabled:   #CBD5E1;
 
   /* ── Brand primaire (amber) ── */
   --primary:         #F59E0B;
@@ -32,21 +32,21 @@
   --primary-text:    #92400E;
 
   /* ── Sémantique ── */
-  --success:         #10B981;
-  --success-light:   #D1FAE5;
-  --success-text:    #065F46;
+  --success:         #16A34A;
+  --success-light:   #DCFCE7;
+  --success-text:    #14532D;
 
   --warning:         #F59E0B;
   --warning-light:   #FEF3C7;
   --warning-text:    #92400E;
 
-  --danger:          #EF4444;
+  --danger:          #DC2626;
   --danger-light:    #FEE2E2;
   --danger-text:     #991B1B;
 
-  --info:            #3B82F6;
+  --info:            #2563EB;
   --info-light:      #DBEAFE;
-  --info-text:       #1E40AF;
+  --info-text:       #1E3A8A;
 
   /* ── Aliases legacy (compatibilité composants existants) ── */
   --color-bg:              var(--bg);

@@ -24,10 +24,13 @@ export async function createTenantAndProfile(data: {
   if (authError || !user) return { error: 'Non authentifié' }
 
   // Idempotency: if user already has a profile, do not create a second tenant
+  // Idempotency: order by created_at so we inspect the primary profile first.
   const { data: existingProfile } = await supabaseAdmin
     .from('profiles')
     .select('tenant_id')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
 
   if (existingProfile?.tenant_id) return { success: true, alreadyExists: true }

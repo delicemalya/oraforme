@@ -70,10 +70,20 @@ async function fetchTenantForUser(
   userId: string,
   email: string,
 ): Promise<TenantState | null> {
+  // CRITICAL FIX (multi-tenant isolation):
+  // A super-admin or invited user may have rows in multiple tenants.
+  // .maybeSingle() without ordering is non-deterministic: PostgREST returns
+  // whichever row the planner picks first — causing "wrong company on refresh".
+  //
+  // Fix: order by created_at ASC so the oldest (primary) profile always wins,
+  // then limit to 1.  When we add a tenant-switcher UI the stored tenant_id
+  // from localStorage will override this default instead of breaking isolation.
   const { data: profile } = await supabase
     .from('profiles')
     .select('id, role, tenant_id, ecole_role_name, tenants(nom_entreprise, modules_actifs, secteur_activite)')
     .eq('user_id', userId)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
 
   if (!profile) return null

@@ -101,6 +101,8 @@ export default function MIAAPage() {
         .from('profiles')
         .select('tenants(nom_entreprise, modules_actifs)')
         .eq('user_id', user.id)
+        .order('created_at', { ascending: true })
+        .limit(1)
         .maybeSingle()
       const t = (data?.tenants as { nom_entreprise?: string; modules_actifs?: string[] } | null)
       const nom = t?.nom_entreprise ?? ''

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { renderToBuffer } from '@react-pdf/renderer'
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
   const { data: callerProfile } = await supabaseAdmin
-    .from('profiles').select('tenant_id').eq('user_id', user.id).maybeSingle()
+    .from('profiles').select('tenant_id').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
   if (!callerProfile?.tenant_id) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
 
   const { searchParams } = new URL(req.url)

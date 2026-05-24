@@ -40,10 +40,14 @@ export async function requireTenant(requiredRole?: 'owner' | 'admin'): Promise<G
     return { ctx: null, error: NextResponse.json({ error: 'Non authentifié' }, { status: 401 }) }
   }
 
+  // CRITICAL FIX: order by created_at so the primary profile always wins when
+  // a user has rows across multiple tenants (super-admin, invited users).
   const { data: profile } = await supabaseAdmin
     .from('profiles')
     .select('tenant_id, role, ecole_role_name')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
 
   if (!profile?.tenant_id) {

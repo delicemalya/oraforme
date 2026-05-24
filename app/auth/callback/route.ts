@@ -75,6 +75,8 @@ export async function GET(request: NextRequest) {
     .from('profiles')
     .select('tenant_id')
     .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
 
   if (profile?.tenant_id) {
