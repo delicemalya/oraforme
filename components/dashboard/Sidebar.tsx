@@ -5,224 +5,102 @@ import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
-  LayoutDashboard, FileText, Package, UserCheck,
+  LayoutDashboard, FileText, Package, Users,
   ChefHat, GraduationCap, Hotel, Bot,
   LogOut, Menu, X, Lock,
   Settings, ShieldAlert, ShieldCheck, Store,
   Wallet, BookOpen, ShoppingCart,
   Receipt, BarChart2, Truck,
-  BookMarked, Calculator, HeartHandshake, Users, UsersRound,
-  Layers, CreditCard, Activity, TrendingUp,
+  BookMarked, Calculator, HeartHandshake, UsersRound,
+  Layers, Activity, TrendingUp,
+  Bell, FolderOpen, Building2,
 } from 'lucide-react'
-import { CORE_MODULE_IDS, CORE_SECTION_LABEL } from '@/lib/erp-core'
+import {
+  CORE_ERP_MODULES,
+  SECTOR_SPECIFIC,
+  PLATFORM_MODULES,
+  SECTOR_LABELS,
+  ECOLE_CORE_ROLE_FILTER,
+  type SectorId,
+} from '@/lib/erp-sectors'
 import { useState, useEffect } from 'react'
 import { SUPER_ADMIN_EMAILS } from '@/lib/admin-config'
 import type { LucideIcon } from 'lucide-react'
 import type { ModulePermission } from '@/lib/hooks/usePermissions'
 import { useLocale } from '@/lib/hooks/useLocale'
 
-// ── Generic modules (tenants sans secteur défini) ─────────────────────────────
+// ── Icon & color maps ─────────────────────────────────────────────────────────
 
-const ALL_MODULES = [
-  { id: 'rh',           label: 'RH & Paie',           icon: UserCheck,     href: '/dashboard/rh' },
-  { id: 'finance',      label: 'Finance',              icon: TrendingUp,    href: '/dashboard/finance' },
-  { id: 'comptabilite', label: 'Comptabilité',         icon: BookOpen,      href: '/dashboard/comptabilite' },
-  { id: 'tresorerie',   label: 'Trésorerie',           icon: Wallet,        href: '/dashboard/tresorerie' },
-  { id: 'stock',        label: 'Stock & Inventaire',   icon: Package,       href: '/dashboard/stock' },
-  // Business modules (sector-specific)
-  { id: 'facturation',  label: 'FacturePro',           icon: FileText,      href: '/dashboard/facturation' },
-  { id: 'ecole',        label: 'École & Université',   icon: GraduationCap, href: '/dashboard/ecole' },
-  { id: 'restaurant',   label: 'Resto POS',            icon: ChefHat,       href: '/dashboard/restaurant' },
-  { id: 'achats',       label: 'Achats & Fourn.',      icon: ShoppingCart,  href: '/dashboard/achats' },
-  { id: 'depenses',     label: 'Dépenses',             icon: Receipt,       href: '/dashboard/depenses' },
-  { id: 'rapports',     label: 'Rapports IA',          icon: BarChart2,     href: '/dashboard/rapports' },
-  { id: 'hotel',        label: 'Hôtel & Hébergement',  icon: Hotel,         href: '/dashboard/hotel' },
-  { id: 'transport',    label: 'Transport VTC',        icon: Truck,         href: '/dashboard/transport' },
-  { id: 'bizbot',       label: 'MIAA+ Assistant',      icon: Bot,           href: '/dashboard/miaa' },
-]
+const CORE_ICONS: Record<string, LucideIcon> = {
+  direction:    BarChart2,
+  rh:           Users,
+  finance:      TrendingUp,
+  comptabilite: Calculator,
+  tresorerie:   Wallet,
+  stock:        Package,
+  achats:       ShoppingCart,
+  crm:          UsersRound,
+  facturation:  FileText,
+  depenses:     Receipt,
+}
 
-// ── Navigation par secteur métier ─────────────────────────────────────────────
+const SECTOR_ICONS: Record<string, LucideIcon> = {
+  scolarite:                BookMarked,
+  daac:                     Layers,
+  'espace-formateur':       BookOpen,
+  'espace-etudiant':        GraduationCap,
+  'espace-parent':          HeartHandshake,
+  'parametres-academiques': Settings,
+  restaurant:               ChefHat,
+  cuisine:                  ChefHat,
+  hotel:                    Hotel,
+  transport:                Truck,
+}
+
+const PLATFORM_ICONS: Record<string, LucideIcon> = {
+  analytics:     Activity,
+  bizbot:        Bot,
+  ged:           FolderOpen,
+  notifications: Bell,
+  profil:        Building2,
+  roles:         ShieldCheck,
+  audit:         ShieldAlert,
+  parametres:    Settings,
+}
+
+// Modules plateforme limités au owner / direction générale
+const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
+
+// ── Type interne NavItem ──────────────────────────────────────────────────────
 
 type NavItem = {
-  id: string
-  label: string
+  id:       string
+  label:    string
   sublabel: string
-  icon: LucideIcon
-  href: string
-  color: string
-  exact?: boolean
+  icon:     LucideIcon
+  href:     string
+  exact?:   boolean
 }
 
-// ── Visibilité par rôle école ─────────────────────────────────────────────────
+// ── ALL_MODULES (tenants sans secteur) ────────────────────────────────────────
 
-const ECOLE_ROLE_VISIBILITY: Record<string, string[]> = {
-  'direction':              ['DIRECTION_GENERALE'],
-  'daac':                   ['DIRECTION_GENERALE', 'DAAC'],
-  'rh':                     ['DIRECTION_GENERALE', 'RAF', 'RH_PAIE'],
-  'comptabilite':           ['DIRECTION_GENERALE', 'RAF'],
-  'tresorerie':             ['DIRECTION_GENERALE', 'RAF'],
-  'scolarite':              ['DIRECTION_GENERALE', 'SCOLARITE', 'DAAC'],
-  'espace-formateur':       ['FORMATEUR', 'DIRECTION_GENERALE', 'DAAC', 'RH_PAIE'],
-  'espace-etudiant':        ['ETUDIANT'],
-  'espace-parent':          ['PARENT'],
-  'parametres-academiques': ['DIRECTION_GENERALE', 'DAAC'],
-  'miaa':                   [], // visible à tous
-}
-
-const SECTOR_NAV: Record<string, NavItem[]> = {
-  ecole: [
-    { id: 'direction',              label: 'Direction Générale',     sublabel: 'Pilotage & finances',     icon: BarChart2,      href: '/dashboard/ecole/direction',              color: '#F59E0B' },
-    { id: 'daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     icon: Layers,         href: '/dashboard/ecole/daac',                   color: '#F59E0B' },
-    { id: 'rh',                     label: 'RH & Paie',              sublabel: 'Personnel & salaires',     icon: Users,          href: '/dashboard/ecole/rh',                     color: '#64748B' },
-    { id: 'comptabilite',           label: 'Comptabilité',           sublabel: 'Journal OHADA',            icon: Calculator,     href: '/dashboard/ecole/comptabilite',           color: '#64748B' },
-    { id: 'tresorerie',             label: 'Trésorerie',             sublabel: 'Wallets & encaissements',  icon: Wallet,         href: '/dashboard/tresorerie',                   color: '#64748B' },
-    { id: 'finance',               label: 'Finance',                sublabel: 'KPIs & résultats',         icon: TrendingUp,     href: '/dashboard/finance',                      color: '#F59E0B' },
-    { id: 'scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     icon: BookMarked,     href: '/dashboard/ecole/scolarite',              color: '#F59E0B' },
-    { id: 'espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           icon: BookOpen,       href: '/dashboard/ecole/espace-formateur',       color: '#64748B' },
-    { id: 'espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              icon: GraduationCap,  href: '/dashboard/ecole/espace-etudiant',        color: '#64748B' },
-    { id: 'espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi de mes enfants',     icon: HeartHandshake, href: '/dashboard/ecole/espace-parent',          color: '#64748B' },
-    { id: 'parametres-academiques', label: 'Paramètres académ.',     sublabel: 'LMD & mentions',           icon: Settings,       href: '/dashboard/ecole/parametres-academiques', color: '#94A3B8' },
-    { id: 'miaa',                   label: 'MIAA+',                  sublabel: 'IA scolaire',              icon: Bot,            href: '/dashboard/ecole/miaa',                   color: '#F59E0B' },
-  ],
-  restaurant: [
-    { id: 'pos',        label: 'Caisse POS',   sublabel: 'Ventes & commandes', icon: ChefHat,   href: '/dashboard/restaurant',  color: '#F59E0B' },
-    { id: 'stock',      label: 'Stock',        sublabel: 'Inventaire',         icon: Package,   href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'rh',         label: 'RH & Paie',   sublabel: 'Personnel',          icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie', label: 'Trésorerie',   sublabel: 'Finances',           icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'miaa',       label: 'MIAA+',        sublabel: 'Assistant IA',       icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
-  ],
-  commerce: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
-  ],
-  supermarche: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Caisse & ventes',    icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Rayons & inventaire', icon: Package,    href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',        icon: ShoppingCart,href: '/dashboard/achats',     color: '#64748B' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',           icon: Users,       href: '/dashboard/rh',         color: '#64748B' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie', color: '#64748B' },
-  ],
-  boisson: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Ventes & livraisons', icon: FileText,   href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',       label: 'Stock',        sublabel: 'Inventaire boissons', icon: Package,    href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'achats',      label: 'Achats',       sublabel: 'Fournisseurs',        icon: ShoppingCart,href: '/dashboard/achats',     color: '#64748B' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',           icon: Users,       href: '/dashboard/rh',         color: '#64748B' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie', color: '#64748B' },
-  ],
-  transport_public: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Lignes & voyageurs',  icon: Truck,       href: '/dashboard/transport',  color: '#F59E0B' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Billets & recettes',  icon: FileText,    href: '/dashboard/facturation', color: '#64748B' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs & agents', icon: Users,       href: '/dashboard/rh',         color: '#64748B' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie', color: '#64748B' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,         href: '/dashboard/miaa',       color: '#F59E0B' },
-  ],
-  sante: [
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Consultations',       icon: FileText,  href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel médical',   icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'stock',       label: 'Pharmacie',    sublabel: 'Médicaments',         icon: Package,   href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
-  ],
-  transport: [
-    { id: 'transport',   label: 'Transport',    sublabel: 'Flotte & courses',    icon: Truck,     href: '/dashboard/transport',   color: '#F59E0B' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',    icon: FileText,  href: '/dashboard/facturation', color: '#64748B' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Chauffeurs',          icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,       href: '/dashboard/miaa',        color: '#F59E0B' },
-  ],
-  hotel: [
-    { id: 'hotel',       label: 'Hébergement',  sublabel: 'Réservations',        icon: Hotel,       href: '/dashboard/hotel',       color: '#F59E0B' },
-    { id: 'facturation', label: 'Facturation',  sublabel: 'Devis & factures',    icon: FileText,    href: '/dashboard/facturation', color: '#64748B' },
-    { id: 'rh',          label: 'RH & Paie',   sublabel: 'Personnel',           icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',  label: 'Trésorerie',   sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'miaa',        label: 'MIAA+',        sublabel: 'Assistant IA',        icon: Bot,         href: '/dashboard/miaa',        color: '#F59E0B' },
-  ],
-  boutique: [
-    { id: 'facturation',  label: 'Caisse & Ventes', sublabel: 'Factures & reçus',  icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'finance',      label: 'Finance',          sublabel: 'KPIs & résultats',   icon: TrendingUp,  href: '/dashboard/finance',     color: '#F59E0B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
-  ],
-  btp: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & travaux',    icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',        label: 'Stock chantier',   sublabel: 'Matériaux',          icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
-    { id: 'rh',           label: 'RH & Équipes',    sublabel: 'Personnel chantier', icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'finance',      label: 'Finance',          sublabel: 'KPIs & résultats',   icon: TrendingUp,  href: '/dashboard/finance',     color: '#F59E0B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
-  ],
-  cabinet: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Devis & honoraires', icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
-    { id: 'miaa',         label: 'MIAA+',            sublabel: 'Assistant IA',       icon: Bot,         href: '/dashboard/miaa',        color: '#F59E0B' },
-  ],
-  petrole: [
-    { id: 'facturation',  label: 'Facturation',      sublabel: 'Ventes & contrats',  icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',        label: 'Stock',            sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',       icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
-  ],
-  ong: [
-    { id: 'facturation',  label: 'Projets & Budget', sublabel: 'Rapports bailleurs', icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Suivi des charges',  icon: Receipt,     href: '/dashboard/depenses',    color: '#64748B' },
-    { id: 'stock',        label: 'Stock & Matériel', sublabel: 'Inventaire',         icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'rh',           label: 'RH & Bénévoles',  sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',           icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',              icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
-  ],
-  banque: [
-    { id: 'facturation',  label: 'Comptes clients',  sublabel: 'Prêts & épargne',    icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA & reporting',  icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',          icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Liquidités',         icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-  ],
-  pharmacie: [
-    { id: 'facturation',  label: 'Caisse',           sublabel: 'Ventes & ordonnances', icon: FileText,  href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',        label: 'Stock médicaments',sublabel: 'Inventaire & péremption',icon: Package, href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'achats',       label: 'Achats',           sublabel: 'Fournisseurs',         icon: ShoppingCart,href: '/dashboard/achats',    color: '#64748B' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,     href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',             icon: Wallet,    href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',                icon: Calculator,href: '/dashboard/comptabilite',color: '#64748B' },
-  ],
-  agriculture: [
-    { id: 'facturation',  label: 'Ventes & Récoltes',sublabel: 'Clients & marchés',   icon: FileText,    href: '/dashboard/facturation', color: '#F59E0B' },
-    { id: 'stock',        label: 'Stock & Cheptel',  sublabel: 'Inventaire agricole', icon: Package,     href: '/dashboard/stock',       color: '#64748B' },
-    { id: 'achats',       label: 'Achats & Intrants',sublabel: 'Fournisseurs',        icon: ShoppingCart,href: '/dashboard/achats',      color: '#64748B' },
-    { id: 'depenses',     label: 'Dépenses',         sublabel: 'Charges exploitation',icon: Receipt,     href: '/dashboard/depenses',    color: '#F59E0B' },
-    { id: 'rh',           label: 'RH & Paie',       sublabel: 'Saisonniers & agents',icon: Users,       href: '/dashboard/rh',          color: '#64748B' },
-    { id: 'tresorerie',   label: 'Trésorerie',       sublabel: 'Finances',            icon: Wallet,      href: '/dashboard/tresorerie',  color: '#64748B' },
-    { id: 'comptabilite', label: 'Comptabilité',     sublabel: 'OHADA',               icon: Calculator,  href: '/dashboard/comptabilite',color: '#64748B' },
-  ],
-}
-
-const SECTOR_LABEL: Record<string, string> = {
-  ecole:            'École & Université',
-  restaurant:       'Restauration',
-  commerce:         'Commerce',
-  supermarche:      'Supermarché',
-  boutique:         'Boutique',
-  boisson:          'Boissons',
-  sante:            'Santé',
-  transport:        'Transport',
-  transport_public: 'Transport Public',
-  hotel:            'Hôtellerie',
-  btp:              'BTP & Industrie',
-  cabinet:          'Cabinet & Conseil',
-  petrole:          'Pétrole & Mines',
-  ong:              'ONG & Association',
-  banque:           'Banque & Microfinance',
-  pharmacie:        'Pharmacie',
-  agriculture:      'Agriculture',
-}
+const ALL_MODULES = [
+  { id: 'direction',    label: 'Direction Générale',  icon: BarChart2,     href: '/dashboard/direction' },
+  { id: 'rh',           label: 'RH & Paie',           icon: Users,         href: '/dashboard/rh' },
+  { id: 'finance',      label: 'Finance',             icon: TrendingUp,    href: '/dashboard/finance' },
+  { id: 'comptabilite', label: 'Comptabilité',        icon: Calculator,    href: '/dashboard/comptabilite' },
+  { id: 'tresorerie',   label: 'Trésorerie',          icon: Wallet,        href: '/dashboard/tresorerie' },
+  { id: 'stock',        label: 'Stock & Inventaire',  icon: Package,       href: '/dashboard/stock' },
+  { id: 'facturation',  label: 'Facturation',         icon: FileText,      href: '/dashboard/facturation' },
+  { id: 'achats',       label: 'Achats & Fourn.',     icon: ShoppingCart,  href: '/dashboard/achats' },
+  { id: 'depenses',     label: 'Dépenses',            icon: Receipt,       href: '/dashboard/depenses' },
+  { id: 'crm',          label: 'CRM Clients',         icon: UsersRound,    href: '/dashboard/crm' },
+  { id: 'ecole',        label: 'École & Université',  icon: GraduationCap, href: '/dashboard/ecole' },
+  { id: 'restaurant',   label: 'Resto POS',           icon: ChefHat,       href: '/dashboard/restaurant' },
+  { id: 'hotel',        label: 'Hôtel & Hébergement', icon: Hotel,         href: '/dashboard/hotel' },
+  { id: 'transport',    label: 'Transport VTC',       icon: Truck,         href: '/dashboard/transport' },
+  { id: 'bizbot',       label: 'MIAA+ Assistant',     icon: Bot,           href: '/dashboard/miaa' },
+]
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
@@ -232,11 +110,10 @@ export default function Sidebar() {
 
   const { tenant, loading: tenantLoading } = useTenantContext()
 
-  const nomEntreprise = tenant?.nomEntreprise ?? null
-  const secteur       = tenant?.secteur       ?? null
-  const role          = tenant?.role          ?? null
-  const ecoleRole     = tenant?.ecoleRole     ?? null
-  const isSuperAdmin  = tenant?.isSuperAdmin  ?? false
+  const secteur      = tenant?.secteur    ?? null
+  const role         = tenant?.role       ?? null
+  const ecoleRole    = tenant?.ecoleRole  ?? null
+  const isSuperAdmin = tenant?.isSuperAdmin ?? false
 
   const [mobileOpen,    setMobileOpen]    = useState(false)
   const [modulesActifs, setModulesActifs] = useState<string[]>([])
@@ -320,29 +197,71 @@ export default function Sidebar() {
     window.location.href = '/login'
   }
 
-  const rawSectorItems = secteur ? (SECTOR_NAV[secteur] ?? null) : null
+  // ── 3-layer nav builder ───────────────────────────────────────────────────
 
-  const sectorNav = rawSectorItems
-    ? rawSectorItems.filter(item => {
+  // LAYER 1 — Core ERP (10 modules universels)
+  const coreNavItems: NavItem[] = loaded && !!secteur
+    ? CORE_ERP_MODULES.map(mod => ({
+        id:       mod.id,
+        label:    mod.label,
+        sublabel: mod.sublabel,
+        icon:     CORE_ICONS[mod.id] ?? BarChart2,
+        href:     mod.href,
+      })).filter(item => {
         if (isOwner) return true
         if (secteur === 'ecole') {
-          const allowed = ECOLE_ROLE_VISIBILITY[item.id]
+          const allowed = ECOLE_CORE_ROLE_FILTER[item.id]
           if (!allowed || allowed.length === 0) return true
           return ecoleRole ? allowed.includes(ecoleRole) : false
         }
-        return permissions[item.id]?.can_view === true
+        // Other sectors: check user permissions (default show if no explicit deny)
+        return permissions[item.id]?.can_view !== false
       })
-    : null
+    : []
 
-  const coreNavItems     = sectorNav ? sectorNav.filter(item =>  CORE_MODULE_IDS.has(item.id)) : []
-  const businessNavItems = sectorNav ? sectorNav.filter(item => !CORE_MODULE_IDS.has(item.id)) : []
+  // LAYER 2 — Sector-specific additions
+  const sectorNavItems: NavItem[] = loaded && !!secteur
+    ? (SECTOR_SPECIFIC[secteur as SectorId] ?? []).map(mod => ({
+        id:       mod.id,
+        label:    mod.label,
+        sublabel: mod.sublabel,
+        icon:     SECTOR_ICONS[mod.id] ?? Settings,
+        href:     mod.href,
+      })).filter(item => {
+        if (isOwner) return true
+        if (secteur === 'ecole') {
+          const sItem = SECTOR_SPECIFIC['ecole']?.find(m => m.id === item.id)
+          const rf    = sItem?.roleFilter
+          if (!rf || rf.length === 0) return true
+          return ecoleRole ? rf.includes(ecoleRole) : false
+        }
+        return permissions[item.id]?.can_view !== false
+      })
+    : []
 
-  const allActiveModules  = ALL_MODULES.filter(m =>
+  // LAYER 3 — Platform (bottom, always visible, some restricted)
+  const platformNavItems: NavItem[] = loaded
+    ? PLATFORM_MODULES.map(mod => ({
+        id:       mod.id,
+        label:    mod.label,
+        sublabel: mod.sublabel,
+        icon:     PLATFORM_ICONS[mod.id] ?? Settings,
+        href:     mod.href,
+      })).filter(item => {
+        if (PLATFORM_RESTRICTED.has(item.id)) {
+          return isOwner || ecoleRole === 'DIRECTION_GENERALE'
+        }
+        return true
+      })
+    : []
+
+  // Generic (no-sector) active/inactive modules
+  const allActiveModules     = ALL_MODULES.filter(m =>
     modulesActifs.includes(m.id) && (isOwner || permissions[m.id]?.can_view !== false),
   )
-  const coreActiveModules     = allActiveModules.filter(m =>  CORE_MODULE_IDS.has(m.id))
-  const businessActiveModules = allActiveModules.filter(m => !CORE_MODULE_IDS.has(m.id))
-  const inactiveModules       = ALL_MODULES.filter(m => !modulesActifs.includes(m.id))
+  const inactiveModules      = ALL_MODULES.filter(m => !modulesActifs.includes(m.id))
+
+  const hasSector = loaded && !!secteur
 
   // ── Shared class helpers ────────────────────────────────────────────────────
 
@@ -352,12 +271,36 @@ export default function Sidebar() {
   const iconActive  = 'text-amber-700'
   const iconInactive= 'text-[#94A3B8]'
 
+  // ── Item renderer helper ────────────────────────────────────────────────────
+
+  function NavLink({ item, exact }: { item: NavItem; exact?: boolean }) {
+    const active   = isActive(item.href, exact)
+    const canEdit  = isOwner || permissions[item.id]?.can_edit
+    const Icon     = item.icon
+    return (
+      <Link
+        href={item.href}
+        onClick={() => setMobileOpen(false)}
+        className={`${navBase} py-2 ${active ? navActive : navInactive}`}
+      >
+        <Icon size={15} className={`shrink-0 transition-colors ${active ? iconActive : iconInactive}`} />
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium leading-tight truncate">{item.label}</div>
+          <div className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1">
+            {item.sublabel}
+            {!isOwner && !canEdit && <Lock size={8} className="text-[#CBD5E1]" />}
+          </div>
+        </div>
+      </Link>
+    )
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full overflow-hidden">
 
-      {/* Logo */}
+      {/* Logo + role badge */}
       <div className="border-b border-[#E2E8F0] shrink-0">
         <div className="px-4 py-3 flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -382,7 +325,6 @@ export default function Sidebar() {
 
         {/* Dashboard */}
         {(() => {
-          const hasSector = loaded && !!sectorNav
           const href   = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
           const label  = t('nav.dashboard')
           const sub    = hasSector ? t('nav.directionSub') : null
@@ -402,103 +344,40 @@ export default function Sidebar() {
           )
         })()}
 
-        {/* ── Sector navigation ─────────────────────────────────────────────── */}
-        {loaded && sectorNav && (
+        {/* ── LAYER 1 : Core ERP (sector tenants) ─────────────────────────── */}
+        {hasSector && coreNavItems.length > 0 && (
           <>
-            {coreNavItems.length > 0 && (
-              <>
-                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">
-                  {CORE_SECTION_LABEL}
-                </p>
-                {coreNavItems.map(item => {
-                  const Icon   = item.icon
-                  const active = isActive(item.href, item.exact)
-                  const canEdit= isOwner || permissions[item.id]?.can_edit
-                  return (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`${navBase} py-2 ${active ? navActive : navInactive}`}
-                    >
-                      <Icon size={15} className={`shrink-0 transition-colors ${active ? iconActive : iconInactive}`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate">{item.label}</div>
-                        <div className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1">
-                          {item.sublabel}
-                          {!isOwner && !canEdit && <Lock size={8} className="text-[#CBD5E1]" />}
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </>
-            )}
-
-            {businessNavItems.length > 0 && (
-              <>
-                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">
-                  {SECTOR_LABEL[secteur!] ?? secteur}
-                </p>
-                {businessNavItems.map(item => {
-                  const Icon   = item.icon
-                  const active = isActive(item.href, item.exact)
-                  const canEdit= isOwner || permissions[item.id]?.can_edit
-                  return (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`${navBase} py-2 ${active ? navActive : navInactive}`}
-                    >
-                      <Icon size={15} className={`shrink-0 transition-colors ${active ? iconActive : iconInactive}`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium leading-tight truncate">{item.label}</div>
-                        <div className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1">
-                          {item.sublabel}
-                          {!isOwner && !canEdit && <Lock size={8} className="text-[#CBD5E1]" />}
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </>
-            )}
-
-            {sectorNav.length === 0 && (
-              <p className="text-xs text-[#94A3B8] px-3 py-2">Aucun module assigné.</p>
-            )}
+            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1 font-bold">
+              Core ERP
+            </p>
+            {coreNavItems.map(item => <NavLink key={item.id} item={item} />)}
           </>
         )}
 
-        {/* ── Generic navigation ────────────────────────────────────────────── */}
-        {loaded && !sectorNav && (
+        {/* ── LAYER 2 : Sector-specific additions ─────────────────────────── */}
+        {hasSector && sectorNavItems.length > 0 && (
           <>
-            {coreActiveModules.length > 0 && (
-              <>
-                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">{CORE_SECTION_LABEL}</p>
-                {coreActiveModules.map(mod => {
-                  const Icon   = mod.icon
-                  const active = isActive(mod.href)
-                  return (
-                    <Link
-                      key={mod.id}
-                      href={mod.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`${navBase} py-2.5 ${active ? navActive : navInactive}`}
-                    >
-                      <Icon size={15} className={`shrink-0 ${active ? iconActive : iconInactive}`} />
-                      <span className="truncate">{mod.label}</span>
-                    </Link>
-                  )
-                })}
-              </>
-            )}
+            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1 font-bold">
+              {SECTOR_LABELS[secteur!] ?? secteur}
+            </p>
+            {sectorNavItems.map(item => <NavLink key={item.id} item={item} />)}
+          </>
+        )}
 
-            {businessActiveModules.length > 0 && (
+        {/* Empty sector state */}
+        {hasSector && coreNavItems.length === 0 && sectorNavItems.length === 0 && (
+          <p className="text-xs text-[#94A3B8] px-3 py-2">Aucun module assigné.</p>
+        )}
+
+        {/* ── Generic navigation (no-sector tenants) ──────────────────────── */}
+        {loaded && !hasSector && (
+          <>
+            {allActiveModules.length > 0 && (
               <>
-                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.myModules')}</p>
-                {businessActiveModules.map(mod => {
+                <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1 font-bold">
+                  {t('nav.myModules')}
+                </p>
+                {allActiveModules.map(mod => {
                   const Icon   = mod.icon
                   const active = isActive(mod.href)
                   return (
@@ -518,7 +397,9 @@ export default function Sidebar() {
 
             {isOwner && inactiveModules.length > 0 && (
               <>
-                <p className="text-xs text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1">{t('nav.inactive')}</p>
+                <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider px-3 pt-3 pb-1 font-bold">
+                  {t('nav.inactive')}
+                </p>
                 {inactiveModules.map(mod => {
                   const Icon = mod.icon
                   return (
@@ -542,6 +423,7 @@ export default function Sidebar() {
           </>
         )}
 
+        {/* Loading skeleton */}
         {!loaded && (
           <div className="space-y-1 pt-2">
             {[...Array(6)].map((_, i) => (
@@ -549,52 +431,49 @@ export default function Sidebar() {
             ))}
           </div>
         )}
-      </nav>
 
-      {/* Bottom */}
-      <div className="px-2 py-3 border-t border-[#E2E8F0] shrink-0 space-y-0.5">
-
-        {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
-          <Link
-            href="/dashboard/roles"
-            onClick={() => setMobileOpen(false)}
-            className={`${navBase} py-2.5 ${isActive('/dashboard/roles') ? navActive : navInactive}`}
-          >
-            <ShieldCheck size={15} className={`shrink-0 ${isActive('/dashboard/roles') ? iconActive : iconInactive}`} />
-            <span>{t('nav.roles')}</span>
-          </Link>
+        {/* ── LAYER 3 : Platform (modules plateforme transverses) ──────────── */}
+        {loaded && platformNavItems.length > 0 && (
+          <>
+            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider px-3 pt-4 pb-1 font-bold">
+              Plateforme
+            </p>
+            {platformNavItems.map(item => {
+              const Icon   = item.icon
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`${navBase} py-2 ${active ? navActive : navInactive}`}
+                >
+                  <Icon size={15} className={`shrink-0 ${active ? iconActive : iconInactive}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium leading-tight truncate">{item.label}</div>
+                    <div className="text-[10px] text-[#94A3B8] truncate">{item.sublabel}</div>
+                  </div>
+                </Link>
+              )
+            })}
+          </>
         )}
 
-        {isOwner && !secteur && (
+        {/* Modules marketplace (owner no-sector) */}
+        {loaded && isOwner && !secteur && (
           <Link
             href="/dashboard/modules"
             onClick={() => setMobileOpen(false)}
-            className={`${navBase} py-2.5 ${isActive('/dashboard/modules') ? navActive : navInactive}`}
+            className={`${navBase} py-2.5 mt-1 ${isActive('/dashboard/modules') ? navActive : navInactive}`}
           >
             <Store size={15} className={`shrink-0 ${isActive('/dashboard/modules') ? iconActive : iconInactive}`} />
             <span>{t('nav.modules')}</span>
           </Link>
         )}
+      </nav>
 
-        {(isOwner || ecoleRole === 'DIRECTION_GENERALE') && (
-          <Link
-            href="/dashboard/analytics"
-            onClick={() => setMobileOpen(false)}
-            className={`${navBase} py-2.5 ${isActive('/dashboard/analytics') ? navActive : navInactive}`}
-          >
-            <Activity size={15} className={`shrink-0 ${isActive('/dashboard/analytics') ? iconActive : iconInactive}`} />
-            <span>Analytics & BI</span>
-          </Link>
-        )}
-
-        <Link
-          href="/dashboard/parametres"
-          onClick={() => setMobileOpen(false)}
-          className={`${navBase} py-2.5 ${isActive('/dashboard/parametres') ? navActive : navInactive}`}
-        >
-          <Settings size={15} className={`shrink-0 ${isActive('/dashboard/parametres') ? iconActive : iconInactive}`} />
-          <span>Paramètres</span>
-        </Link>
+      {/* Bottom actions */}
+      <div className="px-2 py-3 border-t border-[#E2E8F0] shrink-0 space-y-0.5">
 
         {isSuperAdmin && (
           <Link
