@@ -255,7 +255,7 @@ export default function ParametresPage() {
   const btnStyle = {
     background: saved ? '#238636' : '#DC2626',
     color: '#0F172A' as const,
-    boxShadow: saved ? '0 0 16px #2EA04340' : '0 0 16px #DC262635',
+    boxShadow: saved ? '0 0 16px #16A34A40' : '0 0 16px #DC262635',
   }
 
   return (

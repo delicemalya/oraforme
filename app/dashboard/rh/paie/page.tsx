@@ -92,7 +92,7 @@ function printBulletin(row: BulletinRow, mois: number, annee: number, entreprise
     .page { max-width: 700px; margin: 0 auto; padding: 32px 28px; }
     .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #111; padding-bottom: 14px; margin-bottom: 18px; }
     .logo { font-size: 22px; font-weight: 800; color: #111; letter-spacing: -0.5px; }
-    .logo span { color: #2EA043; }
+    .logo span { color: #16A34A; }
     .period { text-align: right; }
     .period h2 { font-size: 14px; font-weight: 700; }
     .period p { color: #555; font-size: 10px; }
@@ -234,7 +234,7 @@ function StatutBulletin({ statut }: { statut: string }) {
   const MAP: Record<string, { label: string; color: string; bg: string }> = {
     generee: { label: 'Générée',  color: '#DC2626', bg: '#DC262618' },
     validee: { label: 'Validée',  color: '#DC2626', bg: '#DC262618' },
-    payee:   { label: 'Payée',    color: '#2EA043', bg: '#2EA04318' },
+    payee:   { label: 'Payée',    color: '#16A34A', bg: '#16A34A18' },
   }
   const s = MAP[statut] ?? MAP.generee
   return (
@@ -552,7 +552,7 @@ export default function PaiePage() {
           label="Total net à payer"
           value={`${fmt(totalNet)} FCFA`}
           sub={`Économie salariés : ${fmt(totalBrut - totalNet)} FCFA`}
-          color="#2EA043"
+          color="#16A34A"
           icon={TrendingUp}
         />
         <KpiCard
@@ -584,7 +584,7 @@ export default function PaiePage() {
               ? '#238636'
               : '#DC2626',
             boxShadow: saved
-              ? '0 0 20px #2EA04340'
+              ? '0 0 20px #16A34A40'
               : '0 0 20px #DC262640',
           }}
         >
@@ -621,7 +621,7 @@ export default function PaiePage() {
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Brut</th>
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">CNSS sal.</th>
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">IRPP</th>
-                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-[#2EA043]">Net</th>
+                  <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-[#16A34A]">Net</th>
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Patro.</th>
                   <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Statut</th>
                   <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Actions</th>
@@ -702,7 +702,7 @@ export default function PaiePage() {
                     </td>
 
                     {/* Net */}
-                    <td className="px-3 py-3 text-right text-xs font-bold text-[#2EA043]">
+                    <td className="px-3 py-3 text-right text-xs font-bold text-[#16A34A]">
                       {fmt(row.net)}
                     </td>
 
@@ -718,12 +718,12 @@ export default function PaiePage() {
                         onChange={e => updateStatut(row.employe_id, e.target.value as 'generee' | 'validee' | 'payee')}
                         className="bg-transparent text-[10px] focus:outline-none cursor-pointer"
                         style={{
-                          color: row.statut === 'payee' ? '#2EA043' : row.statut === 'validee' ? '#DC2626' : '#DC2626',
+                          color: row.statut === 'payee' ? '#16A34A' : row.statut === 'validee' ? '#DC2626' : '#DC2626',
                         }}
                       >
                         <option value="generee"  className="bg-[var(--card-bg)] text-[#DC2626]">Générée</option>
                         <option value="validee"  className="bg-[var(--card-bg)] text-[#DC2626]">Validée</option>
-                        <option value="payee"    className="bg-[var(--card-bg)] text-[#2EA043]">Payée</option>
+                        <option value="payee"    className="bg-[var(--card-bg)] text-[#16A34A]">Payée</option>
                       </select>
                     </td>
 
@@ -766,7 +766,7 @@ export default function PaiePage() {
                   <td className="px-3 py-3 text-right text-xs font-bold text-[#DC2626]">
                     −{fmt(totalIRPP)}
                   </td>
-                  <td className="px-3 py-3 text-right text-xs font-bold text-[#2EA043]">
+                  <td className="px-3 py-3 text-right text-xs font-bold text-[#16A34A]">
                     {fmt(totalNet)}
                   </td>
                   <td className="px-3 py-3 text-right text-xs font-bold text-[var(--text-secondary)]">
@@ -808,12 +808,12 @@ export default function PaiePage() {
               </div>
               <div>
                 <p className="text-[10px] text-[var(--text-secondary)]">Net à payer</p>
-                <p className="font-bold text-[#2EA043]">{fmt(totalNet)} FCFA</p>
+                <p className="font-bold text-[#16A34A]">{fmt(totalNet)} FCFA</p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#2EA043]/30 p-4 flex flex-col justify-between"
+          <div className="rounded-xl border border-[#16A34A]/30 p-4 flex flex-col justify-between"
                style={{ background: 'rgba(46,160,67,0.06)' }}>
             <p className="text-xs text-[var(--text-secondary)] font-semibold uppercase tracking-wider mb-2">Coût employeur total</p>
             <div>
@@ -823,8 +823,8 @@ export default function PaiePage() {
             <button
               onClick={genererToutesPaies}
               disabled={saving}
-              className="mt-3 w-full py-2 rounded-lg text-xs font-semibold text-[#2EA043] border border-[#2EA043]/40
-                         hover:bg-[#2EA043]/10 transition-colors disabled:opacity-50"
+              className="mt-3 w-full py-2 rounded-lg text-xs font-semibold text-[#16A34A] border border-[#16A34A]/40
+                         hover:bg-[#16A34A]/10 transition-colors disabled:opacity-50"
             >
               {saving ? 'Enregistrement…' : 'Sauvegarder les modifications'}
             </button>

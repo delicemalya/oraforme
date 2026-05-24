@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -44,11 +44,11 @@ export function BiTrendChart({
         <Tooltip
           contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
           labelStyle={{ color: '#FFFFFF', fontWeight: 600 }}
-          itemStyle={{ color: '#8B949E' }}
+          itemStyle={{ color: '#64748B' }}
           formatter={(v: unknown) => new Intl.NumberFormat('fr-FR').format(Number(v)) + ' FCFA'}
         />
         {series.length > 1 && (
-          <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 10, color: '#8B949E' }} />
+          <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 10, color: '#64748B' }} />
         )}
         {series.map(s => (
           <Area
@@ -89,12 +89,12 @@ export function BiBarChart({
         <Tooltip
           contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
           labelStyle={{ color: '#FFFFFF', fontWeight: 600 }}
-          itemStyle={{ color: '#8B949E' }}
+          itemStyle={{ color: '#64748B' }}
           formatter={(v: unknown) => new Intl.NumberFormat('fr-FR').format(Number(v)) + ' FCFA'}
           cursor={{ fill: '#ffffff08' }}
         />
         {series.length > 1 && (
-          <Legend iconType="square" iconSize={8} wrapperStyle={{ fontSize: 10, color: '#8B949E' }} />
+          <Legend iconType="square" iconSize={8} wrapperStyle={{ fontSize: 10, color: '#64748B' }} />
         )}
         {series.map(s => (
           <Bar key={s.dataKey} dataKey={s.dataKey} name={s.label ?? s.dataKey} fill={s.color} radius={[3, 3, 0, 0]} maxBarSize={28} />

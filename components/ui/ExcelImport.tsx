@@ -182,7 +182,7 @@ export default function ExcelImport({ title, description, columns, onImport, tem
         {step === 'preview' && (
           <motion.div key="preview" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex items-center gap-2 mb-3">
-              <FileSpreadsheet size={15} className="text-[#2EA043]" />
+              <FileSpreadsheet size={15} className="text-[#16A34A]" />
               <span className="text-xs text-[var(--text)] font-medium">{file?.name}</span>
               <span className="text-xs text-[var(--text-secondary)]">— Aperçu ({preview.length} premières lignes)</span>
             </div>
@@ -234,8 +234,8 @@ export default function ExcelImport({ title, description, columns, onImport, tem
         {step === 'done' && result && (
           <motion.div key="done" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#2EA04315] flex items-center justify-center shrink-0">
-                <CheckCircle2 size={24} className="text-[#2EA043]" />
+              <div className="w-12 h-12 rounded-2xl bg-[#16A34A15] flex items-center justify-center shrink-0">
+                <CheckCircle2 size={24} className="text-[#16A34A]" />
               </div>
               <div>
                 <p className="text-sm font-bold text-[var(--text)]">{result.success} lignes importées avec succès</p>

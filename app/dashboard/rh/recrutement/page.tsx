@@ -47,7 +47,7 @@ interface Candidat {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function scoreColor(s: number) {
-  if (s >= 70) return '#2EA043'
+  if (s >= 70) return '#16A34A'
   if (s >= 50) return '#DC2626'
   return '#DC2626'
 }
@@ -96,7 +96,7 @@ function ScoreBadge({ score }: { score: number }) {
 function StatutBadge({ statut }: { statut: string }) {
   const map: Record<string, { label: string; color: string }> = {
     nouveau:  { label: 'Nouveau',  color: '#DC2626' },
-    retenu:   { label: 'Retenu',   color: '#2EA043' },
+    retenu:   { label: 'Retenu',   color: '#16A34A' },
     rejete:   { label: 'Rejeté',  color: '#DC2626' },
     entretien:{ label: 'Entretien',color: '#DC2626' },
   }
@@ -296,7 +296,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-sm font-semibold text-[var(--text)] truncate">{o.titre}</p>
-                  <span className="text-[10px] font-semibold text-[#2EA043] bg-[#2EA04318] px-1.5 py-0.5 rounded-full shrink-0">
+                  <span className="text-[10px] font-semibold text-[#16A34A] bg-[#16A34A18] px-1.5 py-0.5 rounded-full shrink-0">
                     {o.statut}
                   </span>
                 </div>
@@ -590,7 +590,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                   </p>
                 </div>
                 {c.recommande && (
-                  <span className="text-[10px] font-bold text-[#2EA043] bg-[#2EA04318] px-2 py-0.5 rounded-full shrink-0">
+                  <span className="text-[10px] font-bold text-[#16A34A] bg-[#16A34A18] px-2 py-0.5 rounded-full shrink-0">
                     ✓ Recommandé
                   </span>
                 )}
@@ -603,11 +603,11 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                 {c.points_forts.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-bold text-[#2EA043] mb-1.5">✅ Points forts</p>
+                    <p className="text-[10px] font-bold text-[#16A34A] mb-1.5">✅ Points forts</p>
                     <ul className="space-y-0.5">
                       {c.points_forts.slice(0, 4).map((p, j) => (
                         <li key={j} className="text-xs text-[var(--text-secondary)] flex items-start gap-1.5">
-                          <span className="text-[#2EA043] mt-0.5 shrink-0">·</span>{p}
+                          <span className="text-[#16A34A] mt-0.5 shrink-0">·</span>{p}
                         </li>
                       ))}
                     </ul>
@@ -651,7 +651,7 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
                   <a
                     href={`https://wa.me/${c.telephone.replace(/\s/g, '')}`}
                     target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface)]/10 border border-[#2EA043]/20 text-[#2EA043] rounded-lg text-xs font-semibold hover:bg-[var(--surface)]/20 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface)]/10 border border-[#16A34A]/20 text-[#16A34A] rounded-lg text-xs font-semibold hover:bg-[var(--surface)]/20 transition-colors"
                   >
                     <Phone size={12} /> WhatsApp
                   </a>
@@ -782,7 +782,7 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
                   <p className="text-xs font-semibold text-[var(--text)] truncate">{c.nom}</p>
                   <p className="text-[10px] text-[var(--text-secondary)]">{c.resume_court?.slice(0, 80)}...</p>
                 </div>
-                <span className="text-[10px] text-[#2EA043] bg-[#2EA04314] px-2 py-0.5 rounded-full shrink-0">
+                <span className="text-[10px] text-[#16A34A] bg-[#16A34A14] px-2 py-0.5 rounded-full shrink-0">
                   ✓ {config.action === 'notifier' ? 'Notifié' : config.action === 'retenir' ? 'Retenu' : 'Rejeté'}
                 </span>
               </motion.div>

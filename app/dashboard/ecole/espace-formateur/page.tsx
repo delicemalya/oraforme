@@ -64,7 +64,7 @@ const STATUT_HEURE: Record<TeacherHour['statut'], { label: string; color: string
 // ── Small badge ───────────────────────────────────────────────────────────────
 
 function Badge({ statut }: { statut: string }) {
-  const cfg = STATUT_HEURE[statut as TeacherHour['statut']] ?? { label: statut, color: '#8B949E', bg: '#8B949E18' }
+  const cfg = STATUT_HEURE[statut as TeacherHour['statut']] ?? { label: statut, color: '#64748B', bg: '#64748B18' }
   return (
     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold" style={{ color: cfg.color, background: cfg.bg }}>
       {cfg.label}

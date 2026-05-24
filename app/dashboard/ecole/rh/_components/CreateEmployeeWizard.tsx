@@ -274,14 +274,14 @@ export function CreateEmployeeWizard({
                 <div key={n} className="flex flex-col items-center gap-1">
                   <div className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
                     style={{
-                      background: past ? '#2EA043' : active ? 'rgba(46,160,67,0.12)' : '#F3F4F6',
-                      border: `2px solid ${past || active ? '#2EA043' : 'transparent'}`,
+                      background: past ? '#16A34A' : active ? 'rgba(46,160,67,0.12)' : '#F3F4F6',
+                      border: `2px solid ${past || active ? '#16A34A' : 'transparent'}`,
                     }}>
                     {past ? <Check size={12} className="text-white" />
-                           : <Icon size={11} style={{ color: active ? '#2EA043' : '#64748B' }} />}
+                           : <Icon size={11} style={{ color: active ? '#16A34A' : '#64748B' }} />}
                   </div>
                   <span className="text-[9px] hidden sm:block text-center leading-tight max-w-[52px]"
-                    style={{ color: active ? '#2EA043' : past ? '#8B949E' : '#64748B' }}>
+                    style={{ color: active ? '#16A34A' : past ? '#64748B' : '#64748B' }}>
                     {s.label}
                   </span>
                 </div>
@@ -427,10 +427,10 @@ export function CreateEmployeeWizard({
                         <div key={r.id} onClick={() => toggleRole(r.id)}
                           className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all"
                           style={acc_.roles[r.id]
-                            ? { borderColor: '#2EA043', background: 'rgba(46,160,67,0.06)' }
+                            ? { borderColor: '#16A34A', background: 'rgba(46,160,67,0.06)' }
                             : { borderColor: '#E5E7EB' }}>
                           <div className="w-4 h-4 rounded flex items-center justify-center shrink-0 transition-all"
-                            style={{ background: acc_.roles[r.id] ? '#2EA043' : '#E5E7EB' }}>
+                            style={{ background: acc_.roles[r.id] ? '#16A34A' : '#E5E7EB' }}>
                             {acc_.roles[r.id] && <Check size={10} className="text-white" />}
                           </div>
                           <span className="text-xs" style={{ color: acc_.roles[r.id] ? '#101729' : '#6B7280' }}>{r.label}</span>
@@ -477,7 +477,7 @@ export function CreateEmployeeWizard({
                     </div>
                     <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(46,160,67,0.06)', border: '1px solid rgba(46,160,67,0.15)' }}>
                       <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Salaire brut estimé</p>
-                      <p className="text-xl font-bold mt-1" style={{ color: '#2EA043' }}>
+                      <p className="text-xl font-bold mt-1" style={{ color: '#16A34A' }}>
                         {fmtN(salaireBrut)} <span className="text-sm font-normal">FCFA</span>
                       </p>
                     </div>
@@ -498,7 +498,7 @@ export function CreateEmployeeWizard({
                         <button key={m} type="button" onClick={() => setSal(p => ({ ...p, mode_paiement: m }))}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all"
                           style={sal_.mode_paiement === m
-                            ? { background: '#2EA043', color: '#fff' }
+                            ? { background: '#16A34A', color: '#fff' }
                             : { background: '#F3F4F6', color: '#6B7280', border: '1px solid #E5E7EB' }}>
                           {m.replace('_', ' ')}
                         </button>
@@ -562,7 +562,7 @@ export function CreateEmployeeWizard({
                       <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 220 }}
                         className="w-16 h-16 rounded-full flex items-center justify-center"
                         style={{ background: 'rgba(46,160,67,0.15)' }}>
-                        <CheckCircle2 size={32} style={{ color: '#2EA043' }} />
+                        <CheckCircle2 size={32} style={{ color: '#16A34A' }} />
                       </motion.div>
                       <div className="text-center">
                         <p className="text-base font-bold text-[#101729]">Employé créé avec succès !</p>
@@ -589,7 +589,7 @@ export function CreateEmployeeWizard({
                             </p>
                           </div>
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full capitalize"
-                            style={{ background: '#2EA04318', color: '#2EA043' }}>
+                            style={{ background: '#16A34A18', color: '#16A34A' }}>
                             {post_.type_employe}
                           </span>
                         </div>
@@ -624,7 +624,7 @@ export function CreateEmployeeWizard({
                           <li>✓ Dossier enregistré dans RH & Paie</li>
                           <li>✓ Compte tiers créé en Comptabilité (641 — Rémunérations du personnel)</li>
                           <li>✓ Notification envoyée à la Direction Générale</li>
-                          <li style={{ color: acc_.email_connexion ? '#8B949E' : '#64748B' }}>
+                          <li style={{ color: acc_.email_connexion ? '#64748B' : '#64748B' }}>
                             {acc_.email_connexion ? '✓ Email de connexion configuré' : '○ Aucun compte système (email non renseigné)'}
                           </li>
                         </ul>

@@ -54,7 +54,7 @@ export default function TopClientsChart({ data }: { data: ClientRevenue[] }) {
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={data.slice(0, 5)} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
               <XAxis type="number" tick={{ fill: '#64748B', fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
-              <YAxis type="category" dataKey="nom" tick={{ fill: '#8B949E', fontSize: 9 }} axisLine={false} tickLine={false} width={80} />
+              <YAxis type="category" dataKey="nom" tick={{ fill: '#64748B', fontSize: 9 }} axisLine={false} tickLine={false} width={80} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="montant" radius={[0, 4, 4, 0]} barSize={16}>
                 {data.slice(0, 5).map((_, i) => (

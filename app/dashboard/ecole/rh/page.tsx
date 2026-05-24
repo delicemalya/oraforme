@@ -179,7 +179,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
 
 // ── Info item helper ─────────────────────────────────────────────────────────
 
-function InfoItem({ icon: Icon, label, value, color = '#8B949E' }: { icon: React.ElementType; label: string; value: string; color?: string }) {
+function InfoItem({ icon: Icon, label, value, color = '#64748B' }: { icon: React.ElementType; label: string; value: string; color?: string }) {
   return (
     <div className="flex items-start gap-2">
       <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ background: `${color}18` }}>
@@ -348,7 +348,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                     className="flex-1 rounded-xl border p-3 text-left transition-all"
                     style={{ borderColor: form.type_enseignant === val ? color : 'rgba(255,255,255,0.08)',
                              background: form.type_enseignant === val ? `${color}12` : 'transparent' }}>
-                    <p className="text-xs font-bold" style={{ color: form.type_enseignant === val ? color : '#8B949E' }}>{label}</p>
+                    <p className="text-xs font-bold" style={{ color: form.type_enseignant === val ? color : '#64748B' }}>{label}</p>
                     <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{desc}</p>
                   </button>
                 ))}
@@ -710,7 +710,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
   const kpis = [
     { label: 'Total',    value: staff.length,                                    color: '#DC2626' },
     { label: 'Actifs',   value: staff.filter(s => s.statut === 'actif').length,  color: '#0F172A' },
-    { label: 'Inactifs', value: staff.filter(s => s.statut === 'inactif').length,color: '#8B949E' },
+    { label: 'Inactifs', value: staff.filter(s => s.statut === 'inactif').length,color: '#64748B' },
   ]
 
   return (
@@ -1785,7 +1785,7 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
           <KpiCard label="Postes ouverts" value={postes.filter(p => p.statut === 'ouvert').length} color="#0F172A" />
-          <KpiCard label="Postes fermés"  value={postes.filter(p => p.statut === 'ferme').length}  color="#8B949E" />
+          <KpiCard label="Postes fermés"  value={postes.filter(p => p.statut === 'ferme').length}  color="#64748B" />
         </div>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#00b9a7', color: '#fff' }}>
           <Plus size={13} /> Ouvrir un poste

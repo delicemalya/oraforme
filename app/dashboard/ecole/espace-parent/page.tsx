@@ -115,7 +115,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
         <>
           <div className="grid grid-cols-4 gap-3">
             <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#0F172A" />
-            <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
+            <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#64748B'} sub={mention?.label} />
             <KpiCard label="Absences"         value={totalAbs}                            color="#DC2626" sub={`${justifiedAbs} justifiées`} />
             <KpiCard label="Alertes"          value={nbAlerts}                            color="#DC2626" sub="non lues" />
           </div>
@@ -132,7 +132,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
               return (
                 <button key={t.id} onClick={() => setActiveTab(t.id)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all relative"
-                  style={{ background: activeTab === t.id ? accentColor : 'transparent', color: activeTab === t.id ? '#fff' : '#8B949E' }}>
+                  style={{ background: activeTab === t.id ? accentColor : 'transparent', color: activeTab === t.id ? '#fff' : '#64748B' }}>
                   <Icon size={12} /> {t.label}
                   {t.count > 0 && activeTab !== t.id && (
                     <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-gray-100 text-[var(--text-secondary)]">{t.count}</span>

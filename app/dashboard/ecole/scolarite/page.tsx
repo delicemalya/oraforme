@@ -119,7 +119,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
         <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1">
           {(['tous', 'actif', 'suspendu', 'banni', 'diplome'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: filter === f ? '#DC2626' : 'transparent', color: filter === f ? '#0F172A' : '#8B949E' }}>
+              style={{ background: filter === f ? '#DC2626' : 'transparent', color: filter === f ? '#0F172A' : '#64748B' }}>
               {f === 'tous' ? 'Tous' : STATUT_ETU[f as StatutEtu]?.label ?? f}
             </button>
           ))}
@@ -246,7 +246,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                     const cfg = STATUT_ETU[s]
                     return (
                       <button key={s} onClick={() => changeStatut(selected.id, s)} className="py-1.5 rounded-lg text-[10px] font-semibold transition-all"
-                        style={{ background: selected.statut === s ? cfg.bg : 'rgba(255,255,255,0.04)', color: selected.statut === s ? cfg.color : '#8B949E', border: `1px solid ${selected.statut === s ? cfg.color + '40' : 'transparent'}` }}>
+                        style={{ background: selected.statut === s ? cfg.bg : 'rgba(255,255,255,0.04)', color: selected.statut === s ? cfg.color : '#64748B', border: `1px solid ${selected.statut === s ? cfg.color + '40' : 'transparent'}` }}>
                         {cfg.label}
                       </button>
                     )
@@ -604,7 +604,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
           <div className="flex flex-wrap items-center gap-3 justify-between">
             <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1">
               {PERIODES.map(p => (
-                <button key={p.value} onClick={() => setPeriode(p.value)} className="px-2.5 py-1 rounded-md text-xs font-medium transition-all" style={{ background: periode === p.value ? '#DC2626' : 'transparent', color: periode === p.value ? '#0F172A' : '#8B949E' }}>{p.label}</button>
+                <button key={p.value} onClick={() => setPeriode(p.value)} className="px-2.5 py-1 rounded-md text-xs font-medium transition-all" style={{ background: periode === p.value ? '#DC2626' : 'transparent', color: periode === p.value ? '#0F172A' : '#64748B' }}>{p.label}</button>
               ))}
             </div>
             {moyenne !== null && mention && (
@@ -800,7 +800,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
       <div className="flex items-center gap-2 justify-between flex-wrap">
         <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1">
           {(['tous', 'examen', 'conge_scolaire', 'evenement', 'conseil', 'autre'] as const).map(t => (
-            <button key={t} onClick={() => setFilterType(t)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all" style={{ background: filterType === t ? '#DC2626' : 'transparent', color: filterType === t ? '#0F172A' : '#8B949E' }}>
+            <button key={t} onClick={() => setFilterType(t)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all" style={{ background: filterType === t ? '#DC2626' : 'transparent', color: filterType === t ? '#0F172A' : '#64748B' }}>
               {t === 'tous' ? 'Tous' : TYPE_EVENT[t as TypeEvent]?.label ?? t}
             </button>
           ))}
@@ -1084,7 +1084,7 @@ export default function ScolaritePage() {
           return (
             <button key={t.id} onClick={() => setSubTab(t.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#DC2626' : 'transparent', color: subTab === t.id ? '#0F172A' : '#8B949E' }}>
+              style={{ background: subTab === t.id ? '#DC2626' : 'transparent', color: subTab === t.id ? '#0F172A' : '#64748B' }}>
               <Icon size={12} /> {t.label}
             </button>
           )

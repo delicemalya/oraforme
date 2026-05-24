@@ -92,7 +92,7 @@ export default async function AdminRevenusPage() {
         <h2 className="text-sm font-semibold text-[var(--text)] mb-4">MRR par plan tarifaire</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { plan: 'starter', color: '#8B949E', label: 'Starter' },
+            { plan: 'starter', color: '#64748B', label: 'Starter' },
             { plan: 'business', color: '#DC2626', label: 'Business' },
             { plan: 'premium', color: '#DC2626', label: 'Premium' },
           ].map(p => {

@@ -44,8 +44,8 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="w-full max-w-md text-center">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-10">
-            <div className="w-14 h-14 rounded-full bg-[#2EA043]/10 flex items-center justify-center mx-auto mb-5">
-              <CheckCircle size={28} className="text-[#2EA043]" />
+            <div className="w-14 h-14 rounded-full bg-[#16A34A]/10 flex items-center justify-center mx-auto mb-5">
+              <CheckCircle size={28} className="text-[#16A34A]" />
             </div>
             <h2 className="text-lg font-bold text-[var(--text)] mb-2">Mot de passe mis à jour</h2>
             <p className="text-sm text-[var(--text-secondary)]">Vous allez être redirigé vers votre tableau de bord...</p>

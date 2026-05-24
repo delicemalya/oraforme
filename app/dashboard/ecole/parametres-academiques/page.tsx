@@ -57,7 +57,7 @@ const DEFAULT: AcademicSettings = {
   nb_max_matieres_rattrapage: 3,
   conservation_meilleure_note: true,
   mentions: [
-    { min: 16, label: 'Très Bien',  color: '#2EA043' },
+    { min: 16, label: 'Très Bien',  color: '#16A34A' },
     { min: 14, label: 'Bien',        color: '#DC2626' },
     { min: 12, label: 'Assez Bien', color: '#7C3AED' },
     { min: 10, label: 'Passable',   color: '#DC2626' },
@@ -89,7 +89,7 @@ function Toggle({ value, onChange, label, sub }: {
         {sub && <div className="text-xs text-[var(--text-secondary)] mt-0.5">{sub}</div>}
       </div>
       {value
-        ? <ToggleRight size={22} className="text-[#2EA043] shrink-0" />
+        ? <ToggleRight size={22} className="text-[#16A34A] shrink-0" />
         : <ToggleLeft  size={22} className="text-[var(--text-secondary)] shrink-0" />
       }
     </button>
@@ -191,7 +191,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
   function addMention() {
     setS(p => ({
       ...p,
-      mentions: [...p.mentions, { min: 0, label: 'Nouvelle mention', color: '#8B949E' }],
+      mentions: [...p.mentions, { min: 0, label: 'Nouvelle mention', color: '#64748B' }],
     }))
   }
 
@@ -539,7 +539,7 @@ export default function ParametresAcademiquesPage() {
             exit={{ opacity: 0 }}
             className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm ${
               toast.ok
-                ? 'bg-[#2EA043]/10 border-[#2EA043]/25 text-[#2EA043]'
+                ? 'bg-[#16A34A]/10 border-[#16A34A]/25 text-[#16A34A]'
                 : 'bg-[#DC2626]/10 border-[#DC2626]/25 text-[#DC2626]'
             }`}
           >

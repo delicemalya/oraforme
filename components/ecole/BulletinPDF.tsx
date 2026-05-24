@@ -44,7 +44,7 @@ const GRAY   = '#6B7280'
 const LGRAY  = '#F9FAFB'
 const WHITE  = '#FFFFFF'
 const MGRAY  = '#374151'
-const GREEN  = '#2EA043'
+const GREEN  = '#16A34A'
 const RED    = '#DC2626'
 
 const s = StyleSheet.create({

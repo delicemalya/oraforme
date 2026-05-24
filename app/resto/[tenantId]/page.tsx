@@ -109,9 +109,9 @@ export default function PublicOrderPage() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="w-20 h-20 rounded-full bg-[#2EA043]/20 flex items-center justify-center mb-6"
+          className="w-20 h-20 rounded-full bg-[#16A34A]/20 flex items-center justify-center mb-6"
         >
-          <Check size={36} className="text-[#2EA043]" />
+          <Check size={36} className="text-[#16A34A]" />
         </motion.div>
         <h1 className="text-2xl font-bold text-white mb-2">Commande envoyée !</h1>
         <p className="text-[var(--text-secondary)] mb-6">Votre commande a été transmise en cuisine. Merci !</p>
@@ -142,7 +142,7 @@ export default function PublicOrderPage() {
           className="relative flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-all"
           style={{
             borderColor: cartCount > 0 ? '#DC2626' : 'rgba(255,255,255,0.1)',
-            color:       cartCount > 0 ? '#DC2626' : '#8B949E',
+            color:       cartCount > 0 ? '#DC2626' : '#64748B',
             background:  cartCount > 0 ? '#DC262612' : 'transparent',
           }}
         >
@@ -281,7 +281,7 @@ export default function PublicOrderPage() {
                       className="py-2 rounded-lg text-xs font-semibold border transition-all"
                       style={{
                         borderColor: mode === m ? '#DC2626' : 'rgba(255,255,255,0.08)',
-                        color:       mode === m ? '#DC2626' : '#8B949E',
+                        color:       mode === m ? '#DC2626' : '#64748B',
                         background:  mode === m ? '#DC262615' : 'transparent',
                       }}
                     >
@@ -350,9 +350,9 @@ export default function PublicOrderPage() {
                         onClick={() => setPaiement(v)}
                         className="py-2 rounded-lg text-xs font-medium border transition-all"
                         style={{
-                          borderColor: paiement === v ? '#2EA043' : 'rgba(255,255,255,0.08)',
-                          color:       paiement === v ? '#2EA043' : '#8B949E',
-                          background:  paiement === v ? '#2EA04315' : 'transparent',
+                          borderColor: paiement === v ? '#16A34A' : 'rgba(255,255,255,0.08)',
+                          color:       paiement === v ? '#16A34A' : '#64748B',
+                          background:  paiement === v ? '#16A34A15' : 'transparent',
                         }}
                       >
                         {l}

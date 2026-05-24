@@ -267,13 +267,13 @@ export default function OnboardingPage() {
                             onClick={() => toggleMod(key)}
                             className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
                               selected
-                                ? 'border-[#2EA043] bg-[#2EA043]/8'
+                                ? 'border-[#16A34A] bg-[#16A34A]/8'
                                 : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border)]'
                             }`}
                           >
                             <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all ${
                               selected
-                                ? 'bg-[#2EA043] border-[#2EA043]'
+                                ? 'bg-[#16A34A] border-[#16A34A]'
                                 : 'border-[var(--border)]'
                             }`}>
                               {selected ? <Check size={10} className="text-[#DC2626]" /> : <Plus size={9} className="text-[var(--text-secondary)]" />}

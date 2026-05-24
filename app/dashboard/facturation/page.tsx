@@ -47,7 +47,7 @@ interface EntrepriseConfig {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const STATUT_CONFIG: Record<StatutFac, { label: string; color: string; bg: string; icon: React.ElementType }> = {
-  brouillon: { label: 'Brouillon',  color: '#8B949E', bg: '#8B949E18', icon: Clock },
+  brouillon: { label: 'Brouillon',  color: '#64748B', bg: '#64748B18', icon: Clock },
   envoyee:   { label: 'Envoyée',    color: '#DC2626', bg: '#DC262618', icon: Send },
   payee:     { label: 'Payée',      color: '#0F172A', bg: '#0F172A18', icon: CheckCircle },
   retard:    { label: 'En retard',  color: '#DC2626', bg: '#DC262618', icon: AlertTriangle },
@@ -442,7 +442,7 @@ export default function FacturationPage() {
               key={val}
               onClick={() => setFilter(val)}
               className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: filter === val ? '#DC2626' : 'transparent', color: filter === val ? '#0F172A' : '#8B949E' }}
+              style={{ background: filter === val ? '#DC2626' : 'transparent', color: filter === val ? '#0F172A' : '#64748B' }}
             >
               {label}
             </button>
@@ -804,7 +804,7 @@ export default function FacturationPage() {
                             style={
                               isCurrent
                                 ? { color: v.color, background: v.bg, borderColor: `${v.color}40`, cursor: 'default' }
-                                : { color: '#8B949E', background: 'transparent', borderColor: '#E5E7EB', cursor: 'pointer' }
+                                : { color: '#64748B', background: 'transparent', borderColor: '#E5E7EB', cursor: 'pointer' }
                             }
                           >
                             <Icon size={10} /> {v.label}

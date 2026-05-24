@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
     <div style="background:#0F172A;padding:24px 32px">
       <h1 style="color:#DC2626;margin:0;font-size:20px">${tenantName}</h1>
-      <p style="color:#8B949E;margin:4px 0 0;font-size:13px">Facture électronique</p>
+      <p style="color:#64748B;margin:4px 0 0;font-size:13px">Facture électronique</p>
     </div>
     <div style="padding:32px">
       <p style="color:#333;font-size:15px">Cher(e) <strong>${facture.client_name ?? 'Client'}</strong>,</p>

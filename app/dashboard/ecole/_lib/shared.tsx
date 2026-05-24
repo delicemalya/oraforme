@@ -102,7 +102,7 @@ export const TYPE_EVENT: Record<TypeEvent, { label: string; color: string; bg: s
   conge_scolaire: { label: 'Congé',     color: '#DC2626', bg: '#DC262618' },
   evenement:      { label: 'Événement', color: '#7C3AED', bg: 'rgba(139,0,112,0.15)' },
   conseil:        { label: 'Conseil',   color: '#7C3AED', bg: '#7C3AED18' },
-  autre:          { label: 'Autre',     color: '#8B949E', bg: '#8B949E18' },
+  autre:          { label: 'Autre',     color: '#64748B', bg: '#64748B18' },
 }
 
 export const DEFAULT_FRAIS = [

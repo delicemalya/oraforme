@@ -23,7 +23,7 @@ function timeAgo(d: string) {
 }
 
 const STATUT: Record<string, { label: string; color: string; Icon: React.ElementType; action: string }> = {
-  brouillon: { label: 'Brouillon',  color: '#8B949E', Icon: Clock,        action: 'créé un brouillon' },
+  brouillon: { label: 'Brouillon',  color: '#64748B', Icon: Clock,        action: 'créé un brouillon' },
   envoyee:   { label: 'Envoyée',   color: '#DC2626', Icon: Send,         action: 'envoyé une facture' },
   payee:     { label: 'Payée',     color: '#0F172A', Icon: CheckCircle,  action: 'reçu un paiement' },
   annulee:   { label: 'Annulée',  color: '#DC2626', Icon: FileText,     action: 'annulé une facture' },

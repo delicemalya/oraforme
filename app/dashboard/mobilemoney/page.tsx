@@ -140,7 +140,7 @@ export default function MobileMoneyPage() {
         {[
           { label: 'Total reçu', value: fmtFCFA(totalRecu), color: '#0F172A' },
           { label: 'Total envoyé', value: fmtFCFA(totalEnvoi), color: '#DC2626' },
-          { label: 'Frais payés', value: fmtFCFA(totalFrais), color: '#8B949E' },
+          { label: 'Frais payés', value: fmtFCFA(totalFrais), color: '#64748B' },
         ].map(k => (
           <div key={k.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4 text-center">
             <p className="text-xs text-[var(--text-secondary)] mb-1">{k.label}</p>

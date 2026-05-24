@@ -98,7 +98,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#0F172A" />
-        <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
+        <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#64748B'} sub={mention?.label} />
         <KpiCard label="Absences"         value={totalAbs}                               color="#DC2626" sub={`${justifiedAbs} justifiées`} />
         <KpiCard label="Alertes"          value={nbAlerts}                               color="#DC2626" sub="non lues" />
       </div>

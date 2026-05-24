@@ -17,7 +17,7 @@ const STATUT_LABELS: Record<string, string> = { impaye: 'Impayé', partiel: 'Par
 const STATUT_COLORS: Record<string, string> = {
   impaye: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
   partiel: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
-  paye: 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30',
+  paye: 'text-[#16A34A] bg-[#16A34A]/10 border-[#16A34A]/30',
 }
 
 export default function AchatsPage() {
@@ -166,7 +166,7 @@ export default function AchatsPage() {
                         <p className="text-xs text-[var(--text-secondary)]">dû</p>
                       </div>
                     )}
-                    {dette === 0 && <CheckCircle size={16} className="text-[#2EA043]" />}
+                    {dette === 0 && <CheckCircle size={16} className="text-[#16A34A]" />}
                   </div>
                 )
               })}
@@ -210,7 +210,7 @@ export default function AchatsPage() {
                       <td className="px-4 py-2.5">
                         {a.statut !== 'paye' && (
                           <button onClick={() => payerAchat(a.id)}
-                            className="text-xs text-[#2EA043] hover:underline">Payer</button>
+                            className="text-xs text-[#16A34A] hover:underline">Payer</button>
                         )}
                       </td>
                     </tr>
@@ -236,7 +236,7 @@ export default function AchatsPage() {
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
           {debtsByFournisseur.length === 0 ? (
             <div className="p-10 text-center">
-              <CheckCircle size={32} className="text-[#2EA043] mx-auto mb-3" />
+              <CheckCircle size={32} className="text-[#16A34A] mx-auto mb-3" />
               <p className="text-sm text-[var(--text)] font-medium">Aucune dette fournisseur !</p>
               <p className="text-xs text-[var(--text-secondary)] mt-1">Tous vos achats sont à jour</p>
             </div>
@@ -257,7 +257,7 @@ export default function AchatsPage() {
                       onClick={async () => {
                         await Promise.all(factures.map(a => payerAchat(a.id)))
                       }}
-                      className="w-full py-2 rounded-lg text-xs font-medium bg-[#2EA043]/10 border border-[#2EA043]/30 text-[#2EA043] hover:bg-[#2EA043]/20 transition-colors">
+                      className="w-full py-2 rounded-lg text-xs font-medium bg-[#16A34A]/10 border border-[#16A34A]/30 text-[#16A34A] hover:bg-[#16A34A]/20 transition-colors">
                       Tout payer — {fmtFCFA(f.dette)}
                     </button>
                   </div>

@@ -37,7 +37,7 @@ const NEXT_STATUS: Partial<Record<StatutCmd, StatutCmd>> = {
 const STATUS_CONFIG: Partial<Record<StatutCmd, { label: string; color: string; bg: string; border: string }>> = {
   en_attente:    { label: 'En attente',     color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
   en_preparation:{ label: 'En préparation', color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
-  pret:          { label: 'Prêt à servir',  color: '#2EA043', bg: '#2EA04318', border: '#2EA04340' },
+  pret:          { label: 'Prêt à servir',  color: '#16A34A', bg: '#16A34A18', border: '#16A34A40' },
   livre:         { label: 'Livré',          color: '#7C3AED', bg: '#7C3AED18', border: '#7C3AED40' },
 }
 

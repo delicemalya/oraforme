@@ -1112,8 +1112,8 @@ export default function RestaurantPage() {
               <h3 className="text-sm font-semibold text-[var(--text)] mb-4">CA par heure</h3>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={chartHeure}>
-                  <XAxis dataKey="heure" tick={{ fill: '#8B949E', fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#8B949E', fontSize: 10 }} axisLine={false} tickLine={false} width={40}
+                  <XAxis dataKey="heure" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} width={40}
                     tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
                   <Tooltip contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -1137,7 +1137,7 @@ export default function RestaurantPage() {
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     <Tooltip formatter={(v: any) => [fmtFCFA(Number(v ?? 0))]}
                       contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }} />
-                    <Legend wrapperStyle={{ fontSize: 11, color: '#8B949E' }} />
+                    <Legend wrapperStyle={{ fontSize: 11, color: '#64748B' }} />
                   </PieChart>
                 </ResponsiveContainer>
               )}

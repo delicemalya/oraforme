@@ -226,7 +226,7 @@ export default function DepensesPage() {
                   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                   formatter={(v: any) => [fmtFCFA(Number(v ?? 0)), '']}
                 />
-                <Legend wrapperStyle={{ fontSize: 10, color: '#8B949E' }} />
+                <Legend wrapperStyle={{ fontSize: 10, color: '#64748B' }} />
               </PieChart>
             </ResponsiveContainer>
           )}

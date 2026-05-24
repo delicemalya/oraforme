@@ -50,9 +50,9 @@ const s = StyleSheet.create({
   logo: { width: 40, height: 40, backgroundColor: GOLD, borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
   logoText: { color: BLACK, fontSize: 18, fontFamily: 'Helvetica-Bold' },
   companyName: { fontSize: 13, fontFamily: 'Helvetica-Bold', color: WHITE, marginLeft: 10 },
-  companyMeta: { fontSize: 8, color: '#8B949E', marginLeft: 10, marginTop: 2 },
+  companyMeta: { fontSize: 8, color: '#64748B', marginLeft: 10, marginTop: 2 },
   payslipTitle: { fontSize: 22, fontFamily: 'Helvetica-Bold', color: GOLD, textAlign: 'right' },
-  payslipPeriod: { fontSize: 9, color: '#8B949E', textAlign: 'right', marginTop: 3 },
+  payslipPeriod: { fontSize: 9, color: '#64748B', textAlign: 'right', marginTop: 3 },
   // Sections
   twoCol: { flexDirection: 'row', gap: 12, marginBottom: 14 },
   section: { flex: 1, backgroundColor: LGRAY, borderRadius: 6, padding: 10 },

@@ -201,8 +201,8 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                 {step === 'done' && (
                   <motion.div key="done" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4">
                     <div className="text-center py-2">
-                      <div className="w-12 h-12 rounded-2xl bg-[#2EA04320] flex items-center justify-center mx-auto mb-3">
-                        <CheckCircle2 size={24} className="text-[#2EA043]" />
+                      <div className="w-12 h-12 rounded-2xl bg-[#16A34A20] flex items-center justify-center mx-auto mb-3">
+                        <CheckCircle2 size={24} className="text-[#16A34A]" />
                       </div>
                       <p className="text-sm font-bold text-[var(--text)]">Lien généré avec succès !</p>
                       <p className="text-xs text-[var(--text-secondary)] mt-1">Partagez ce lien par SMS ou WhatsApp</p>

@@ -107,9 +107,9 @@ export default async function AdminMIAAPage() {
           </h2>
           <div className="space-y-3">
             {[
-              { label: 'MRR MIAA+', value: fmtFCFA(mrrMIAA), color: '#2EA043', note: `${nbTenantsWithMIAA} × 6 000 FCFA` },
+              { label: 'MRR MIAA+', value: fmtFCFA(mrrMIAA), color: '#16A34A', note: `${nbTenantsWithMIAA} × 6 000 FCFA` },
               { label: 'Coût API estimé', value: fmtFCFA(monthlyCostFCFA), color: '#DC2626', note: `$${monthlyCostUSD.toFixed(2)} × 600 FCFA/$` },
-              { label: 'Marge brute', value: fmtFCFA(Math.max(margeIA, 0)), color: margeIA >= 0 ? '#2EA043' : '#DC2626', note: `${mrrMIAA > 0 ? Math.round((margeIA / mrrMIAA) * 100) : 0}% de marge` },
+              { label: 'Marge brute', value: fmtFCFA(Math.max(margeIA, 0)), color: margeIA >= 0 ? '#16A34A' : '#DC2626', note: `${mrrMIAA > 0 ? Math.round((margeIA / mrrMIAA) * 100) : 0}% de marge` },
             ].map(r => (
               <div key={r.label} className="flex items-center justify-between px-3 py-2.5 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
                 <div>
@@ -175,7 +175,7 @@ export default async function AdminMIAAPage() {
             { label: 'Modèle', value: 'Claude Haiku 4.5', color: '#7C3AED' },
             { label: 'Max tokens', value: '1 024 out', color: '#DC2626' },
             { label: 'Historique', value: '10 messages', color: '#DC2626' },
-            { label: 'Context', value: 'Congo fiscal', color: '#2EA043' },
+            { label: 'Context', value: 'Congo fiscal', color: '#16A34A' },
           ].map(c => (
             <div key={c.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-3">
               <p className="text-xs text-[var(--text-secondary)] mb-1">{c.label}</p>

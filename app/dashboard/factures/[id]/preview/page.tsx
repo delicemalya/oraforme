@@ -57,10 +57,10 @@ interface Config {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
-  brouillon: { label: 'BROUILLON', color: '#8B949E', bg: '#8B949E20' },
+  brouillon: { label: 'BROUILLON', color: '#64748B', bg: '#64748B20' },
   envoyee:   { label: 'ENVOYÉE',   color: '#DC2626', bg: '#DC262620' },
   envoye:    { label: 'ENVOYÉE',   color: '#DC2626', bg: '#DC262620' },
-  payee:     { label: 'PAYÉE',     color: '#2EA043', bg: '#2EA04320' },
+  payee:     { label: 'PAYÉE',     color: '#16A34A', bg: '#16A34A20' },
   retard:    { label: 'EN RETARD', color: '#DC2626', bg: '#DC262620' },
   annulee:   { label: 'ANNULÉE',  color: '#64748B', bg: '#48495820' },
 }
@@ -244,7 +244,7 @@ export default function InvoicePreviewPage() {
           {/* Send */}
           <motion.button onClick={handleSend} disabled={sending || sent} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-60 shrink-0"
-            style={{ background: sent ? '#2EA04320' : '#DC262615', color: sent ? '#2EA043' : '#DC2626', border: `1px solid ${sent ? '#2EA04340' : '#DC262630'}` }}
+            style={{ background: sent ? '#16A34A20' : '#DC262615', color: sent ? '#16A34A' : '#DC2626', border: `1px solid ${sent ? '#16A34A40' : '#DC262630'}` }}
           >
             {sending ? <Loader2 className="animate-spin" size={13} /> : sent ? <Check size={13} /> : <Send size={13} />}
             {sent ? 'Envoyée !' : 'Envoyer'}
@@ -475,7 +475,7 @@ export default function InvoicePreviewPage() {
             <motion.div
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 24 }}
               className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm shadow-2xl"
-              style={{ background: '#2EA043', color: '#fff', zIndex: 9999 }}
+              style={{ background: '#16A34A', color: '#fff', zIndex: 9999 }}
             >
               <Check size={16} /> Facture marquée comme envoyée !
             </motion.div>
