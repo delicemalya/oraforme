@@ -9,6 +9,8 @@ import {
   Shield, FileSearch, LifeBuoy, Settings, ServerCrash,
   Zap, Key, HardDrive, Wrench, BarChart3, Receipt,
   ArrowRightLeft, ChevronDown, Cpu, Globe,
+  Wallet, Banknote, RefreshCw, PieChart, BookOpen, Scale,
+  DollarSign, Plus,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -18,20 +20,30 @@ const SECTIONS = [
   {
     group: 'OVERVIEW',
     items: [
-      { href: '/admin',               label: 'Dashboard Global',   icon: LayoutDashboard, exact: true, badge: null },
+      { href: '/admin',               label: 'Dashboard Global',   icon: LayoutDashboard, exact: true,  badge: null },
       { href: '/admin/analytics',     label: 'Analytics',          icon: BarChart3,        exact: false, badge: null },
-      { href: '/admin/notifications', label: 'Notifications',      icon: Bell,             exact: false, badge: '3' },
+      { href: '/admin/notifications', label: 'Notifications',      icon: Bell,             exact: false, badge: '3'  },
+    ],
+  },
+  {
+    group: 'FINANCE CENTER',
+    items: [
+      { href: '/admin/finance',              label: 'Dashboard Financier', icon: DollarSign,    exact: true,  badge: null },
+      { href: '/admin/finance/caisse',       label: 'Caisse & Liquidités', icon: Wallet,        exact: false, badge: null },
+      { href: '/admin/finance/transferts',   label: 'Transferts & Rembt.', icon: RefreshCw,     exact: false, badge: null },
+      { href: '/admin/finance/analytics',    label: 'Analytics Financières', icon: PieChart,    exact: false, badge: null },
     ],
   },
   {
     group: 'CLIENTS & REVENUS',
     items: [
-      { href: '/admin/clients',      label: 'Entreprises',       icon: Building2,    exact: false, badge: null },
-      { href: '/admin/abonnements',  label: 'Abonnements',       icon: Package,      exact: false, badge: null },
-      { href: '/admin/utilisateurs', label: 'Utilisateurs',      icon: Users,        exact: false, badge: null },
-      { href: '/admin/revenus',      label: 'Revenus & MRR',     icon: TrendingUp,   exact: false, badge: null },
-      { href: '/admin/billing',      label: 'Billing & Paiements', icon: CreditCard,  exact: false, badge: null },
-      { href: '/admin/support',      label: 'Support Clients',   icon: LifeBuoy,     exact: false, badge: null },
+      { href: '/admin/clients',      label: 'Entreprises',         icon: Building2,    exact: false, badge: null },
+      { href: '/admin/clients/nouveau', label: 'Créer entreprise', icon: Plus,         exact: false, badge: null },
+      { href: '/admin/abonnements',  label: 'Abonnements',         icon: Package,      exact: false, badge: null },
+      { href: '/admin/utilisateurs', label: 'Utilisateurs',        icon: Users,        exact: false, badge: null },
+      { href: '/admin/revenus',      label: 'Revenus & MRR',       icon: TrendingUp,   exact: false, badge: null },
+      { href: '/admin/billing',      label: 'Billing & Paiements', icon: CreditCard,   exact: false, badge: null },
+      { href: '/admin/support',      label: 'Support Clients',     icon: LifeBuoy,     exact: false, badge: null },
     ],
   },
   {
