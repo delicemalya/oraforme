@@ -4,84 +4,59 @@
 -- Run in Supabase SQL Editor (Dashboard > SQL Editor > New query)
 -- ============================================================================
 
--- ── 1. PROFILES — performance index for multi-tenant user lookup ──────────────
--- All profile queries now use ORDER BY created_at ASC LIMIT 1 to ensure the
--- primary (oldest) profile is always returned for multi-tenant users.
--- This index makes those queries fast.
+-- ── 1. PROFILES — ajouter la colonne created_at (manquante) ──────────────────
+-- La table profiles n'a pas de created_at dans le schéma initial.
+-- Tous les queries .order('created_at') dans le code en ont besoin.
+-- Backfill : on utilise auth.users.created_at si possible, sinon NOW().
+
+ALTER TABLE profiles
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+-- Backfill depuis auth.users pour les lignes existantes
+UPDATE profiles p
+SET created_at = COALESCE(
+  (SELECT au.created_at FROM auth.users au WHERE au.id = p.user_id),
+  NOW()
+)
+WHERE created_at = NOW();
+-- Note: si toutes les lignes ont created_at = NOW() (vient d'être créée),
+-- elles seront toutes backfillées. C'est idempotent.
+
+-- ── 2. PROFILES — index de performance pour les requêtes multi-tenant ────────
+-- Toutes les queries profils utilisent maintenant:
+-- .eq('user_id', userId).order('created_at', { ascending: true }).limit(1)
+-- Cet index couvre ce pattern efficacement.
 CREATE INDEX IF NOT EXISTS idx_profiles_user_created_at
   ON profiles(user_id, created_at ASC);
 
--- ── 2. TENANTS — add status column for suspend/unsuspend ─────────────────────
--- 'active'    = normal operation
--- 'suspended' = access blocked by super-admin (users see suspension notice)
+-- ── 3. TENANTS — colonne status pour suspend/unsuspend ───────────────────────
 ALTER TABLE tenants
   ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active'
   CHECK (status IN ('active', 'suspended'));
 
--- Index for quickly filtering active/suspended tenants
 CREATE INDEX IF NOT EXISTS idx_tenants_status
   ON tenants(status);
 
--- ── 3. TENANTS — add soft-delete support ─────────────────────────────────────
--- When a company is deleted via Admin, deleted_at is set.
--- Hard purge must be done manually in Supabase if needed.
+-- ── 4. TENANTS — soft-delete support ─────────────────────────────────────────
 ALTER TABLE tenants
   ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
 
--- ── 4. TENANTS — exclude soft-deleted rows from normal operations ─────────────
--- Update/create a view that hides deleted tenants from regular API queries.
--- The supabaseAdmin client bypasses RLS and can see all rows (for admin pages).
--- Regular clients use RLS which should already scope to the user's tenant.
--- This index helps filter out deleted tenants efficiently.
 CREATE INDEX IF NOT EXISTS idx_tenants_not_deleted
   ON tenants(id)
   WHERE deleted_at IS NULL;
 
--- ── 5. RLS — ensure suspended tenants cannot read data ───────────────────────
--- The existing auth_tenant_id() RLS helper function returns the tenant_id
--- from the JWT claims or from the profiles table.
--- Add a check: if the tenant is suspended, return NULL (no access).
---
--- IMPORTANT: Only run this if you have an auth_tenant_id() function.
--- Check with: SELECT proname FROM pg_proc WHERE proname = 'auth_tenant_id';
+-- ── 5. VÉRIFICATION ───────────────────────────────────────────────────────────
+-- Lancez ces requêtes pour confirmer :
 
--- Example updated auth_tenant_id() — adapt to your actual implementation:
-/*
-CREATE OR REPLACE FUNCTION auth_tenant_id() RETURNS UUID AS $$
-DECLARE
-  _tid UUID;
-  _status TEXT;
-BEGIN
-  -- Get tenant_id for the current user
-  SELECT p.tenant_id INTO _tid
-  FROM profiles p
-  WHERE p.user_id = auth.uid()
-  ORDER BY p.created_at ASC
-  LIMIT 1;
+-- SELECT column_name, data_type, column_default
+-- FROM information_schema.columns
+-- WHERE table_name = 'profiles' AND column_name = 'created_at';
 
-  IF _tid IS NULL THEN RETURN NULL; END IF;
+-- SELECT column_name FROM information_schema.columns
+-- WHERE table_name = 'tenants' AND column_name IN ('status', 'deleted_at');
 
-  -- Check tenant status — suspended or deleted tenants get no access
-  SELECT status INTO _status FROM tenants WHERE id = _tid;
-  IF _status IS NULL OR _status = 'suspended' THEN RETURN NULL; END IF;
-
-  RETURN _tid;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
-*/
--- ↑ Uncomment and run this ONLY if you want the database to enforce suspension
--- at the RLS level (most secure option). For now, enforcement is at app level.
-
--- ── 6. VERIFY — check existing data ──────────────────────────────────────────
--- Run these queries to verify migration success:
-
--- Check new columns:
--- SELECT id, nom_entreprise, status, deleted_at FROM tenants LIMIT 5;
-
--- Check index creation:
--- SELECT indexname, tablename FROM pg_indexes
--- WHERE tablename IN ('profiles', 'tenants')
--- AND indexname LIKE 'idx_%'
+-- SELECT indexname FROM pg_indexes
+-- WHERE tablename IN ('profiles', 'tenants') AND indexname LIKE 'idx_%'
 -- ORDER BY tablename, indexname;
 
--- ── END OF MIGRATION ──────────────────────────────────────────────────────────
+-- ── FIN ───────────────────────────────────────────────────────────────────────
