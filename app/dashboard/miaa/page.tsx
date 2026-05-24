@@ -15,12 +15,12 @@ interface Message { role: 'user' | 'bot'; text: string; ts?: number }
 // ── Capabilities ──────────────────────────────────────────────────────────────
 
 const CAPABILITIES = [
-  { icon: Calculator, label: 'Calculs fiscaux',       desc: 'TVA 18%, CA 5%, CNSS, IRPP Congo',       color: '#F51E33' },
-  { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#F51E33' },
-  { icon: FileText,   label: 'Génération documents',  desc: 'Factures, bulletins de paie, rapports',   color: '#142850' },
-  { icon: Bell,       label: 'Alertes intelligentes', desc: 'Impayés, stock bas, échéances',            color: '#F51E33' },
-  { icon: Cog,        label: 'Automatisation',        desc: 'Workflows, relances, rappels',             color: '#8B0070' },
-  { icon: Globe,      label: 'Multilingue',           desc: 'Français, English, Lingala',              color: '#142850' },
+  { icon: Calculator, label: 'Calculs fiscaux',       desc: 'TVA 18%, CA 5%, CNSS, IRPP Congo',       color: '#DC2626' },
+  { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#DC2626' },
+  { icon: FileText,   label: 'Génération documents',  desc: 'Factures, bulletins de paie, rapports',   color: '#0F172A' },
+  { icon: Bell,       label: 'Alertes intelligentes', desc: 'Impayés, stock bas, échéances',            color: '#DC2626' },
+  { icon: Cog,        label: 'Automatisation',        desc: 'Workflows, relances, rappels',             color: '#7C3AED' },
+  { icon: Globe,      label: 'Multilingue',           desc: 'Français, English, Lingala',              color: '#0F172A' },
 ]
 
 // ── Quick actions by category ─────────────────────────────────────────────────
@@ -181,12 +181,12 @@ export default function MIAAPage() {
       <div className="flex-1 flex flex-col bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl overflow-hidden min-h-0">
 
         {/* Chat Header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)] shrink-0" style={{ background: '#142850' }}>
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)] shrink-0" style={{ background: '#0F172A' }}>
           <MIAALogo size={40} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="text-sm font-bold text-[var(--text)]">✨ MIAA+ — Assistant Intelligent</h1>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#F51E3320', color: '#F51E33' }}>IA</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#DC262620', color: '#DC2626' }}>IA</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--surface)] animate-pulse shrink-0" />
@@ -223,10 +223,10 @@ export default function MIAAPage() {
                 <div
                   className={`max-w-[78%] text-xs px-3.5 py-2.5 rounded-2xl leading-relaxed ${
                     m.role === 'user'
-                      ? 'rounded-br-sm font-semibold text-[#F51E33]'
-                      : 'rounded-bl-sm text-[var(--text)] border-l-2 border-[#F51E33]/50'
+                      ? 'rounded-br-sm font-semibold text-[#DC2626]'
+                      : 'rounded-bl-sm text-[var(--text)] border-l-2 border-[#DC2626]/50'
                   }`}
-                  style={m.role === 'user' ? { background: '#F51E33' } : { background: '#1C2128' }}
+                  style={m.role === 'user' ? { background: '#DC2626' } : { background: '#1C2128' }}
                   dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
                 />
               </motion.div>
@@ -241,11 +241,11 @@ export default function MIAAPage() {
               className="flex justify-start gap-2.5"
             >
               <div className="shrink-0 mt-1"><MIAALogo size={24} /></div>
-              <div className="bg-[#1C2128] rounded-2xl rounded-bl-sm px-3.5 py-2.5 flex items-center gap-1.5 border-l-2 border-[#F51E33]/50">
+              <div className="bg-[#1C2128] rounded-2xl rounded-bl-sm px-3.5 py-2.5 flex items-center gap-1.5 border-l-2 border-[#DC2626]/50">
                 {[0, 1, 2].map(i => (
                   <motion.span
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-[#F51E33]/60"
+                    className="w-1.5 h-1.5 rounded-full bg-[#DC2626]/60"
                     animate={{ opacity: [0.3, 1, 0.3] }}
                     transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
                   />
@@ -264,7 +264,7 @@ export default function MIAAPage() {
               <button
                 key={s}
                 onClick={() => send(s)}
-                className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text)] bg-[var(--surface)] hover:bg-white/5 border border-[var(--border)] hover:border-[#F51E33]/40 rounded-full px-3 py-1 transition-all"
+                className="text-[11px] text-[var(--text-secondary)] hover:text-[var(--text)] bg-[var(--surface)] hover:bg-white/5 border border-[var(--border)] hover:border-[#DC2626]/40 rounded-full px-3 py-1 transition-all"
               >
                 {s}
               </button>
@@ -281,16 +281,16 @@ export default function MIAAPage() {
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
             placeholder="Posez votre question à MIAA+… (Entrée pour envoyer)"
             disabled={loading}
-            className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-2 text-xs text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50 transition-colors disabled:opacity-50"
+            className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-2 text-xs text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50 transition-colors disabled:opacity-50"
           />
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => send(input)}
             disabled={loading || !input.trim()}
             className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors shrink-0 disabled:opacity-40"
-            style={{ background: '#F51E33' }}
+            style={{ background: '#DC2626' }}
           >
-            {loading ? <Loader2 size={14} className="text-[#F51E33] animate-spin" /> : <Send size={14} className="text-[#F51E33]" />}
+            {loading ? <Loader2 size={14} className="text-[#DC2626] animate-spin" /> : <Send size={14} className="text-[#DC2626]" />}
           </motion.button>
         </div>
       </div>
@@ -301,7 +301,7 @@ export default function MIAAPage() {
         {/* Capabilities */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
           <p className="text-xs font-bold text-[var(--text)] mb-3 flex items-center gap-2">
-            <Sparkles size={13} className="text-[#F51E33]" /> Capacités MIAA+
+            <Sparkles size={13} className="text-[#DC2626]" /> Capacités MIAA+
           </p>
           <div className="grid grid-cols-2 gap-2">
             {CAPABILITIES.map(cap => {
@@ -384,7 +384,7 @@ export default function MIAAPage() {
             </div>
             <div className="flex justify-between">
               <span>Modules actifs</span>
-              <span className="text-[#F51E33]">{modulesActifs.length}</span>
+              <span className="text-[#DC2626]">{modulesActifs.length}</span>
             </div>
           </div>
         </div>

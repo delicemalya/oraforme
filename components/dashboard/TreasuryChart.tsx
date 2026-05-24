@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import {
   ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -49,8 +49,8 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
         </div>
         <div className="flex gap-3 text-[10px]">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[var(--surface)] inline-block" />Entrées</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F51E33] inline-block" />Sorties</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F51E33] inline-block" />Solde</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#DC2626] inline-block" />Sorties</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#DC2626] inline-block" />Solde</span>
         </div>
       </div>
 
@@ -63,21 +63,21 @@ export default function TreasuryChart({ data }: { data: MonthData[] }) {
           <ComposedChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="gradEntrees" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#142850" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#142850" stopOpacity={0} />
+                <stop offset="0%" stopColor="#0F172A" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#0F172A" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="gradSolde" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#F51E33" stopOpacity={0.2} />
-                <stop offset="100%" stopColor="#F51E33" stopOpacity={0} />
+                <stop offset="0%" stopColor="#DC2626" stopOpacity={0.2} />
+                <stop offset="100%" stopColor="#DC2626" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#1C2128" vertical={false} />
-            <XAxis dataKey="mois" tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: '#484F58', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
+            <XAxis dataKey="mois" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtAxis} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="entrees" name="Entrées" fill="#142850" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
-            <Bar dataKey="sorties" name="Sorties" fill="#F51E33" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
-            <Area type="monotone" dataKey="solde" name="Solde" stroke="#F51E33" strokeWidth={2.5} fill="url(#gradSolde)" dot={false} activeDot={{ r: 5, fill: '#F51E33' }} />
+            <Bar dataKey="entrees" name="Entrées" fill="#0F172A" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
+            <Bar dataKey="sorties" name="Sorties" fill="#DC2626" opacity={0.7} radius={[3,3,0,0]} barSize={12} />
+            <Area type="monotone" dataKey="solde" name="Solde" stroke="#DC2626" strokeWidth={2.5} fill="url(#gradSolde)" dot={false} activeDot={{ r: 5, fill: '#DC2626' }} />
           </ComposedChart>
         </ResponsiveContainer>
       )}

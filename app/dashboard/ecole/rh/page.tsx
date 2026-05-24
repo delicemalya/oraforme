@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -61,10 +61,10 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
   })
 
   const kpis = [
-    { label: 'Total',       value: employes.length,                                              color: '#F51E33' },
-    { label: 'Actifs',      value: employes.filter(e => e.statut === 'actif').length,            color: '#142850' },
-    { label: 'Formateurs',  value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#8B0070' },
-    { label: 'Temporaires', value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#F51E33' },
+    { label: 'Total',       value: employes.length,                                              color: '#DC2626' },
+    { label: 'Actifs',      value: employes.filter(e => e.statut === 'actif').length,            color: '#0F172A' },
+    { label: 'Formateurs',  value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#7C3AED' },
+    { label: 'Temporaires', value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#DC2626' },
   ]
 
   return (
@@ -101,7 +101,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
             const sc = e.statut === 'actif'
               ? { color: '#FFFFFF', bg: '#00b9a7', border: 'none', label: 'ACTIF' }
               : e.statut === 'suspendu'
-              ? { color: '#FFFFFF', bg: '#F51E33', border: 'none', label: 'SUSPENDU' }
+              ? { color: '#FFFFFF', bg: '#DC2626', border: 'none', label: 'SUSPENDU' }
               : { color: '#6B7280', bg: '#F3F4F6', border: '1px solid #E5E7EB', label: (e.statut ?? 'INACTIF').toUpperCase() }
             return (
               <motion.div key={e.id} layout
@@ -146,8 +146,8 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <DollarSign size={11} className="text-[#F51E33] shrink-0" />
-                    <p className="text-[11px] font-semibold" style={{ color: '#F51E33' }}>{fmt(brut)} FCFA/mois</p>
+                    <DollarSign size={11} className="text-[#DC2626] shrink-0" />
+                    <p className="text-[11px] font-semibold" style={{ color: '#DC2626' }}>{fmt(brut)} FCFA/mois</p>
                   </div>
                 </div>
 
@@ -292,10 +292,10 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
   }
 
   const kpis = [
-    { label: 'Total',        value: enseignants.length,                                                                  color: '#F51E33' },
-    { label: 'Employés',     value: enseignants.filter(e => ((e as any).type_enseignant ?? 'employe') === 'employe').length,  color: '#142850' },
-    { label: 'Prestataires', value: enseignants.filter(e => (e as any).type_enseignant === 'prestataire').length,        color: '#F51E33' },
-    { label: 'En congé',     value: enseignants.filter(e => e.statut === 'conge').length,                               color: '#F51E33' },
+    { label: 'Total',        value: enseignants.length,                                                                  color: '#DC2626' },
+    { label: 'Employés',     value: enseignants.filter(e => ((e as any).type_enseignant ?? 'employe') === 'employe').length,  color: '#0F172A' },
+    { label: 'Prestataires', value: enseignants.filter(e => (e as any).type_enseignant === 'prestataire').length,        color: '#DC2626' },
+    { label: 'En congé',     value: enseignants.filter(e => e.statut === 'conge').length,                               color: '#DC2626' },
   ]
 
   const SEL = 'w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]'
@@ -342,8 +342,8 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
             <div>
               <p className={SEC}>Type de relation</p>
               <div className="flex gap-2">
-                {([['employe', 'Enseignant Employé', 'CDI/CDD/Vacataire/Stagiaire — paie mensuelle', '#8B0070'],
-                   ['prestataire', 'Prestataire', 'Payé à l\'heure via Trésorerie', '#F51E33']] as const).map(([val, label, desc, color]) => (
+                {([['employe', 'Enseignant Employé', 'CDI/CDD/Vacataire/Stagiaire — paie mensuelle', '#7C3AED'],
+                   ['prestataire', 'Prestataire', 'Payé à l\'heure via Trésorerie', '#DC2626']] as const).map(([val, label, desc, color]) => (
                   <button key={val} type="button" onClick={() => setForm(p => ({ ...p, type_enseignant: val, type_contrat: '', salaire: '' }))}
                     className="flex-1 rounded-xl border p-3 text-left transition-all"
                     style={{ borderColor: form.type_enseignant === val ? color : 'rgba(255,255,255,0.08)',
@@ -430,7 +430,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                     </select>
                   </div>
                   <div className="flex items-end pb-1">
-                    <p className="text-[11px] text-[#F51E33] bg-[#F51E33]/10 rounded-lg px-3 py-2">
+                    <p className="text-[11px] text-[#DC2626] bg-[#DC2626]/10 rounded-lg px-3 py-2">
                       Payé via Trésorerie → Prestataire
                     </p>
                   </div>
@@ -507,8 +507,8 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                 {/* Type badge */}
                 <span className="absolute top-3 left-3 text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wide uppercase"
                   style={isPresta
-                    ? { color: '#F51E33', background: 'rgba(249,115,22,0.15)' }
-                    : { color: '#F51E33', background: 'rgba(56,139,253,0.12)' }}>
+                    ? { color: '#DC2626', background: 'rgba(249,115,22,0.15)' }
+                    : { color: '#DC2626', background: 'rgba(56,139,253,0.12)' }}>
                   {isPresta ? 'Prestataire' : tc ? tc.toUpperCase() : 'Employé'}
                 </span>
 
@@ -533,7 +533,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                   {isPresta ? (
                     <div className="col-span-2">
                       <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Taux horaire</p>
-                      <p className="text-sm mt-0.5 font-bold" style={{ color: '#F51E33' }}>
+                      <p className="text-sm mt-0.5 font-bold" style={{ color: '#DC2626' }}>
                         {e.taux_horaire ? `${fmt(e.taux_horaire)} FCFA/h` : '—'}
                       </p>
                     </div>
@@ -541,13 +541,13 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                     <>
                       <div>
                         <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Mensuel</p>
-                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F51E33' }}>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#DC2626' }}>
                           {e.salaire_mensuel ? `${fmt(e.salaire_mensuel)} F` : '—'}
                         </p>
                       </div>
                       <div>
                         <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Horaire</p>
-                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#F51E33' }}>
+                        <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#DC2626' }}>
                           {e.taux_horaire ? `${fmt(e.taux_horaire)} F/h` : '—'}
                         </p>
                       </div>
@@ -567,8 +567,8 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
                   </div>
                   {e.mobile_money_type && e.mobile_money_numero && (
                     <div className="flex items-center gap-2">
-                      <Smartphone size={11} className="shrink-0" style={{ color: '#F51E33' }} />
-                      <p className="text-[11px] truncate" style={{ color: '#F51E33' }}>{e.mobile_money_type} · {e.mobile_money_numero}</p>
+                      <Smartphone size={11} className="shrink-0" style={{ color: '#DC2626' }} />
+                      <p className="text-[11px] truncate" style={{ color: '#DC2626' }}>{e.mobile_money_type} · {e.mobile_money_numero}</p>
                     </div>
                   )}
                 </div>
@@ -708,8 +708,8 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
   })
 
   const kpis = [
-    { label: 'Total',    value: staff.length,                                    color: '#F51E33' },
-    { label: 'Actifs',   value: staff.filter(s => s.statut === 'actif').length,  color: '#142850' },
+    { label: 'Total',    value: staff.length,                                    color: '#DC2626' },
+    { label: 'Actifs',   value: staff.filter(s => s.statut === 'actif').length,  color: '#0F172A' },
     { label: 'Inactifs', value: staff.filter(s => s.statut === 'inactif').length,color: '#8B949E' },
   ]
 
@@ -874,7 +874,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                 {/* Salaire */}
                 <div className="pt-2 border-t border-[var(--border)] text-center">
                   <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Salaire mensuel</p>
-                  <p className="text-sm font-bold mt-0.5" style={{ color: '#F51E33' }}>{fmt(s.salaire)} FCFA</p>
+                  <p className="text-sm font-bold mt-0.5" style={{ color: '#DC2626' }}>{fmt(s.salaire)} FCFA</p>
                 </div>
 
                 {/* Contact */}
@@ -889,8 +889,8 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
                   </div>
                   {s.mobile_money_type && s.mobile_money_numero && (
                     <div className="flex items-center gap-2">
-                      <Smartphone size={11} className="shrink-0" style={{ color: '#F51E33' }} />
-                      <p className="text-[11px] truncate" style={{ color: '#F51E33' }}>{s.mobile_money_type} · {s.mobile_money_numero}</p>
+                      <Smartphone size={11} className="shrink-0" style={{ color: '#DC2626' }} />
+                      <p className="text-[11px] truncate" style={{ color: '#DC2626' }}>{s.mobile_money_type} · {s.mobile_money_numero}</p>
                     </div>
                   )}
                 </div>
@@ -951,9 +951,9 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
   }
 
   const STATUT_COLORS: Record<string, { color: string; bg: string; border: string }> = {
-    en_attente: { color: '#F51E33', bg: 'rgba(245,30,51,0.15)',   border: '1px solid #F51E33' },
+    en_attente: { color: '#DC2626', bg: 'rgba(245,30,51,0.15)',   border: '1px solid #DC2626' },
     approuve:   { color: '#FFFFFF', bg: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' },
-    refuse:     { color: '#F51E33', bg: 'rgba(245,30,51,0.15)',   border: '1px solid #F51E33' },
+    refuse:     { color: '#DC2626', bg: 'rgba(245,30,51,0.15)',   border: '1px solid #DC2626' },
   }
 
   return (
@@ -965,7 +965,7 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Employé *</label>
@@ -1018,7 +1018,7 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
                       {c.statut === 'en_attente' && (
                         <div className="flex gap-1">
                           <button onClick={() => updateStatut(c.id, 'approuve')} className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.08)', color: '#FFFFFF' }}>Approuver</button>
-                          <button onClick={() => updateStatut(c.id, 'refuse')}   className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: '#F51E3318', color: '#F51E33' }}>Refuser</button>
+                          <button onClick={() => updateStatut(c.id, 'refuse')}   className="px-2 py-1 rounded text-[10px] font-semibold" style={{ background: '#DC262618', color: '#DC2626' }}>Refuser</button>
                         </div>
                       )}
                     </td>
@@ -1548,8 +1548,8 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       {/* KPIs + logo */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex gap-3 flex-wrap">
-          <KpiCard label="Total salaires payés" value={fmt(totalNet) + ' FCFA'} color="#142850" />
-          <KpiCard label="Bulletins émis" value={paies.length} color="#F51E33" />
+          <KpiCard label="Total salaires payés" value={fmt(totalNet) + ' FCFA'} color="#0F172A" />
+          <KpiCard label="Bulletins émis" value={paies.length} color="#DC2626" />
         </div>
         <button onClick={() => setShowLogo(!showLogo)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors">
@@ -1619,7 +1619,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                 <div className="text-right text-[10px] text-[var(--text-secondary)]">
                   {agent.banque && <p>{agent.banque} — {agent.rib ?? '—'}</p>}
                   {!agent.banque && agent.mobile_money_type && (
-                    <p style={{ color: '#F51E33' }}>{agent.mobile_money_type} · {agent.mobile_money_numero}</p>
+                    <p style={{ color: '#DC2626' }}>{agent.mobile_money_type} · {agent.mobile_money_numero}</p>
                   )}
                   {agent.numero_cnss && <p className="mt-0.5">CNSS: {agent.numero_cnss}</p>}
                 </div>
@@ -1649,11 +1649,11 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                 </div>
                 <div className="p-3 text-center">
                   <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">CNSS 8%</p>
-                  <p className="text-base font-bold mt-0.5" style={{ color: '#F51E33' }}>−{fmt(retenues)} <span className="text-[9px] text-[var(--text-secondary)]">FCFA</span></p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#DC2626' }}>−{fmt(retenues)} <span className="text-[9px] text-[var(--text-secondary)]">FCFA</span></p>
                 </div>
                 <div className="p-3 text-center" style={{ background: 'rgba(46,160,67,0.06)' }}>
                   <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Net à payer</p>
-                  <p className="text-base font-bold mt-0.5" style={{ color: '#F51E33' }}>{fmt(net)} <span className="text-[9px] text-[var(--text-muted)]">FCFA</span></p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: '#DC2626' }}>{fmt(net)} <span className="text-[9px] text-[var(--text-muted)]">FCFA</span></p>
                 </div>
               </div>
 
@@ -1666,7 +1666,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                     return (
                       <button key={m.id} onClick={() => payer(m.id)} disabled={paying}
                         className="flex flex-col items-center gap-1.5 py-4 rounded-xl border font-semibold transition-all disabled:opacity-40 text-[11px]"
-                        style={{ background: 'rgba(245,30,51,0.08)', borderColor: 'rgba(245,30,51,0.3)', color: '#F51E33' }}>
+                        style={{ background: 'rgba(245,30,51,0.08)', borderColor: 'rgba(245,30,51,0.3)', color: '#DC2626' }}>
                         {paying ? <Loader2 size={16} className="animate-spin" /> : <Icon size={16} />}
                         {m.label}
                       </button>
@@ -1716,7 +1716,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                       </td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)]">{MOIS[p.mois]} {p.annee}</td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)]">{fmt(p.salaire_base + p.primes)}</td>
-                      <td className="px-4 py-2.5 text-[#F51E33]">−{fmt(p.retenues)}</td>
+                      <td className="px-4 py-2.5 text-[#DC2626]">−{fmt(p.retenues)}</td>
                       <td className="px-4 py-2.5 font-bold text-[#101729]">{fmt(p.net)} FCFA</td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{(p.mode_paiement ?? '—').replace('_', ' ')}</td>
                       <td className="px-4 py-2.5">
@@ -1742,7 +1742,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
         {toast && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-            style={{ background: toast.ok ? '#8B0070' : '#F51E33' }}>
+            style={{ background: toast.ok ? '#7C3AED' : '#DC2626' }}>
             {toast.ok ? <Check size={14} /> : <AlertCircle size={14} />} {toast.msg}
           </motion.div>
         )}
@@ -1784,7 +1784,7 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
-          <KpiCard label="Postes ouverts" value={postes.filter(p => p.statut === 'ouvert').length} color="#142850" />
+          <KpiCard label="Postes ouverts" value={postes.filter(p => p.statut === 'ouvert').length} color="#0F172A" />
           <KpiCard label="Postes fermés"  value={postes.filter(p => p.statut === 'ferme').length}  color="#8B949E" />
         </div>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#00b9a7', color: '#fff' }}>
@@ -1793,7 +1793,7 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre du poste *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} placeholder="Prof de Mathématiques…" />
               <div>
@@ -1822,11 +1822,11 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
         <div className="space-y-2">
           {postes.map(p => (
             <div key={p.id} className="rounded-xl border border-[var(--border)] p-4 flex items-start gap-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-              <AlertCircle size={14} className="mt-0.5 shrink-0" style={{ color: p.statut === 'ouvert' ? '#F51E33' : 'rgba(255,255,255,0.35)' }} />
+              <AlertCircle size={14} className="mt-0.5 shrink-0" style={{ color: p.statut === 'ouvert' ? '#DC2626' : 'rgba(255,255,255,0.35)' }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-[#101729]">{p.titre}</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'ouvert' ? { color: '#F51E33', background: 'rgba(245,30,51,0.15)', border: '1px solid #F51E33' } : { color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'ouvert' ? { color: '#DC2626', background: 'rgba(245,30,51,0.15)', border: '1px solid #DC2626' } : { color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
                     {p.statut === 'ouvert' ? 'Ouvert' : 'Fermé'}
                   </span>
                 </div>
@@ -1951,16 +1951,16 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
 
   const displayed = filter === 'tous' ? heures : heures.filter(h => h.statut === filter)
   const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
-    declare:   { label: 'Déclaré',  color: '#F51E33', bg: '#F51E3318' },
-    validated: { label: 'Validé',   color: '#F51E33', bg: '#F51E3318' },
+    declare:   { label: 'Déclaré',  color: '#DC2626', bg: '#DC262618' },
+    validated: { label: 'Validé',   color: '#DC2626', bg: '#DC262618' },
     paye:      { label: 'Payé',     color: '#FFFFFF', bg: 'rgba(255,255,255,0.08)' },
   }
 
   const kpis = [
-    { label: 'En attente', value: heures.filter(h => h.statut === 'declare').length,   color: '#F51E33' },
-    { label: 'Validées',   value: heures.filter(h => h.statut === 'validated').length, color: '#F51E33' },
-    { label: 'Payées',     value: heures.filter(h => h.statut === 'paye').length,      color: '#142850' },
-    { label: 'Total heures', value: heures.reduce((s, h) => s + h.heures, 0),          color: '#8B0070' },
+    { label: 'En attente', value: heures.filter(h => h.statut === 'declare').length,   color: '#DC2626' },
+    { label: 'Validées',   value: heures.filter(h => h.statut === 'validated').length, color: '#DC2626' },
+    { label: 'Payées',     value: heures.filter(h => h.statut === 'paye').length,      color: '#0F172A' },
+    { label: 'Total heures', value: heures.reduce((s, h) => s + h.heures, 0),          color: '#7C3AED' },
   ]
 
   return (
@@ -1974,7 +1974,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
         {(['tous', 'declare', 'validated', 'paye'] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === f ? 'text-white' : 'text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)]'}`}
-            style={filter === f ? { background: f === 'tous' ? '#142850' : STATUT_CFG[f]?.color ?? '#142850' } : {}}>
+            style={filter === f ? { background: f === 'tous' ? '#0F172A' : STATUT_CFG[f]?.color ?? '#0F172A' } : {}}>
             {f === 'tous' ? 'Toutes' : STATUT_CFG[f]?.label}
           </button>
         ))}
@@ -2001,14 +2001,14 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
                   <p className="text-[10px] text-[var(--text-secondary)]">
                     {h.heures}h · {h.matiere ?? '—'} · {new Date(h.date_declaration).toLocaleDateString('fr-FR')}
                     {h.periode ? ` · ${h.periode}` : ''}
-                    {' · '}<span style={{ color: '#F51E33' }}>{new Intl.NumberFormat('fr-FR').format(h.heures * (ens?.taux_horaire ?? 5000))} FCFA</span>
+                    {' · '}<span style={{ color: '#DC2626' }}>{new Intl.NumberFormat('fr-FR').format(h.heures * (ens?.taux_horaire ?? 5000))} FCFA</span>
                   </p>
                 </div>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: cfg.color, background: cfg.bg }}>{cfg.label}</span>
                 <div className="flex gap-1.5">
                   {h.statut === 'declare' && (
                     <button onClick={() => valider(h)} disabled={saving === h.id}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold disabled:opacity-40" style={{ background: '#7C3AED', color: '#fff' }}>
                       {saving === h.id ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />} Valider
                     </button>
                   )}
@@ -2028,7 +2028,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
       {toast && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
-          style={{ background: '#8B0070' }}>
+          style={{ background: '#7C3AED' }}>
           <Check size={14} /> {toast}
         </motion.div>
       )}
@@ -2082,7 +2082,7 @@ export default function RhPage() {
           return (
             <button key={t.id} onClick={() => setSubTab(t.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#8B0070' : 'transparent', color: subTab === t.id ? '#fff' : 'rgba(255,255,255,0.5)' }}>
+              style={{ background: subTab === t.id ? '#7C3AED' : 'transparent', color: subTab === t.id ? '#fff' : 'rgba(255,255,255,0.5)' }}>
               <Icon size={12} /> {t.label}
             </button>
           )

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useState } from "react";
@@ -144,7 +144,7 @@ export default function Step1() {
                       className="absolute top-3.5 right-3.5 w-5 h-5 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-[0_2px_8px_rgba(250,204,21,0.4)]"
                     >
                       <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-                        <path d="M1 3.5L3.2 5.8L8 1" stroke="#142850" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M1 3.5L3.2 5.8L8 1" stroke="#0F172A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </motion.div>
                   )}
@@ -216,7 +216,7 @@ export default function Step1() {
           disabled={!selected}
           className={`relative px-10 py-3.5 rounded-2xl font-semibold text-sm overflow-hidden transition-all duration-400
             ${selected
-              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#F51E33] shadow-[0_8px_32px_rgba(250,204,21,0.3)] cursor-pointer"
+              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-[#DC2626] shadow-[0_8px_32px_rgba(250,204,21,0.3)] cursor-pointer"
               : "bg-white/[0.04] text-[var(--text-secondary)] border border-white/[0.07] cursor-default"
             }`}
         >

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
@@ -54,7 +54,7 @@ function Section({ title, icon: Icon, children }: { title: string; icon: React.E
   return (
     <div className="rounded-xl border border-[var(--border)] overflow-hidden">
       <div className="px-4 py-2.5 border-b border-[var(--border)] flex items-center gap-2" style={{ background: '#F9FAFB' }}>
-        <Icon size={13} className="text-[#F51E33]" />
+        <Icon size={13} className="text-[#DC2626]" />
         <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{title}</span>
       </div>
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">{children}</div>
@@ -253,9 +253,9 @@ export default function ParametresPage() {
   }
 
   const btnStyle = {
-    background: saved ? '#238636' : '#F51E33',
-    color: '#142850' as const,
-    boxShadow: saved ? '0 0 16px #2EA04340' : '0 0 16px #F51E3335',
+    background: saved ? '#238636' : '#DC2626',
+    color: '#0F172A' as const,
+    boxShadow: saved ? '0 0 16px #2EA04340' : '0 0 16px #DC262635',
   }
 
   return (
@@ -276,7 +276,7 @@ export default function ParametresPage() {
       {/* ── LOGO SECTION ─────────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-[var(--border)] overflow-hidden">
         <div className="px-4 py-2.5 border-b border-[var(--border)] flex items-center gap-2" style={{ background: '#F9FAFB' }}>
-          <Upload size={13} className="text-[#F51E33]" />
+          <Upload size={13} className="text-[#DC2626]" />
           <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Logo de l&apos;entreprise</span>
         </div>
         <div className="p-4">
@@ -288,7 +288,7 @@ export default function ParametresPage() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={cfg.logo_url} alt="Logo" className="w-full h-full object-contain" />
               ) : (
-                <span className="text-2xl font-black text-[#F51E33]">
+                <span className="text-2xl font-black text-[#DC2626]">
                   {cfg.nom ? cfg.nom.charAt(0).toUpperCase() : 'O'}
                 </span>
               )}
@@ -304,7 +304,7 @@ export default function ParametresPage() {
                 <motion.button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo}
                   whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-50"
-                  style={{ background: '#F51E33', color: '#142850' }}>
+                  style={{ background: '#DC2626', color: '#0F172A' }}>
                   {uploadingLogo ? <Loader2 className="animate-spin" size={13} /> : <Upload size={13} />}
                   {uploadingLogo ? 'Upload en cours…' : cfg.logo_url ? 'Changer le logo' : 'Uploader un logo'}
                 </motion.button>
@@ -373,7 +373,7 @@ export default function ParametresPage() {
       {/* ── CENTRES DE COÛTS ─────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-[var(--border)] overflow-hidden">
         <div className="px-4 py-2.5 border-b border-[var(--border)] flex items-center gap-2" style={{ background: '#F9FAFB' }}>
-          <Layers size={13} className="text-[#F51E33]" />
+          <Layers size={13} className="text-[#DC2626]" />
           <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Centres de coûts</span>
           <span className="ml-auto text-[10px] text-[var(--text-secondary)]">{costCenters.length} centre{costCenters.length > 1 ? 's' : ''}</span>
         </div>
@@ -386,10 +386,10 @@ export default function ParametresPage() {
             <div className="space-y-1.5">
               {costCenters.map(cc => (
                 <div key={cc.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--border)]" style={{ background: '#F9FAFB' }}>
-                  <span className="text-xs font-mono font-bold text-[#F51E33] w-12 shrink-0">{cc.code}</span>
+                  <span className="text-xs font-mono font-bold text-[#DC2626] w-12 shrink-0">{cc.code}</span>
                   <span className="text-xs text-[var(--text)] flex-1 truncate">{cc.nom}</span>
                   <span className="text-[10px] text-[var(--text-secondary)] shrink-0">{CC_TYPE_LABELS[cc.type] ?? cc.type}</span>
-                  <button onClick={() => deleteCostCenter(cc.id)} className="shrink-0 text-[var(--text-secondary)] hover:text-[#F51E33] transition-colors ml-1">
+                  <button onClick={() => deleteCostCenter(cc.id)} className="shrink-0 text-[var(--text-secondary)] hover:text-[#DC2626] transition-colors ml-1">
                     <Trash2 size={12} />
                   </button>
                 </div>
@@ -414,7 +414,7 @@ export default function ParametresPage() {
               </select>
               <button onClick={saveCostCenter} disabled={ccSaving || !ccForm.code || !ccForm.nom}
                 className="px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-2 shrink-0"
-                style={{ background: '#F51E33', color: '#142850' }}>
+                style={{ background: '#DC2626', color: '#0F172A' }}>
                 {ccSaving ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
                 Ajouter
               </button>
@@ -424,10 +424,10 @@ export default function ParametresPage() {
       </div>
 
       {/* ── FISCAL INFO ──────────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-[#F51E33]/20 p-4" style={{ background: 'rgba(240,163,10,0.03)' }}>
+      <div className="rounded-xl border border-[#DC2626]/20 p-4" style={{ background: 'rgba(240,163,10,0.03)' }}>
         <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#F51E33]/15 flex items-center justify-center shrink-0 mt-0.5">
-            <FileText size={14} className="text-[#F51E33]" />
+          <div className="w-8 h-8 rounded-lg bg-[#DC2626]/15 flex items-center justify-center shrink-0 mt-0.5">
+            <FileText size={14} className="text-[#DC2626]" />
           </div>
           <div>
             <p className="text-sm font-semibold text-[#101729] mb-1">Logique fiscale Congo-Brazzaville</p>

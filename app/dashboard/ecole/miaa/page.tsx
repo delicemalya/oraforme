@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -52,7 +52,7 @@ function InsightCard({ icon: Icon, label, value, sub, color, trend }: {
   color: string; trend?: 'up' | 'down' | 'warn'
 }) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : AlertTriangle
-  const trendColor = trend === 'up' ? 'text-[#A8C4E4]' : trend === 'down' ? 'text-red-400' : 'text-[#F51E33]'
+  const trendColor = trend === 'up' ? 'text-[#A8C4E4]' : trend === 'down' ? 'text-red-400' : 'text-[#DC2626]'
   return (
     <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start gap-3">
       <div className="p-2 rounded-lg shrink-0" style={{ background: `${color}22` }}>
@@ -295,22 +295,22 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
             className="grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0"
           >
             <InsightCard
-              icon={GraduationCap} label="Élèves actifs" color="#F51E33"
+              icon={GraduationCap} label="Élèves actifs" color="#DC2626"
               value={ctx.actifs.toString()} sub={`${ctx.totalEtudiants} total`}
               trend={ctx.actifs > ctx.suspendus ? 'up' : 'warn'}
             />
             <InsightCard
-              icon={CreditCard} label="Revenus (année)" color="#142850"
+              icon={CreditCard} label="Revenus (année)" color="#0F172A"
               value={fmt(ctx.revenusAnnee)} sub="paiements scolaires"
               trend="up"
             />
             <InsightCard
-              icon={AlertTriangle} label="Taux suspension" color="#F51E33"
+              icon={AlertTriangle} label="Taux suspension" color="#DC2626"
               value={`${tauxSuspension}%`} sub={`${ctx.suspendus} élèves bloqués`}
               trend={parseFloat(tauxSuspension) > 10 ? 'warn' : 'up'}
             />
             <InsightCard
-              icon={BookOpen} label="Moy. générale" color="#8B0070"
+              icon={BookOpen} label="Moy. générale" color="#7C3AED"
               value={moyenneNotes === '—' ? '—' : `${moyenneNotes}/20`}
               sub={`${ctx.notes.length} notes saisies`}
               trend={parseFloat(moyenneNotes) >= 10 ? 'up' : 'down'}
@@ -409,7 +409,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
           {/* Context status */}
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${ctx ? 'bg-[#00b9a7]' : 'bg-[#F51E33]'} animate-pulse`} />
+              <div className={`w-2 h-2 rounded-full ${ctx ? 'bg-[#00b9a7]' : 'bg-[#DC2626]'} animate-pulse`} />
               <span className="text-xs text-[var(--text-secondary)]">
                 {ctx ? 'Contexte actif' : 'Sans contexte'}
               </span>

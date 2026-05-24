@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -267,7 +267,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-[#8B0070]/15 flex items-center justify-center text-[10px] font-bold text-[#8B0070] shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-[#7C3AED]/15 flex items-center justify-center text-[10px] font-bold text-[#7C3AED] shrink-0">
                             {e.nom.charAt(0).toUpperCase()}
                           </div>
                           <span className="text-sm font-semibold text-[var(--text)]">{e.nom}</span>
@@ -319,7 +319,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 {/* Header */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#8B0070]/15 flex items-center justify-center text-lg font-bold text-[#8B0070]">
+                    <div className="w-12 h-12 rounded-xl bg-[#7C3AED]/15 flex items-center justify-center text-lg font-bold text-[#7C3AED]">
                       {selected.nom.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -351,7 +351,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                         onClick={() => updateStatut(selected.id, s)}
                         className={`py-1.5 rounded-lg text-[10px] font-bold transition-all ${
                           selected.statut === s
-                            ? 'ring-1 ring-[#F51E33] text-[var(--primary)] bg-[var(--primary)]/10'
+                            ? 'ring-1 ring-[#DC2626] text-[var(--primary)] bg-[var(--primary)]/10'
                             : 'border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
                         }`}
                       >
@@ -414,7 +414,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 <div className="flex gap-2">
                   <Link
                     href="/dashboard/rh/paie"
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[var(--primary)]/10 border border-[#F51E33]/20 text-[var(--primary)] rounded-lg text-xs font-semibold hover:bg-[var(--primary)]/20 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[var(--primary)]/10 border border-[#DC2626]/20 text-[var(--primary)] rounded-lg text-xs font-semibold hover:bg-[var(--primary)]/20 transition-colors"
                   >
                     <FileText size={12} /> Générer bulletin
                   </Link>
@@ -712,7 +712,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
             return (
               <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                 className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4 flex items-center gap-4">
-                <div className="w-9 h-9 rounded-full bg-[#8B0070]/15 flex items-center justify-center text-xs font-bold text-[#8B0070] shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#7C3AED]/15 flex items-center justify-center text-xs font-bold text-[#7C3AED] shrink-0">
                   {emp?.nom?.charAt(0) ?? 'E'}
                 </div>
                 <div className="flex-1 min-w-0">

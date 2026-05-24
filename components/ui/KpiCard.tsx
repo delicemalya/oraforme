@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
@@ -76,7 +76,7 @@ export default function KpiCard({
       <div className="flex items-start justify-between mb-3 relative">
         <div
           className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: `#142850` }}
+          style={{ background: `#0F172A` }}
         >
           <Icon size={16} style={{ color }} />
         </div>
@@ -84,8 +84,8 @@ export default function KpiCard({
           <span
             className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shrink-0"
             style={{
-              color: trendUp ? '#142850' : '#F51E33',
-              backgroundColor: trendUp ? '#14285018' : '#F51E3318',
+              color: trendUp ? '#0F172A' : '#DC2626',
+              backgroundColor: trendUp ? '#0F172A18' : '#DC262618',
             }}
           >
             {trendUp ? '▲' : '▼'} {trend}

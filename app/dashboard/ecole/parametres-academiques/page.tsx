@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
@@ -58,10 +58,10 @@ const DEFAULT: AcademicSettings = {
   conservation_meilleure_note: true,
   mentions: [
     { min: 16, label: 'Très Bien',  color: '#2EA043' },
-    { min: 14, label: 'Bien',        color: '#F51E33' },
-    { min: 12, label: 'Assez Bien', color: '#8B0070' },
-    { min: 10, label: 'Passable',   color: '#F51E33' },
-    { min: 0,  label: 'Insuffisant',color: '#F51E33' },
+    { min: 14, label: 'Bien',        color: '#DC2626' },
+    { min: 12, label: 'Assez Bien', color: '#7C3AED' },
+    { min: 10, label: 'Passable',   color: '#DC2626' },
+    { min: 0,  label: 'Insuffisant',color: '#DC2626' },
   ],
 }
 
@@ -107,7 +107,7 @@ function NumInput({ label, value, onChange, min = 0, max, step = 0.5, sub }: {
         type="number" min={min} max={max} step={step}
         value={value}
         onChange={e => onChange(parseFloat(e.target.value) || 0)}
-        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[#F51E33]/50"
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[#DC2626]/50"
       />
       {sub && <div className="text-[10px] text-[var(--text-secondary)] mt-1">{sub}</div>}
     </div>
@@ -139,14 +139,14 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
               onClick={() => setS(p => ({ ...p, system_type: sys.value }))}
               className={`w-full flex items-start gap-3 p-3.5 rounded-xl border text-left transition-all ${
                 s.system_type === sys.value
-                  ? 'border-[#F51E33]/60 bg-[#F51E33]/8'
+                  ? 'border-[#DC2626]/60 bg-[#DC2626]/8'
                   : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border)]'
               }`}
             >
               <div className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${
-                s.system_type === sys.value ? 'border-[#F51E33]' : 'border-[#484F58]'
+                s.system_type === sys.value ? 'border-[#DC2626]' : 'border-[#64748B]'
               }`}>
-                {s.system_type === sys.value && <div className="w-2 h-2 rounded-full bg-[#F51E33]" />}
+                {s.system_type === sys.value && <div className="w-2 h-2 rounded-full bg-[#DC2626]" />}
               </div>
               <div>
                 <div className="text-sm font-semibold text-[var(--text)]">{sys.label}</div>
@@ -167,7 +167,7 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
               onClick={() => setS(p => ({ ...p, note_sur: n }))}
               className={`flex-1 py-3 rounded-xl border text-sm font-semibold transition-all ${
                 s.note_sur === n
-                  ? 'border-[#F51E33]/60 bg-[#F51E33]/10 text-[#F51E33]'
+                  ? 'border-[#DC2626]/60 bg-[#DC2626]/10 text-[#DC2626]'
                   : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--border)]'
               }`}
             >
@@ -239,7 +239,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
               value={m.label}
               onChange={e => updateMention(i, 'label', e.target.value)}
               placeholder="Label"
-              className="flex-1 bg-transparent border border-[var(--border)] rounded-lg px-2.5 py-1.5 text-sm text-[var(--text)] focus:outline-none focus:border-[#F51E33]/50"
+              className="flex-1 bg-transparent border border-[var(--border)] rounded-lg px-2.5 py-1.5 text-sm text-[var(--text)] focus:outline-none focus:border-[#DC2626]/50"
             />
 
             {/* Seuil min */}
@@ -251,7 +251,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
                 min={0}
                 max={s.note_sur}
                 onChange={e => updateMention(i, 'min', parseFloat(e.target.value) || 0)}
-                className="w-16 bg-transparent border border-[var(--border)] rounded-lg px-2 py-1.5 text-sm text-[var(--text)] text-center focus:outline-none focus:border-[#F51E33]/50"
+                className="w-16 bg-transparent border border-[var(--border)] rounded-lg px-2 py-1.5 text-sm text-[var(--text)] text-center focus:outline-none focus:border-[#DC2626]/50"
               />
             </div>
 
@@ -266,7 +266,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
             <button
               type="button"
               onClick={() => removeMention(i)}
-              className="shrink-0 p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[#F51E33] hover:bg-[#F51E33]/10 transition-colors"
+              className="shrink-0 p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[#DC2626] hover:bg-[#DC2626]/10 transition-colors"
             >
               <Trash2 size={14} />
             </button>
@@ -277,7 +277,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
       <button
         type="button"
         onClick={addMention}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--text-secondary)] text-sm hover:border-[#F51E33]/40 hover:text-[#F51E33] transition-colors"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--text-secondary)] text-sm hover:border-[#DC2626]/40 hover:text-[#DC2626] transition-colors"
       >
         <Plus size={14} />
         Ajouter une mention
@@ -311,7 +311,7 @@ function TabLMD({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: AcademicSe
   return (
     <div className="space-y-5">
       {!isLMD && (
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-[#F51E33]/8 border border-[#F51E33]/20 text-[#F51E33] text-xs">
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-[#DC2626]/8 border border-[#DC2626]/20 text-[#DC2626] text-xs">
           <AlertTriangle size={13} />
           Ces règles s&apos;appliquent uniquement en mode LMD ou Hybride. Changez le système dans l&apos;onglet Général.
         </div>
@@ -521,7 +521,7 @@ export default function ParametresAcademiquesPage() {
           <button
             onClick={save}
             disabled={saving || loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00b9a7] text-white text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-all"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00b9a7] text-white text-sm font-semibold hover:bg-[#DC2626]/90 disabled:opacity-50 transition-all"
           >
             {saving
               ? <RefreshCw size={14} className="animate-spin" />
@@ -540,7 +540,7 @@ export default function ParametresAcademiquesPage() {
             className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm ${
               toast.ok
                 ? 'bg-[#2EA043]/10 border-[#2EA043]/25 text-[#2EA043]'
-                : 'bg-[#F51E33]/10 border-[#F51E33]/25 text-[#F51E33]'
+                : 'bg-[#DC2626]/10 border-[#DC2626]/25 text-[#DC2626]'
             }`}
           >
             {toast.ok ? <CheckCircle size={15} /> : <AlertTriangle size={15} />}
@@ -588,7 +588,7 @@ export default function ParametresAcademiquesPage() {
           <button
             onClick={save}
             disabled={saving || loading}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00b9a7] text-white text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00b9a7] text-white text-sm font-semibold hover:bg-[#DC2626]/90 disabled:opacity-50 transition-all"
           >
             {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
             Enregistrer les paramètres

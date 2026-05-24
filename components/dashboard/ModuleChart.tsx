@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -9,7 +9,7 @@ export default function ModuleChart({ data, title }: { data: Entry[]; title: str
 
   const normalizedData = data.map(d => ({
     ...d,
-    color: d.color === '#142850' ? '#F51E33' : d.color,
+    color: d.color === '#0F172A' ? '#DC2626' : d.color,
   }))
 
   return (

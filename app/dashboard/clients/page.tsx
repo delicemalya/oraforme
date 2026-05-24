@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -18,7 +18,7 @@ interface Client {
   created_at: string
 }
 
-const AVATAR_COLORS = ['#F51E33', '#F51E33', '#142850', '#8B0070', '#8B0070', '#F51E33', '#142850', '#F51E33']
+const AVATAR_COLORS = ['#DC2626', '#DC2626', '#0F172A', '#7C3AED', '#7C3AED', '#DC2626', '#0F172A', '#DC2626']
 function avatarColor(nom: string) { return AVATAR_COLORS[nom.charCodeAt(0) % AVATAR_COLORS.length] }
 function initials(nom: string) { return nom.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() }
 function fmtDate(d: string) { return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) }
@@ -52,7 +52,7 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/60 transition-colors"
+        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B] focus:outline-none focus:border-[#DC2626]/60 transition-colors"
       />
     </div>
   )
@@ -133,7 +133,7 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
             className="fixed top-4 right-4 z-50 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-3 text-sm text-[var(--text)] shadow-2xl flex items-center gap-2"
           >
-            <CheckCircle size={14} className="text-[#F51E33]" /> {toast}
+            <CheckCircle size={14} className="text-[#DC2626]" /> {toast}
           </motion.div>
         )}
       </AnimatePresence>
@@ -150,7 +150,7 @@ export default function ClientsPage() {
           onClick={() => setShowForm(true)}
           whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm shrink-0"
-          style={{ background: 'linear-gradient(135deg,#F51E33,#d4880a)', color: '#142850', boxShadow: '0 0 18px #F51E3330' }}
+          style={{ background: 'linear-gradient(135deg,#DC2626,#d4880a)', color: '#0F172A', boxShadow: '0 0 18px #DC262630' }}
         >
           <UserPlus size={15} /> Nouveau client
         </motion.button>
@@ -158,16 +158,16 @@ export default function ClientsPage() {
 
       {/* KPI row */}
       <motion.div {...fadeUp(1)} className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <KpiCard label="Total clients"    value={clients.length}   sub="Dans votre base"         icon={Users}      color="#F51E33" />
-        <KpiCard label="Nouveaux ce mois" value={newThisMonth}     sub="Ajoutés en mai"          icon={TrendingUp} color="#142850" />
-        <KpiCard label="Avec email"       value={clients.filter(c => c.email).length} sub="Contactables par mail" icon={Mail} color="#8B0070" />
+        <KpiCard label="Total clients"    value={clients.length}   sub="Dans votre base"         icon={Users}      color="#DC2626" />
+        <KpiCard label="Nouveaux ce mois" value={newThisMonth}     sub="Ajoutés en mai"          icon={TrendingUp} color="#0F172A" />
+        <KpiCard label="Avec email"       value={clients.filter(c => c.email).length} sub="Contactables par mail" icon={Mail} color="#7C3AED" />
       </motion.div>
 
       {/* Search */}
       <motion.div {...fadeUp(2)} className="relative max-w-sm">
         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
         <input
-          className="w-full pl-9 pr-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/50 transition-colors"
+          className="w-full pl-9 pr-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[#64748B] focus:outline-none focus:border-[#DC2626]/50 transition-colors"
           placeholder="Rechercher un client…"
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -188,7 +188,7 @@ export default function ClientsPage() {
             onClick={() => setShowForm(true)}
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm"
-            style={{ background: 'linear-gradient(135deg,#F51E33,#d4880a)', color: '#142850' }}
+            style={{ background: 'linear-gradient(135deg,#DC2626,#d4880a)', color: '#0F172A' }}
           >
             <Plus size={14} /> Ajouter un client
           </motion.button>
@@ -295,8 +295,8 @@ export default function ClientsPage() {
               >
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-[#F51E33]/15 flex items-center justify-center">
-                      <UserPlus size={15} className="text-[#F51E33]" />
+                    <div className="w-8 h-8 rounded-lg bg-[#DC2626]/15 flex items-center justify-center">
+                      <UserPlus size={15} className="text-[#DC2626]" />
                     </div>
                     <h2 className="text-base font-bold text-[var(--text)]">Nouveau client</h2>
                   </div>
@@ -316,7 +316,7 @@ export default function ClientsPage() {
                       value={form.adresse}
                       onChange={e => setField('adresse', e.target.value)}
                       placeholder="Adresse complète"
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text)] placeholder-[#484F58] focus:outline-none focus:border-[#F51E33]/60 transition-colors resize-none"
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B] focus:outline-none focus:border-[#DC2626]/60 transition-colors resize-none"
                     />
                   </div>
 
@@ -331,7 +331,7 @@ export default function ClientsPage() {
                       onClick={handleSave}
                       disabled={saving || !form.nom.trim()}
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm disabled:opacity-40 transition-opacity"
-                      style={{ background: 'linear-gradient(135deg,#F51E33,#d4880a)', color: '#142850' }}
+                      style={{ background: 'linear-gradient(135deg,#DC2626,#d4880a)', color: '#0F172A' }}
                     >
                       {saving ? <Loader2 className="animate-spin" size={14} /> : <><Plus size={14} /> Ajouter</>}
                     </button>

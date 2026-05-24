@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase-server'
+﻿import { supabaseAdmin } from '@/lib/supabase-server'
 import { MODULE_LABELS, MODULE_PRICES, fmtFCFA } from '@/lib/admin-config'
 import { TrendingUp } from 'lucide-react'
 import { ModuleRevenueChart, GrowthChart } from '@/components/admin/AdminChartsClient'
@@ -50,8 +50,8 @@ export default async function AdminRevenusPage() {
     <div className="space-y-6">
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
-          <TrendingUp size={18} className="text-[#F51E33]" />
+        <div className="w-10 h-10 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/20 flex items-center justify-center">
+          <TrendingUp size={18} className="text-[#DC2626]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">Revenus & MRR</h1>
@@ -62,10 +62,10 @@ export default async function AdminRevenusPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'MRR', value: fmtFCFA(totalMRR), sub: 'Revenus récurrents mensuels', color: '#F51E33' },
-          { label: 'ARR', value: fmtFCFA(totalARR), sub: 'Revenus annuels récurrents', color: '#F51E33' },
-          { label: 'CA Clients', value: fmtFCFA(caClients), sub: 'Facturé par les clients', color: '#142850' },
-          { label: 'ARPU', value: fmtFCFA(tenants.length > 0 ? totalMRR / tenants.length : 0), sub: 'Revenu moyen/client/mois', color: '#F51E33' },
+          { label: 'MRR', value: fmtFCFA(totalMRR), sub: 'Revenus récurrents mensuels', color: '#DC2626' },
+          { label: 'ARR', value: fmtFCFA(totalARR), sub: 'Revenus annuels récurrents', color: '#DC2626' },
+          { label: 'CA Clients', value: fmtFCFA(caClients), sub: 'Facturé par les clients', color: '#0F172A' },
+          { label: 'ARPU', value: fmtFCFA(tenants.length > 0 ? totalMRR / tenants.length : 0), sub: 'Revenu moyen/client/mois', color: '#DC2626' },
         ].map(k => (
           <div key={k.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">{k.label}</p>
@@ -93,8 +93,8 @@ export default async function AdminRevenusPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { plan: 'starter', color: '#8B949E', label: 'Starter' },
-            { plan: 'business', color: '#F51E33', label: 'Business' },
-            { plan: 'premium', color: '#F51E33', label: 'Premium' },
+            { plan: 'business', color: '#DC2626', label: 'Business' },
+            { plan: 'premium', color: '#DC2626', label: 'Premium' },
           ].map(p => {
             const nb = tenants.filter(t => t.plan === p.plan).length
             const mrr = mrrByPlan[p.plan] ?? 0
@@ -132,7 +132,7 @@ export default async function AdminRevenusPage() {
               <p className="text-sm text-[var(--text-secondary)] w-28 shrink-0">{m.module}</p>
               <div className="flex-1 h-2 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#F51E33] rounded-full"
+                  className="h-full bg-[#DC2626] rounded-full"
                   style={{ width: `${totalMRR > 0 ? (m.mrr / totalMRR) * 100 : 0}%` }}
                 />
               </div>

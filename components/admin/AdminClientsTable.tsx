@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -18,8 +18,8 @@ type TenantRow = {
 
 const PLAN_COLORS: Record<string, string> = {
   starter: 'text-[var(--text-secondary)] bg-[var(--surface-alt)] border-[var(--border)]',
-  business: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
-  premium: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
+  business: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
+  premium: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
 }
 
 export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] }) {
@@ -46,7 +46,7 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher entreprise..."
-            className="bg-transparent text-sm text-[var(--text)] placeholder-[#484F58] outline-none flex-1"
+            className="bg-transparent text-sm text-[var(--text)] placeholder-[#64748B] outline-none flex-1"
           />
         </div>
         <select
@@ -120,14 +120,14 @@ export default function AdminClientsTable({ tenants }: { tenants: TenantRow[] })
                 </td>
                 <td className="px-3 py-3 text-right text-[var(--text)]">{t.nb_users}</td>
                 <td className="px-3 py-3 text-right text-[var(--text)]">{t.nb_factures}</td>
-                <td className="px-3 py-3 text-right font-medium text-[#F51E33]">{fmtFCFA(t.ca_genere)}</td>
+                <td className="px-3 py-3 text-right font-medium text-[#DC2626]">{fmtFCFA(t.ca_genere)}</td>
                 <td className="px-3 py-3 text-[var(--text-secondary)] text-xs whitespace-nowrap">
                   {new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
                 </td>
                 <td className="px-3 py-3">
                   <Link
                     href={`/admin/clients/${t.id}`}
-                    className="flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[#F51E33] transition-colors"
+                    className="flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-[#DC2626] transition-colors"
                   >
                     <ExternalLink size={12} />
                     Voir

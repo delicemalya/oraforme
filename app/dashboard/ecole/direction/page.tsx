@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -89,10 +89,10 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
   }
 
   const kpis = [
-    { label: 'Revenu du mois',   value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#142850' },
-    { label: 'Revenu de l\'année', value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#F51E33' },
-    { label: 'Étudiants',        value: etudiants.filter(e => e.statut === 'actif').length, color: '#F51E33' },
-    { label: 'Impayés',          value: statsLoading ? '…' : impayeCount,                  color: '#F51E33' },
+    { label: 'Revenu du mois',   value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#0F172A' },
+    { label: 'Revenu de l\'année', value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#DC2626' },
+    { label: 'Étudiants',        value: etudiants.filter(e => e.statut === 'actif').length, color: '#DC2626' },
+    { label: 'Impayés',          value: statsLoading ? '…' : impayeCount,                  color: '#DC2626' },
   ]
 
   return (
@@ -102,16 +102,16 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <KpiCard label="Enseignants actifs" value={enseignants.filter(e => e.statut === 'actif').length} color="#8B0070" />
-        <KpiCard label="Classes" value={classes.length} color="#142850" />
-        <KpiCard label="Diplômés" value={etudiants.filter(e => e.statut === 'diplome').length} color="#8B0070" />
+        <KpiCard label="Enseignants actifs" value={enseignants.filter(e => e.statut === 'actif').length} color="#7C3AED" />
+        <KpiCard label="Classes" value={classes.length} color="#0F172A" />
+        <KpiCard label="Diplômés" value={etudiants.filter(e => e.statut === 'diplome').length} color="#7C3AED" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(248,81,73,0.04)' }}>
+        <div className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(248,81,73,0.04)' }}>
           <div className="flex items-center gap-2">
-            <AlertTriangle size={14} className="text-[#F51E33]" />
-            <p className="text-xs font-bold text-[#F51E33]">Gestion des impayés</p>
+            <AlertTriangle size={14} className="text-[#DC2626]" />
+            <p className="text-xs font-bold text-[#DC2626]">Gestion des impayés</p>
           </div>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             Suspendre automatiquement les étudiants actifs sans paiement cette année. Un code de déblocage est généré pour chacun.
@@ -140,7 +140,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
                       <span className="text-[var(--text-secondary)]">{nb}/{c.nb_places}</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-[var(--border)]">
-                      <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: pct > 90 ? '#F51E33' : '#F51E33' }} />
+                      <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: pct > 90 ? '#DC2626' : '#DC2626' }} />
                     </div>
                   </div>
                 )
@@ -167,7 +167,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
                     <td className="px-4 py-2.5 text-[#101729]">{etu ? `${etu.prenom} ${etu.nom}` : '—'}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmt(p.montant)} FCFA</td>
                   </tr>
                 )
               })}
@@ -218,9 +218,9 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total encaissé" value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#142850" />
-        <KpiCard label="Nb paiements"   value={loading ? '…' : paiements.length}         color="#F51E33" />
-        <KpiCard label="Moyenne/paiement" value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#F51E33" />
+        <KpiCard label="Total encaissé" value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#0F172A" />
+        <KpiCard label="Nb paiements"   value={loading ? '…' : paiements.length}         color="#DC2626" />
+        <KpiCard label="Moyenne/paiement" value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#DC2626" />
       </div>
 
       {Object.keys(byMethod).length > 0 && (
@@ -236,7 +236,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
                     <span className="text-[var(--text-secondary)]">{fmt(amount)} FCFA ({pct.toFixed(0)}%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-[var(--border)]">
-                    <div className="h-2 rounded-full bg-[#F51E33]" style={{ width: `${pct}%` }} />
+                    <div className="h-2 rounded-full bg-[#DC2626]" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )
@@ -259,7 +259,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-[#101729]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmt(p.montant)} FCFA</td>
                   </tr>
                 ))}
               </tbody>
@@ -324,7 +324,7 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
 
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
@@ -406,15 +406,15 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <KpiCard label="Total bourses accordées" value={fmt(total) + ' FCFA'} color="#8B0070" />
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#8B0070', color: '#fff' }}>
+        <KpiCard label="Total bourses accordées" value={fmt(total) + ' FCFA'} color="#7C3AED" />
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#7C3AED', color: '#fff' }}>
           <Plus size={13} /> Accorder une bourse
         </button>
       </div>
 
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#8B0070]/30 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#7C3AED]/30 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Étudiant *</label>
@@ -429,7 +429,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.etudiant_id || !form.montant || !form.libelle} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
+              <button onClick={add} disabled={saving || !form.etudiant_id || !form.montant || !form.libelle} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#7C3AED', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Accorder
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
@@ -459,7 +459,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
                         ) : <span className="text-[var(--text-secondary)]">—</span>}
                       </td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)]">{b.libelle}</td>
-                      <td className="px-4 py-2.5 font-semibold text-[#8B0070]">{fmt(b.montant)} FCFA</td>
+                      <td className="px-4 py-2.5 font-semibold text-[#7C3AED]">{fmt(b.montant)} FCFA</td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(b.created_at).toLocaleDateString('fr-FR')}</td>
                     </tr>
                   )
@@ -508,7 +508,7 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#F51E33]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
@@ -539,7 +539,7 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
                 <div>
                   <p className="text-sm font-bold text-[#101729]">{p.nom}</p>
                   <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 capitalize">{p.type}</p>
-                  {p.contact && <p className="text-[10px] text-[#F51E33] mt-1">{p.contact}</p>}
+                  {p.contact && <p className="text-[10px] text-[#DC2626] mt-1">{p.contact}</p>}
                   {p.description && <p className="text-[10px] text-[var(--text-secondary)] mt-1">{p.description}</p>}
                 </div>
                 <button onClick={() => del(p.id)} className="text-[var(--text-secondary)] hover:text-red-400"><Trash2 size={12} /></button>
@@ -581,13 +581,13 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#8B0070', color: '#fff' }}>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#7C3AED', color: '#fff' }}>
           <Megaphone size={13} /> Nouvelle annonce
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#8B0070]/30 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#7C3AED]/30 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
             <div className="space-y-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
@@ -602,7 +602,7 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={add} disabled={saving || !form.titre || !form.message} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#8B0070', color: '#fff' }}>
+              <button onClick={add} disabled={saving || !form.titre || !form.message} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#7C3AED', color: '#fff' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Megaphone size={12} />} Publier
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
@@ -621,7 +621,7 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-semibold text-[#101729]">{a.titre}</p>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#8B0070]/10 text-[#8B0070] font-bold capitalize">{a.cible}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#7C3AED]/10 text-[#7C3AED] font-bold capitalize">{a.cible}</span>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{a.message}</p>
                   <p className="text-[10px] text-[var(--text-secondary)] mt-2">{new Date(a.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>

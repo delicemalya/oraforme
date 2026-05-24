@@ -78,7 +78,7 @@ export default function ResetPasswordPage() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#DC2626] placeholder-[#64748B] transition-colors"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#DC2626] placeholder-[#64748B] transition-colors"
               />
             </div>
 
@@ -103,8 +103,8 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold text-[#F51E33] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ background: '#F51E33' }}
+              className="w-full py-2.5 rounded-lg text-sm font-semibold text-[#DC2626] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: '#DC2626' }}
             >
               {loading ? 'Enregistrement...' : 'Enregistrer le nouveau mot de passe'}
             </button>

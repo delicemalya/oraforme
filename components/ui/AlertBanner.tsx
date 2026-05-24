@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -42,8 +42,8 @@ export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount
   if (alerts.length === 0) return null
 
   const COLORS = {
-    warning: { text: '#F51E33', bg: '#F51E330C', border: '#F51E3328' },
-    danger:  { text: '#F51E33', bg: '#F51E330C', border: '#F51E3328' },
+    warning: { text: '#DC2626', bg: '#DC26260C', border: '#DC262628' },
+    danger:  { text: '#DC2626', bg: '#DC26260C', border: '#DC262628' },
   }
 
   return (

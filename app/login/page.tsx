@@ -130,7 +130,7 @@ export default function LoginPage() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-alt)] text-[var(--text)] text-sm font-medium hover:border-[#484F58] hover:bg-white/5 transition-all disabled:opacity-60 disabled:cursor-not-allowed mb-5"
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-alt)] text-[var(--text)] text-sm font-medium hover:border-[#64748B] hover:bg-white/5 transition-all disabled:opacity-60 disabled:cursor-not-allowed mb-5"
           >
             <GoogleIcon />
             Continuer avec Google
@@ -173,7 +173,7 @@ export default function LoginPage() {
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-[var(--text-secondary)]">Mot de passe</label>
-                  <Link href="/forgot-password" className="text-xs text-[#F51E33] hover:underline">
+                  <Link href="/forgot-password" className="text-xs text-[#DC2626] hover:underline">
                     Oublié ?
                   </Link>
                 </div>
@@ -184,7 +184,7 @@ export default function LoginPage() {
                   onChange={e => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#DC2626] placeholder-[#64748B] transition-colors"
                 />
               </div>
               {error && <ErrorBox message={error} />}
@@ -208,7 +208,7 @@ export default function LoginPage() {
                     placeholder="06 000 00 00"
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
-                    className="flex-1 px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58]"
+                    className="flex-1 px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#DC2626] placeholder-[#64748B]"
                     required
                   />
                 </div>
@@ -226,7 +226,7 @@ export default function LoginPage() {
           {/* ── Phone: enter OTP ─────────────────────────────────────── */}
           {mode === 'phone' && phoneStep === 'otp' && (
             <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
-              <div className="p-3 bg-[#F51E33]/5 border border-[#F51E33]/20 rounded-lg text-xs text-[#F51E33]">
+              <div className="p-3 bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg text-xs text-[#DC2626]">
                 Code envoyé au <strong>{phone}</strong>
               </div>
               <div className="flex flex-col gap-1.5">
@@ -239,7 +239,7 @@ export default function LoginPage() {
                   value={otp}
                   onChange={e => setOtp(e.target.value)}
                   maxLength={6}
-                  className="w-full px-4 py-3 text-center text-2xl tracking-[0.5em] rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] focus:outline-none focus:border-[#F51E33] placeholder-[#484F58]"
+                  className="w-full px-4 py-3 text-center text-2xl tracking-[0.5em] rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] focus:outline-none focus:border-[#DC2626] placeholder-[#64748B]"
                   required
                 />
               </div>
@@ -259,7 +259,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-[var(--text-secondary)] mt-6">
             Pas encore de compte ?{' '}
-            <Link href="/register" className="text-[#F51E33] hover:underline">
+            <Link href="/register" className="text-[#DC2626] hover:underline">
               Créer un compte
             </Link>
           </p>

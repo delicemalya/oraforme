@@ -186,20 +186,20 @@ export default function AiAssistant() {
           whileTap={{ scale: 0.92 }}
           onClick={() => setOpen(true)}
           className="relative w-[54px] h-[54px] rounded-full shadow-xl flex items-center justify-center"
-          style={{ background: '#F51E33', willChange: 'transform' }}
+          style={{ background: '#DC2626', willChange: 'transform' }}
           title="MIAA+ — Assistant IA"
         >
           {/* Pulse rings */}
-          <span className="absolute inset-0 rounded-full bg-[#F51E33]/50 animate-ping" style={{ animationDuration: '2.5s' }} />
-          <span className="absolute inset-[-5px] rounded-full border border-[#F51E33]/25" />
+          <span className="absolute inset-0 rounded-full bg-[#DC2626]/50 animate-ping" style={{ animationDuration: '2.5s' }} />
+          <span className="absolute inset-[-5px] rounded-full border border-[#DC2626]/25" />
           {/* Icon */}
-          <Sparkles size={22} className="text-[#F51E33] relative z-10" />
+          <Sparkles size={22} className="text-[#DC2626] relative z-10" />
           {/* IA badge */}
-          <span className="absolute -top-1 -right-1 bg-[#8B0070] text-white font-black rounded-full flex items-center justify-center z-20" style={{ fontSize: 7, width: 16, height: 16, letterSpacing: -0.5 }}>
+          <span className="absolute -top-1 -right-1 bg-[#7C3AED] text-white font-black rounded-full flex items-center justify-center z-20" style={{ fontSize: 7, width: 16, height: 16, letterSpacing: -0.5 }}>
             IA
           </span>
         </motion.button>
-        <span className="text-[10px] font-bold text-[#F51E33] tracking-wide select-none">MIAA+</span>
+        <span className="text-[10px] font-bold text-[#DC2626] tracking-wide select-none">MIAA+</span>
       </div>
 
       {/* ── Chat modal ───────────────────────────────────────────────────── */}
@@ -222,7 +222,7 @@ export default function AiAssistant() {
               onClick={e => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] shrink-0" style={{ background: '#142850' }}>
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] shrink-0" style={{ background: '#0F172A' }}>
                 <MIAALogo size={34} />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-[var(--text)]">✨ MIAA+ — Assistant Intelligent</p>
@@ -257,11 +257,11 @@ export default function AiAssistant() {
                     <div
                       className={`max-w-[82%] text-xs px-3 py-2 rounded-2xl leading-relaxed ${
                         m.role === 'user'
-                          ? 'rounded-br-sm text-[#F51E33] font-semibold'
-                          : 'rounded-bl-sm text-[var(--text)] border-l-2 border-[#F51E33]/60'
+                          ? 'rounded-br-sm text-[#DC2626] font-semibold'
+                          : 'rounded-bl-sm text-[var(--text)] border-l-2 border-[#DC2626]/60'
                       }`}
                       style={m.role === 'user'
-                        ? { background: '#F51E33' }
+                        ? { background: '#DC2626' }
                         : { background: '#1C2128' }
                       }
                       dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
@@ -273,11 +273,11 @@ export default function AiAssistant() {
                 {loading && (
                   <div className="flex justify-start gap-2">
                     <MIAALogo size={20} />
-                    <div className="bg-[#1C2128] rounded-2xl rounded-bl-sm px-3 py-2.5 flex gap-1 items-center border-l-2 border-[#F51E33]/60">
+                    <div className="bg-[#1C2128] rounded-2xl rounded-bl-sm px-3 py-2.5 flex gap-1 items-center border-l-2 border-[#DC2626]/60">
                       {[0, 1, 2].map(i => (
                         <motion.span
                           key={i}
-                          className="w-1.5 h-1.5 rounded-full bg-[#F51E33]/60"
+                          className="w-1.5 h-1.5 rounded-full bg-[#DC2626]/60"
                           animate={{ opacity: [0.3, 1, 0.3] }}
                           transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
                         />
@@ -296,7 +296,7 @@ export default function AiAssistant() {
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="text-left text-[11px] text-[var(--text-secondary)] hover:text-[var(--text)] bg-[var(--surface)] hover:bg-white/5 border border-[var(--border)] hover:border-[#F51E33]/30 rounded-xl px-3 py-1.5 transition-all"
+                      className="text-left text-[11px] text-[var(--text-secondary)] hover:text-[var(--text)] bg-[var(--surface)] hover:bg-white/5 border border-[var(--border)] hover:border-[#DC2626]/30 rounded-xl px-3 py-1.5 transition-all"
                     >
                       {s}
                     </button>
@@ -312,16 +312,16 @@ export default function AiAssistant() {
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
                   placeholder="Posez votre question à MIAA+…"
                   disabled={loading}
-                  className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3 py-1.5 text-xs text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50 transition-colors disabled:opacity-50"
+                  className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3 py-1.5 text-xs text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50 transition-colors disabled:opacity-50"
                 />
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   onClick={() => send(input)}
                   disabled={loading || !input.trim()}
                   className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors shrink-0 disabled:opacity-40"
-                  style={{ background: '#F51E33' }}
+                  style={{ background: '#DC2626' }}
                 >
-                  <Send size={12} className="text-[#F51E33]" />
+                  <Send size={12} className="text-[#DC2626]" />
                 </motion.button>
               </div>
             </motion.div>

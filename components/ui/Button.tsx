@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { ButtonHTMLAttributes } from 'react'
 
@@ -19,7 +19,7 @@ export default function Button({
 
   const variants = {
     primary: 'bg-[var(--primary)] text-white hover:bg-[#D4900A] active:scale-[0.98]',
-    secondary: 'bg-[var(--surface-alt)] text-[var(--text)] border border-[var(--border)] hover:border-[#F51E33] hover:text-[#F51E33]',
+    secondary: 'bg-[var(--surface-alt)] text-[var(--text)] border border-[var(--border)] hover:border-[#DC2626] hover:text-[#DC2626]',
     ghost: 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5',
   }
 

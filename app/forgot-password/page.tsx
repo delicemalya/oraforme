@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
               <span className="text-[var(--text)] font-medium">{email}</span>.
               Vérifiez votre boîte mail (et le dossier spam).
             </p>
-            <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[#F51E33] hover:underline">
+            <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[#DC2626] hover:underline">
               <ArrowLeft size={14} /> Retour à la connexion
             </Link>
           </div>
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33] placeholder-[#484F58] transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#DC2626] placeholder-[#64748B] transition-colors"
               />
             </div>
 
@@ -92,15 +92,15 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold text-[#F51E33] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ background: '#F51E33' }}
+              className="w-full py-2.5 rounded-lg text-sm font-semibold text-[#DC2626] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: '#DC2626' }}
             >
               {loading ? 'Envoi...' : 'Envoyer le lien'}
             </button>
           </form>
 
           <p className="text-center text-sm text-[var(--text-secondary)] mt-6">
-            <Link href="/login" className="inline-flex items-center gap-1 text-[#F51E33] hover:underline">
+            <Link href="/login" className="inline-flex items-center gap-1 text-[#DC2626] hover:underline">
               <ArrowLeft size={12} /> Retour à la connexion
             </Link>
           </p>

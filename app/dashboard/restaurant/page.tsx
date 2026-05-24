@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -44,15 +44,15 @@ const TABS = [
 type TabKey = typeof TABS[number]['key']
 
 const MODES_PAIE: { key: ModePaie; label: string; color: string }[] = [
-  { key: 'especes', label: 'Espèces',    color: '#142850' },
+  { key: 'especes', label: 'Espèces',    color: '#0F172A' },
   { key: 'airtel',  label: 'Airtel Money', color: '#E53935' },
-  { key: 'mtn',     label: 'MTN MoMo',   color: '#F51E33' },
+  { key: 'mtn',     label: 'MTN MoMo',   color: '#DC2626' },
 ]
 
 const TABLE_COLORS: Record<string, string> = {
-  libre:   '#484F58',
-  occupee: '#F51E33',
-  prete:   '#142850',
+  libre:   '#64748B',
+  occupee: '#DC2626',
+  prete:   '#0F172A',
 }
 
 function fmtFCFA(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA' }
@@ -321,9 +321,9 @@ export default function RestaurantPage() {
 
   const cmdsLivrees = cmdsDuJour.filter(c => c.statut !== 'annule')
   const chartPaie = [
-    { name: 'Espèces',    val: cmdsLivrees.filter(c => ['especes', 'Espèces'].includes(c.paiement ?? '')).reduce((s, c) => s + c.total, 0), color: '#142850' },
+    { name: 'Espèces',    val: cmdsLivrees.filter(c => ['especes', 'Espèces'].includes(c.paiement ?? '')).reduce((s, c) => s + c.total, 0), color: '#0F172A' },
     { name: 'Airtel',     val: cmdsLivrees.filter(c => c.paiement === 'airtel').reduce((s, c) => s + c.total, 0), color: '#E53935' },
-    { name: 'MTN',        val: cmdsLivrees.filter(c => c.paiement === 'mtn').reduce((s, c) => s + c.total, 0), color: '#F51E33' },
+    { name: 'MTN',        val: cmdsLivrees.filter(c => c.paiement === 'mtn').reduce((s, c) => s + c.total, 0), color: '#DC2626' },
   ].filter(x => x.val > 0)
 
   const platCount: Record<string, number> = {}
@@ -359,7 +359,7 @@ export default function RestaurantPage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-6 h-6 border-2 border-[#F51E33] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#DC2626] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -377,9 +377,9 @@ export default function RestaurantPage() {
         <div>
           <h1 className="text-2xl font-bold text-[var(--text)]">Restaurant & POS</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-            CA du jour : <span className="text-[#F51E33] font-semibold">{fmtFCFA(caDuJour)}</span>
+            CA du jour : <span className="text-[#DC2626] font-semibold">{fmtFCFA(caDuJour)}</span>
             {' · '}{cmdsDuJour.length} commande{cmdsDuJour.length > 1 ? 's' : ''}
-            {enPrepa > 0 && <span className="text-[#F51E33]"> · {enPrepa} en attente</span>}
+            {enPrepa > 0 && <span className="text-[#DC2626]"> · {enPrepa} en attente</span>}
           </p>
         </div>
         <div className="flex gap-2">
@@ -387,7 +387,7 @@ export default function RestaurantPage() {
             <RefreshCw size={13} />
           </button>
           <Link href="/dashboard/restaurant/cuisine"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#F51E33]/40 text-[#F51E33] text-xs font-semibold hover:bg-[#F51E33]/10 transition-colors">
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#DC2626]/40 text-[#DC2626] text-xs font-semibold hover:bg-[#DC2626]/10 transition-colors">
             <Monitor size={13} /> Écran Cuisine
           </Link>
         </div>
@@ -409,10 +409,10 @@ export default function RestaurantPage() {
           {/* KPIs du jour */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
             {[
-              { label: "CA aujourd'hui",   val: fmtFCFA(caDuJour),           color: '#F51E33', icon: DollarSign },
-              { label: 'Commandes',        val: cmdsDuJour.length,            color: '#F51E33', icon: ShoppingCart },
-              { label: 'En attente/prép',  val: enPrepa,                      color: enPrepa > 0 ? '#F51E33' : '#142850', icon: Clock },
-              { label: 'Plats au menu',    val: menu.filter(m=>m.disponible).length, color: '#142850', icon: ChefHat },
+              { label: "CA aujourd'hui",   val: fmtFCFA(caDuJour),           color: '#DC2626', icon: DollarSign },
+              { label: 'Commandes',        val: cmdsDuJour.length,            color: '#DC2626', icon: ShoppingCart },
+              { label: 'En attente/prép',  val: enPrepa,                      color: enPrepa > 0 ? '#DC2626' : '#0F172A', icon: Clock },
+              { label: 'Plats au menu',    val: menu.filter(m=>m.disponible).length, color: '#0F172A', icon: ChefHat },
             ].map(k => {
               const Icon = k.icon
               return (
@@ -431,12 +431,12 @@ export default function RestaurantPage() {
           {categories.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-4">
               <button onClick={() => setCatFilter('')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!catFilter ? 'bg-[#F51E33]/15 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] border border-[var(--border)]'}`}>
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!catFilter ? 'bg-[#DC2626]/15 text-[#DC2626] border border-[#DC2626]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] border border-[var(--border)]'}`}>
                 Tous
               </button>
               {categories.map(cat => (
                 <button key={cat} onClick={() => setCatFilter(cat === catFilter ? '' : cat)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${catFilter === cat ? 'bg-[#F51E33]/15 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] border border-[var(--border)]'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${catFilter === cat ? 'bg-[#DC2626]/15 text-[#DC2626] border border-[#DC2626]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] border border-[var(--border)]'}`}>
                   {cat}
                 </button>
               ))}
@@ -457,14 +457,14 @@ export default function RestaurantPage() {
                     <button key={item.id} onClick={() => ajouterAuPanier(item)} disabled={!item.disponible}
                       className={`text-left p-4 rounded-xl border transition-all relative ${
                         item.disponible
-                          ? 'border-[var(--border)] bg-[var(--card-bg)] hover:border-[#F51E33]/40 active:scale-95'
+                          ? 'border-[var(--border)] bg-[var(--card-bg)] hover:border-[#DC2626]/40 active:scale-95'
                           : 'border-[var(--border)] bg-[var(--card-bg)]/50 opacity-40 cursor-not-allowed'
                       }`}>
                       <div className="text-2xl mb-2">{item.emoji}</div>
                       <p className="text-sm font-medium text-[var(--text)] leading-tight">{item.nom}</p>
-                      <p className="text-xs font-bold text-[#F51E33] mt-1">{fmtFCFA(item.prix)}</p>
+                      <p className="text-xs font-bold text-[#DC2626] mt-1">{fmtFCFA(item.prix)}</p>
                       {!item.disponible && (
-                        <span className="absolute top-2 right-2 text-[9px] bg-[#F51E33]/15 text-[#F51E33] px-1 py-0.5 rounded font-bold">INDISPO</span>
+                        <span className="absolute top-2 right-2 text-[9px] bg-[#DC2626]/15 text-[#DC2626] px-1 py-0.5 rounded font-bold">INDISPO</span>
                       )}
                     </button>
                   ))}
@@ -475,10 +475,10 @@ export default function RestaurantPage() {
             {/* Panier */}
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 flex flex-col h-fit sticky top-6">
               <div className="flex items-center gap-2 mb-4">
-                <ShoppingCart size={16} className="text-[#F51E33]" />
+                <ShoppingCart size={16} className="text-[#DC2626]" />
                 <h3 className="font-semibold text-[var(--text)] text-sm">Commande en cours</h3>
                 {panier.length > 0 && (
-                  <button onClick={() => setPanier([])} className="ml-auto text-[var(--text-secondary)] hover:text-[#F51E33] transition-colors">
+                  <button onClick={() => setPanier([])} className="ml-auto text-[var(--text-secondary)] hover:text-[#DC2626] transition-colors">
                     <Trash2 size={13} />
                   </button>
                 )}
@@ -487,12 +487,12 @@ export default function RestaurantPage() {
               {/* Table + mode */}
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <select value={tableNum} onChange={e => setTableNum(e.target.value)}
-                  className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#F51E33]">
+                  className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#DC2626]">
                   <option value="">À emporter</option>
                   {tables.map(t => <option key={t.id} value={String(t.numero)}>Table {t.numero}{t.nom ? ` — ${t.nom}` : ''}</option>)}
                 </select>
                 <select value={mode} onChange={e => setMode(e.target.value as ModeCmd)}
-                  className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#F51E33]">
+                  className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#DC2626]">
                   <option value="sur_place">Sur place</option>
                   <option value="emporter">À emporter</option>
                   <option value="livraison">Livraison</option>
@@ -515,7 +515,7 @@ export default function RestaurantPage() {
                         <span className="text-xs font-bold text-[var(--text)] w-5 text-center">{item.quantite}</span>
                         <button onClick={() => changerQte(item.nom, +1)} className="w-5 h-5 rounded bg-[var(--surface-alt)] text-[var(--text-secondary)] hover:text-[var(--text)] text-xs font-bold flex items-center justify-center">+</button>
                       </div>
-                      <span className="text-xs font-semibold text-[#F51E33] shrink-0 w-20 text-right">{fmtFCFA(item.prix * item.quantite)}</span>
+                      <span className="text-xs font-semibold text-[#DC2626] shrink-0 w-20 text-right">{fmtFCFA(item.prix * item.quantite)}</span>
                     </div>
                   ))}
                 </div>
@@ -536,7 +536,7 @@ export default function RestaurantPage() {
                         <span>CA (5% TVA)</span><span>{fmtFCFA(ca)}</span>
                       </div>
                       <div className="flex justify-between text-sm font-bold text-[var(--text)] border-t border-[var(--border)] pt-1.5">
-                        <span>Total TTC</span><span className="text-[#F51E33]">{fmtFCFA(ttc)}</span>
+                        <span>Total TTC</span><span className="text-[#DC2626]">{fmtFCFA(ttc)}</span>
                       </div>
                     </div>
 
@@ -554,7 +554,7 @@ export default function RestaurantPage() {
                     </div>
 
                     <button onClick={passerCommande} disabled={savingCmd}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold hover:bg-[#DC2626]/90 disabled:opacity-50 transition-colors">
                       {savingCmd ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
                       Valider & Imprimer reçu
                     </button>
@@ -576,16 +576,16 @@ export default function RestaurantPage() {
                 <RefreshCw size={12} /> Actualiser
               </button>
               <Link href="/dashboard/restaurant/cuisine"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] text-xs font-semibold">
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#DC2626]/10 border border-[#DC2626]/30 text-[#DC2626] text-xs font-semibold">
                 <Monitor size={12} /> Écran Cuisine
               </Link>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { key: ['en_attente', 'en_preparation'] as StatutCmd[], label: 'En préparation', color: '#F51E33', nextStatut: 'pret' as StatutCmd, btnLabel: 'Marquer prêt' },
-              { key: ['pret'] as StatutCmd[], label: 'Prêt à servir', color: '#F51E33', nextStatut: 'livre' as StatutCmd, btnLabel: 'Marquer livré' },
-              { key: ['livre'] as StatutCmd[], label: 'Livré', color: '#142850', nextStatut: null, btnLabel: '' },
+              { key: ['en_attente', 'en_preparation'] as StatutCmd[], label: 'En préparation', color: '#DC2626', nextStatut: 'pret' as StatutCmd, btnLabel: 'Marquer prêt' },
+              { key: ['pret'] as StatutCmd[], label: 'Prêt à servir', color: '#DC2626', nextStatut: 'livre' as StatutCmd, btnLabel: 'Marquer livré' },
+              { key: ['livre'] as StatutCmd[], label: 'Livré', color: '#0F172A', nextStatut: null, btnLabel: '' },
             ].map(col => {
               const cols = commandes.filter(c => (col.key as string[]).includes(c.statut))
               return (
@@ -617,7 +617,7 @@ export default function RestaurantPage() {
                           ))}
                         </div>
                         <div className="flex items-center justify-between gap-1">
-                          <span className="text-xs font-bold text-[#F51E33]">{fmtFCFA(cmd.total)}</span>
+                          <span className="text-xs font-bold text-[#DC2626]">{fmtFCFA(cmd.total)}</span>
                           <div className="flex items-center gap-1">
                             {cmd.statut === 'en_attente' && (
                               <button onClick={() => annulerCommande(cmd.id)}
@@ -650,7 +650,7 @@ export default function RestaurantPage() {
         <div>
           <div className="flex justify-end mb-4">
             <button onClick={() => setShowMenuForm(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#DC2626]/90 transition-colors">
               <Plus size={15} /> Ajouter un plat
             </button>
           </div>
@@ -674,7 +674,7 @@ export default function RestaurantPage() {
                     <tr key={item.id} className={`border-b border-[var(--border)] hover:bg-white/5/50 ${i === menu.length - 1 ? 'border-0' : ''}`}>
                       <td className="px-4 py-3"><span className="mr-2">{item.emoji}</span><span className="font-medium text-[var(--text)]">{item.nom}</span></td>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{item.categorie || '—'}</td>
-                      <td className="px-4 py-3 font-semibold text-[#F51E33]">{fmtFCFA(item.prix)}</td>
+                      <td className="px-4 py-3 font-semibold text-[#DC2626]">{fmtFCFA(item.prix)}</td>
                       <td className="px-4 py-3">
                         <button onClick={() => toggleDispo(item.id, item.disponible)}
                           className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all ${item.disponible ? 'bg-[#1a3570]/10 text-[#1a3570] hover:bg-red-500/10 hover:text-red-400' : 'bg-red-500/10 text-red-400 hover:bg-[#1a3570]/10 hover:text-[#1a3570]'}`}>
@@ -708,18 +708,18 @@ export default function RestaurantPage() {
                     <div className="col-span-3">
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Nom du plat *</label>
                       <input value={menuForm.nom} onChange={e => setMenuForm(p => ({ ...p, nom: e.target.value }))} placeholder="Poulet Yassa"
-                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                     </div>
                   </div>
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Catégorie</label>
                     <input value={menuForm.categorie} onChange={e => setMenuForm(p => ({ ...p, categorie: e.target.value }))} placeholder="Plats, Entrées, Desserts…"
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                   </div>
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Prix (FCFA)</label>
                     <input type="number" value={menuForm.prix} onChange={e => setMenuForm(p => ({ ...p, prix: e.target.value }))} placeholder="3500"
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                   </div>
                 </div>
                 <div className="flex gap-2 mt-5">
@@ -728,7 +728,7 @@ export default function RestaurantPage() {
                     Annuler
                   </button>
                   <button onClick={saveMenuItem} disabled={savingMenu || !menuForm.nom}
-                    className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#F51E33]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                     {savingMenu && <Loader2 size={13} className="animate-spin" />}
                     Ajouter
                   </button>
@@ -744,7 +744,7 @@ export default function RestaurantPage() {
         <div className="space-y-5">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
-              <Table2 size={15} className="text-[#F51E33]" /> Ajouter une table
+              <Table2 size={15} className="text-[#DC2626]" /> Ajouter une table
             </h3>
             <div className="grid grid-cols-3 gap-3 mb-3">
               <div>
@@ -764,7 +764,7 @@ export default function RestaurantPage() {
               </div>
             </div>
             <button onClick={addTable} disabled={addingTable || !tableForm.numero}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#DC2626]/90 disabled:opacity-50 transition-colors">
               {addingTable ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Créer la table
             </button>
           </div>
@@ -778,9 +778,9 @@ export default function RestaurantPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {tables.map(t => {
                 const tableUrl = `${publicUrl}?table=${t.numero}`
-                const color = TABLE_COLORS[t.statut] ?? '#484F58'
+                const color = TABLE_COLORS[t.statut] ?? '#64748B'
                 return (
-                  <div key={t.id} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 text-center hover:border-[#F51E33]/30 transition-colors">
+                  <div key={t.id} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 text-center hover:border-[#DC2626]/30 transition-colors">
                     <div className="w-3 h-3 rounded-full mx-auto mb-2" style={{ background: color }} />
                     <p className="text-base font-bold text-[#101729] mb-0.5">
                       Table {t.numero}{t.nom ? ` — ${t.nom}` : ''}
@@ -793,10 +793,10 @@ export default function RestaurantPage() {
                     <div className="space-y-2">
                       <button onClick={() => { navigator.clipboard.writeText(tableUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
                         className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-xs transition-colors">
-                        {copied ? <><Check size={12} className="text-[#F51E33]" /> Copié !</> : <><Copy size={12} /> Copier lien</>}
+                        {copied ? <><Check size={12} className="text-[#DC2626]" /> Copié !</> : <><Copy size={12} /> Copier lien</>}
                       </button>
                       <a href={tableUrl} target="_blank" rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[#F51E33]/30 text-[#F51E33] hover:bg-[#F51E33]/10 text-xs transition-colors">
+                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[#DC2626]/30 text-[#DC2626] hover:bg-[#DC2626]/10 text-xs transition-colors">
                         <ExternalLink size={12} /> Page client
                       </a>
                       <button onClick={() => deleteTable(t.id)}
@@ -817,7 +817,7 @@ export default function RestaurantPage() {
         <div className="space-y-5">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[var(--text)] mb-1 flex items-center gap-2">
-              <BookOpen size={15} className="text-[#F51E33]" /> Recettes — ingrédients par plat
+              <BookOpen size={15} className="text-[#DC2626]" /> Recettes — ingrédients par plat
             </h3>
             <p className="text-xs text-[var(--text-secondary)] mb-4">
               Liez les ingrédients (stock) à chaque plat. Le stock se décrémente automatiquement à chaque vente.
@@ -826,7 +826,7 @@ export default function RestaurantPage() {
             <div className="mb-5">
               <label className="text-xs text-[var(--text-secondary)] mb-1 block">Sélectionner un plat</label>
               <select value={selectedMenuItem} onChange={e => setSelectedMenuItem(e.target.value)}
-                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[#F51E33]/50">
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[#DC2626]/50">
                 <option value="">— Choisir un plat du menu —</option>
                 {menu.map(m => <option key={m.id} value={m.id}>{m.emoji} {m.nom}</option>)}
               </select>
@@ -887,7 +887,7 @@ export default function RestaurantPage() {
                     <div>
                       <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Ou saisir manuellement</label>
                       <input value={recetteForm.article_nom} onChange={e => setRecetteForm(p => ({ ...p, article_nom: e.target.value, article_id: '' }))}
-                        placeholder="Nom ingrédient" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#484F58] outline-none" />
+                        placeholder="Nom ingrédient" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#64748B] outline-none" />
                     </div>
                     <div className="flex gap-1">
                       <div className="flex-1">
@@ -934,22 +934,22 @@ export default function RestaurantPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm text-[var(--text-secondary)]">{achats.length} achat(s) récent(s)</p>
             <button onClick={() => setShowAchatForm(v => !v)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#F51E33]/90 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#DC2626]/90 transition-colors">
               <Plus size={15} /> Nouvel achat
             </button>
           </div>
 
           {/* Formulaire nouvel achat */}
           {showAchatForm && (
-            <div className="bg-[var(--card-bg)] border border-[#F51E33]/30 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-[#F51E33] mb-4 flex items-center gap-2">
+            <div className="bg-[var(--card-bg)] border border-[#DC2626]/30 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-[#DC2626] mb-4 flex items-center gap-2">
                 <Truck size={14} /> Enregistrer un achat fournisseur
               </h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="col-span-2 sm:col-span-1">
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Fournisseur *</label>
                   <input value={achatForm.fournisseur_nom} onChange={e => setAchatForm(p => ({ ...p, fournisseur_nom: e.target.value }))}
-                    placeholder="Nom du fournisseur" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                    placeholder="Nom du fournisseur" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                 </div>
                 <div>
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
@@ -970,7 +970,7 @@ export default function RestaurantPage() {
                 <div>
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Note</label>
                   <input value={achatForm.note} onChange={e => setAchatForm(p => ({ ...p, note: e.target.value }))}
-                    placeholder="Optionnel" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none" />
+                    placeholder="Optionnel" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none" />
                 </div>
               </div>
 
@@ -978,7 +978,7 @@ export default function RestaurantPage() {
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Articles</p>
-                  <button onClick={addAchatLigne} className="text-xs text-[#F51E33] hover:underline flex items-center gap-1">
+                  <button onClick={addAchatLigne} className="text-xs text-[#DC2626] hover:underline flex items-center gap-1">
                     <Plus size={11} /> Ajouter une ligne
                   </button>
                 </div>
@@ -992,7 +992,7 @@ export default function RestaurantPage() {
                     <div key={i} className="grid grid-cols-12 gap-2 items-center">
                       <div className="col-span-4">
                         <input value={ligne.article_nom} onChange={e => updateAchatLigne(i, 'article_nom', e.target.value)}
-                          placeholder="Ingrédient / article" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#484F58] outline-none" />
+                          placeholder="Ingrédient / article" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#64748B] outline-none" />
                       </div>
                       <div className="col-span-2">
                         <select value={ligne.article_id ?? ''} onChange={e => {
@@ -1015,7 +1015,7 @@ export default function RestaurantPage() {
                           placeholder="Prix" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
                       </div>
                       <div className="col-span-1 text-right">
-                        <span className="text-xs font-semibold text-[#F51E33]">
+                        <span className="text-xs font-semibold text-[#DC2626]">
                           {ligne.quantite && ligne.prix_unitaire ? fmtFCFA(ligne.quantite * ligne.prix_unitaire) : '—'}
                         </span>
                       </div>
@@ -1029,7 +1029,7 @@ export default function RestaurantPage() {
                 </div>
                 {achatForm.lignes.length > 0 && (
                   <div className="flex justify-end mt-3 pt-2 border-t border-[var(--border)]">
-                    <span className="text-sm font-bold text-[#F51E33]">
+                    <span className="text-sm font-bold text-[#DC2626]">
                       Total : {fmtFCFA(achatForm.lignes.reduce((s, l) => s + (l.quantite || 0) * (l.prix_unitaire || 0), 0))}
                     </span>
                   </div>
@@ -1041,7 +1041,7 @@ export default function RestaurantPage() {
                   Annuler
                 </button>
                 <button onClick={saveAchat} disabled={savingAchat || !achatForm.fournisseur_nom.trim() || !achatForm.lignes.length}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#F51E33]/90 disabled:opacity-50 transition-colors">
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 disabled:opacity-50 transition-colors">
                   {savingAchat && <Loader2 size={13} className="animate-spin" />}
                   Enregistrer l&apos;achat
                 </button>
@@ -1073,7 +1073,7 @@ export default function RestaurantPage() {
                       <td className="px-4 py-3 font-medium text-[var(--text)]">{a.fournisseur_nom}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)] capitalize">{a.mode_paiement}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{(a.lignes as AchatLigne[]).length} article(s)</td>
-                      <td className="px-4 py-3 font-semibold text-[#F51E33]">{fmtFCFA(a.total)}</td>
+                      <td className="px-4 py-3 font-semibold text-[#DC2626]">{fmtFCFA(a.total)}</td>
                       <td className="px-4 py-3">
                         <button onClick={() => deleteAchat(a.id)} className="text-[var(--text-secondary)] hover:text-red-400 transition-colors">
                           <Trash2 size={14} />
@@ -1094,10 +1094,10 @@ export default function RestaurantPage() {
           {/* KPIs */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: 'CA TTC', val: fmtFCFA(caDuJour), color: '#F51E33' },
-              { label: 'CA HT', val: fmtFCFA(calculerTVACongo(caDuJour).ht), color: '#F51E33' },
-              { label: 'TVA collectée', val: fmtFCFA(calculerTVACongo(caDuJour).tva), color: '#8B0070' },
-              { label: 'Nb commandes', val: cmdsDuJour.length, color: '#142850' },
+              { label: 'CA TTC', val: fmtFCFA(caDuJour), color: '#DC2626' },
+              { label: 'CA HT', val: fmtFCFA(calculerTVACongo(caDuJour).ht), color: '#DC2626' },
+              { label: 'TVA collectée', val: fmtFCFA(calculerTVACongo(caDuJour).tva), color: '#7C3AED' },
+              { label: 'Nb commandes', val: cmdsDuJour.length, color: '#0F172A' },
             ].map(k => (
               <div key={k.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4">
                 <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{k.label}</p>
@@ -1118,7 +1118,7 @@ export default function RestaurantPage() {
                   <Tooltip contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                     formatter={(v: any) => [fmtFCFA(Number(v ?? 0)), 'CA']} />
-                  <Bar dataKey="total" fill="#F51E33" radius={[2, 2, 0, 0]} maxBarSize={20} />
+                  <Bar dataKey="total" fill="#DC2626" radius={[2, 2, 0, 0]} maxBarSize={20} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -1155,10 +1155,10 @@ export default function RestaurantPage() {
                   <div key={p.nom} className="flex items-center gap-3">
                     <span className="text-sm font-bold text-[var(--text-secondary)] w-5">#{i+1}</span>
                     <div className="flex-1 bg-[var(--surface-alt)] rounded-full h-2">
-                      <div className="h-2 rounded-full bg-[#F51E33]" style={{ width: `${(p.q / topPlats[0].q) * 100}%` }} />
+                      <div className="h-2 rounded-full bg-[#DC2626]" style={{ width: `${(p.q / topPlats[0].q) * 100}%` }} />
                     </div>
                     <span className="text-sm text-[var(--text)] min-w-[120px]">{p.nom}</span>
-                    <span className="text-xs font-bold text-[#F51E33] w-12 text-right">{p.q}x</span>
+                    <span className="text-xs font-bold text-[#DC2626] w-12 text-right">{p.q}x</span>
                   </div>
                 ))}
               </div>
@@ -1167,8 +1167,8 @@ export default function RestaurantPage() {
 
           {/* Alertes stock */}
           {stockArticles.some(a => a.quantite <= 0 || (a.seuil_alerte !== null && a.quantite <= a.seuil_alerte)) && (
-            <div className="bg-[var(--card-bg)] border border-[#F51E33]/40 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-[#F51E33] mb-3 flex items-center gap-2">
+            <div className="bg-[var(--card-bg)] border border-[#DC2626]/40 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-[#DC2626] mb-3 flex items-center gap-2">
                 <AlertTriangle size={15} /> Alertes stock
               </h3>
               <div className="space-y-2">
@@ -1178,7 +1178,7 @@ export default function RestaurantPage() {
                   .map(a => (
                     <div key={a.id} className="flex items-center justify-between text-xs">
                       <span className="text-[var(--text)] font-medium">{a.nom}</span>
-                      <span className={`font-bold ${a.quantite <= 0 ? 'text-[#F51E33]' : 'text-[#F51E33]'}`}>
+                      <span className={`font-bold ${a.quantite <= 0 ? 'text-[#DC2626]' : 'text-[#DC2626]'}`}>
                         {a.quantite <= 0 ? 'RUPTURE' : `${a.quantite} ${a.unite} (seuil : ${a.seuil_alerte})`}
                       </span>
                     </div>
@@ -1190,13 +1190,13 @@ export default function RestaurantPage() {
           {/* Clôture caisse */}
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
-              <AlertTriangle size={15} className="text-[#F51E33]" /> Clôture de caisse
+              <AlertTriangle size={15} className="text-[#DC2626]" /> Clôture de caisse
             </h3>
             <p className="text-xs text-[var(--text-secondary)] mb-4">
               La clôture enregistre le rapport journalier dans Supabase et lie les données à la trésorerie.
             </p>
             <button onClick={cloturerCaisse}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] text-sm font-semibold hover:bg-[#F51E33]/20 transition-colors">
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/30 text-[#DC2626] text-sm font-semibold hover:bg-[#DC2626]/20 transition-colors">
               <BarChart2 size={15} /> Clôturer la caisse du jour
             </button>
           </div>
@@ -1210,9 +1210,9 @@ export default function RestaurantPage() {
           <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <button onClick={() => setReceipt(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
             <div className="text-center mb-5">
-              <CheckCircle size={40} className="text-[#F51E33] mx-auto mb-3" />
+              <CheckCircle size={40} className="text-[#DC2626] mx-auto mb-3" />
               <h3 className="text-base font-bold text-[var(--text)]">Commande enregistrée !</h3>
-              <p className="text-sm text-[var(--text-secondary)] mt-1">Reçu N° <span className="text-[#F51E33] font-bold">{receipt.numeroRecu}</span></p>
+              <p className="text-sm text-[var(--text-secondary)] mt-1">Reçu N° <span className="text-[#DC2626] font-bold">{receipt.numeroRecu}</span></p>
             </div>
             <div className="bg-[var(--surface)] rounded-xl p-4 mb-5 space-y-2">
               <div className="flex justify-between text-xs">
@@ -1229,7 +1229,7 @@ export default function RestaurantPage() {
               </div>
               <div className="flex justify-between text-sm font-bold border-t border-[var(--border)] pt-2">
                 <span className="text-[var(--text)]">Total TTC</span>
-                <span className="text-[#F51E33]">{fmtFCFA(receipt.fiscal.ttc)}</span>
+                <span className="text-[#DC2626]">{fmtFCFA(receipt.fiscal.ttc)}</span>
               </div>
             </div>
             <div className="flex gap-2">
@@ -1238,7 +1238,7 @@ export default function RestaurantPage() {
                 Fermer
               </button>
               <a href={`/api/resto/receipt/${receipt.commandeId}`} target="_blank" rel="noopener noreferrer"
-                className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#F51E33]/90 transition-colors flex items-center justify-center gap-2">
+                className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 transition-colors flex items-center justify-center gap-2">
                 <TrendingUp size={13} /> Télécharger PDF
               </a>
             </div>

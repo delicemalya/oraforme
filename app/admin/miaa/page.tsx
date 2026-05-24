@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase-server'
+﻿import { supabaseAdmin } from '@/lib/supabase-server'
 import { fmtFCFA } from '@/lib/admin-config'
 import { Bot, MessageSquare, Zap, DollarSign, TrendingUp } from 'lucide-react'
 
@@ -58,8 +58,8 @@ export default async function AdminMIAAPage() {
     <div className="space-y-6">
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#8B0070]/10 border border-[#8B0070]/20 flex items-center justify-center">
-          <Bot size={18} className="text-[#8B0070]" />
+        <div className="w-10 h-10 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 flex items-center justify-center">
+          <Bot size={18} className="text-[#7C3AED]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">MIAA+ Stats</h1>
@@ -70,8 +70,8 @@ export default async function AdminMIAAPage() {
       </div>
 
       {/* Note about estimations */}
-      <div className="bg-[#8B0070]/5 border border-[#8B0070]/20 rounded-xl p-4 text-xs text-[var(--text-secondary)]">
-        <span className="text-[#8B0070] font-medium">Note : </span>
+      <div className="bg-[#7C3AED]/5 border border-[#7C3AED]/20 rounded-xl p-4 text-xs text-[var(--text-secondary)]">
+        <span className="text-[#7C3AED] font-medium">Note : </span>
         Les métriques de conversations sont des estimations basées sur les moyennes d&apos;usage.
         Pour des statistiques réelles, ajoute une table <code className="bg-[var(--surface-alt)] px-1 py-0.5 rounded">miaa_conversations</code> pour logger les échanges.
       </div>
@@ -79,10 +79,10 @@ export default async function AdminMIAAPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: Bot,           label: 'Clients actifs',     value: nbTenantsWithMIAA.toString(),             color: '#8B0070', sub: 'module bizbot actif' },
-          { icon: MessageSquare, label: 'Convs/mois (est.)',  value: monthlyConversations.toLocaleString('fr'), color: '#F51E33', sub: `${dailyConversations} /jour` },
-          { icon: Zap,           label: 'Tokens/mois (est.)', value: `${Math.round((monthlyInputTokens + monthlyOutputTokens) / 1_000_000)}M`, color: '#F51E33', sub: 'Claude Haiku 4.5' },
-          { icon: DollarSign,    label: 'Coût API/mois',      value: `$${monthlyCostUSD.toFixed(2)}`,          color: '#F51E33', sub: fmtFCFA(monthlyCostFCFA) },
+          { icon: Bot,           label: 'Clients actifs',     value: nbTenantsWithMIAA.toString(),             color: '#7C3AED', sub: 'module bizbot actif' },
+          { icon: MessageSquare, label: 'Convs/mois (est.)',  value: monthlyConversations.toLocaleString('fr'), color: '#DC2626', sub: `${dailyConversations} /jour` },
+          { icon: Zap,           label: 'Tokens/mois (est.)', value: `${Math.round((monthlyInputTokens + monthlyOutputTokens) / 1_000_000)}M`, color: '#DC2626', sub: 'Claude Haiku 4.5' },
+          { icon: DollarSign,    label: 'Coût API/mois',      value: `$${monthlyCostUSD.toFixed(2)}`,          color: '#DC2626', sub: fmtFCFA(monthlyCostFCFA) },
         ].map(k => (
           <div key={k.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <div className="flex items-center justify-between mb-3">
@@ -102,14 +102,14 @@ export default async function AdminMIAAPage() {
         {/* Financial analysis */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
-            <TrendingUp size={14} className="text-[#8B0070]" />
+            <TrendingUp size={14} className="text-[#7C3AED]" />
             Analyse financière MIAA+
           </h2>
           <div className="space-y-3">
             {[
               { label: 'MRR MIAA+', value: fmtFCFA(mrrMIAA), color: '#2EA043', note: `${nbTenantsWithMIAA} × 6 000 FCFA` },
-              { label: 'Coût API estimé', value: fmtFCFA(monthlyCostFCFA), color: '#F51E33', note: `$${monthlyCostUSD.toFixed(2)} × 600 FCFA/$` },
-              { label: 'Marge brute', value: fmtFCFA(Math.max(margeIA, 0)), color: margeIA >= 0 ? '#2EA043' : '#F51E33', note: `${mrrMIAA > 0 ? Math.round((margeIA / mrrMIAA) * 100) : 0}% de marge` },
+              { label: 'Coût API estimé', value: fmtFCFA(monthlyCostFCFA), color: '#DC2626', note: `$${monthlyCostUSD.toFixed(2)} × 600 FCFA/$` },
+              { label: 'Marge brute', value: fmtFCFA(Math.max(margeIA, 0)), color: margeIA >= 0 ? '#2EA043' : '#DC2626', note: `${mrrMIAA > 0 ? Math.round((margeIA / mrrMIAA) * 100) : 0}% de marge` },
             ].map(r => (
               <div key={r.label} className="flex items-center justify-between px-3 py-2.5 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
                 <div>
@@ -133,7 +133,7 @@ export default async function AdminMIAAPage() {
                   <span className="text-[var(--text)] font-medium">{c.pct}%</span>
                 </div>
                 <div className="h-1.5 bg-[var(--surface-alt)] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#8B0070] rounded-full" style={{ width: `${c.pct}%` }} />
+                  <div className="h-full bg-[#7C3AED] rounded-full" style={{ width: `${c.pct}%` }} />
                 </div>
               </div>
             ))}
@@ -152,8 +152,8 @@ export default async function AdminMIAAPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {tenantsWithMIAA.map(t => (
               <div key={t.id} className="flex items-center gap-3 px-3 py-3 bg-[var(--surface)] border border-[var(--border)] rounded-lg">
-                <div className="w-8 h-8 rounded-lg bg-[#8B0070]/20 border border-[#8B0070]/30 flex items-center justify-center shrink-0">
-                  <span className="text-[#8B0070] text-sm font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[#7C3AED]/20 border border-[#7C3AED]/30 flex items-center justify-center shrink-0">
+                  <span className="text-[#7C3AED] text-sm font-bold">
                     {t.nom_entreprise.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -172,9 +172,9 @@ export default async function AdminMIAAPage() {
         <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Configuration technique</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: 'Modèle', value: 'Claude Haiku 4.5', color: '#8B0070' },
-            { label: 'Max tokens', value: '1 024 out', color: '#F51E33' },
-            { label: 'Historique', value: '10 messages', color: '#F51E33' },
+            { label: 'Modèle', value: 'Claude Haiku 4.5', color: '#7C3AED' },
+            { label: 'Max tokens', value: '1 024 out', color: '#DC2626' },
+            { label: 'Historique', value: '10 messages', color: '#DC2626' },
             { label: 'Context', value: 'Congo fiscal', color: '#2EA043' },
           ].map(c => (
             <div key={c.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-3">

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'framer-motion'
 import type { Enseignant, Etudiant } from '../../_lib/shared'
@@ -39,7 +39,7 @@ export type ProfilPerson =
 
 // ── Tokens ────────────────────────────────────────────────────────────────────
 
-const G  = '#F51E33'
+const G  = '#DC2626'
 const BG = '#FFFFFF'
 const CARD    = '#F9FAFB'
 const BORDER  = '#E5E7EB'
@@ -49,7 +49,7 @@ const T1 = '#101729'
 const T2 = '#6B7280'
 const T3 = '#9CA3AF'
 const GREEN  = '#2EA043'
-const RED    = '#F51E33'
+const RED    = '#DC2626'
 const BLUE   = '#00b9a7'
 const PURPLE = '#ff7000'
 
@@ -63,7 +63,7 @@ function Avatar({ name, size = 78 }: { name: string; size?: number }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: '#F51E33',
+      background: '#DC2626',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size / 2.5, fontWeight: 800, color: '#FFFFFF',
     }}>
@@ -453,7 +453,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
         }}>
 
         {/* Orange accent line top */}
-        <div style={{ height: 2, background: '#F51E33', flexShrink: 0 }} />
+        <div style={{ height: 2, background: '#DC2626', flexShrink: 0 }} />
 
         {/* ── Profile header ─────────────────────────────────────────────── */}
         <div style={{
@@ -515,7 +515,7 @@ export function ProfilDrawer({ person, onClose }: { person: ProfilPerson; onClos
 
             {/* Modifier button */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
-              <button style={{ padding: '8px 16px', borderRadius: 9, background: '#F51E33', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>
+              <button style={{ padding: '8px 16px', borderRadius: 9, background: '#DC2626', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>
                 ✏️ Modifier
               </button>
               <button style={{ padding: '7px 16px', borderRadius: 9, background: CARD, color: T2, fontWeight: 600, fontSize: 12, border: `1px solid ${BORDER}`, cursor: 'pointer' }}>

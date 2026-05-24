@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -66,8 +66,8 @@ export default function PWAInstall() {
       >
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl">
           <div className="flex items-start gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#F51E33] flex items-center justify-center shrink-0">
-              <Smartphone size={20} className="text-[#F51E33]" />
+            <div className="w-11 h-11 rounded-xl bg-[#DC2626] flex items-center justify-center shrink-0">
+              <Smartphone size={20} className="text-[#DC2626]" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-[var(--text)]">Installer Oraforme</p>
@@ -80,10 +80,10 @@ export default function PWAInstall() {
             </button>
           </div>
           <div className="flex gap-2 mt-3">
-            <button onClick={dismiss} className="flex-1 py-2 text-xs text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl hover:border-[#484F58] transition-all">
+            <button onClick={dismiss} className="flex-1 py-2 text-xs text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl hover:border-[#64748B] transition-all">
               Plus tard
             </button>
-            <button onClick={install} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#F51E33] bg-[#F51E33] rounded-xl hover:bg-[#E09000] transition-all">
+            <button onClick={install} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#DC2626] bg-[#DC2626] rounded-xl hover:bg-[#E09000] transition-all">
               <Download size={13} /> Installer
             </button>
           </div>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -97,7 +97,7 @@ export default function PublicOrderPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--surface)] flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#F51E33]" size={32} />
+        <Loader2 className="animate-spin text-[#DC2626]" size={32} />
       </div>
     )
   }
@@ -118,7 +118,7 @@ export default function PublicOrderPage() {
         <button
           onClick={() => setSuccess(false)}
           className="px-6 py-3 rounded-xl font-semibold text-sm"
-          style={{ background: '#F51E33' }}
+          style={{ background: '#DC2626' }}
         >
           Nouvelle commande
         </button>
@@ -131,7 +131,7 @@ export default function PublicOrderPage() {
       {/* Header */}
       <div className="sticky top-0 z-40 bg-[var(--surface)]/95 backdrop-blur border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ChefHat size={20} className="text-[#F51E33]" />
+          <ChefHat size={20} className="text-[#DC2626]" />
           <div>
             <p className="text-sm font-bold text-white">{restaurant}</p>
             {tableFromQR && <p className="text-xs text-[var(--text-secondary)]">Table {tableFromQR}</p>}
@@ -141,9 +141,9 @@ export default function PublicOrderPage() {
           onClick={() => setShowCart(true)}
           className="relative flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-all"
           style={{
-            borderColor: cartCount > 0 ? '#F51E33' : 'rgba(255,255,255,0.1)',
-            color:       cartCount > 0 ? '#F51E33' : '#8B949E',
-            background:  cartCount > 0 ? '#F51E3312' : 'transparent',
+            borderColor: cartCount > 0 ? '#DC2626' : 'rgba(255,255,255,0.1)',
+            color:       cartCount > 0 ? '#DC2626' : '#8B949E',
+            background:  cartCount > 0 ? '#DC262612' : 'transparent',
           }}
         >
           <ShoppingCart size={16} />
@@ -182,7 +182,7 @@ export default function PublicOrderPage() {
                       <span className="text-3xl shrink-0">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-white">{item.nom}</p>
-                        <p className="text-sm font-bold text-[#F51E33] mt-0.5">{fmt(item.prix)}</p>
+                        <p className="text-sm font-bold text-[#DC2626] mt-0.5">{fmt(item.prix)}</p>
                       </div>
                       <div className="shrink-0">
                         {inCart ? (
@@ -197,7 +197,7 @@ export default function PublicOrderPage() {
                             <button
                               onClick={() => addToCart(item)}
                               className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                              style={{ background: '#F51E33', color: '#142850' }}
+                              style={{ background: '#DC2626', color: '#0F172A' }}
                             >
                               <Plus size={13} />
                             </button>
@@ -206,7 +206,7 @@ export default function PublicOrderPage() {
                           <button
                             onClick={() => addToCart(item)}
                             className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
-                            style={{ background: '#F51E33', color: '#142850' }}
+                            style={{ background: '#DC2626', color: '#0F172A' }}
                           >
                             <Plus size={16} />
                           </button>
@@ -254,7 +254,7 @@ export default function PublicOrderPage() {
                       <span className="text-xl shrink-0">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-white truncate">{item.nom}</p>
-                        <p className="text-xs text-[#F51E33]">{fmt(item.prix)} × {item.quantite}</p>
+                        <p className="text-xs text-[#DC2626]">{fmt(item.prix)} × {item.quantite}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <button onClick={() => updateQty(item.nom, -1)} className="w-7 h-7 rounded-full bg-white/[0.08] text-white flex items-center justify-center">
@@ -280,9 +280,9 @@ export default function PublicOrderPage() {
                       onClick={() => setMode(m)}
                       className="py-2 rounded-lg text-xs font-semibold border transition-all"
                       style={{
-                        borderColor: mode === m ? '#F51E33' : 'rgba(255,255,255,0.08)',
-                        color:       mode === m ? '#F51E33' : '#8B949E',
-                        background:  mode === m ? '#F51E3315' : 'transparent',
+                        borderColor: mode === m ? '#DC2626' : 'rgba(255,255,255,0.08)',
+                        color:       mode === m ? '#DC2626' : '#8B949E',
+                        background:  mode === m ? '#DC262615' : 'transparent',
                       }}
                     >
                       {m === 'sur_place' ? 'Sur place' : m === 'emporter' ? 'À emporter' : 'Livraison'}
@@ -296,7 +296,7 @@ export default function PublicOrderPage() {
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] text-xs">Table</span>
                       <input
-                        className="w-full pl-14 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F51E33]/50"
+                        className="w-full pl-14 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#DC2626]/50"
                         placeholder="Numéro de table"
                         value={tableNum}
                         onChange={e => setTableNum(e.target.value)}
@@ -307,14 +307,14 @@ export default function PublicOrderPage() {
                     <div className="relative flex-1">
                       <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                       <input
-                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F51E33]/50"
+                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#DC2626]/50"
                         placeholder="Votre téléphone"
                         value={clientTel}
                         onChange={e => setClientTel(e.target.value)}
                       />
                     </div>
                     <input
-                      className="flex-1 px-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F51E33]/50"
+                      className="flex-1 px-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#DC2626]/50"
                       placeholder="Votre nom"
                       value={clientNom}
                       onChange={e => setClientNom(e.target.value)}
@@ -324,7 +324,7 @@ export default function PublicOrderPage() {
                     <div className="relative">
                       <MapPin size={13} className="absolute left-3 top-3 text-[var(--text-secondary)]" />
                       <input
-                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F51E33]/50"
+                        className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#DC2626]/50"
                         placeholder="Adresse de livraison"
                         value={adresse}
                         onChange={e => setAdresse(e.target.value)}
@@ -334,7 +334,7 @@ export default function PublicOrderPage() {
                   <div className="relative">
                     <MessageSquare size={13} className="absolute left-3 top-3 text-[var(--text-secondary)]" />
                     <textarea
-                      className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#F51E33]/50 resize-none"
+                      className="w-full pl-8 pr-3 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-sm text-white focus:outline-none focus:border-[#DC2626]/50 resize-none"
                       rows={2}
                       placeholder="Note pour la cuisine (facultatif)"
                       value={note}
@@ -366,7 +366,7 @@ export default function PublicOrderPage() {
                 {/* Total + submit */}
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm font-semibold text-white">Total</span>
-                  <span className="text-lg font-bold text-[#F51E33]">{fmt(total)}</span>
+                  <span className="text-lg font-bold text-[#DC2626]">{fmt(total)}</span>
                 </div>
 
                 <motion.button
@@ -375,7 +375,7 @@ export default function PublicOrderPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   className="w-full py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 disabled:opacity-50"
-                  style={{ background: '#F51E33', color: '#142850' }}
+                  style={{ background: '#DC2626', color: '#0F172A' }}
                 >
                   {submitting ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />}
                   {submitting ? 'Envoi en cours…' : 'Commander'}

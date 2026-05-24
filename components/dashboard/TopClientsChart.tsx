@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
@@ -17,15 +17,15 @@ function fmtShort(n: number) {
   return String(n)
 }
 
-const GOLD = '#F51E33'
-const GOLDS = ['#F51E33', '#E09000', '#C07800', '#A06000', '#805000']
+const GOLD = '#DC2626'
+const GOLDS = ['#DC2626', '#E09000', '#C07800', '#A06000', '#805000']
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-3 shadow-2xl text-xs">
       <p className="text-[var(--text)] font-semibold mb-1 truncate max-w-[160px]">{label}</p>
-      <p className="text-[#F51E33]">{fmtFull(payload[0].value)}</p>
+      <p className="text-[#DC2626]">{fmtFull(payload[0].value)}</p>
       {payload[0].payload.count && (
         <p className="text-[var(--text-secondary)] mt-0.5">{payload[0].payload.count} facture(s)</p>
       )}
@@ -53,7 +53,7 @@ export default function TopClientsChart({ data }: { data: ClientRevenue[] }) {
         <>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={data.slice(0, 5)} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
-              <XAxis type="number" tick={{ fill: '#484F58', fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+              <XAxis type="number" tick={{ fill: '#64748B', fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
               <YAxis type="category" dataKey="nom" tick={{ fill: '#8B949E', fontSize: 9 }} axisLine={false} tickLine={false} width={80} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="montant" radius={[0, 4, 4, 0]} barSize={16}>

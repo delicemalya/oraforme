@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -21,18 +21,18 @@ type Depense = {
 type CostCenter = { id: string; code: string; nom: string }
 
 const CATEGORIES = [
-  { id: 'carburant',    label: '🚗 Carburant & Transport',       color: '#F51E33' },
-  { id: 'loyer',        label: '🏠 Loyer & Charges locatives',    color: '#8B0070' },
-  { id: 'electricite',  label: '💡 Électricité & Eau',           color: '#F51E33' },
-  { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#F51E33' },
-  { id: 'salaires',     label: '👥 Salaires & RH',               color: '#8B0070' },
-  { id: 'fournitures',  label: '🛒 Achats & Fournitures',        color: '#142850' },
-  { id: 'sante',        label: '🏥 Santé & Assurances',          color: '#142850' },
-  { id: 'taxes',        label: '📊 Taxes & Impôts',              color: '#F51E33' },
+  { id: 'carburant',    label: '🚗 Carburant & Transport',       color: '#DC2626' },
+  { id: 'loyer',        label: '🏠 Loyer & Charges locatives',    color: '#7C3AED' },
+  { id: 'electricite',  label: '💡 Électricité & Eau',           color: '#DC2626' },
+  { id: 'telephone',    label: '📱 Téléphone & Internet',        color: '#DC2626' },
+  { id: 'salaires',     label: '👥 Salaires & RH',               color: '#7C3AED' },
+  { id: 'fournitures',  label: '🛒 Achats & Fournitures',        color: '#0F172A' },
+  { id: 'sante',        label: '🏥 Santé & Assurances',          color: '#0F172A' },
+  { id: 'taxes',        label: '📊 Taxes & Impôts',              color: '#DC2626' },
   { id: 'maintenance',  label: '🔧 Maintenance & Réparations',   color: '#84CC16' },
-  { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#F51E33' },
-  { id: 'voyages',      label: '✈️ Voyages & Déplacements',      color: '#F51E33' },
-  { id: 'autre',        label: '📦 Autre',                       color: '#484F58' },
+  { id: 'marketing',    label: '📢 Marketing & Communication',   color: '#DC2626' },
+  { id: 'voyages',      label: '✈️ Voyages & Déplacements',      color: '#DC2626' },
+  { id: 'autre',        label: '📦 Autre',                       color: '#64748B' },
 ]
 
 const MODES = ['Espèces', 'Airtel Money', 'MTN MoMo', 'Virement', 'Carte']
@@ -154,15 +154,15 @@ export default function DepensesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
-          <Receipt size={18} className="text-[#F51E33]" />
+        <div className="w-10 h-10 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/20 flex items-center justify-center">
+          <Receipt size={18} className="text-[#DC2626]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">Dépenses & Charges</h1>
           <p className="text-xs text-[var(--text-secondary)]">Suivi de toutes vos dépenses par catégorie</p>
         </div>
         <button onClick={() => setShowModal(true)}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-medium hover:bg-[#F51E33]/90 transition-colors">
+          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-medium hover:bg-[#DC2626]/90 transition-colors">
           <Plus size={15} /> Dépense
         </button>
       </div>
@@ -172,7 +172,7 @@ export default function DepensesPage() {
         {[{ label: '7 jours', days: 7 }, { label: '30 jours', days: 30 }, { label: '90 jours', days: 90 }].map(p => (
           <button key={p.days} onClick={() => setPeriode(p.days)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              periode === p.days ? 'bg-[#F51E33]/10 text-[#F51E33] border border-[#F51E33]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5'
+              periode === p.days ? 'bg-[#DC2626]/10 text-[#DC2626] border border-[#DC2626]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5'
             }`}>
             {p.label}
           </button>
@@ -182,10 +182,10 @@ export default function DepensesPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total période',       value: fmtFCFA(totalMois),   gradient: '#F51E33', icon: TrendingDown },
-          { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: '#F51E33', icon: Receipt },
-          { label: 'Moyenne par jour',    value: fmtFCFA(moyJour),     gradient: '#8B0070', icon: Receipt },
-          { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? '#F51E33' : '#142850', icon: varPct > 0 ? TrendingUp : TrendingDown },
+          { label: 'Total période',       value: fmtFCFA(totalMois),   gradient: '#DC2626', icon: TrendingDown },
+          { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: '#DC2626', icon: Receipt },
+          { label: 'Moyenne par jour',    value: fmtFCFA(moyJour),     gradient: '#7C3AED', icon: Receipt },
+          { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? '#DC2626' : '#0F172A', icon: varPct > 0 ? TrendingUp : TrendingDown },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -278,7 +278,7 @@ export default function DepensesPage() {
                     <p className="text-xs text-[var(--text-secondary)]">{cat?.label.split(' ').slice(1).join(' ') ?? d.categorie} · {d.mode_paiement}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-[#F51E33]">-{fmtFCFA(d.montant)}</p>
+                    <p className="text-sm font-semibold text-[#DC2626]">-{fmtFCFA(d.montant)}</p>
                     <p className="text-xs text-[var(--text-secondary)]">
                       {new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                     </p>
@@ -286,7 +286,7 @@ export default function DepensesPage() {
                   <button
                     onClick={() => deleteDepense(d.id)}
                     disabled={deleting === d.id}
-                    className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[#F51E33] hover:bg-[#F51E33]/10 transition-all"
+                    className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[#DC2626] hover:bg-[#DC2626]/10 transition-all"
                     title="Supprimer"
                   >
                     {deleting === d.id
@@ -326,14 +326,14 @@ export default function DepensesPage() {
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Description</label>
                   <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                     placeholder="Description de la dépense..."
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA)</label>
                     <input type="number" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                   </div>
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
@@ -362,7 +362,7 @@ export default function DepensesPage() {
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Réf. pièce (facultatif)</label>
                   <input value={form.reference_piece} onChange={e => setForm(f => ({ ...f, reference_piece: e.target.value }))}
                     placeholder="Ex: FAC-2025-001, BON-42..."
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#F51E33]/50" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                 </div>
 
                 {/* Écriture OHADA */}
@@ -371,14 +371,14 @@ export default function DepensesPage() {
                     <BookOpen size={10} /> Écriture OHADA (auto-calculée)
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
-                    <div className="bg-[var(--surface)] border border-[#142850]/20 rounded-lg px-3 py-2">
+                    <div className="bg-[var(--surface)] border border-[#0F172A]/20 rounded-lg px-3 py-2">
                       <p className="text-[var(--text-secondary)] mb-0.5">Débit</p>
-                      <p className="text-[#F51E33] font-semibold">{form.debit_account}</p>
+                      <p className="text-[#DC2626] font-semibold">{form.debit_account}</p>
                       <p className="text-[var(--text-secondary)] text-[9px] truncate">{accountLabel(form.debit_account)}</p>
                     </div>
-                    <div className="bg-[var(--surface)] border border-[#F51E33]/20 rounded-lg px-3 py-2">
+                    <div className="bg-[var(--surface)] border border-[#DC2626]/20 rounded-lg px-3 py-2">
                       <p className="text-[var(--text-secondary)] mb-0.5">Crédit</p>
-                      <p className="text-[#F51E33] font-semibold">{form.credit_account}</p>
+                      <p className="text-[#DC2626] font-semibold">{form.credit_account}</p>
                       <p className="text-[var(--text-secondary)] text-[9px] truncate">{accountLabel(form.credit_account)}</p>
                     </div>
                   </div>
@@ -388,7 +388,7 @@ export default function DepensesPage() {
                 <button onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
                 <button onClick={save} disabled={saving || !form.description || !form.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#F51E33]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                   {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
                 </button>
               </div>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -61,8 +61,8 @@ export interface Absence {
 
 export const STATUT_ETU: Record<StatutEtu, { label: string; color: string; bg: string }> = {
   actif:    { label: 'Actif',    color: '#FFFFFF', bg: '#00b9a7' },
-  suspendu: { label: 'Suspendu', color: '#FFFFFF', bg: '#F51E33' },
-  banni:    { label: 'Banni',    color: '#FFFFFF', bg: '#F51E33' },
+  suspendu: { label: 'Suspendu', color: '#FFFFFF', bg: '#DC2626' },
+  banni:    { label: 'Banni',    color: '#FFFFFF', bg: '#DC2626' },
   diplome:  { label: 'Diplômé', color: '#FFFFFF', bg: '#ff7000' },
 }
 
@@ -84,11 +84,11 @@ export const PERIODES: { value: Periode; label: string }[] = [
 ]
 
 export const MENTIONS = [
-  { min: 16, label: 'Très Bien',  color: '#8B0070' },
-  { min: 14, label: 'Bien',        color: '#F51E33' },
-  { min: 12, label: 'Assez Bien', color: '#8B0070' },
-  { min: 10, label: 'Passable',   color: '#F51E33' },
-  { min: 0,  label: 'Insuffisant',color: '#F51E33' },
+  { min: 16, label: 'Très Bien',  color: '#7C3AED' },
+  { min: 14, label: 'Bien',        color: '#DC2626' },
+  { min: 12, label: 'Assez Bien', color: '#7C3AED' },
+  { min: 10, label: 'Passable',   color: '#DC2626' },
+  { min: 0,  label: 'Insuffisant',color: '#DC2626' },
 ]
 
 export const STATUT_ENS: Record<StatutEnseignant, { label: string; color: string; bg: string }> = {
@@ -98,10 +98,10 @@ export const STATUT_ENS: Record<StatutEnseignant, { label: string; color: string
 }
 
 export const TYPE_EVENT: Record<TypeEvent, { label: string; color: string; bg: string }> = {
-  examen:         { label: 'Examen',    color: '#F51E33', bg: '#F51E3318' },
-  conge_scolaire: { label: 'Congé',     color: '#F51E33', bg: '#F51E3318' },
-  evenement:      { label: 'Événement', color: '#8B0070', bg: 'rgba(139,0,112,0.15)' },
-  conseil:        { label: 'Conseil',   color: '#8B0070', bg: '#8B007018' },
+  examen:         { label: 'Examen',    color: '#DC2626', bg: '#DC262618' },
+  conge_scolaire: { label: 'Congé',     color: '#DC2626', bg: '#DC262618' },
+  evenement:      { label: 'Événement', color: '#7C3AED', bg: 'rgba(139,0,112,0.15)' },
+  conseil:        { label: 'Conseil',   color: '#7C3AED', bg: '#7C3AED18' },
   autre:          { label: 'Autre',     color: '#8B949E', bg: '#8B949E18' },
 }
 
@@ -269,26 +269,26 @@ export const TYPES_ATTESTATION: { value: Attestation['type_attestation']; label:
 ]
 
 export const STATUT_DIPLOME: Record<Diploma['statut'], { label: string; color: string; bg: string }> = {
-  en_attente: { label: 'En attente', color: '#F51E33', bg: '#F51E3318' },
-  valide:     { label: 'Validé',     color: '#F51E33', bg: '#F51E3318' },
-  delivre:    { label: 'Délivré',    color: '#142850', bg: '#14285018' },
-  revoque:    { label: 'Révoqué',    color: '#F51E33', bg: '#F51E3318' },
+  en_attente: { label: 'En attente', color: '#DC2626', bg: '#DC262618' },
+  valide:     { label: 'Validé',     color: '#DC2626', bg: '#DC262618' },
+  delivre:    { label: 'Délivré',    color: '#0F172A', bg: '#0F172A18' },
+  revoque:    { label: 'Révoqué',    color: '#DC2626', bg: '#DC262618' },
 }
 
 export const STATUT_DEFENSE: Record<Defense['statut'], { label: string; color: string; bg: string }> = {
-  planifie: { label: 'Planifiée',  color: '#F51E33', bg: '#F51E3318' },
-  en_cours: { label: 'En cours',   color: '#F51E33', bg: '#F51E3318' },
-  passe:    { label: 'Passée',     color: '#142850', bg: '#14285018' },
-  reporte:  { label: 'Reportée',   color: '#8B0070', bg: '#8B007018' },
-  annule:   { label: 'Annulée',    color: '#F51E33', bg: '#F51E3318' },
+  planifie: { label: 'Planifiée',  color: '#DC2626', bg: '#DC262618' },
+  en_cours: { label: 'En cours',   color: '#DC2626', bg: '#DC262618' },
+  passe:    { label: 'Passée',     color: '#0F172A', bg: '#0F172A18' },
+  reporte:  { label: 'Reportée',   color: '#7C3AED', bg: '#7C3AED18' },
+  annule:   { label: 'Annulée',    color: '#DC2626', bg: '#DC262618' },
 }
 
 export const MENTIONS_DIPLOME: { value: string; label: string; color: string }[] = [
-  { value: 'excellent',   label: 'Excellent',    color: '#142850' },
-  { value: 'tres_bien',   label: 'Très Bien',    color: '#F51E33' },
-  { value: 'bien',        label: 'Bien',          color: '#8B0070' },
-  { value: 'assez_bien',  label: 'Assez Bien',   color: '#F51E33' },
-  { value: 'passable',    label: 'Passable',      color: '#F51E33' },
+  { value: 'excellent',   label: 'Excellent',    color: '#0F172A' },
+  { value: 'tres_bien',   label: 'Très Bien',    color: '#DC2626' },
+  { value: 'bien',        label: 'Bien',          color: '#7C3AED' },
+  { value: 'assez_bien',  label: 'Assez Bien',   color: '#DC2626' },
+  { value: 'passable',    label: 'Passable',      color: '#DC2626' },
 ]
 
 // ── Academic Settings ─────────────────────────────────────────────────────────
@@ -381,7 +381,7 @@ export function printDiploma(etudiant: Etudiant, diploma: Diploma, nomEcole: str
   const w = window.open('', '_blank', 'width=900,height=700')
   if (!w) return
   w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/><title>Diplôme</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Times New Roman',serif;background:#fff}.page{width:880px;height:620px;margin:auto;padding:48px 60px;border:8px double #8B0070;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;background:#f5f3ff;font-size:120px;color:#8B007020;font-weight:900;letter-spacing:-4px;pointer-events:none}.header{margin-bottom:24px}.school{font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:4px;color:#1a1a2e}.title{font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:6px;color:#8B0070;margin:16px 0;border-top:2px solid #8B0070;border-bottom:2px solid #8B0070;padding:8px 0}.name{font-size:28px;font-style:italic;font-weight:700;color:#1a1a2e;margin-bottom:8px}.level{font-size:16px;color:#444;margin-bottom:4px}.mention{font-size:20px;font-weight:700;color:${mention?.color ?? '#142850'};margin:16px 0}.details{font-size:12px;color:#666;line-height:2}.footer{display:flex;justify-content:space-between;width:100%;margin-top:auto;padding-top:24px}.sign-box{text-align:center;width:200px}.sign-line{border-top:1px solid #555;padding-top:6px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#555}.num{position:absolute;bottom:16px;right:24px;font-size:9px;color:#aaa}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Times New Roman',serif;background:#fff}.page{width:880px;height:620px;margin:auto;padding:48px 60px;border:8px double #7C3AED;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;background:#f5f3ff;font-size:120px;color:#7C3AED20;font-weight:900;letter-spacing:-4px;pointer-events:none}.header{margin-bottom:24px}.school{font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:4px;color:#1a1a2e}.title{font-size:36px;font-weight:700;text-transform:uppercase;letter-spacing:6px;color:#7C3AED;margin:16px 0;border-top:2px solid #7C3AED;border-bottom:2px solid #7C3AED;padding:8px 0}.name{font-size:28px;font-style:italic;font-weight:700;color:#1a1a2e;margin-bottom:8px}.level{font-size:16px;color:#444;margin-bottom:4px}.mention{font-size:20px;font-weight:700;color:${mention?.color ?? '#0F172A'};margin:16px 0}.details{font-size:12px;color:#666;line-height:2}.footer{display:flex;justify-content:space-between;width:100%;margin-top:auto;padding-top:24px}.sign-box{text-align:center;width:200px}.sign-line{border-top:1px solid #555;padding-top:6px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#555}.num{position:absolute;bottom:16px;right:24px;font-size:9px;color:#aaa}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
 </head><body><div class="page">
 <div class="watermark">DIPLÔME</div>
 <div class="header"><div class="school">${nomEcole}</div></div>
@@ -415,7 +415,7 @@ export function StatutBadge({ statut }: { statut: StatutEtu }) {
   )
 }
 
-const AVATAR_PALETTE = ['#00b9a7', '#ff7000', '#142850']
+const AVATAR_PALETTE = ['#00b9a7', '#ff7000', '#0F172A']
 
 export function Avatar({ nom, prenom, photoUrl, size = 32, avatarIndex }: { nom: string; prenom: string; photoUrl: string | null; size?: number; avatarIndex?: number }) {
   if (photoUrl) {
@@ -450,10 +450,10 @@ export function FI({ label, value, onChange, placeholder, type = 'text' }: {
 
 export function KpiCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
   const colorMap: Record<string, string> = {
-    '#F51E33': '#00b9a7',
-    '#8B0070': '#ff7000',
+    '#DC2626': '#00b9a7',
+    '#7C3AED': '#ff7000',
     '#F08900': '#ff7000',
-    '#142850': '#142850',
+    '#0F172A': '#0F172A',
   }
   const bg = color ? (colorMap[color] ?? color) : null
   const hasColorBg = !!bg

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -23,7 +23,7 @@ export default function LanguageSelector() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#F51E33] hover:text-[var(--text)] transition-all text-xs font-medium"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#DC2626] hover:text-[var(--text)] transition-all text-xs font-medium"
         title="Changer de langue"
       >
         <Globe size={13} />
@@ -46,13 +46,13 @@ export default function LanguageSelector() {
                 onClick={() => { setLocale(loc as Locale); setOpen(false) }}
                 className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-left transition-colors ${
                   locale === loc
-                    ? 'bg-[#F51E3315] text-[#F51E33] font-semibold'
+                    ? 'bg-[#DC262615] text-[#DC2626] font-semibold'
                     : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text)]'
                 }`}
               >
                 <span className="text-base">{LOCALE_FLAGS[loc as Locale]}</span>
                 <span>{LOCALE_LABELS[loc as Locale]}</span>
-                {locale === loc && <span className="ml-auto text-[#F51E33]">✓</span>}
+                {locale === loc && <span className="ml-auto text-[#DC2626]">✓</span>}
               </button>
             ))}
           </motion.div>

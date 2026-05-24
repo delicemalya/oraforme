@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -49,38 +49,38 @@ type ModuleDef = { id: string; label: string; sublabel: string; icon: LucideIcon
 
 const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
   ecole: [
-    { id: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,     color: '#F51E33' },
-    { id: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,      color: '#F51E33' },
-    { id: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,          color: '#142850' },
-    { id: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA',                icon: Calculator,     color: '#8B0070' },
-    { id: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap,  color: '#142850' },
-    { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#8B0070' },
-    { id: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,            color: '#F51E33' },
+    { id: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,     color: '#DC2626' },
+    { id: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,      color: '#DC2626' },
+    { id: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,          color: '#0F172A' },
+    { id: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA',                icon: Calculator,     color: '#7C3AED' },
+    { id: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap,  color: '#0F172A' },
+    { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#7C3AED' },
+    { id: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,            color: '#DC2626' },
   ],
   restaurant: [
-    { id: 'pos',        label: 'Caisse POS',  sublabel: 'Ventes',     icon: ChefHat,   color: '#F51E33' },
-    { id: 'stock',      label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#142850' },
-    { id: 'rh',         label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F51E33' },
-    { id: 'tresorerie', label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0070' },
-    { id: 'miaa',       label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F51E33' },
+    { id: 'pos',        label: 'Caisse POS',  sublabel: 'Ventes',     icon: ChefHat,   color: '#DC2626' },
+    { id: 'stock',      label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0F172A' },
+    { id: 'rh',         label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#DC2626' },
+    { id: 'tresorerie', label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#7C3AED' },
+    { id: 'miaa',       label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#DC2626' },
   ],
   commerce: [
-    { id: 'facturation', label: 'Facturation', sublabel: 'Devis',      icon: FileText,  color: '#F51E33' },
-    { id: 'stock',       label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#142850' },
-    { id: 'rh',          label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#F51E33' },
-    { id: 'tresorerie',  label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#8B0070' },
-    { id: 'miaa',        label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#F51E33' },
+    { id: 'facturation', label: 'Facturation', sublabel: 'Devis',      icon: FileText,  color: '#DC2626' },
+    { id: 'stock',       label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0F172A' },
+    { id: 'rh',          label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#DC2626' },
+    { id: 'tresorerie',  label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#7C3AED' },
+    { id: 'miaa',        label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#DC2626' },
   ],
   default: [
-    { id: 'facturation',  label: 'Facturation',  sublabel: '',          icon: FileText,  color: '#F51E33' },
-    { id: 'stock',        label: 'Stock',        sublabel: '',          icon: Package,   color: '#142850' },
-    { id: 'rh',           label: 'RH',           sublabel: '',          icon: Users,     color: '#F51E33' },
-    { id: 'tresorerie',   label: 'Trésorerie',   sublabel: '',          icon: Wallet,    color: '#8B0070' },
-    { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#8B0070' },
-    { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#142850' },
-    { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#8B0070' },
-    { id: 'transport',    label: 'Transport',    sublabel: '',          icon: Truck,     color: '#F51E33' },
-    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#142850' },
+    { id: 'facturation',  label: 'Facturation',  sublabel: '',          icon: FileText,  color: '#DC2626' },
+    { id: 'stock',        label: 'Stock',        sublabel: '',          icon: Package,   color: '#0F172A' },
+    { id: 'rh',           label: 'RH',           sublabel: '',          icon: Users,     color: '#DC2626' },
+    { id: 'tresorerie',   label: 'Trésorerie',   sublabel: '',          icon: Wallet,    color: '#7C3AED' },
+    { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#7C3AED' },
+    { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#0F172A' },
+    { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#7C3AED' },
+    { id: 'transport',    label: 'Transport',    sublabel: '',          icon: Truck,     color: '#DC2626' },
+    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#0F172A' },
   ],
 }
 
@@ -88,7 +88,7 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
 
 function RoleBadge({ role }: { role: Role }) {
   const cfg = {
-    owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-[#F51E33] border-amber-500/20' },
+    owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-[#DC2626] border-amber-500/20' },
     admin:  { label: 'Administrateur', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
     membre: { label: 'Membre',         cls: 'bg-gray-100 text-[var(--text-secondary)] border-gray-200' },
   }
@@ -312,7 +312,7 @@ export default function EquipePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[#101729]flex items-center gap-2">
-            <UsersRound size={20} className="text-[#F51E33]" />
+            <UsersRound size={20} className="text-[#DC2626]" />
             Gestion de l'équipe
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">
@@ -321,7 +321,7 @@ export default function EquipePage() {
         </div>
         <button
           onClick={() => setInviteOpen(true)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#F51E33] text-sm hover:bg-amber-500/30 transition"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#DC2626] text-sm hover:bg-amber-500/30 transition"
         >
           <Plus size={14} />
           Inviter un membre
@@ -346,7 +346,7 @@ export default function EquipePage() {
               className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md"
             >
               <h2 className="text-base font-bold text-[#101729]mb-4 flex items-center gap-2">
-                <Send size={16} className="text-[#F51E33]" />
+                <Send size={16} className="text-[#DC2626]" />
                 Inviter un membre
               </h2>
 
@@ -409,7 +409,7 @@ export default function EquipePage() {
                 <button
                   onClick={sendInvite}
                   disabled={!inviteEmail.trim() || inviting}
-                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#F51E33] disabled:opacity-40 transition flex items-center justify-center gap-2"
+                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#DC2626] disabled:opacity-40 transition flex items-center justify-center gap-2"
                 >
                   {inviting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                   Envoyer
@@ -440,7 +440,7 @@ export default function EquipePage() {
                 }`}
               >
                 <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
-                  <span className="text-xs font-bold text-[#F51E33]">
+                  <span className="text-xs font-bold text-[#DC2626]">
                     {(member.prenom?.[0] ?? member.nom?.[0] ?? '?').toUpperCase()}
                   </span>
                 </div>
@@ -482,7 +482,7 @@ export default function EquipePage() {
             </div>
           ) : selected.role === 'owner' ? (
             <div className="flex flex-col items-center justify-center h-64 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center">
-              <Shield size={28} className="text-[#F51E33]/40 mb-3" />
+              <Shield size={28} className="text-[#DC2626]/40 mb-3" />
               <p className="text-sm text-[var(--text-secondary)] font-medium">
                 {selected.prenom} {selected.nom}
               </p>
@@ -497,7 +497,7 @@ export default function EquipePage() {
               <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center">
-                    <span className="text-sm font-bold text-[#F51E33]">
+                    <span className="text-sm font-bold text-[#DC2626]">
                       {(selected.prenom?.[0] ?? '?').toUpperCase()}
                     </span>
                   </div>
@@ -605,7 +605,7 @@ export default function EquipePage() {
                   <button
                     onClick={savePerms}
                     disabled={saving}
-                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#F51E33] disabled:opacity-40 transition"
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#DC2626] disabled:opacity-40 transition"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     Enregistrer les permissions

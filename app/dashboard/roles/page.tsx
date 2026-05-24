@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -36,31 +36,31 @@ interface RolePerm {
 type ModuleDef = { key: string; label: string; sublabel: string; icon: LucideIcon; color: string }
 
 const ECOLE_MODULES: ModuleDef[] = [
-  { key: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,    color: '#F51E33' },
-  { key: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,     color: '#F51E33' },
-  { key: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,         color: '#142850' },
-  { key: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA & Trésorerie',   icon: Calculator,    color: '#8B0070' },
-  { key: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap, color: '#142850' },
-  { key: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake,color: '#8B0070' },
-  { key: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,           color: '#F51E33' },
+  { key: 'scolarite',       label: 'Scolarité',       sublabel: 'Inscriptions & notes', icon: BookMarked,    color: '#DC2626' },
+  { key: 'direction',       label: 'Direction',       sublabel: 'Finances & pilotage',  icon: BarChart2,     color: '#DC2626' },
+  { key: 'rh',              label: 'RH & Paie',       sublabel: 'Personnel',            icon: Users,         color: '#0F172A' },
+  { key: 'comptabilite',    label: 'Comptabilité',    sublabel: 'OHADA & Trésorerie',   icon: Calculator,    color: '#7C3AED' },
+  { key: 'espace-etudiant', label: 'Espace Étudiant', sublabel: 'Dossiers élèves',      icon: GraduationCap, color: '#0F172A' },
+  { key: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake,color: '#7C3AED' },
+  { key: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,           color: '#DC2626' },
 ]
 
 const GENERIC_MODULES: ModuleDef[] = [
-  { key: 'facturation',  label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  color: '#F51E33' },
-  { key: 'stock',        label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   color: '#142850' },
-  { key: 'rh',           label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     color: '#F51E33' },
-  { key: 'tresorerie',   label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    color: '#8B0070' },
-  { key: 'comptabilite', label: 'Comptabilité', sublabel: 'OHADA',             icon: BookOpen,  color: '#8B0070' },
-  { key: 'restaurant',   label: 'Caisse POS',   sublabel: 'Ventes',            icon: ChefHat,   color: '#F51E33' },
-  { key: 'transport',    label: 'Transport',    sublabel: 'Flotte',            icon: Truck,     color: '#F51E33' },
-  { key: 'hotel',        label: 'Hôtel',        sublabel: 'Hébergement',       icon: Hotel,     color: '#142850' },
-  { key: 'miaa',         label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       color: '#F51E33' },
+  { key: 'facturation',  label: 'Facturation',  sublabel: 'Devis & factures',  icon: FileText,  color: '#DC2626' },
+  { key: 'stock',        label: 'Stock',        sublabel: 'Inventaire',        icon: Package,   color: '#0F172A' },
+  { key: 'rh',           label: 'RH & Paie',   sublabel: 'Personnel',         icon: Users,     color: '#DC2626' },
+  { key: 'tresorerie',   label: 'Trésorerie',   sublabel: 'Finances',          icon: Wallet,    color: '#7C3AED' },
+  { key: 'comptabilite', label: 'Comptabilité', sublabel: 'OHADA',             icon: BookOpen,  color: '#7C3AED' },
+  { key: 'restaurant',   label: 'Caisse POS',   sublabel: 'Ventes',            icon: ChefHat,   color: '#DC2626' },
+  { key: 'transport',    label: 'Transport',    sublabel: 'Flotte',            icon: Truck,     color: '#DC2626' },
+  { key: 'hotel',        label: 'Hôtel',        sublabel: 'Hébergement',       icon: Hotel,     color: '#0F172A' },
+  { key: 'miaa',         label: 'MIAA+',        sublabel: 'Assistant IA',      icon: Bot,       color: '#DC2626' },
 ]
 
 // Couleurs proposées pour les rôles
 const ROLE_COLORS = [
-  '#F51E33', '#142850', '#8B0070', '#F51E33',
-  '#8B0070', '#142850', '#F51E33', '#F51E33', '#84CC16',
+  '#DC2626', '#0F172A', '#7C3AED', '#DC2626',
+  '#7C3AED', '#0F172A', '#DC2626', '#DC2626', '#84CC16',
 ]
 
 // ── Toggle ────────────────────────────────────────────────────────────────────
@@ -212,13 +212,13 @@ export default function RolesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[#101729]flex items-center gap-2">
-            <Shield size={20} className="text-[#F51E33]" /> Gestion des rôles
+            <Shield size={20} className="text-[#DC2626]" /> Gestion des rôles
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">Créez des rôles personnalisés et définissez leurs accès aux modules.</p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#F51E33] text-sm hover:bg-amber-500/30 transition"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#DC2626] text-sm hover:bg-amber-500/30 transition"
         >
           <Plus size={14} /> Nouveau rôle
         </button>
@@ -238,7 +238,7 @@ export default function RolesPage() {
               className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md space-y-4"
             >
               <h2 className="text-base font-bold text-[#101729]flex items-center gap-2">
-                <Shield size={16} className="text-[#F51E33]" />
+                <Shield size={16} className="text-[#DC2626]" />
                 {editingRole ? 'Modifier le rôle' : 'Nouveau rôle'}
               </h2>
 
@@ -289,7 +289,7 @@ export default function RolesPage() {
                 </button>
                 <button
                   onClick={saveRole} disabled={!form.name.trim() || saving}
-                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#F51E33] disabled:opacity-40 transition flex items-center justify-center gap-2"
+                  className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#DC2626] disabled:opacity-40 transition flex items-center justify-center gap-2"
                 >
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                   {editingRole ? 'Enregistrer' : 'Créer'}
@@ -418,7 +418,7 @@ export default function RolesPage() {
                 <div className="mt-5 flex justify-end">
                   <button
                     onClick={saveRolePerms} disabled={saving}
-                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#F51E33] disabled:opacity-40 transition"
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#DC2626] disabled:opacity-40 transition"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     Enregistrer les accès

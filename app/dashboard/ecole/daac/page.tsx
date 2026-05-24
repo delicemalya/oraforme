@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
@@ -90,10 +90,10 @@ export default function DaacPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
           className="grid grid-cols-2 lg:grid-cols-4 gap-3"
         >
-          <KpiCard label="Étudiants actifs"    value={actifs}         color="#F51E33" />
-          <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#F51E33" />
-          <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#8B0070" />
-          <KpiCard label="Soutenances planif." value={souPlanifie}    color="#142850" />
+          <KpiCard label="Étudiants actifs"    value={actifs}         color="#DC2626" />
+          <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#DC2626" />
+          <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#7C3AED" />
+          <KpiCard label="Soutenances planif." value={souPlanifie}    color="#0F172A" />
         </motion.div>
 
         {/* Tabs */}

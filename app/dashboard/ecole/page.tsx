@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
@@ -78,7 +78,7 @@ function StatCard({
           <Icon size={18} style={{ color }} />
         </div>
         {badge && (
-          <span style={{ background: 'rgba(245,30,51,0.1)', color: '#F51E33', fontSize: 10, fontWeight: 600, borderRadius: 4, padding: '2px 8px' }}>
+          <span style={{ background: 'rgba(245,30,51,0.1)', color: '#DC2626', fontSize: 10, fontWeight: 600, borderRadius: 4, padding: '2px 8px' }}>
             {badge}
           </span>
         )}
@@ -117,7 +117,7 @@ function RevenueCard({
         <div className="kpi-card" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px 24px', height: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
             <div style={{ width: 36, height: 36, background: 'rgba(245,30,51,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <TrendingUp size={18} style={{ color: '#F51E33' }} />
+              <TrendingUp size={18} style={{ color: '#DC2626' }} />
             </div>
             <div style={{ display: 'flex', gap: 2, background: 'var(--border)', borderRadius: 8, padding: 3 }}
               onClick={e => e.preventDefault()}>
@@ -126,7 +126,7 @@ function RevenueCard({
                   onClick={e => { e.preventDefault(); e.stopPropagation(); setPeriod(p) }}
                   style={{
                     padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700,
-                    background: period === p ? '#F51E33' : 'transparent',
+                    background: period === p ? '#DC2626' : 'transparent',
                     color: period === p ? '#FFFFFF' : 'var(--text-secondary)',
                     border: 'none', cursor: 'pointer',
                   }}>
@@ -276,7 +276,7 @@ export default function EcoleOverviewPage() {
     <div className="flex flex-col gap-6 pb-10">
 
       {/* ── Banner — fond orange plat ────────────────────────────────────────── */}
-      <motion.div {...fade(0)} style={{ background: '#F51E33', borderRadius: 12, padding: '20px 24px' }}>
+      <motion.div {...fade(0)} style={{ background: '#DC2626', borderRadius: 12, padding: '20px 24px' }}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
@@ -294,7 +294,7 @@ export default function EcoleOverviewPage() {
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
               <Link href="/dashboard/ecole/scolarite"
-                style={{ background: '#FFFFFF', color: '#F51E33', fontWeight: 700, fontSize: 13, padding: '8px 16px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                style={{ background: '#FFFFFF', color: '#DC2626', fontWeight: 700, fontSize: 13, padding: '8px 16px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 <Plus size={13} /> Inscrire un étudiant
               </Link>
               <Link href="/dashboard/ecole/direction"
@@ -324,15 +324,15 @@ export default function EcoleOverviewPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
         <StatCard i={1} icon={GraduationCap} label="Inscrits (année en cours)"
           value={d.nbEtudiants} sub={`${d.nbActifs} actifs · ${d.nbSuspendus} suspendus`}
-          color="#F51E33" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% actifs`} />
+          color="#DC2626" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% actifs`} />
 
         <StatCard i={2} icon={Users} label="Agents"
           value={nbAgents} sub={`${d.nbEmployes} employés · ${d.nbStaff} staff direction`}
-          color="#F51E33" href="/dashboard/ecole/rh" badge="Personnel" />
+          color="#DC2626" href="/dashboard/ecole/rh" badge="Personnel" />
 
         <StatCard i={3} icon={BookOpen} label="Formateurs (Enseignants)"
           value={d.nbEnseignants} sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`}
-          color="#8B0070" href="/dashboard/ecole/rh" badge="Actifs" />
+          color="#7C3AED" href="/dashboard/ecole/rh" badge="Actifs" />
 
         <RevenueCard i={4}
           revenuJour={d.revenuJour} revenuSemaine={d.revenuSemaine} revenuMois={d.revenuMois}
@@ -340,7 +340,7 @@ export default function EcoleOverviewPage() {
 
         <StatCard i={5} icon={Receipt} label="Sorties du jour"
           value={fmt(d.depensesJour)} sub="FCFA de dépenses aujourd'hui"
-          color={d.depensesJour > 100000 ? '#F51E33' : '#F51E33'}
+          color={d.depensesJour > 100000 ? '#DC2626' : '#DC2626'}
           href="/dashboard/ecole/tresorerie" badge="Dépenses" />
       </div>
 
@@ -357,7 +357,7 @@ export default function EcoleOverviewPage() {
               <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Paiements scolaires — 8 derniers mois</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-secondary)' }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#F51E33' }} />
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#DC2626' }} />
               Revenus encaissés
             </div>
           </div>
@@ -372,8 +372,8 @@ export default function EcoleOverviewPage() {
                 labelStyle={{ color: 'var(--text-secondary)' }}
                 formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, 'Recettes']}
               />
-              <Line type="monotone" dataKey="montant" stroke="#F51E33" strokeWidth={2}
-                dot={false} activeDot={{ r: 4, fill: '#F51E33', stroke: 'rgba(245,30,51,0.25)', strokeWidth: 6 }} />
+              <Line type="monotone" dataKey="montant" stroke="#DC2626" strokeWidth={2}
+                dot={false} activeDot={{ r: 4, fill: '#DC2626', stroke: 'rgba(245,30,51,0.25)', strokeWidth: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -389,7 +389,7 @@ export default function EcoleOverviewPage() {
               <p style={{ fontSize: 48, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>{recoveryRate}%</p>
               <span style={{
                 fontSize: 11, fontWeight: 700,
-                color: recoveryRate >= 80 ? '#F51E33' : recoveryRate >= 50 ? '#F51E33' : '#F51E33',
+                color: recoveryRate >= 80 ? '#DC2626' : recoveryRate >= 50 ? '#DC2626' : '#DC2626',
               }}>
                 {recoveryRate >= 80 ? '✓ En bonne voie' : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
               </span>
@@ -398,20 +398,20 @@ export default function EcoleOverviewPage() {
               <div style={{
                 height: '100%', borderRadius: 3,
                 width: `${recoveryRate}%`,
-                background: recoveryRate >= 80 ? '#F51E33' : '#F51E33',
+                background: recoveryRate >= 80 ? '#DC2626' : '#DC2626',
                 transition: 'width 0.7s ease',
               }} />
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {d.montantImpayes > 0
                 ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
-                : <>Aucun impayé — <strong style={{ color: '#F51E33' }}>excellent !</strong></>
+                : <>Aucun impayé — <strong style={{ color: '#DC2626' }}>excellent !</strong></>
               }
             </p>
           </div>
           <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
             <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Chiffre d&apos;affaire annuel</p>
-            <p style={{ fontSize: 20, fontWeight: 800, color: '#F51E33' }}>{fmt(d.revenuAnnee)} FCFA</p>
+            <p style={{ fontSize: 20, fontWeight: 800, color: '#DC2626' }}>{fmt(d.revenuAnnee)} FCFA</p>
             <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Total encaissé depuis le début</p>
           </div>
         </motion.div>
@@ -422,16 +422,16 @@ export default function EcoleOverviewPage() {
         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Raccourcis</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
-            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,    color: '#8B0070', sub: 'Journal OHADA' },
-            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,         color: '#F51E33', sub: 'Personnel & salaires' },
-            { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,   color: '#F51E33', sub: 'Permissions' },
-            { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap, color: '#F51E33', sub: 'Inscriptions & frais' },
-            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,    color: '#F51E33', sub: 'Direction & rapports' },
+            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,    color: '#7C3AED', sub: 'Journal OHADA' },
+            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,         color: '#DC2626', sub: 'Personnel & salaires' },
+            { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,   color: '#DC2626', sub: 'Permissions' },
+            { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap, color: '#DC2626', sub: 'Inscriptions & frais' },
+            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,    color: '#DC2626', sub: 'Direction & rapports' },
           ].map(({ label, href, color, icon: Icon, sub }) => (
             <Link key={href} href={href}
               className="flex items-center gap-3 transition-all duration-200 group"
               style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', textDecoration: 'none' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = '#F51E33'; el.style.transform = 'translateY(-1px)' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = '#DC2626'; el.style.transform = 'translateY(-1px)' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'var(--border)'; el.style.transform = 'translateY(0)' }}
             >
               <Icon size={20} style={{ color, flexShrink: 0 }} />
@@ -452,7 +452,7 @@ export default function EcoleOverviewPage() {
             <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Transactions Récentes</p>
             <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>Derniers paiements scolaires enregistrés</p>
           </div>
-          <Link href="/dashboard/ecole/direction" style={{ fontSize: 12, color: '#F51E33', fontWeight: 600 }}>
+          <Link href="/dashboard/ecole/direction" style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
             Voir tout →
           </Link>
         </div>
@@ -482,7 +482,7 @@ export default function EcoleOverviewPage() {
                     <td className="px-4 py-3">
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(245,30,51,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <DollarSign size={13} style={{ color: '#F51E33' }} />
+                          <DollarSign size={13} style={{ color: '#DC2626' }} />
                         </div>
                         <div>
                           <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', maxWidth: 180 }} className="truncate">
@@ -496,10 +496,10 @@ export default function EcoleOverviewPage() {
                       {new Date(p.created_at).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#F51E33', fontFamily: 'monospace' }}>+{fmt(p.montant)} FCFA</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', fontFamily: 'monospace' }}>+{fmt(p.montant)} FCFA</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: 'rgba(245,30,51,0.1)', color: '#F51E33' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: 'rgba(245,30,51,0.1)', color: '#DC2626' }}>
                         {p.methode?.replace(/_/g, ' ') ?? 'Espèces'}
                       </span>
                     </td>
@@ -514,12 +514,12 @@ export default function EcoleOverviewPage() {
       {/* ── Alerte impayés ───────────────────────────────────────────────────── */}
       {d.nbImpayes > 0 && (
         <motion.div {...fade(10)} style={{ background: 'rgba(245,30,51,0.06)', border: '1px solid rgba(245,30,51,0.2)', borderRadius: 12, padding: '16px 20px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-          <AlertTriangle size={17} style={{ color: '#F51E33', flexShrink: 0, marginTop: 1 }} />
+          <AlertTriangle size={17} style={{ color: '#DC2626', flexShrink: 0, marginTop: 1 }} />
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Impayés en attente</p>
             <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
               {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA à recouvrer.{' '}
-              <Link href="/dashboard/ecole/scolarite" style={{ color: '#F51E33', fontWeight: 600 }}>Traiter →</Link>
+              <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>Traiter →</Link>
             </p>
           </div>
         </motion.div>

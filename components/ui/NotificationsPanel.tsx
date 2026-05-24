@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -17,10 +17,10 @@ interface Notification {
 }
 
 const TYPE_CONFIG = {
-  info:    { icon: Info,          color: '#F51E33', bg: '#F51E3315' },
-  warning: { icon: AlertTriangle, color: '#F51E33', bg: '#F51E3315' },
-  success: { icon: CheckCircle,   color: '#142850', bg: '#14285015' },
-  error:   { icon: XCircle,       color: '#F51E33', bg: '#F51E3315' },
+  info:    { icon: Info,          color: '#DC2626', bg: '#DC262615' },
+  warning: { icon: AlertTriangle, color: '#DC2626', bg: '#DC262615' },
+  success: { icon: CheckCircle,   color: '#0F172A', bg: '#0F172A15' },
+  error:   { icon: XCircle,       color: '#DC2626', bg: '#DC262615' },
 }
 
 function timeAgo(date: string): string {
@@ -88,11 +88,11 @@ export default function NotificationsPanel() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#F51E33] hover:text-[var(--text)] transition-all"
+        className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--card-bg)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[#DC2626] hover:text-[var(--text)] transition-all"
       >
         <Bell size={15} />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F51E33] rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#DC2626] rounded-full text-[9px] font-bold text-white flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -112,12 +112,12 @@ export default function NotificationsPanel() {
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-[var(--text)]">Notifications</h3>
                 {unread > 0 && (
-                  <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#F51E33] text-white rounded-full">{unread}</span>
+                  <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#DC2626] text-white rounded-full">{unread}</span>
                 )}
               </div>
               <div className="flex items-center gap-2">
                 {unread > 0 && (
-                  <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-[var(--text-secondary)] hover:text-[#F51E33] transition-colors">
+                  <button onClick={markAllRead} className="flex items-center gap-1 text-[10px] text-[var(--text-secondary)] hover:text-[#DC2626] transition-colors">
                     <CheckCheck size={12} /> Tout lire
                   </button>
                 )}
@@ -145,7 +145,7 @@ export default function NotificationsPanel() {
                       key={n.id}
                       onClick={() => { markRead(n.id); if (n.link) setOpen(false) }}
                       className={`flex items-start gap-3 px-4 py-3.5 border-b border-[var(--border)] cursor-pointer transition-colors hover:bg-white/5 ${
-                        !n.read ? 'bg-[#F51E3304]' : ''
+                        !n.read ? 'bg-[#DC262604]' : ''
                       }`}
                     >
                       <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: cfg.bg }}>
@@ -156,13 +156,13 @@ export default function NotificationsPanel() {
                           <p className={`text-xs font-semibold leading-tight ${n.read ? 'text-[var(--text-secondary)]' : 'text-[var(--text)]'}`}>
                             {n.title}
                           </p>
-                          {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#F51E33] shrink-0 mt-1" />}
+                          {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0 mt-1" />}
                         </div>
                         {n.message && <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 line-clamp-2">{n.message}</p>}
                         <div className="flex items-center justify-between mt-1">
                           <span className="text-[9px] text-[var(--text-secondary)]">{timeAgo(n.created_at)}</span>
                           {n.link && (
-                            <Link href={n.link} className="text-[9px] text-[#F51E33] flex items-center gap-0.5 hover:underline">
+                            <Link href={n.link} className="text-[9px] text-[#DC2626] flex items-center gap-0.5 hover:underline">
                               Voir <ExternalLink size={8} />
                             </Link>
                           )}

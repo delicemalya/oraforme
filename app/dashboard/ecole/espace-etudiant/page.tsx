@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -61,7 +61,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
   return (
     <div className="space-y-4">
       {/* Student card */}
-      <div className="rounded-xl border border-[#142850]/20 p-5" style={{ background: 'rgba(0,185,167,0.06)' }}>
+      <div className="rounded-xl border border-[#0F172A]/20 p-5" style={{ background: 'rgba(0,185,167,0.06)' }}>
         <div className="flex items-start gap-4">
           <Avatar nom={etudiant.nom} prenom={etudiant.prenom} photoUrl={etudiant.photo_url} size={56} />
           <div className="flex-1">
@@ -72,24 +72,24 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
           {isAdmin && onToggleBlock && (
             <button onClick={onToggleBlock} disabled={blocking}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
-              style={etudiant.statut === 'suspendu' ? { background: '#142850', color: '#fff' } : { background: '#F51E33', color: '#fff' }}>
+              style={etudiant.statut === 'suspendu' ? { background: '#0F172A', color: '#fff' } : { background: '#DC2626', color: '#fff' }}>
               {blocking ? <Loader2 size={12} className="animate-spin" /> : etudiant.statut === 'suspendu' ? <><Unlock size={12} /> Débloquer</> : <><Lock size={12} /> Suspendre</>}
             </button>
           )}
         </div>
         {isAdmin && etudiant.statut === 'suspendu' && etudiant.code_deblocage && (
           <div className="mt-3 pt-3 border-t border-[var(--border)]">
-            <p className="text-[10px] text-[var(--text-secondary)]">Code de déblocage : <span className="font-mono font-bold text-[#F51E33]">{etudiant.code_deblocage}</span></p>
+            <p className="text-[10px] text-[var(--text-secondary)]">Code de déblocage : <span className="font-mono font-bold text-[#DC2626]">{etudiant.code_deblocage}</span></p>
           </div>
         )}
       </div>
 
       {/* Warning */}
       {etudiant.statut === 'suspendu' && (
-        <div className="rounded-xl border border-[#F51E33]/30 p-4 flex items-start gap-3" style={{ background: 'rgba(248,81,73,0.06)' }}>
-          <AlertCircle size={16} className="text-[#F51E33] shrink-0 mt-0.5" />
+        <div className="rounded-xl border border-[#DC2626]/30 p-4 flex items-start gap-3" style={{ background: 'rgba(248,81,73,0.06)' }}>
+          <AlertCircle size={16} className="text-[#DC2626] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-[#F51E33]">Accès suspendu</p>
+            <p className="text-sm font-bold text-[#DC2626]">Accès suspendu</p>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">Un solde impayé a été détecté. Régularisez votre situation auprès de l&apos;administration.</p>
           </div>
         </div>
@@ -97,10 +97,10 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
 
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
-        <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#142850" />
+        <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#0F172A" />
         <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
-        <KpiCard label="Absences"         value={totalAbs}                               color="#F51E33" sub={`${justifiedAbs} justifiées`} />
-        <KpiCard label="Alertes"          value={nbAlerts}                               color="#F51E33" sub="non lues" />
+        <KpiCard label="Absences"         value={totalAbs}                               color="#DC2626" sub={`${justifiedAbs} justifiées`} />
+        <KpiCard label="Alertes"          value={nbAlerts}                               color="#DC2626" sub="non lues" />
       </div>
 
       {/* Tabs */}
@@ -185,9 +185,9 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-[#101729]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmt(p.montant)} FCFA</td>
                     <td className="px-4 py-2.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#0F172A', background: '#0F172A18' } : { color: '#DC2626', background: '#DC262618' }}>
                         {p.statut === 'paye' ? 'Payé' : 'En attente'}
                       </span>
                     </td>
@@ -214,7 +214,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
                     <td className="px-4 py-2.5 text-[#101729]">{a.matiere ?? '—'}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{a.motif ?? '—'}</td>
                     <td className="px-4 py-2.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#0F172A', background: '#0F172A18' } : { color: '#DC2626', background: '#DC262618' }}>
                         {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                       </span>
                     </td>
@@ -238,7 +238,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
             {notifs.map(n => (
               <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-[var(--border)] opacity-60' : 'border-[#00b9a7]/30'}`} style={{ background: n.read ? '#FFFFFF' : 'rgba(0,185,167,0.04)' }}>
                 <div className="flex items-start gap-2">
-                  <Bell size={12} className={n.read ? 'text-[var(--text-secondary)]' : 'text-[#F51E33]'} />
+                  <Bell size={12} className={n.read ? 'text-[var(--text-secondary)]' : 'text-[#DC2626]'} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-[#101729]">{n.titre}</p>
                     <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{n.message}</p>
@@ -421,8 +421,8 @@ export default function EspaceEtudiantPage() {
         </div>
 
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-[#142850]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(0,185,167,0.04)' }}>
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: '#142850' }}>
+          className="rounded-xl border border-[#0F172A]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(0,185,167,0.04)' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: '#0F172A' }}>
             <User size={28} className="text-white" />
           </div>
           <h2 className="text-lg font-bold text-[#101729] mb-1">Accès à mon dossier</h2>
@@ -436,12 +436,12 @@ export default function EspaceEtudiantPage() {
               onKeyDown={e => e.key === 'Enter' && lookupByNumeroId()}
             />
             <button onClick={lookupByNumeroId} disabled={searching || !studentId.trim()}
-              className="px-5 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
+              className="px-5 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#0F172A', color: '#fff' }}>
               {searching ? <Loader2 className="animate-spin" size={14} /> : <ChevronRight size={14} />}
             </button>
           </div>
           {idError && (
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-xs text-[#F51E33] flex items-center gap-1.5">
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-xs text-[#DC2626] flex items-center gap-1.5">
               <AlertCircle size={12} /> {idError}
             </motion.p>
           )}
@@ -474,7 +474,7 @@ export default function EspaceEtudiantPage() {
         <p className="text-xs text-[var(--text-secondary)] mt-0.5">Accédez au dossier complet d&apos;un étudiant — résultats, paiements, absences</p>
       </div>
 
-      <div className="rounded-xl border border-[#142850]/20 p-4 space-y-3" style={{ background: 'rgba(0,185,167,0.04)' }}>
+      <div className="rounded-xl border border-[#0F172A]/20 p-4 space-y-3" style={{ background: 'rgba(0,185,167,0.04)' }}>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
@@ -487,7 +487,7 @@ export default function EspaceEtudiantPage() {
             />
           </div>
           <button onClick={adminSearchStudents} disabled={adminSearching || !adminSearch.trim()}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#142850', color: '#fff' }}>
+            className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-40" style={{ background: '#0F172A', color: '#fff' }}>
             {adminSearching ? <Loader2 className="animate-spin" size={14} /> : <Search size={14} />} Rechercher
           </button>
         </div>
@@ -507,7 +507,7 @@ export default function EspaceEtudiantPage() {
                 <p className="text-xs text-[var(--text-secondary)]">{e.numero_id} · {e.classe ?? NIVEAUX.find(n => n.value === e.niveau)?.label}</p>
               </div>
               <StatutBadge statut={e.statut} />
-              <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-[#F51E33] transition-colors" />
+              <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-[#DC2626] transition-colors" />
             </button>
           ))}
         </div>

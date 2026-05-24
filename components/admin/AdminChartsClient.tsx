@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -9,10 +9,10 @@ import { fmtFCFA } from '@/lib/admin-config'
 type ModuleRevData = { module: string; clients: number; mrr: number }
 type GrowthData = { date: string; inscriptions: number }
 
-const RED = '#F51E33'
-const ORANGE = '#F51E33'
-const GREEN = '#142850'
-const BLUE = '#F51E33'
+const RED = '#DC2626'
+const ORANGE = '#DC2626'
+const GREEN = '#0F172A'
+const BLUE = '#DC2626'
 
 function CustomTooltip({ active, payload, label }: {
   active?: boolean

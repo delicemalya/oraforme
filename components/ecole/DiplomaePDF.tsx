@@ -1,4 +1,4 @@
-import {
+﻿import {
   Document, Page, View, Text, Image, StyleSheet, Canvas,
 } from '@react-pdf/renderer'
 
@@ -35,7 +35,7 @@ export interface DiplomaePDFData {
 // ── Design ────────────────────────────────────────────────────────────────────
 
 const GOLD    = '#C8A400'
-const GOLD2   = '#F51E33'
+const GOLD2   = '#DC2626'
 const BLACK   = '#0A0A0A'
 const GRAY    = '#6B7280'
 const WHITE   = '#FFFFFF'
@@ -134,7 +134,7 @@ const s = StyleSheet.create({
   qrBlock: { alignItems: 'center' },
   qrImg:   { width: 56, height: 56 },
   qrLabel: { fontSize: 6, color: GRAY, marginTop: 3, textAlign: 'center' },
-  watermark: { position: 'absolute', top: '42%', left: '5%', transform: 'rotate(-35deg)', fontSize: 80, fontFamily: 'Helvetica-Bold', color: '#F51E3308', opacity: 0.06 },
+  watermark: { position: 'absolute', top: '42%', left: '5%', transform: 'rotate(-35deg)', fontSize: 80, fontFamily: 'Helvetica-Bold', color: '#DC262608', opacity: 0.06 },
 })
 
 function fmtDate(d: string) {

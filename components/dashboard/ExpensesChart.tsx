@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
@@ -12,7 +12,7 @@ function fmtFull(n: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 }
 
-const COLORS = ['#F51E33', '#F51E33', '#142850', '#8B0070', '#F51E33', '#8B0070', '#142850', '#84CC16']
+const COLORS = ['#DC2626', '#DC2626', '#0F172A', '#7C3AED', '#DC2626', '#7C3AED', '#0F172A', '#84CC16']
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null

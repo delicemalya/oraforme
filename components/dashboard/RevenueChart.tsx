@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -71,10 +71,10 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
           <Line
             type="monotone"
             dataKey="montant"
-            stroke="#F51E33"
+            stroke="#DC2626"
             strokeWidth={2}
-            dot={hasData ? { fill: '#F51E33', r: 3, strokeWidth: 0 } : false}
-            activeDot={{ r: 5, fill: '#F51E33', stroke: 'rgba(245,30,51,0.25)', strokeWidth: 6 }}
+            dot={hasData ? { fill: '#DC2626', r: 3, strokeWidth: 0 } : false}
+            activeDot={{ r: 5, fill: '#DC2626', stroke: 'rgba(245,30,51,0.25)', strokeWidth: 6 }}
             isAnimationActive
             animationDuration={900}
             animationEasing="ease-out"

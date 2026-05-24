@@ -1,4 +1,4 @@
-import {
+﻿import {
   Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
 
@@ -38,14 +38,14 @@ export interface BulletinPDFData {
 }
 
 // Colors
-const GOLD   = '#F51E33'
+const GOLD   = '#DC2626'
 const BLACK  = '#111111'
 const GRAY   = '#6B7280'
 const LGRAY  = '#F9FAFB'
 const WHITE  = '#FFFFFF'
 const MGRAY  = '#374151'
 const GREEN  = '#2EA043'
-const RED    = '#F51E33'
+const RED    = '#DC2626'
 
 const s = StyleSheet.create({
   page: { padding: 36, backgroundColor: WHITE, fontFamily: 'Helvetica', fontSize: 9, color: BLACK },
@@ -211,10 +211,10 @@ export function BulletinPDF({ data }: { data: BulletinPDFData }) {
             <Text style={[s.resultSub, { color: moyColor }]}>/ {max}</Text>
           </View>
           {data.rang && (
-            <View style={[s.resultBox, { backgroundColor: '#F51E3315', borderWidth: 1.5, borderColor: '#F51E33' }]}>
-              <Text style={[s.resultLabel, { color: '#F51E33' }]}>Rang de classe</Text>
-              <Text style={[s.resultValue, { color: '#F51E33' }]}>{data.rang}</Text>
-              {data.effectif_classe && <Text style={[s.resultSub, { color: '#F51E33' }]}>/ {data.effectif_classe} élèves</Text>}
+            <View style={[s.resultBox, { backgroundColor: '#DC262615', borderWidth: 1.5, borderColor: '#DC2626' }]}>
+              <Text style={[s.resultLabel, { color: '#DC2626' }]}>Rang de classe</Text>
+              <Text style={[s.resultValue, { color: '#DC2626' }]}>{data.rang}</Text>
+              {data.effectif_classe && <Text style={[s.resultSub, { color: '#DC2626' }]}>/ {data.effectif_classe} élèves</Text>}
             </View>
           )}
           <View style={[s.resultBox, { backgroundColor: GOLD + '15', borderWidth: 1.5, borderColor: GOLD }]}>

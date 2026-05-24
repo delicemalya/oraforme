@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'framer-motion'
 import { FileText, CheckCircle, Clock, Send } from 'lucide-react'
@@ -24,9 +24,9 @@ function timeAgo(d: string) {
 
 const STATUT: Record<string, { label: string; color: string; Icon: React.ElementType; action: string }> = {
   brouillon: { label: 'Brouillon',  color: '#8B949E', Icon: Clock,        action: 'créé un brouillon' },
-  envoyee:   { label: 'Envoyée',   color: '#F51E33', Icon: Send,         action: 'envoyé une facture' },
-  payee:     { label: 'Payée',     color: '#142850', Icon: CheckCircle,  action: 'reçu un paiement' },
-  annulee:   { label: 'Annulée',  color: '#F51E33', Icon: FileText,     action: 'annulé une facture' },
+  envoyee:   { label: 'Envoyée',   color: '#DC2626', Icon: Send,         action: 'envoyé une facture' },
+  payee:     { label: 'Payée',     color: '#0F172A', Icon: CheckCircle,  action: 'reçu un paiement' },
+  annulee:   { label: 'Annulée',  color: '#DC2626', Icon: FileText,     action: 'annulé une facture' },
 }
 
 function fmt(n: number) {
@@ -41,7 +41,7 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
           <FileText size={18} className="text-[var(--text-secondary)]" />
         </div>
         <p className="text-xs text-[var(--text-secondary)]">Aucune activité récente</p>
-        <Link href="/dashboard/facturation" className="text-xs text-[#F51E33] hover:underline mt-1">
+        <Link href="/dashboard/facturation" className="text-xs text-[#DC2626] hover:underline mt-1">
           Créer une facture →
         </Link>
       </div>

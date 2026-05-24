@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
@@ -81,12 +81,12 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
             <CartesianGrid strokeDasharray="3 3" stroke="#1a2d50" vertical={false} />
             <XAxis
               dataKey="day"
-              tick={{ fill: '#484F58', fontSize: 11 }}
+              tick={{ fill: '#64748B', fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: '#484F58', fontSize: 11 }}
+              tick={{ fill: '#64748B', fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               allowDecimals={false}
@@ -102,7 +102,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
               cursor={{ fill: '#1a2d50', radius: 4 }}
               formatter={(val) => [val, 'Factures']}
             />
-            <Bar dataKey="factures" fill="#F51E33" radius={[4, 4, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="factures" fill="#DC2626" radius={[4, 4, 0, 0]} maxBarSize={32} />
           </BarChart>
         </ResponsiveContainer>
       </div>

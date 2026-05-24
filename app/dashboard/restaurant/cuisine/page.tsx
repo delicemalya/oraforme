@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -35,10 +35,10 @@ const NEXT_STATUS: Partial<Record<StatutCmd, StatutCmd>> = {
 }
 
 const STATUS_CONFIG: Partial<Record<StatutCmd, { label: string; color: string; bg: string; border: string }>> = {
-  en_attente:    { label: 'En attente',     color: '#F51E33', bg: '#F51E3318', border: '#F51E3340' },
-  en_preparation:{ label: 'En préparation', color: '#F51E33', bg: '#F51E3318', border: '#F51E3340' },
+  en_attente:    { label: 'En attente',     color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
+  en_preparation:{ label: 'En préparation', color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
   pret:          { label: 'Prêt à servir',  color: '#2EA043', bg: '#2EA04318', border: '#2EA04340' },
-  livre:         { label: 'Livré',          color: '#8B0070', bg: '#8B007018', border: '#8B007040' },
+  livre:         { label: 'Livré',          color: '#7C3AED', bg: '#7C3AED18', border: '#7C3AED40' },
 }
 
 export default function CuisinePage() {
@@ -86,7 +86,7 @@ export default function CuisinePage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin text-[#F51E33]" size={28} />
+        <Loader2 className="animate-spin text-[#DC2626]" size={28} />
       </div>
     )
   }
@@ -96,8 +96,8 @@ export default function CuisinePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#F51E33]/15 flex items-center justify-center">
-            <ChefHat size={20} className="text-[#F51E33]" />
+          <div className="w-10 h-10 rounded-xl bg-[#DC2626]/15 flex items-center justify-center">
+            <ChefHat size={20} className="text-[#DC2626]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-[#101729]">Écran Cuisine</h1>
@@ -136,7 +136,7 @@ export default function CuisinePage() {
                   <span className="text-xs font-bold" style={{ color: cfg.color }}>{cfg.label}</span>
                   <span
                     className="ml-auto text-xs font-bold px-1.5 py-0.5 rounded-full"
-                    style={{ background: cfg.color, color: '#142850' }}
+                    style={{ background: cfg.color, color: '#0F172A' }}
                   >
                     {cmds.length}
                   </span>
@@ -179,7 +179,7 @@ export default function CuisinePage() {
                             {(cmd.items as CmdItem[]).map((item, i) => (
                               <div key={i} className="flex items-center justify-between">
                                 <span className="text-sm text-[#101729]">
-                                  <span className="font-bold text-[#F51E33] mr-1">{item.quantite}×</span>
+                                  <span className="font-bold text-[#DC2626] mr-1">{item.quantite}×</span>
                                   {item.nom}
                                 </span>
                               </div>
@@ -187,7 +187,7 @@ export default function CuisinePage() {
                           </div>
 
                           {cmd.note_client && (
-                            <p className="text-xs text-[#F51E33] bg-[#F51E33]/10 rounded-lg px-2.5 py-1.5">
+                            <p className="text-xs text-[#DC2626] bg-[#DC2626]/10 rounded-lg px-2.5 py-1.5">
                               📝 {cmd.note_client}
                             </p>
                           )}
@@ -200,7 +200,7 @@ export default function CuisinePage() {
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.97 }}
                               className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
-                              style={{ background: nextCfg.color, color: '#142850' }}
+                              style={{ background: nextCfg.color, color: '#0F172A' }}
                             >
                               {advancing === cmd.id ? (
                                 <Loader2 className="animate-spin" size={13} />

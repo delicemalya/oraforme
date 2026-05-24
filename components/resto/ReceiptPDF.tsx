@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
+﻿import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
 
 export interface ReceiptData {
   numero_recu: string
@@ -25,7 +25,7 @@ const s = StyleSheet.create({
   gray:    { color: '#6B7280' },
   sep:     { borderBottom: '1px dashed #CCCCCC', marginVertical: 6 },
   row:     { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 },
-  gold:    { color: '#F51E33' },
+  gold:    { color: '#DC2626' },
   large:   { fontSize: 11, fontFamily: 'Helvetica-Bold' },
   xlarge:  { fontSize: 14, fontFamily: 'Helvetica-Bold' },
   small:   { fontSize: 7, color: '#9CA3AF' },

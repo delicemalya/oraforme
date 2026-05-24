@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -15,8 +15,8 @@ const TABS = ['Fournisseurs', 'Achats', 'Dettes']
 const STATUTS = ['impaye', 'partiel', 'paye']
 const STATUT_LABELS: Record<string, string> = { impaye: 'Impayé', partiel: 'Partiel', paye: 'Payé' }
 const STATUT_COLORS: Record<string, string> = {
-  impaye: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
-  partiel: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
+  impaye: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
+  partiel: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
   paye: 'text-[#2EA043] bg-[#2EA043]/10 border-[#2EA043]/30',
 }
 
@@ -109,18 +109,18 @@ export default function AchatsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#8B0070]/10 border border-[#8B0070]/20 flex items-center justify-center">
-          <ShoppingCart size={18} className="text-[#8B0070]" />
+        <div className="w-10 h-10 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 flex items-center justify-center">
+          <ShoppingCart size={18} className="text-[#7C3AED]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">Achats & Fournisseurs</h1>
           <p className="text-xs text-[var(--text-secondary)]">
             {fournisseurs.length} fournisseur{fournisseurs.length > 1 ? 's' : ''} ·
-            <span className="text-[#F51E33] ml-1">Dettes : {fmtFCFA(totalDu)}</span>
+            <span className="text-[#DC2626] ml-1">Dettes : {fmtFCFA(totalDu)}</span>
           </p>
         </div>
         <button onClick={() => setModal(tab === 0 ? 'fournisseur' : 'achat')}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B0070]/10 border border-[#8B0070]/30 text-[#8B0070] text-sm font-medium hover:bg-[#8B0070]/20 transition-colors">
+          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/30 text-[#7C3AED] text-sm font-medium hover:bg-[#7C3AED]/20 transition-colors">
           <Plus size={15} /> {tab === 0 ? 'Fournisseur' : 'Achat'}
         </button>
       </div>
@@ -130,11 +130,11 @@ export default function AchatsPage() {
         {TABS.map((t, i) => (
           <button key={i} onClick={() => setTab(i)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === i ? 'bg-[#8B0070]/10 text-[#8B0070]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
+              tab === i ? 'bg-[#7C3AED]/10 text-[#7C3AED]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
             }`}>
             {t}
             {i === 2 && debtsByFournisseur.length > 0 && (
-              <span className="ml-1.5 text-xs bg-[#F51E33] text-white rounded-full px-1.5 py-0.5">{debtsByFournisseur.length}</span>
+              <span className="ml-1.5 text-xs bg-[#DC2626] text-white rounded-full px-1.5 py-0.5">{debtsByFournisseur.length}</span>
             )}
           </button>
         ))}
@@ -153,8 +153,8 @@ export default function AchatsPage() {
                 const dette = achats.filter(a => a.fournisseur_id === f.id && a.statut !== 'paye').reduce((s, a) => s + a.montant, 0)
                 return (
                   <div key={f.id} className="flex items-center gap-4 px-5 py-4 hover:bg-white/5/30 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-[#8B0070]/10 border border-[#8B0070]/20 flex items-center justify-center shrink-0">
-                      <span className="text-[#8B0070] text-sm font-bold">{f.nom.charAt(0).toUpperCase()}</span>
+                    <div className="w-9 h-9 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/20 flex items-center justify-center shrink-0">
+                      <span className="text-[#7C3AED] text-sm font-bold">{f.nom.charAt(0).toUpperCase()}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-[var(--text)] truncate">{f.nom}</p>
@@ -162,7 +162,7 @@ export default function AchatsPage() {
                     </div>
                     {dette > 0 && (
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-[#F51E33]">{fmtFCFA(dette)}</p>
+                        <p className="text-sm font-semibold text-[#DC2626]">{fmtFCFA(dette)}</p>
                         <p className="text-xs text-[var(--text-secondary)]">dû</p>
                       </div>
                     )}
@@ -220,12 +220,12 @@ export default function AchatsPage() {
             </table>
           </div>
           {achats.filter(a => a.statut !== 'paye').length > 0 && (
-            <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between bg-[#F51E33]/5">
+            <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between bg-[#DC2626]/5">
               <span className="text-sm text-[var(--text-secondary)] flex items-center gap-2">
-                <AlertCircle size={14} className="text-[#F51E33]" />
+                <AlertCircle size={14} className="text-[#DC2626]" />
                 Total non payé
               </span>
-              <span className="text-sm font-bold text-[#F51E33]">{fmtFCFA(totalDu)}</span>
+              <span className="text-sm font-bold text-[#DC2626]">{fmtFCFA(totalDu)}</span>
             </div>
           )}
         </div>
@@ -251,7 +251,7 @@ export default function AchatsPage() {
                         <p className="text-sm font-semibold text-[var(--text)]">{f.nom}</p>
                         <p className="text-xs text-[var(--text-secondary)]">{factures.length} achat{factures.length > 1 ? 's' : ''} impayé{factures.length > 1 ? 's' : ''}</p>
                       </div>
-                      <p className="text-base font-bold text-[#F51E33]">{fmtFCFA(f.dette)}</p>
+                      <p className="text-base font-bold text-[#DC2626]">{fmtFCFA(f.dette)}</p>
                     </div>
                     <button
                       onClick={async () => {
@@ -293,13 +293,13 @@ export default function AchatsPage() {
                       <input value={fForm[field.key as keyof typeof fForm]}
                         onChange={e => setFForm(f => ({ ...f, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
-                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#7C3AED]/50" />
                     </div>
                   ))}
                   <div className="flex gap-2 pt-2">
                     <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
                     <button onClick={saveFournisseur} disabled={saving || !fForm.nom}
-                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0070] text-white hover:bg-[#8B0070]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#7C3AED] text-white hover:bg-[#7C3AED]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
                     </button>
                   </div>
@@ -318,7 +318,7 @@ export default function AchatsPage() {
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Description *</label>
                     <input value={aForm.description} onChange={e => setAForm(f => ({ ...f, description: e.target.value }))}
                       placeholder="Décrivez l'achat..."
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#7C3AED]/50" />
                   </div>
                   {costCenters.length > 0 && (
                     <div>
@@ -335,7 +335,7 @@ export default function AchatsPage() {
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA) *</label>
                       <input type="number" value={aForm.montant} onChange={e => setAForm(f => ({ ...f, montant: e.target.value }))}
                         placeholder="0"
-                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#484F58] outline-none focus:border-[#8B0070]/50" />
+                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#7C3AED]/50" />
                     </div>
                     <div>
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
@@ -346,7 +346,7 @@ export default function AchatsPage() {
                   <div className="flex gap-2 pt-2">
                     <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
                     <button onClick={saveAchat} disabled={saving || !aForm.description || !aForm.montant}
-                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#8B0070] text-white hover:bg-[#8B0070]/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#7C3AED] text-white hover:bg-[#7C3AED]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                       {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
                     </button>
                   </div>

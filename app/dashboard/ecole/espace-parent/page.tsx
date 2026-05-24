@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -99,10 +99,10 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
 
       {/* Suspended warning */}
       {etudiant.statut === 'suspendu' && (
-        <div className="rounded-xl border border-[#F51E33]/30 p-4" style={{ background: 'rgba(248,81,73,0.06)' }}>
+        <div className="rounded-xl border border-[#DC2626]/30 p-4" style={{ background: 'rgba(248,81,73,0.06)' }}>
           <div className="flex items-center gap-2">
-            <AlertCircle size={16} className="text-[#F51E33]" />
-            <p className="text-sm font-bold text-[#F51E33]">Accès suspendu — solde impayé détecté</p>
+            <AlertCircle size={16} className="text-[#DC2626]" />
+            <p className="text-sm font-bold text-[#DC2626]">Accès suspendu — solde impayé détecté</p>
           </div>
           <p className="text-xs text-[var(--text-secondary)] mt-1 ml-6">Veuillez vous rapprocher de l&apos;administration pour régulariser la situation.</p>
         </div>
@@ -114,10 +114,10 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-3">
-            <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#142850" />
+            <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#0F172A" />
             <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#8B949E'} sub={mention?.label} />
-            <KpiCard label="Absences"         value={totalAbs}                            color="#F51E33" sub={`${justifiedAbs} justifiées`} />
-            <KpiCard label="Alertes"          value={nbAlerts}                            color="#F51E33" sub="non lues" />
+            <KpiCard label="Absences"         value={totalAbs}                            color="#DC2626" sub={`${justifiedAbs} justifiées`} />
+            <KpiCard label="Alertes"          value={nbAlerts}                            color="#DC2626" sub="non lues" />
           </div>
 
           {/* Tabs */}
@@ -201,9 +201,9 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
                         <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-[#101729]">{p.libelle}</td>
                         <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
-                        <td className="px-4 py-2.5 font-semibold text-[#F51E33]">{fmt(p.montant)} FCFA</td>
+                        <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmt(p.montant)} FCFA</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={p.statut === 'paye' ? { color: '#0F172A', background: '#0F172A18' } : { color: '#DC2626', background: '#DC262618' }}>
                             {p.statut === 'paye' ? 'Payé' : 'En attente'}
                           </span>
                         </td>
@@ -230,7 +230,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
                         <td className="px-4 py-2.5 text-[#101729]">{a.matiere ?? '—'}</td>
                         <td className="px-4 py-2.5 text-[var(--text-secondary)]">{a.motif ?? '—'}</td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#142850', background: '#14285018' } : { color: '#F51E33', background: '#F51E3318' }}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#0F172A', background: '#0F172A18' } : { color: '#DC2626', background: '#DC262618' }}>
                             {a.justifiee ? 'Justifiée' : 'Non justifiée'}
                           </span>
                         </td>
@@ -252,9 +252,9 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
             ) : (
               <div className="space-y-2">
                 {notifs.map(n => (
-                  <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-[var(--border)] opacity-60' : 'border-[#F51E33]/30'}`} style={{ background: n.read ? '#F9FAFB' : 'rgba(240,163,10,0.04)' }}>
+                  <div key={n.id} className={`rounded-xl border p-3 ${n.read ? 'border-[var(--border)] opacity-60' : 'border-[#DC2626]/30'}`} style={{ background: n.read ? '#F9FAFB' : 'rgba(240,163,10,0.04)' }}>
                     <div className="flex items-start gap-2">
-                      <Bell size={12} className={n.read ? 'text-[var(--text-secondary)]' : 'text-[#F51E33]'} />
+                      <Bell size={12} className={n.read ? 'text-[var(--text-secondary)]' : 'text-[#DC2626]'} />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-[#101729]">{n.titre}</p>
                         <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{n.message}</p>
@@ -354,8 +354,8 @@ export default function EspaceParentPage() {
         </div>
 
         {children.length === 0 ? (
-          <div className="rounded-xl border border-[#F51E33]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(240,163,10,0.04)' }}>
-            <AlertCircle size={32} className="text-[#F51E33] mb-3" />
+          <div className="rounded-xl border border-[#DC2626]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(240,163,10,0.04)' }}>
+            <AlertCircle size={32} className="text-[#DC2626] mb-3" />
             <p className="text-sm font-semibold text-[#101729] mb-1">Aucun enfant trouvé</p>
             <p className="text-xs text-[var(--text-secondary)] max-w-sm">
               Aucun étudiant n&apos;est associé à l&apos;email <strong className="text-[#101729]">{userEmail}</strong>.<br/>

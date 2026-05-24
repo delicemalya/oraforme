@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 
 export default function NotFound() {
   return (
@@ -6,14 +6,14 @@ export default function NotFound() {
       <div className="text-center max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-10">
-          <div className="w-9 h-9 rounded-xl bg-[#F51E33] flex items-center justify-center shrink-0">
-            <span className="text-[#F51E33] font-bold text-base">O</span>
+          <div className="w-9 h-9 rounded-xl bg-[#DC2626] flex items-center justify-center shrink-0">
+            <span className="text-[#DC2626] font-bold text-base">O</span>
           </div>
           <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
         </div>
 
         {/* 404 */}
-        <p className="text-[120px] font-black text-[#F51E33] leading-none tracking-tight select-none">
+        <p className="text-[120px] font-black text-[#DC2626] leading-none tracking-tight select-none">
           404
         </p>
 
@@ -34,7 +34,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/"
-            className="px-5 py-2.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] text-sm font-medium hover:text-[var(--text)] hover:border-[#484F58] transition-colors"
+            className="px-5 py-2.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] text-sm font-medium hover:text-[var(--text)] hover:border-[#64748B] transition-colors"
           >
             Accueil
           </Link>

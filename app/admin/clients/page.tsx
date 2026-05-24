@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase-server'
+﻿import { supabaseAdmin } from '@/lib/supabase-server'
 import AdminClientsTable from '@/components/admin/AdminClientsTable'
 import { Building2 } from 'lucide-react'
 
@@ -27,8 +27,8 @@ export default async function AdminClientsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
-          <Building2 size={18} className="text-[#F51E33]" />
+        <div className="w-10 h-10 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/20 flex items-center justify-center">
+          <Building2 size={18} className="text-[#DC2626]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">Clients</h1>

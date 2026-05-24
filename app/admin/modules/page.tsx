@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase-server'
+﻿import { supabaseAdmin } from '@/lib/supabase-server'
 import { MODULE_LABELS, MODULE_PRICES, MODULE_ICONS, fmtFCFA } from '@/lib/admin-config'
 import { Package, Users, TrendingUp } from 'lucide-react'
 
@@ -23,8 +23,8 @@ export default async function AdminModulesPage() {
     <div className="space-y-6">
 
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
-          <Package size={18} className="text-[#F51E33]" />
+        <div className="w-10 h-10 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/20 flex items-center justify-center">
+          <Package size={18} className="text-[#DC2626]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">Gestion des modules</h1>
@@ -43,12 +43,12 @@ export default async function AdminModulesPage() {
                   <span className="text-2xl">{MODULE_ICONS[m.id] ?? '📦'}</span>
                   <div>
                     <p className="text-sm font-semibold text-[var(--text)]">{MODULE_LABELS[m.id]}</p>
-                    <p className="text-xs text-[#F51E33] font-medium">{fmtFCFA(price)}/mois</p>
+                    <p className="text-xs text-[#DC2626] font-medium">{fmtFCFA(price)}/mois</p>
                   </div>
                 </div>
                 <div className={`text-xs px-2 py-0.5 rounded border font-medium ${
                   m.clientsAvec > 0
-                    ? 'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30'
+                    ? 'text-[#DC2626] bg-[var(--surface)]/10 border-[#0F172A]/30'
                     : 'text-[var(--text-secondary)] bg-[var(--surface-alt)] border-[var(--border)]'
                 }`}>
                   {m.clientsAvec > 0 ? 'Actif' : 'Inactif'}
@@ -61,11 +61,11 @@ export default async function AdminModulesPage() {
                   <p className="text-[10px] text-[var(--text-secondary)]">clients</p>
                 </div>
                 <div className="bg-[var(--surface)] rounded-lg p-2 text-center">
-                  <p className="text-lg font-bold text-[#F51E33]">{fmtFCFA(m.mrr).replace(' FCFA', '')}</p>
+                  <p className="text-lg font-bold text-[#DC2626]">{fmtFCFA(m.mrr).replace(' FCFA', '')}</p>
                   <p className="text-[10px] text-[var(--text-secondary)]">MRR</p>
                 </div>
                 <div className="bg-[var(--surface)] rounded-lg p-2 text-center">
-                  <p className="text-lg font-bold text-[#F51E33]">{m.penetration}%</p>
+                  <p className="text-lg font-bold text-[#DC2626]">{m.penetration}%</p>
                   <p className="text-[10px] text-[var(--text-secondary)]">pénétr.</p>
                 </div>
               </div>
@@ -73,7 +73,7 @@ export default async function AdminModulesPage() {
               {/* Penetration bar */}
               <div className="h-1.5 bg-[var(--surface-alt)] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#F51E33] rounded-full transition-all"
+                  className="h-full bg-[#DC2626] rounded-full transition-all"
                   style={{ width: `${m.penetration}%` }}
                 />
               </div>
@@ -105,7 +105,7 @@ export default async function AdminModulesPage() {
                   </td>
                   <td className="py-2.5 px-3 text-right text-[var(--text-secondary)]">{fmtFCFA(MODULE_PRICES[m.id] ?? 0)}</td>
                   <td className="py-2.5 px-3 text-right text-[var(--text)]">{m.clientsAvec}</td>
-                  <td className="py-2.5 px-3 text-right font-medium text-[#F51E33]">{fmtFCFA(m.mrr)}</td>
+                  <td className="py-2.5 px-3 text-right font-medium text-[#DC2626]">{fmtFCFA(m.mrr)}</td>
                   <td className="py-2.5 px-3 text-right text-[var(--text-secondary)]">
                     {totalMRR > 0 ? Math.round((m.mrr / totalMRR) * 100) : 0}%
                   </td>
@@ -113,7 +113,7 @@ export default async function AdminModulesPage() {
               ))}
               <tr className="border-t-2 border-[var(--border)]">
                 <td className="py-2.5 px-3 font-bold text-[var(--text)]" colSpan={3}>Total MRR</td>
-                <td className="py-2.5 px-3 text-right font-bold text-[#F51E33]">{fmtFCFA(totalMRR)}</td>
+                <td className="py-2.5 px-3 text-right font-bold text-[#DC2626]">{fmtFCFA(totalMRR)}</td>
                 <td className="py-2.5 px-3 text-right font-bold text-[var(--text)]">100%</td>
               </tr>
             </tbody>

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase-server'
+﻿import { supabaseAdmin } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { MODULE_LABELS, MODULE_PRICES, fmtFCFA } from '@/lib/admin-config'
@@ -28,10 +28,10 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
   const mrr = (tenant.modules_actifs ?? []).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
 
   const STATUT_COLORS: Record<string, string> = {
-    payee: 'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30',
-    envoyee: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
+    payee: 'text-[#DC2626] bg-[var(--surface)]/10 border-[#0F172A]/30',
+    envoyee: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
     brouillon: 'text-[var(--text-secondary)] bg-[var(--surface-alt)] border-[var(--border)]',
-    annulee: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
+    annulee: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
   }
 
   return (
@@ -58,10 +58,10 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       {/* Info cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: Building2, label: 'Plan', value: tenant.plan ?? '—', color: '#F51E33' },
-          { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#F51E33' },
-          { icon: FileText, label: 'CA généré', value: fmtFCFA(caGenere), color: '#142850' },
-          { icon: Users, label: 'MRR estimé', value: fmtFCFA(mrr), color: '#F51E33' },
+          { icon: Building2, label: 'Plan', value: tenant.plan ?? '—', color: '#DC2626' },
+          { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#DC2626' },
+          { icon: FileText, label: 'CA généré', value: fmtFCFA(caGenere), color: '#0F172A' },
+          { icon: Users, label: 'MRR estimé', value: fmtFCFA(mrr), color: '#DC2626' },
         ].map(c => (
           <div key={c.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4">
             <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2">{c.label}</p>
@@ -78,14 +78,14 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         {/* Modules actifs */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
-            <Package size={14} className="text-[#F51E33]" />
+            <Package size={14} className="text-[#DC2626]" />
             Modules actifs
           </h2>
           <div className="space-y-2">
             {(tenant.modules_actifs ?? []).map((m: string) => (
               <div key={m} className="flex items-center justify-between px-3 py-2 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
                 <span className="text-sm text-[var(--text)]">{MODULE_LABELS[m] ?? m}</span>
-                <span className="text-xs text-[#F51E33] font-medium">{fmtFCFA(MODULE_PRICES[m] ?? 0)}/mois</span>
+                <span className="text-xs text-[#DC2626] font-medium">{fmtFCFA(MODULE_PRICES[m] ?? 0)}/mois</span>
               </div>
             ))}
             {(tenant.modules_actifs ?? []).length === 0 && (
@@ -97,14 +97,14 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         {/* Utilisateurs */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
-            <Users size={14} className="text-[#F51E33]" />
+            <Users size={14} className="text-[#DC2626]" />
             Utilisateurs ({profiles.length})
           </h2>
           <div className="space-y-2">
             {profiles.map(p => (
               <div key={p.id} className="flex items-center gap-3 px-3 py-2 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
-                <div className="w-7 h-7 rounded-full bg-[#F51E33]/20 border border-[#F51E33]/30 flex items-center justify-center shrink-0">
-                  <span className="text-[#F51E33] text-xs font-bold">
+                <div className="w-7 h-7 rounded-full bg-[#DC2626]/20 border border-[#DC2626]/30 flex items-center justify-center shrink-0">
+                  <span className="text-[#DC2626] text-xs font-bold">
                     {(p.prenom || p.nom || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -122,7 +122,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       {/* Factures récentes */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
         <h2 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
-          <FileText size={14} className="text-[#F51E33]" />
+          <FileText size={14} className="text-[#DC2626]" />
           Factures récentes ({factures.length})
         </h2>
         <div className="overflow-x-auto">
@@ -142,7 +142,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
               {factures.map(f => (
                 <tr key={f.id} className="hover:bg-white/5/30 transition-colors">
                   <td className="py-2.5 px-3 text-[var(--text)] truncate max-w-[180px]">{f.client_nom ?? '—'}</td>
-                  <td className="py-2.5 px-3 text-right font-medium text-[#F51E33]">{fmtFCFA(f.total ?? 0)}</td>
+                  <td className="py-2.5 px-3 text-right font-medium text-[#DC2626]">{fmtFCFA(f.total ?? 0)}</td>
                   <td className="py-2.5 px-3">
                     <span className={`text-xs px-2 py-0.5 rounded border ${STATUT_COLORS[f.statut] ?? STATUT_COLORS.brouillon}`}>
                       {f.statut}

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -387,14 +387,14 @@ export default function ComptabilitePage() {
                     <td className="px-4 py-2.5">
                       <span className={`text-xs px-2 py-0.5 rounded border ${
                         e.type === 'recette'
-                          ? 'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30'
-                          : 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30'
+                          ? 'text-[#DC2626] bg-[var(--surface)]/10 border-[#0F172A]/30'
+                          : 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30'
                       }`}>{e.type}</span>
                     </td>
                     <td className="px-4 py-2.5 text-right text-[var(--text)] font-medium whitespace-nowrap">{fmtFCFA(e.montant_ht)}</td>
                     <td className="px-4 py-2.5 text-right text-[var(--text-secondary)] text-xs whitespace-nowrap">{fmtFCFA(e.tva)}</td>
                     <td className="px-4 py-2.5 text-right text-[var(--text-secondary)] text-xs whitespace-nowrap">{fmtFCFA(e.ca)}</td>
-                    <td className="px-4 py-2.5 text-right text-[#F51E33] font-semibold whitespace-nowrap">{fmtFCFA(e.montant_ttc)}</td>
+                    <td className="px-4 py-2.5 text-right text-[#DC2626] font-semibold whitespace-nowrap">{fmtFCFA(e.montant_ttc)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -435,7 +435,7 @@ export default function ComptabilitePage() {
                       </td>
                       <td className="px-4 py-2.5 text-[var(--text)] max-w-[180px] truncate">{e.libelle}</td>
                       <td className="px-4 py-2.5">
-                        <span className="font-mono text-[11px] text-[#F51E33] bg-[var(--surface)]/10 px-2 py-0.5 rounded">
+                        <span className="font-mono text-[11px] text-[#DC2626] bg-[var(--surface)]/10 px-2 py-0.5 rounded">
                           {e.debit_account}
                         </span>
                         <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 max-w-[120px] truncate">
@@ -443,19 +443,19 @@ export default function ComptabilitePage() {
                         </p>
                       </td>
                       <td className="px-4 py-2.5">
-                        <span className="font-mono text-[11px] text-[#F51E33] bg-[#F51E33]/10 px-2 py-0.5 rounded">
+                        <span className="font-mono text-[11px] text-[#DC2626] bg-[#DC2626]/10 px-2 py-0.5 rounded">
                           {e.credit_account}
                         </span>
                         <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 max-w-[120px] truncate">
                           {accountLabel(e.credit_account)}
                         </p>
                       </td>
-                      <td className="px-4 py-2.5 text-right text-[#F51E33] font-semibold whitespace-nowrap">
+                      <td className="px-4 py-2.5 text-right text-[#DC2626] font-semibold whitespace-nowrap">
                         {fmtFCFA(e.montant)}
                       </td>
                       <td className="px-4 py-2.5">
                         {e.source && (
-                          <span className="text-[10px] text-[#F51E33] bg-[#F51E33]/10 px-2 py-0.5 rounded">
+                          <span className="text-[10px] text-[#DC2626] bg-[#DC2626]/10 px-2 py-0.5 rounded">
                             {e.source}
                           </span>
                         )}
@@ -503,17 +503,17 @@ export default function ComptabilitePage() {
                         <td className="px-4 py-2.5 text-[var(--text)] text-xs max-w-[180px] truncate">{gl.account_name}</td>
                         <td className="px-4 py-2.5">
                           <span className={`text-[10px] px-2 py-0.5 rounded ${
-                            gl.account_type === 'tresorerie' ? 'bg-[#F51E33]/10 text-[#F51E33]' :
-                            gl.account_type === 'produit'    ? 'bg-[var(--surface)]/10 text-[#F51E33]' :
-                            gl.account_type === 'charge'     ? 'bg-[#F51E33]/10 text-[#F51E33]' :
-                            gl.account_type === 'actif'      ? 'bg-[#F51E33]/10 text-[#F51E33]' :
+                            gl.account_type === 'tresorerie' ? 'bg-[#DC2626]/10 text-[#DC2626]' :
+                            gl.account_type === 'produit'    ? 'bg-[var(--surface)]/10 text-[#DC2626]' :
+                            gl.account_type === 'charge'     ? 'bg-[#DC2626]/10 text-[#DC2626]' :
+                            gl.account_type === 'actif'      ? 'bg-[#DC2626]/10 text-[#DC2626]' :
                             'bg-[#8957E5]/10 text-[#8957E5]'
                           }`}>{gl.account_type}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-right text-[#F51E33] font-mono text-xs whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-right text-[#DC2626] font-mono text-xs whitespace-nowrap">
                           {fmtFCFA(gl.total_debit)}
                         </td>
-                        <td className="px-4 py-2.5 text-right text-[#F51E33] font-mono text-xs whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-right text-[#DC2626] font-mono text-xs whitespace-nowrap">
                           {fmtFCFA(gl.total_credit)}
                         </td>
                         <td className="px-4 py-2.5 text-right font-semibold whitespace-nowrap" style={{
@@ -648,7 +648,7 @@ export default function ComptabilitePage() {
           )}
           {aiLoading && (
             <div className="flex items-center gap-3 text-[var(--text-secondary)] py-6">
-              <Loader2 size={16} className="animate-spin text-[#F51E33]" />
+              <Loader2 size={16} className="animate-spin text-[#DC2626]" />
               <span className="text-sm">MIAA+ analyse vos données…</span>
             </div>
           )}
@@ -685,7 +685,7 @@ export default function ComptabilitePage() {
                   <Download size={12} /> CSV
                 </button>
                 <button onClick={() => setShowRapModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-[#F51E33]/10 border border-[#F51E33]/30 text-[#F51E33] hover:bg-[#F51E33]/20 transition-colors">
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-[#DC2626]/10 border border-[#DC2626]/30 text-[#DC2626] hover:bg-[#DC2626]/20 transition-colors">
                   <Plus size={12} /> Ajouter ligne
                 </button>
               </div>
@@ -761,24 +761,24 @@ export default function ComptabilitePage() {
                             <div className="flex items-center gap-1">
                               {r.statut !== 'rapproche' && (
                                 <button onClick={() => updateRapStatut(r.id, 'rapproche')}
-                                  className="px-2 py-1 rounded text-[10px] bg-[var(--surface)]/10 text-[#F51E33] hover:bg-[var(--surface)]/20 transition-colors" title="Marquer rapproché">
+                                  className="px-2 py-1 rounded text-[10px] bg-[var(--surface)]/10 text-[#DC2626] hover:bg-[var(--surface)]/20 transition-colors" title="Marquer rapproché">
                                   ✓
                                 </button>
                               )}
                               {r.statut !== 'ecart' && (
                                 <button onClick={() => updateRapStatut(r.id, 'ecart')}
-                                  className="px-2 py-1 rounded text-[10px] bg-[#F51E33]/10 text-[#F51E33] hover:bg-[#F51E33]/20 transition-colors" title="Signaler écart">
+                                  className="px-2 py-1 rounded text-[10px] bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626]/20 transition-colors" title="Signaler écart">
                                   !
                                 </button>
                               )}
                               {r.statut !== 'non_rapproche' && (
                                 <button onClick={() => updateRapStatut(r.id, 'non_rapproche')}
-                                  className="px-2 py-1 rounded text-[10px] bg-[#F51E33]/10 text-[#F51E33] hover:bg-[#F51E33]/20 transition-colors" title="Remettre en attente">
+                                  className="px-2 py-1 rounded text-[10px] bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626]/20 transition-colors" title="Remettre en attente">
                                   ↺
                                 </button>
                               )}
                               <button onClick={() => deleteRap(r.id)}
-                                className="px-2 py-1 rounded text-[10px] bg-[#484F58]/10 text-[var(--text-secondary)] hover:bg-[#F51E33]/10 hover:text-[#F51E33] transition-colors" title="Supprimer">
+                                className="px-2 py-1 rounded text-[10px] bg-[#64748B]/10 text-[var(--text-secondary)] hover:bg-[#DC2626]/10 hover:text-[#DC2626] transition-colors" title="Supprimer">
                                 <Trash2 size={10} />
                               </button>
                             </div>
@@ -827,19 +827,19 @@ export default function ComptabilitePage() {
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Référence</label>
                   <input value={rapForm.reference} onChange={e => setRapForm(f => ({ ...f, reference: e.target.value }))}
                     placeholder="VIR-2025-001, CHQ-456…"
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#F51E33]/50" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
                 </div>
                 <div>
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA)</label>
                   <input type="number" value={rapForm.montant} onChange={e => setRapForm(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#F51E33]/50" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
                 </div>
                 <div>
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Libellé (optionnel)</label>
                   <input value={rapForm.libelle} onChange={e => setRapForm(f => ({ ...f, libelle: e.target.value }))}
                     placeholder="Description…"
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#F51E33]/50" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
                 </div>
               </div>
               <div className="flex gap-2 mt-5">
@@ -883,14 +883,14 @@ export default function ComptabilitePage() {
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">Libellé</label>
                   <input value={form.libelle} onChange={e => setForm(f => ({ ...f, libelle: e.target.value }))}
                     placeholder="Description de l'opération..."
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#F51E33]/50" />
+                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant HT (FCFA)</label>
                     <input type="number" value={form.montant_ht} onChange={e => setForm(f => ({ ...f, montant_ht: e.target.value }))}
                       placeholder="0"
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#F51E33]/50" />
+                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
                   </div>
                   <div>
                     <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
@@ -899,10 +899,10 @@ export default function ComptabilitePage() {
                   </div>
                 </div>
                 {form.type === 'recette' && form.montant_ht && (
-                  <div className="bg-[#F51E33]/5 border border-[#F51E33]/20 rounded-lg p-3 text-xs space-y-1">
-                    <p className="text-[var(--text-secondary)]">TVA (18%) : <span className="text-[#F51E33] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18))}</span></p>
-                    <p className="text-[var(--text-secondary)]">CA (5% TVA) : <span className="text-[#F51E33] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18 * 0.05))}</span></p>
-                    <p className="text-[var(--text-secondary)] font-medium">TTC : <span className="text-[#F51E33] font-bold">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 1.189))}</span></p>
+                  <div className="bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg p-3 text-xs space-y-1">
+                    <p className="text-[var(--text-secondary)]">TVA (18%) : <span className="text-[#DC2626] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18))}</span></p>
+                    <p className="text-[var(--text-secondary)]">CA (5% TVA) : <span className="text-[#DC2626] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18 * 0.05))}</span></p>
+                    <p className="text-[var(--text-secondary)] font-medium">TTC : <span className="text-[#DC2626] font-bold">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 1.189))}</span></p>
                   </div>
                 )}
                 <div>

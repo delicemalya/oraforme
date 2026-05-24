@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -58,14 +58,14 @@ interface Config {
 
 const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> = {
   brouillon: { label: 'BROUILLON', color: '#8B949E', bg: '#8B949E20' },
-  envoyee:   { label: 'ENVOYÉE',   color: '#F51E33', bg: '#F51E3320' },
-  envoye:    { label: 'ENVOYÉE',   color: '#F51E33', bg: '#F51E3320' },
+  envoyee:   { label: 'ENVOYÉE',   color: '#DC2626', bg: '#DC262620' },
+  envoye:    { label: 'ENVOYÉE',   color: '#DC2626', bg: '#DC262620' },
   payee:     { label: 'PAYÉE',     color: '#2EA043', bg: '#2EA04320' },
-  retard:    { label: 'EN RETARD', color: '#F51E33', bg: '#F51E3320' },
-  annulee:   { label: 'ANNULÉE',  color: '#484F58', bg: '#48495820' },
+  retard:    { label: 'EN RETARD', color: '#DC2626', bg: '#DC262620' },
+  annulee:   { label: 'ANNULÉE',  color: '#64748B', bg: '#48495820' },
 }
 
-const GOLD = '#F51E33'
+const GOLD = '#DC2626'
 
 function fmt(n: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n))
@@ -179,7 +179,7 @@ export default function InvoicePreviewPage() {
 
   if (loading) return (
     <div className="fixed inset-0 z-50 bg-[var(--surface)] flex items-center justify-center">
-      <Loader2 className="animate-spin text-[#F51E33]" size={32} />
+      <Loader2 className="animate-spin text-[#DC2626]" size={32} />
     </div>
   )
 
@@ -244,7 +244,7 @@ export default function InvoicePreviewPage() {
           {/* Send */}
           <motion.button onClick={handleSend} disabled={sending || sent} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-60 shrink-0"
-            style={{ background: sent ? '#2EA04320' : '#F51E3315', color: sent ? '#2EA043' : '#F51E33', border: `1px solid ${sent ? '#2EA04340' : '#F51E3330'}` }}
+            style={{ background: sent ? '#2EA04320' : '#DC262615', color: sent ? '#2EA043' : '#DC2626', border: `1px solid ${sent ? '#2EA04340' : '#DC262630'}` }}
           >
             {sending ? <Loader2 className="animate-spin" size={13} /> : sent ? <Check size={13} /> : <Send size={13} />}
             {sent ? 'Envoyée !' : 'Envoyer'}
@@ -253,7 +253,7 @@ export default function InvoicePreviewPage() {
           {/* Download */}
           <motion.button onClick={handleDownload} disabled={downloading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-60 shrink-0"
-            style={{ background: `#d4880a`, color: '#142850' }}
+            style={{ background: `#d4880a`, color: '#0F172A' }}
           >
             {downloading ? <Loader2 className="animate-spin" size={14} /> : <Download size={14} />}
             <span className="hidden sm:inline">Télécharger PDF</span>
@@ -292,7 +292,7 @@ export default function InvoicePreviewPage() {
                           style={{ width: 52, height: 52, objectFit: 'contain', borderRadius: 8, flexShrink: 0 }} />
                       ) : (
                         <div style={{ width: 52, height: 52, background: GOLD, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span style={{ color: '#142850', fontWeight: 900, fontSize: 24 }}>{companyLetter}</span>
+                          <span style={{ color: '#0F172A', fontWeight: 900, fontSize: 24 }}>{companyLetter}</span>
                         </div>
                       )}
                       <div>

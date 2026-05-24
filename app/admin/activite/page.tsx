@@ -1,10 +1,10 @@
-import { supabaseAdmin } from '@/lib/supabase-server'
+﻿import { supabaseAdmin } from '@/lib/supabase-server'
 import { fmtFCFA } from '@/lib/admin-config'
 import { Activity, TrendingDown, ArrowUpRight, ArrowDownRight, AlertTriangle, CheckCircle2 } from 'lucide-react'
 
 const TYPE_STYLE = {
-  entree: { label: 'Entrée', color: '#142850', bg: '#14285010', border: '#14285030', icon: ArrowUpRight },
-  sortie: { label: 'Sortie', color: '#F51E33', bg: '#F51E3310', border: '#F51E3330', icon: ArrowDownRight },
+  entree: { label: 'Entrée', color: '#0F172A', bg: '#0F172A10', border: '#0F172A30', icon: ArrowUpRight },
+  sortie: { label: 'Sortie', color: '#DC2626', bg: '#DC262610', border: '#DC262630', icon: ArrowDownRight },
 }
 
 function timeAgo(dateStr: string) {
@@ -111,8 +111,8 @@ export default async function AdminActivitePage() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
-          <Activity size={18} className="text-[#F51E33]" />
+        <div className="w-10 h-10 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/20 flex items-center justify-center">
+          <Activity size={18} className="text-[#DC2626]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">Activité en temps réel</h1>
@@ -124,12 +124,12 @@ export default async function AdminActivitePage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Entrées aujourd'hui</p>
-          <p className="text-2xl font-bold text-[#F51E33]">{fmtFCFA(todayIn)}</p>
+          <p className="text-2xl font-bold text-[#DC2626]">{fmtFCFA(todayIn)}</p>
           <p className="text-xs text-[var(--text-secondary)] mt-1">{todayTx.filter(t => t.type === 'entree').length} transactions</p>
         </div>
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Sorties aujourd'hui</p>
-          <p className="text-2xl font-bold text-[#F51E33]">{fmtFCFA(todayOut)}</p>
+          <p className="text-2xl font-bold text-[#DC2626]">{fmtFCFA(todayOut)}</p>
           <p className="text-xs text-[var(--text-secondary)] mt-1">{todayTx.filter(t => t.type === 'sortie').length} transactions</p>
         </div>
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
@@ -139,7 +139,7 @@ export default async function AdminActivitePage() {
         </div>
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Plus actif</p>
-          <p className="text-lg font-bold text-[#F51E33] truncate">{mostActiveTenant}</p>
+          <p className="text-lg font-bold text-[#DC2626] truncate">{mostActiveTenant}</p>
           <p className="text-xs text-[var(--text-secondary)] mt-1">
             {inactiveCount > 0
               ? `⚠ ${inactiveCount} inactif${inactiveCount > 1 ? 's' : ''} +21j`
@@ -204,7 +204,7 @@ export default async function AdminActivitePage() {
           <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[var(--text)]">Santé des clients</h2>
             {(inactiveCount + warnCount) > 0 && (
-              <div className="flex items-center gap-1 text-[#F51E33]">
+              <div className="flex items-center gap-1 text-[#DC2626]">
                 <AlertTriangle size={12} />
                 <span className="text-xs font-medium">{inactiveCount + warnCount}</span>
               </div>
@@ -216,9 +216,9 @@ export default async function AdminActivitePage() {
             )}
             {tenantRows.map(t => {
               const RISK = {
-                ok:     { color: '#142850', icon: CheckCircle2, label: 'Actif' },
-                warn:   { color: '#F51E33', icon: AlertTriangle, label: '+7j sans activité' },
-                danger: { color: '#F51E33', icon: TrendingDown,  label: t.lastDate ? '+21j inactif' : 'Jamais utilisé' },
+                ok:     { color: '#0F172A', icon: CheckCircle2, label: 'Actif' },
+                warn:   { color: '#DC2626', icon: AlertTriangle, label: '+7j sans activité' },
+                danger: { color: '#DC2626', icon: TrendingDown,  label: t.lastDate ? '+21j inactif' : 'Jamais utilisé' },
               }
               const r = RISK[t.risk]
               const RIcon = r.icon
@@ -268,9 +268,9 @@ export default async function AdminActivitePage() {
               )}
               {tenantRows.map(t => {
                 const RISK_BADGE = {
-                  ok:     'text-[#F51E33] bg-[var(--surface)]/10 border-[#142850]/30',
-                  warn:   'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
-                  danger: 'text-[#F51E33] bg-[#F51E33]/10 border-[#F51E33]/30',
+                  ok:     'text-[#DC2626] bg-[var(--surface)]/10 border-[#0F172A]/30',
+                  warn:   'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
+                  danger: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
                 }
                 const RISK_LABEL = {
                   ok: 'Actif',

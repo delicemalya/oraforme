@@ -95,8 +95,8 @@ export default function RegisterPage() {
       <div className="min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md text-center">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-10">
-            <div className="w-14 h-14 rounded-full bg-[#F51E33]/10 flex items-center justify-center mx-auto mb-5">
-              <MailCheck size={28} className="text-[#F51E33]" />
+            <div className="w-14 h-14 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-5">
+              <MailCheck size={28} className="text-[#DC2626]" />
             </div>
             <h2 className="text-lg font-bold text-[var(--text)] mb-2">Vérifiez votre email</h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
@@ -109,7 +109,7 @@ export default function RegisterPage() {
             </p>
             <Link
               href="/login"
-              className="inline-block text-sm text-[#F51E33] hover:underline"
+              className="inline-block text-sm text-[#DC2626] hover:underline"
             >
               Retour à la connexion
             </Link>
@@ -192,7 +192,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-[var(--text-secondary)] mt-6">
             Déjà un compte ?{' '}
-            <Link href="/login" className="text-[#F51E33] hover:underline">
+            <Link href="/login" className="text-[#DC2626] hover:underline">
               Se connecter
             </Link>
           </p>

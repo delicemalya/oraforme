@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
   // Factures by status donut
   const facturesByStatus = [
     { name: 'Payées',    value: factures.filter(f => f.statut === 'payee').length,    color: '#2EA043' },
-    { name: 'En attente', value: factures.filter(f => f.statut === 'envoyee').length, color: '#F51E33' },
+    { name: 'En attente', value: factures.filter(f => f.statut === 'envoyee').length, color: '#DC2626' },
     { name: 'Brouillon',  value: factures.filter(f => f.statut === 'brouillon').length,color: '#8B949E' },
     { name: 'Annulées',   value: factures.filter(f => f.statut === 'annulee').length, color: '#F85149' },
   ].filter(s => s.value > 0)

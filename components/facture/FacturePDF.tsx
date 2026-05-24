@@ -1,4 +1,4 @@
-import {
+﻿import {
   Document, Page, View, Text, Image, StyleSheet,
 } from '@react-pdf/renderer'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
@@ -38,7 +38,7 @@ export interface EntrepriseConfigData {
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
-const GOLD  = '#F51E33'
+const GOLD  = '#DC2626'
 const BLACK = '#111111'
 const GRAY  = '#6B7280'
 const LGRAY = '#F9FAFB'

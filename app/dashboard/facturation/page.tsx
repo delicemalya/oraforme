@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -48,10 +48,10 @@ interface EntrepriseConfig {
 
 const STATUT_CONFIG: Record<StatutFac, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   brouillon: { label: 'Brouillon',  color: '#8B949E', bg: '#8B949E18', icon: Clock },
-  envoyee:   { label: 'Envoyée',    color: '#F51E33', bg: '#F51E3318', icon: Send },
-  payee:     { label: 'Payée',      color: '#142850', bg: '#14285018', icon: CheckCircle },
-  retard:    { label: 'En retard',  color: '#F51E33', bg: '#F51E3318', icon: AlertTriangle },
-  annulee:   { label: 'Annulée',   color: '#484F58', bg: '#48495818', icon: XCircle },
+  envoyee:   { label: 'Envoyée',    color: '#DC2626', bg: '#DC262618', icon: Send },
+  payee:     { label: 'Payée',      color: '#0F172A', bg: '#0F172A18', icon: CheckCircle },
+  retard:    { label: 'En retard',  color: '#DC2626', bg: '#DC262618', icon: AlertTriangle },
+  annulee:   { label: 'Annulée',   color: '#64748B', bg: '#48495818', icon: XCircle },
 }
 
 const fmt = formaterMontant
@@ -412,7 +412,7 @@ export default function FacturationPage() {
             onClick={openNew}
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm"
-            style={{ background: '#F51E33', color: '#142850', boxShadow: '0 0 18px #F51E3335' }}
+            style={{ background: '#DC2626', color: '#0F172A', boxShadow: '0 0 18px #DC262635' }}
           >
             <Plus size={15} /> Nouvelle facture
           </motion.button>
@@ -421,10 +421,10 @@ export default function FacturationPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#F51E33"  icon={FileText} />
-        <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#142850"  icon={CheckCircle} />
-        <KpiCard label="En attente"      value={fmt(totalEnAttente)} color="#F51E33"  icon={Clock} />
-        <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#F51E33"  icon={AlertTriangle} />
+        <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#DC2626"  icon={FileText} />
+        <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#0F172A"  icon={CheckCircle} />
+        <KpiCard label="En attente"      value={fmt(totalEnAttente)} color="#DC2626"  icon={Clock} />
+        <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#DC2626"  icon={AlertTriangle} />
       </div>
 
       {/* Filters + Search */}
@@ -442,7 +442,7 @@ export default function FacturationPage() {
               key={val}
               onClick={() => setFilter(val)}
               className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: filter === val ? '#F51E33' : 'transparent', color: filter === val ? '#142850' : '#8B949E' }}
+              style={{ background: filter === val ? '#DC2626' : 'transparent', color: filter === val ? '#0F172A' : '#8B949E' }}
             >
               {label}
             </button>
@@ -489,7 +489,7 @@ export default function FacturationPage() {
                       className="border-b border-[var(--border)] hover:bg-gray-50 transition-colors group"
                     >
                       <td className="px-4 py-3">
-                        <span className="text-xs font-mono font-semibold text-[#F51E33]">
+                        <span className="text-xs font-mono font-semibold text-[#DC2626]">
                           {f.invoice_number ?? f.id.slice(0, 8).toUpperCase()}
                         </span>
                       </td>
@@ -502,7 +502,7 @@ export default function FacturationPage() {
                       </td>
                       <td className="px-4 py-3 text-xs text-[var(--text-secondary)]">{fmt(ht)}</td>
                       <td className="px-4 py-3 text-xs text-[var(--text-secondary)]">{fmt(tva + ca)}</td>
-                      <td className="px-4 py-3 text-sm font-bold text-[#F51E33]">{fmt(ttc)}</td>
+                      <td className="px-4 py-3 text-sm font-bold text-[#DC2626]">{fmt(ttc)}</td>
                       <td className="px-4 py-3">
                         {/* Controlled select — triggers confirmation dialog */}
                         <select
@@ -519,16 +519,16 @@ export default function FacturationPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <ActionBtn title="Voir détail"     onClick={() => setViewId(f.id)}                                                                       icon={<Eye size={13} />} />
-                          <ActionBtn title="Aperçu plein écran" onClick={() => router.push(`/dashboard/factures/${f.id}/preview`)}                                 icon={<ExternalLink size={13} />} hoverClass="hover:text-[#F51E33]" />
+                          <ActionBtn title="Aperçu plein écran" onClick={() => router.push(`/dashboard/factures/${f.id}/preview`)}                                 icon={<ExternalLink size={13} />} hoverClass="hover:text-[#DC2626]" />
                           <ActionBtn title="Modifier"        onClick={() => openEdit(f)}                                                                           icon={<Edit3 size={13} />} />
                           {f.client_phone && <ActionBtn title="WhatsApp" onClick={() => sendWhatsApp(f)}                                                           icon={<MessageCircle size={13} />} hoverClass="hover:text-[#25D366]" />}
-                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#F51E33]" />}
+                          {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#DC2626]" />}
                           <ActionBtn
                             title="Télécharger PDF"
                             onClick={() => downloadPDF(f.id, f.invoice_number ?? f.id.slice(0, 8))}
                             disabled={dlLoading === f.id}
                             icon={dlLoading === f.id ? <Loader2 className="animate-spin" size={13} /> : <Download size={13} />}
-                            hoverClass="hover:text-[#F51E33]"
+                            hoverClass="hover:text-[#DC2626]"
                           />
                           <ActionBtn title="Supprimer" onClick={() => del(f.id)} icon={<Trash2 size={13} />} hoverClass="hover:text-red-400" />
                         </div>
@@ -593,7 +593,7 @@ export default function FacturationPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Lignes de facture</p>
-                      <button onClick={() => setLignes(p => [...p, emptyLigne()])} className="text-xs text-[#F51E33] hover:underline flex items-center gap-1">
+                      <button onClick={() => setLignes(p => [...p, emptyLigne()])} className="text-xs text-[#DC2626] hover:underline flex items-center gap-1">
                         <Plus size={11} /> Ajouter une ligne
                       </button>
                     </div>
@@ -621,7 +621,7 @@ export default function FacturationPage() {
                             <input type="number" min="1" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] text-center" value={l.quantity} onChange={e => updateLigne(i, 'quantity', e.target.value)} />
                           </div>
                           <div className="col-span-1 text-right">
-                            <span className="text-xs font-semibold text-[#F51E33]">{fmt(l.price * l.quantity)}</span>
+                            <span className="text-xs font-semibold text-[#DC2626]">{fmt(l.price * l.quantity)}</span>
                           </div>
                           <div className="col-span-1 flex justify-center">
                             {lignes.length > 1 && (
@@ -646,7 +646,7 @@ export default function FacturationPage() {
                       <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA (5 % de la TVA)</span><span className="text-[#101729]">{fmt(caLive)}</span></div>
                       <div className="border-t border-[var(--border)] pt-3 flex justify-between">
                         <span className="text-base font-bold text-[#101729]">TOTAL TTC</span>
-                        <span className="text-xl font-bold text-[#F51E33]">{fmt(ttcLive)}</span>
+                        <span className="text-xl font-bold text-[#DC2626]">{fmt(ttcLive)}</span>
                       </div>
                     </div>
                   </div>
@@ -669,7 +669,7 @@ export default function FacturationPage() {
                       onClick={() => handleSave('envoyee')}
                       disabled={saving || !clientNom}
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm flex-1 justify-center disabled:opacity-40"
-                      style={{ background: '#F51E33', color: '#142850' }}
+                      style={{ background: '#DC2626', color: '#0F172A' }}
                     >
                       {saving ? <Loader2 className="animate-spin" size={14} /> : <><Send size={14} /> Émettre la facture</>}
                     </button>
@@ -714,7 +714,7 @@ export default function FacturationPage() {
                     <button
                       onClick={() => downloadPDF(viewedFac.id, viewedFac.invoice_number ?? viewedFac.id.slice(0, 8))}
                       disabled={dlLoading === viewedFac.id}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F51E33]/15 border border-[#F51E33]/30 text-[#F51E33] text-xs font-semibold hover:bg-[#F51E33]/25 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#DC2626]/15 border border-[#DC2626]/30 text-[#DC2626] text-xs font-semibold hover:bg-[#DC2626]/25 transition-colors disabled:opacity-50"
                     >
                       {dlLoading === viewedFac.id ? <Loader2 className="animate-spin" size={12} /> : <Download size={12} />} PDF
                     </button>
@@ -763,7 +763,7 @@ export default function FacturationPage() {
                               <td className="px-3 py-2 text-[var(--text)]">{l.description}</td>
                               <td className="px-3 py-2 text-[var(--text-secondary)] text-right">{fmt(l.price)}</td>
                               <td className="px-3 py-2 text-[var(--text-secondary)] text-center">{l.quantity}</td>
-                              <td className="px-3 py-2 text-[#F51E33] font-semibold text-right">{fmt(l.price * l.quantity)}</td>
+                              <td className="px-3 py-2 text-[#DC2626] font-semibold text-right">{fmt(l.price * l.quantity)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -782,7 +782,7 @@ export default function FacturationPage() {
                         <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA 5 %</span><span className="text-[#101729]">{fmt(ca)}</span></div>
                         <div className="border-t border-[var(--border)] pt-2 flex justify-between">
                           <span className="font-bold text-[#101729]">TOTAL TTC</span>
-                          <span className="font-bold text-[#F51E33] text-lg">{fmt(ttc)}</span>
+                          <span className="font-bold text-[#DC2626] text-lg">{fmt(ttc)}</span>
                         </div>
                       </div>
                     )
@@ -862,7 +862,7 @@ export default function FacturationPage() {
                     {viewedFac.client_email && (
                       <button
                         onClick={() => sendEmail(viewedFac)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#F51E33]/30 text-[#F51E33] text-xs font-semibold hover:bg-[#F51E33]/10 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#DC2626]/30 text-[#DC2626] text-xs font-semibold hover:bg-[#DC2626]/10 transition-colors"
                       >
                         <Mail size={13} /> Email
                       </button>

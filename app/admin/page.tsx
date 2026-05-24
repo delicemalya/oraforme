@@ -97,8 +97,8 @@ export default async function AdminPage() {
 
       {/* Page header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#F51E33]/10 border border-[#F51E33]/20 flex items-center justify-center">
-          <ShieldAlert size={18} className="text-[#F51E33]" />
+        <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/20 flex items-center justify-center">
+          <ShieldAlert size={18} className="text-[var(--primary)]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">Vue globale</h1>
@@ -109,22 +109,22 @@ export default async function AdminPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          icon={Building2} label="Clients actifs" color="#F51E33"
+          icon={Building2} label="Clients actifs" color="#2563EB"
           value={nbClients.toString()}
           sub={newClientsThisMonth > 0 ? `+${newClientsThisMonth} ce mois` : 'Aucun nouveau ce mois'}
         />
         <KpiCard
-          icon={DollarSign} label="MRR plateforme" color="#F51E33"
+          icon={DollarSign} label="MRR plateforme" color="#16A34A"
           value={fmtFCFA(totalMRR)}
           sub={`CA total généré: ${fmtFCFA(totalCA)}`}
         />
         <KpiCard
-          icon={Package} label="Modules vendus" color="#F51E33"
+          icon={Package} label="Modules vendus" color="#F59E0B"
           value={totalModulesSold.toString()}
           sub={`Top: ${moduleRevData[0]?.module ?? '—'}`}
         />
         <KpiCard
-          icon={Users} label="Utilisateurs" color="#142850"
+          icon={Users} label="Utilisateurs" color="#8B5CF6"
           value={nbUsers.toString()}
           sub={`${nbClients > 0 ? (nbUsers / nbClients).toFixed(1) : 0} user/client`}
         />
@@ -137,7 +137,7 @@ export default async function AdminPage() {
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[var(--text)]">Revenus par module (MRR)</h2>
-            <span className="text-xs text-[#F51E33] font-bold">{fmtFCFA(totalMRR)}/mois</span>
+            <span className="text-xs text-[var(--success)] font-bold">{fmtFCFA(totalMRR)}/mois</span>
           </div>
           <ModuleRevenueChart data={moduleRevData} />
         </div>
@@ -160,7 +160,7 @@ export default async function AdminPage() {
             <div key={m.module} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-3">
               <p className="text-xs text-[var(--text-secondary)] truncate mb-1">{m.module}</p>
               <p className="text-sm font-bold text-[var(--text)]">{m.clients} client{m.clients > 1 ? 's' : ''}</p>
-              <p className="text-xs text-[#F51E33] font-medium mt-0.5">{fmtFCFA(m.mrr)}/mois</p>
+              <p className="text-xs text-[var(--primary)] font-medium mt-0.5">{fmtFCFA(m.mrr)}/mois</p>
             </div>
           ))}
         </div>

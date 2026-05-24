@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -278,10 +278,10 @@ export function CreateEmployeeWizard({
                       border: `2px solid ${past || active ? '#2EA043' : 'transparent'}`,
                     }}>
                     {past ? <Check size={12} className="text-white" />
-                           : <Icon size={11} style={{ color: active ? '#2EA043' : '#484F58' }} />}
+                           : <Icon size={11} style={{ color: active ? '#2EA043' : '#64748B' }} />}
                   </div>
                   <span className="text-[9px] hidden sm:block text-center leading-tight max-w-[52px]"
-                    style={{ color: active ? '#2EA043' : past ? '#8B949E' : '#484F58' }}>
+                    style={{ color: active ? '#2EA043' : past ? '#8B949E' : '#64748B' }}>
                     {s.label}
                   </span>
                 </div>
@@ -538,7 +538,7 @@ export function CreateEmployeeWizard({
                       className="flex items-center gap-4 p-4 rounded-xl border border-[var(--border)] cursor-pointer hover:border-[#00b9a7]/30 transition-all group"
                       style={{ background: '#FFFFFF' }}>
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(56,139,253,0.1)' }}>
-                        <FileText size={16} style={{ color: '#F51E33' }} />
+                        <FileText size={16} style={{ color: '#DC2626' }} />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-[#101729]">{doc.label}</p>
@@ -624,7 +624,7 @@ export function CreateEmployeeWizard({
                           <li>✓ Dossier enregistré dans RH & Paie</li>
                           <li>✓ Compte tiers créé en Comptabilité (641 — Rémunérations du personnel)</li>
                           <li>✓ Notification envoyée à la Direction Générale</li>
-                          <li style={{ color: acc_.email_connexion ? '#8B949E' : '#484F58' }}>
+                          <li style={{ color: acc_.email_connexion ? '#8B949E' : '#64748B' }}>
                             {acc_.email_connexion ? '✓ Email de connexion configuré' : '○ Aucun compte système (email non renseigné)'}
                           </li>
                         </ul>
@@ -642,7 +642,7 @@ export function CreateEmployeeWizard({
         {!done && (
           <div className="shrink-0 px-6 py-4 border-t border-[var(--border)]">
             {errMsg && (
-              <div className="mb-3 px-4 py-3 rounded-xl text-xs font-medium" style={{ background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.25)', color: '#F51E33' }}>
+              <div className="mb-3 px-4 py-3 rounded-xl text-xs font-medium" style={{ background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.25)', color: '#DC2626' }}>
                 ⚠ {errMsg}
               </div>
             )}

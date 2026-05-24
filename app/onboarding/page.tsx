@@ -77,11 +77,11 @@ export default function OnboardingPage() {
             {STEPS.map((s, i) => (
               <div key={s} className="flex items-center gap-1.5">
                 <div className={`flex items-center gap-1.5 text-xs ${
-                  i === step ? 'text-[#F51E33]' : i < step ? 'text-[var(--text-secondary)]' : 'text-[var(--text-secondary)]'
+                  i === step ? 'text-[#DC2626]' : i < step ? 'text-[var(--text-secondary)]' : 'text-[var(--text-secondary)]'
                 }`}>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${
-                    i < step   ? 'bg-[#F51E33] border-[#F51E33] text-[#F51E33]' :
-                    i === step ? 'border-[#F51E33] text-[#F51E33]'              :
+                    i < step   ? 'bg-[#DC2626] border-[#DC2626] text-[#DC2626]' :
+                    i === step ? 'border-[#DC2626] text-[#DC2626]'              :
                                  'border-[var(--border)] text-[var(--text-secondary)]'
                   }`}>
                     {i < step ? '✓' : i + 1}
@@ -89,7 +89,7 @@ export default function OnboardingPage() {
                   <span className="hidden sm:inline">{s}</span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className={`w-5 h-px ${i < step ? 'bg-[#F51E33]' : 'bg-[#30363D]'}`} />
+                  <div className={`w-5 h-px ${i < step ? 'bg-[#DC2626]' : 'bg-[#30363D]'}`} />
                 )}
               </div>
             ))}
@@ -114,14 +114,14 @@ export default function OnboardingPage() {
                     onClick={() => setSecteurId(id)}
                     className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all ${
                       secteurId === id
-                        ? 'border-[#F51E33] bg-[#F51E33]/5 shadow-[0_0_0_1px_#F51E3333]'
-                        : 'border-[var(--border)] bg-[var(--surface-alt)] hover:border-[#484F58]'
+                        ? 'border-[#DC2626] bg-[#DC2626]/5 shadow-[0_0_0_1px_#DC262633]'
+                        : 'border-[var(--border)] bg-[var(--surface-alt)] hover:border-[#64748B]'
                     }`}
                   >
                     <span className="text-2xl">{cfg.emoji}</span>
                     <span className="text-xs font-medium text-[var(--text)] leading-tight">{cfg.label}</span>
                     {secteurId === id && (
-                      <span className="text-xs text-[#F51E33]">{cfg.uiModules.length} modules</span>
+                      <span className="text-xs text-[#DC2626]">{cfg.uiModules.length} modules</span>
                     )}
                   </button>
                 ))}
@@ -129,8 +129,8 @@ export default function OnboardingPage() {
 
               {/* Module preview */}
               {secteurCfg && uiModules.length > 0 && (
-                <div className="mt-4 p-3 bg-[#F51E33]/5 border border-[#F51E33]/20 rounded-lg">
-                  <p className="text-xs text-[#F51E33] font-medium mb-2">
+                <div className="mt-4 p-3 bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg">
+                  <p className="text-xs text-[#DC2626] font-medium mb-2">
                     Modules inclus par défaut pour {secteurCfg.label}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -172,7 +172,7 @@ export default function OnboardingPage() {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-[var(--text-secondary)]">Pays</label>
                   <select
-                    className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#F51E33]"
+                    className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#DC2626]"
                     value={entreprise.pays}
                     onChange={e => setEntreprise(p => ({ ...p, pays: e.target.value }))}
                   >
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
               {/* Modules recommandés */}
               {secteurCfg && (
                 <div className="mb-4">
-                  <p className="text-xs text-[#F51E33] font-medium uppercase tracking-wider mb-2">
+                  <p className="text-xs text-[#DC2626] font-medium uppercase tracking-wider mb-2">
                     ✦ Recommandés pour {secteurCfg.label}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -221,16 +221,16 @@ export default function OnboardingPage() {
                           onClick={() => toggleMod(key)}
                           className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
                             selected
-                              ? 'border-[#F51E33] bg-[#F51E33]/8'
-                              : 'border-[var(--border)] bg-[var(--surface-alt)] hover:border-[#484F58]'
+                              ? 'border-[#DC2626] bg-[#DC2626]/8'
+                              : 'border-[var(--border)] bg-[var(--surface-alt)] hover:border-[#64748B]'
                           }`}
                         >
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all ${
                             selected
-                              ? 'bg-[#F51E33] border-[#F51E33]'
-                              : 'border-[#484F58]'
+                              ? 'bg-[#DC2626] border-[#DC2626]'
+                              : 'border-[#64748B]'
                           }`}>
-                            {selected && <Check size={10} className="text-[#F51E33]" />}
+                            {selected && <Check size={10} className="text-[#DC2626]" />}
                           </div>
                           <div className="min-w-0">
                             <div className="text-xs font-medium text-[var(--text)] truncate">
@@ -276,7 +276,7 @@ export default function OnboardingPage() {
                                 ? 'bg-[#2EA043] border-[#2EA043]'
                                 : 'border-[var(--border)]'
                             }`}>
-                              {selected ? <Check size={10} className="text-[#F51E33]" /> : <Plus size={9} className="text-[var(--text-secondary)]" />}
+                              {selected ? <Check size={10} className="text-[#DC2626]" /> : <Plus size={9} className="text-[var(--text-secondary)]" />}
                             </div>
                             <div className="min-w-0">
                               <div className="text-xs font-medium text-[var(--text-secondary)] truncate">
@@ -301,12 +301,12 @@ export default function OnboardingPage() {
                     {selectedMods.length} module{selectedMods.length !== 1 ? 's' : ''} sélectionné{selectedMods.length !== 1 ? 's' : ''}
                   </span>
                   {selectedMods.length === 0 && (
-                    <div className="flex items-center gap-1 text-[10px] text-[#F51E33] mt-0.5">
+                    <div className="flex items-center gap-1 text-[10px] text-[#DC2626] mt-0.5">
                       <X size={9} /> Sélectionnez au moins un module
                     </div>
                   )}
                 </div>
-                <span className="text-base font-bold text-[#F51E33]">
+                <span className="text-base font-bold text-[#DC2626]">
                   {totalMensuel.toLocaleString()} F<span className="text-xs font-normal text-[var(--text-secondary)]">/mois</span>
                 </span>
               </div>
@@ -356,7 +356,7 @@ export default function OnboardingPage() {
                       return m ? (
                         <span
                           key={key}
-                          className="inline-flex items-center gap-1 text-xs bg-[#F51E33]/10 text-[#F51E33] border border-[#F51E33]/20 rounded-full px-2.5 py-1"
+                          className="inline-flex items-center gap-1 text-xs bg-[#DC2626]/10 text-[#DC2626] border border-[#DC2626]/20 rounded-full px-2.5 py-1"
                         >
                           {m.emoji} {m.label}
                         </span>
@@ -367,7 +367,7 @@ export default function OnboardingPage() {
 
                 <div className="p-4 bg-[var(--surface-alt)] rounded-xl flex items-center justify-between">
                   <span className="text-sm text-[var(--text-secondary)]">Total mensuel estimé</span>
-                  <span className="text-xl font-bold text-[#F51E33]">
+                  <span className="text-xl font-bold text-[#DC2626]">
                     {totalMensuel.toLocaleString()} <span className="text-sm font-normal">FCFA</span>
                   </span>
                 </div>

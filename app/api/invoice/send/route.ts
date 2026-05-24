@@ -55,8 +55,8 @@ export async function POST(req: NextRequest) {
 <head><meta charset="utf-8"/></head>
 <body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;margin:0">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-    <div style="background:#142850;padding:24px 32px">
-      <h1 style="color:#F51E33;margin:0;font-size:20px">${tenantName}</h1>
+    <div style="background:#0F172A;padding:24px 32px">
+      <h1 style="color:#DC2626;margin:0;font-size:20px">${tenantName}</h1>
       <p style="color:#8B949E;margin:4px 0 0;font-size:13px">Facture électronique</p>
     </div>
     <div style="padding:32px">
@@ -69,11 +69,11 @@ export async function POST(req: NextRequest) {
           <tr><td style="color:#666;padding:6px 0">Numéro</td><td style="text-align:right;font-weight:bold">${facture.invoice_number}</td></tr>
           <tr><td style="color:#666;padding:6px 0">Montant HT</td><td style="text-align:right">${fmt(facture.montant_ht ?? 0)}</td></tr>
           <tr><td style="color:#666;padding:6px 0">TVA</td><td style="text-align:right">${fmt(facture.tva ?? 0)}</td></tr>
-          <tr style="border-top:2px solid #ddd"><td style="color:#333;padding:10px 0 0;font-weight:bold;font-size:16px">TOTAL TTC</td><td style="text-align:right;font-weight:bold;font-size:16px;color:#F51E33;padding-top:10px">${fmt(facture.total ?? 0)}</td></tr>
+          <tr style="border-top:2px solid #ddd"><td style="color:#333;padding:10px 0 0;font-weight:bold;font-size:16px">TOTAL TTC</td><td style="text-align:right;font-weight:bold;font-size:16px;color:#DC2626;padding-top:10px">${fmt(facture.total ?? 0)}</td></tr>
         </table>
       </div>
       <div style="text-align:center;margin:32px 0">
-        <a href="${pdfUrl}" style="display:inline-block;padding:14px 32px;background:#F51E33;color:#000;text-decoration:none;border-radius:6px;font-weight:bold;font-size:14px">
+        <a href="${pdfUrl}" style="display:inline-block;padding:14px 32px;background:#DC2626;color:#000;text-decoration:none;border-radius:6px;font-weight:bold;font-size:14px">
           📄 Télécharger la facture PDF
         </a>
       </div>
