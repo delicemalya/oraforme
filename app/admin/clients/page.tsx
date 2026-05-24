@@ -4,7 +4,7 @@ import { Building2 } from 'lucide-react'
 
 export default async function AdminClientsPage() {
   const [tenantsRes, profilesRes, facturesRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, modules_actifs, created_at').order('created_at', { ascending: false }),
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, modules_actifs, created_at, status').order('created_at', { ascending: false }),
     supabaseAdmin.from('profiles').select('id, tenant_id'),
     supabaseAdmin.from('factures').select('id, tenant_id, total, statut'),
   ])
@@ -22,6 +22,7 @@ export default async function AdminClientsPage() {
     nb_factures: factures.filter(f => f.tenant_id === t.id).length,
     ca_genere:   factures.filter(f => f.tenant_id === t.id && f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0),
     created_at: t.created_at,
+    status: (t as { status?: 'active' | 'suspended' }).status ?? 'active',
   }))
 
   return (

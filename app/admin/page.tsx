@@ -8,7 +8,7 @@ export default async function AdminPage() {
   // ── Fetch all tenants ──
   const { data: tenants } = await supabaseAdmin
     .from('tenants')
-    .select('id, nom_entreprise, plan, modules_actifs, created_at')
+    .select('id, nom_entreprise, plan, modules_actifs, created_at, status')
     .order('created_at', { ascending: false })
 
   const tenantIds = (tenants ?? []).map(t => t.id)
@@ -72,6 +72,7 @@ export default async function AdminPage() {
       nb_factures: tFactures.length,
       ca_genere: ca,
       created_at: t.created_at,
+      status: (t as { status?: 'active' | 'suspended' }).status ?? 'active',
     }
   })
 
