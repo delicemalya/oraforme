@@ -90,7 +90,7 @@ const ALL_MODULES = [
   { id: 'finance',      label: 'Finance',             icon: TrendingUp,    href: '/dashboard/finance' },
   { id: 'comptabilite', label: 'Comptabilité',        icon: Calculator,    href: '/dashboard/comptabilite' },
   { id: 'tresorerie',   label: 'Trésorerie',          icon: Wallet,        href: '/dashboard/tresorerie' },
-  { id: 'stock',        label: 'Stock & Inventaire',  icon: Package,       href: '/dashboard/stock' },
+  { id: 'stock',        label: 'Stock & Inventaire',  icon: Package,       href: '/dashboard/stocks' },
   { id: 'facturation',  label: 'Facturation',         icon: FileText,      href: '/dashboard/facturation' },
   { id: 'achats',       label: 'Achats & Fourn.',     icon: ShoppingCart,  href: '/dashboard/achats' },
   { id: 'depenses',     label: 'Dépenses',            icon: Receipt,       href: '/dashboard/depenses' },

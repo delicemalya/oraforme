@@ -181,7 +181,7 @@ function QuickLinksCard({ secteur, modules }: { secteur: string | null; modules:
     { label: 'Facturation',  href: '/dashboard/facturation' },
     { label: 'Trésorerie',   href: '/dashboard/tresorerie' },
     { label: 'RH',           href: '/dashboard/rh' },
-    { label: 'Stock',        href: '/dashboard/stock' },
+    { label: 'Stock',        href: '/dashboard/stocks' },
     { label: 'Comptabilité', href: '/dashboard/comptabilite' },
   ]
 
@@ -274,7 +274,7 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
   ],
   restaurant: [
     { label: 'Caisse POS',   href: '/dashboard/restaurant', icon: ChefHat,     color: '#DC2626', desc: 'Ouvrir la caisse' },
-    { label: 'Stock cuisine', href: '/dashboard/stock',      icon: Package,     color: '#DC2626', desc: 'Inventaire & alertes' },
+    { label: 'Stock cuisine', href: '/dashboard/stocks',      icon: Package,     color: '#DC2626', desc: 'Inventaire & alertes' },
     { label: 'RH & Paie',    href: '/dashboard/rh',         icon: Users,       color: '#DC2626', desc: 'Gestion du personnel' },
     { label: 'Trésorerie',   href: '/dashboard/tresorerie', icon: Wallet,      color: '#DC2626', desc: 'Suivi des finances' },
     { label: 'Dépenses',     href: '/dashboard/depenses',   icon: Receipt,     color: '#DC2626', desc: 'Charges & sorties' },
@@ -282,7 +282,7 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
   ],
   commerce: [
     { label: 'Facturation',  href: '/dashboard/facturation', icon: FileText,    color: '#DC2626', desc: 'Devis & factures' },
-    { label: 'Stock',        href: '/dashboard/stock',       icon: Package,     color: '#DC2626', desc: 'Inventaire' },
+    { label: 'Stock',        href: '/dashboard/stocks',       icon: Package,     color: '#DC2626', desc: 'Inventaire' },
     { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#DC2626', desc: 'Finances' },
     { label: 'Achats',       href: '/dashboard/achats',      icon: ShoppingCart,color: '#DC2626', desc: 'Fournisseurs' },
     { label: 'RH & Paie',    href: '/dashboard/rh',          icon: Users,       color: '#DC2626', desc: 'Personnel' },
@@ -290,7 +290,7 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
   ],
   supermarche: [
     { label: 'Caisse',        href: '/dashboard/facturation', icon: FileText,    color: '#DC2626', desc: 'Ventes' },
-    { label: 'Rayons & Stock',href: '/dashboard/stock',       icon: Package,     color: '#DC2626', desc: 'Inventaire' },
+    { label: 'Rayons & Stock',href: '/dashboard/stocks',       icon: Package,     color: '#DC2626', desc: 'Inventaire' },
     { label: 'Achats',        href: '/dashboard/achats',      icon: ShoppingCart,color: '#DC2626', desc: 'Fournisseurs' },
     { label: 'RH & Paie',    href: '/dashboard/rh',          icon: Users,       color: '#DC2626', desc: 'Personnel' },
     { label: 'Trésorerie',   href: '/dashboard/tresorerie',  icon: Wallet,      color: '#DC2626', desc: 'Finances' },
@@ -311,7 +311,7 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
   ],
   sante: [
     { label: 'Consultations', href: '/dashboard/facturation', icon: FileText,      color: '#DC2626', desc: 'Ordonnances & actes' },
-    { label: 'Pharmacie',     href: '/dashboard/stock',       icon: Package,       color: '#DC2626', desc: 'Médicaments' },
+    { label: 'Pharmacie',     href: '/dashboard/stocks',       icon: Package,       color: '#DC2626', desc: 'Médicaments' },
     { label: 'RH médical',   href: '/dashboard/rh',           icon: Users,         color: '#DC2626', desc: 'Personnel soignant' },
     { label: 'Trésorerie',   href: '/dashboard/tresorerie',   icon: Wallet,        color: '#DC2626', desc: 'Finances' },
     { label: 'MIAA+',        href: '/dashboard/miaa',         icon: Bot,           color: '#DC2626', desc: 'Assistant IA' },
@@ -320,7 +320,7 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
     { label: 'Facturation',  href: '/dashboard/facturation',  icon: FileText,   color: '#DC2626', desc: 'Devis & factures' },
     { label: 'Trésorerie',   href: '/dashboard/tresorerie',   icon: Wallet,     color: '#DC2626', desc: 'Suivi financier' },
     { label: 'RH & Paie',   href: '/dashboard/rh',           icon: Users,      color: '#DC2626', desc: 'Personnel' },
-    { label: 'Stock',        href: '/dashboard/stock',        icon: Package,    color: '#DC2626', desc: 'Inventaire' },
+    { label: 'Stock',        href: '/dashboard/stocks',        icon: Package,    color: '#DC2626', desc: 'Inventaire' },
     { label: 'Comptabilité', href: '/dashboard/comptabilite', icon: Calculator, color: '#DC2626', desc: 'OHADA' },
     { label: 'MIAA+',        href: '/dashboard/miaa',         icon: Bot,        color: '#DC2626', desc: 'Assistant IA' },
   ],
@@ -553,7 +553,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     { label: alerts.lowStockCount > 0 ? 'Ruptures de stock' : 'Alertes stock', value: kpis.nbAlertes, sub: alerts.lowStockCount > 0 ? `${alerts.lowStockCount} article${alerts.lowStockCount > 1 ? 's' : ''} épuisé${alerts.lowStockCount > 1 ? 's' : ''}` : 'Tout est en ordre', icon: AlertTriangle, bg: kpis.nbAlertes > 0 ? '#DC2626' : '#DC2626', i: 3 },
   ] : [
     { label: t('dash.employees'), value: kpis.nbEmployes, sub: 'Dans votre équipe',       icon: Users,         bg: '#DC2626', badge: 'Personnel', href: '/dashboard/rh',    i: 0 },
-    { label: t('dash.stock'),     value: kpis.nbArticles, sub: 'Références inventoriées', icon: Package,       bg: '#DC2626', href: '/dashboard/stock', i: 1 },
+    { label: t('dash.stock'),     value: kpis.nbArticles, sub: 'Références inventoriées', icon: Package,       bg: '#DC2626', href: '/dashboard/stocks', i: 1 },
     { label: t('dash.alerts'),    value: kpis.nbAlertes,  sub: 'À traiter',               icon: AlertTriangle, bg: '#DC2626', i: 2 },
   ]
 

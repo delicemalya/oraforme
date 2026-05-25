@@ -21,7 +21,7 @@ export const CORE_ERP_MODULES = [
   { id: 'finance',      href: '/dashboard/finance',      label: 'Finance',             sublabel: 'KPIs & résultats'         },
   { id: 'comptabilite', href: '/dashboard/comptabilite', label: 'Comptabilité',        sublabel: 'Journal OHADA'            },
   { id: 'tresorerie',   href: '/dashboard/tresorerie',   label: 'Trésorerie',          sublabel: 'Caisse, banque, wallets'  },
-  { id: 'stock',        href: '/dashboard/stock',        label: 'Stock & Inventaire',  sublabel: 'Gestion des stocks'       },
+  { id: 'stock',        href: '/dashboard/stocks',       label: 'Stock & Inventaire',  sublabel: 'Gestion des stocks'       },
   { id: 'achats',       href: '/dashboard/achats',       label: 'Achats',              sublabel: 'Commandes & fournisseurs' },
   { id: 'crm',          href: '/dashboard/crm',          label: 'CRM Clients',         sublabel: 'Relations & prospects'    },
   { id: 'facturation',  href: '/dashboard/facturation',  label: 'Facturation',         sublabel: 'Devis & factures'         },
