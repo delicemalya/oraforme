@@ -1,85 +1,40 @@
-﻿'use client'
+'use client'
+
+/**
+ * Dashboard Comptable OHADA — Vue d'ensemble financière premium
+ * KPIs temps réel · Graphiques · Alertes · Accès rapide aux modules
+ */
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts'
-import { Plus, BookOpen, X, Loader2, Download, Scale, List, BarChart2, GitMerge, CheckCircle, AlertTriangle, Circle, Trash2 } from 'lucide-react'
-import { fmtFCFA } from '@/lib/admin-config'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { OHADA_ACCOUNTS, resolveAccounts, accountLabel, type AccountCode } from '@/lib/accounting-engine'
+import { resolveAccounts, accountLabel, OHADA_ACCOUNTS, type AccountCode } from '@/lib/accounting-engine'
+import { fmtFCFA } from '@/lib/admin-config'
+import Link from 'next/link'
+import {
+  TrendingUp, TrendingDown, DollarSign, Scale, AlertTriangle,
+  BookOpen, BarChart2, GitMerge, Percent, Lock, Download,
+  List, Users, Layers, Package, Plus, X, ChevronRight,
+  CheckCircle2, ArrowUpRight, ArrowDownRight, Activity,
+  CreditCard, Building2, Smartphone,
+} from 'lucide-react'
 
-type JournalEntry = {
-  id: string
-  date: string
-  libelle: string
+/* ─── Types ─────────────────────────────────────────────── */
+interface JournalEntry {
+  id: string; date: string; libelle: string
   type: 'recette' | 'depense'
-  montant_ht: number
-  tva: number
-  ca: number
-  montant_ttc: number
-  categorie: string
-  debit_account?: string
-  credit_account?: string
+  montant_ht: number; tva: number; ca: number; montant_ttc: number
+  categorie: string; debit_account?: string; credit_account?: string
   created_at: string
 }
-
-type DoubleEntry = {
-  id: string
-  date_operation: string
-  libelle: string
-  debit_account: string
-  credit_account: string
-  montant: number
-  source?: string
-  created_at: string
+interface DoubleEntry {
+  id: string; date_operation: string; libelle: string
+  debit_account: string; credit_account: string
+  montant: number; source?: string; created_at: string
 }
 
-type GrandLivreLine = {
-  account_number: string
-  account_name: string
-  account_type: string
-  total_debit: number
-  total_credit: number
-  solde: number
-}
-
-type RapprochementEntry = {
-  id: string
-  date_releve: string
-  reference: string
-  montant: number
-  type: 'debit' | 'credit'
-  libelle: string | null
-  statut: 'non_rapproche' | 'rapproche' | 'ecart'
-  created_at: string
-}
-
-function downloadCSV(data: Record<string, unknown>[], filename: string) {
-  if (!data.length) return
-  const headers = Object.keys(data[0])
-  const rows = data.map(row =>
-    headers.map(h => {
-      const val = row[h]
-      if (val === null || val === undefined) return ''
-      const s = String(val)
-      return s.includes(';') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s
-    }).join(';')
-  )
-  const csv = '﻿' + [headers.join(';'), ...rows].join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url; a.download = filename; a.click()
-  URL.revokeObjectURL(url)
-}
-
-const TABS = ['Journal', 'Partie double', 'Grand Livre', 'Rapport mensuel', 'Analyse MIAA+', 'Rapprochement']
-const CATS_RECETTE = ['Vente produit', 'Prestation service', 'Loyer reçu', 'Autre recette']
-const CATS_DEPENSE = ['Achats', 'Salaires', 'Loyer', 'Charges', 'Taxes', 'Autre dépense']
-const MONTHS_FR = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+/* ─── Helpers ────────────────────────────────────────────── */
+const MONTHS_FR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
 
 function calcTVACongo(ht: number) {
   const tva = Math.round(ht * 0.18)
@@ -87,314 +42,411 @@ function calcTVACongo(ht: number) {
   return { tva, ca, ttc: ht + tva + ca }
 }
 
+const CATS_RECETTE = ["Vente / Chiffre d'affaires", 'Frais de scolarité', 'Prestation de services', 'Virement reçu', 'Autre recette']
+const CATS_DEPENSE = ['Salaires', 'CNSS', 'Achats / Fournisseur', 'Loyer', 'Impôts / Taxes', 'Charges diverses', 'Frais bancaires', 'Autre dépense']
+
+/* ─── Modules quick-access ───────────────────────────────── */
+const COMPTA_QUICK = [
+  { href: '/dashboard/comptabilite/journal',         label: 'Journal',         icon: BookOpen,   color: '#2563EB', desc: 'Écritures chronologiques'   },
+  { href: '/dashboard/comptabilite/grand-livre',     label: 'Grand Livre',     icon: Scale,      color: '#16A34A', desc: 'Solde par compte'            },
+  { href: '/dashboard/comptabilite/balance',         label: 'Balance',         icon: BarChart2,  color: '#8B5CF6', desc: 'Totaux débit/crédit'        },
+  { href: '/dashboard/comptabilite/bilan',           label: 'Bilan & Résultat',icon: TrendingUp, color: '#F59E0B', desc: 'États financiers OHADA'      },
+  { href: '/dashboard/comptabilite/plan-comptable',  label: 'Plan Comptable',  icon: List,       color: '#0891B2', desc: 'Comptes OHADA Classes 1-9'   },
+  { href: '/dashboard/comptabilite/tiers',           label: 'Tiers',           icon: Users,      color: '#D97706', desc: 'Clients & fournisseurs'      },
+  { href: '/dashboard/comptabilite/immobilisations', label: 'Immobilisations', icon: Package,    color: '#DC2626', desc: 'Amortissements auto'         },
+  { href: '/dashboard/comptabilite/tva',             label: 'TVA & Fiscalité', icon: Percent,    color: '#0F172A', desc: 'Déclarations TVA Congo'       },
+  { href: '/dashboard/comptabilite/rapprochement',   label: 'Rapprochement',   icon: GitMerge,   color: '#64748B', desc: 'Banques & caisses'           },
+  { href: '/dashboard/comptabilite/cloture',         label: 'Clôture',         icon: Lock,       color: '#7C3AED', desc: 'Clôture mensuelle/annuelle'  },
+  { href: '/dashboard/comptabilite/rapports',        label: 'Rapports',        icon: Download,   color: '#059669', desc: 'PDF · Excel · SYSCOHADA'     },
+  { href: '/dashboard/comptabilite/centres-couts',   label: 'Centres de coûts',icon: Layers,     color: '#EA580C', desc: 'Analytique par projet'       },
+]
+
+/* ─── Main Page ──────────────────────────────────────────── */
 export default function ComptabilitePage() {
   const { tenantId } = useTenant()
-  const [tab, setTab] = useState(0)
-  const [entries, setEntries] = useState<JournalEntry[]>([])
-  const [doubleEntries, setDoubleEntries] = useState<DoubleEntry[]>([])
-  const [grandLivre, setGrandLivre] = useState<GrandLivreLine[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [aiAnalysis, setAiAnalysis] = useState('')
-  const [aiLoading, setAiLoading] = useState(false)
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth())
-  const [selectedYear] = useState(new Date().getFullYear())
 
-  // Rapprochement state
-  const [rapprochements, setRapprochements] = useState<RapprochementEntry[]>([])
-  const [rapLoading, setRapLoading] = useState(false)
-  const [rapFilter, setRapFilter] = useState<'all' | 'non_rapproche' | 'rapproche' | 'ecart'>('all')
-  const [showRapModal, setShowRapModal] = useState(false)
-  const [rapSaving, setRapSaving] = useState(false)
-  const [rapForm, setRapForm] = useState({
-    date_releve: new Date().toISOString().split('T')[0],
-    reference: '',
-    montant: '',
-    type: 'credit' as 'credit' | 'debit',
-    libelle: '',
-  })
+  /* State */
+  const [recettesTotal,  setRecettesTotal]  = useState(0)
+  const [depensesTotal,  setDepensesTotal]  = useState(0)
+  const [tvaCollectee,   setTvaCollectee]   = useState(0)
+  const [recentEntries,  setRecentEntries]  = useState<JournalEntry[]>([])
+  const [recentDouble,   setRecentDouble]   = useState<DoubleEntry[]>([])
+  const [monthlyData,    setMonthlyData]    = useState<{ label: string; recettes: number; depenses: number }[]>([])
+  const [loading,        setLoading]        = useState(true)
+  const [showModal,      setShowModal]      = useState(false)
+  const [saving,         setSaving]         = useState(false)
+  const [saveOk,         setSaveOk]         = useState(false)
+  const [saveErr,        setSaveErr]        = useState<string | null>(null)
 
-  const [form, setForm] = useState({
-    type: 'recette' as 'recette' | 'depense',
-    libelle: '',
-    montant_ht: '',
-    categorie: CATS_RECETTE[0],
-    date: new Date().toISOString().split('T')[0],
-    debit_account: '' as AccountCode,
-    credit_account: '' as AccountCode,
-  })
+  /* Form */
+  const [formType,    setFormType]    = useState<'recette'|'depense'>('recette')
+  const [formLibelle, setFormLibelle] = useState('')
+  const [formMontant, setFormMontant] = useState('')
+  const [formDate,    setFormDate]    = useState(new Date().toISOString().slice(0, 10))
+  const [formCat,     setFormCat]     = useState('')
+  const [formDebit,   setFormDebit]   = useState<AccountCode>('')
+  const [formCredit,  setFormCredit]  = useState<AccountCode>('')
 
-  // Auto-resolve accounts from type/category
-  useEffect(() => {
-    const mappedType = form.type === 'recette' ? 'entree' : 'sortie'
-    const catMap: Record<string, string> = {
-      'Vente produit': 'Vente',
-      'Prestation service': 'Prestation',
-      'Salaires': 'Salaires',
-      'Achats': 'Achats',
-      'Loyer': 'Loyer',
-      'Taxes': 'Taxes',
-      'Charges': 'Charges',
-    }
-    const [d, c] = resolveAccounts(mappedType, catMap[form.categorie] ?? form.categorie)
-    setForm(f => ({ ...f, debit_account: d, credit_account: c }))
-  }, [form.type, form.categorie])
-
+  /* ── Load data ───────────────────────────────────────────── */
   const load = useCallback(async () => {
-    const tid = tenantId
-    if (!tid) return
+    if (!tenantId) return
+    setLoading(true)
 
-    const [{ data: jc }, { data: je }] = await Promise.all([
-      supabase.from('journal_comptable').select('*').eq('tenant_id', tid).order('date', { ascending: false }),
-      supabase.from('journal_entries').select('*').eq('tenant_id', tid).order('date_operation', { ascending: false }).limit(500),
+    const now   = new Date()
+    const year  = now.getFullYear()
+    const month = now.getMonth() + 1
+
+    const [jcR, deR] = await Promise.all([
+      supabase.from('journal_comptable')
+        .select('*').eq('tenant_id', tenantId)
+        .order('date', { ascending: false }).limit(200),
+      supabase.from('journal_entries')
+        .select('*').eq('tenant_id', tenantId)
+        .order('date_operation', { ascending: false }).limit(10),
     ])
 
-    setEntries(jc ?? [])
-    setDoubleEntries(je ?? [])
+    const all = (jcR.data || []) as JournalEntry[]
 
-    // Build grand livre from journal_entries
-    const accountMap: Record<string, GrandLivreLine> = {}
-    for (const e of (je ?? [])) {
-      const accounts = OHADA_ACCOUNTS as readonly { number: string; name: string; type: string }[]
+    /* KPIs année courante */
+    const thisYear = all.filter(e => new Date(e.date).getFullYear() === year)
+    const rec  = thisYear.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ht, 0)
+    const dep  = thisYear.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ht, 0)
+    const tva  = thisYear.filter(e => e.type === 'recette').reduce((s, e) => s + (e.tva || 0), 0)
 
-      if (!accountMap[e.debit_account]) {
-        const found = accounts.find(a => a.number === e.debit_account)
-        accountMap[e.debit_account] = {
-          account_number: e.debit_account,
-          account_name: found?.name ?? e.debit_account,
-          account_type: found?.type ?? '—',
-          total_debit: 0, total_credit: 0, solde: 0,
-        }
-      }
-      if (!accountMap[e.credit_account]) {
-        const found = accounts.find(a => a.number === e.credit_account)
-        accountMap[e.credit_account] = {
-          account_number: e.credit_account,
-          account_name: found?.name ?? e.credit_account,
-          account_type: found?.type ?? '—',
-          total_debit: 0, total_credit: 0, solde: 0,
-        }
-      }
-      accountMap[e.debit_account].total_debit  += e.montant
-      accountMap[e.credit_account].total_credit += e.montant
+    setRecettesTotal(rec)
+    setDepensesTotal(dep)
+    setTvaCollectee(tva)
+    setRecentEntries(all.slice(0, 10))
+    setRecentDouble((deR.data || []) as DoubleEntry[])
+
+    /* Monthly data for chart (6 months) */
+    const monthly: { label: string; recettes: number; depenses: number }[] = []
+    for (let i = 5; i >= 0; i--) {
+      const d   = new Date(year, now.getMonth() - i, 1)
+      const m   = d.getMonth() + 1
+      const y   = d.getFullYear()
+      const mrec = all.filter(e => {
+        const ed = new Date(e.date)
+        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.type === 'recette'
+      }).reduce((s, e) => s + e.montant_ht, 0)
+      const mdep = all.filter(e => {
+        const ed = new Date(e.date)
+        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.type === 'depense'
+      }).reduce((s, e) => s + e.montant_ht, 0)
+      monthly.push({ label: MONTHS_FR[m - 1], recettes: Math.round(mrec / 1000), depenses: Math.round(mdep / 1000) })
     }
-    const gl = Object.values(accountMap).map(a => ({
-      ...a,
-      solde: a.total_debit - a.total_credit,
-    })).sort((a, b) => a.account_number.localeCompare(b.account_number))
-    setGrandLivre(gl)
-
+    setMonthlyData(monthly)
     setLoading(false)
   }, [tenantId])
 
   useEffect(() => { load() }, [load])
-  useEffect(() => { if (tab === 5) loadRapprochements() }, [tab, rapFilter]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function save() {
-    if (!form.libelle || !form.montant_ht) return
-    setSaving(true)
-    const tid = tenantId
-    if (!tid) { setSaving(false); return }
+  /* Auto-resolve OHADA accounts */
+  useEffect(() => {
+    if (!formCat) return
+    const [d, c] = resolveAccounts(formType === 'recette' ? 'entree' : 'sortie', formCat)
+    setFormDebit(d); setFormCredit(c)
+  }, [formType, formCat])
 
-    const ht = parseInt(form.montant_ht)
-    const { tva, ca, ttc } = calcTVACongo(form.type === 'recette' ? ht : 0)
-    const { data: { user } } = await supabase.auth.getUser()
+  /* ── Save operation ──────────────────────────────────────── */
+  async function handleSave() {
+    if (!tenantId || !formLibelle.trim() || !formMontant || !formCat) {
+      setSaveErr('Libellé, montant et catégorie obligatoires')
+      return
+    }
+    setSaving(true); setSaveErr(null)
 
-    await supabase.from('journal_comptable').insert({
-      tenant_id:    tid,
-      date:         form.date,
-      libelle:      form.libelle,
-      type:         form.type,
-      montant_ht:   ht,
-      tva:          form.type === 'recette' ? tva : 0,
-      ca:           form.type === 'recette' ? ca : 0,
-      montant_ttc:  form.type === 'recette' ? ttc : ht,
-      categorie:    form.categorie,
-      debit_account:  form.debit_account || undefined,
-      credit_account: form.credit_account || undefined,
-      source:       'comptabilite',
-      created_by:   user?.id,
+    const ht  = Number(formMontant)
+    const { tva, ca, ttc } = calcTVACongo(ht)
+
+    /* 1. journal_comptable */
+    const { error: e1 } = await supabase.from('journal_comptable').insert({
+      tenant_id: tenantId, date: formDate,
+      libelle: formLibelle.trim(), type: formType,
+      montant_ht: ht, tva, ca, montant_ttc: ttc,
+      categorie: formCat,
+      debit_account:  formDebit  || null,
+      credit_account: formCredit || null,
     })
+    if (e1) { setSaveErr(e1.message); setSaving(false); return }
 
-    // Also write a journal_entry for double-entry tracking
-    if (form.debit_account && form.credit_account) {
+    /* 2. journal_entries (double-entry) */
+    if (formDebit && formCredit) {
       await supabase.from('journal_entries').insert({
-        tenant_id:      tid,
-        date_operation: form.date,
-        libelle:        form.libelle,
-        debit_account:  form.debit_account,
-        credit_account: form.credit_account,
-        montant:        ht,
-        source:         'comptabilite',
-        fiscal_year:    new Date(form.date).getFullYear(),
-        created_by:     user?.id,
+        tenant_id: tenantId,
+        date_operation: formDate,
+        libelle: formLibelle.trim(),
+        debit_account: formDebit,
+        credit_account: formCredit,
+        montant: ht,
+        source: 'manuel',
+        fiscal_year: new Date(formDate).getFullYear(),
       })
     }
 
-    setShowModal(false)
-    setForm({ type: 'recette', libelle: '', montant_ht: '', categorie: CATS_RECETTE[0], date: new Date().toISOString().split('T')[0], debit_account: '', credit_account: '' })
+    setSaveOk(true)
+    setTimeout(() => { setSaveOk(false); setShowModal(false); resetForm(); load() }, 1200)
     setSaving(false)
-    load()
   }
 
-  async function loadRapprochements() {
-    setRapLoading(true)
-    try {
-      const res = await fetch(`/api/rapprochement?statut=${rapFilter}`)
-      const json = await res.json()
-      setRapprochements(json.data ?? [])
-    } catch {
-      setRapprochements([])
-    }
-    setRapLoading(false)
+  function resetForm() {
+    setFormType('recette'); setFormLibelle(''); setFormMontant('')
+    setFormDate(new Date().toISOString().slice(0, 10)); setFormCat('')
+    setFormDebit(''); setFormCredit(''); setSaveErr(null); setSaveOk(false)
   }
 
-  async function saveRapprochement() {
-    if (!rapForm.reference || !rapForm.montant || !rapForm.date_releve) return
-    setRapSaving(true)
-    await fetch('/api/rapprochement', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        date_releve: rapForm.date_releve,
-        reference: rapForm.reference,
-        montant: Number(rapForm.montant),
-        type: rapForm.type,
-        libelle: rapForm.libelle || null,
-      }),
-    })
-    setShowRapModal(false)
-    setRapForm({ date_releve: new Date().toISOString().split('T')[0], reference: '', montant: '', type: 'credit', libelle: '' })
-    setRapSaving(false)
-    loadRapprochements()
+  /* ── Derived ─────────────────────────────────────────────── */
+  const resultat    = recettesTotal - depensesTotal
+  const tvaAReverse = Math.round(tvaCollectee * 0.85) // estimation après déductible
+
+  /* ── Mini bar chart (pure CSS) ───────────────────────────── */
+  function MiniChart() {
+    const maxVal = Math.max(...monthlyData.flatMap(d => [d.recettes, d.depenses]), 1)
+    return (
+      <div className="flex items-end gap-2 h-28 pt-2">
+        {monthlyData.map((d, i) => (
+          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+            <div className="w-full flex gap-0.5 items-end justify-center" style={{ height: '80px' }}>
+              <div className="flex-1 rounded-t transition-all"
+                style={{ height: `${Math.max(3, (d.recettes / maxVal) * 76)}px`, background: '#16A34A', opacity: 0.85 }} />
+              <div className="flex-1 rounded-t transition-all"
+                style={{ height: `${Math.max(3, (d.depenses / maxVal) * 76)}px`, background: '#DC2626', opacity: 0.7 }} />
+            </div>
+            <span className="text-[9px] text-[#94A3B8]">{d.label}</span>
+          </div>
+        ))}
+      </div>
+    )
   }
 
-  async function updateRapStatut(id: string, statut: 'rapproche' | 'ecart' | 'non_rapproche') {
-    await fetch('/api/rapprochement', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, statut }),
-    })
-    setRapprochements(prev => prev.map(r => r.id === id ? { ...r, statut } : r))
-  }
-
-  async function deleteRap(id: string) {
-    await fetch(`/api/rapprochement?id=${id}`, { method: 'DELETE' })
-    setRapprochements(prev => prev.filter(r => r.id !== id))
-  }
-
-  async function analyserMIAA() {
-    setAiLoading(true)
-    const totalRecettes = entries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ht, 0)
-    const totalDepenses = entries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ht, 0)
-    const benefice      = totalRecettes - totalDepenses
-    const marge         = totalRecettes > 0 ? Math.round((benefice / totalRecettes) * 100) : 0
-
-    const message = `Analyse ma comptabilité : Recettes HT = ${fmtFCFA(totalRecettes)}, Dépenses = ${fmtFCFA(totalDepenses)}, Bénéfice = ${fmtFCFA(benefice)}, Marge = ${marge}%. Donne une analyse concise et 3 recommandations pratiques en 150 mots max.`
-    const res = await fetch('/api/ai/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, module: 'comptabilite' }),
-    })
-    const data = await res.json()
-    setAiAnalysis(data.reply ?? 'Erreur lors de l\'analyse.')
-    setAiLoading(false)
-  }
-
-  const monthlyData = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(selectedYear, new Date().getMonth() - (5 - i), 1)
-    const monthStr = d.toISOString().slice(0, 7)
-    const recettes = entries.filter(e => e.type === 'recette' && e.date.startsWith(monthStr)).reduce((s, e) => s + e.montant_ht, 0)
-    const depenses = entries.filter(e => e.type === 'depense' && e.date.startsWith(monthStr)).reduce((s, e) => s + e.montant_ht, 0)
-    return { mois: MONTHS_FR[d.getMonth()], Recettes: recettes, Dépenses: depenses }
-  })
-
-  const reportMonthStr  = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`
-  const monthEntries    = entries.filter(e => e.date.startsWith(reportMonthStr))
-  const reportRecettes  = monthEntries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ht, 0)
-  const reportRecTTC    = monthEntries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ttc, 0)
-  const reportTVA       = monthEntries.filter(e => e.type === 'recette').reduce((s, e) => s + e.tva, 0)
-  const reportCA        = monthEntries.filter(e => e.type === 'recette').reduce((s, e) => s + e.ca, 0)
-  const reportDepenses  = monthEntries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ht, 0)
-  const reportBenef     = reportRecettes - reportDepenses
-
-  const TAB_ICONS = [List, BookOpen, Scale, BarChart2, null, GitMerge]
+  if (loading) return (
+    <div className="flex items-center justify-center py-24 text-[#94A3B8]">
+      <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
+      Chargement comptabilité…
+    </div>
+  )
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[var(--primary-light)] border border-[var(--primary)] flex items-center justify-center">
-          <BookOpen size={18} className="text-[var(--primary)]" />
-        </div>
+
+      {/* ── Header ──────────────────────────────────────────── */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="page-title">Comptabilité</h1>
-          <p className="text-xs text-[var(--text-secondary)]">Double entrée OHADA · TVA Congo automatique</p>
+          <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
+            <Scale size={22} className="text-[#2563EB]" />
+            Comptabilité OHADA
+          </h1>
+          <p className="text-[13px] text-[#64748B] mt-0.5">
+            Double entrée · TVA Congo (18% + 5% CA) · SYSCOHADA
+          </p>
         </div>
-        <button onClick={() => setShowModal(true)}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary-light)] border border-[var(--primary)] text-[var(--primary-text)] text-sm font-medium hover:bg-[var(--primary)] hover:text-white transition-colors">
-          <Plus size={15} /> Opération
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg shadow-sm"
+        >
+          <Plus size={14} />
+          Nouvelle écriture
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1 overflow-x-auto">
-        {TABS.map((t, i) => {
-          const Icon = TAB_ICONS[i]
-          return (
-            <button key={i} onClick={() => setTab(i)}
-              className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                tab === i ? 'bg-[var(--primary-light)] text-[var(--primary-text)]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
-              }`}>
-              {Icon && <Icon size={11} />}
-              {t}
-            </button>
-          )
-        })}
+      {/* ── KPIs ─────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          {
+            label: 'Recettes HT',
+            value: fmtFCFA(recettesTotal),
+            icon: ArrowUpRight, color: '#16A34A',
+            trend: recettesTotal > depensesTotal ? '▲ Excédent' : undefined,
+          },
+          {
+            label: 'Dépenses HT',
+            value: fmtFCFA(depensesTotal),
+            icon: ArrowDownRight, color: '#DC2626',
+          },
+          {
+            label: resultat >= 0 ? 'Résultat net' : 'Déficit',
+            value: fmtFCFA(Math.abs(resultat)),
+            icon: resultat >= 0 ? TrendingUp : TrendingDown,
+            color: resultat >= 0 ? '#2563EB' : '#DC2626',
+            trend: resultat >= 0 ? '✓ Bénéfice' : '⚠ Perte',
+          },
+          {
+            label: 'TVA collectée',
+            value: fmtFCFA(tvaCollectee),
+            icon: Percent, color: '#D97706',
+            trend: tvaAReverse > 0 ? `~${fmtFCFA(tvaAReverse)} à reverser` : undefined,
+          },
+        ].map(k => (
+          <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: k.color + '18' }}>
+                <k.icon size={14} style={{ color: k.color }} />
+              </div>
+            </div>
+            <div className="text-[20px] font-extrabold text-[#0F172A] truncate">{k.value}</div>
+            <div className="text-[11px] text-[#64748B] mt-0.5">{k.label}</div>
+            {k.trend && <div className="text-[10px] mt-1 font-semibold" style={{ color: k.color }}>{k.trend}</div>}
+          </div>
+        ))}
       </div>
 
-      {/* Tab 0 — Journal simplifié */}
-      {tab === 0 && (
-        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
+      {/* ── Cashflow Chart + Résumé ───────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        {/* Chart */}
+        <div className="sm:col-span-2 bg-white rounded-xl border border-[#E2E8F0] p-5">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[13px] font-bold text-[#0F172A]">Cashflow 6 mois</p>
+            <div className="flex items-center gap-3 text-[10px]">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#16A34A] inline-block" /> Recettes</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#DC2626] inline-block" /> Dépenses</span>
+              <span className="text-[#94A3B8]">(en milliers FCFA)</span>
+            </div>
+          </div>
+          {monthlyData.some(d => d.recettes > 0 || d.depenses > 0) ? (
+            <MiniChart />
+          ) : (
+            <div className="h-28 flex items-center justify-center text-[12px] text-[#94A3B8]">
+              Aucune donnée pour les 6 derniers mois
+            </div>
+          )}
+        </div>
+
+        {/* Résumé financier */}
+        <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col gap-3">
+          <p className="text-[13px] font-bold text-[#0F172A]">Résumé financier</p>
+          {[
+            { label: 'Recettes HT',        value: recettesTotal,         color: '#16A34A' },
+            { label: 'TVA collectée',       value: tvaCollectee,          color: '#D97706' },
+            { label: 'Dépenses HT',         value: depensesTotal,         color: '#DC2626' },
+            { label: 'Résultat brut',       value: Math.abs(resultat),    color: resultat >= 0 ? '#2563EB' : '#DC2626' },
+          ].map(r => (
+            <div key={r.label} className="flex justify-between items-center py-1.5 border-b border-[#F1F5F9] last:border-0">
+              <span className="text-[12px] text-[#64748B]">{r.label}</span>
+              <span className="text-[12px] font-bold" style={{ color: r.color }}>
+                {r.value > 0 ? fmtFCFA(r.value) : '—'}
+              </span>
+            </div>
+          ))}
+          <Link href="/dashboard/comptabilite/bilan"
+            className="mt-1 flex items-center justify-center gap-1 py-2 bg-[#EFF6FF] text-[#2563EB] text-[11px] font-bold rounded-lg hover:bg-[#DBEAFE]">
+            Voir le bilan complet <ChevronRight size={11} />
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Alertes comptables ────────────────────────────────── */}
+      {(tvaAReverse > 0 || recentEntries.length === 0) && (
+        <div className="space-y-2">
+          {tvaAReverse > 0 && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-[#FEF3C7] border border-[#FDE68A]">
+              <AlertTriangle size={14} className="text-[#D97706] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[12px] font-bold text-[#D97706]">TVA à reverser estimée : {fmtFCFA(tvaAReverse)}</p>
+                <p className="text-[11px] text-[#D97706]/80">Pensez à déclarer votre TVA mensuelle dans le module Fiscalité.</p>
+              </div>
+              <Link href="/dashboard/comptabilite/tva" className="ml-auto text-[11px] font-bold text-[#D97706] underline whitespace-nowrap">
+                Déclarer →
+              </Link>
+            </div>
+          )}
+          {recentEntries.length === 0 && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE]">
+              <Activity size={14} className="text-[#2563EB] shrink-0 mt-0.5" />
+              <p className="text-[12px] text-[#2563EB]">Aucune écriture comptable — cliquez sur &quot;Nouvelle écriture&quot; pour commencer.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Quick module grid ─────────────────────────────────── */}
+      <div>
+        <h2 className="text-[14px] font-bold text-[#0F172A] mb-3">Modules comptables</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {COMPTA_QUICK.map(mod => (
+            <Link key={mod.href} href={mod.href}>
+              <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group">
+                <div className="w-9 h-9 rounded-xl mb-3 flex items-center justify-center" style={{ background: mod.color + '15' }}>
+                  <mod.icon size={16} style={{ color: mod.color }} />
+                </div>
+                <p className="text-[12px] font-bold text-[#0F172A] group-hover:text-[#2563EB]">{mod.label}</p>
+                <p className="text-[10px] text-[#94A3B8] mt-0.5">{mod.desc}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Dernières écritures ───────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[13px] font-bold text-[#0F172A]">Dernières écritures</p>
+          <Link href="/dashboard/comptabilite/journal" className="text-[11px] text-[#2563EB] font-semibold hover:underline">
+            Voir tout →
+          </Link>
+        </div>
+        {recentEntries.length === 0 ? (
+          <p className="text-center py-6 text-[12px] text-[#94A3B8]">Aucune écriture</p>
+        ) : (
+          <div className="space-y-1">
+            {recentEntries.map(e => (
+              <div key={e.id} className="flex items-center gap-3 py-2 border-b border-[#F1F5F9] last:border-0">
+                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${e.type === 'recette' ? 'bg-[#16A34A]' : 'bg-[#DC2626]'}`} />
+                <span className="text-[11px] text-[#94A3B8] w-20 shrink-0">
+                  {new Date(e.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' })}
+                </span>
+                <span className="text-[12px] text-[#0F172A] flex-1 truncate">{e.libelle}</span>
+                <span className="text-[11px] text-[#94A3B8] truncate hidden sm:block w-24">{e.categorie}</span>
+                <span className={`text-[12px] font-bold shrink-0 ${e.type === 'recette' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
+                  {e.type === 'recette' ? '+' : '-'}{fmtFCFA(e.montant_ttc)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Dernières écritures double-entrée ─────────────────── */}
+      {recentDouble.length > 0 && (
+        <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[13px] font-bold text-[#0F172A]">Partie double — récente</p>
+            <Link href="/dashboard/comptabilite/journal" className="text-[11px] text-[#2563EB] font-semibold hover:underline">
+              Journal complet →
+            </Link>
+          </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-[11px]">
               <thead>
-                <tr className="border-b border-[var(--border)]">
-                  {['Date', 'Libellé', 'Catégorie', 'Type', 'HT', 'TVA', 'CA', 'TTC'].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
+                <tr className="border-b border-[#E2E8F0]">
+                  {['Date','Libellé','Débit','Crédit','Montant','Source'].map(h => (
+                    <th key={h} className="pb-2 text-left text-[10px] font-semibold text-[#94A3B8] uppercase pr-3">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border)]">
-                {loading && <tr><td colSpan={8} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[var(--text-secondary)] mx-auto" /></td></tr>}
-                {!loading && entries.length === 0 && (
-                  <tr><td colSpan={8} className="text-center py-10 text-[var(--text-secondary)] text-sm">Aucune opération</td></tr>
-                )}
-                {entries.map(e => (
-                  <tr key={e.id} className="hover:bg-white/5/30 transition-colors">
-                    <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs whitespace-nowrap">
-                      {new Date(e.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+              <tbody>
+                {recentDouble.map(e => (
+                  <tr key={e.id} className="border-b border-[#F8FAFC] hover:bg-[#F8FAFC]">
+                    <td className="py-1.5 pr-3 whitespace-nowrap text-[#64748B]">
+                      {new Date(e.date_operation).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' })}
                     </td>
-                    <td className="px-4 py-2.5 max-w-[200px]">
-                      <p className="text-[var(--text)] truncate">{e.libelle}</p>
-                      {(e.debit_account || e.credit_account) && (
-                        <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5">
-                          D:{e.debit_account} / C:{e.credit_account}
-                        </p>
-                      )}
+                    <td className="py-1.5 pr-3 max-w-[200px] truncate font-medium text-[#0F172A]">{e.libelle}</td>
+                    <td className="py-1.5 pr-3">
+                      <span className="px-1.5 py-0.5 bg-[#EFF6FF] text-[#2563EB] rounded font-mono text-[10px]">
+                        {e.debit_account}
+                      </span>
                     </td>
-                    <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs">{e.categorie}</td>
-                    <td className="px-4 py-2.5">
-                      <span className={`text-xs px-2 py-0.5 rounded border ${
-                        e.type === 'recette'
-                          ? 'text-[#DC2626] bg-[var(--surface)]/10 border-[#0F172A]/30'
-                          : 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30'
-                      }`}>{e.type}</span>
+                    <td className="py-1.5 pr-3">
+                      <span className="px-1.5 py-0.5 bg-[#F0FDF4] text-[#16A34A] rounded font-mono text-[10px]">
+                        {e.credit_account}
+                      </span>
                     </td>
-                    <td className="px-4 py-2.5 text-right text-[var(--text)] font-medium whitespace-nowrap">{fmtFCFA(e.montant_ht)}</td>
-                    <td className="px-4 py-2.5 text-right text-[var(--text-secondary)] text-xs whitespace-nowrap">{fmtFCFA(e.tva)}</td>
-                    <td className="px-4 py-2.5 text-right text-[var(--text-secondary)] text-xs whitespace-nowrap">{fmtFCFA(e.ca)}</td>
-                    <td className="px-4 py-2.5 text-right text-[#DC2626] font-semibold whitespace-nowrap">{fmtFCFA(e.montant_ttc)}</td>
+                    <td className="py-1.5 pr-3 font-bold text-[#0F172A]">{fmtFCFA(e.montant)}</td>
+                    <td className="py-1.5">
+                      <span className="px-1.5 py-0.5 bg-[#F1F5F9] text-[#64748B] rounded text-[9px] font-semibold uppercase">
+                        {e.source || 'manuel'}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -403,563 +455,123 @@ export default function ComptabilitePage() {
         </div>
       )}
 
-      {/* Tab 1 — Partie double (journal_entries) */}
-      {tab === 1 && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-[var(--text-secondary)]">
-              {doubleEntries.length} écritures · alimentées automatiquement par toutes les opérations (trésorerie, factures, paie, dépenses)
-            </p>
-          </div>
-          <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--border)]">
-                    {['Date', 'Libellé', 'Compte Débité', 'Compte Crédité', 'Montant', 'Source'].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)]">
-                  {loading && <tr><td colSpan={6} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[var(--text-secondary)] mx-auto" /></td></tr>}
-                  {!loading && doubleEntries.length === 0 && (
-                    <tr><td colSpan={6} className="text-center py-10 text-[var(--text-secondary)] text-sm">
-                      Aucune écriture — les opérations de trésorerie génèrent des écritures automatiquement
-                    </td></tr>
-                  )}
-                  {doubleEntries.map(e => (
-                    <tr key={e.id} className="hover:bg-white/5/30 transition-colors">
-                      <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs whitespace-nowrap">
-                        {new Date(e.date_operation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
-                      </td>
-                      <td className="px-4 py-2.5 text-[var(--text)] max-w-[180px] truncate">{e.libelle}</td>
-                      <td className="px-4 py-2.5">
-                        <span className="font-mono text-[11px] text-[#DC2626] bg-[var(--surface)]/10 px-2 py-0.5 rounded">
-                          {e.debit_account}
-                        </span>
-                        <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 max-w-[120px] truncate">
-                          {accountLabel(e.debit_account)}
-                        </p>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="font-mono text-[11px] text-[#DC2626] bg-[#DC2626]/10 px-2 py-0.5 rounded">
-                          {e.credit_account}
-                        </span>
-                        <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 max-w-[120px] truncate">
-                          {accountLabel(e.credit_account)}
-                        </p>
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-[#DC2626] font-semibold whitespace-nowrap">
-                        {fmtFCFA(e.montant)}
-                      </td>
-                      <td className="px-4 py-2.5">
-                        {e.source && (
-                          <span className="text-[10px] text-[#DC2626] bg-[#DC2626]/10 px-2 py-0.5 rounded">
-                            {e.source}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 2 — Grand Livre */}
-      {tab === 2 && (
-        <div className="space-y-4">
-          <p className="text-xs text-[var(--text-secondary)]">Balance des comptes OHADA — cumulé tous exercices</p>
-          {loading ? (
-            <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-[var(--text-secondary)]" /></div>
-          ) : grandLivre.length === 0 ? (
-            <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-10 text-center">
-              <Scale size={32} className="text-[var(--text-secondary)] mx-auto mb-3" />
-              <p className="text-[var(--text-secondary)] text-sm">Aucune écriture comptable</p>
-              <p className="text-[var(--text-secondary)] text-xs mt-1">Enregistrez des opérations de trésorerie pour alimenter le Grand Livre</p>
-            </div>
-          ) : (
-            <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-[var(--border)]">
-                      {['Compte', 'Intitulé', 'Type', 'Débit total', 'Crédit total', 'Solde'].map(h => (
-                        <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--border)]">
-                    {grandLivre.map(gl => (
-                      <tr key={gl.account_number} className="hover:bg-white/5/30 transition-colors">
-                        <td className="px-4 py-2.5">
-                          <span className="font-mono text-[11px] bg-[var(--surface-alt)] text-[var(--text)] px-2 py-0.5 rounded">
-                            {gl.account_number}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5 text-[var(--text)] text-xs max-w-[180px] truncate">{gl.account_name}</td>
-                        <td className="px-4 py-2.5">
-                          <span className={`text-[10px] px-2 py-0.5 rounded ${
-                            gl.account_type === 'tresorerie' ? 'bg-[#DC2626]/10 text-[#DC2626]' :
-                            gl.account_type === 'produit'    ? 'bg-[var(--surface)]/10 text-[#DC2626]' :
-                            gl.account_type === 'charge'     ? 'bg-[#DC2626]/10 text-[#DC2626]' :
-                            gl.account_type === 'actif'      ? 'bg-[#DC2626]/10 text-[#DC2626]' :
-                            'bg-[#8957E5]/10 text-[#8957E5]'
-                          }`}>{gl.account_type}</span>
-                        </td>
-                        <td className="px-4 py-2.5 text-right text-[#DC2626] font-mono text-xs whitespace-nowrap">
-                          {fmtFCFA(gl.total_debit)}
-                        </td>
-                        <td className="px-4 py-2.5 text-right text-[#DC2626] font-mono text-xs whitespace-nowrap">
-                          {fmtFCFA(gl.total_credit)}
-                        </td>
-                        <td className="px-4 py-2.5 text-right font-semibold whitespace-nowrap" style={{
-                          color: gl.solde > 0 ? 'var(--success)' : gl.solde < 0 ? 'var(--danger)' : 'var(--text-secondary)'
-                        }}>
-                          {gl.solde >= 0 ? '' : '-'}{fmtFCFA(Math.abs(gl.solde))}
-                        </td>
-                      </tr>
-                    ))}
-                    {/* Totals row */}
-                    <tr className="bg-[var(--surface-alt)] border-t-2 border-[var(--border-strong)]">
-                      <td className="px-4 py-3" colSpan={3}>
-                        <span className="text-xs font-bold text-[var(--text)] uppercase tracking-wider">Totaux</span>
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-[var(--text)] whitespace-nowrap">
-                        {fmtFCFA(grandLivre.reduce((s, g) => s + g.total_debit, 0))}
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-[var(--text)] whitespace-nowrap">
-                        {fmtFCFA(grandLivre.reduce((s, g) => s + g.total_credit, 0))}
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-[var(--text)] whitespace-nowrap">
-                        {fmtFCFA(grandLivre.reduce((s, g) => s + g.solde, 0))}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+      {/* ── Modal Nouvelle Écriture ───────────────────────────── */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
+              <div>
+                <h2 className="font-bold text-[#0F172A] text-[15px]">Nouvelle écriture comptable</h2>
+                <p className="text-[11px] text-[#94A3B8] mt-0.5">Double entrée OHADA · TVA Congo automatique</p>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tab 3 — Rapport mensuel */}
-      {tab === 3 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <select value={selectedMonth} onChange={e => setSelectedMonth(parseInt(e.target.value))}
-              className="bg-[var(--card-bg)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
-              {MONTHS_FR.map((m, i) => <option key={i} value={i}>{m} {selectedYear}</option>)}
-            </select>
-          </div>
-          <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 mb-4">
-            <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Recettes vs Dépenses — 6 derniers mois</h2>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={monthlyData} barGap={4} margin={{ top: 4, right: 4, left: 0, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="mois" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} width={36}
-                  tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} formatter={(v: any) => [fmtFCFA(Number(v ?? 0)), '']} />
-                <Legend wrapperStyle={{ fontSize: 11, color: 'var(--text-secondary)' }} />
-                <Bar dataKey="Recettes" fill="#F59E0B" radius={[3, 3, 0, 0]} maxBarSize={32} />
-                <Bar dataKey="Dépenses" fill="#EF4444" radius={[3, 3, 0, 0]} maxBarSize={32} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-6">
-            <h2 className="text-sm font-bold text-[var(--text)] mb-4 uppercase tracking-wider">
-              Rapport {MONTHS_FR[selectedMonth]} {selectedYear}
-            </h2>
-            <div className="space-y-3">
-              {[
-                { label: 'Recettes HT',                         value: fmtFCFA(reportRecettes),   color: 'var(--success)' },
-                { label: 'TVA collectée (18%)',                  value: fmtFCFA(reportTVA),        color: 'var(--text-secondary)' },
-                { label: "Contribution d'Appui (5% TVA)",        value: fmtFCFA(reportCA),         color: 'var(--text-secondary)' },
-                { label: 'Recettes TTC',                        value: fmtFCFA(reportRecTTC),     color: 'var(--primary)' },
-                { label: 'Dépenses totales',                    value: fmtFCFA(reportDepenses),   color: 'var(--danger)' },
-                { label: 'Bénéfice brut',                       value: fmtFCFA(reportBenef),      color: reportBenef >= 0 ? 'var(--success)' : 'var(--danger)' },
-              ].map(r => (
-                <div key={r.label} className="flex items-center justify-between border-b border-[var(--border)] pb-2 last:border-0">
-                  <span className="text-sm text-[var(--text-secondary)]">{r.label}</span>
-                  <span className="text-sm font-semibold" style={{ color: r.color }}>{r.value}</span>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => downloadCSV(
-                monthEntries.map(e => ({
-                  date: e.date,
-                  libelle: e.libelle,
-                  type: e.type,
-                  categorie: e.categorie,
-                  montant_ht: e.montant_ht,
-                  tva: e.tva,
-                  ca: e.ca,
-                  montant_ttc: e.montant_ttc,
-                  compte_debit: e.debit_account ?? '',
-                  compte_credit: e.credit_account ?? '',
-                })),
-                `journal_${MONTHS_FR[selectedMonth]}_${selectedYear}.csv`
-              )}
-              className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
-            >
-              <Download size={14} /> Exporter CSV ({monthEntries.length} lignes)
-            </button>
-            <button
-              onClick={() => downloadCSV(
-                grandLivre.map(gl => ({
-                  compte: gl.account_number,
-                  intitule: gl.account_name,
-                  type: gl.account_type,
-                  total_debit: gl.total_debit,
-                  total_credit: gl.total_credit,
-                  solde: gl.solde,
-                })),
-                `grand_livre_${selectedYear}.csv`
-              )}
-              className="mt-2 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
-            >
-              <Download size={14} /> Exporter Grand Livre CSV
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 4 — Analyse MIAA+ */}
-      {tab === 4 && (
-        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[var(--text)]">Analyse MIAA+ de votre comptabilité</h2>
-            <button onClick={analyserMIAA} disabled={aiLoading}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm bg-[var(--primary)] text-white font-medium hover:bg-[var(--primary-hover)] disabled:opacity-50 transition-colors">
-              {aiLoading ? <Loader2 size={13} className="animate-spin" /> : '✨'}
-              Analyser
-            </button>
-          </div>
-          {!aiAnalysis && !aiLoading && (
-            <p className="text-sm text-[var(--text-secondary)] text-center py-8">
-              Cliquez sur &quot;Analyser&quot; pour obtenir une analyse IA de votre comptabilité
-            </p>
-          )}
-          {aiLoading && (
-            <div className="flex items-center gap-3 text-[var(--text-secondary)] py-6">
-              <Loader2 size={16} className="animate-spin text-[#DC2626]" />
-              <span className="text-sm">MIAA+ analyse vos données…</span>
-            </div>
-          )}
-          {aiAnalysis && (
-            <div className="bg-[var(--surface-alt)] border-l-2 border-[var(--primary)] rounded-r-xl p-4 text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap">
-              {aiAnalysis}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tab 5 — Rapprochement bancaire */}
-      {tab === 5 && (() => {
-        const filtered = rapFilter === 'all' ? rapprochements : rapprochements.filter(r => r.statut === rapFilter)
-        const totalCredit = rapprochements.filter(r => r.type === 'credit').reduce((s, r) => s + r.montant, 0)
-        const totalDebit  = rapprochements.filter(r => r.type === 'debit').reduce((s, r) => s + r.montant, 0)
-        const nbNonRap    = rapprochements.filter(r => r.statut === 'non_rapproche').length
-        const nbEcart     = rapprochements.filter(r => r.statut === 'ecart').length
-
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-[var(--text-secondary)]">
-                Comparez les relevés bancaires avec vos transactions enregistrées
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => downloadCSV(
-                    rapprochements.map(r => ({ date: r.date_releve, reference: r.reference, libelle: r.libelle ?? '', type: r.type, montant: r.montant, statut: r.statut })),
-                    'rapprochement_bancaire.csv'
-                  )}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
-                >
-                  <Download size={12} /> CSV
-                </button>
-                <button onClick={() => setShowRapModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-[#DC2626]/10 border border-[#DC2626]/30 text-[#DC2626] hover:bg-[#DC2626]/20 transition-colors">
-                  <Plus size={12} /> Ajouter ligne
-                </button>
-              </div>
+              <button onClick={() => { setShowModal(false); resetForm() }}><X size={18} className="text-[#94A3B8]" /></button>
             </div>
 
-            {/* KPIs */}
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { label: 'Crédits totaux',    value: fmtFCFA(totalCredit), color: 'var(--success)' },
-                { label: 'Débits totaux',     value: fmtFCFA(totalDebit),  color: 'var(--danger)' },
-                { label: 'Non rapprochés',    value: nbNonRap,             color: 'var(--warning)' },
-                { label: 'Écarts détectés',   value: nbEcart,              color: 'var(--danger)' },
-              ].map(k => (
-                <div key={k.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4">
-                  <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-1">{k.label}</p>
-                  <p className="text-lg font-bold" style={{ color: k.color }}>{k.value}</p>
-                </div>
-              ))}
-            </div>
+            <div className="p-5 space-y-4">
 
-            {/* Filter */}
-            <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1 w-fit">
-              {([['all', 'Tous'], ['non_rapproche', 'Non rapprochés'], ['rapproche', 'Rapprochés'], ['ecart', 'Écarts']] as const).map(([v, l]) => (
-                <button key={v} onClick={() => setRapFilter(v)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${rapFilter === v ? 'bg-[var(--primary-light)] text-[var(--primary-text)]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'}`}>
-                  {l}
-                </button>
-              ))}
-            </div>
-
-            {/* Table */}
-            <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
-              {rapLoading ? (
-                <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-[var(--text-secondary)]" /></div>
-              ) : filtered.length === 0 ? (
-                <div className="text-center py-12">
-                  <GitMerge size={32} className="text-[var(--text-secondary)] mx-auto mb-3" />
-                  <p className="text-[var(--text-secondary)] text-sm">Aucune ligne de rapprochement</p>
-                  <p className="text-[var(--text-secondary)] text-xs mt-1">Ajoutez vos lignes de relevé bancaire pour les rapprocher</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-[var(--border)]">
-                        {['Date', 'Référence', 'Libellé', 'Type', 'Montant', 'Statut', 'Actions'].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--border)]">
-                      {filtered.map(r => (
-                        <tr key={r.id} className="hover:bg-white/5/30 transition-colors">
-                          <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs whitespace-nowrap">
-                            {new Date(r.date_releve).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
-                          </td>
-                          <td className="px-4 py-2.5 font-mono text-[11px] text-[var(--text)]">{r.reference}</td>
-                          <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs max-w-[160px] truncate">{r.libelle ?? '—'}</td>
-                          <td className="px-4 py-2.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${r.type === 'credit' ? 'bg-[var(--success-light)] text-[var(--success-text)]' : 'bg-[var(--danger-light)] text-[var(--danger-text)]'}`}>
-                              {r.type === 'credit' ? '↑ Crédit' : '↓ Débit'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-2.5 text-right font-semibold whitespace-nowrap" style={{ color: r.type === 'credit' ? 'var(--success)' : 'var(--danger)' }}>
-                            {fmtFCFA(r.montant)}
-                          </td>
-                          <td className="px-4 py-2.5">
-                            {r.statut === 'rapproche'     && <span className="flex items-center gap-1 text-[10px] text-[var(--success)]"><CheckCircle size={10} /> Rapproché</span>}
-                            {r.statut === 'non_rapproche' && <span className="flex items-center gap-1 text-[10px] text-[var(--text-secondary)]"><Circle size={10} /> En attente</span>}
-                            {r.statut === 'ecart'         && <span className="flex items-center gap-1 text-[10px] text-[var(--danger)]"><AlertTriangle size={10} /> Écart</span>}
-                          </td>
-                          <td className="px-4 py-2.5">
-                            <div className="flex items-center gap-1">
-                              {r.statut !== 'rapproche' && (
-                                <button onClick={() => updateRapStatut(r.id, 'rapproche')}
-                                  className="px-2 py-1 rounded text-[10px] bg-[var(--surface)]/10 text-[#DC2626] hover:bg-[var(--surface)]/20 transition-colors" title="Marquer rapproché">
-                                  ✓
-                                </button>
-                              )}
-                              {r.statut !== 'ecart' && (
-                                <button onClick={() => updateRapStatut(r.id, 'ecart')}
-                                  className="px-2 py-1 rounded text-[10px] bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626]/20 transition-colors" title="Signaler écart">
-                                  !
-                                </button>
-                              )}
-                              {r.statut !== 'non_rapproche' && (
-                                <button onClick={() => updateRapStatut(r.id, 'non_rapproche')}
-                                  className="px-2 py-1 rounded text-[10px] bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626]/20 transition-colors" title="Remettre en attente">
-                                  ↺
-                                </button>
-                              )}
-                              <button onClick={() => deleteRap(r.id)}
-                                className="px-2 py-1 rounded text-[10px] bg-[#64748B]/10 text-[var(--text-secondary)] hover:bg-[#DC2626]/10 hover:text-[#DC2626] transition-colors" title="Supprimer">
-                                <Trash2 size={10} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        )
-      })()}
-
-      {/* Modal rapprochement */}
-      <AnimatePresence>
-        {showRapModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60" onClick={() => setShowRapModal(false)} />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
-              <button onClick={() => setShowRapModal(false)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[var(--text)] mb-4">Nouvelle ligne de relevé</h3>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date relevé</label>
-                    <input type="date" value={rapForm.date_releve} onChange={e => setRapForm(f => ({ ...f, date_releve: e.target.value }))}
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Type</label>
-                    <div className="flex gap-2">
-                      {(['credit', 'debit'] as const).map(t => (
-                        <button key={t} onClick={() => setRapForm(f => ({ ...f, type: t }))}
-                          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${rapForm.type === t ? t === 'credit' ? 'bg-[var(--success)] text-white' : 'bg-[var(--danger)] text-white' : 'bg-[var(--surface-alt)] text-[var(--text-secondary)]'}`}>
-                          {t === 'credit' ? '↑ Crédit' : '↓ Débit'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Référence</label>
-                  <input value={rapForm.reference} onChange={e => setRapForm(f => ({ ...f, reference: e.target.value }))}
-                    placeholder="VIR-2025-001, CHQ-456…"
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
-                </div>
-                <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA)</label>
-                  <input type="number" value={rapForm.montant} onChange={e => setRapForm(f => ({ ...f, montant: e.target.value }))}
-                    placeholder="0"
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
-                </div>
-                <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Libellé (optionnel)</label>
-                  <input value={rapForm.libelle} onChange={e => setRapForm(f => ({ ...f, libelle: e.target.value }))}
-                    placeholder="Description…"
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
-                </div>
-              </div>
-              <div className="flex gap-2 mt-5">
-                <button onClick={() => setShowRapModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-                  Annuler
-                </button>
-                <button onClick={saveRapprochement} disabled={rapSaving || !rapForm.reference || !rapForm.montant}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
-                  {rapSaving && <Loader2 size={13} className="animate-spin" />}
-                  Enregistrer
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60" onClick={() => setShowModal(false)} />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
-              <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[var(--text)] mb-4">Nouvelle opération</h3>
-              <div className="flex gap-2 mb-4">
+              {/* Type toggle */}
+              <div className="flex rounded-xl border border-[#E2E8F0] overflow-hidden">
                 {(['recette', 'depense'] as const).map(t => (
-                  <button key={t} onClick={() => setForm(f => ({ ...f, type: t, categorie: t === 'recette' ? CATS_RECETTE[0] : CATS_DEPENSE[0] }))}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      form.type === t ? t === 'recette' ? 'bg-[var(--success)] text-white' : 'bg-[var(--danger)] text-white' : 'bg-[var(--surface-alt)] text-[var(--text-secondary)]'
+                  <button key={t} onClick={() => { setFormType(t); setFormCat('') }}
+                    className={`flex-1 py-2.5 text-[12px] font-bold transition-all ${
+                      formType === t
+                        ? t === 'recette' ? 'bg-[#16A34A] text-white' : 'bg-[#DC2626] text-white'
+                        : 'text-[#64748B] hover:bg-[#F8FAFC]'
                     }`}>
-                    {t === 'recette' ? '+ Recette' : '− Dépense'}
+                    {t === 'recette' ? '⬆ Recette' : '⬇ Dépense'}
                   </button>
                 ))}
               </div>
-              <div className="space-y-3">
+
+              {/* Libellé */}
+              <div>
+                <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Libellé *</label>
+                <input value={formLibelle} onChange={e => setFormLibelle(e.target.value)}
+                  placeholder="Description de l'opération"
+                  className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
+              </div>
+
+              {/* Montant + Date */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Libellé</label>
-                  <input value={form.libelle} onChange={e => setForm(f => ({ ...f, libelle: e.target.value }))}
-                    placeholder="Description de l'opération..."
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
+                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Montant HT (FCFA) *</label>
+                  <input type="number" value={formMontant} onChange={e => setFormMontant(e.target.value)}
+                    placeholder="0"
+                    className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant HT (FCFA)</label>
-                    <input type="number" value={form.montant_ht} onChange={e => setForm(f => ({ ...f, montant_ht: e.target.value }))}
-                      placeholder="0"
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[var(--text-muted)] outline-none focus:border-[#DC2626]/50" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
-                    <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-                      className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
-                  </div>
-                </div>
-                {form.type === 'recette' && form.montant_ht && (
-                  <div className="bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg p-3 text-xs space-y-1">
-                    <p className="text-[var(--text-secondary)]">TVA (18%) : <span className="text-[#DC2626] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18))}</span></p>
-                    <p className="text-[var(--text-secondary)]">CA (5% TVA) : <span className="text-[#DC2626] font-medium">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 0.18 * 0.05))}</span></p>
-                    <p className="text-[var(--text-secondary)] font-medium">TTC : <span className="text-[#DC2626] font-bold">{fmtFCFA(Math.round(parseInt(form.montant_ht || '0') * 1.189))}</span></p>
-                  </div>
-                )}
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Catégorie</label>
-                  <select value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))}
-                    className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
-                    {(form.type === 'recette' ? CATS_RECETTE : CATS_DEPENSE).map(c => <option key={c}>{c}</option>)}
+                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Date</label>
+                  <input type="date" value={formDate} onChange={e => setFormDate(e.target.value)}
+                    className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
+                </div>
+              </div>
+
+              {/* TVA preview */}
+              {formMontant && Number(formMontant) > 0 && (() => {
+                const { tva, ca, ttc } = calcTVACongo(Number(formMontant))
+                return (
+                  <div className="bg-[#FEF3C7] rounded-lg p-3 text-[11px] grid grid-cols-3 gap-2">
+                    <div className="text-center"><div className="font-bold text-[#D97706]">{fmtFCFA(tva)}</div><div className="text-[#94A3B8]">TVA 18%</div></div>
+                    <div className="text-center"><div className="font-bold text-[#D97706]">{fmtFCFA(ca)}</div><div className="text-[#94A3B8]">CA 5%</div></div>
+                    <div className="text-center"><div className="font-bold text-[#0F172A]">{fmtFCFA(ttc)}</div><div className="text-[#94A3B8]">TTC</div></div>
+                  </div>
+                )
+              })()}
+
+              {/* Catégorie */}
+              <div>
+                <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Catégorie *</label>
+                <select value={formCat} onChange={e => setFormCat(e.target.value)}
+                  className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30">
+                  <option value="">— Sélectionner —</option>
+                  {(formType === 'recette' ? CATS_RECETTE : CATS_DEPENSE).map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Comptes OHADA */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Compte Débité</label>
+                  <select value={formDebit} onChange={e => setFormDebit(e.target.value as AccountCode)}
+                    className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30">
+                    <option value="">— Auto —</option>
+                    {OHADA_ACCOUNTS.map(a => (
+                      <option key={a.number} value={String(a.number)}>{a.number} — {a.name}</option>
+                    ))}
                   </select>
                 </div>
-
-                {/* Double-entry accounts */}
-                <div className="border-t border-[var(--border)] pt-3">
-                  <p className="text-[10px] text-[#6E7681] uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <BookOpen size={10} /> Écriture à partie double (OHADA)
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">Compte débité</label>
-                      <select value={form.debit_account} onChange={e => setForm(f => ({ ...f, debit_account: e.target.value }))}
-                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-2 text-xs text-[var(--text)] outline-none">
-                        {(OHADA_ACCOUNTS as readonly { number: string; name: string }[]).map(a => (
-                          <option key={a.number} value={a.number}>{a.number} — {a.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">Compte crédité</label>
-                      <select value={form.credit_account} onChange={e => setForm(f => ({ ...f, credit_account: e.target.value }))}
-                        className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-2 text-xs text-[var(--text)] outline-none">
-                        {(OHADA_ACCOUNTS as readonly { number: string; name: string }[]).map(a => (
-                          <option key={a.number} value={a.number}>{a.number} — {a.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  {form.debit_account && form.credit_account && (
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-2 font-mono">
-                      D {form.debit_account} / C {form.credit_account}
-                    </p>
-                  )}
+                <div>
+                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Compte Crédité</label>
+                  <select value={formCredit} onChange={e => setFormCredit(e.target.value as AccountCode)}
+                    className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30">
+                    <option value="">— Auto —</option>
+                    {OHADA_ACCOUNTS.map(a => (
+                      <option key={a.number} value={String(a.number)}>{a.number} — {a.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
-              <div className="flex gap-2 mt-5">
-                <button onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
+
+              {saveErr  && <p className="text-[12px] text-[#DC2626] bg-[#FEE2E2] px-3 py-2 rounded-lg">{saveErr}</p>}
+              {saveOk   && <p className="text-[12px] text-[#16A34A] bg-[#DCFCE7] px-3 py-2 rounded-lg flex items-center gap-1"><CheckCircle2 size={13} /> Écriture enregistrée !</p>}
+
+              <div className="flex gap-2 pt-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex-1 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
+                  {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                  Enregistrer l&apos;écriture
+                </button>
+                <button onClick={() => { setShowModal(false); resetForm() }}
+                  className="px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-[12px] text-[#64748B] hover:bg-[#F8FAFC]">
                   Annuler
                 </button>
-                <button onClick={save} disabled={saving || !form.libelle || !form.montant_ht}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
-                  {saving && <Loader2 size={13} className="animate-spin" />}
-                  Enregistrer
-                </button>
               </div>
-            </motion.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   )
 }
