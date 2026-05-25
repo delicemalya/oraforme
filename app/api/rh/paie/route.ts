@@ -2,6 +2,73 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { hrAuth } from '../../hr/_auth'
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * OHADA helper — server-side version of writeComptaEntry (uses supabaseAdmin)
+ *
+ * Écriture paie Congo-Brazzaville :
+ *   - 641 Rémunérations / 421 Personnel — rémunérations dues   [brut net]
+ *   - 644 Charges sociales patronales / 431 CNSS               [cnss_patronal]
+ *   - 421 Personnel — rémunérations dues / 521 Banque           [paiement net]
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+interface OhadaWriteInput {
+  tenantId:      string
+  date:          string
+  libelle:       string
+  montant:       number
+  debitAccount:  string
+  creditAccount: string
+  source:        string
+  sourceId?:     string
+}
+
+async function writeOhadaEntryAdmin(input: OhadaWriteInput): Promise<{ ok: boolean; error?: string }> {
+  const fiscalYear = new Date(input.date).getFullYear()
+  const categorie  = '641 — Rémunérations du personnel'
+
+  try {
+    // 1. journal_comptable
+    const { error: jcErr } = await supabaseAdmin.from('journal_comptable').insert({
+      tenant_id:      input.tenantId,
+      date:           input.date,
+      libelle:        input.libelle,
+      type:           'depense',
+      montant_ht:     input.montant,
+      tva:            0,
+      ca:             0,
+      montant_ttc:    input.montant,
+      categorie,
+      debit_account:  input.debitAccount,
+      credit_account: input.creditAccount,
+      source:         input.source,
+      source_id:      input.sourceId ?? null,
+    })
+    if (jcErr) return { ok: false, error: `journal_comptable: ${jcErr.message}` }
+
+    // 2. journal_entries
+    const { error: jeErr } = await supabaseAdmin.from('journal_entries').insert({
+      tenant_id:       input.tenantId,
+      date_operation:  input.date,
+      libelle:         input.libelle,
+      debit_account:   input.debitAccount,
+      credit_account:  input.creditAccount,
+      montant:         input.montant,
+      source:          input.source,
+      source_id:       input.sourceId ?? null,
+      fiscal_year:     fiscalYear,
+    })
+    if (jeErr) return { ok: false, error: `journal_entries: ${jeErr.message}` }
+
+    return { ok: true }
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Erreur inconnue'
+    return { ok: false, error: msg }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * GET /api/rh/paie
+ * ─────────────────────────────────────────────────────────────────────────── */
 export async function GET(req: NextRequest) {
   const auth = await hrAuth()
   if (!auth) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
@@ -28,6 +95,10 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ data })
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * POST /api/rh/paie
+ * Crée un bulletin de paie + génère automatiquement 3 écritures OHADA
+ * ─────────────────────────────────────────────────────────────────────────── */
 export async function POST(req: NextRequest) {
   const auth = await hrAuth()
   if (!auth) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
@@ -46,38 +117,167 @@ export async function POST(req: NextRequest) {
 
   // Verify employee belongs to this tenant
   const { data: emp } = await supabaseAdmin
-    .from('employes').select('id, nom').eq('id', employe_id).eq('tenant_id', auth.tenantId).maybeSingle()
+    .from('employes')
+    .select('id, nom, poste, matricule')
+    .eq('id', employe_id)
+    .eq('tenant_id', auth.tenantId)
+    .maybeSingle()
   if (!emp) return NextResponse.json({ error: 'Employé introuvable' }, { status: 404 })
 
   // Check duplicate
   const { data: dup } = await supabaseAdmin
     .from('bulletins_paie')
-    .select('id').eq('tenant_id', auth.tenantId)
-    .eq('employe_id', employe_id).eq('mois', mois).eq('annee', annee)
+    .select('id')
+    .eq('tenant_id', auth.tenantId)
+    .eq('employe_id', employe_id)
+    .eq('mois', mois)
+    .eq('annee', annee)
     .maybeSingle()
   if (dup) return NextResponse.json({ error: `Bulletin ${mois}/${annee} déjà créé pour cet employé` }, { status: 409 })
 
-  const { data, error } = await supabaseAdmin
+  /* ── Valeurs numériques ───────────────────────────────────────────────── */
+  const numBrut        = Number(brut)
+  const numNet         = Number(net)         || numBrut
+  const numCnssSalarie = Number(cnss_salarie)  || 0
+  const numCnssPatron  = Number(cnss_patronal) || 0
+  const numIrpp        = Number(irpp)          || 0
+  const numPrimes      = Number(primes)        || 0
+  const numHeuresSup   = Number(heures_sup)    || 0
+  const numTauxHoraire = Number(taux_horaire)  || 0
+  const modePaie       = mode_paiement || 'virement'
+
+  /* ── Insérer le bulletin ─────────────────────────────────────────────── */
+  const { data: bulletin, error: bulErr } = await supabaseAdmin
     .from('bulletins_paie')
     .insert({
       tenant_id:      auth.tenantId,
       employe_id,
       mois:           parseInt(mois),
       annee:          parseInt(annee),
-      brut:           Number(brut),
-      cnss_salarie:   Number(cnss_salarie)  || 0,
-      cnss_patronal:  Number(cnss_patronal) || 0,
-      irpp:           Number(irpp)          || 0,
-      net:            Number(net)           || Number(brut),
-      primes:         Number(primes)        || 0,
-      heures_sup:     Number(heures_sup)    || 0,
-      taux_horaire:   Number(taux_horaire)  || 0,
-      mode_paiement:  mode_paiement || 'virement',
+      brut:           numBrut,
+      cnss_salarie:   numCnssSalarie,
+      cnss_patronal:  numCnssPatron,
+      irpp:           numIrpp,
+      net:            numNet,
+      primes:         numPrimes,
+      heures_sup:     numHeuresSup,
+      taux_horaire:   numTauxHoraire,
+      mode_paiement:  modePaie,
       statut:         'generee',
     })
     .select('*, employes(nom, poste, matricule)')
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true, data }, { status: 201 })
+  if (bulErr) return NextResponse.json({ error: bulErr.message }, { status: 500 })
+
+  /* ── Compte trésorerie selon mode de paiement ───────────────────────── */
+  const MOIS_LABELS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+  const moisLabel = MOIS_LABELS[(parseInt(mois) - 1)] ?? `M${mois}`
+  const dateOp    = new Date().toISOString().slice(0, 10)
+  const empNom    = emp.nom ?? 'Employé'
+
+  function modeToAccount(mode: string): string {
+    switch (mode.toLowerCase()) {
+      case 'virement':     return '521000'
+      case 'cheque':       return '521000'
+      case 'especes':      return '571000'
+      case 'airtel_money':
+      case 'mtn_momo':
+      case 'mobile_money': return '571100'
+      default:             return '521000'
+    }
+  }
+  const compteBank = modeToAccount(modePaie)
+  const bulletinId = bulletin.id
+
+  /* ── 3 ÉCRITURES OHADA AUTOMATIQUES ─────────────────────────────────── */
+
+  /**
+   * Écriture 1 — Constatation salaire brut
+   *   Débit  641000 Rémunérations du personnel   → brut
+   *   Crédit 421000 Personnel — rémunérations dûes
+   */
+  const e1 = await writeOhadaEntryAdmin({
+    tenantId:      auth.tenantId,
+    date:          dateOp,
+    libelle:       `Salaire ${moisLabel} ${annee} — ${empNom}`,
+    montant:       numBrut,
+    debitAccount:  '641000',
+    creditAccount: '421000',
+    source:        'paie',
+    sourceId:      bulletinId,
+  })
+
+  /**
+   * Écriture 2 — Charges patronales CNSS
+   *   Débit  644000 Charges sociales patronales
+   *   Crédit 431000 CNSS / Sécurité sociale
+   */
+  const ohadaErrors: string[] = []
+  if (!e1.ok && e1.error) ohadaErrors.push(e1.error)
+
+  if (numCnssPatron > 0) {
+    const e2 = await writeOhadaEntryAdmin({
+      tenantId:      auth.tenantId,
+      date:          dateOp,
+      libelle:       `CNSS patronal ${moisLabel} ${annee} — ${empNom}`,
+      montant:       numCnssPatron,
+      debitAccount:  '644000',
+      creditAccount: '431000',
+      source:        'paie',
+      sourceId:      bulletinId,
+    })
+    if (!e2.ok && e2.error) ohadaErrors.push(e2.error)
+  }
+
+  /**
+   * Écriture 3 — Paiement net (décaissement)
+   *   Débit  421000 Personnel — rémunérations dûes   → net
+   *   Crédit 521000/571000 Banque ou Caisse
+   */
+  const e3 = await writeOhadaEntryAdmin({
+    tenantId:      auth.tenantId,
+    date:          dateOp,
+    libelle:       `Paiement salaire ${moisLabel} ${annee} — ${empNom} (${modePaie})`,
+    montant:       numNet,
+    debitAccount:  '421000',
+    creditAccount: compteBank,
+    source:        'paie',
+    sourceId:      bulletinId,
+  })
+  if (!e3.ok && e3.error) ohadaErrors.push(e3.error)
+
+  /**
+   * Écriture 4 — IRPP (si > 0)
+   *   Débit  447000 Impôts sur salaires
+   *   Crédit 521000 Banque (à reverser à l'État)
+   */
+  if (numIrpp > 0) {
+    const e4 = await writeOhadaEntryAdmin({
+      tenantId:      auth.tenantId,
+      date:          dateOp,
+      libelle:       `IRPP ${moisLabel} ${annee} — ${empNom}`,
+      montant:       numIrpp,
+      debitAccount:  '447000',
+      creditAccount: '521000',
+      source:        'paie',
+      sourceId:      bulletinId,
+    })
+    if (!e4.ok && e4.error) ohadaErrors.push(e4.error)
+  }
+
+  return NextResponse.json({
+    success: true,
+    data: bulletin,
+    ohada: {
+      written: ohadaErrors.length === 0,
+      errors:  ohadaErrors.length > 0 ? ohadaErrors : undefined,
+      entries: [
+        `641/421 Salaire brut: ${numBrut} FCFA`,
+        numCnssPatron > 0 ? `644/431 CNSS patronal: ${numCnssPatron} FCFA` : null,
+        `421/${compteBank} Net payé: ${numNet} FCFA`,
+        numIrpp > 0 ? `447/521 IRPP: ${numIrpp} FCFA` : null,
+      ].filter(Boolean),
+    },
+  }, { status: 201 })
 }
