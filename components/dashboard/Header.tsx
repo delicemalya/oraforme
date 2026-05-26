@@ -3,22 +3,16 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Search, Globe, ChevronDown, LogOut, Sun, Moon, UsersRound } from 'lucide-react'
+import { Search, ChevronDown, LogOut, Sun, Moon, UsersRound } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { useLocale } from '@/lib/hooks/useLocale'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
-import {
-  type Locale,
-  LOCALE_FLAGS,
-  LOCALE_LABELS,
-  getStoredLocale,
-  setStoredLocale,
-} from '@/lib/i18n'
-
-const DISPLAY_LOCALES: Locale[] = ['fr', 'en', 'ln', 'pt']
+import LanguageSelector from '@/components/ui/LanguageSelector'
 
 export default function Header() {
   const { tenant } = useTenantContext()
+  const { t } = useLocale()
   const pathname = usePathname()
   const isOwner = tenant?.role === 'owner'
   const canSeeTeam = isOwner || tenant?.ecoleRole === 'DIRECTION_GENERALE'
@@ -27,14 +21,11 @@ export default function Header() {
   const [initials,     setInitials]     = useState('U')
   const [logoUrl,      setLogoUrl]      = useState<string | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [langOpen,     setLangOpen]     = useState(false)
-  const [locale,       setLocale]       = useState<Locale>('fr')
   const [theme,        setTheme]        = useState<'dark' | 'light'>('light')
 
   const nomEntreprise = tenant?.nomEntreprise ?? null
 
   useEffect(() => {
-    setLocale(getStoredLocale())
     const stored = localStorage.getItem('oraforme-theme') as 'dark' | 'light' | null
     const effective: 'dark' | 'light' = stored === 'dark' ? 'dark' : 'light'
     setTheme(effective)
@@ -84,13 +75,6 @@ export default function Header() {
     window.location.href = '/login'
   }
 
-  function handleLocaleChange(l: Locale) {
-    setLocale(l)
-    setStoredLocale(l)
-    setLangOpen(false)
-    window.location.reload()
-  }
-
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
@@ -106,7 +90,7 @@ export default function Header() {
         <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-3 py-1.5">
           <Search size={13} className="text-[#94A3B8] shrink-0" />
           <input
-            placeholder="Rechercher..."
+            placeholder={`${t('common.search')}...`}
             className="bg-transparent text-sm text-[#0F172A] placeholder-[#94A3B8] outline-none flex-1 w-0 min-w-0"
           />
           <kbd className="hidden sm:block text-[10px] text-[#94A3B8] border border-[#E2E8F0] rounded px-1 shrink-0">⌘K</kbd>
@@ -144,60 +128,23 @@ export default function Header() {
           }`}
         >
           <UsersRound size={14} />
-          <span>Équipe</span>
+          <span>{t('nav.equipe')}</span>
         </Link>
       )}
 
-      <div className="flex items-center gap-1 ml-auto">
+      <div className="flex items-center gap-1.5 ml-auto">
 
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
-          title={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+          title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
           className="p-2 text-[#64748B] hover:text-[#0F172A] transition-colors rounded-lg hover:bg-[#F8FAFC]"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        {/* Language dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setLangOpen(!langOpen)}
-            title="Changer de langue"
-            className="p-2 text-[#64748B] hover:text-[#0F172A] transition-colors rounded-lg hover:bg-[#F8FAFC] flex items-center gap-1"
-          >
-            <Globe size={16} />
-            <span className="hidden sm:block text-[10px] font-bold text-[#64748B]">
-              {locale.toUpperCase()}
-            </span>
-          </button>
-
-          {langOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setLangOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-20 py-1 overflow-hidden">
-                <p className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider px-3 pt-2 pb-1">Langue</p>
-                {DISPLAY_LOCALES.map(l => (
-                  <button
-                    key={l}
-                    onClick={() => handleLocaleChange(l)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left ${
-                      locale === l
-                        ? 'text-amber-700 bg-amber-50'
-                        : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
-                    }`}
-                  >
-                    <span className="text-base">{LOCALE_FLAGS[l]}</span>
-                    <span className="text-xs font-medium">{LOCALE_LABELS[l]}</span>
-                    {locale === l && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-500" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        {/* ✅ Sélecteur de langue — 8 langues via LocaleContext (sans reload) */}
+        <LanguageSelector />
 
         <NotificationsPanel />
 
@@ -229,7 +176,7 @@ export default function Header() {
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#64748B] hover:text-red-500 hover:bg-red-50 transition-colors"
                 >
                   <LogOut size={14} />
-                  Déconnexion
+                  {t('auth.logout')}
                 </button>
               </div>
             </>

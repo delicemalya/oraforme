@@ -152,15 +152,44 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 
 // ─── Sidebar Group definitions ────────────────────────────────────────────────
 
+// Les labels sont des clés i18n — traduits dynamiquement dans le composant via t()
 const SIDEBAR_GROUPS = [
-  { id: 'pilotage',    label: 'Pilotage',          icon: LayoutDashboard, moduleIds: ['direction', 'finance', 'analytics', 'audit', 'notifications'] },
-  { id: 'finance_ops', label: 'Finance & Compta',  icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses'] },
-  { id: 'rh_org',      label: 'RH & Organisation', icon: Users,           moduleIds: ['rh', 'roles'] },
-  { id: 'commercial',  label: 'Commercial',         icon: UsersRound,      moduleIds: ['crm'] },
-  { id: 'supply',      label: 'Stock & Achats',     icon: Package,         moduleIds: ['stock', 'achats'] },
-  { id: 'docs_ai',     label: 'Documents & IA',     icon: FolderOpen,      moduleIds: ['ged', 'bizbot'] },
-  { id: 'params',      label: 'Paramètres',          icon: Settings,        moduleIds: ['profil', 'parametres'] },
+  { id: 'pilotage',    labelKey: 'nav.pilotage',    icon: LayoutDashboard, moduleIds: ['direction', 'finance', 'analytics', 'audit', 'notifications'] },
+  { id: 'finance_ops', labelKey: 'nav.finance_ops', icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses'] },
+  { id: 'rh_org',      labelKey: 'nav.rh_org',      icon: Users,           moduleIds: ['rh', 'roles'] },
+  { id: 'commercial',  labelKey: 'nav.commercial',  icon: UsersRound,      moduleIds: ['crm'] },
+  { id: 'supply',      labelKey: 'nav.supply',      icon: Package,         moduleIds: ['stock', 'achats'] },
+  { id: 'docs_ai',     labelKey: 'nav.docs_ai',     icon: FolderOpen,      moduleIds: ['ged', 'bizbot'] },
+  { id: 'params',      labelKey: 'nav.params',      icon: Settings,        moduleIds: ['profil', 'parametres'] },
 ]
+
+// Mapping module ID → clé i18n (pour les labels des items du menu)
+const MODULE_LABEL_KEYS: Record<string, string> = {
+  direction:    'nav.direction',
+  finance:      'nav.finance',
+  analytics:    'nav.analytics',
+  audit:        'nav.audit',
+  notifications:'nav.notifications',
+  comptabilite: 'nav.comptabilite',
+  tresorerie:   'nav.tresorerie',
+  facturation:  'nav.facturation',
+  depenses:     'nav.depenses',
+  rh:           'nav.rh',
+  roles:        'nav.roles',
+  crm:          'nav.crm',
+  stock:        'nav.stock',
+  achats:       'nav.achats',
+  ged:          'nav.ged',
+  bizbot:       'nav.bizbot',
+  profil:       'nav.profil',
+  parametres:   'nav.parametres',
+  ecole:        'nav.ecole',
+  restaurant:   'nav.restaurant',
+  hotel:        'nav.hotel',
+  transport:    'nav.transport',
+  mobilemoney:  'nav.mobilemoney',
+  workflows:    'nav.workflows',
+}
 
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
 
@@ -288,11 +317,13 @@ export default function Sidebar() {
         if (!canView(mid)) continue
         const def = getModuleDef(mid)
         if (!def) continue
-        items.push({ id: mid, label: def.label, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
+        // Utilise la clé i18n si disponible, sinon fallback sur le label statique
+        const translatedLabel = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
+        items.push({ id: mid, label: translatedLabel, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
       }
-      return { ...grp, items, color: COLORS[grp.id] }
+      return { ...grp, label: t(grp.labelKey), items, color: COLORS[grp.id] }
     }).filter(g => g.items.length > 0)
-  }, [loaded, canView])
+  }, [loaded, canView, t])
 
   const metierGroup = useMemo((): NavGroup | null => {
     if (!loaded) return null
@@ -317,11 +348,14 @@ export default function Sidebar() {
     for (const mid of EXTRA_IDS) {
       if (!modulesActifs.includes(mid) || permissions[mid]?.can_view === false) continue
       const def = getModuleDef(mid)
-      if (def) extraItems.push({ id: mid, label: def.label, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
+      if (def) {
+        const translatedLabel = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
+        extraItems.push({ id: mid, label: translatedLabel, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
+      }
     }
     if (!extraItems.length) return null
-    return { id: 'metier', label: 'Modules Sectoriels', icon: Store, items: extraItems, color: COLORS.metier }
-  }, [loaded, secteur, isOwner, ecoleRole, permissions, modulesActifs])
+    return { id: 'metier', label: t('nav.metier'), icon: Store, items: extraItems, color: COLORS.metier }
+  }, [loaded, secteur, isOwner, ecoleRole, permissions, modulesActifs, t])
 
   const dashHref   = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
   const dashActive = isActive(dashHref, true)
@@ -445,7 +479,7 @@ export default function Sidebar() {
             <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
               role === 'admin' ? 'bg-blue-100 text-blue-600' : 'bg-[#F8FAFC] text-[#64748B] border border-[#E5E7EB]'
             }`}>
-              {role === 'admin' ? 'Administrateur' : 'Membre'}
+              {role === 'admin' ? t('roles.role') + ' Admin' : t('common.active')}
             </span>
           </div>
         )}
@@ -544,7 +578,7 @@ export default function Sidebar() {
           onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B' }}
         >
           <LogOut size={13} className="shrink-0" />
-          <span>Déconnexion</span>
+          <span>{t('nav.logout')}</span>
         </button>
       </div>
     </div>
