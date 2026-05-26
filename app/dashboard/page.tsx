@@ -114,13 +114,12 @@ export default async function DashboardPage() {
       total: f.total ?? 0, statut: f.statut, created_at: f.created_at,
     }))
 
-    const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
     daily = Array.from({ length: 7 }, (_, i) => {
       const d = new Date()
       d.setDate(d.getDate() - (6 - i))
       const dayStr = d.toISOString().split('T')[0]
       const items = activityRes.data?.filter(f => f.created_at.startsWith(dayStr)) ?? []
-      return { day: DAYS_FR[d.getDay()], montant: items.reduce((s, f) => s + (f.total ?? 0), 0), count: items.length }
+      return { day: String(d.getDay()), montant: items.reduce((s, f) => s + (f.total ?? 0), 0), count: items.length }
     })
 
     const counts = { brouillon: 0, envoyee: 0, payee: 0, annulee: 0 }
@@ -138,11 +137,10 @@ export default async function DashboardPage() {
     nbAlertes = nbPending
   } else {
     // Pour les non-financiers : graphe vide avec modules
-    const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
     daily = Array.from({ length: 7 }, (_, i) => {
       const d = new Date()
       d.setDate(d.getDate() - (6 - i))
-      return { day: DAYS_FR[d.getDay()], montant: 0, count: 0 }
+      return { day: String(d.getDay()), montant: 0, count: 0 }
     })
     moduleBreakdown = modulesActifs.map((m, i) => ({
       name: MODULE_LABELS[m] ?? m, value: 1, color: MODULE_COLORS[i % MODULE_COLORS.length],
