@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ─── Types ───────────────────────────────────────────────────
 type FinData = {
@@ -47,8 +48,6 @@ type FinData = {
 }
 
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-const TABS = ['Vue d\'ensemble', 'Compte de résultat', 'Bilan', 'Flux de trésorerie', 'Rapport TVA', 'Analyse MIAA+']
-const TAB_ICONS = [BarChart2, List, Scale, Activity, Receipt, Sparkles]
 
 function fadeUp(i: number) {
   return {
@@ -116,6 +115,18 @@ function Section({ title, rows, total, totalLabel, totalColor = '#DC2626' }: {
 
 // ─── Main ─────────────────────────────────────────────────────
 export default function RapportsPage() {
+  const { t } = useLocale()
+
+  const TABS = [
+    t('rapports.tab.overview'),
+    t('rapports.tab.resultat'),
+    t('rapports.tab.bilan'),
+    t('rapports.tab.flux'),
+    t('rapports.tab.tva'),
+    t('rapports.tab.miaa'),
+  ]
+  const TAB_ICONS = [BarChart2, List, Scale, Activity, Receipt, Sparkles]
+
   const [tab, setTab] = useState(0)
   const [data, setData] = useState<FinData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -137,8 +148,8 @@ export default function RapportsPage() {
     if (!profile?.tenant_id) return
     const tid = profile.tenant_id
     setTenantId(tid)
-    const t = profile.tenants as unknown as { nom_entreprise: string } | null
-    if (t?.nom_entreprise) setNomEntreprise(t.nom_entreprise)
+    const tenant = profile.tenants as unknown as { nom_entreprise: string } | null
+    if (tenant?.nom_entreprise) setNomEntreprise(tenant.nom_entreprise)
 
     const yearStart = `${selectedYear}-01-01`
     const yearEnd   = `${selectedYear}-12-31`
@@ -161,15 +172,15 @@ export default function RapportsPage() {
     const bulletins    = bpRes.data   ?? []
     const openingBalance = fyRes.data?.solde_ouverture ?? 0
 
-    const totalEntrees = transactions.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-    const totalSorties = transactions.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
-    const caResto      = transactions.filter(t => t.type === 'entree' && t.source === 'pos').reduce((s, t) => s + t.montant, 0)
+    const totalEntrees = transactions.filter(tx => tx.type === 'entree').reduce((s, tx) => s + tx.montant, 0)
+    const totalSorties = transactions.filter(tx => tx.type === 'sortie').reduce((s, tx) => s + tx.montant, 0)
+    const caResto      = transactions.filter(tx => tx.type === 'entree' && tx.source === 'pos').reduce((s, tx) => s + tx.montant, 0)
 
     // Produits
     const ventesFactures = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.montant_ht ?? f.total ?? 0), 0)
     const tvaCollectee   = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.tva ?? 0), 0)
     const caCollecte     = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.ca ?? 0), 0)
-    const prestations    = transactions.filter(t => t.type === 'entree' && (t.categorie?.toLowerCase().includes('prestation') || t.source === 'paiement_scolaire')).reduce((s, t) => s + t.montant, 0)
+    const prestations    = transactions.filter(tx => tx.type === 'entree' && (tx.categorie?.toLowerCase().includes('prestation') || tx.source === 'paiement_scolaire')).reduce((s, tx) => s + tx.montant, 0)
     const autresProduits = totalEntrees - ventesFactures - prestations
 
     // Charges par catégorie depense
@@ -215,7 +226,7 @@ export default function RapportsPage() {
     const msg = `Analyse financière ${nomEntreprise} — ${data.annee}.\n\nCompte de résultat :\n- Produits : ${fmtFCFA(produits)}\n- Charges totales : ${fmtFCFA(charges)}\n- Résultat net : ${fmtFCFA(resultat)} (marge ${marge}%)\n\nTrésorerie :\n- Solde actuel : ${fmtFCFA(data.soldeTresorerie)}\n- Encaissements : ${fmtFCFA(data.totalEntrees)}\n- Décaissements : ${fmtFCFA(data.totalSorties)}\n\nRH : ${data.nbEmployes} employés, masse salariale ${fmtFCFA(data.salairesTotal)}\nFactures : ${data.nbFacturesPayees}/${data.nbFactures} payées (${txPaie}%)\nCréances clients : ${fmtFCFA(data.clientsCreances)}\nDettes fournisseurs : ${fmtFCFA(data.dettesFournisseurs)}\n\nDonne une analyse financière professionnelle en 3 paragraphes : état général, alertes, recommandations concrètes. Style direct, 200 mots max.`
     const res = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg, module: 'rapports', entreprise: nomEntreprise }) })
     const d = await res.json()
-    setAiText(d.reply ?? "Erreur lors de l'analyse.")
+    setAiText(d.reply ?? t('rapports.miaa.errorAnalyse'))
     setAiLoading(false)
   }
 
@@ -237,8 +248,10 @@ export default function RapportsPage() {
             <BarChart2 size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[var(--text)]">Rapports Financiers</h1>
-            <p className="text-xs text-[var(--text-secondary)]">ERP · {nomEntreprise} · {moisLabel}</p>
+            <h1 className="text-xl font-bold text-[var(--text)]">{t('rapports.title')}</h1>
+            <p className="text-xs text-[var(--text-secondary)]">
+              {t('rapports.subtitle').replace('{entreprise}', nomEntreprise).replace('{mois}', moisLabel)}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -254,14 +267,14 @@ export default function RapportsPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1 overflow-x-auto">
-        {TABS.map((t, i) => {
+        {TABS.map((tabLabel, i) => {
           const Icon = TAB_ICONS[i]
           return (
             <button key={i} onClick={() => setTab(i)}
               className={`flex-1 min-w-fit py-2 px-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1 whitespace-nowrap ${
                 tab === i ? 'bg-[var(--surface)]/10 text-[#DC2626]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
               }`}>
-              <Icon size={11} />{t}
+              <Icon size={11} />{tabLabel}
             </button>
           )
         })}
@@ -269,7 +282,7 @@ export default function RapportsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-[var(--text-secondary)]">
-          <Loader2 size={22} className="animate-spin mr-2" /> Chargement des données…
+          <Loader2 size={22} className="animate-spin mr-2" /> {t('rapports.loading')}
         </div>
       ) : data ? (
         <>
@@ -278,29 +291,29 @@ export default function RapportsPage() {
           {tab === 0 && (
             <div className="space-y-5">
               <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-                <KpiCard i={1} label="Recettes totales"   value={fmtFCFA(data.totalEntrees)} sub="Encaissements exercice"
+                <KpiCard i={1} label={t('rapports.kpi.recettes')} value={fmtFCFA(data.totalEntrees)} sub={t('rapports.kpi.recettesSub')}
                   color="linear-gradient(135deg,#071535 0%,#0F172A 50%,#1A3570 100%)" icon={TrendingUp} trend={marge > 0 ? marge : undefined} />
-                <KpiCard i={2} label="Charges totales"    value={fmtFCFA(totalCharges)}       sub="Toutes dépenses"
+                <KpiCard i={2} label={t('rapports.kpi.charges')}  value={fmtFCFA(totalCharges)}       sub={t('rapports.kpi.chargesSub')}
                   color="linear-gradient(135deg,#7A0000 0%,#A00018 50%,#DC2626 100%)"  icon={TrendingDown} />
-                <KpiCard i={3} label="Résultat net"       value={fmtFCFA(resultatNet)}        sub={`Marge ${marge}%`}
+                <KpiCard i={3} label={t('rapports.kpi.resultat')} value={fmtFCFA(resultatNet)}        sub={`${t('rapports.cr.margeNette')} ${marge}%`}
                   color={resultatNet >= 0 ? 'linear-gradient(135deg,#4A0040 0%,#7C3AED 50%,#7C3AED 100%)' : 'linear-gradient(135deg,#4A0040 0%,#7C3AED 50%,#7C3AED 100%)'}
                   icon={resultatNet >= 0 ? ArrowUpRight : ArrowDownRight} trend={marge} />
-                <KpiCard i={4} label="Taux de paiement"  value={`${txPaiement}%`}            sub={`${data.nbFacturesPayees}/${data.nbFactures} factures`}
+                <KpiCard i={4} label={t('rapports.kpi.tauxPaiement')} value={`${txPaiement}%`} sub={`${data.nbFacturesPayees}/${data.nbFactures} factures`}
                   color="linear-gradient(135deg,#7A3800 0%,#C06000 50%,#DC2626 100%)"  icon={CheckCircle} />
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                 <div className="xl:col-span-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                   <h2 className="text-sm font-bold text-[var(--text)] mb-4 flex items-center gap-2">
-                    <FileText size={14} className="text-[#DC2626]" /> Détail financier — {data.annee}
+                    <FileText size={14} className="text-[#DC2626]" /> {t('rapports.detail.title').replace('{annee}', String(data.annee))}
                   </h2>
                   <div className="space-y-3">
                     {[
-                      { label: 'Recettes brutes',     val: totalProduits,       color: '#0F172A', pct: 100 },
-                      { label: 'Achats & stock',       val: data.achatsTotal,    color: '#DC2626', pct: totalProduits > 0 ? (data.achatsTotal / totalProduits) * 100 : 0 },
-                      { label: 'Masse salariale',      val: data.salairesTotal,  color: '#7C3AED', pct: totalProduits > 0 ? (data.salairesTotal / totalProduits) * 100 : 0 },
-                      { label: 'Charges locatives',    val: data.loyerTotal,     color: '#DC2626', pct: totalProduits > 0 ? (data.loyerTotal / totalProduits) * 100 : 0 },
-                      { label: 'Résultat net',         val: resultatNet,         color: resultatNet >= 0 ? '#DC2626' : '#DC2626', pct: totalProduits > 0 ? Math.abs(resultatNet / totalProduits) * 100 : 0 },
+                      { label: t('rapports.detail.recettes'), val: totalProduits,       color: '#0F172A', pct: 100 },
+                      { label: t('rapports.detail.achats'),   val: data.achatsTotal,    color: '#DC2626', pct: totalProduits > 0 ? (data.achatsTotal / totalProduits) * 100 : 0 },
+                      { label: t('rapports.detail.salaires'), val: data.salairesTotal,  color: '#7C3AED', pct: totalProduits > 0 ? (data.salairesTotal / totalProduits) * 100 : 0 },
+                      { label: t('rapports.detail.loyer'),    val: data.loyerTotal,     color: '#DC2626', pct: totalProduits > 0 ? (data.loyerTotal / totalProduits) * 100 : 0 },
+                      { label: t('rapports.detail.resultat'), val: resultatNet,         color: resultatNet >= 0 ? '#DC2626' : '#DC2626', pct: totalProduits > 0 ? Math.abs(resultatNet / totalProduits) * 100 : 0 },
                     ].map(row => (
                       <div key={row.label}>
                         <div className="flex items-center justify-between mb-1">
@@ -316,9 +329,9 @@ export default function RapportsPage() {
                   </div>
                   <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-[var(--border)]">
                     {[
-                      { label: 'Factures payées', val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#0F172A' : '#DC2626' },
-                      { label: 'Employés', val: data.nbEmployes.toString(), color: '#DC2626' },
-                      { label: 'Marge nette', val: `${marge}%`, color: marge >= 20 ? '#0F172A' : marge >= 10 ? '#DC2626' : '#DC2626' },
+                      { label: t('rapports.detail.facturesPaid'), val: `${data.nbFacturesPayees}/${data.nbFactures}`, color: txPaiement >= 80 ? '#0F172A' : '#DC2626' },
+                      { label: t('rapports.detail.employes'),     val: data.nbEmployes.toString(), color: '#DC2626' },
+                      { label: t('rapports.detail.margeNette'),   val: `${marge}%`, color: marge >= 20 ? '#0F172A' : marge >= 10 ? '#DC2626' : '#DC2626' },
                     ].map(s => (
                       <div key={s.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 text-center">
                         <p className="text-[10px] text-[var(--text-secondary)] mb-1 uppercase tracking-wide">{s.label}</p>
@@ -334,32 +347,32 @@ export default function RapportsPage() {
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#4A0040,#7C3AED)' }}>
                         <Users size={14} className="text-white" />
                       </div>
-                      <p className="text-sm font-bold text-[var(--text)]">Ressources Humaines</p>
+                      <p className="text-sm font-bold text-[var(--text)]">{t('rapports.rh.title')}</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between py-2 border-b border-[var(--border)]">
-                        <span className="text-xs text-[var(--text-secondary)]">Effectif</span>
+                        <span className="text-xs text-[var(--text-secondary)]">{t('rapports.rh.effectif')}</span>
                         <span className="text-sm font-bold text-[#DC2626]">{data.nbEmployes}</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-[var(--border)]">
-                        <span className="text-xs text-[var(--text-secondary)]">Masse salariale</span>
+                        <span className="text-xs text-[var(--text-secondary)]">{t('rapports.rh.salaires')}</span>
                         <span className="text-sm font-bold text-[#7C3AED]">{fmtFCFA(data.salairesTotal)}</span>
                       </div>
                       <div className="flex justify-between py-2">
-                        <span className="text-xs text-[var(--text-secondary)]">Charges CNSS</span>
+                        <span className="text-xs text-[var(--text-secondary)]">{t('rapports.rh.cnss')}</span>
                         <span className="text-sm font-bold text-[#DC2626]">{fmtFCFA(data.cnssTotal)}</span>
                       </div>
                     </div>
                   </div>
                   <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
-                    <p className="text-xs font-bold text-[var(--text)] mb-3 uppercase tracking-wide">Exports</p>
+                    <p className="text-xs font-bold text-[var(--text)] mb-3 uppercase tracking-wide">{t('rapports.exports.title')}</p>
                     <div className="space-y-2">
                       {[
-                        { label: 'Rapport PDF', note: 'À venir' },
-                        { label: 'Export CSV', note: 'À venir' },
-                        { label: 'Rapport TVA Congo', note: 'Onglet TVA' },
+                        { label: t('rapports.exports.pdf'), note: t('rapports.exports.soon') },
+                        { label: t('rapports.exports.csv'), note: t('rapports.exports.soon') },
+                        { label: t('rapports.exports.tva'), note: t('rapports.exports.tvaTab') },
                       ].map(e => (
-                        <button key={e.label} onClick={() => e.note === 'Onglet TVA' ? setTab(4) : undefined}
+                        <button key={e.label} onClick={() => e.note === t('rapports.exports.tvaTab') ? setTab(4) : undefined}
                           className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--border)] hover:bg-white/5 transition-all group text-left">
                           <div className="flex items-center gap-2">
                             <Download size={12} className="text-[var(--text-secondary)] group-hover:text-[#DC2626] transition-colors" />
@@ -378,14 +391,14 @@ export default function RapportsPage() {
                 return (
                   <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                     <h2 className="text-sm font-bold text-[var(--text)] mb-4 flex items-center gap-2">
-                      <ChefHat size={14} className="text-[#DC2626]" /> Restaurant — {data.annee}
+                      <ChefHat size={14} className="text-[#DC2626]" /> {t('rapports.resto.title').replace('{annee}', String(data.annee))}
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { label: 'CA TTC Restaurant', val: fmtFCFA(data.caResto),   color: '#DC2626' },
-                        { label: 'CA HT',              val: fmtFCFA(fiscal.ht),      color: '#DC2626' },
-                        { label: 'TVA collectée (18%)',val: fmtFCFA(fiscal.tva),     color: '#7C3AED' },
-                        { label: 'CA (5% TVA)',         val: fmtFCFA(fiscal.ca),      color: '#DC2626' },
+                        { label: t('rapports.resto.caTtc'), val: fmtFCFA(data.caResto),   color: '#DC2626' },
+                        { label: t('rapports.resto.caHt'),  val: fmtFCFA(fiscal.ht),      color: '#DC2626' },
+                        { label: t('rapports.resto.tva'),   val: fmtFCFA(fiscal.tva),     color: '#7C3AED' },
+                        { label: t('rapports.resto.ca'),    val: fmtFCFA(fiscal.ca),      color: '#DC2626' },
                       ].map(k => (
                         <div key={k.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
                           <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{k.label}</p>
@@ -402,21 +415,21 @@ export default function RapportsPage() {
           {/* ── TAB 1 : Compte de résultat ── */}
           {tab === 1 && (
             <div className="space-y-4">
-              <p className="text-xs text-[var(--text-secondary)]">Exercice {data.annee} · OHADA / Plan comptable congolais</p>
+              <p className="text-xs text-[var(--text-secondary)]">{t('rapports.cr.exercice').replace('{annee}', String(data.annee))}</p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Section
-                  title="PRODUITS D'EXPLOITATION"
+                  title={t('rapports.cr.produits')}
                   rows={[
                     { label: '707 — Ventes factures',          value: data.ventesFactures,   color: '#0F172A' },
                     { label: '706 — Prestations de services',  value: data.prestations,       color: '#0F172A' },
                     { label: '708/709 — Autres produits',      value: data.autresProduits,    color: '#0F172A' },
                   ]}
                   total={totalProduits}
-                  totalLabel="TOTAL PRODUITS"
+                  totalLabel={t('rapports.cr.totalProduits')}
                   totalColor="#0F172A"
                 />
                 <Section
-                  title="CHARGES D'EXPLOITATION"
+                  title={t('rapports.cr.charges')}
                   rows={[
                     { label: '601 — Achats & marchandises',    value: data.achatsTotal,       color: '#DC2626' },
                     { label: '641 — Rémunérations personnel',  value: data.salairesTotal,     color: '#DC2626' },
@@ -427,7 +440,7 @@ export default function RapportsPage() {
                     { label: '651 — Autres charges',           value: data.autresCharges,     color: '#DC2626' },
                   ]}
                   total={totalCharges}
-                  totalLabel="TOTAL CHARGES"
+                  totalLabel={t('rapports.cr.totalCharges')}
                   totalColor="#DC2626"
                 />
               </div>
@@ -437,14 +450,14 @@ export default function RapportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                      {resultatNet >= 0 ? 'BÉNÉFICE NET' : 'PERTE NETTE'} — EXERCICE {data.annee}
+                      {resultatNet >= 0 ? t('rapports.cr.benefice') : t('rapports.cr.perte')} — {t('rapports.cr.exerciceLabel').replace('{annee}', String(data.annee))}
                     </p>
                     <p className="text-3xl font-bold mt-1" style={{ color: resultatNet >= 0 ? '#0F172A' : '#DC2626' }}>
                       {fmtFCFA(Math.abs(resultatNet))}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-[var(--text-secondary)]">Marge nette</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{t('rapports.cr.margeNette')}</p>
                     <p className="text-2xl font-bold mt-1" style={{ color: marge >= 20 ? '#0F172A' : marge >= 10 ? '#DC2626' : '#DC2626' }}>
                       {marge}%
                     </p>
@@ -452,9 +465,9 @@ export default function RapportsPage() {
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {[
-                    { label: 'Produits', value: fmtFCFA(totalProduits), color: '#0F172A' },
-                    { label: 'Charges',  value: fmtFCFA(totalCharges),  color: '#DC2626' },
-                    { label: 'Résultat', value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#DC2626' : '#DC2626' },
+                    { label: t('rapports.cr.prodRow'),    value: fmtFCFA(totalProduits), color: '#0F172A' },
+                    { label: t('rapports.cr.chargesRow'), value: fmtFCFA(totalCharges),  color: '#DC2626' },
+                    { label: t('rapports.cr.resultatRow'),value: fmtFCFA(resultatNet),   color: resultatNet >= 0 ? '#DC2626' : '#DC2626' },
                   ].map(r => (
                     <div key={r.label} className="bg-[var(--surface)]/60 rounded-xl p-3 text-center">
                       <p className="text-[10px] text-[var(--text-secondary)] mb-1">{r.label}</p>
@@ -469,38 +482,38 @@ export default function RapportsPage() {
           {/* ── TAB 2 : Bilan ── */}
           {tab === 2 && (
             <div className="space-y-4">
-              <p className="text-xs text-[var(--text-secondary)]">Bilan simplifié au 31/12/{data.annee} — OHADA</p>
+              <p className="text-xs text-[var(--text-secondary)]">{t('rapports.bilan.subtitle').replace('{annee}', String(data.annee))}</p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Section
-                  title="ACTIF"
+                  title={t('rapports.bilan.actif')}
                   rows={[
-                    { label: 'Trésorerie (caisse + banque)',  value: data.soldeTresorerie,       color: '#DC2626' },
-                    { label: 'Créances clients (à recevoir)', value: data.clientsCreances,       color: '#DC2626' },
+                    { label: t('rapports.bilan.tresorerie'), value: data.soldeTresorerie,   color: '#DC2626' },
+                    { label: t('rapports.bilan.creances'),   value: data.clientsCreances,   color: '#DC2626' },
                   ]}
                   total={Math.max(0, data.soldeTresorerie) + data.clientsCreances}
-                  totalLabel="TOTAL ACTIF"
+                  totalLabel={t('rapports.bilan.totalActif')}
                   totalColor="#DC2626"
                 />
                 <div className="space-y-3">
                   <Section
-                    title="CAPITAUX PROPRES"
+                    title={t('rapports.bilan.capitaux')}
                     rows={[
-                      { label: 'Report à nouveau (N-1)',  value: data.openingBalance,  color: '#7C3AED' },
-                      { label: 'Résultat de l\'exercice', value: resultatNet,           color: resultatNet >= 0 ? '#0F172A' : '#DC2626' },
+                      { label: t('rapports.bilan.report'),      value: data.openingBalance, color: '#7C3AED' },
+                      { label: t('rapports.bilan.exerciceRes'), value: resultatNet,          color: resultatNet >= 0 ? '#0F172A' : '#DC2626' },
                     ]}
                     total={data.openingBalance + resultatNet}
-                    totalLabel="TOTAL CAPITAUX PROPRES"
+                    totalLabel={t('rapports.bilan.totalCapitaux')}
                     totalColor="#7C3AED"
                   />
                   <Section
-                    title="DETTES"
+                    title={t('rapports.bilan.dettes')}
                     rows={[
-                      { label: 'Fournisseurs (à payer)',       value: data.dettesFournisseurs, color: '#DC2626' },
-                      { label: 'Dettes sociales (CNSS)',       value: data.cnssTotal,          color: '#DC2626' },
-                      { label: 'TVA collectée à reverser',     value: data.tvaCollectee + data.caCollecte, color: '#DC2626' },
+                      { label: t('rapports.bilan.fournisseurs'), value: data.dettesFournisseurs,                  color: '#DC2626' },
+                      { label: t('rapports.bilan.dettesCnss'),   value: data.cnssTotal,                          color: '#DC2626' },
+                      { label: t('rapports.bilan.tvaReverser'),  value: data.tvaCollectee + data.caCollecte,     color: '#DC2626' },
                     ]}
                     total={data.dettesFournisseurs + data.cnssTotal + data.tvaCollectee + data.caCollecte}
-                    totalLabel="TOTAL DETTES"
+                    totalLabel={t('rapports.bilan.totalDettes')}
                     totalColor="#DC2626"
                   />
                 </div>
@@ -511,12 +524,12 @@ export default function RapportsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Scale size={16} className="text-[#DC2626]" />
-                    <span className="text-sm font-bold text-[var(--text)]">Vérification équilibre</span>
+                    <span className="text-sm font-bold text-[var(--text)]">{t('rapports.bilan.equilibre')}</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-[var(--text-secondary)]">Actif — Passif</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{t('rapports.bilan.actifPassif')}</p>
                     <p className="text-sm font-bold text-[var(--text-secondary)]">
-                      (bilan simplifié — hors immobilisations)
+                      {t('rapports.bilan.simplified')}
                     </p>
                   </div>
                 </div>
@@ -527,13 +540,13 @@ export default function RapportsPage() {
           {/* ── TAB 3 : Flux de trésorerie ── */}
           {tab === 3 && (
             <div className="space-y-4">
-              <p className="text-xs text-[var(--text-secondary)]">Flux de trésorerie — Exercice {data.annee}</p>
+              <p className="text-xs text-[var(--text-secondary)]">{t('rapports.flux.subtitle').replace('{annee}', String(data.annee))}</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
-                  { label: 'Solde ouverture', value: data.openingBalance,    color: '#7C3AED', icon: Wallet },
-                  { label: 'Variation nette', value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#0F172A' : '#DC2626', icon: Activity },
-                  { label: 'Solde clôture',  value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#DC2626' : '#DC2626', icon: Wallet },
+                  { label: t('rapports.flux.soldeOuv'), value: data.openingBalance,    color: '#7C3AED', icon: Wallet },
+                  { label: t('rapports.flux.variation'), value: data.totalEntrees - data.totalSorties, color: (data.totalEntrees - data.totalSorties) >= 0 ? '#0F172A' : '#DC2626', icon: Activity },
+                  { label: t('rapports.flux.soldeClo'), value: data.soldeTresorerie,    color: data.soldeTresorerie >= 0 ? '#DC2626' : '#DC2626', icon: Wallet },
                 ].map((k, i) => (
                   <motion.div key={k.label} {...fadeUp(i)} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: k.color + '20' }}>
@@ -548,26 +561,26 @@ export default function RapportsPage() {
               </div>
 
               <Section
-                title="FLUX D'EXPLOITATION"
+                title={t('rapports.flux.exploitation')}
                 rows={[
-                  { label: 'Encaissements clients',          value: data.totalEntrees,   color: '#0F172A' },
-                  { label: 'Décaissements fournisseurs',     value: -data.achatsTotal,   color: '#DC2626' },
-                  { label: 'Décaissements salaires & CNSS',  value: -(data.salairesTotal + data.cnssTotal), color: '#DC2626' },
-                  { label: 'Décaissements charges diverses', value: -(data.loyerTotal + data.carburantTotal + data.taxesTotal + data.autresCharges), color: '#DC2626' },
+                  { label: t('rapports.flux.encaissements'),  value: data.totalEntrees,   color: '#0F172A' },
+                  { label: t('rapports.flux.decaisseFourn'),  value: -data.achatsTotal,   color: '#DC2626' },
+                  { label: t('rapports.flux.decaisseRH'),     value: -(data.salairesTotal + data.cnssTotal), color: '#DC2626' },
+                  { label: t('rapports.flux.decaisseDiv'),    value: -(data.loyerTotal + data.carburantTotal + data.taxesTotal + data.autresCharges), color: '#DC2626' },
                 ]}
                 total={data.totalEntrees - data.totalSorties}
-                totalLabel="FLUX NET D'EXPLOITATION"
+                totalLabel={t('rapports.flux.netExploitation')}
                 totalColor={(data.totalEntrees - data.totalSorties) >= 0 ? '#0F172A' : '#DC2626'}
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-                  <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">FLUX D'INVESTISSEMENT</h3>
-                  <p className="text-sm text-[var(--text-secondary)] text-center py-4">Non suivi dans cet exercice</p>
+                  <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">{t('rapports.flux.investTitle')}</h3>
+                  <p className="text-sm text-[var(--text-secondary)] text-center py-4">{t('rapports.flux.nonSuivi')}</p>
                 </div>
                 <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-                  <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">FLUX DE FINANCEMENT</h3>
-                  <p className="text-sm text-[var(--text-secondary)] text-center py-4">Non suivi dans cet exercice</p>
+                  <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">{t('rapports.flux.finTitle')}</h3>
+                  <p className="text-sm text-[var(--text-secondary)] text-center py-4">{t('rapports.flux.nonSuivi')}</p>
                 </div>
               </div>
             </div>
@@ -581,31 +594,31 @@ export default function RapportsPage() {
             const fiscalResto = data.caResto > 0 ? calculerTVACongo(data.caResto) : null
             return (
               <div className="space-y-4">
-                <p className="text-xs text-[var(--text-secondary)]">Rapport TVA Congo DRC — Exercice {data.annee}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{t('rapports.tva.subtitle').replace('{annee}', String(data.annee))}</p>
 
                 <Section
-                  title="TVA COLLECTÉE — Sur factures"
+                  title={t('rapports.tva.collected')}
                   rows={[
-                    { label: 'Base imposable HT',          value: data.ventesFactures,  color: '#FFFFFF' },
-                    { label: 'TVA 18% collectée',          value: tvaTotal,             color: '#7C3AED' },
-                    { label: "Contribution d'Appui (5%)",  value: caTotal,              color: '#DC2626' },
+                    { label: t('rapports.tva.baseHT'), value: data.ventesFactures, color: '#FFFFFF' },
+                    { label: t('rapports.tva.tva18'),  value: tvaTotal,            color: '#7C3AED' },
+                    { label: t('rapports.tva.ca5'),    value: caTotal,             color: '#DC2626' },
                   ]}
                   total={totalDGI}
-                  totalLabel="TOTAL TVA + CA À REVERSER"
+                  totalLabel={t('rapports.tva.totalReverser')}
                   totalColor="#DC2626"
                 />
 
                 {fiscalResto && (
                   <Section
-                    title="TVA COLLECTÉE — CA Restaurant"
+                    title={t('rapports.tva.collectedResto')}
                     rows={[
-                      { label: 'CA TTC restaurant',      value: data.caResto,       color: '#FFFFFF' },
-                      { label: 'CA HT (base imposable)', value: fiscalResto.ht,     color: '#FFFFFF' },
-                      { label: 'TVA 18% collectée',      value: fiscalResto.tva,    color: '#7C3AED' },
-                      { label: "CA (5% TVA)",            value: fiscalResto.ca,     color: '#DC2626' },
+                      { label: t('rapports.tva.caTtcResto'), value: data.caResto,       color: '#FFFFFF' },
+                      { label: t('rapports.tva.caHtBase'),   value: fiscalResto.ht,     color: '#FFFFFF' },
+                      { label: t('rapports.tva.tva18'),      value: fiscalResto.tva,    color: '#7C3AED' },
+                      { label: t('rapports.tva.ca5'),        value: fiscalResto.ca,     color: '#DC2626' },
                     ]}
                     total={fiscalResto.tva + fiscalResto.ca}
-                    totalLabel="TOTAL TVA RESTO À REVERSER"
+                    totalLabel={t('rapports.tva.totalResto')}
                     totalColor="#DC2626"
                   />
                 )}
@@ -613,14 +626,14 @@ export default function RapportsPage() {
                 {/* Récap DGI */}
                 <div className="bg-[#DC2626]/5 border-2 border-[#DC2626]/30 rounded-2xl p-6">
                   <h3 className="text-sm font-bold text-[#DC2626] mb-4 uppercase tracking-wider">
-                    Déclaration DGI — {data.annee}
+                    {t('rapports.tva.dgiTitle').replace('{annee}', String(data.annee))}
                   </h3>
                   <div className="space-y-3">
                     {[
-                      { label: 'TVA collectée sur ventes',     value: tvaTotal + (fiscalResto?.tva ?? 0) },
-                      { label: 'TVA déductible sur achats',    value: 0 },
-                      { label: 'TVA nette à reverser',         value: tvaTotal + (fiscalResto?.tva ?? 0) },
-                      { label: "Contribution d'Appui (CA)",    value: caTotal + (fiscalResto?.ca ?? 0) },
+                      { label: t('rapports.tva.ventes'),      value: tvaTotal + (fiscalResto?.tva ?? 0) },
+                      { label: t('rapports.tva.deductible'),  value: 0 },
+                      { label: t('rapports.tva.nette'),       value: tvaTotal + (fiscalResto?.tva ?? 0) },
+                      { label: t('rapports.tva.contribution'),value: caTotal + (fiscalResto?.ca ?? 0) },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#DC2626]/10 last:border-0">
                         <span className="text-sm text-[var(--text-secondary)]">{r.label}</span>
@@ -629,7 +642,7 @@ export default function RapportsPage() {
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t border-[#DC2626]/30 flex justify-between items-center">
-                    <span className="text-base font-bold text-[var(--text)]">TOTAL À PAYER À LA DGI</span>
+                    <span className="text-base font-bold text-[var(--text)]">{t('rapports.tva.totalDgi')}</span>
                     <span className="text-xl font-bold text-[#DC2626]">
                       {fmtFCFA(totalDGI + (fiscalResto?.tva ?? 0) + (fiscalResto?.ca ?? 0))}
                     </span>
@@ -651,28 +664,30 @@ export default function RapportsPage() {
                       <Sparkles size={16} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[var(--text)]">Analyse MIAA+</p>
-                      <p className="text-[10px] text-[var(--text-secondary)]">Powered by Claude · {nomEntreprise} · {data.annee}</p>
+                      <p className="text-sm font-bold text-[var(--text)]">{t('rapports.miaa.title')}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)]">
+                        {t('rapports.miaa.powered').replace('{entreprise}', nomEntreprise).replace('{annee}', String(data.annee))}
+                      </p>
                     </div>
                   </div>
                   <button onClick={genererAnalyse} disabled={aiLoading}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
                     style={{ background: 'linear-gradient(135deg,#DC2626,#d4880a)', color: '#0F172A' }}>
                     {aiLoading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-                    {aiText ? 'Régénérer' : 'Générer'}
+                    {aiText ? t('rapports.miaa.regenerate') : t('rapports.miaa.generate')}
                   </button>
                 </div>
                 {!aiText && !aiLoading && (
                   <div className="border border-dashed border-[var(--border)] rounded-xl p-8 text-center">
                     <Sparkles size={24} className="mx-auto mb-3 text-[#DC2626] opacity-40" />
-                    <p className="text-sm text-[var(--text-secondary)]">MIAA+ analyse vos données et génère une analyse financière complète</p>
-                    <p className="text-xs text-[var(--text-secondary)] mt-1">Compte de résultat · Trésorerie · Créances · Recommandations</p>
+                    <p className="text-sm text-[var(--text-secondary)]">{t('rapports.miaa.emptyTitle')}</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-1">{t('rapports.miaa.emptySubtitle')}</p>
                   </div>
                 )}
                 {aiLoading && (
                   <div className="flex items-center gap-3 text-[var(--text-secondary)] py-6 px-2">
                     <Loader2 size={16} className="animate-spin text-[#DC2626]" />
-                    <span className="text-sm">MIAA+ rédige votre analyse financière complète…</span>
+                    <span className="text-sm">{t('rapports.miaa.analyzing')}</span>
                   </div>
                 )}
                 {aiText && !aiLoading && (

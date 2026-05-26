@@ -1,8 +1,9 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Receipt, Plus, X, Loader2, TrendingDown, TrendingUp, BookOpen, Trash2 } from 'lucide-react'
@@ -39,6 +40,7 @@ const MODES = ['Espèces', 'Airtel Money', 'MTN MoMo', 'Virement', 'Carte']
 
 export default function DepensesPage() {
   const { tenantId, loading: tLoading } = useTenant()
+  const { t } = useLocale()
   const [depenses,     setDepenses]     = useState<Depense[]>([])
   const [costCenters,  setCostCenters]  = useState<CostCenter[]>([])
   const [loading,      setLoading]      = useState(true)
@@ -124,7 +126,7 @@ export default function DepensesPage() {
   }
 
   async function deleteDepense(id: string) {
-    if (!confirm('Supprimer cette dépense et la transaction associée ?')) return
+    if (!confirm(t('dep.deleteConfirm'))) return
     setDeleting(id)
     // fn_delete_depense() is SECURITY DEFINER → supprime depense + transaction liée
     await supabase.rpc('fn_delete_depense', { p_dep_id: id })
@@ -158,18 +160,18 @@ export default function DepensesPage() {
           <Receipt size={18} className="text-[#DC2626]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[var(--text)]">Dépenses & Charges</h1>
-          <p className="text-xs text-[var(--text-secondary)]">Suivi de toutes vos dépenses par catégorie</p>
+          <h1 className="text-xl font-bold text-[var(--text)]">{t('dep.title')}</h1>
+          <p className="text-xs text-[var(--text-secondary)]">{t('dep.subtitle')}</p>
         </div>
         <button onClick={() => setShowModal(true)}
           className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-medium hover:bg-[#DC2626]/90 transition-colors">
-          <Plus size={15} /> Dépense
+          <Plus size={15} /> {t('dep.newDepense')}
         </button>
       </div>
 
       {/* Periode filter */}
       <div className="flex gap-1">
-        {[{ label: '7 jours', days: 7 }, { label: '30 jours', days: 30 }, { label: '90 jours', days: 90 }].map(p => (
+        {[{ label: t('dep.period7'), days: 7 }, { label: t('dep.period30'), days: 30 }, { label: t('dep.period90'), days: 90 }].map(p => (
           <button key={p.days} onClick={() => setPeriode(p.days)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               periode === p.days ? 'bg-[#DC2626]/10 text-[#DC2626] border border-[#DC2626]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-white/5'
@@ -182,10 +184,10 @@ export default function DepensesPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total période',       value: fmtFCFA(totalMois),   gradient: '#DC2626', icon: TrendingDown },
-          { label: 'Plus grosse dépense', value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: '#DC2626', icon: Receipt },
-          { label: 'Moyenne par jour',    value: fmtFCFA(moyJour),     gradient: '#7C3AED', icon: Receipt },
-          { label: 'Vs période préc.',    value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? '#DC2626' : '#0F172A', icon: varPct > 0 ? TrendingUp : TrendingDown },
+          { label: t('dep.kpi.total'),   value: fmtFCFA(totalMois),   gradient: '#DC2626', icon: TrendingDown },
+          { label: t('dep.kpi.biggest'), value: maxDepense.description !== '—' ? fmtFCFA(maxDepense.montant) : '—', gradient: '#DC2626', icon: Receipt },
+          { label: t('dep.kpi.avgDay'),  value: fmtFCFA(moyJour),     gradient: '#7C3AED', icon: Receipt },
+          { label: t('dep.kpi.vsPrev'),  value: prevTotal > 0 ? `${varPct > 0 ? '+' : ''}${varPct}%` : '—', gradient: varPct > 0 ? '#DC2626' : '#0F172A', icon: varPct > 0 ? TrendingUp : TrendingDown },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -212,9 +214,9 @@ export default function DepensesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Pie chart */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Répartition par catégorie</h2>
+          <h2 className="text-sm font-semibold text-[var(--text)] mb-4">{t('dep.chart.byCat')}</h2>
           {byCat.length === 0 ? (
-            <p className="text-sm text-[var(--text-secondary)] text-center py-12">Aucune dépense sur la période</p>
+            <p className="text-sm text-[var(--text-secondary)] text-center py-12">{t('dep.list.empty')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -234,7 +236,7 @@ export default function DepensesPage() {
 
         {/* Top categories */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Top catégories</h2>
+          <h2 className="text-sm font-semibold text-[var(--text)] mb-4">{t('dep.chart.topCat')}</h2>
           <div className="space-y-3">
             {byCat.slice(0, 6).map(c => (
               <div key={c.name}>
@@ -249,7 +251,7 @@ export default function DepensesPage() {
                 </div>
               </div>
             ))}
-            {byCat.length === 0 && <p className="text-sm text-[var(--text-secondary)] text-center py-6">Aucune dépense</p>}
+            {byCat.length === 0 && <p className="text-sm text-[var(--text-secondary)] text-center py-6">{t('dep.list.empty')}</p>}
           </div>
         </div>
       </div>
@@ -257,13 +259,15 @@ export default function DepensesPage() {
       {/* Liste */}
       <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[var(--text)]">Liste des dépenses</h2>
-          <span className="text-xs text-[var(--text-secondary)]">{filtered.length} dépense{filtered.length > 1 ? 's' : ''}</span>
+          <h2 className="text-sm font-semibold text-[var(--text)]">{t('dep.list.title')}</h2>
+          <span className="text-xs text-[var(--text-secondary)]">
+            {filtered.length} {filtered.length > 1 ? t('dep.list.countPl') : t('dep.list.count')}
+          </span>
         </div>
         {loading ? (
           <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[var(--text-secondary)]" /></div>
         ) : filtered.length === 0 ? (
-          <div className="p-10 text-center text-[var(--text-secondary)] text-sm">Aucune dépense sur la période</div>
+          <div className="p-10 text-center text-[var(--text-secondary)] text-sm">{t('dep.list.empty')}</div>
         ) : (
           <div className="divide-y divide-[var(--border)]">
             {filtered.slice(0, 50).map(d => {
@@ -287,7 +291,7 @@ export default function DepensesPage() {
                     onClick={() => deleteDepense(d.id)}
                     disabled={deleting === d.id}
                     className="opacity-0 group-hover:opacity-100 ml-1 p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[#DC2626] hover:bg-[#DC2626]/10 transition-all"
-                    title="Supprimer"
+                    title={t('common.delete')}
                   >
                     {deleting === d.id
                       ? <Loader2 size={13} className="animate-spin" />
@@ -309,10 +313,10 @@ export default function DepensesPage() {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
               <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
-              <h3 className="text-base font-bold text-[var(--text)] mb-4">Nouvelle dépense</h3>
+              <h3 className="text-base font-bold text-[var(--text)] mb-4">{t('dep.modal.title')}</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Catégorie</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.category')}</label>
                   <select value={form.categorie} onChange={e => {
                     const cat = e.target.value
                     const [d, c] = CAT_ACCOUNTS[cat] ?? ['651000', '571000']
@@ -323,26 +327,26 @@ export default function DepensesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Description</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.description')}</label>
                   <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                    placeholder="Description de la dépense..."
+                    placeholder={t('dep.modal.descPlaceholder')}
                     className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA)</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.amount')}</label>
                     <input type="number" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                       placeholder="0"
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.date')}</label>
                     <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Mode de paiement</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.payMode')}</label>
                   <select value={form.mode_paiement} onChange={e => setForm(f => ({ ...f, mode_paiement: e.target.value }))}
                     className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
                     {MODES.map(m => <option key={m}>{m}</option>)}
@@ -350,34 +354,34 @@ export default function DepensesPage() {
                 </div>
                 {costCenters.length > 0 && (
                   <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Centre de coût (facultatif)</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.costCenter')}</label>
                     <select value={form.cost_center_id} onChange={e => setForm(f => ({ ...f, cost_center_id: e.target.value }))}
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
-                      <option value="">— Aucun centre —</option>
+                      <option value="">{t('dep.modal.noCostCenter')}</option>
                       {costCenters.map(cc => <option key={cc.id} value={cc.id}>{cc.code} — {cc.nom}</option>)}
                     </select>
                   </div>
                 )}
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Réf. pièce (facultatif)</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.refPiece')}</label>
                   <input value={form.reference_piece} onChange={e => setForm(f => ({ ...f, reference_piece: e.target.value }))}
-                    placeholder="Ex: FAC-2025-001, BON-42..."
+                    placeholder={t('dep.modal.refPlaceholder')}
                     className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                 </div>
 
                 {/* Écriture OHADA */}
                 <div className="border-t border-[var(--border)] pt-3">
                   <p className="text-[10px] text-[#6E7681] uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <BookOpen size={10} /> Écriture OHADA (auto-calculée)
+                    <BookOpen size={10} /> {t('dep.modal.ohadaTitle')}
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
                     <div className="bg-[var(--surface)] border border-[#0F172A]/20 rounded-lg px-3 py-2">
-                      <p className="text-[var(--text-secondary)] mb-0.5">Débit</p>
+                      <p className="text-[var(--text-secondary)] mb-0.5">{t('dep.modal.debit')}</p>
                       <p className="text-[#DC2626] font-semibold">{form.debit_account}</p>
                       <p className="text-[var(--text-secondary)] text-[9px] truncate">{accountLabel(form.debit_account)}</p>
                     </div>
                     <div className="bg-[var(--surface)] border border-[#DC2626]/20 rounded-lg px-3 py-2">
-                      <p className="text-[var(--text-secondary)] mb-0.5">Crédit</p>
+                      <p className="text-[var(--text-secondary)] mb-0.5">{t('dep.modal.credit')}</p>
                       <p className="text-[#DC2626] font-semibold">{form.credit_account}</p>
                       <p className="text-[var(--text-secondary)] text-[9px] truncate">{accountLabel(form.credit_account)}</p>
                     </div>
@@ -386,10 +390,10 @@ export default function DepensesPage() {
               </div>
               <div className="flex gap-2 mt-5">
                 <button onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
+                  className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">{t('common.cancel')}</button>
                 <button onClick={save} disabled={saving || !form.description || !form.montant}
                   className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 disabled:opacity-50 flex items-center justify-center gap-2">
-                  {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
+                  {saving && <Loader2 size={13} className="animate-spin" />} {t('dep.modal.save')}
                 </button>
               </div>
             </motion.div>

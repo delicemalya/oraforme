@@ -1,13 +1,14 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Truck, Plus, X, Loader2, MapPin, User, Star,
   Clock, CheckCircle, AlertCircle, TrendingUp, Wallet,
-  Phone, Calendar, Navigation,
+  Phone, Navigation,
 } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
 
@@ -38,21 +39,6 @@ type Course = {
   created_at: string
 }
 
-const STATUTS_CHAUFFEUR: Record<string, { label: string; color: string; bg: string }> = {
-  actif:     { label: 'Disponible', color: '#0F172A', bg: '#0F172A18' },
-  inactif:   { label: 'Inactif',    color: '#64748B', bg: '#64748B18' },
-  en_course: { label: 'En course',  color: '#DC2626', bg: '#DC262618' },
-}
-
-const STATUTS_COURSE: Record<string, { label: string; color: string; bg: string }> = {
-  en_attente: { label: 'En attente', color: '#DC2626', bg: '#DC262618' },
-  en_cours:   { label: 'En cours',   color: '#DC2626', bg: '#DC262618' },
-  terminee:   { label: 'Terminée',   color: '#0F172A', bg: '#0F172A18' },
-  annulee:    { label: 'Annulée',    color: '#DC2626', bg: '#DC262618' },
-}
-
-const TABS = ['Courses', 'Chauffeurs', 'Statistiques']
-
 function fadeUp(i: number) {
   return {
     initial: { opacity: 0, y: 16 },
@@ -63,6 +49,7 @@ function fadeUp(i: number) {
 
 export default function TransportPage() {
   const { tenantId, loading: tLoading } = useTenant()
+  const { t } = useLocale()
   const [tab, setTab]           = useState(0)
   const [chauffeurs, setChauffeurs] = useState<Chauffeur[]>([])
   const [courses, setCourses]   = useState<Course[]>([])
@@ -70,6 +57,21 @@ export default function TransportPage() {
   const [saving, setSaving]     = useState(false)
   const [modal, setModal]       = useState<'course' | 'chauffeur' | null>(null)
   const [filterStatut, setFilterStatut] = useState<string>('all')
+
+  const STATUTS_CHAUFFEUR: Record<string, { label: string; color: string; bg: string }> = {
+    actif:     { label: t('transport.statusAvailable'), color: '#0F172A', bg: '#0F172A18' },
+    inactif:   { label: t('transport.statusInactive'),  color: '#64748B', bg: '#64748B18' },
+    en_course: { label: t('transport.statusOnRide'),    color: '#DC2626', bg: '#DC262618' },
+  }
+
+  const STATUTS_COURSE: Record<string, { label: string; color: string; bg: string }> = {
+    en_attente: { label: t('transport.statusPending'),     color: '#DC2626', bg: '#DC262618' },
+    en_cours:   { label: t('transport.statusInProgress'),  color: '#DC2626', bg: '#DC262618' },
+    terminee:   { label: t('transport.statusDone'),        color: '#0F172A', bg: '#0F172A18' },
+    annulee:    { label: t('transport.statusCancelled'),   color: '#DC2626', bg: '#DC262618' },
+  }
+
+  const TABS = [t('transport.tabCourses'), t('transport.tabDrivers'), t('transport.tabStats')]
 
   const [cForm, setCForm] = useState({
     chauffeur_id: '',
@@ -188,23 +190,23 @@ export default function TransportPage() {
       <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-[var(--text)] flex items-center gap-2">
-            <Truck size={20} className="text-[#DC2626]" /> Transport VTC
+            <Truck size={20} className="text-[#DC2626]" /> {t('transport.title')}
           </h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Gestion de flotte, courses et chauffeurs</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{t('transport.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setModal('chauffeur')}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs text-[var(--text-secondary)] bg-[var(--card-bg)] border border-[var(--border)] rounded-xl hover:border-[#64748B] hover:text-[var(--text)] transition-all"
           >
-            <User size={11} /> Nouveau chauffeur
+            <User size={11} /> {t('transport.newDriver')}
           </button>
           <button
             onClick={() => setModal('course')}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#DC2626] rounded-xl hover:opacity-90 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white rounded-xl hover:opacity-90 transition-all"
             style={{ background: '#DC2626' }}
           >
-            <Plus size={11} /> Nouvelle course
+            <Plus size={11} /> {t('transport.newCourse')}
           </button>
         </div>
       </motion.div>
@@ -212,10 +214,10 @@ export default function TransportPage() {
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 auto-rows-[120px]">
         {[
-          { label: 'Total courses', value: totalCourses, icon: Navigation, grad: '#0F172A', i: 0 },
-          { label: 'Terminées', value: coursesTerminees, icon: CheckCircle, grad: '#7C3AED', i: 1 },
-          { label: "Chiffre d'affaires", value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: '#DC2626', i: 2 },
-          { label: 'Chauffeurs actifs', value: chauffeursActifs, icon: Truck, grad: '#7C3AED', i: 3 },
+          { label: t('transport.totalCourses'),  value: totalCourses,          icon: Navigation, grad: '#0F172A', i: 0 },
+          { label: t('transport.completed'),     value: coursesTerminees,      icon: CheckCircle, grad: '#7C3AED', i: 1 },
+          { label: t('transport.revenue'),       value: fmtFCFA(chiffreAffaires), icon: Wallet, grad: '#DC2626', i: 2 },
+          { label: t('transport.activeDrivers'), value: chauffeursActifs,      icon: Truck, grad: '#7C3AED', i: 3 },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -235,15 +237,15 @@ export default function TransportPage() {
 
       {/* ── Tabs ── */}
       <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1 w-fit">
-        {TABS.map((tab_, i) => (
+        {TABS.map((tabLabel, i) => (
           <button
-            key={tab_}
+            key={tabLabel}
             onClick={() => setTab(i)}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
               tab === i ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
             }`}
           >
-            {tab_}
+            {tabLabel}
           </button>
         ))}
       </div>
@@ -269,7 +271,7 @@ export default function TransportPage() {
                     : 'border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]'
                 }`}
               >
-                {s === 'all' ? 'Toutes' : STATUTS_COURSE[s]?.label}
+                {s === 'all' ? t('transport.allCourses') : STATUTS_COURSE[s]?.label}
               </button>
             ))}
           </div>
@@ -277,19 +279,19 @@ export default function TransportPage() {
           {filteredCourses.length === 0 ? (
             <div className="text-center py-16 text-[var(--text-secondary)]">
               <Truck size={32} className="mx-auto mb-3 opacity-30" />
-              <p className="text-sm">Aucune course enregistrée</p>
+              <p className="text-sm">{t('transport.noCourses')}</p>
             </div>
           ) : (
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl overflow-hidden">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
-                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Client</th>
-                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider hidden sm:table-cell">Trajet</th>
-                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider hidden md:table-cell">Chauffeur</th>
-                    <th className="text-right px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Tarif</th>
-                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Statut</th>
-                    <th className="px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Actions</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('transport.colClient')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider hidden sm:table-cell">{t('transport.colRoute')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider hidden md:table-cell">{t('transport.colDriver')}</th>
+                    <th className="text-right px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('transport.colFare')}</th>
+                    <th className="text-left px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('transport.colStatus')}</th>
+                    <th className="px-4 py-3 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('transport.colActions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -339,7 +341,7 @@ export default function TransportPage() {
                                 onClick={() => updateStatutCourse(c.id, 'en_cours', c.chauffeur_id)}
                                 className="text-[10px] px-2 py-1 rounded-lg bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626]/20 transition-all"
                               >
-                                Démarrer
+                                {t('transport.start')}
                               </button>
                             )}
                             {c.statut === 'en_cours' && (
@@ -347,7 +349,7 @@ export default function TransportPage() {
                                 onClick={() => updateStatutCourse(c.id, 'terminee', c.chauffeur_id)}
                                 className="text-[10px] px-2 py-1 rounded-lg bg-[var(--surface)]/10 text-[#DC2626] hover:bg-[var(--surface)]/20 transition-all"
                               >
-                                Terminer
+                                {t('transport.finish')}
                               </button>
                             )}
                             {(c.statut === 'en_attente' || c.statut === 'en_cours') && (
@@ -355,7 +357,7 @@ export default function TransportPage() {
                                 onClick={() => updateStatutCourse(c.id, 'annulee', c.chauffeur_id)}
                                 className="text-[10px] px-2 py-1 rounded-lg bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626]/20 transition-all"
                               >
-                                Annuler
+                                {t('transport.cancel')}
                               </button>
                             )}
                           </div>
@@ -376,7 +378,7 @@ export default function TransportPage() {
           {chauffeurs.length === 0 ? (
             <div className="text-center py-16 text-[var(--text-secondary)]">
               <User size={32} className="mx-auto mb-3 opacity-30" />
-              <p className="text-sm">Aucun chauffeur enregistré</p>
+              <p className="text-sm">{t('transport.noDrivers')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -414,7 +416,7 @@ export default function TransportPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Star size={11} className="text-[var(--text-secondary)]" />
-                        <span>Permis: {ch.permis}</span>
+                        <span>{t('transport.license')} {ch.permis}</span>
                       </div>
                     </div>
                     <div className="mt-3 pt-3 border-t border-[var(--border)] flex gap-2">
@@ -426,7 +428,7 @@ export default function TransportPage() {
                         }}
                         className="flex-1 text-[10px] py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#64748B] transition-all"
                       >
-                        {ch.statut === 'actif' ? 'Désactiver' : 'Activer'}
+                        {ch.statut === 'actif' ? t('transport.disable') : t('transport.enable')}
                       </button>
                     </div>
                   </motion.div>
@@ -442,9 +444,9 @@ export default function TransportPage() {
         <motion.div {...fadeUp(1)} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {[
-              { label: 'Taux de réussite', value: totalCourses > 0 ? `${Math.round((coursesTerminees / totalCourses) * 100)}%` : '—', icon: TrendingUp, color: '#0F172A' },
-              { label: 'Courses en attente', value: courses.filter(c => c.statut === 'en_attente').length, icon: Clock, color: '#DC2626' },
-              { label: 'Courses annulées', value: courses.filter(c => c.statut === 'annulee').length, icon: AlertCircle, color: '#DC2626' },
+              { label: t('transport.statsSuccessRate'), value: totalCourses > 0 ? `${Math.round((coursesTerminees / totalCourses) * 100)}%` : '—', icon: TrendingUp, color: '#0F172A' },
+              { label: t('transport.statsPending'),     value: courses.filter(c => c.statut === 'en_attente').length, icon: Clock, color: '#DC2626' },
+              { label: t('transport.statsCancelled'),   value: courses.filter(c => c.statut === 'annulee').length,    icon: AlertCircle, color: '#DC2626' },
             ].map((s, i) => {
               const Icon = s.icon
               return (
@@ -460,9 +462,9 @@ export default function TransportPage() {
           </div>
 
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
-            <p className="text-sm font-bold text-[var(--text)] mb-4">Revenus par chauffeur</p>
+            <p className="text-sm font-bold text-[var(--text)] mb-4">{t('transport.revenueByDriver')}</p>
             {chauffeurs.length === 0 ? (
-              <p className="text-xs text-[var(--text-secondary)] text-center py-4">Aucun chauffeur</p>
+              <p className="text-xs text-[var(--text-secondary)] text-center py-4">{t('transport.noDriver')}</p>
             ) : (
               <div className="space-y-3">
                 {chauffeurs.map(ch => {
@@ -504,7 +506,7 @@ export default function TransportPage() {
               className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-lg shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-bold text-[var(--text)]">Nouvelle course</h2>
+                <h2 className="text-base font-bold text-[var(--text)]">{t('transport.modalCourseTitle')}</h2>
                 <button onClick={() => setModal(null)} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                   <X size={18} />
                 </button>
@@ -515,30 +517,30 @@ export default function TransportPage() {
                   onChange={e => setCForm(f => ({ ...f, chauffeur_id: e.target.value }))}
                   className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)]"
                 >
-                  <option value="">Sélectionner un chauffeur</option>
+                  <option value="">{t('transport.selectDriver')}</option>
                   {chauffeurs.filter(c => c.statut === 'actif').map(c => (
                     <option key={c.id} value={c.id}>{c.nom} — {c.vehicule} ({c.plaque})</option>
                   ))}
                 </select>
                 <div className="grid grid-cols-2 gap-3">
-                  <input placeholder="Nom client *" value={cForm.client_nom}
+                  <input placeholder={t('transport.clientName')} value={cForm.client_nom}
                     onChange={e => setCForm(f => ({ ...f, client_nom: e.target.value }))}
                     className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
-                  <input placeholder="Téléphone" value={cForm.client_tel}
+                  <input placeholder={t('transport.clientPhone')} value={cForm.client_tel}
                     onChange={e => setCForm(f => ({ ...f, client_tel: e.target.value }))}
                     className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
                 </div>
-                <input placeholder="Point de départ *" value={cForm.depart}
+                <input placeholder={t('transport.departure')} value={cForm.depart}
                   onChange={e => setCForm(f => ({ ...f, depart: e.target.value }))}
                   className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
-                <input placeholder="Destination *" value={cForm.arrivee}
+                <input placeholder={t('transport.destination')} value={cForm.arrivee}
                   onChange={e => setCForm(f => ({ ...f, arrivee: e.target.value }))}
                   className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
                 <div className="grid grid-cols-3 gap-3">
-                  <input placeholder="Distance (km)" type="number" value={cForm.distance_km}
+                  <input placeholder={t('transport.distance')} type="number" value={cForm.distance_km}
                     onChange={e => setCForm(f => ({ ...f, distance_km: e.target.value }))}
                     className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
-                  <input placeholder="Tarif (FCFA) *" type="number" value={cForm.tarif}
+                  <input placeholder={t('transport.fare')} type="number" value={cForm.tarif}
                     onChange={e => setCForm(f => ({ ...f, tarif: e.target.value }))}
                     className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
                   <input type="date" value={cForm.date}
@@ -548,16 +550,16 @@ export default function TransportPage() {
               </div>
               <div className="flex gap-3 mt-5">
                 <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-all">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={saveCourse}
                   disabled={saving || !cForm.chauffeur_id || !cForm.depart || !cForm.arrivee}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[#DC2626] disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{ background: '#DC2626' }}
                 >
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                  Créer la course
+                  {t('transport.createCourse')}
                 </button>
               </div>
             </motion.div>
@@ -578,42 +580,42 @@ export default function TransportPage() {
               className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-bold text-[var(--text)]">Nouveau chauffeur</h2>
+                <h2 className="text-base font-bold text-[var(--text)]">{t('transport.modalDriverTitle')}</h2>
                 <button onClick={() => setModal(null)} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
                   <X size={18} />
                 </button>
               </div>
               <div className="space-y-3">
-                <input placeholder="Nom complet *" value={dForm.nom}
+                <input placeholder={t('transport.driverFullName')} value={dForm.nom}
                   onChange={e => setDForm(f => ({ ...f, nom: e.target.value }))}
                   className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
-                <input placeholder="Téléphone" value={dForm.telephone}
+                <input placeholder={t('transport.clientPhone')} value={dForm.telephone}
                   onChange={e => setDForm(f => ({ ...f, telephone: e.target.value }))}
                   className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
-                <input placeholder="N° de permis" value={dForm.permis}
+                <input placeholder={t('transport.driverLicense')} value={dForm.permis}
                   onChange={e => setDForm(f => ({ ...f, permis: e.target.value }))}
                   className="w-full bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
                 <div className="grid grid-cols-2 gap-3">
-                  <input placeholder="Modèle véhicule" value={dForm.vehicule}
+                  <input placeholder={t('transport.vehicleModel')} value={dForm.vehicule}
                     onChange={e => setDForm(f => ({ ...f, vehicule: e.target.value }))}
                     className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
-                  <input placeholder="Plaque" value={dForm.plaque}
+                  <input placeholder={t('transport.plate')} value={dForm.plaque}
                     onChange={e => setDForm(f => ({ ...f, plaque: e.target.value }))}
                     className="bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B]" />
                 </div>
               </div>
               <div className="flex gap-3 mt-5">
                 <button onClick={() => setModal(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-all">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={saveChauffeur}
                   disabled={saving || !dForm.nom}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[#DC2626] disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{ background: '#DC2626' }}
                 >
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                  Enregistrer
+                  {t('common.save')}
                 </button>
               </div>
             </motion.div>

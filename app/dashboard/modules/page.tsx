@@ -5,6 +5,7 @@ import { MODULE_LABELS, MODULE_PRICES, MODULE_ICONS, MODULE_DESCS, fmtFCFA } fro
 import { Store, CheckCircle, Lock, Loader2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 type ModuleInfo = {
   id: string
@@ -19,6 +20,7 @@ export default function ModulesMarketplacePage() {
   // Use TenantContext as the single source of truth.
   // After each toggle we call tenant.reload() so the Sidebar re-renders immediately.
   const { tenant, loading, reload } = useTenantContext()
+  const { t } = useLocale()
 
   const [toggling, setToggling] = useState<string | null>(null)
   const [confirm, setConfirm]   = useState<{ id: string; action: 'activate' | 'deactivate' } | null>(null)
@@ -46,8 +48,8 @@ export default function ModulesMarketplacePage() {
 
       showToast(
         action === 'activate'
-          ? `${MODULE_LABELS[moduleId]} activé !`
-          : `${MODULE_LABELS[moduleId]} désactivé`,
+          ? `${MODULE_LABELS[moduleId]} ${t('modules.activate').toLowerCase()} !`
+          : `${MODULE_LABELS[moduleId]} ${t('modules.deactivate').toLowerCase()}`,
         action === 'activate'
       )
     } catch (e: unknown) {
@@ -82,9 +84,9 @@ export default function ModulesMarketplacePage() {
             <Store size={18} className="text-[#F59E0B]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[var(--text)]">Modules</h1>
+            <h1 className="text-xl font-bold text-[var(--text)]">{t('modules.title')}</h1>
             <p className="text-xs text-[var(--text-secondary)]">
-              {activeList.length} actif{activeList.length > 1 ? 's' : ''} · {fmtFCFA(mrrTotal)}/mois
+              {activeList.length} {activeList.length > 1 ? t('modules.actives') : t('modules.active')} · {fmtFCFA(mrrTotal)}{t('modules.perMonth')}
             </p>
           </div>
         </div>
@@ -101,7 +103,7 @@ export default function ModulesMarketplacePage() {
           {/* Active modules */}
           {activeList.length > 0 && (
             <div>
-              <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-3 px-1">Modules actifs</p>
+              <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-3 px-1">{t('modules.activeModules')}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {activeList.map(m => (
                   <ModuleCard
@@ -109,6 +111,7 @@ export default function ModulesMarketplacePage() {
                     module={m}
                     toggling={toggling === m.id}
                     onAction={() => setConfirm({ id: m.id, action: 'deactivate' })}
+                    t={t}
                   />
                 ))}
               </div>
@@ -118,7 +121,7 @@ export default function ModulesMarketplacePage() {
           {/* Inactive modules */}
           {inactiveList.length > 0 && (
             <div>
-              <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-3 px-1">Modules disponibles</p>
+              <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-3 px-1">{t('modules.available')}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {inactiveList.map(m => (
                   <ModuleCard
@@ -126,6 +129,7 @@ export default function ModulesMarketplacePage() {
                     module={m}
                     toggling={toggling === m.id}
                     onAction={() => setConfirm({ id: m.id, action: 'activate' })}
+                    t={t}
                   />
                 ))}
               </div>
@@ -159,19 +163,19 @@ export default function ModulesMarketplacePage() {
               </button>
               <div className="text-3xl mb-3">{MODULE_ICONS[confirm.id]}</div>
               <h3 className="text-base font-bold text-[var(--text)] mb-1">
-                {confirm.action === 'activate' ? 'Activer' : 'Désactiver'} {MODULE_LABELS[confirm.id]} ?
+                {confirm.action === 'activate' ? t('modules.activate') : t('modules.deactivate')} {MODULE_LABELS[confirm.id]} ?
               </h3>
               {confirm.action === 'activate' ? (
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
-                  Ce module sera immédiatement accessible dans votre sidebar.
-                  Tarif :{' '}
+                  {t('modules.confirmActivate')}
+                  {' '}{t('modules.tarif')}{' '}
                   <span className="text-[var(--primary)] font-medium">
-                    {fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}/mois
+                    {fmtFCFA(MODULE_PRICES[confirm.id] ?? 0)}{t('modules.perMonth')}
                   </span>
                 </p>
               ) : (
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
-                  Le module sera retiré de votre sidebar. Vos données sont conservées.
+                  {t('modules.confirmDeactivate')}
                 </p>
               )}
               <div className="flex gap-2">
@@ -179,7 +183,7 @@ export default function ModulesMarketplacePage() {
                   onClick={() => setConfirm(null)}
                   className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors"
                 >
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={() => toggleModule(confirm.id, confirm.action)}
@@ -189,7 +193,7 @@ export default function ModulesMarketplacePage() {
                       : 'bg-[var(--danger-light)] border border-[var(--danger)]/30 text-[var(--danger)] hover:bg-[var(--danger)]/20'
                   }`}
                 >
-                  {confirm.action === 'activate' ? 'Activer' : 'Désactiver'}
+                  {confirm.action === 'activate' ? t('modules.activate') : t('modules.deactivate')}
                 </button>
               </div>
             </motion.div>
@@ -220,11 +224,12 @@ export default function ModulesMarketplacePage() {
 }
 
 function ModuleCard({
-  module: m, toggling, onAction,
+  module: m, toggling, onAction, t,
 }: {
   module: ModuleInfo
   toggling: boolean
   onAction: () => void
+  t: (key: string) => string
 }) {
   return (
     <div className={`bg-[var(--surface)] border rounded-xl p-5 transition-all ${
@@ -237,7 +242,7 @@ function ModuleCard({
           <span className="text-2xl">{m.icon}</span>
           <div>
             <p className="text-sm font-semibold text-[var(--text)]">{m.label}</p>
-            <p className="text-xs text-[var(--primary)] font-medium">{fmtFCFA(m.price)}/mois</p>
+            <p className="text-xs text-[var(--primary)] font-medium">{fmtFCFA(m.price)}{t('modules.perMonth')}</p>
           </div>
         </div>
         {m.active
@@ -260,8 +265,8 @@ function ModuleCard({
         {toggling
           ? <Loader2 size={13} className="animate-spin" />
           : m.active
-          ? 'Désactiver'
-          : `Activer — ${fmtFCFA(m.price)}/mois`
+          ? t('modules.deactivate')
+          : `${t('modules.activate')} — ${fmtFCFA(m.price)}${t('modules.perMonth')}`
         }
       </button>
     </div>

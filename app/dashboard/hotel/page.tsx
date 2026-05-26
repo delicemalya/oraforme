@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
-  Hotel, BedDouble, Users, CalendarCheck, TrendingUp,
+  Hotel, BedDouble, Users, TrendingUp,
   Plus, Search, RefreshCw, X, AlertTriangle,
-  CheckCircle2, Clock, Star, Wifi, Coffee
+  CheckCircle2, Wifi, Coffee
 } from 'lucide-react'
 
 interface Chambre {
@@ -36,27 +37,13 @@ interface Reservation {
 }
 
 const TYPES_CHAMBRE = ['Simple', 'Double', 'Twin', 'Suite', 'Familiale', 'Présidentielle']
-const STATUTS_CHAMBRE = [
-  { value: 'disponible',   label: 'Disponible',  color: '#16A34A', bg: '#F0FDF4' },
-  { value: 'occupee',      label: 'Occupée',     color: '#DC2626', bg: '#FEF2F2' },
-  { value: 'reservee',     label: 'Réservée',    color: '#D97706', bg: '#FFFBEB' },
-  { value: 'maintenance',  label: 'Maintenance', color: '#64748B', bg: '#F1F5F9' },
-]
-const STATUTS_RESA = [
-  { value: 'confirmee',   label: 'Confirmée',   color: '#16A34A', bg: '#F0FDF4' },
-  { value: 'en_attente',  label: 'En attente',  color: '#D97706', bg: '#FFFBEB' },
-  { value: 'arrivee',     label: 'Arrivée',     color: '#2563EB', bg: '#EFF6FF' },
-  { value: 'depart',      label: 'Départ',      color: '#7C3AED', bg: '#F5F3FF' },
-  { value: 'annulee',     label: 'Annulée',     color: '#DC2626', bg: '#FEF2F2' },
-]
-
-const TAB = ['Chambres', 'Réservations']
 
 const emptyC = { numero: '', type: 'Double', prix_nuit: '', capacite: '2', statut: 'disponible', etage: '', description: '' }
 const emptyR = { chambre_id: '', client_nom: '', client_telephone: '', date_arrivee: '', date_depart: '', nb_personnes: '1', statut: 'confirmee' }
 
 export default function HotelPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [tab, setTab] = useState(0)
   const [chambres, setChambres] = useState<Chambre[]>([])
   const [reservations, setReservations] = useState<Reservation[]>([])
@@ -67,6 +54,21 @@ export default function HotelPage() {
   const [error, setError] = useState('')
   const [cForm, setCForm] = useState(emptyC)
   const [rForm, setRForm] = useState(emptyR)
+
+  const STATUTS_CHAMBRE = [
+    { value: 'disponible',   label: t('hotel.statusAvailable'),   color: '#16A34A', bg: '#F0FDF4' },
+    { value: 'occupee',      label: t('hotel.statusOccupied'),    color: '#DC2626', bg: '#FEF2F2' },
+    { value: 'reservee',     label: t('hotel.statusReserved'),    color: '#D97706', bg: '#FFFBEB' },
+    { value: 'maintenance',  label: t('hotel.statusMaintenance'), color: '#64748B', bg: '#F1F5F9' },
+  ]
+  const STATUTS_RESA = [
+    { value: 'confirmee',   label: t('hotel.resaConfirmed'),  color: '#16A34A', bg: '#F0FDF4' },
+    { value: 'en_attente',  label: t('hotel.resaPending'),    color: '#D97706', bg: '#FFFBEB' },
+    { value: 'arrivee',     label: t('hotel.resaArrived'),    color: '#2563EB', bg: '#EFF6FF' },
+    { value: 'depart',      label: t('hotel.resaDeparted'),   color: '#7C3AED', bg: '#F5F3FF' },
+    { value: 'annulee',     label: t('hotel.resaCancelled'),  color: '#DC2626', bg: '#FEF2F2' },
+  ]
+  const TAB = [t('hotel.tabRooms'), t('hotel.tabReservations')]
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -94,7 +96,7 @@ export default function HotelPage() {
   const montantTotal = selectedChambre ? nuits * selectedChambre.prix_nuit : 0
 
   const handleSaveChambre = async () => {
-    if (!tenantId || !cForm.numero || !cForm.prix_nuit) { setError('Numéro et prix requis'); return }
+    if (!tenantId || !cForm.numero || !cForm.prix_nuit) { setError(t('hotel.errorNumAndPrice')); return }
     setSaving(true); setError('')
     try {
       await supabase.from('hotel_chambres').insert({
@@ -110,9 +112,9 @@ export default function HotelPage() {
 
   const handleSaveResa = async () => {
     if (!tenantId || !rForm.client_nom || !rForm.date_arrivee || !rForm.date_depart) {
-      setError('Client et dates requis'); return
+      setError(t('hotel.errorClientAndDates')); return
     }
-    if (nuits <= 0) { setError('La date de départ doit être après l\'arrivée'); return }
+    if (nuits <= 0) { setError(t('hotel.errorDepartAfterArrival')); return }
     setSaving(true); setError('')
     try {
       await supabase.from('hotel_reservations').insert({
@@ -161,9 +163,9 @@ export default function HotelPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Hotel size={20} className="text-[#F59E0B]" />
-            Gestion Hôtelière
+            {t('hotel.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Chambres, réservations, check-in/check-out</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('hotel.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="flex items-center gap-1.5 border border-[#E2E8F0] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC]">
@@ -171,7 +173,7 @@ export default function HotelPage() {
           </button>
           <button onClick={() => { setError(''); setShowModal(true) }}
             className="flex items-center gap-1.5 bg-[#F59E0B] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#D97706] shadow-sm">
-            <Plus size={14} /> {tab === 0 ? 'Nouvelle chambre' : 'Nouvelle réservation'}
+            <Plus size={14} /> {tab === 0 ? t('hotel.newRoom') : t('hotel.newReservation')}
           </button>
         </div>
       </div>
@@ -179,10 +181,10 @@ export default function HotelPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Chambres totales', value: chambres.length, icon: BedDouble, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Disponibles', value: disponibles, icon: CheckCircle2, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Taux occupation', value: `${txOccupation}%`, icon: TrendingUp, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Revenu ce mois', value: fmtFCFA(revenuMois), icon: TrendingUp, color: '#7C3AED', bg: '#F5F3FF' },
+          { label: t('hotel.totalRooms'),    value: chambres.length,       icon: BedDouble,    color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('hotel.available'),     value: disponibles,           icon: CheckCircle2, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('hotel.occupancyRate'), value: `${txOccupation}%`,   icon: TrendingUp,   color: '#D97706', bg: '#FFFBEB' },
+          { label: t('hotel.monthRevenue'),  value: fmtFCFA(revenuMois),  icon: TrendingUp,   color: '#7C3AED', bg: '#F5F3FF' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -198,10 +200,10 @@ export default function HotelPage() {
 
       {/* Tabs */}
       <div className="bg-white border border-[#E2E8F0] rounded-2xl p-1 flex gap-1 w-fit">
-        {TAB.map((t, i) => (
-          <button key={t} onClick={() => setTab(i)}
+        {TAB.map((tabLabel, i) => (
+          <button key={tabLabel} onClick={() => setTab(i)}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${tab === i ? 'bg-[#F59E0B] text-white shadow-sm' : 'text-[#64748B] hover:bg-[#F8FAFC]'}`}>
-            {t}
+            {tabLabel}
           </button>
         ))}
       </div>
@@ -211,7 +213,7 @@ export default function HotelPage() {
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder={tab === 0 ? 'Rechercher une chambre…' : 'Rechercher un client…'}
+            placeholder={tab === 0 ? t('hotel.searchRoom') : t('hotel.searchClient')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
         </div>
       </div>
@@ -224,7 +226,7 @@ export default function HotelPage() {
           ) : filteredC.length === 0 ? (
             <div className="col-span-4 bg-white border border-[#E2E8F0] rounded-2xl flex flex-col items-center justify-center py-16 gap-3">
               <BedDouble size={32} className="text-[#E2E8F0]" />
-              <p className="text-sm text-[#64748B]">Aucune chambre — commencez par en ajouter une</p>
+              <p className="text-sm text-[#64748B]">{t('hotel.noRooms')}</p>
             </div>
           ) : filteredC.map(c => {
             const st = getStatutC(c.statut)
@@ -232,17 +234,17 @@ export default function HotelPage() {
               <div key={c.id} className="bg-white border border-[#E2E8F0] rounded-2xl p-4 hover:border-[#F59E0B]/40 transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="text-sm font-bold text-[#0F172A]">Chambre {c.numero}</p>
-                    <p className="text-xs text-[#64748B]">{c.type}{c.etage != null ? ` · Étage ${c.etage}` : ''}</p>
+                    <p className="text-sm font-bold text-[#0F172A]">{t('hotel.room')} {c.numero}</p>
+                    <p className="text-xs text-[#64748B]">{c.type}{c.etage != null ? ` · ${t('hotel.floor')} ${c.etage}` : ''}</p>
                   </div>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: st.color, background: st.bg }}>{st.label}</span>
                 </div>
                 <div className="flex items-center gap-3 text-[11px] text-[#64748B] mb-3">
-                  <span className="flex items-center gap-1"><Users size={11} />{c.capacite} pers.</span>
+                  <span className="flex items-center gap-1"><Users size={11} />{c.capacite} {t('hotel.persons')}</span>
                   <span className="flex items-center gap-1"><Wifi size={11} />WiFi</span>
                   <span className="flex items-center gap-1"><Coffee size={11} />Petit-dej</span>
                 </div>
-                <p className="text-base font-bold text-[#F59E0B]">{fmtFCFA(c.prix_nuit)}<span className="text-[10px] text-[#94A3B8] font-normal">/nuit</span></p>
+                <p className="text-base font-bold text-[#F59E0B]">{fmtFCFA(c.prix_nuit)}<span className="text-[10px] text-[#94A3B8] font-normal">{t('hotel.perNight')}</span></p>
               </div>
             )
           })}
@@ -253,20 +255,24 @@ export default function HotelPage() {
       {tab === 1 && (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
           {loading ? (
-            <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+            <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
-                    {['Client','Chambre','Arrivée','Départ','Nuits','Montant','Statut','Actions'].map(h => (
+                    {[
+                      t('hotel.colClient'), t('hotel.colRoom'), t('hotel.colArrival'),
+                      t('hotel.colDeparture'), t('hotel.colNights'), t('hotel.colAmount'),
+                      t('hotel.colStatus'), t('hotel.colActions'),
+                    ].map(h => (
                       <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredR.length === 0 ? (
-                    <tr><td colSpan={8} className="text-center py-12 text-sm text-[#64748B]">Aucune réservation</td></tr>
+                    <tr><td colSpan={8} className="text-center py-12 text-sm text-[#64748B]">{t('hotel.noReservations')}</td></tr>
                   ) : filteredR.map(r => {
                     const ch = chambres.find(c => c.id === r.chambre_id)
                     const st = getStatutR(r.statut)
@@ -276,7 +282,7 @@ export default function HotelPage() {
                           <p className="text-xs font-bold text-[#0F172A]">{r.client_nom}</p>
                           <p className="text-[10px] text-[#94A3B8]">{r.client_telephone || '—'}</p>
                         </td>
-                        <td className="px-4 py-3 text-xs text-[#374151]">{ch ? `Ch. ${ch.numero}` : '—'}</td>
+                        <td className="px-4 py-3 text-xs text-[#374151]">{ch ? `${t('hotel.room').slice(0,2)}. ${ch.numero}` : '—'}</td>
                         <td className="px-4 py-3 text-xs text-[#374151]">{r.date_arrivee ? new Date(r.date_arrivee).toLocaleDateString('fr-FR') : '—'}</td>
                         <td className="px-4 py-3 text-xs text-[#374151]">{r.date_depart ? new Date(r.date_depart).toLocaleDateString('fr-FR') : '—'}</td>
                         <td className="px-4 py-3 text-center text-xs font-bold text-[#374151]">{r.nb_nuits}</td>
@@ -288,11 +294,11 @@ export default function HotelPage() {
                           <div className="flex gap-1">
                             {r.statut === 'confirmee' && (
                               <button onClick={() => handleCheckIn(r)}
-                                className="text-[11px] text-[#2563EB] border border-[#BFDBFE] px-2 py-0.5 rounded-lg hover:bg-[#EFF6FF]">Check-in</button>
+                                className="text-[11px] text-[#2563EB] border border-[#BFDBFE] px-2 py-0.5 rounded-lg hover:bg-[#EFF6FF]">{t('hotel.checkin')}</button>
                             )}
                             {r.statut === 'arrivee' && (
                               <button onClick={() => handleCheckOut(r)}
-                                className="text-[11px] text-[#16A34A] border border-[#BBF7D0] px-2 py-0.5 rounded-lg hover:bg-[#F0FDF4]">Check-out</button>
+                                className="text-[11px] text-[#16A34A] border border-[#BBF7D0] px-2 py-0.5 rounded-lg hover:bg-[#F0FDF4]">{t('hotel.checkout')}</button>
                             )}
                           </div>
                         </td>
@@ -313,7 +319,7 @@ export default function HotelPage() {
             <div className="flex items-center justify-between p-5 border-b border-[#F1F5F9] sticky top-0 bg-white">
               <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
                 <Hotel size={15} className="text-[#F59E0B]" />
-                {tab === 0 ? 'Nouvelle chambre' : 'Nouvelle réservation'}
+                {tab === 0 ? t('hotel.newRoom') : t('hotel.newReservation')}
               </h2>
               <button onClick={() => setShowModal(false)}><X size={18} className="text-[#94A3B8]" /></button>
             </div>
@@ -324,34 +330,34 @@ export default function HotelPage() {
                 <>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Numéro *</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formRoomNumber')}</label>
                       <input value={cForm.numero} onChange={e => setCForm(f => ({ ...f, numero: e.target.value }))} placeholder="101"
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Type *</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formType')}</label>
                       <select value={cForm.type} onChange={e => setCForm(f => ({ ...f, type: e.target.value }))}
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none">
-                        {TYPES_CHAMBRE.map(t => <option key={t} value={t}>{t}</option>)}
+                        {TYPES_CHAMBRE.map(tp => <option key={tp} value={tp}>{tp}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Prix / nuit (FCFA) *</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formPrice')}</label>
                       <input type="number" value={cForm.prix_nuit} onChange={e => setCForm(f => ({ ...f, prix_nuit: e.target.value }))} placeholder="50000"
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Capacité (pers.)</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formCapacity')}</label>
                       <input type="number" min="1" value={cForm.capacite} onChange={e => setCForm(f => ({ ...f, capacite: e.target.value }))}
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Étage</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formFloor')}</label>
                       <input type="number" value={cForm.etage} onChange={e => setCForm(f => ({ ...f, etage: e.target.value }))} placeholder="1"
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Statut</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formStatus')}</label>
                       <select value={cForm.statut} onChange={e => setCForm(f => ({ ...f, statut: e.target.value }))}
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none">
                         {STATUTS_CHAMBRE.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
@@ -359,48 +365,48 @@ export default function HotelPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Description</label>
+                    <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formDescription')}</label>
                     <textarea value={cForm.description} onChange={e => setCForm(f => ({ ...f, description: e.target.value }))}
-                      rows={2} placeholder="Vue mer, balcon, jacuzzi…"
+                      rows={2} placeholder={t('hotel.formDescPlaceholder')}
                       className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none resize-none" />
                   </div>
                 </>
               ) : (
                 <>
                   <div>
-                    <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Nom du client *</label>
+                    <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formClientName')}</label>
                     <input value={rForm.client_nom} onChange={e => setRForm(f => ({ ...f, client_nom: e.target.value }))}
                       className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Téléphone</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formPhone')}</label>
                       <input value={rForm.client_telephone} onChange={e => setRForm(f => ({ ...f, client_telephone: e.target.value }))}
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Nb personnes</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formPersons')}</label>
                       <input type="number" min="1" value={rForm.nb_personnes} onChange={e => setRForm(f => ({ ...f, nb_personnes: e.target.value }))}
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Arrivée *</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formArrival')}</label>
                       <input type="date" value={rForm.date_arrivee} onChange={e => setRForm(f => ({ ...f, date_arrivee: e.target.value }))}
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Départ *</label>
+                      <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formDeparture')}</label>
                       <input type="date" value={rForm.date_depart} onChange={e => setRForm(f => ({ ...f, date_depart: e.target.value }))}
                         className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
                     </div>
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-[#374151] mb-1 block">Chambre</label>
+                    <label className="text-[11px] font-semibold text-[#374151] mb-1 block">{t('hotel.formRoomSelect')}</label>
                     <select value={rForm.chambre_id} onChange={e => setRForm(f => ({ ...f, chambre_id: e.target.value }))}
                       className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none">
-                      <option value="">Sans chambre attribuée</option>
+                      <option value="">{t('hotel.formNoRoom')}</option>
                       {chambres.filter(c => c.statut === 'disponible').map(c => (
-                        <option key={c.id} value={c.id}>Chambre {c.numero} — {c.type} — {fmtFCFA(c.prix_nuit)}/nuit</option>
+                        <option key={c.id} value={c.id}>{t('hotel.room')} {c.numero} — {c.type} — {fmtFCFA(c.prix_nuit)}{t('hotel.perNight')}</option>
                       ))}
                     </select>
                   </div>
@@ -414,10 +420,10 @@ export default function HotelPage() {
             </div>
             <div className="flex justify-end gap-2 px-5 pb-5">
               <button onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+                className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={tab === 0 ? handleSaveChambre : handleSaveResa} disabled={saving}
                 className="px-4 py-2 text-xs font-semibold bg-[#F59E0B] text-white rounded-xl hover:bg-[#D97706] disabled:opacity-50">
-                {saving ? 'Enregistrement…' : 'Enregistrer'}
+                {saving ? t('common.saving') : t('common.save')}
               </button>
             </div>
           </div>

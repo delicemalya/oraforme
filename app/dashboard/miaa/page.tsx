@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -7,62 +7,11 @@ import {
   Bell, Cog, Globe, Loader2, Trash2, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Message { role: 'user' | 'bot'; text: string; ts?: number }
-
-// ── Capabilities ──────────────────────────────────────────────────────────────
-
-const CAPABILITIES = [
-  { icon: Calculator, label: 'Calculs fiscaux',       desc: 'TVA 18%, CA 5%, CNSS, IRPP Congo',       color: '#DC2626' },
-  { icon: BarChart2,  label: 'Analyse de données',    desc: 'Indicateurs, tendances, comparaisons',    color: '#DC2626' },
-  { icon: FileText,   label: 'Génération documents',  desc: 'Factures, bulletins de paie, rapports',   color: '#0F172A' },
-  { icon: Bell,       label: 'Alertes intelligentes', desc: 'Impayés, stock bas, échéances',            color: '#DC2626' },
-  { icon: Cog,        label: 'Automatisation',        desc: 'Workflows, relances, rappels',             color: '#7C3AED' },
-  { icon: Globe,      label: 'Multilingue',           desc: 'Français, English, Lingala',              color: '#0F172A' },
-]
-
-// ── Quick actions by category ─────────────────────────────────────────────────
-
-const QUICK_CATEGORIES = [
-  {
-    label: '🧮 Fiscal Congo',
-    actions: [
-      'Calculer TVA + CA sur 1 500 000 FCFA',
-      'Calculer le net pour un brut de 600 000 FCFA',
-      'Quelles sont les tranches de l\'IRPP Congo ?',
-      'Calculer les charges patronales CNSS sur 800 000 FCFA',
-    ],
-  },
-  {
-    label: '📄 Facturation',
-    actions: [
-      'Explique les règles de facturation OHADA',
-      'Comment rédiger une relance de facture impayée ?',
-      'Quel est le délai légal de paiement en Congo ?',
-      'Comment gérer les avoirs et remises ?',
-    ],
-  },
-  {
-    label: '👔 RH & Paie',
-    actions: [
-      'Quelles sont les obligations CNSS pour une PME ?',
-      'Comment calculer le préavis en cas de licenciement ?',
-      'Calcule le bulletin de paie pour 450 000 FCFA brut',
-      'Quelles sont les allocations familiales légales ?',
-    ],
-  },
-  {
-    label: '🏫 Scolaire',
-    actions: [
-      'Comment calculer une moyenne pondérée sur 20 ?',
-      'Quelles sont les règles de redoublement ?',
-      'Génère un modèle de relevé de notes',
-      'Comment gérer les frais d\'inscription ?',
-    ],
-  },
-]
 
 // ── MIAA+ Logo ────────────────────────────────────────────────────────────────
 
@@ -84,6 +33,56 @@ function formatText(text: string) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function MIAAPage() {
+  const { t } = useLocale()
+
+  const CAPABILITIES = [
+    { icon: Calculator, label: t('miaa.cap.fiscal'),   desc: t('miaa.cap.fiscalDesc'),   color: '#DC2626' },
+    { icon: BarChart2,  label: t('miaa.cap.analyse'),  desc: t('miaa.cap.analyseDesc'),  color: '#DC2626' },
+    { icon: FileText,   label: t('miaa.cap.docs'),     desc: t('miaa.cap.docsDesc'),     color: '#0F172A' },
+    { icon: Bell,       label: t('miaa.cap.alerts'),   desc: t('miaa.cap.alertsDesc'),   color: '#DC2626' },
+    { icon: Cog,        label: t('miaa.cap.auto'),     desc: t('miaa.cap.autoDesc'),     color: '#7C3AED' },
+    { icon: Globe,      label: t('miaa.cap.multi'),    desc: t('miaa.cap.multiDesc'),    color: '#0F172A' },
+  ]
+
+  const QUICK_CATEGORIES = [
+    {
+      label: t('miaa.quick.fiscal'),
+      actions: [
+        'Calculer TVA + CA sur 1 500 000 FCFA',
+        'Calculer le net pour un brut de 600 000 FCFA',
+        'Quelles sont les tranches de l\'IRPP Congo ?',
+        'Calculer les charges patronales CNSS sur 800 000 FCFA',
+      ],
+    },
+    {
+      label: t('miaa.quick.facturation'),
+      actions: [
+        'Explique les règles de facturation OHADA',
+        'Comment rédiger une relance de facture impayée ?',
+        'Quel est le délai légal de paiement en Congo ?',
+        'Comment gérer les avoirs et remises ?',
+      ],
+    },
+    {
+      label: t('miaa.quick.rh'),
+      actions: [
+        'Quelles sont les obligations CNSS pour une PME ?',
+        'Comment calculer le préavis en cas de licenciement ?',
+        'Calcule le bulletin de paie pour 450 000 FCFA brut',
+        'Quelles sont les allocations familiales légales ?',
+      ],
+    },
+    {
+      label: t('miaa.quick.scolaire'),
+      actions: [
+        'Comment calculer une moyenne pondérée sur 20 ?',
+        'Quelles sont les règles de redoublement ?',
+        'Génère un modèle de relevé de notes',
+        'Comment gérer les frais d\'inscription ?',
+      ],
+    },
+  ]
+
   const [messages,      setMessages]      = useState<Message[]>([])
   const [input,         setInput]         = useState('')
   const [loading,       setLoading]       = useState(false)
@@ -92,6 +91,11 @@ export default function MIAAPage() {
   const [expandedCat,   setExpandedCat]   = useState<number | null>(0)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef  = useRef<HTMLInputElement>(null)
+
+  function getGreeting() {
+    const h = new Date().getHours()
+    return h < 12 ? t('miaa.greetMorning') : h < 18 ? t('miaa.greetAfternoon') : t('miaa.greetEvening')
+  }
 
   // Load user context
   useEffect(() => {
@@ -104,18 +108,18 @@ export default function MIAAPage() {
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle()
-      const t = (data?.tenants as { nom_entreprise?: string; modules_actifs?: string[] } | null)
-      const nom = t?.nom_entreprise ?? ''
+      const tenant = (data?.tenants as { nom_entreprise?: string; modules_actifs?: string[] } | null)
+      const nom = tenant?.nom_entreprise ?? ''
       setEntreprise(nom)
-      setModulesActifs(t?.modules_actifs ?? [])
+      setModulesActifs(tenant?.modules_actifs ?? [])
 
-      const h = new Date().getHours()
-      const salut = h < 12 ? 'Bonjour' : h < 18 ? 'Bonne après-midi' : 'Bonne soirée'
+      const salut = getGreeting()
       const greeting = nom
-        ? `${salut} ! Je suis **MIAA+**, votre assistant intelligent chez **${nom}**.\n\nJe peux vous aider avec :\n✓ Calculs fiscaux Congo (TVA, CA, CNSS, IRPP)\n✓ Gestion de votre facturation et comptabilité\n✓ RH, paie et obligations sociales\n✓ Toute question sur votre activité\n\nPosez-moi une question ou choisissez une suggestion ci-dessous.`
-        : `${salut} ! Je suis **MIAA+**, l'assistant IA d'oraforme.\n\nComment puis-je vous aider aujourd'hui ?`
+        ? `${salut} ! ${t('miaa.greetWithCompany').replace('{entreprise}', nom)}`
+        : `${salut} ! ${t('miaa.greetNoCompany')}`
       setMessages([{ role: 'bot', text: greeting, ts: Date.now() }])
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -154,22 +158,21 @@ export default function MIAAPage() {
         }),
       })
       const { reply } = await res.json()
-      setMessages(prev => [...prev, { role: 'bot', text: reply ?? "Désolé, je n'ai pas pu répondre.", ts: Date.now() }])
+      setMessages(prev => [...prev, { role: 'bot', text: reply ?? t('miaa.errorReply'), ts: Date.now() }])
     } catch {
-      setMessages(prev => [...prev, { role: 'bot', text: '❌ Erreur de connexion. Vérifiez votre clé API dans .env.local.', ts: Date.now() }])
+      setMessages(prev => [...prev, { role: 'bot', text: t('miaa.errorConnection'), ts: Date.now() }])
     } finally {
       setLoading(false)
     }
-  }, [loading, messages, entreprise, modulesActifs])
+  }, [loading, messages, entreprise, modulesActifs, t])
 
   function clearChat() {
-    const h = new Date().getHours()
-    const salut = h < 12 ? 'Bonjour' : h < 18 ? 'Bonne après-midi' : 'Bonne soirée'
+    const salut = getGreeting()
     setMessages([{
       role: 'bot',
       text: entreprise
-        ? `${salut} ! Nouvelle conversation démarrée. Comment puis-je vous aider chez **${entreprise}** ?`
-        : `${salut} ! Nouvelle conversation. Comment puis-je vous aider ?`,
+        ? `${salut} ! ${t('miaa.newConvWithCompany').replace('{entreprise}', entreprise)}`
+        : `${salut} ! ${t('miaa.newConvNoCompany')}`,
       ts: Date.now(),
     }])
   }
@@ -185,19 +188,19 @@ export default function MIAAPage() {
           <MIAALogo size={40} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-[var(--text)]">✨ MIAA+ — Assistant Intelligent</h1>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#DC262620', color: '#DC2626' }}>IA</span>
+              <h1 className="text-sm font-bold text-[var(--text)]">{t('miaa.title')}</h1>
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: '#DC262620', color: '#DC2626' }}>{t('miaa.badge')}</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--surface)] animate-pulse shrink-0" />
               <p className="text-[10px] text-[var(--text-secondary)] truncate">
-                {entreprise ? `${entreprise} · ` : ''}oraforme ERP · Spécialisé Congo-Brazzaville
+                {entreprise ? `${entreprise} · ` : ''}{t('miaa.subtitle')}
               </p>
             </div>
           </div>
           <button
             onClick={clearChat}
-            title="Nouvelle conversation"
+            title={t('miaa.newChat')}
             className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-secondary)] hover:bg-white/5 rounded-lg transition-colors"
           >
             <Trash2 size={14} />
@@ -250,7 +253,7 @@ export default function MIAAPage() {
                     transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
                   />
                 ))}
-                <span className="text-[9px] text-[var(--text-secondary)] ml-1">MIAA+ est en train d&apos;écrire…</span>
+                <span className="text-[9px] text-[var(--text-secondary)] ml-1">{t('miaa.typing')}</span>
               </div>
             </motion.div>
           )}
@@ -260,7 +263,7 @@ export default function MIAAPage() {
         {/* Suggestions row (visible when chat is fresh) */}
         {messages.length <= 1 && !loading && (
           <div className="px-4 pb-2 flex gap-2 flex-wrap shrink-0">
-            {['🧮 Calculer TVA sur 500 000 FCFA', '👔 Net pour 400 000 FCFA brut', '📋 Règles CNSS Congo'].map(s => (
+            {[t('miaa.suggest.tva'), t('miaa.suggest.net'), t('miaa.suggest.cnss')].map(s => (
               <button
                 key={s}
                 onClick={() => send(s)}
@@ -279,7 +282,7 @@ export default function MIAAPage() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
-            placeholder="Posez votre question à MIAA+… (Entrée pour envoyer)"
+            placeholder={t('miaa.placeholder')}
             disabled={loading}
             className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-2 text-xs text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50 transition-colors disabled:opacity-50"
           />
@@ -301,7 +304,7 @@ export default function MIAAPage() {
         {/* Capabilities */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
           <p className="text-xs font-bold text-[var(--text)] mb-3 flex items-center gap-2">
-            <Sparkles size={13} className="text-[#DC2626]" /> Capacités MIAA+
+            <Sparkles size={13} className="text-[#DC2626]" /> {t('miaa.capabilities')}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {CAPABILITIES.map(cap => {
@@ -324,7 +327,7 @@ export default function MIAAPage() {
 
         {/* Quick actions by category */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4 flex-1">
-          <p className="text-xs font-bold text-[var(--text)] mb-3">Questions rapides</p>
+          <p className="text-xs font-bold text-[var(--text)] mb-3">{t('miaa.quickQuestions')}</p>
           <div className="space-y-2">
             {QUICK_CATEGORIES.map((cat, ci) => (
               <div key={cat.label} className="border border-[var(--border)] rounded-xl overflow-hidden">
@@ -368,22 +371,22 @@ export default function MIAAPage() {
 
         {/* Config hint */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
-          <p className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Configuration</p>
+          <p className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">{t('miaa.configTitle')}</p>
           <div className="space-y-2 text-[10px] text-[var(--text-secondary)]">
             <div className="flex justify-between">
-              <span>Modèle IA</span>
-              <span className="text-[var(--text-secondary)]">Claude Haiku 4.5</span>
+              <span>{t('miaa.configModel')}</span>
+              <span className="text-[var(--text-secondary)]">{t('miaa.configModelValue')}</span>
             </div>
             <div className="flex justify-between">
-              <span>Langue</span>
-              <span className="text-[var(--text-secondary)]">Français 🇫🇷</span>
+              <span>{t('miaa.configLang')}</span>
+              <span className="text-[var(--text-secondary)]">{t('miaa.configLangValue')}</span>
             </div>
             <div className="flex justify-between">
-              <span>Contexte</span>
-              <span className="text-[var(--text-secondary)]">Congo-Brazzaville</span>
+              <span>{t('miaa.configContext')}</span>
+              <span className="text-[var(--text-secondary)]">{t('miaa.configContextValue')}</span>
             </div>
             <div className="flex justify-between">
-              <span>Modules actifs</span>
+              <span>{t('miaa.configModules')}</span>
               <span className="text-[#DC2626]">{modulesActifs.length}</span>
             </div>
           </div>
