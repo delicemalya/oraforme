@@ -11,6 +11,7 @@
 -- ============================================================
 
 -- ── 1. Créer la table notifications si absente ──────────────
+-- NOTE: La table existe déjà depuis CATCHUP_008_to_025 sans source/source_id
 CREATE TABLE IF NOT EXISTS notifications (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id  UUID        REFERENCES tenants(id) ON DELETE CASCADE,
@@ -20,10 +21,13 @@ CREATE TABLE IF NOT EXISTS notifications (
   type       TEXT        NOT NULL DEFAULT 'info' CHECK (type IN ('info','warning','success','error')),
   read       BOOLEAN     NOT NULL DEFAULT false,
   link       TEXT,
-  source     TEXT,       -- 'workflow', 'finance', 'rh', 'ecole', etc.
-  source_id  UUID,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Ajouter les colonnes manquantes sur la table existante
+ALTER TABLE notifications
+  ADD COLUMN IF NOT EXISTS source    TEXT,    -- 'workflow', 'finance', 'rh', 'ecole', etc.
+  ADD COLUMN IF NOT EXISTS source_id UUID;
 
 -- ── 2. Activer RLS ──────────────────────────────────────────
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
