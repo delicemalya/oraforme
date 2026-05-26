@@ -6,23 +6,40 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 
 export type UserRole = 'owner' | 'admin' | 'membre'
 
+// ─── Granular permission type ─────────────────────────────────────────────────
+
 export interface ModulePermission {
-  can_view:   boolean
-  can_edit:   boolean
-  can_delete: boolean
+  can_view:     boolean
+  can_edit:     boolean
+  can_delete:   boolean
+  can_export:   boolean   // export PDF/Excel
+  can_validate: boolean   // valider une écriture, facture, etc.
+  can_approve:  boolean   // approuver un budget, un achat, etc.
 }
 
+export type PermAction = 'view' | 'edit' | 'delete' | 'export' | 'validate' | 'approve'
+
+// ─── Full hook result ─────────────────────────────────────────────────────────
+
 export interface UsePermissionsResult {
-  role:        UserRole | null
-  profileId:   string | null
-  isOwner:     boolean
-  isAdmin:     boolean
-  isFinancial: boolean
+  role:            UserRole | null
+  profileId:       string | null
+  isOwner:         boolean
+  isAdmin:         boolean
+  isFinancial:     boolean
   dynamicRoleName: string | null
-  permissions: Record<string, ModulePermission>
-  can: (moduleKey: string, action?: 'view' | 'edit' | 'delete') => boolean
-  loading:     boolean
+  permissions:     Record<string, ModulePermission>
+  can:             (moduleKey: string, action?: PermAction) => boolean
+  canView:         (moduleKey: string) => boolean
+  canEdit:         (moduleKey: string) => boolean
+  canDelete:       (moduleKey: string) => boolean
+  canExport:       (moduleKey: string) => boolean
+  canValidate:     (moduleKey: string) => boolean
+  canApprove:      (moduleKey: string) => boolean
+  loading:         boolean
 }
+
+// ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function usePermissions(): UsePermissionsResult {
   const { tenant, loading: tenantLoading } = useTenantContext()
@@ -43,7 +60,6 @@ export function usePermissions(): UsePermissionsResult {
       return
     }
 
-    // Owner → accès total, pas besoin de charger les permissions
     if (tenant.role === 'owner') {
       setIsFinancial(true)
       setLoading(false)
@@ -56,13 +72,14 @@ export function usePermissions(): UsePermissionsResult {
       setLoading(true)
       const permMap: Record<string, ModulePermission> = {}
 
-      // Récupérer le dynamic_role_id depuis le profil — scoped to the correct
-      // tenant so multi-tenant users get the right role assignment.
+      // ── 1. Rôle dynamique — scopé au tenant courant (CRITICAL FIX) ──────────
       const { data: profile } = await supabase
         .from('profiles')
         .select('dynamic_role_id')
         .eq('user_id', tenant!.userId)
         .eq('tenant_id', tenant!.tenantId)
+        .order('created_at', { ascending: true })
+        .limit(1)
         .maybeSingle()
 
       if (profile?.dynamic_role_id && !cancelled) {
@@ -74,7 +91,7 @@ export function usePermissions(): UsePermissionsResult {
             .maybeSingle(),
           supabase
             .from('role_permissions')
-            .select('module_key, can_view, can_edit, can_delete')
+            .select('module_key, can_view, can_edit, can_delete, can_export, can_validate, can_approve')
             .eq('role_id', profile.dynamic_role_id),
         ])
 
@@ -85,26 +102,36 @@ export function usePermissions(): UsePermissionsResult {
           }
           for (const p of rolePerms ?? []) {
             permMap[p.module_key] = {
-              can_view:   p.can_view,
-              can_edit:   p.can_edit,
-              can_delete: p.can_delete,
+              can_view:     p.can_view     ?? false,
+              can_edit:     p.can_edit     ?? false,
+              can_delete:   p.can_delete   ?? false,
+              can_export:   p.can_export   ?? false,
+              can_validate: p.can_validate ?? false,
+              can_approve:  p.can_approve  ?? false,
             }
           }
         }
       }
 
-      // Fusionner avec les permissions directes
+      // ── 2. Permissions directes (override individuel) ────────────────────────
       const { data: directPerms } = await supabase
         .from('user_permissions')
-        .select('module_key, can_view, can_edit, can_delete')
+        .select('module_key, can_view, can_edit, can_delete, can_export, can_validate, can_approve')
         .eq('profile_id', tenant!.profileId)
 
       if (!cancelled) {
         for (const p of directPerms ?? []) {
+          const existing = permMap[p.module_key] ?? {
+            can_view: false, can_edit: false, can_delete: false,
+            can_export: false, can_validate: false, can_approve: false,
+          }
           permMap[p.module_key] = {
-            can_view:   p.can_view,
-            can_edit:   p.can_edit,
-            can_delete: p.can_delete,
+            can_view:     p.can_view     ?? existing.can_view,
+            can_edit:     p.can_edit     ?? existing.can_edit,
+            can_delete:   p.can_delete   ?? existing.can_delete,
+            can_export:   p.can_export   ?? existing.can_export,
+            can_validate: p.can_validate ?? existing.can_validate,
+            can_approve:  p.can_approve  ?? existing.can_approve,
           }
         }
         setPermissions(permMap)
@@ -114,23 +141,35 @@ export function usePermissions(): UsePermissionsResult {
 
     loadPerms()
     return () => { cancelled = true }
-  }, [tenant?.userId, tenant?.profileId, tenant?.role, tenantLoading])
+  }, [tenant?.userId, tenant?.profileId, tenant?.tenantId, tenant?.role, tenantLoading])
 
-  const role    = tenant?.role ?? null
+  const role      = tenant?.role      ?? null
   const profileId = tenant?.profileId ?? null
 
   const can = useCallback(
-    (moduleKey: string, action: 'view' | 'edit' | 'delete' = 'view'): boolean => {
+    (moduleKey: string, action: PermAction = 'view'): boolean => {
       if (role === 'owner') return true
       const p = permissions[moduleKey]
       if (!p) return false
-      if (action === 'view')   return p.can_view
-      if (action === 'edit')   return p.can_edit
-      if (action === 'delete') return p.can_delete
-      return false
+      switch (action) {
+        case 'view':     return p.can_view
+        case 'edit':     return p.can_edit
+        case 'delete':   return p.can_delete
+        case 'export':   return p.can_export
+        case 'validate': return p.can_validate
+        case 'approve':  return p.can_approve
+        default:         return false
+      }
     },
     [role, permissions]
   )
+
+  const canView     = useCallback((m: string) => can(m, 'view'),     [can])
+  const canEdit     = useCallback((m: string) => can(m, 'edit'),     [can])
+  const canDelete   = useCallback((m: string) => can(m, 'delete'),   [can])
+  const canExport   = useCallback((m: string) => can(m, 'export'),   [can])
+  const canValidate = useCallback((m: string) => can(m, 'validate'), [can])
+  const canApprove  = useCallback((m: string) => can(m, 'approve'),  [can])
 
   return {
     role,
@@ -141,6 +180,12 @@ export function usePermissions(): UsePermissionsResult {
     dynamicRoleName,
     permissions,
     can,
+    canView,
+    canEdit,
+    canDelete,
+    canExport,
+    canValidate,
+    canApprove,
     loading: tenantLoading || loading,
   }
 }

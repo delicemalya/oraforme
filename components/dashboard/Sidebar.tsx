@@ -236,12 +236,19 @@ export default function Sidebar() {
       }
       const { data: perms } = await supabase
         .from('user_permissions')
-        .select('module_key, can_view, can_edit, can_delete')
+        .select('module_key, can_view, can_edit, can_delete, can_export, can_validate, can_approve')
         .eq('profile_id', tenant!.profileId)
       if (cancelled) return
       const permMap: Record<string, ModulePermission> = {}
       for (const p of perms ?? []) {
-        permMap[p.module_key] = { can_view: p.can_view, can_edit: p.can_edit, can_delete: p.can_delete }
+        permMap[p.module_key] = {
+          can_view:     p.can_view     ?? false,
+          can_edit:     p.can_edit     ?? false,
+          can_delete:   p.can_delete   ?? false,
+          can_export:   p.can_export   ?? false,
+          can_validate: p.can_validate ?? false,
+          can_approve:  p.can_approve  ?? false,
+        }
       }
       setPermissions(permMap)
       setPermsLoaded(true)
