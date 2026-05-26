@@ -128,11 +128,11 @@ export default async function DashboardPage() {
     const totalInvoices = Object.values(counts).reduce((s, v) => s + v, 0)
     moduleBreakdown = totalInvoices > 0
       ? ([
-          { name: 'Payées',     value: counts.payee,    color: '#16A34A' },
-          { name: 'Envoyées',   value: counts.envoyee,  color: '#2563EB' },
-          { name: 'Brouillons', value: counts.brouillon,color: '#64748B' },
-          { name: 'Annulées',   value: counts.annulee,  color: '#DC2626' },
-        ] as { name: string; value: number; color: string }[]).filter(d => d.value > 0)
+          { name: 'Payées',     statut: 'payee',    value: counts.payee,    color: '#16A34A' },
+          { name: 'Envoyées',   statut: 'envoyee',  value: counts.envoyee,  color: '#2563EB' },
+          { name: 'Brouillons', statut: 'brouillon',value: counts.brouillon,color: '#64748B' },
+          { name: 'Annulées',   statut: 'annulee',  value: counts.annulee,  color: '#DC2626' },
+        ] as { name: string; statut: string; value: number; color: string }[]).filter(d => d.value > 0)
       : modulesActifs.map((m, i) => ({ name: MODULE_LABELS[m] ?? m, value: 1, color: MODULE_COLORS[i % MODULE_COLORS.length] }))
 
     nbAlertes = nbPending

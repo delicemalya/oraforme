@@ -15,6 +15,7 @@ import {
 } from 'recharts'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // Types kept for backward-compat
 export type EcoleRole =
@@ -104,11 +105,12 @@ function RevenueCard({
   revenuJour: number; revenuSemaine: number; revenuMois: number
   nbPaiementsJour: number; nbPaiementsSemaine: number; nbPaiementsMois: number; i: number
 }) {
+  const { t } = useLocale()
   const [period, setPeriod] = useState<'jour' | 'semaine' | 'mois'>('mois')
   const cfg = {
-    jour:    { value: revenuJour,    nb: nbPaiementsJour,    sub: "Aujourd'hui" },
-    semaine: { value: revenuSemaine, nb: nbPaiementsSemaine, sub: '7 derniers jours' },
-    mois:    { value: revenuMois,    nb: nbPaiementsMois,    sub: 'Ce mois' },
+    jour:    { value: revenuJour,    nb: nbPaiementsJour,    sub: t('school.today') },
+    semaine: { value: revenuSemaine, nb: nbPaiementsSemaine, sub: t('school.last7Days') },
+    mois:    { value: revenuMois,    nb: nbPaiementsMois,    sub: t('school.thisMonth') },
   }[period]
 
   return (
@@ -130,12 +132,12 @@ function RevenueCard({
                     color: period === p ? '#FFFFFF' : 'var(--text-secondary)',
                     border: 'none', cursor: 'pointer',
                   }}>
-                  {p === 'jour' ? 'Jour' : p === 'semaine' ? '7j' : 'Mois'}
+                  {p === 'jour' ? t('common.day') : p === 'semaine' ? '7j' : t('common.month')}
                 </button>
               ))}
             </div>
           </div>
-          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: 6 }}>Recettes</p>
+          <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: 6 }}>{t('school.receipts')}</p>
           <p style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4 }}>
             {fmt(cfg.value)} <span style={{ fontSize: 16, fontWeight: 600 }}>FCFA</span>
           </p>
@@ -150,6 +152,7 @@ function RevenueCard({
 
 export default function EcoleOverviewPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [data,     setData]     = useState<OverviewData | null>(null)
   const [loading,  setLoading]  = useState(true)
   const [nomEcole, setNomEcole] = useState('École')
@@ -260,7 +263,7 @@ export default function EcoleOverviewPage() {
 
   if (tenantLoading || loading) return (
     <div className="flex items-center justify-center h-64" style={{ color: 'var(--text-secondary)' }}>
-      <Loader2 className="animate-spin mr-2" size={18} /> Chargement du tableau de bord…
+      <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
     </div>
   )
 
@@ -280,26 +283,26 @@ export default function EcoleOverviewPage() {
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>Bonjour, Admin 👋</h1>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{t('school.greeting')}, Admin 👋</h1>
               <button onClick={load} style={{ color: 'rgba(255,255,255,0.5)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}
                 className="hover:opacity-80 transition-opacity">
                 <RefreshCw size={13} />
               </button>
             </div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>
-              Gérez votre établissement, vos équipes et vos finances en un seul endroit.
+              {t('school.dashSubtitle')}
             </p>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
-              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> · Tableau de bord complet
+              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> · {t('nav.dashboard')}
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
               <Link href="/dashboard/ecole/scolarite"
                 style={{ background: '#FFFFFF', color: '#DC2626', fontWeight: 700, fontSize: 13, padding: '8px 16px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <Plus size={13} /> Inscrire un étudiant
+                <Plus size={13} /> {t('school.enrollment')}
               </Link>
               <Link href="/dashboard/ecole/direction"
                 style={{ background: 'transparent', color: '#FFFFFF', fontWeight: 600, fontSize: 13, padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.5)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                Voir les rapports
+                {t('nav.rapports')}
               </Link>
             </div>
           </div>
@@ -307,9 +310,9 @@ export default function EcoleOverviewPage() {
           {/* Mini-stats */}
           <div className="flex gap-3 flex-shrink-0 flex-wrap">
             {[
-              { label: 'Recouvrement',     value: `${recoveryRate}%` },
-              { label: 'Sessions actives', value: d.sessionsEnCours },
-              { label: 'Impayés',          value: `${d.nbImpayes} dossiers` },
+              { label: t('school.recovery'),       value: `${recoveryRate}%` },
+              { label: t('school.activeSessions'), value: d.sessionsEnCours },
+              { label: t('school.unpaid'),         value: `${d.nbImpayes} dossiers` },
             ].map(s => (
               <div key={s.label} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '12px 16px', textAlign: 'center', minWidth: 100 }}>
                 <p style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{s.label}</p>
@@ -322,26 +325,26 @@ export default function EcoleOverviewPage() {
 
       {/* ── 5 KPI Cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
-        <StatCard i={1} icon={GraduationCap} label="Inscrits (année en cours)"
-          value={d.nbEtudiants} sub={`${d.nbActifs} actifs · ${d.nbSuspendus} suspendus`}
-          color="#DC2626" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% actifs`} />
+        <StatCard i={1} icon={GraduationCap} label={t('school.enrolled')}
+          value={d.nbEtudiants} sub={`${d.nbActifs} ${t('common.active').toLowerCase()} · ${d.nbSuspendus} suspendus`}
+          color="#DC2626" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% ${t('common.active').toLowerCase()}`} />
 
-        <StatCard i={2} icon={Users} label="Agents"
-          value={nbAgents} sub={`${d.nbEmployes} employés · ${d.nbStaff} staff direction`}
-          color="#DC2626" href="/dashboard/ecole/rh" badge="Personnel" />
+        <StatCard i={2} icon={Users} label={t('school.agents')}
+          value={nbAgents} sub={`${d.nbEmployes} ${t('rh.employees').toLowerCase()} · ${d.nbStaff} staff direction`}
+          color="#DC2626" href="/dashboard/ecole/rh" badge={t('rh.employees')} />
 
-        <StatCard i={3} icon={BookOpen} label="Formateurs (Enseignants)"
-          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} prestataires`}
-          color="#7C3AED" href="/dashboard/ecole/rh" badge="Actifs" />
+        <StatCard i={3} icon={BookOpen} label={t('school.trainers')}
+          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} ${t('rh.employees').toLowerCase()} · ${d.nbEnsPrestataires} prestataires`}
+          color="#7C3AED" href="/dashboard/ecole/rh" badge={t('common.active')} />
 
         <RevenueCard i={4}
           revenuJour={d.revenuJour} revenuSemaine={d.revenuSemaine} revenuMois={d.revenuMois}
           nbPaiementsJour={d.nbPaiementsJour} nbPaiementsSemaine={d.nbPaiementsSemaine} nbPaiementsMois={d.nbPaiementsMois} />
 
-        <StatCard i={5} icon={Receipt} label="Sorties du jour"
-          value={fmt(d.depensesJour)} sub="FCFA de dépenses aujourd'hui"
+        <StatCard i={5} icon={Receipt} label={t('school.exits')}
+          value={fmt(d.depensesJour)} sub={`FCFA ${t('finance.expenses').toLowerCase()}`}
           color={d.depensesJour > 100000 ? '#DC2626' : '#DC2626'}
-          href="/dashboard/ecole/tresorerie" badge="Dépenses" />
+          href="/dashboard/ecole/tresorerie" badge={t('finance.expenses')} />
       </div>
 
       {/* ── Graphique + panel droit ──────────────────────────────────────────── */}
@@ -353,12 +356,12 @@ export default function EcoleOverviewPage() {
         }}>
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>Analyse des Flux Financiers</p>
-              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Paiements scolaires — 8 derniers mois</p>
+              <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{t('school.cashflowAnalysis')}</p>
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')} — 8 {t('school.lastMonths')}</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-secondary)' }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#DC2626' }} />
-              Revenus encaissés
+              {t('finance.revenue')}
             </div>
           </div>
           <ResponsiveContainer width="100%" height={200}>
@@ -370,7 +373,7 @@ export default function EcoleOverviewPage() {
               <Tooltip
                 contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12 }}
                 labelStyle={{ color: 'var(--text-secondary)' }}
-                formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, 'Recettes']}
+                formatter={(value) => [`${fmt(Number(value ?? 0))} FCFA`, t('school.receipts')]}
               />
               <Line type="monotone" dataKey="montant" stroke="#DC2626" strokeWidth={2}
                 dot={false} activeDot={{ r: 4, fill: '#DC2626', stroke: 'rgba(245,30,51,0.25)', strokeWidth: 6 }} />
@@ -384,14 +387,14 @@ export default function EcoleOverviewPage() {
           display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
         }}>
           <div>
-            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Objectif Recouvrement</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t('school.recoveryTarget')}</p>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
               <p style={{ fontSize: 48, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>{recoveryRate}%</p>
               <span style={{
                 fontSize: 11, fontWeight: 700,
                 color: recoveryRate >= 80 ? '#DC2626' : recoveryRate >= 50 ? '#DC2626' : '#DC2626',
               }}>
-                {recoveryRate >= 80 ? '✓ En bonne voie' : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
+                {recoveryRate >= 80 ? `✓ ${t('school.onTrack')}` : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
               </span>
             </div>
             <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden', marginBottom: 12 }}>
@@ -405,28 +408,28 @@ export default function EcoleOverviewPage() {
             <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {d.montantImpayes > 0
                 ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
-                : <>Aucun impayé — <strong style={{ color: '#DC2626' }}>excellent !</strong></>
+                : <>{t('school.noUnpaid')} — <strong style={{ color: '#DC2626' }}>{t('school.excellent')}</strong></>
               }
             </p>
           </div>
           <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Chiffre d&apos;affaire annuel</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>{t('school.annualRevenue')}</p>
             <p style={{ fontSize: 20, fontWeight: 800, color: '#DC2626' }}>{fmt(d.revenuAnnee)} FCFA</p>
-            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Total encaissé depuis le début</p>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('common.total')} {t('finance.revenue').toLowerCase()}</p>
           </div>
         </motion.div>
       </div>
 
       {/* ── Raccourcis ───────────────────────────────────────────────────────── */}
       <motion.div {...fade(8)}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Raccourcis</p>
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{t('school.shortcuts')}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
-            { label: 'Comptabilité',      href: '/dashboard/ecole/comptabilite',  icon: Calculator,    color: '#7C3AED', sub: 'Journal OHADA' },
-            { label: 'RH & Paie',         href: '/dashboard/ecole/rh',            icon: Users,         color: '#DC2626', sub: 'Personnel & salaires' },
-            { label: 'Rôles & Accès',     href: '/dashboard/roles',               icon: ShieldCheck,   color: '#DC2626', sub: 'Permissions' },
-            { label: 'Page Étudiants',    href: '/dashboard/ecole/scolarite',     icon: GraduationCap, color: '#DC2626', sub: 'Inscriptions & frais' },
-            { label: "Chiffre d'affaire", href: '/dashboard/ecole/direction',     icon: TrendingUp,    color: '#DC2626', sub: 'Direction & rapports' },
+            { label: t('nav.comptabilite'),  href: '/dashboard/ecole/comptabilite',  icon: Calculator,    color: '#7C3AED', sub: 'Journal OHADA' },
+            { label: t('nav.rh'),            href: '/dashboard/ecole/rh',            icon: Users,         color: '#DC2626', sub: `${t('rh.employees')} & ${t('rh.payroll')}` },
+            { label: t('nav.roles'),         href: '/dashboard/roles',               icon: ShieldCheck,   color: '#DC2626', sub: t('roles.permission') },
+            { label: t('school.students'),   href: '/dashboard/ecole/scolarite',     icon: GraduationCap, color: '#DC2626', sub: `${t('school.enrollment')} & ${t('school.fees')}` },
+            { label: t('school.annualRevenue'), href: '/dashboard/ecole/direction',  icon: TrendingUp,    color: '#DC2626', sub: `${t('nav.direction')} & ${t('nav.rapports')}` },
           ].map(({ label, href, color, icon: Icon, sub }) => (
             <Link key={href} href={href}
               className="flex items-center gap-3 transition-all duration-200 group"
@@ -449,25 +452,25 @@ export default function EcoleOverviewPage() {
       <motion.div {...fade(9)} style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
           <div>
-            <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Transactions Récentes</p>
-            <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>Derniers paiements scolaires enregistrés</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{t('school.recentTransactions')}</p>
+            <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')}</p>
           </div>
           <Link href="/dashboard/ecole/direction" style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
-            Voir tout →
+            {t('common.seeAll')} →
           </Link>
         </div>
 
         {d.recentPaie.length === 0 ? (
           <div style={{ padding: '48px 0', textAlign: 'center' }}>
             <DollarSign size={28} style={{ color: 'var(--border)', margin: '0 auto 8px' }} />
-            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Aucune transaction pour le moment.</p>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('school.noTransaction')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['Description', 'Date', 'Montant', 'Mode'].map(h => (
+                  {[t('common.description'), t('common.date'), t('common.amount'), t('common.type')].map(h => (
                     <th key={h} className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{h}</th>
                   ))}
                 </tr>
@@ -486,9 +489,9 @@ export default function EcoleOverviewPage() {
                         </div>
                         <div>
                           <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', maxWidth: 180 }} className="truncate">
-                            {p.libelle || 'Paiement scolarité'}
+                            {p.libelle || t('school.schoolPayments')}
                           </p>
-                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>Scolarité</p>
+                          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{t('school.fees')}</p>
                         </div>
                       </div>
                     </td>
@@ -500,7 +503,7 @@ export default function EcoleOverviewPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: 'rgba(245,30,51,0.1)', color: '#DC2626' }}>
-                        {p.methode?.replace(/_/g, ' ') ?? 'Espèces'}
+                        {p.methode?.replace(/_/g, ' ') ?? t('finance.cash')}
                       </span>
                     </td>
                   </tr>
@@ -516,10 +519,10 @@ export default function EcoleOverviewPage() {
         <motion.div {...fade(10)} style={{ background: 'rgba(245,30,51,0.06)', border: '1px solid rgba(245,30,51,0.2)', borderRadius: 12, padding: '16px 20px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <AlertTriangle size={17} style={{ color: '#DC2626', flexShrink: 0, marginTop: 1 }} />
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Impayés en attente</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{t('school.unpaid')} {t('common.pending').toLowerCase()}</p>
             <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA à recouvrer.{' '}
-              <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>Traiter →</Link>
+              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA {t('school.recovery').toLowerCase()}.{' '}
+              <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>{t('common.validate')} →</Link>
             </p>
           </div>
         </motion.div>

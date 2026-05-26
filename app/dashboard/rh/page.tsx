@@ -18,6 +18,7 @@ import {
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -179,6 +180,7 @@ const QUICK_MODULES = [
 function TabEquipe({ tenantId, employes, onRefresh }: {
   tenantId: string; employes: Employe[]; onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [showForm,      setShowForm]      = useState(false)
   const [saving,        setSaving]        = useState(false)
   const [selected,      setSelected]      = useState<Employe | null>(null)
@@ -239,7 +241,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Supprimer cet employé définitivement ?')) return
+    if (!confirm(t('rh.deletePermanent'))) return
     await supabase.from('employes').delete().eq('id', id)
     setSelected(null)
     onRefresh()
@@ -252,10 +254,10 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
       {/* KPI strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Effectif actif',    val: employes.filter(e=>e.statut==='actif').length,                   color: '#10B981', icon: Users },
-          { label: 'En congé / Malade', val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, color: '#F59E0B', icon: Calendar },
-          { label: 'Masse salariale',   val: fmtFCFA(masseBrute),                                             color: '#3B82F6', icon: TrendingUp },
-          { label: 'Charge patronale',  val: fmtFCFA(masseBrute * TAUX_CNSS_PATRONAL),                        color: '#8B5CF6', icon: AlertTriangle },
+          { label: t('rh.activeSalary'),    val: employes.filter(e=>e.statut==='actif').length,                   color: '#10B981', icon: Users },
+          { label: t('rh.onLeaveOrSick'),   val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, color: '#F59E0B', icon: Calendar },
+          { label: t('rh.payrollMass'),     val: fmtFCFA(masseBrute),                                             color: '#3B82F6', icon: TrendingUp },
+          { label: t('rh.employerCharge'),  val: fmtFCFA(masseBrute * TAUX_CNSS_PATRONAL),                        color: '#8B5CF6', icon: AlertTriangle },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -278,7 +280,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
           <div className="relative">
             <input
               type="text"
-              placeholder="Rechercher un employé…"
+              placeholder={t('rh.searchEmployee')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-8 pr-3 py-2 text-[12px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 w-48"
@@ -296,7 +298,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     : 'border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]'
                 }`}
               >
-                {s === 'tous' ? 'Tous' : STATUT_STYLES[s]?.label ?? s}
+                {s === 'tous' ? t('common.all') : STATUT_STYLES[s]?.label ?? s}
               </button>
             ))}
           </div>
@@ -305,7 +307,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-3 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold hover:bg-amber-600 transition-colors shadow-sm"
         >
-          <Plus size={13} /> Ajouter employé
+          <Plus size={13} /> {t('rh.addEmployee')}
         </button>
       </div>
 
@@ -313,9 +315,9 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
       {displayed.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#E2E8F0] py-14 text-center">
           <Users size={36} className="mx-auto mb-3 text-[#CBD5E1]" />
-          <p className="text-sm text-[#64748B]">Aucun employé dans cette catégorie.</p>
+          <p className="text-sm text-[#64748B]">{t('rh.noEmployee')}</p>
           <button onClick={() => setShowForm(true)} className="mt-3 text-[12px] text-[#F59E0B] font-semibold hover:underline">
-            + Ajouter le premier employé
+            + {t('rh.addFirstEmployee')}
           </button>
         </div>
       ) : (
@@ -324,7 +326,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
             <table className="w-full text-sm min-w-[700px]">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                  {['Employé','Matricule','Poste / Dép.','Contrat','Statut','Brut','Net estimé','Actions'].map(h => (
+                  {[t('rh.employee'),t('rh.matricule'),'Poste / Dép.',t('rh.contract'),t('common.status'),t('rh.gross'),t('rh.net'),t('common.actions')].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-[10px] font-bold text-[#64748B] uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -400,7 +402,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     <EmployeeAvatar emp={selected} size="lg" />
                     <div>
                       <h2 className="text-base font-bold text-[#0F172A]">{selected.nom}</h2>
-                      <p className="text-xs text-[#64748B]">{selected.poste || 'Aucun poste'}</p>
+                      <p className="text-xs text-[#64748B]">{selected.poste || t('rh.position')}</p>
                       {selected.departement && (
                         <p className="text-[10px] text-[#94A3B8]">{selected.departement}</p>
                       )}
@@ -427,7 +429,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 {/* Change status */}
                 <div>
-                  <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide mb-2">Changer le statut</p>
+                  <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide mb-2">{t('rh.changeStatus')}</p>
                   <div className="grid grid-cols-3 gap-1.5">
                     {(Object.keys(STATUT_STYLES) as Statut[]).map(s => (
                       <button key={s} onClick={() => updateStatut(selected.id, s)}
@@ -445,15 +447,15 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 {/* Info grid */}
                 <div className="space-y-1.5">
                   {[
-                    ['Matricule / Code',  selected.matricule ?? selected.agent_code ?? '—'],
-                    ['Email',             selected.email || '—'],
-                    ['Téléphone',         selected.telephone || '—'],
-                    ['N° CNSS',           selected.cnss || '—'],
-                    ['Département',       selected.departement || '—'],
-                    ['Manager',           selected.manager || '—'],
-                    ['Date d\'embauche',  selected.date_embauche ? new Date(selected.date_embauche).toLocaleDateString('fr-FR') : '—'],
-                    ['Date naissance',    selected.date_naissance ? `${new Date(selected.date_naissance).toLocaleDateString('fr-FR')} (${ageYears(selected.date_naissance)} ans)` : '—'],
-                    ['Fin de contrat',    selected.date_fin_contrat ? new Date(selected.date_fin_contrat).toLocaleDateString('fr-FR') : '—'],
+                    [t('rh.matricule'),   selected.matricule ?? selected.agent_code ?? '—'],
+                    [t('common.email'),   selected.email || '—'],
+                    [t('common.phone'),   selected.telephone || '—'],
+                    [t('rh.cnss'),        selected.cnss || '—'],
+                    [t('rh.department'),  selected.departement || '—'],
+                    [t('rh.manager'),     selected.manager || '—'],
+                    [t('rh.startDate'),   selected.date_embauche ? new Date(selected.date_embauche).toLocaleDateString('fr-FR') : '—'],
+                    [t('rh.birthDate'),   selected.date_naissance ? `${new Date(selected.date_naissance).toLocaleDateString('fr-FR')} (${ageYears(selected.date_naissance)} ans)` : '—'],
+                    [t('rh.endDate'),     selected.date_fin_contrat ? new Date(selected.date_fin_contrat).toLocaleDateString('fr-FR') : '—'],
                   ].map(([k, v]) => (
                     <div key={k} className="flex justify-between items-center bg-[#F8FAFC] rounded-lg px-3 py-2">
                       <span className="text-[11px] text-[#64748B]">{k}</span>
@@ -464,20 +466,20 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 {/* Payroll preview */}
                 <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 space-y-2">
-                  <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide mb-3">Simulation paie</p>
+                  <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide mb-3">{t('rh.paySimulation')}</p>
                   {(() => {
                     const { cnss, irpp, net, patro } = calcNet(selected.salaire_base)
                     return (
                       <>
-                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">Salaire brut</span><span className="font-semibold text-[#0F172A]">{fmt(selected.salaire_base)} FCFA</span></div>
-                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">CNSS salarié (5,04%)</span><span className="text-red-500">−{fmt(cnss)} FCFA</span></div>
-                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">IRPP progressif</span><span className="text-red-500">−{fmt(irpp)} FCFA</span></div>
+                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.gross')}</span><span className="font-semibold text-[#0F172A]">{fmt(selected.salaire_base)} FCFA</span></div>
+                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.cnss')} (5,04%)</span><span className="text-red-500">−{fmt(cnss)} FCFA</span></div>
+                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.irpp')}</span><span className="text-red-500">−{fmt(irpp)} FCFA</span></div>
                         <div className="flex justify-between font-bold text-[13px] pt-2 border-t border-[#E2E8F0]">
-                          <span className="text-[#0F172A]">Net à payer</span>
+                          <span className="text-[#0F172A]">{t('rh.netToPay')}</span>
                           <span className="text-[#10B981]">{fmt(net)} FCFA</span>
                         </div>
                         <div className="flex justify-between text-[11px] pt-1">
-                          <span className="text-[#94A3B8]">Charge patronale CNSS</span>
+                          <span className="text-[#94A3B8]">{t('rh.employerCnss')}</span>
                           <span className="text-[#94A3B8]">{fmt(patro)} FCFA</span>
                         </div>
                       </>
@@ -487,7 +489,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 {selected.notes && (
                   <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-blue-600 mb-1">Notes internes</p>
+                    <p className="text-[10px] font-bold text-blue-600 mb-1">{t('rh.internalNotes')}</p>
                     <p className="text-[12px] text-[#64748B]">{selected.notes}</p>
                   </div>
                 )}
@@ -496,19 +498,19 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 <div className="grid grid-cols-2 gap-2">
                   <Link href="/dashboard/rh/paie"
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-[12px] font-semibold hover:bg-amber-100 transition-colors">
-                    <FileText size={13} /> Générer bulletin
+                    <FileText size={13} /> {t('rh.generateSlip')}
                   </Link>
                   <Link href="/dashboard/rh/presences"
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl text-[12px] font-semibold hover:bg-blue-100 transition-colors">
-                    <Clock size={13} /> Présences
+                    <Clock size={13} /> {t('rh.presences')}
                   </Link>
                   <Link href="/dashboard/rh/evaluations"
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] rounded-xl text-[12px] font-semibold hover:bg-[#F1F5F9] transition-colors">
-                    <Star size={13} /> Évaluation
+                    <Star size={13} /> {t('rh.evaluation')}
                   </Link>
                   <button onClick={() => handleDelete(selected.id)}
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-red-50 border border-red-200 text-red-600 rounded-xl text-[12px] font-semibold hover:bg-red-100 transition-colors">
-                    <Trash2 size={13} /> Supprimer
+                    <Trash2 size={13} /> {t('common.delete')}
                   </button>
                 </div>
               </div>
@@ -529,13 +531,13 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
             >
               <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-[16px] font-bold text-[#0F172A]">Nouvel employé</h2>
+                  <h2 className="text-[16px] font-bold text-[#0F172A]">{t('rh.newEmployee')}</h2>
                   <button onClick={() => setShowForm(false)}><X size={18} className="text-[#64748B]" /></button>
                 </div>
 
                 {/* Photo URL */}
                 <div className="mb-4">
-                  <label className={lCls}>Photo (URL)</label>
+                  <label className={lCls}>{t('rh.photoUrl')}</label>
                   <input value={form.photo_url} onChange={e => setForm(p => ({...p, photo_url: e.target.value}))}
                     placeholder="https://..." className={iCls} />
                 </div>
@@ -563,24 +565,24 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <div>
-                    <label className={lCls}>Poste / Fonction</label>
+                    <label className={lCls}>{t('rh.positionFunc')}</label>
                     <input value={form.poste} onChange={e => setForm(p => ({...p, poste: e.target.value}))}
                       placeholder="Directeur Général, Comptable…" className={iCls} />
                   </div>
                   <div>
-                    <label className={lCls}>Type de contrat</label>
+                    <label className={lCls}>{t('rh.contractType')}</label>
                     <select value={form.contrat} onChange={e => setForm(p => ({...p, contrat: e.target.value as Contrat}))} className={iCls}>
                       {Object.entries(CONTRAT_STYLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className={lCls}>Salaire brut (FCFA)</label>
+                    <label className={lCls}>{t('rh.grossSalary')}</label>
                     <input type="number" value={form.salaire_base}
                       onChange={e => setForm(p => ({...p, salaire_base: e.target.value}))}
                       placeholder="150000" className={iCls} />
                   </div>
                   <div>
-                    <label className={lCls}>Ville de travail</label>
+                    <label className={lCls}>{t('rh.workCity')}</label>
                     <select value={form.ville} onChange={e => setForm(p => ({...p, ville: e.target.value}))} className={iCls}>
                       <option value="PNR">Pointe-Noire</option>
                       <option value="BZV">Brazzaville</option>
@@ -593,23 +595,23 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     </select>
                   </div>
                   <div>
-                    <label className={lCls}>Date d&apos;embauche</label>
+                    <label className={lCls}>{t('rh.startDate')}</label>
                     <input type="date" value={form.date_embauche} onChange={e => setForm(p => ({...p, date_embauche: e.target.value}))} className={iCls} />
                   </div>
                   <div>
-                    <label className={lCls}>Date de naissance</label>
+                    <label className={lCls}>{t('rh.birthDate')}</label>
                     <input type="date" value={form.date_naissance} onChange={e => setForm(p => ({...p, date_naissance: e.target.value}))} className={iCls} />
                   </div>
                   {(form.contrat === 'cdd' || form.contrat === 'stage' || form.contrat === 'vacation') && (
                     <div className="col-span-2">
-                      <label className={lCls}>Fin de contrat</label>
+                      <label className={lCls}>{t('rh.endDate')}</label>
                       <input type="date" value={form.date_fin_contrat} onChange={e => setForm(p => ({...p, date_fin_contrat: e.target.value}))} className={iCls} />
                     </div>
                   )}
                 </div>
 
                 <div className="mt-3">
-                  <label className={lCls}>Notes internes</label>
+                  <label className={lCls}>{t('rh.internalNotes')}</label>
                   <textarea value={form.notes} onChange={e => setForm(p => ({...p, notes: e.target.value}))}
                     rows={2} placeholder="Observations, informations complémentaires…"
                     className={`${iCls} resize-none`} />
@@ -617,7 +619,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 {/* Matricule preview */}
                 <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                  <p className="text-[10px] font-bold text-amber-700 mb-1">Matricule généré automatiquement</p>
+                  <p className="text-[10px] font-bold text-amber-700 mb-1">{t('rh.autoMatricule')}</p>
                   <p className="font-mono text-[13px] font-bold text-amber-900">
                     {form.nom ? form.nom.substring(0, 3).toUpperCase() : 'XXX'}-{new Date().getFullYear()}-{form.ville || 'PNR'}-####
                   </p>
@@ -628,10 +630,10 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                   const { cnss, irpp, net } = calcNet(Number(form.salaire_base))
                   return (
                     <div className="mt-3 bg-[#F8FAFC] rounded-xl p-3 text-[12px] space-y-1">
-                      <p className="font-bold text-[#64748B] mb-2">Aperçu calcul paie</p>
-                      <div className="flex justify-between"><span className="text-[#64748B]">CNSS salarié</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
-                      <div className="flex justify-between"><span className="text-[#64748B]">IRPP</span><span className="text-red-500">−{fmt(irpp)} F</span></div>
-                      <div className="flex justify-between font-bold border-t border-[#E2E8F0] pt-1"><span>Net à payer</span><span className="text-[#10B981]">{fmt(net)} F</span></div>
+                      <p className="font-bold text-[#64748B] mb-2">{t('rh.payPreview')}</p>
+                      <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.cnss')}</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
+                      <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.irpp')}</span><span className="text-red-500">−{fmt(irpp)} F</span></div>
+                      <div className="flex justify-between font-bold border-t border-[#E2E8F0] pt-1"><span>{t('rh.netToPay')}</span><span className="text-[#10B981]">{fmt(net)} F</span></div>
                     </div>
                   )
                 })()}
@@ -639,12 +641,12 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                 <div className="flex gap-3 mt-5">
                   <button onClick={() => setShowForm(false)}
                     className="flex-1 py-2.5 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[13px] font-semibold hover:bg-[#F8FAFC]">
-                    Annuler
+                    {t('common.cancel')}
                   </button>
                   <button onClick={handleSave} disabled={saving || !form.nom.trim()}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#F59E0B] text-white rounded-xl text-[13px] font-bold disabled:opacity-50 hover:bg-amber-600 transition-colors">
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                    {saving ? 'Enregistrement…' : 'Créer employé'}
+                    {saving ? t('rh.saving') : t('rh.createEmployee')}
                   </button>
                 </div>
               </div>
@@ -661,6 +663,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 function TabConges({ tenantId, employes, conges, onRefresh }: {
   tenantId: string; employes: Employe[]; conges: Conge[]; onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
@@ -712,9 +715,9 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'En attente',  val: pending.length,  color: '#F59E0B' },
-          { label: 'Approuvés',   val: approved.length, color: '#10B981' },
-          { label: 'Total jours', val: approved.reduce((s, c) => s + c.nb_jours, 0), color: '#2563EB' },
+          { label: t('common.pending'),  val: pending.length,  color: '#F59E0B' },
+          { label: t('common.approved'), val: approved.length, color: '#10B981' },
+          { label: t('common.total'),    val: approved.reduce((s, c) => s + c.nb_jours, 0), color: '#2563EB' },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-2xl border border-[#E2E8F0] p-4">
             <p className="text-[20px] font-bold tabular-nums" style={{ color: k.color }}>{k.val}</p>
@@ -727,7 +730,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
         <p className="text-[13px] text-[#64748B]">{conges.length} demande{conges.length !== 1 ? 's' : ''}</p>
         <button onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-3 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold hover:bg-amber-600 transition-colors">
-          <Plus size={13} /> Nouvelle demande
+          <Plus size={13} /> {t('rh.newLeaveRequest')}
         </button>
       </div>
 
@@ -735,41 +738,41 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
         {showForm && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="bg-white border border-[#E2E8F0] rounded-2xl p-5 space-y-4 overflow-hidden shadow-sm">
-            <h3 className="text-[14px] font-bold text-[#0F172A]">Demande de congé</h3>
+            <h3 className="text-[14px] font-bold text-[#0F172A]">{t('rh.leaveRequest')}</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={lCls}>Employé *</label>
+                <label className={lCls}>{t('rh.employee')} *</label>
                 <select value={form.employe_id} onChange={e => setForm(p => ({...p, employe_id: e.target.value}))} className={iCls}>
                   <option value="">Sélectionner...</option>
                   {employes.filter(e => e.statut === 'actif').map(e => <option key={e.id} value={e.id}>{e.nom}</option>)}
                 </select>
               </div>
               <div>
-                <label className={lCls}>Type de congé</label>
+                <label className={lCls}>{t('rh.leaveType')}</label>
                 <select value={form.type_conge} onChange={e => setForm(p => ({...p, type_conge: e.target.value as TypeConge}))} className={iCls}>
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div>
-                <label className={lCls}>Date début</label>
+                <label className={lCls}>{t('rh.leaveStart')}</label>
                 <input type="date" value={form.date_debut} onChange={e => setForm(p => ({...p, date_debut: e.target.value}))} className={iCls} />
               </div>
               <div>
-                <label className={lCls}>Date fin {joursForm > 0 && <span className="text-amber-600">({joursForm} j)</span>}</label>
+                <label className={lCls}>{t('rh.leaveEnd')} {joursForm > 0 && <span className="text-amber-600">({joursForm} j)</span>}</label>
                 <input type="date" value={form.date_fin} onChange={e => setForm(p => ({...p, date_fin: e.target.value}))} className={iCls} />
               </div>
             </div>
             <div>
-              <label className={lCls}>Motif</label>
+              <label className={lCls}>{t('rh.leaveReason')}</label>
               <input value={form.motif} onChange={e => setForm(p => ({...p, motif: e.target.value}))}
-                placeholder="Motif de la demande…" className={iCls} />
+                placeholder={t('rh.leaveReason') + '…'} className={iCls} />
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-[12px] text-[#64748B] hover:text-[#0F172A]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-[12px] text-[#64748B] hover:text-[#0F172A]">{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving || !form.employe_id || joursForm < 1}
                 className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold disabled:opacity-50">
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                Soumettre
+                {t('common.submit')}
               </button>
             </div>
           </motion.div>
@@ -779,7 +782,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
       {conges.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#E2E8F0] py-12 text-center">
           <Calendar size={32} className="mx-auto mb-3 text-[#CBD5E1]" />
-          <p className="text-[13px] text-[#64748B]">Aucune demande de congé.</p>
+          <p className="text-[13px] text-[#64748B]">{t('rh.noLeave')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -823,6 +826,7 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
 // ── Onglet : Alertes ───────────────────────────────────────────────────────────
 
 function TabAlertes({ employes }: { employes: Employe[] }) {
+  const { t } = useLocale()
   const today = new Date()
   const alerts: { type: 'error' | 'warning' | 'info'; emp: Employe; msg: string; sub: string; href: string }[] = []
 
@@ -860,7 +864,7 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
             <Check size={22} className="text-green-600" />
           </div>
-          <p className="text-[13px] text-[#64748B]">Aucune alerte RH active. Tout est en ordre.</p>
+          <p className="text-[13px] text-[#64748B]">{t('rh.noAlert')}</p>
         </div>
       ) : (
         alerts.map((a, i) => {
@@ -890,6 +894,7 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
 // ── Onglet : Rapports ──────────────────────────────────────────────────────────
 
 function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[] }) {
+  const { t } = useLocale()
   const actifs      = employes.filter(e => e.statut === 'actif')
   const masseBrute  = actifs.reduce((s, e) => s + e.salaire_base, 0)
   const massePatro  = actifs.reduce((s, e) => s + Math.min(e.salaire_base, PLAFOND_CNSS) * TAUX_CNSS_PATRONAL, 0)
@@ -905,12 +910,12 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
     <div className="space-y-4">
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {[
-          { label: 'Masse brute',         val: fmtFCFA(masseBrute),          color: '#0F172A', sub: 'employés actifs' },
-          { label: 'Masse nette',          val: fmtFCFA(masseNette),          color: '#10B981', sub: 'après CNSS + IRPP' },
-          { label: 'Charges patronales',   val: fmtFCFA(massePatro),          color: '#EF4444', sub: '14,16% plafonné' },
-          { label: 'Coût total employeur', val: fmtFCFA(masseBrute + massePatro), color: '#0F172A', sub: 'brut + charges' },
-          { label: 'Congés accordés',      val: `${totalJours} jours`,         color: '#2563EB', sub: `${congesApp.length} demande(s)` },
-          { label: 'Effectif total',        val: employes.length,              color: '#0F172A', sub: `${actifs.length} actifs` },
+          { label: t('rh.grossMass'),        val: fmtFCFA(masseBrute),              color: '#0F172A', sub: t('rh.employees') },
+          { label: t('rh.netMass'),          val: fmtFCFA(masseNette),              color: '#10B981', sub: `après ${t('rh.cnss')} + ${t('rh.irpp')}` },
+          { label: t('rh.employerCharges'),  val: fmtFCFA(massePatro),              color: '#EF4444', sub: '14,16% plafonné' },
+          { label: t('rh.totalCost'),        val: fmtFCFA(masseBrute + massePatro), color: '#0F172A', sub: 'brut + charges' },
+          { label: t('rh.grantedLeave'),     val: `${totalJours} jours`,             color: '#2563EB', sub: `${congesApp.length} demande(s)` },
+          { label: t('rh.totalHeadcount'),   val: employes.length,                  color: '#0F172A', sub: `${actifs.length} ${t('common.active')}` },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider mb-2">{k.label}</p>
@@ -921,7 +926,7 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
       </div>
 
       <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-sm">
-        <h3 className="text-[13px] font-bold text-[#0F172A] mb-4">Répartition par type de contrat</h3>
+        <h3 className="text-[13px] font-bold text-[#0F172A] mb-4">{t('rh.contractBreakdown')}</h3>
         <div className="space-y-3">
           {parContrat.map(({ label, count, color }) => (
             <div key={label} className="flex items-center gap-3">
@@ -942,12 +947,12 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
         <Link href="/dashboard/rh/paie"
           className="flex items-center gap-3 p-4 bg-white border border-[#E2E8F0] rounded-2xl hover:border-amber-200 hover:shadow-md transition-all">
           <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center"><FileText size={16} className="text-amber-600" /></div>
-          <div><p className="text-[13px] font-semibold text-[#0F172A]">Traitement de la paie</p><p className="text-[11px] text-[#64748B]">Générer les bulletins</p></div>
+          <div><p className="text-[13px] font-semibold text-[#0F172A]">{t('rh.payProcessing')}</p><p className="text-[11px] text-[#64748B]">{t('rh.generateSlips')}</p></div>
         </Link>
         <Link href="/dashboard/rh/analytics"
           className="flex items-center gap-3 p-4 bg-white border border-[#E2E8F0] rounded-2xl hover:border-amber-200 hover:shadow-md transition-all">
           <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center"><BarChart2 size={16} className="text-blue-600" /></div>
-          <div><p className="text-[13px] font-semibold text-[#0F172A]">Analytics RH</p><p className="text-[11px] text-[#64748B]">Statistiques avancées</p></div>
+          <div><p className="text-[13px] font-semibold text-[#0F172A]">{t('rh.rhAnalytics')}</p><p className="text-[11px] text-[#64748B]">{t('rh.advancedStats')}</p></div>
         </Link>
       </div>
     </div>
@@ -961,16 +966,17 @@ const iCls = 'w-full bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 text-
 
 // ── Page principale ────────────────────────────────────────────────────────────
 
-const MAIN_TABS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'equipe',    label: 'Équipe',    icon: Users },
-  { id: 'conges',    label: 'Congés',    icon: Calendar },
-  { id: 'alertes',   label: 'Alertes',   icon: Bell },
-  { id: 'rapports',  label: 'Rapports',  icon: TrendingUp },
+const MAIN_TABS_DEF = [
+  { id: 'dashboard', labelKey: 'rh.dashboard', icon: LayoutDashboard },
+  { id: 'equipe',    labelKey: 'rh.team',       icon: Users },
+  { id: 'conges',    labelKey: 'rh.leave',      icon: Calendar },
+  { id: 'alertes',   labelKey: 'rh.alerts',     icon: Bell },
+  { id: 'rapports',  labelKey: 'rh.reports',    icon: TrendingUp },
 ]
 
 export default function RHPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [activeTab,  setActiveTab]  = useState('dashboard')
   const [employes,   setEmployes]   = useState<Employe[]>([])
   const [conges,     setConges]     = useState<Conge[]>([])
@@ -1030,10 +1036,10 @@ export default function RHPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Employés actifs',   val: employes.filter(e=>e.statut==='actif').length,    color: '#10B981', icon: Users,         sub: `${employes.length} total` },
-          { label: 'Masse salariale',   val: fmtFCFA(masseSalariale),                          color: '#F59E0B', icon: DollarSign,    sub: 'mensuelle brute' },
-          { label: 'Congés en attente', val: pendingConges,                                    color: '#2563EB', icon: Calendar,      sub: 'à valider' },
-          { label: 'Contrats expirant', val: expiring,                                         color: expiring > 0 ? '#EF4444' : '#64748B', icon: AlertTriangle, sub: 'dans 30 jours' },
+          { label: t('rh.employees'),           val: employes.filter(e=>e.statut==='actif').length,    color: '#10B981', icon: Users,         sub: `${employes.length} total` },
+          { label: t('rh.payrollMass'),         val: fmtFCFA(masseSalariale),                          color: '#F59E0B', icon: DollarSign,    sub: 'mensuelle brute' },
+          { label: t('rh.leave'),               val: pendingConges,                                    color: '#2563EB', icon: Calendar,      sub: t('rh.toValidate') },
+          { label: t('rh.expiringContracts'),   val: expiring,                                         color: expiring > 0 ? '#EF4444' : '#64748B', icon: AlertTriangle, sub: t('rh.in30days') },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -1054,7 +1060,7 @@ export default function RHPage() {
 
       {/* Quick module access */}
       <div>
-        <h3 className="text-[13px] font-bold text-[#0F172A] mb-3">Modules RH</h3>
+        <h3 className="text-[13px] font-bold text-[#0F172A] mb-3">{t('rh.modules')}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {QUICK_MODULES.map(mod => {
             const Icon = mod.icon
@@ -1078,9 +1084,9 @@ export default function RHPage() {
         {/* Recent employees */}
         <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm">
           <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
-            <h3 className="text-[13px] font-bold text-[#0F172A]">Derniers employés</h3>
+            <h3 className="text-[13px] font-bold text-[#0F172A]">{t('rh.lastEmployees')}</h3>
             <button onClick={() => setActiveTab('equipe')} className="text-[11px] text-[#F59E0B] font-semibold hover:underline flex items-center gap-0.5">
-              Voir tous <ArrowRight size={11} />
+              {t('common.seeAll')} <ArrowRight size={11} />
             </button>
           </div>
           <div className="divide-y divide-[#E2E8F0]">
@@ -1095,7 +1101,7 @@ export default function RHPage() {
               </div>
             ))}
             {employes.length === 0 && (
-              <div className="px-5 py-8 text-center text-[12px] text-[#94A3B8]">Aucun employé</div>
+              <div className="px-5 py-8 text-center text-[12px] text-[#94A3B8]">{t('rh.noEmployeeFull')}</div>
             )}
           </div>
         </div>
@@ -1103,9 +1109,9 @@ export default function RHPage() {
         {/* Recent bulletins */}
         <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm">
           <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
-            <h3 className="text-[13px] font-bold text-[#0F172A]">Derniers bulletins de paie</h3>
+            <h3 className="text-[13px] font-bold text-[#0F172A]">{t('rh.lastPayslips')}</h3>
             <Link href="/dashboard/rh/paie" className="text-[11px] text-[#F59E0B] font-semibold hover:underline flex items-center gap-0.5">
-              Gérer <ArrowRight size={11} />
+              {t('rh.payManage')} <ArrowRight size={11} />
             </Link>
           </div>
           <div className="divide-y divide-[#E2E8F0]">
@@ -1131,7 +1137,7 @@ export default function RHPage() {
               </div>
             ))}
             {bulletins.length === 0 && (
-              <div className="px-5 py-8 text-center text-[12px] text-[#94A3B8]">Aucun bulletin généré</div>
+              <div className="px-5 py-8 text-center text-[12px] text-[#94A3B8]">{t('rh.noPayslip')}</div>
             )}
           </div>
         </div>
@@ -1163,25 +1169,25 @@ export default function RHPage() {
             <Users size={18} className="text-amber-600" />
           </div>
           <div>
-            <h1 className="text-[20px] font-bold text-[#0F172A]">RH & Paie</h1>
+            <h1 className="text-[20px] font-bold text-[#0F172A]">{t('nav.rh')}</h1>
             <p className="text-[11px] text-[#64748B]">
-              {employes.length} employé{employes.length !== 1 ? 's' : ''} · {pendingConges} congé{pendingConges !== 1 ? 's' : ''} en attente
+              {employes.length} {t('rh.employee')}{employes.length !== 1 ? 's' : ''} · {pendingConges} {t('rh.leave')} {t('rh.pendingLeave')}
             </p>
           </div>
         </div>
         <div className="flex gap-2">
           <Link href="/dashboard/rh/paie" className="flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[12px] font-semibold hover:border-amber-200 hover:text-amber-600 transition-colors">
-            <DollarSign size={13} /> Paie
+            <DollarSign size={13} /> {t('rh.payroll')}
           </Link>
           <Link href="/dashboard/rh/recrutement" className="flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[12px] font-semibold hover:border-blue-200 hover:text-blue-600 transition-colors">
-            <Briefcase size={13} /> Recrutement
+            <Briefcase size={13} /> {t('rh.recruitment')}
           </Link>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-0.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-1">
-        {MAIN_TABS.map(tab => {
+        {MAIN_TABS_DEF.map(tab => {
           const Icon = tab.icon
           return (
             <button
@@ -1194,7 +1200,7 @@ export default function RHPage() {
               }`}
             >
               <Icon size={13} />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="hidden sm:inline">{t(tab.labelKey)}</span>
               {tab.id === 'alertes' && nbAlertes > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center bg-[#EF4444] text-white">
                   {nbAlertes}

@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
@@ -48,6 +49,7 @@ function today() { return new Date().toISOString().split('T')[0] }
 
 export default function TresorerieDashboard() {
   const { tenantId, loading: tLoading } = useTenant()
+  const { t } = useLocale()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [caisses,      setCaisses]      = useState<Caisse[]>([])
   const [banques,      setBanques]      = useState<CompteBancaire[]>([])
@@ -180,7 +182,7 @@ export default function TresorerieDashboard() {
   if (tLoading || loading) return (
     <div className="flex items-center justify-center py-24">
       <div className="w-6 h-6 border-2 border-[#0891B2] border-t-transparent rounded-full animate-spin mr-2" />
-      <span className="text-[#94A3B8] text-[13px]">Chargement Trésorerie…</span>
+      <span className="text-[#94A3B8] text-[13px]">{t('treso.loading')}</span>
     </div>
   )
 
@@ -201,10 +203,10 @@ export default function TresorerieDashboard() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <PiggyBank size={22} className="text-[#0891B2]" />
-            Trésorerie Enterprise
+            {t('treso.enterprise')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            Flux financiers temps réel · Multi-comptes · OHADA
+            {t('treso.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -213,11 +215,11 @@ export default function TresorerieDashboard() {
           </button>
           <button onClick={() => setModal('enc')}
             className="flex items-center gap-1.5 px-3 py-2 bg-[#16A34A] text-white rounded-lg text-[12px] font-semibold hover:bg-[#15803D]">
-            <ArrowUpCircle size={13} /> Encaisser
+            <ArrowUpCircle size={13} /> {t('treso.encaisser')}
           </button>
           <button onClick={() => setModal('dec')}
             className="flex items-center gap-1.5 px-3 py-2 bg-[#DC2626] text-white rounded-lg text-[12px] font-semibold hover:bg-[#B91C1C]">
-            <ArrowDownCircle size={13} /> Décaisser
+            <ArrowDownCircle size={13} /> {t('treso.decaisser')}
           </button>
         </div>
       </div>
@@ -226,23 +228,23 @@ export default function TresorerieDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           {
-            label: 'Trésorerie Globale', value: tresorerie,
-            sub: `Banque + Caisse + Mobile`, icon: PiggyBank,
+            label: t('treso.globalTreasury'), value: tresorerie,
+            sub: t('treso.bankPlusCash'), icon: PiggyBank,
             gradient: 'from-[#0891B2] to-[#0E7490]', trend: null,
           },
           {
-            label: 'Encaissements', value: encMois,
-            sub: `${monthTx.filter(t => t.type === 'entree').length} opérations ce mois`,
+            label: t('treso.receipts'), value: encMois,
+            sub: `${monthTx.filter(tx => tx.type === 'entree').length} ${t('treso.opsCount')}`,
             icon: TrendingUp, gradient: 'from-[#16A34A] to-[#15803D]', trend: pctEnc,
           },
           {
-            label: 'Décaissements', value: decMois,
-            sub: `${monthTx.filter(t => t.type === 'sortie').length} opérations ce mois`,
+            label: t('treso.payments'), value: decMois,
+            sub: `${monthTx.filter(tx => tx.type === 'sortie').length} ${t('treso.opsCount')}`,
             icon: TrendingDown, gradient: 'from-[#DC2626] to-[#B91C1C]', trend: pctDec,
           },
           {
-            label: 'Cashflow Net', value: cashflow,
-            sub: cashflow >= 0 ? 'Position positive' : 'Déficit ce mois',
+            label: t('treso.netCashflow'), value: cashflow,
+            sub: cashflow >= 0 ? t('treso.positivePos') : t('treso.deficitMonth'),
             icon: Zap, gradient: cashflow >= 0 ? 'from-[#8B5CF6] to-[#7C3AED]' : 'from-[#DC2626] to-[#B91C1C]',
             trend: null,
           },
@@ -279,8 +281,8 @@ export default function TresorerieDashboard() {
           {/* Account breakdown */}
           <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[14px] font-extrabold text-[#0F172A]">Répartition des fonds</h2>
-              <span className="text-[11px] font-bold text-[#0891B2]">{fmtFCFA(tresorerie)} total</span>
+              <h2 className="text-[14px] font-extrabold text-[#0F172A]">{t('treso.fundsBreakdown')}</h2>
+              <span className="text-[11px] font-bold text-[#0891B2]">{fmtFCFA(tresorerie)} {t('treso.totalLabel')}</span>
             </div>
             <div className="space-y-3">
               {/* Banques */}
@@ -288,7 +290,7 @@ export default function TresorerieDashboard() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Landmark size={13} className="text-[#0891B2]" />
-                    <span className="text-[11px] font-bold text-[#64748B] uppercase">Banques</span>
+                    <span className="text-[11px] font-bold text-[#64748B] uppercase">{t('treso.banks')}</span>
                     <span className="ml-auto text-[12px] font-extrabold text-[#0891B2]">{fmtFCFA(totalBanque)}</span>
                   </div>
                   {banques.map(b => (
@@ -301,7 +303,7 @@ export default function TresorerieDashboard() {
                     </div>
                   ))}
                   {banques.length === 0 && (
-                    <p className="text-[11px] text-[#94A3B8] py-2">Aucun compte bancaire</p>
+                    <p className="text-[11px] text-[#94A3B8] py-2">{t('treso.noBankAccount')}</p>
                   )}
                 </div>
               )}
@@ -310,7 +312,7 @@ export default function TresorerieDashboard() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Archive size={13} className="text-[#D97706]" />
-                    <span className="text-[11px] font-bold text-[#64748B] uppercase">Caisses</span>
+                    <span className="text-[11px] font-bold text-[#64748B] uppercase">{t('treso.cashLabel')}</span>
                     <span className="ml-auto text-[12px] font-extrabold text-[#D97706]">{fmtFCFA(totalCaisse)}</span>
                   </div>
                   {caisses.map(c => (
@@ -329,7 +331,7 @@ export default function TresorerieDashboard() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Smartphone size={13} className="text-[#8B5CF6]" />
-                    <span className="text-[11px] font-bold text-[#64748B] uppercase">Mobile Money</span>
+                    <span className="text-[11px] font-bold text-[#64748B] uppercase">{t('treso.mobile')}</span>
                     <span className="ml-auto text-[12px] font-extrabold text-[#8B5CF6]">{fmtFCFA(totalWallets)}</span>
                   </div>
                   {wallets.map(w => (
@@ -345,7 +347,7 @@ export default function TresorerieDashboard() {
               )}
               {banques.length === 0 && caisses.length === 0 && wallets.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="text-[13px] text-[#94A3B8]">Aucun compte configuré</p>
+                  <p className="text-[13px] text-[#94A3B8]">{t('treso.noAccount')}</p>
                   <div className="flex gap-2 justify-center mt-3">
                     <Link href="/dashboard/tresorerie/banques"
                       className="text-[11px] px-3 py-1.5 bg-[#EFF6FF] text-[#0891B2] rounded-lg font-semibold">
@@ -364,10 +366,10 @@ export default function TresorerieDashboard() {
           {/* Cashflow Chart 30 jours */}
           <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[14px] font-extrabold text-[#0F172A]">Cashflow — 30 derniers jours</h2>
+              <h2 className="text-[14px] font-extrabold text-[#0F172A]">{t('treso.cashflow30')}</h2>
               <div className="flex gap-3 text-[10px]">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#16A34A] inline-block" />Entrées</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#DC2626] inline-block" />Sorties</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#16A34A] inline-block" />{t('treso.entries')}</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#DC2626] inline-block" />{t('treso.exits')}</span>
               </div>
             </div>
             <div className="flex items-end gap-0.5 h-28">
@@ -393,7 +395,7 @@ export default function TresorerieDashboard() {
 
           {/* Quick access modules */}
           <div className="bg-white rounded-2xl border border-[#E2E8F0] p-4">
-            <h2 className="text-[13px] font-extrabold text-[#0F172A] mb-3">Accès rapides</h2>
+            <h2 className="text-[13px] font-extrabold text-[#0F172A] mb-3">{t('treso.quickAccess')}</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { href: '/dashboard/tresorerie/caisses',        label: 'Caisses',          icon: Archive,       color: '#D97706' },
@@ -424,14 +426,14 @@ export default function TresorerieDashboard() {
           {/* Recent transactions */}
           <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#F1F5F9]">
-              <h2 className="text-[13px] font-extrabold text-[#0F172A]">Dernières transactions</h2>
+              <h2 className="text-[13px] font-extrabold text-[#0F172A]">{t('treso.lastTransactions')}</h2>
               <Link href="/dashboard/tresorerie/historique"
                 className="text-[11px] text-[#0891B2] font-semibold hover:underline">
-                Tout voir →
+                {t('treso.seeAll')}
               </Link>
             </div>
             {transactions.length === 0 ? (
-              <div className="text-center py-10 text-[#94A3B8] text-[12px]">Aucune transaction</div>
+              <div className="text-center py-10 text-[#94A3B8] text-[12px]">{t('treso.noTransaction')}</div>
             ) : (
               <div className="divide-y divide-[#F8FAFC]">
                 {transactions.slice(0, 10).map(tx => (
@@ -465,16 +467,16 @@ export default function TresorerieDashboard() {
             <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-xl p-4 space-y-2">
               <div className="flex items-center gap-2 text-[#DC2626]">
                 <AlertTriangle size={14} />
-                <span className="text-[12px] font-extrabold">Alertes trésorerie</span>
+                <span className="text-[12px] font-extrabold">{t('treso.alertsTitle')}</span>
               </div>
               {caisses.filter(c => c.solde < 50000).map(c => (
                 <div key={c.id} className="flex items-start gap-2">
-                  <span className="text-[10px] text-[#DC2626]">• Caisse {c.nom} : solde faible ({fmtFCFA(c.solde)})</span>
+                  <span className="text-[10px] text-[#DC2626]">• {t('treso.cashLabel')} {c.nom} : {t('treso.lowCash')} ({fmtFCFA(c.solde)})</span>
                 </div>
               ))}
               {cashflow < 0 && (
                 <span className="block text-[10px] text-[#DC2626]">
-                  • Cashflow négatif ce mois : {fmtFCFA(cashflow)}
+                  • {t('treso.negativeCashflow')} : {fmtFCFA(cashflow)}
                 </span>
               )}
             </div>
@@ -485,10 +487,10 @@ export default function TresorerieDashboard() {
       {/* Quick stats strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Comptes bancaires', value: banques.length,  color: '#0891B2' },
-          { label: 'Caisses actives',   value: caisses.length,  color: '#D97706' },
-          { label: 'Wallets mobile',    value: wallets.length,  color: '#8B5CF6' },
-          { label: 'Ops ce mois',       value: monthTx.length,  color: '#0F172A' },
+          { label: t('treso.bankAccounts2'), value: banques.length,  color: '#0891B2' },
+          { label: t('treso.activeCash'),    value: caisses.length,  color: '#D97706' },
+          { label: t('treso.mobileWallets2'),value: wallets.length,  color: '#8B5CF6' },
+          { label: t('treso.opsThisMonth'),  value: monthTx.length,  color: '#0F172A' },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-3">
             <div className="text-[22px] font-extrabold" style={{ color: k.color }}>{k.value}</div>
@@ -503,39 +505,39 @@ export default function TresorerieDashboard() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
               <h2 className="text-[15px] font-extrabold text-[#16A34A] flex items-center gap-2">
-                <ArrowUpCircle size={16} /> Encaissement
+                <ArrowUpCircle size={16} /> {t('treso.encaissement')}
               </h2>
               <button onClick={() => setModal(null)}><X size={16} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-3">
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Catégorie</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.category')}</label>
                 <select value={fEnc.categorie} onChange={e => setFEnc(f => ({ ...f, categorie: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30">
                   {CATS_ENTREE.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Description *</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.descriptionField')}</label>
                 <input value={fEnc.description} onChange={e => setFEnc(f => ({ ...f, description: e.target.value }))}
                   placeholder="Facture #001 — Client XYZ"
                   className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Montant (FCFA) *</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.amountField')}</label>
                   <input type="number" value={fEnc.montant} onChange={e => setFEnc(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Date</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('common.date')}</label>
                   <input type="date" value={fEnc.date} onChange={e => setFEnc(f => ({ ...f, date: e.target.value }))}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none" />
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Mode de paiement</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.paymentMode')}</label>
                 <div className="flex flex-wrap gap-1.5">
                   {MODES.map(m => (
                     <button key={m.value} onClick={() => setFEnc(f => ({ ...f, mode: m.value }))}
@@ -550,11 +552,11 @@ export default function TresorerieDashboard() {
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
               <button onClick={() => setModal(null)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={saveEncaisser} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#16A34A] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? t('treso.registering') : t('treso.register')}
               </button>
             </div>
           </div>
@@ -567,39 +569,39 @@ export default function TresorerieDashboard() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
               <h2 className="text-[15px] font-extrabold text-[#DC2626] flex items-center gap-2">
-                <ArrowDownCircle size={16} /> Décaissement
+                <ArrowDownCircle size={16} /> {t('treso.decaissement')}
               </h2>
               <button onClick={() => setModal(null)}><X size={16} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-3">
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Catégorie</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.category')}</label>
                 <select value={fDec.categorie} onChange={e => setFDec(f => ({ ...f, categorie: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/30">
                   {CATS_SORTIE.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Description *</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.descriptionField')}</label>
                 <input value={fDec.description} onChange={e => setFDec(f => ({ ...f, description: e.target.value }))}
                   placeholder="Achat fournitures bureau"
                   className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/30" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Montant (FCFA) *</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.amountField')}</label>
                   <input type="number" value={fDec.montant} onChange={e => setFDec(f => ({ ...f, montant: e.target.value }))}
                     placeholder="0"
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/30" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Date</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('common.date')}</label>
                   <input type="date" value={fDec.date} onChange={e => setFDec(f => ({ ...f, date: e.target.value }))}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none" />
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Mode de paiement</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('treso.paymentMode')}</label>
                 <div className="flex flex-wrap gap-1.5">
                   {MODES.map(m => (
                     <button key={m.value} onClick={() => setFDec(f => ({ ...f, mode: m.value }))}
@@ -614,11 +616,11 @@ export default function TresorerieDashboard() {
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
               <button onClick={() => setModal(null)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={saveDecaisser} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#DC2626] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? t('treso.registering') : t('treso.register')}
               </button>
             </div>
           </div>

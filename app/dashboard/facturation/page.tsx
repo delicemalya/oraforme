@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerTVACongo, formaterMontant, genererNumeroFacture } from '@/lib/fiscalite-congo'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -129,6 +130,7 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
 
 export default function FacturationPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const router = useRouter()
 
   const [factures,       setFactures]       = useState<Facture[]>([])
@@ -378,7 +380,7 @@ export default function FacturationPage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-        <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+        <Loader2 className="animate-spin mr-2" size={18} /> {t('invoice.loading')}
       </div>
     )
   }
@@ -401,12 +403,12 @@ export default function FacturationPage() {
       {/* Header */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Facturation</h1>
+          <h1 className="text-xl font-bold text-[#101729]">{t('invoice.title')}</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">TVA 18 % + CA 5 % · Congo-Brazzaville</p>
         </div>
         <div className="flex gap-2">
           <Link href="/dashboard/parametres" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-xs font-medium transition-colors">
-            <Settings size={13} /> Paramètres
+            <Settings size={13} /> {t('invoice.settings')}
           </Link>
           <motion.button
             onClick={openNew}
@@ -414,29 +416,29 @@ export default function FacturationPage() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm"
             style={{ background: '#DC2626', color: '#0F172A', boxShadow: '0 0 18px #DC262635' }}
           >
-            <Plus size={15} /> Nouvelle facture
+            <Plus size={15} /> {t('invoice.new')}
           </motion.button>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Total ce mois"   value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#DC2626"  icon={FileText} />
-        <KpiCard label="Encaissé"        value={fmt(totalEncaisse)}  color="#0F172A"  icon={CheckCircle} />
-        <KpiCard label="En attente"      value={fmt(totalEnAttente)} color="#DC2626"  icon={Clock} />
-        <KpiCard label="En retard"       value={fmt(totalEnRetard)}  color="#DC2626"  icon={AlertTriangle} />
+        <KpiCard label={t('invoice.thisMonth')} value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#DC2626"  icon={FileText} />
+        <KpiCard label={t('invoice.collected')} value={fmt(totalEncaisse)}  color="#0F172A"  icon={CheckCircle} />
+        <KpiCard label={t('invoice.waiting')}   value={fmt(totalEnAttente)} color="#DC2626"  icon={Clock} />
+        <KpiCard label={t('invoice.late')}      value={fmt(totalEnRetard)}  color="#DC2626"  icon={AlertTriangle} />
       </div>
 
       {/* Filters + Search */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1 flex-wrap">
           {([
-            ['toutes',    'Toutes'],
-            ['brouillon', 'Brouillons'],
-            ['envoyee',   'Envoyées'],
-            ['payee',     'Payées'],
-            ['retard',    'En retard'],
-            ['annulee',   'Annulées'],
+            ['toutes',    t('invoice.all')],
+            ['brouillon', t('invoice.drafts')],
+            ['envoyee',   t('invoice.sent')],
+            ['payee',     t('invoice.paid2')],
+            ['retard',    t('invoice.late')],
+            ['annulee',   t('invoice.cancelled')],
           ] as const).map(([val, label]) => (
             <button
               key={val}
@@ -452,7 +454,7 @@ export default function FacturationPage() {
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
             className="pl-8 pr-3 py-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7] w-52"
-            placeholder="Rechercher client, N°…"
+            placeholder={t('common.search') + ' client, N°…'}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -463,7 +465,7 @@ export default function FacturationPage() {
       {displayed.length === 0 ? (
         <div className="text-center py-16 text-[var(--text-secondary)]">
           <FileText size={32} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Aucune facture trouvée.</p>
+          <p className="text-sm">{t('invoice.noInvoice')}</p>
         </div>
       ) : (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
@@ -471,7 +473,7 @@ export default function FacturationPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
-                  {['N° Facture', 'Client', 'Date', 'HT', 'TVA+CA', 'TTC', 'Statut', 'Actions'].map(h => (
+                  {[t('invoice.number'), t('invoice.client'), t('common.date'), 'HT', 'TVA+CA', 'TTC', t('common.status'), t('common.actions')].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -557,7 +559,7 @@ export default function FacturationPage() {
                 onClick={e => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-                  <h2 className="text-base font-bold text-[#101729]">{editId ? 'Modifier la facture' : 'Nouvelle facture'}</h2>
+                  <h2 className="text-base font-bold text-[#101729]">{editId ? t('invoice.editInvoice') : t('invoice.new')}</h2>
                   <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><X size={18} /></button>
                 </div>
 
@@ -565,23 +567,23 @@ export default function FacturationPage() {
                   {/* Client + Metadata */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Informations client</p>
-                      <FormInput label="Nom / Entreprise *" value={clientNom} onChange={setClientNom} placeholder="Entreprise ABC" />
-                      <FormInput label="Adresse" value={clientAddress} onChange={setClientAddress} placeholder="123 Rue du Commerce, Brazzaville" />
+                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.clientInfo')}</p>
+                      <FormInput label={t('invoice.companyName')} value={clientNom} onChange={setClientNom} placeholder="Entreprise ABC" />
+                      <FormInput label={t('common.address')} value={clientAddress} onChange={setClientAddress} placeholder="123 Rue du Commerce, Brazzaville" />
                       <div className="grid grid-cols-2 gap-3">
-                        <FormInput label="Téléphone" value={clientPhone} onChange={setClientPhone} placeholder="+242 06 000 0000" />
-                        <FormInput label="Email" value={clientEmail} onChange={setClientEmail} placeholder="client@mail.com" type="email" />
+                        <FormInput label={t('common.phone')} value={clientPhone} onChange={setClientPhone} placeholder="+242 06 000 0000" />
+                        <FormInput label={t('common.email')} value={clientEmail} onChange={setClientEmail} placeholder="client@mail.com" type="email" />
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Informations facture</p>
-                      <FormInput label="N° Facture" value={invoiceNum} onChange={setInvoiceNum} placeholder="FAC-2025-0001" />
+                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.invoiceInfo')}</p>
+                      <FormInput label={t('invoice.number')} value={invoiceNum} onChange={setInvoiceNum} placeholder="FAC-2025-0001" />
                       <div className="grid grid-cols-2 gap-3">
-                        <FormInput label="Date" value={dateVal} onChange={setDateVal} type="date" />
-                        <FormInput label="Date d'échéance" value={dueDate} onChange={setDueDate} type="date" />
+                        <FormInput label={t('common.date')} value={dateVal} onChange={setDateVal} type="date" />
+                        <FormInput label={t('invoice.dueDate2')} value={dueDate} onChange={setDueDate} type="date" />
                       </div>
                       <div>
-                        <label className="block text-xs text-[var(--text-secondary)] mb-1">Statut</label>
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.status')}</label>
                         <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                           {Object.entries(STATUT_CONFIG).map(([k, v]) => <option key={k} value={k} className="bg-[var(--card-bg)]">{v.label}</option>)}
                         </select>
@@ -592,16 +594,16 @@ export default function FacturationPage() {
                   {/* Lines */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Lignes de facture</p>
+                      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.items')}</p>
                       <button onClick={() => setLignes(p => [...p, emptyLigne()])} className="text-xs text-[#DC2626] hover:underline flex items-center gap-1">
-                        <Plus size={11} /> Ajouter une ligne
+                        <Plus size={11} /> {t('invoice.addLine')}
                       </button>
                     </div>
                     <div className="grid grid-cols-12 gap-2 mb-1 px-1">
-                      <span className="col-span-5 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Désignation</span>
-                      <span className="col-span-3 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Prix unitaire</span>
-                      <span className="col-span-2 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Qté</span>
-                      <span className="col-span-1 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider text-right">Total</span>
+                      <span className="col-span-5 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.designation')}</span>
+                      <span className="col-span-3 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.unitPrice')}</span>
+                      <span className="col-span-2 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.qty')}</span>
+                      <span className="col-span-1 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider text-right">{t('common.total')}</span>
                       <span className="col-span-1" />
                     </div>
                     <div className="space-y-2">
@@ -612,7 +614,7 @@ export default function FacturationPage() {
                           className={`grid grid-cols-12 gap-2 items-center rounded-lg px-2 py-1.5 ${i % 2 === 0 ? 'bg-[#F9FAFB]' : 'bg-transparent'}`}
                         >
                           <div className="col-span-5">
-                            <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]" placeholder="Description du service…" value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
+                            <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]" placeholder={t('common.description') + '…'} value={l.description} onChange={e => updateLigne(i, 'description', e.target.value)} />
                           </div>
                           <div className="col-span-3">
                             <input type="number" min="0" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] text-right" value={l.price || ''} onChange={e => updateLigne(i, 'price', e.target.value)} />
@@ -638,14 +640,14 @@ export default function FacturationPage() {
                   {/* Fiscal Breakdown */}
                   <div className="border border-[var(--border)] rounded-xl overflow-hidden">
                     <div className="px-4 py-2 border-b border-[var(--border)]" style={{ background: '#F9FAFB' }}>
-                      <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Récapitulatif fiscal · Congo-Brazzaville</span>
+                      <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.fiscalSummary')}</span>
                     </div>
                     <div className="p-4 space-y-2">
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Sous-total HT</span><span className="text-[#101729] font-medium">{fmt(subtotalLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">TVA (18 %)</span><span className="text-[#101729]">{fmt(tvaLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA (5 % de la TVA)</span><span className="text-[#101729]">{fmt(caLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.subtotal')}</span><span className="text-[#101729] font-medium">{fmt(subtotalLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.tva18')}</span><span className="text-[#101729]">{fmt(tvaLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.ca5')}</span><span className="text-[#101729]">{fmt(caLive)}</span></div>
                       <div className="border-t border-[var(--border)] pt-3 flex justify-between">
-                        <span className="text-base font-bold text-[#101729]">TOTAL TTC</span>
+                        <span className="text-base font-bold text-[#101729]">{t('invoice.totalTTC')}</span>
                         <span className="text-xl font-bold text-[#DC2626]">{fmt(ttcLive)}</span>
                       </div>
                     </div>
@@ -653,17 +655,17 @@ export default function FacturationPage() {
 
                   {/* Notes */}
                   <div>
-                    <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Notes (optionnel)</label>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-1.5">{t('invoice.notesOptional')}</label>
                     <textarea rows={3} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7] resize-none" placeholder="Conditions de paiement, remerciements…" value={notes} onChange={e => setNotes(e.target.value)} />
                   </div>
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-3 pt-2">
                     <button onClick={() => setShowForm(false)} className="px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-sm font-medium transition-colors">
-                      Annuler
+                      {t('common.cancel')}
                     </button>
                     <button onClick={() => handleSave('brouillon')} disabled={saving || !clientNom} className="px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-sm font-medium transition-colors disabled:opacity-40">
-                      {saving ? <Loader2 className="animate-spin" size={14} /> : 'Enregistrer brouillon'}
+                      {saving ? <Loader2 className="animate-spin" size={14} /> : t('invoice.saveDraft')}
                     </button>
                     <button
                       onClick={() => handleSave('envoyee')}
@@ -671,7 +673,7 @@ export default function FacturationPage() {
                       className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm flex-1 justify-center disabled:opacity-40"
                       style={{ background: '#DC2626', color: '#0F172A' }}
                     >
-                      {saving ? <Loader2 className="animate-spin" size={14} /> : <><Send size={14} /> Émettre la facture</>}
+                      {saving ? <Loader2 className="animate-spin" size={14} /> : <><Send size={14} /> {t('invoice.emit')}</>}
                     </button>
                   </div>
                 </div>
@@ -709,7 +711,7 @@ export default function FacturationPage() {
                       onClick={() => router.push(`/dashboard/factures/${viewedFac.id}/preview`)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-xs font-medium transition-colors"
                     >
-                      <ExternalLink size={12} /> Aperçu
+                      <ExternalLink size={12} /> {t('invoice.preview')}
                     </button>
                     <button
                       onClick={() => downloadPDF(viewedFac.id, viewedFac.invoice_number ?? viewedFac.id.slice(0, 8))}
@@ -728,16 +730,16 @@ export default function FacturationPage() {
                   {/* Client + Dates */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">Client</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{t('invoice.clientSection')}</p>
                       <p className="font-semibold text-[#101729] text-sm">{viewedFac.client_name ?? viewedFac.client_nom}</p>
                       {viewedFac.client_address && <p className="text-xs text-[var(--text-secondary)] mt-0.5">{viewedFac.client_address}</p>}
                       {viewedFac.client_phone   && <p className="text-xs text-[var(--text-secondary)]">{viewedFac.client_phone}</p>}
                       {viewedFac.client_email   && <p className="text-xs text-[var(--text-secondary)]">{viewedFac.client_email}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">Dates</p>
-                      <p className="text-xs text-[var(--text-secondary)]">Émise le <span className="text-[#101729]">{fmtDate(viewedFac.date ?? viewedFac.created_at)}</span></p>
-                      {viewedFac.due_date && <p className="text-xs text-[var(--text-secondary)] mt-1">Échéance <span className="text-[#101729]">{fmtDate(viewedFac.due_date)}</span></p>}
+                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{t('invoice.datesSection')}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{t('invoice.issuedOn')} <span className="text-[#101729]">{fmtDate(viewedFac.date ?? viewedFac.created_at)}</span></p>
+                      {viewedFac.due_date && <p className="text-xs text-[var(--text-secondary)] mt-1">{t('invoice.dueOn')} <span className="text-[#101729]">{fmtDate(viewedFac.due_date)}</span></p>}
                     </div>
                   </div>
 
@@ -747,10 +749,10 @@ export default function FacturationPage() {
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="border-b border-[var(--border)]" style={{ background: 'rgba(240,163,10,0.08)' }}>
-                            <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Désignation</th>
-                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Prix U.</th>
-                            <th className="text-center px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Qté</th>
-                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Total</th>
+                            <th className="text-left px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.designation')}</th>
+                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.unitPrice')}</th>
+                            <th className="text-center px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('invoice.qty')}</th>
+                            <th className="text-right px-3 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('common.total')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -777,11 +779,11 @@ export default function FacturationPage() {
                     const { tva, ca, ttc } = calculerTVACongo(ht)
                     return (
                       <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 space-y-2">
-                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Sous-total HT</span><span className="text-[#101729]">{fmt(ht)}</span></div>
-                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">TVA 18 %</span><span className="text-[#101729]">{fmt(tva)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.subtotal')}</span><span className="text-[#101729]">{fmt(ht)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.tva18')}</span><span className="text-[#101729]">{fmt(tva)}</span></div>
                         <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA 5 %</span><span className="text-[#101729]">{fmt(ca)}</span></div>
                         <div className="border-t border-[var(--border)] pt-2 flex justify-between">
-                          <span className="font-bold text-[#101729]">TOTAL TTC</span>
+                          <span className="font-bold text-[#101729]">{t('invoice.totalTTC')}</span>
                           <span className="font-bold text-[#DC2626] text-lg">{fmt(ttc)}</span>
                         </div>
                       </div>
@@ -790,7 +792,7 @@ export default function FacturationPage() {
 
                   {/* Changer statut */}
                   <div>
-                    <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">Changer le statut</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{t('common.status')}</p>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(STATUT_CONFIG).map(([k, v]) => {
                         const Icon = v.icon
@@ -820,7 +822,7 @@ export default function FacturationPage() {
                       onClick={() => setShowPdfPreview(p => !p)}
                       className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-sm font-medium transition-colors"
                     >
-                      <span className="flex items-center gap-2"><FileText size={14} /> {showPdfPreview ? 'Masquer' : 'Afficher'} l&apos;aperçu PDF</span>
+                      <span className="flex items-center gap-2"><FileText size={14} /> {showPdfPreview ? t('invoice.hidePreview') : t('invoice.showPreview')} {t('invoice.pdfPreview')}</span>
                       <span>{showPdfPreview ? '▲' : '▼'}</span>
                     </button>
                     <AnimatePresence>
@@ -844,7 +846,7 @@ export default function FacturationPage() {
                   {/* Notes */}
                   {viewedFac.notes && (
                     <div className="bg-[#F9FAFB] border border-[var(--border)] rounded-xl p-4">
-                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Notes</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">{t('invoice.notesOptional')}</p>
                       <p className="text-sm text-[var(--text)]">{viewedFac.notes}</p>
                     </div>
                   )}
@@ -871,7 +873,7 @@ export default function FacturationPage() {
                       onClick={() => { setViewId(null); openEdit(viewedFac) }}
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-xs font-medium transition-colors"
                     >
-                      <Edit3 size={13} /> Modifier
+                      <Edit3 size={13} /> {t('common.edit')}
                     </button>
                   </div>
 
@@ -896,9 +898,9 @@ export default function FacturationPage() {
                 initial={{ scale: 0.92 }} animate={{ scale: 1 }} exit={{ scale: 0.92 }}
                 onClick={e => e.stopPropagation()}
               >
-                <h3 className="text-base font-bold text-[#101729] mb-2">Confirmer le changement ?</h3>
+                <h3 className="text-base font-bold text-[#101729] mb-2">{t('invoice.confirmChange')}</h3>
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
-                  Passer de{' '}
+                  {t('invoice.changeStatus')}{' '}
                   <span className="font-semibold" style={{ color: STATUT_CONFIG[confirmStatut.current].color }}>
                     {STATUT_CONFIG[confirmStatut.current].label}
                   </span>
@@ -912,14 +914,14 @@ export default function FacturationPage() {
                     onClick={() => setConfirmStatut(null)}
                     className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-sm font-medium transition-colors"
                   >
-                    Annuler
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={applyStatutChange}
                     className="flex-1 py-2.5 rounded-xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
                     style={{ background: STATUT_CONFIG[confirmStatut.next].color }}
                   >
-                    Confirmer
+                    {t('common.confirm')}
                   </button>
                 </div>
               </motion.div>
