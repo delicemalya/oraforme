@@ -12,8 +12,10 @@ export default function ModuleChart({ data, title }: { data: Entry[]; title: str
   const normalizedData = data.map(d => ({
     ...d,
     color: d.color === '#0F172A' ? '#DC2626' : d.color,
-    // Translate invoice status names if they have a statut key
-    name: d.statut ? t(`invoice.lbl.${d.statut}`) : d.name,
+    // invoice breakdown → translate via statut key; module names → resolve as i18n key if dotted
+    name: d.statut
+      ? t(`invoice.lbl.${d.statut}`)
+      : (d.name.includes('.') ? t(d.name) : d.name),
   }))
 
   return (

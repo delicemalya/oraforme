@@ -2,14 +2,15 @@ import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/dashboard/DashboardClient'
 
+// Values are i18n keys — resolved client-side in ModuleChart
 const MODULE_LABELS: Record<string, string> = {
-  facturation:  'FacturePro',           tresorerie:   'Trésorerie',
-  comptabilite: 'Comptabilité',         mobilemoney:  'Mobile Money',
-  stock:        'Stock & Inventaire',   rh:           'RH Premium',
-  ecole:        'École & Université',   restaurant:   'Resto POS',
-  achats:       'Achats & Fournisseurs',depenses:     'Dépenses',
-  rapports:     'Rapports IA',          hotel:        'Hôtel & Hébergement',
-  transport:    'Transport VTC',        bizbot:       'MIAA+ Assistant',
+  facturation:  'nav.facturation',  tresorerie:   'nav.tresorerie',
+  comptabilite: 'nav.comptabilite', mobilemoney:  'nav.mobilemoney',
+  stock:        'nav.stock',        rh:           'nav.rh',
+  ecole:        'nav.ecole',        restaurant:   'nav.restaurant',
+  achats:       'nav.achats',       depenses:     'nav.depenses',
+  rapports:     'nav.rapports',     hotel:        'nav.hotel',
+  transport:    'nav.transport',    bizbot:       'nav.bizbot',
 }
 
 const MODULE_COLORS = [

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Client {
   id: string
@@ -60,6 +61,7 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
 
 export default function ClientsPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [clients, setClients]   = useState<Client[]>([])
   const [loading, setLoading]   = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -91,8 +93,8 @@ export default function ClientsPage() {
       telephone: form.telephone, adresse: form.adresse,
     })
     setSaving(false)
-    if (error) { showToast('Erreur : ' + error.message); return }
-    showToast('Client ajouté !')
+    if (error) { showToast(t('clients.errorPrefix') + error.message); return }
+    showToast(t('clients.addedMsg'))
     setShowForm(false)
     setForm({ nom: '', email: '', telephone: '', adresse: '' })
     load()
@@ -101,7 +103,7 @@ export default function ClientsPage() {
   async function handleDelete(id: string) {
     await supabase.from('clients').delete().eq('id', id)
     setClients(c => c.filter(x => x.id !== id))
-    showToast('Client supprimé.')
+    showToast(t('clients.deletedMsg'))
     setDeleteId(null)
   }
 
@@ -118,7 +120,7 @@ export default function ClientsPage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-        <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+        <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
       </div>
     )
   }
@@ -141,9 +143,9 @@ export default function ClientsPage() {
       {/* Header */}
       <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
         <div>
-          <h1 className="text-xl font-bold text-[var(--text)]">Clients</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">{t('clients.title')}</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-            {clients.length} client{clients.length !== 1 ? 's' : ''} enregistré{clients.length !== 1 ? 's' : ''}
+            {clients.length} {t('clients.subtitle')}
           </p>
         </div>
         <motion.button
@@ -152,15 +154,15 @@ export default function ClientsPage() {
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm shrink-0"
           style={{ background: 'linear-gradient(135deg,#DC2626,#d4880a)', color: '#0F172A', boxShadow: '0 0 18px #DC262630' }}
         >
-          <UserPlus size={15} /> Nouveau client
+          <UserPlus size={15} /> {t('clients.newClient')}
         </motion.button>
       </motion.div>
 
       {/* KPI row */}
       <motion.div {...fadeUp(1)} className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <KpiCard label="Total clients"    value={clients.length}   sub="Dans votre base"         icon={Users}      color="#DC2626" />
-        <KpiCard label="Nouveaux ce mois" value={newThisMonth}     sub="Ajoutés en mai"          icon={TrendingUp} color="#0F172A" />
-        <KpiCard label="Avec email"       value={clients.filter(c => c.email).length} sub="Contactables par mail" icon={Mail} color="#7C3AED" />
+        <KpiCard label={t('clients.totalClients')} value={clients.length}   sub={t('clients.inBase')}         icon={Users}      color="#DC2626" />
+        <KpiCard label={t('clients.newThisMonth')} value={newThisMonth}     sub={t('dash.ceMoisCi')}          icon={TrendingUp} color="#0F172A" />
+        <KpiCard label={t('clients.withEmail')}    value={clients.filter(c => c.email).length} sub={t('clients.contactByEmail')} icon={Mail} color="#7C3AED" />
       </motion.div>
 
       {/* Search */}
@@ -168,7 +170,7 @@ export default function ClientsPage() {
         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
         <input
           className="w-full pl-9 pr-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[#64748B] focus:outline-none focus:border-[#DC2626]/50 transition-colors"
-          placeholder="Rechercher un client…"
+          placeholder={t('clients.searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -181,8 +183,8 @@ export default function ClientsPage() {
             <Users size={28} className="text-[var(--text-secondary)]" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-semibold text-[var(--text-secondary)]">Aucun client encore</p>
-            <p className="text-xs text-[var(--text-secondary)] mt-1">Ajoutez votre premier client pour commencer.</p>
+            <p className="text-sm font-semibold text-[var(--text-secondary)]">{t('clients.noClients')}</p>
+            <p className="text-xs text-[var(--text-secondary)] mt-1">{t('clients.addFirst')}</p>
           </div>
           <motion.button
             onClick={() => setShowForm(true)}
@@ -190,13 +192,13 @@ export default function ClientsPage() {
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm"
             style={{ background: 'linear-gradient(135deg,#DC2626,#d4880a)', color: '#0F172A' }}
           >
-            <Plus size={14} /> Ajouter un client
+            <Plus size={14} /> {t('clients.addClient')}
           </motion.button>
         </motion.div>
       ) : filtered.length === 0 ? (
         <motion.div {...fadeUp(3)} className="text-center py-16 text-[var(--text-secondary)]">
           <Search size={28} className="mx-auto mb-3 opacity-40" />
-          <p className="text-sm">Aucun client ne correspond à cette recherche.</p>
+          <p className="text-sm">{t('clients.noSearchResult')}</p>
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -265,7 +267,7 @@ export default function ClientsPage() {
                       className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-semibold transition-all border opacity-0 group-hover:opacity-100"
                       style={{ borderColor: `${color}30`, color, background: `${color}0D` }}
                     >
-                      <ArrowUpRight size={11} /> Contacter
+                      <ArrowUpRight size={11} /> {t('clients.contact')}
                     </a>
                   )}
                 </div>
@@ -298,7 +300,7 @@ export default function ClientsPage() {
                     <div className="w-8 h-8 rounded-lg bg-[#DC2626]/15 flex items-center justify-center">
                       <UserPlus size={15} className="text-[#DC2626]" />
                     </div>
-                    <h2 className="text-base font-bold text-[var(--text)]">Nouveau client</h2>
+                    <h2 className="text-base font-bold text-[var(--text)]">{t('clients.formTitle')}</h2>
                   </div>
                   <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors p-1">
                     <X size={18} />
@@ -306,16 +308,16 @@ export default function ClientsPage() {
                 </div>
 
                 <div className="p-6 space-y-4">
-                  <FormInput label="Nom complet / Entreprise *" value={form.nom} onChange={v => setField('nom', v)} placeholder="Jean Dupont ou SARL ABC" />
-                  <FormInput label="Email" type="email" value={form.email} onChange={v => setField('email', v)} placeholder="client@example.com" />
-                  <FormInput label="Téléphone" value={form.telephone} onChange={v => setField('telephone', v)} placeholder="+242 06 000 0000" />
+                  <FormInput label={t('clients.fullName')} value={form.nom} onChange={v => setField('nom', v)} placeholder="Jean Dupont ou SARL ABC" />
+                  <FormInput label={t('common.email')} type="email" value={form.email} onChange={v => setField('email', v)} placeholder="client@example.com" />
+                  <FormInput label={t('common.phone')} value={form.telephone} onChange={v => setField('telephone', v)} placeholder="+242 06 000 0000" />
                   <div>
-                    <label className="block text-xs text-[var(--text-secondary)] mb-1.5 font-medium">Adresse</label>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-1.5 font-medium">{t('clients.address')}</label>
                     <textarea
                       rows={2}
                       value={form.adresse}
                       onChange={e => setField('adresse', e.target.value)}
-                      placeholder="Adresse complète"
+                      placeholder={t('clients.addressPlaceholder')}
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--text)] placeholder-[#64748B] focus:outline-none focus:border-[#DC2626]/60 transition-colors resize-none"
                     />
                   </div>
@@ -325,7 +327,7 @@ export default function ClientsPage() {
                       onClick={() => setShowForm(false)}
                       className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] text-sm font-medium transition-colors"
                     >
-                      Annuler
+                      {t('common.cancel')}
                     </button>
                     <button
                       onClick={handleSave}
@@ -333,7 +335,7 @@ export default function ClientsPage() {
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm disabled:opacity-40 transition-opacity"
                       style={{ background: 'linear-gradient(135deg,#DC2626,#d4880a)', color: '#0F172A' }}
                     >
-                      {saving ? <Loader2 className="animate-spin" size={14} /> : <><Plus size={14} /> Ajouter</>}
+                      {saving ? <Loader2 className="animate-spin" size={14} /> : <><Plus size={14} /> {t('clients.addBtn')}</>}
                     </button>
                   </div>
                 </div>
@@ -357,14 +359,14 @@ export default function ClientsPage() {
                 <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
                   <Trash2 size={20} className="text-red-400" />
                 </div>
-                <p className="text-sm font-bold text-[var(--text)] mb-1">Supprimer ce client ?</p>
-                <p className="text-xs text-[var(--text-secondary)] mb-5">Cette action est irréversible.</p>
+                <p className="text-sm font-bold text-[var(--text)] mb-1">{t('clients.deleteConfirm')}</p>
+                <p className="text-xs text-[var(--text-secondary)] mb-5">{t('clients.deleteWarning')}</p>
                 <div className="flex gap-3">
                   <button onClick={() => setDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-sm font-medium transition-colors">
-                    Annuler
+                    {t('common.cancel')}
                   </button>
                   <button onClick={() => handleDelete(deleteId)} className="flex-1 py-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 text-sm font-semibold transition-colors">
-                    Supprimer
+                    {t('common.delete')}
                   </button>
                 </div>
               </motion.div>
