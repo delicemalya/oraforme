@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import PWAInstall from '@/components/ui/PWAInstall'
+import { LocaleProvider } from '@/lib/contexts/LocaleContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -28,8 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className="h-full bg-[#F5F7FB] text-[#111827] antialiased">
-        {children}
-        <PWAInstall />
+        {/* LocaleProvider enveloppe toute l'app — changement de langue instantané */}
+        <LocaleProvider>
+          {children}
+          <PWAInstall />
+        </LocaleProvider>
       </body>
     </html>
   )

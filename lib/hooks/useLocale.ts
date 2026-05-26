@@ -1,17 +1,13 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { type Locale, SUPPORTED_LOCALES, getStoredLocale, setStoredLocale, t as translate } from '@/lib/i18n'
-
-export function useLocale() {
-  const [locale, setLocaleState] = useState<Locale>(() => getStoredLocale())
-
-  const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale)
-    setStoredLocale(newLocale)
-  }, [])
-
-  const t = useCallback((key: string) => translate(key, locale), [locale])
-
-  return { locale, setLocale, t, SUPPORTED_LOCALES }
-}
+/**
+ * useLocale — Hook i18n pour Oraforme
+ * Re-exporte depuis LocaleContext pour propagation globale instantanée.
+ * Un seul changement de langue met à jour TOUS les composants.
+ *
+ * Usage:
+ *   const { t, locale, setLocale } = useLocale()
+ *   t('common.save')                     → 'Save' (en) | 'Guardar' (es)
+ *   t('wf.pendingCount', { count: 3 })   → '3 pending'
+ */
+export { useLocaleContext as useLocale } from '@/lib/contexts/LocaleContext'
