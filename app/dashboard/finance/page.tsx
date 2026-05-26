@@ -1,558 +1,407 @@
 'use client'
 
+/**
+ * Dashboard Finance — Moteur Financier Central Oraforme
+ * Architecture SAP/Odoo : toutes sources → vue unifiée
+ * OHADA · Multi-tenant · Congo-Brazzaville
+ */
+
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import {
-  AreaChart, Area, BarChart, Bar, Line,
+  AreaChart, Area, BarChart, Bar,
+  LineChart, Line, ComposedChart,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer,
+  ResponsiveContainer, ReferenceLine, Cell,
 } from 'recharts'
 import {
   TrendingUp, TrendingDown, Minus,
-  DollarSign, Wallet,
-  Building2, Smartphone, Users, ArrowUpRight,
-  ArrowDownRight, RefreshCw, Calendar, Download,
-  AlertCircle, Clock, ChevronRight,
+  DollarSign, Wallet, Building2, Smartphone,
+  Users, GraduationCap, ShoppingCart, FileText,
+  ArrowUpRight, ArrowDownRight, RefreshCw, Calendar,
+  Download, AlertCircle, Clock, ChevronRight,
+  Activity, Target, BarChart2, Layers,
+  CheckCircle, AlertTriangle, XCircle, Info,
 } from 'lucide-react'
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-type KpiData = {
-  chiffreAffaires:      number
-  chiffreAffairesMois:  number
-  depensesTotal:        number
-  depensesMois:         number
-  resultatNet:          number
-  soldeBanque:          number
-  soldeCaisse:          number
-  soldeMobile:          number
-  creancesClients:      number
-  dettesFournisseurs:   number
-  tvaSolde:             number
-  chargesSalariales:    number
-  cashflowMois:         number
-  // evolutions
-  caEvol:    number  // % vs mois précédent
-  depEvol:   number
-  netEvol:   number
+interface KpiRaw {
+  ca_annee: number; dep_annee: number; resultat_net: number; marge_nette_pct: number
+  ca_mois: number; dep_mois: number; cashflow_mois: number
+  ca_prev: number; dep_prev: number; cashflow_prev: number
+  solde_banque: number; solde_caisse: number; solde_mobile: number; treso_totale: number
+  creances_clients: number; nb_factures_ouvertes: number; nb_factures_retard: number
+  dettes_fournisseurs: number
+  tva_collectee: number; tva_deductible: number; tva_nette: number; ca_taxe: number
+  salaires_annee: number; ratio_salaires_pct: number
+  ca_ecole: number; ca_facturation: number; ca_autres: number
+  previsions_entrees: number; previsions_sorties: number; previsions_net: number
+  exercice: number; mois_courant: number
 }
 
-type MonthlyData = {
-  mois: string
-  produits: number
-  charges: number
-  resultat: number
+interface MonthlyRow {
+  mois: number; mois_label: string
+  entrees: number; sorties: number; net: number; cumul: number
 }
 
-type TresoData = {
-  nom: string
-  solde: number
-  type: 'banque' | 'caisse' | 'mobile'
+interface SourceRow {
+  module_source: string; type_flux: string; total: number; nb_operations: number
 }
 
-type RecentTx = {
-  id: string
-  date_operation: string
-  libelle: string
-  montant: number
-  type: 'entree' | 'sortie' | 'transfert'
-  categorie: string
-  moyen_paiement: string
+interface ScoreRaw {
+  score: number; label: string
+  score_cashflow: number; score_treso: number; score_creances: number; score_dettes: number
+  treso_totale: number; cashflow_90j: number
 }
 
-type TopCategorie = {
-  name: string
-  value: number
-  color: string
+interface TresoItem { type_compte: string; nom: string; solde: number }
+interface RecentTx {
+  id: string; date_operation: string; libelle: string; montant: number
+  type: 'entree' | 'sortie' | 'transfert'; categorie: string; moyen_paiement: string; source: string
+}
+interface Prevision {
+  id: string; libelle: string; montant: number; type: string; date_prevue: string
+  probabilite: number; statut: string
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+type TabId = 'apercu' | 'cashflow' | 'sources' | 'previsions' | 'tva'
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat('fr-CG', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' FCFA'
+  new Intl.NumberFormat('fr-CG', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' FCFA'
 
 const fmtShort = (n: number): string => {
-  if (Math.abs(n) >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M'
-  if (Math.abs(n) >= 1_000)     return (n / 1_000).toFixed(0) + 'k'
-  return String(n)
+  const abs = Math.abs(n)
+  const sign = n < 0 ? '−' : ''
+  if (abs >= 1_000_000_000) return sign + (abs / 1_000_000_000).toFixed(1) + 'Md'
+  if (abs >= 1_000_000)     return sign + (abs / 1_000_000).toFixed(1) + 'M'
+  if (abs >= 1_000)         return sign + (abs / 1_000).toFixed(0) + 'k'
+  return sign + String(Math.round(abs))
 }
 
-const MONTH_LABELS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
-
-function getDiff(a: number, b: number): number {
+const getDiff = (a: number, b: number): number => {
   if (b === 0) return a > 0 ? 100 : 0
   return Math.round(((a - b) / Math.abs(b)) * 100)
 }
 
-// ── KPI Card ──────────────────────────────────────────────────────────────────
+const MONTH_LABELS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
 
-type KpiCardProps = {
-  label: string
-  value: string
-  sub?: string
-  evol?: number
-  icon: React.ReactNode
-  accent: string
-  loading?: boolean
+const SOURCE_COLORS: Record<string, string> = {
+  'Facturation':   '#10B981',
+  'École':         '#3B82F6',
+  'RH & Paie':     '#7C3AED',
+  'Commercial':    '#F59E0B',
+  'Achats':        '#EF4444',
+  'Dépenses':      '#F97316',
+  'Stock':         '#06B6D4',
+  'Mobile Money':  '#8B5CF6',
+  'Caisse':        '#84CC16',
+  'Hôtellerie':    '#EC4899',
+  'Restauration':  '#14B8A6',
+  'Manuel':        '#94A3B8',
 }
 
-function KpiCard({ label, value, sub, evol, icon, accent, loading }: KpiCardProps) {
+const SOURCE_ICONS: Record<string, React.ReactNode> = {
+  'Facturation':  <FileText size={13} />,
+  'École':        <GraduationCap size={13} />,
+  'RH & Paie':    <Users size={13} />,
+  'Commercial':   <TrendingUp size={13} />,
+  'Achats':       <ShoppingCart size={13} />,
+  'Dépenses':     <TrendingDown size={13} />,
+  'Stock':        <Layers size={13} />,
+  'Mobile Money': <Smartphone size={13} />,
+  'Caisse':       <Wallet size={13} />,
+  'Manuel':       <DollarSign size={13} />,
+}
+
+// ─── Composants réutilisables ─────────────────────────────────────────────────
+
+function KpiCard({
+  label, value, sub, evol, icon, accent, loading, badge,
+}: {
+  label: string; value: string; sub?: string; evol?: number
+  icon: React.ReactNode; accent: string; loading?: boolean; badge?: string
+}) {
   return (
     <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider">{label}</span>
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: accent + '18' }}>
+        <span className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider leading-tight">{label}</span>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: accent + '18' }}>
           <div style={{ color: accent }}>{icon}</div>
         </div>
       </div>
-      {loading ? (
-        <div className="h-8 rounded-lg bg-[#F3F4F6] animate-pulse w-3/4" />
-      ) : (
-        <div className="text-2xl font-bold text-[#111827] leading-tight tracking-tight">{value}</div>
-      )}
-      <div className="flex items-center gap-2">
+      {loading
+        ? <div className="h-8 rounded-lg bg-[#F3F4F6] animate-pulse w-3/4" />
+        : <div className="text-[22px] font-bold text-[#111827] leading-tight tracking-tight">{value}</div>
+      }
+      <div className="flex items-center gap-2 flex-wrap">
         {evol !== undefined && (
-          <span className={`flex items-center gap-0.5 text-xs font-semibold px-1.5 py-0.5 rounded-md ${
-            evol > 0 ? 'bg-emerald-50 text-emerald-600' : evol < 0 ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-[#6B7280]'
+          <span className={`flex items-center gap-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-md ${
+            evol > 0 ? 'bg-emerald-50 text-emerald-600'
+            : evol < 0 ? 'bg-red-50 text-red-500'
+            : 'bg-gray-100 text-[#6B7280]'
           }`}>
-            {evol > 0 ? <ArrowUpRight size={12} /> : evol < 0 ? <ArrowDownRight size={12} /> : <Minus size={12} />}
+            {evol > 0 ? <ArrowUpRight size={11} /> : evol < 0 ? <ArrowDownRight size={11} /> : <Minus size={11} />}
             {Math.abs(evol)}%
           </span>
         )}
-        {sub && <span className="text-xs text-[#9CA3AF]">{sub}</span>}
+        {sub && <span className="text-[11px] text-[#9CA3AF]">{sub}</span>}
+        {badge && (
+          <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: accent + '18', color: accent }}>
+            {badge}
+          </span>
+        )}
       </div>
     </div>
   )
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+function SectionCard({ title, sub, children, action }: {
+  title: string; sub?: string
+  children: React.ReactNode; action?: React.ReactNode
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F3F4F6]">
+        <div>
+          <h3 className="text-[13px] font-semibold text-[#111827]">{title}</h3>
+          {sub && <p className="text-[11px] text-[#9CA3AF] mt-0.5">{sub}</p>}
+        </div>
+        {action}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function FinancePage() {
   const { tenantId } = useTenant()
-
-  const [kpi,       setKpi]       = useState<KpiData | null>(null)
-  const [monthly,   setMonthly]   = useState<MonthlyData[]>([])
-  const [treso,     setTreso]     = useState<TresoData[]>([])
+  const [tab,       setTab]       = useState<TabId>('apercu')
+  const [kpi,       setKpi]       = useState<KpiRaw | null>(null)
+  const [monthly,   setMonthly]   = useState<MonthlyRow[]>([])
+  const [sources,   setSources]   = useState<SourceRow[]>([])
+  const [score,     setScore]     = useState<ScoreRaw | null>(null)
+  const [treso,     setTreso]     = useState<TresoItem[]>([])
   const [recentTx,  setRecentTx]  = useState<RecentTx[]>([])
-  const [topDepCat, setTopDepCat] = useState<TopCategorie[]>([])
-  const [topProCat, setTopProCat] = useState<TopCategorie[]>([])
+  const [prevs,     setPrevs]     = useState<Prevision[]>([])
   const [loading,   setLoading]   = useState(true)
-  const [activeTab, setActiveTab] = useState<'apercu' | 'cashflow' | 'tiers' | 'tva'>('apercu')
+  const [lTreso,    setLTreso]    = useState(true)
 
   const currentYear  = new Date().getFullYear()
-  const currentMonth = new Date().getMonth() // 0-indexed
+  const currentMonth = new Date().getMonth()
 
+  // ── Chargement principal via RPCs serveur ──────────────────────────────────
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
 
-    const startYear  = `${currentYear}-01-01`
-    const endYear    = `${currentYear}-12-31`
-    const startMonth = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`
-    const endMonth   = new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0]
-    const startPrev  = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`
-    const endPrev    = new Date(currentYear, currentMonth, 0).toISOString().split('T')[0]
-
-    // ── Parallel fetches ──────────────────────────────────────────────────────
     const [
-      { data: txYear },
-      { data: txMonth },
-      { data: txPrev },
-      { data: banques },
-      { data: caisses },
+      { data: kpiData },
+      { data: monthlyData },
+      { data: sourceData },
+      { data: scoreData },
     ] = await Promise.all([
-      supabase
-        .from('transactions')
-        .select('type, montant, categorie, moyen_paiement, date_operation, libelle, id')
-        .eq('tenant_id', tenantId)
-        .gte('date_operation', startYear)
-        .lte('date_operation', endYear)
-        .order('date_operation', { ascending: false }),
-      supabase
-        .from('transactions')
-        .select('type, montant, categorie, moyen_paiement')
-        .eq('tenant_id', tenantId)
-        .gte('date_operation', startMonth)
-        .lte('date_operation', endMonth),
-      supabase
-        .from('transactions')
-        .select('type, montant')
-        .eq('tenant_id', tenantId)
-        .gte('date_operation', startPrev)
-        .lte('date_operation', endPrev),
-      supabase
-        .from('comptes_bancaires')
-        .select('nom, solde')
-        .eq('tenant_id', tenantId)
-        .eq('actif', true),
-      supabase
-        .from('caisses')
-        .select('nom, solde')
-        .eq('tenant_id', tenantId)
-        .eq('actif', true),
+      supabase.rpc('fn_finance_kpis',       { p_tenant_id: tenantId }),
+      supabase.rpc('fn_cashflow_monthly',    { p_tenant_id: tenantId }),
+      supabase.rpc('fn_source_breakdown',    { p_tenant_id: tenantId }),
+      supabase.rpc('fn_financial_score',     { p_tenant_id: tenantId }),
     ])
 
-    // ── Agrégats annuels ──────────────────────────────────────────────────────
-    const allTx = txYear ?? []
-    const caTotal      = allTx.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-    const depTotal     = allTx.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
-    const resultatNet  = caTotal - depTotal
+    if (kpiData)     setKpi(kpiData as KpiRaw)
+    if (monthlyData) setMonthly(monthlyData as MonthlyRow[])
+    if (sourceData)  setSources(sourceData as SourceRow[])
+    if (scoreData)   setScore(scoreData as ScoreRaw)
 
-    // ── Mois courant ──────────────────────────────────────────────────────────
-    const moisTx = txMonth ?? []
-    const caMois  = moisTx.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-    const depMois = moisTx.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
-
-    // ── Mois précédent ────────────────────────────────────────────────────────
-    const prevTx = txPrev ?? []
-    const caPrev  = prevTx.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-    const depPrev = prevTx.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
-
-    // ── Trésorerie par type ───────────────────────────────────────────────────
-    const soldeBanque  = (banques  ?? []).reduce((s: number, b: { solde: number }) => s + (b.solde ?? 0), 0)
-    const soldeCaisse  = (caisses  ?? []).reduce((s: number, c: { solde: number }) => s + (c.solde ?? 0), 0)
-
-    // Mobile money from transactions moyen_paiement='mobile_money'
-    const soldeMobile  = allTx
-      .filter(t => t.moyen_paiement === 'mobile_money')
-      .reduce((s, t) => s + (t.type === 'entree' ? t.montant : -t.montant), 0)
-
-    // ── TVA (simple: entrées × 18% - sorties TVA déductible) ─────────────────
-    const tvaCollectee  = caTotal * 0.18
-    const tvaDed        = depTotal * 0.18
-    const tvaSolde      = tvaCollectee - tvaDed
-
-    // ── Charges salariales from transactions ──────────────────────────────────
-    const chargesSalariales = allTx
-      .filter(t => t.type === 'sortie' && (t.categorie?.toLowerCase().includes('salaire') || t.categorie?.toLowerCase().includes('rémunér') || t.categorie === 'CNSS'))
-      .reduce((s, t) => s + t.montant, 0)
-
-    // ── Créances clients (factures non payées) ────────────────────────────────
-    const { data: factures } = await supabase
-      .from('factures')
-      .select('total, statut')
+    // Transactions récentes (direct — pas dans RPC pour garder la flexibilité)
+    const { data: txData } = await supabase
+      .from('transactions')
+      .select('id, date_operation, libelle, montant, type, categorie, moyen_paiement, source')
       .eq('tenant_id', tenantId)
-      .in('statut', ['envoyee', 'partielle', 'en_attente', 'retard'])
-
-    const creancesClients = (factures ?? []).reduce((s: number, f: { total: number }) => s + (f.total ?? 0), 0)
-
-    // ── Dettes fournisseurs ───────────────────────────────────────────────────
-    const { data: bonsCmd } = await supabase
-      .from('bons_commande')
-      .select('montant_total, statut')
-      .eq('tenant_id', tenantId)
-      .in('statut', ['en_attente', 'recu_partiel'])
-
-    const dettesFournisseurs = (bonsCmd ?? []).reduce((s: number, b: { montant_total: number }) => s + (b.montant_total ?? 0), 0)
-
-    setKpi({
-      chiffreAffaires:     caTotal,
-      chiffreAffairesMois: caMois,
-      depensesTotal:       depTotal,
-      depensesMois:        depMois,
-      resultatNet,
-      soldeBanque,
-      soldeCaisse,
-      soldeMobile,
-      creancesClients,
-      dettesFournisseurs,
-      tvaSolde,
-      chargesSalariales,
-      cashflowMois:        caMois - depMois,
-      caEvol:              getDiff(caMois, caPrev),
-      depEvol:             getDiff(depMois, depPrev),
-      netEvol:             getDiff(caMois - depMois, caPrev - depPrev),
-    })
-
-    // ── Données mensuelles ────────────────────────────────────────────────────
-    const byMonth: Record<number, { produits: number; charges: number }> = {}
-    for (let i = 0; i <= currentMonth; i++) byMonth[i] = { produits: 0, charges: 0 }
-
-    for (const t of allTx) {
-      const m = new Date(t.date_operation).getMonth()
-      if (m in byMonth) {
-        if (t.type === 'entree')  byMonth[m].produits += t.montant
-        if (t.type === 'sortie')  byMonth[m].charges  += t.montant
-      }
-    }
-
-    setMonthly(
-      Object.entries(byMonth).map(([mi, v]) => ({
-        mois:     MONTH_LABELS[Number(mi)],
-        produits: Math.round(v.produits),
-        charges:  Math.round(v.charges),
-        resultat: Math.round(v.produits - v.charges),
-      }))
-    )
-
-    // ── Soldes trésorerie ──────────────────────────────────────────────────────
-    const tresoArr: TresoData[] = [
-      ...(banques ?? []).map((b: { nom: string; solde: number }) => ({
-        nom: b.nom, solde: b.solde ?? 0, type: 'banque' as const,
-      })),
-      ...(caisses ?? []).map((c: { nom: string; solde: number }) => ({
-        nom: c.nom, solde: c.solde ?? 0, type: 'caisse' as const,
-      })),
-      ...(soldeMobile !== 0 ? [{ nom: 'Mobile Money', solde: soldeMobile, type: 'mobile' as const }] : []),
-    ]
-    setTreso(tresoArr)
-
-    // ── Transactions récentes ─────────────────────────────────────────────────
-    setRecentTx(
-      allTx.slice(0, 12).map(t => ({
-        id:             t.id,
-        date_operation: t.date_operation,
-        libelle:        t.libelle,
-        montant:        t.montant,
-        type:           t.type as 'entree' | 'sortie' | 'transfert',
-        categorie:      t.categorie,
-        moyen_paiement: t.moyen_paiement,
-      }))
-    )
-
-    // ── Top catégories dépenses ───────────────────────────────────────────────
-    const catMap: Record<string, number> = {}
-    for (const t of allTx.filter(x => x.type === 'sortie')) {
-      catMap[t.categorie] = (catMap[t.categorie] ?? 0) + t.montant
-    }
-    const DEP_COLORS = ['#EF4444','#F97316','#F59E0B','#8B5CF6','#6B7280']
-    setTopDepCat(
-      Object.entries(catMap)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5)
-        .map(([name, value], i) => ({ name, value, color: DEP_COLORS[i] }))
-    )
-
-    // ── Top catégories produits ───────────────────────────────────────────────
-    const proMap: Record<string, number> = {}
-    for (const t of allTx.filter(x => x.type === 'entree')) {
-      proMap[t.categorie] = (proMap[t.categorie] ?? 0) + t.montant
-    }
-    const PRO_COLORS = ['#10B981','#3B82F6','#06B6D4','#84CC16','#A78BFA']
-    setTopProCat(
-      Object.entries(proMap)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5)
-        .map(([name, value], i) => ({ name, value, color: PRO_COLORS[i] }))
-    )
+      .order('date_operation', { ascending: false })
+      .limit(15)
+    setRecentTx((txData as RecentTx[] | null) ?? [])
 
     setLoading(false)
-  }, [tenantId, currentYear, currentMonth])
+  }, [tenantId])
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { load() }, [load])
+  // ── Trésorerie détaillée ───────────────────────────────────────────────────
+  const loadTreso = useCallback(async () => {
+    if (!tenantId) return
+    setLTreso(true)
+    const [{ data: bq }, { data: ca }, { data: mo }] = await Promise.all([
+      supabase.from('comptes_bancaires')    .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true),
+      supabase.from('caisses')              .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true),
+      supabase.from('mobile_money_wallets') .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true),
+    ])
+    const items: TresoItem[] = [
+      ...((bq ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'banque',  nom: r.nom, solde: r.solde ?? 0 })),
+      ...((ca ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'caisse',  nom: r.nom, solde: r.solde ?? 0 })),
+      ...((mo ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'mobile',  nom: r.nom, solde: r.solde ?? 0 })),
+    ]
+    setTreso(items)
+    setLTreso(false)
+  }, [tenantId])
 
-  const TRESO_COLORS = {
-    banque: { bg: '#DBEAFE', text: '#1D4ED8', icon: Building2 },
-    caisse: { bg: '#D1FAE5', text: '#065F46', icon: Wallet },
-    mobile: { bg: '#FEF3C7', text: '#92400E', icon: Smartphone },
+  // ── Prévisions ────────────────────────────────────────────────────────────
+  const loadPrevs = useCallback(async () => {
+    if (!tenantId) return
+    const { data } = await supabase.from('previsions_tresorerie')
+      .select('id, libelle, montant, type, date_prevue, probabilite, statut')
+      .eq('tenant_id', tenantId)
+      .gte('date_prevue', new Date().toISOString().split('T')[0])
+      .order('date_prevue')
+      .limit(30)
+    setPrevs((data as Prevision[] | null) ?? [])
+  }, [tenantId])
+
+  useEffect(() => { load(); loadTreso() }, [load, loadTreso])
+  useEffect(() => { if (tab === 'previsions') loadPrevs() }, [tab, loadPrevs])
+
+  // ── Données dérivées ───────────────────────────────────────────────────────
+  const caEvol  = getDiff(kpi?.ca_mois  ?? 0, kpi?.ca_prev  ?? 0)
+  const depEvol = getDiff(kpi?.dep_mois ?? 0, kpi?.dep_prev ?? 0)
+  const netEvol = getDiff(kpi?.cashflow_mois ?? 0, kpi?.cashflow_prev ?? 0)
+
+  const revenueSources = sources.filter(s => s.type_flux === 'entree').slice(0, 6)
+  const expenseSources = sources.filter(s => s.type_flux === 'sortie').slice(0, 6)
+  const totalCA   = revenueSources.reduce((s, x) => s + x.total, 0)
+  const totalDep  = expenseSources.reduce((s, x) => s + x.total, 0)
+
+  const TRESO_STYLE: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
+    banque: { bg: '#DBEAFE', text: '#1D4ED8', icon: <Building2 size={14} /> },
+    caisse: { bg: '#D1FAE5', text: '#065F46', icon: <Wallet size={14} /> },
+    mobile: { bg: '#FEF3C7', text: '#92400E', icon: <Smartphone size={14} /> },
   }
 
-  return (
-    <div className="space-y-6 max-w-[1400px] mx-auto">
+  const scoreColor = score
+    ? score.score >= 85 ? '#10B981'
+    : score.score >= 70 ? '#3B82F6'
+    : score.score >= 50 ? '#F59E0B'
+    : score.score >= 30 ? '#F97316'
+    : '#EF4444'
+    : '#94A3B8'
 
-      {/* Header */}
+  const TABS: { id: TabId; label: string }[] = [
+    { id: 'apercu',     label: 'Vue d\'ensemble' },
+    { id: 'cashflow',   label: 'Cash flow' },
+    { id: 'sources',    label: 'Sources' },
+    { id: 'previsions', label: 'Prévisions' },
+    { id: 'tva',        label: 'TVA · Fiscalité' },
+  ]
+
+  // ─── RENDER ───────────────────────────────────────────────────────────────
+
+  return (
+    <div className="space-y-5 max-w-[1440px] mx-auto">
+
+      {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-[#111827] tracking-tight">Finance</h1>
-          <p className="text-sm text-[#6B7280] mt-0.5">
-            Tableau de bord financier — exercice {currentYear}
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#F0FDF4] flex items-center justify-center">
+            <Activity size={20} className="text-[#10B981]" />
+          </div>
+          <div>
+            <h1 className="text-[18px] font-bold text-[#111827] tracking-tight">Finance</h1>
+            <p className="text-[11px] text-[#6B7280]">
+              Moteur financier central · Exercice {currentYear} · {MONTH_LABELS[currentMonth]}
+            </p>
+          </div>
+          {/* Score santé */}
+          {score && !loading && (
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border" style={{ borderColor: scoreColor + '40', background: scoreColor + '10' }}>
+              <div className="w-2 h-2 rounded-full" style={{ background: scoreColor }} />
+              <span className="text-[12px] font-bold" style={{ color: scoreColor }}>Santé : {score.label}</span>
+              <span className="text-[11px]" style={{ color: scoreColor }}>{score.score}/100</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#9CA3AF] flex items-center gap-1">
-            <Calendar size={13} />
-            {MONTH_LABELS[currentMonth]} {currentYear}
+          <span className="text-[11px] text-[#9CA3AF] flex items-center gap-1 hidden sm:flex">
+            <Calendar size={12} />
+            {new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
           </span>
-          <button
-            onClick={load}
-            disabled={loading}
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
-          >
-            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+          <button onClick={() => { load(); loadTreso() }} disabled={loading}
+            className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50">
+            <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
             Actualiser
           </button>
-          <button className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-[#F59E0B] text-white hover:bg-[#D97706] transition-colors">
-            <Download size={13} />
-            Exporter
+          <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg bg-[#10B981] text-white hover:bg-[#059669] transition-colors">
+            <Download size={12} /> Exporter
           </button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-[#F3F4F6] rounded-xl p-1 w-fit">
-        {(['apercu', 'cashflow', 'tiers', 'tva'] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-              activeTab === tab
-                ? 'bg-white text-[#111827] shadow-sm'
-                : 'text-[#6B7280] hover:text-[#374151]'
-            }`}
-          >
-            {tab === 'apercu' ? 'Vue d\'ensemble' : tab === 'cashflow' ? 'Cash flow' : tab === 'tiers' ? 'Tiers' : 'TVA / Fiscalité'}
+      {/* ── Tabs ────────────────────────────────────────────────────────── */}
+      <div className="flex gap-1 bg-[#F3F4F6] rounded-xl p-1 w-fit overflow-x-auto">
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            className={`px-4 py-1.5 rounded-lg text-[12px] font-medium transition-all whitespace-nowrap ${
+              tab === t.id ? 'bg-white text-[#111827] shadow-sm' : 'text-[#6B7280] hover:text-[#374151]'
+            }`}>
+            {t.label}
           </button>
         ))}
       </div>
 
-      {/* ── APERCU ──────────────────────────────────────────────────────────── */}
-      {activeTab === 'apercu' && (
-        <div className="space-y-6">
+      {/* ══════════════════════════════════════════════════════════════════
+          TAB : VUE D'ENSEMBLE
+      ══════════════════════════════════════════════════════════════════ */}
+      {tab === 'apercu' && (
+        <div className="space-y-5">
 
           {/* KPI row 1 — P&L */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard
-              label="Chiffre d'affaires"
-              value={loading ? '—' : fmtShort(kpi?.chiffreAffaires ?? 0) + ' FCFA'}
-              sub={`${fmtShort(kpi?.chiffreAffairesMois ?? 0)} ce mois`}
-              evol={kpi?.caEvol}
-              icon={<TrendingUp size={16} />}
-              accent="#10B981"
-              loading={loading}
-            />
-            <KpiCard
-              label="Dépenses totales"
-              value={loading ? '—' : fmtShort(kpi?.depensesTotal ?? 0) + ' FCFA'}
-              sub={`${fmtShort(kpi?.depensesMois ?? 0)} ce mois`}
-              evol={kpi?.depEvol}
-              icon={<TrendingDown size={16} />}
-              accent="#EF4444"
-              loading={loading}
-            />
-            <KpiCard
-              label="Résultat net"
-              value={loading ? '—' : fmtShort(kpi?.resultatNet ?? 0) + ' FCFA'}
-              sub="Produits − Charges"
-              evol={kpi?.netEvol}
-              icon={<DollarSign size={16} />}
-              accent={(kpi?.resultatNet ?? 0) >= 0 ? '#10B981' : '#EF4444'}
-              loading={loading}
-            />
-            <KpiCard
-              label="Cash flow du mois"
-              value={loading ? '—' : fmtShort(kpi?.cashflowMois ?? 0) + ' FCFA'}
-              sub="Entrées − Sorties"
-              icon={<ArrowUpRight size={16} />}
-              accent={(kpi?.cashflowMois ?? 0) >= 0 ? '#3B82F6' : '#F97316'}
-              loading={loading}
-            />
+            <KpiCard label="Chiffre d'affaires" icon={<TrendingUp size={16} />} accent="#10B981" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.ca_annee ?? 0) + ' FCFA'}
+              sub={`${fmtShort(kpi?.ca_mois ?? 0)} ce mois`} evol={caEvol} />
+            <KpiCard label="Dépenses totales" icon={<TrendingDown size={16} />} accent="#EF4444" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.dep_annee ?? 0) + ' FCFA'}
+              sub={`${fmtShort(kpi?.dep_mois ?? 0)} ce mois`} evol={depEvol} />
+            <KpiCard label="Résultat net" icon={<DollarSign size={16} />}
+              accent={(kpi?.resultat_net ?? 0) >= 0 ? '#10B981' : '#EF4444'} loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.resultat_net ?? 0) + ' FCFA'}
+              sub="Produits − Charges" evol={netEvol}
+              badge={kpi ? `${kpi.marge_nette_pct}%` : undefined} />
+            <KpiCard label="Cash flow du mois" icon={<BarChart2 size={16} />}
+              accent={(kpi?.cashflow_mois ?? 0) >= 0 ? '#3B82F6' : '#F97316'} loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.cashflow_mois ?? 0) + ' FCFA'}
+              sub="Entrées − Sorties" />
           </div>
 
           {/* KPI row 2 — Trésorerie */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard
-              label="Solde banque"
-              value={loading ? '—' : fmtShort(kpi?.soldeBanque ?? 0) + ' FCFA'}
-              icon={<Building2 size={16} />}
-              accent="#3B82F6"
-              loading={loading}
-            />
-            <KpiCard
-              label="Solde caisse"
-              value={loading ? '—' : fmtShort(kpi?.soldeCaisse ?? 0) + ' FCFA'}
-              icon={<Wallet size={16} />}
-              accent="#10B981"
-              loading={loading}
-            />
-            <KpiCard
-              label="Mobile Money"
-              value={loading ? '—' : fmtShort(kpi?.soldeMobile ?? 0) + ' FCFA'}
-              icon={<Smartphone size={16} />}
-              accent="#F59E0B"
-              loading={loading}
-            />
-            <KpiCard
-              label="Charges salariales"
-              value={loading ? '—' : fmtShort(kpi?.chargesSalariales ?? 0) + ' FCFA'}
-              sub="Exercice en cours"
-              icon={<Users size={16} />}
-              accent="#8B5CF6"
-              loading={loading}
-            />
+            <KpiCard label="Banque" icon={<Building2 size={16} />} accent="#3B82F6" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.solde_banque ?? 0) + ' FCFA'} />
+            <KpiCard label="Caisse" icon={<Wallet size={16} />} accent="#10B981" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.solde_caisse ?? 0) + ' FCFA'} />
+            <KpiCard label="Mobile Money" icon={<Smartphone size={16} />} accent="#F59E0B" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.solde_mobile ?? 0) + ' FCFA'} />
+            <KpiCard label="Trésorerie totale" icon={<Target size={16} />} accent="#8B5CF6" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.treso_totale ?? 0) + ' FCFA'}
+              sub="Banque + Caisse + Mobile" />
           </div>
 
-          {/* Row 3 — créances / dettes */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-            {/* Créances clients */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-[#111827]">Créances clients</span>
-                <span className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-lg font-medium">
-                  À encaisser
-                </span>
-              </div>
-              {loading ? (
-                <div className="h-10 bg-[#F3F4F6] rounded-lg animate-pulse" />
-              ) : (
-                <>
-                  <div className="text-3xl font-bold text-[#111827] mb-1">
-                    {fmtShort(kpi?.creancesClients ?? 0)} FCFA
-                  </div>
-                  <p className="text-xs text-[#9CA3AF]">Factures envoyées non réglées</p>
-                  {(kpi?.creancesClients ?? 0) > 0 && (
-                    <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 rounded-lg px-2 py-1.5">
-                      <Clock size={12} />
-                      Relances à prévoir
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Dettes fournisseurs */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-[#111827]">Dettes fournisseurs</span>
-                <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-lg font-medium">
-                  À régler
-                </span>
-              </div>
-              {loading ? (
-                <div className="h-10 bg-[#F3F4F6] rounded-lg animate-pulse" />
-              ) : (
-                <>
-                  <div className="text-3xl font-bold text-[#111827] mb-1">
-                    {fmtShort(kpi?.dettesFournisseurs ?? 0)} FCFA
-                  </div>
-                  <p className="text-xs text-[#9CA3AF]">Bons de commande en attente</p>
-                  {(kpi?.dettesFournisseurs ?? 0) > 0 && (
-                    <div className="mt-3 flex items-center gap-1.5 text-xs text-red-500 bg-red-50 rounded-lg px-2 py-1.5">
-                      <AlertCircle size={12} />
-                      Règlements à planifier
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* TVA nette */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-[#111827]">TVA nette estimée</span>
-                <span className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-lg font-medium">
-                  18% + CA 5%
-                </span>
-              </div>
-              {loading ? (
-                <div className="h-10 bg-[#F3F4F6] rounded-lg animate-pulse" />
-              ) : (
-                <>
-                  <div className={`text-3xl font-bold mb-1 ${(kpi?.tvaSolde ?? 0) >= 0 ? 'text-[#111827]' : 'text-red-500'}`}>
-                    {fmtShort(kpi?.tvaSolde ?? 0)} FCFA
-                  </div>
-                  <p className="text-xs text-[#9CA3AF]">TVA collectée − TVA déductible</p>
-                  {(kpi?.tvaSolde ?? 0) > 0 && (
-                    <div className="mt-3 flex items-center gap-1.5 text-xs text-blue-600 bg-blue-50 rounded-lg px-2 py-1.5">
-                      <AlertCircle size={12} />
-                      À déclarer à la DGI
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+          {/* KPI row 3 — Tiers & Fiscalité */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <KpiCard label="Créances clients" icon={<AlertCircle size={16} />} accent="#F59E0B" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.creances_clients ?? 0) + ' FCFA'}
+              sub={kpi ? `${kpi.nb_factures_ouvertes} facture(s)` : '—'}
+              badge={kpi && kpi.nb_factures_retard > 0 ? `${kpi.nb_factures_retard} retard` : undefined} />
+            <KpiCard label="Dettes fournisseurs" icon={<Clock size={16} />} accent="#EF4444" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.dettes_fournisseurs ?? 0) + ' FCFA'}
+              sub="Achats non réglés" />
+            <KpiCard label="TVA nette" icon={<FileText size={16} />} accent="#2563EB" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.tva_nette ?? 0) + ' FCFA'}
+              sub="À déclarer à la DGI" />
+            <KpiCard label="Charges salariales" icon={<Users size={16} />} accent="#7C3AED" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.salaires_annee ?? 0) + ' FCFA'}
+              sub="Exercice en cours"
+              badge={kpi ? `${kpi.ratio_salaires_pct}% du CA` : undefined} />
           </div>
 
           {/* Charts row */}
@@ -562,76 +411,65 @@ export default function FinancePage() {
             <div className="lg:col-span-2 bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-sm font-semibold text-[#111827]">Évolution mensuelle</h3>
-                  <p className="text-xs text-[#9CA3AF]">Produits vs Charges vs Résultat</p>
+                  <h3 className="text-[13px] font-semibold text-[#111827]">Évolution mensuelle</h3>
+                  <p className="text-[11px] text-[#9CA3AF]">Entrées · Sorties · Résultat net · {currentYear}</p>
                 </div>
               </div>
-              {loading ? (
-                <div className="h-56 bg-[#F9FAFB] rounded-xl animate-pulse" />
-              ) : monthly.length === 0 ? (
-                <div className="h-56 flex items-center justify-center text-sm text-[#9CA3AF]">Aucune donnée</div>
-              ) : (
+              {loading ? <div className="h-56 bg-[#F9FAFB] rounded-xl animate-pulse" /> : (
                 <ResponsiveContainer width="100%" height={220}>
                   <AreaChart data={monthly} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                     <defs>
-                      <linearGradient id="gradProduits" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#10B981" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#10B981" stopOpacity={0}    />
+                      <linearGradient id="gEnt" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                       </linearGradient>
-                      <linearGradient id="gradCharges" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#EF4444" stopOpacity={0.12} />
-                        <stop offset="95%" stopColor="#EF4444" stopOpacity={0}    />
+                      <linearGradient id="gSor" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#EF4444" stopOpacity={0.12} />
+                        <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                    <XAxis dataKey="mois" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="mois_label" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
-                    <Tooltip
-                      formatter={(v) => fmt(Number(v))}
-                      contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }}
-                    />
+                    <Tooltip formatter={(v) => fmt(Number(v))}
+                      contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }} />
                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-                    <Area type="monotone" dataKey="produits" name="Produits" stroke="#10B981" strokeWidth={2} fill="url(#gradProduits)" />
-                    <Area type="monotone" dataKey="charges"  name="Charges"  stroke="#EF4444" strokeWidth={2} fill="url(#gradCharges)"  />
-                    <Line  type="monotone" dataKey="resultat" name="Résultat" stroke="#3B82F6" strokeWidth={2} dot={{ r: 3 }} />
+                    <Area type="monotone" dataKey="entrees" name="Entrées"  stroke="#10B981" strokeWidth={2} fill="url(#gEnt)" />
+                    <Area type="monotone" dataKey="sorties" name="Sorties"  stroke="#EF4444" strokeWidth={2} fill="url(#gSor)" />
+                    <Line  type="monotone" dataKey="net"     name="Net"      stroke="#3B82F6" strokeWidth={2} dot={{ r: 3 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
             </div>
 
-            {/* Répartition trésorerie */}
+            {/* Trésorerie par compte */}
             <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <h3 className="text-sm font-semibold text-[#111827] mb-1">Trésorerie</h3>
-              <p className="text-xs text-[#9CA3AF] mb-4">Répartition par compte</p>
-              {loading ? (
-                <div className="space-y-2">
-                  {[1,2,3].map(i => <div key={i} className="h-12 bg-[#F3F4F6] rounded-lg animate-pulse" />)}
-                </div>
+              <h3 className="text-[13px] font-semibold text-[#111827] mb-1">Trésorerie</h3>
+              <p className="text-[11px] text-[#9CA3AF] mb-4">Soldes réels par compte</p>
+              {lTreso ? (
+                <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-12 bg-[#F3F4F6] rounded-lg animate-pulse" />)}</div>
               ) : treso.length === 0 ? (
-                <p className="text-sm text-[#9CA3AF] text-center py-8">Aucun compte configuré</p>
+                <p className="text-[12px] text-[#9CA3AF] text-center py-8">Aucun compte configuré</p>
               ) : (
                 <div className="space-y-2">
                   {treso.map((t, i) => {
-                    const style = TRESO_COLORS[t.type]
-                    const Icon  = style.icon
-                    const total = treso.reduce((s, x) => s + Math.max(x.solde, 0), 0)
+                    const s = TRESO_STYLE[t.type_compte] ?? TRESO_STYLE.caisse
+                    const total = treso.reduce((sum, x) => sum + Math.max(x.solde, 0), 0)
                     const pct   = total > 0 ? Math.round((Math.max(t.solde, 0) / total) * 100) : 0
                     return (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: style.bg + '40' }}>
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: style.bg }}>
-                          <Icon size={15} style={{ color: style.text }} />
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: s.bg + '40' }}>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: s.bg }}>
+                          <div style={{ color: s.text }}>{s.icon}</div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs font-medium text-[#374151] truncate">{t.nom}</div>
+                          <div className="text-[12px] font-medium text-[#374151] truncate">{t.nom}</div>
                           <div className="text-[10px] text-[#9CA3AF]">{pct}% du total</div>
                         </div>
-                        <div className="text-sm font-semibold shrink-0" style={{ color: style.text }}>
-                          {fmtShort(t.solde)}
-                        </div>
+                        <div className="text-[12px] font-bold shrink-0" style={{ color: s.text }}>{fmtShort(t.solde)}</div>
                       </div>
                     )
                   })}
-                  <div className="pt-1 border-t border-[#F3F4F6] flex justify-between text-xs font-semibold text-[#374151]">
+                  <div className="pt-2 border-t border-[#F3F4F6] flex justify-between text-[12px] font-bold text-[#374151]">
                     <span>Total liquidités</span>
                     <span>{fmtShort(treso.reduce((s, t) => s + t.solde, 0))} FCFA</span>
                   </div>
@@ -640,309 +478,99 @@ export default function FinancePage() {
             </div>
           </div>
 
-          {/* Row — Top catégories + transactions récentes */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-            {/* Top dépenses */}
+          {/* Score financier détaillé */}
+          {score && !loading && (
             <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <h3 className="text-sm font-semibold text-[#111827] mb-4">Top dépenses par catégorie</h3>
-              {loading ? (
-                <div className="space-y-2">{[1,2,3,4,5].map(i => <div key={i} className="h-8 bg-[#F3F4F6] rounded animate-pulse" />)}</div>
-              ) : topDepCat.length === 0 ? (
-                <p className="text-sm text-[#9CA3AF] text-center py-6">Aucune dépense enregistrée</p>
-              ) : (
-                <div className="space-y-2">
-                  {topDepCat.map((c, i) => {
-                    const total = topDepCat.reduce((s, x) => s + x.value, 0)
-                    const pct   = total > 0 ? Math.round((c.value / total) * 100) : 0
-                    return (
-                      <div key={i}>
-                        <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="text-[#374151] font-medium truncate max-w-[60%]">{c.name || 'Non classé'}</span>
-                          <span className="text-[#6B7280]">{fmtShort(c.value)} FCFA ({pct}%)</span>
-                        </div>
-                        <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c.color }} />
-                        </div>
-                      </div>
-                    )
-                  })}
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-[13px] font-semibold text-[#111827]">Score de santé financière</h3>
+                  <p className="text-[11px] text-[#9CA3AF]">Basé sur cashflow, trésorerie, créances et dettes</p>
                 </div>
-              )}
-            </div>
-
-            {/* Top produits */}
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <h3 className="text-sm font-semibold text-[#111827] mb-4">Top sources de revenus</h3>
-              {loading ? (
-                <div className="space-y-2">{[1,2,3,4,5].map(i => <div key={i} className="h-8 bg-[#F3F4F6] rounded animate-pulse" />)}</div>
-              ) : topProCat.length === 0 ? (
-                <p className="text-sm text-[#9CA3AF] text-center py-6">Aucun produit enregistré</p>
-              ) : (
-                <div className="space-y-2">
-                  {topProCat.map((c, i) => {
-                    const total = topProCat.reduce((s, x) => s + x.value, 0)
-                    const pct   = total > 0 ? Math.round((c.value / total) * 100) : 0
-                    return (
-                      <div key={i}>
-                        <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="text-[#374151] font-medium truncate max-w-[60%]">{c.name || 'Non classé'}</span>
-                          <span className="text-[#6B7280]">{fmtShort(c.value)} FCFA ({pct}%)</span>
-                        </div>
-                        <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c.color }} />
-                        </div>
-                      </div>
-                    )
-                  })}
+                <div className="flex items-center gap-2">
+                  <div className="text-[28px] font-black" style={{ color: scoreColor }}>{score.score}</div>
+                  <div>
+                    <div className="text-[12px] font-bold" style={{ color: scoreColor }}>{score.label}</div>
+                    <div className="text-[10px] text-[#9CA3AF]">/ 100 pts</div>
+                  </div>
                 </div>
-              )}
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                {[
+                  { label: 'Cash flow', score: score.score_cashflow, max: 25 },
+                  { label: 'Trésorerie', score: score.score_treso, max: 25 },
+                  { label: 'Créances', score: score.score_creances, max: 25 },
+                  { label: 'Dettes', score: score.score_dettes, max: 25 },
+                ].map(item => {
+                  const pct = Math.round((item.score / item.max) * 100)
+                  const c = pct >= 80 ? '#10B981' : pct >= 60 ? '#3B82F6' : pct >= 40 ? '#F59E0B' : '#EF4444'
+                  return (
+                    <div key={item.label} className="bg-[#F9FAFB] rounded-xl p-3">
+                      <div className="flex justify-between text-[11px] mb-2">
+                        <span className="text-[#6B7280]">{item.label}</span>
+                        <span className="font-bold" style={{ color: c }}>{item.score}/{item.max}</span>
+                      </div>
+                      <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: c }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Transactions récentes */}
-          <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-[#F3F4F6]">
-              <h3 className="text-sm font-semibold text-[#111827]">Dernières opérations</h3>
-              <a href="/dashboard/tresorerie" className="text-xs text-[#F59E0B] hover:underline font-medium flex items-center gap-0.5">
+          <SectionCard title="Dernières opérations" sub={`Toutes sources — ${recentTx.length} opérations`}
+            action={
+              <a href="/dashboard/tresorerie/historique" className="text-[11px] text-[#10B981] hover:underline font-medium flex items-center gap-0.5">
                 Voir tout <ChevronRight size={12} />
               </a>
-            </div>
+            }>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#F9FAFB] text-xs text-[#6B7280] uppercase tracking-wider">
+                  <tr className="bg-[#F9FAFB] text-[10px] text-[#6B7280] uppercase tracking-wider">
                     <th className="text-left px-5 py-3 font-medium">Date</th>
                     <th className="text-left px-4 py-3 font-medium">Libellé</th>
-                    <th className="text-left px-4 py-3 font-medium hidden md:table-cell">Catégorie</th>
+                    <th className="text-left px-4 py-3 font-medium hidden md:table-cell">Source</th>
                     <th className="text-left px-4 py-3 font-medium hidden lg:table-cell">Mode</th>
                     <th className="text-right px-5 py-3 font-medium">Montant</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {loading ? (
-                    [...Array(6)].map((_, i) => (
-                      <tr key={i} className="border-t border-[#F3F4F6]">
-                        {[1,2,3,4,5].map(j => (
-                          <td key={j} className="px-4 py-3">
-                            <div className="h-4 bg-[#F3F4F6] rounded animate-pulse" />
-                          </td>
-                        ))}
-                      </tr>
-                    ))
-                  ) : recentTx.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="text-center py-10 text-[#9CA3AF] text-sm">
-                        Aucune opération cette année
-                      </td>
+                  {loading ? [...Array(6)].map((_, i) => (
+                    <tr key={i} className="border-t border-[#F3F4F6]">
+                      {[1,2,3,4,5].map(j => <td key={j} className="px-4 py-3"><div className="h-4 bg-[#F3F4F6] rounded animate-pulse" /></td>)}
                     </tr>
-                  ) : (
-                    recentTx.map(tx => (
+                  )) : recentTx.length === 0 ? (
+                    <tr><td colSpan={5} className="text-center py-10 text-[12px] text-[#9CA3AF]">Aucune opération</td></tr>
+                  ) : recentTx.map(tx => {
+                    const srcColor = SOURCE_COLORS[
+                      tx.source === 'facture' ? 'Facturation'
+                      : tx.source?.includes('scolaire') || tx.source === 'ecole' ? 'École'
+                      : tx.source?.includes('paie') || tx.source === 'salaire' ? 'RH & Paie'
+                      : tx.source === 'achat' ? 'Achats'
+                      : tx.source === 'depense' ? 'Dépenses'
+                      : 'Manuel'
+                    ] ?? '#94A3B8'
+                    return (
                       <tr key={tx.id} className="border-t border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors">
-                        <td className="px-5 py-3 text-xs text-[#6B7280] whitespace-nowrap">
-                          {new Date(tx.date_operation).toLocaleDateString('fr-CG', { day: '2-digit', month: 'short' })}
+                        <td className="px-5 py-3 text-[11px] text-[#6B7280] whitespace-nowrap">
+                          {new Date(tx.date_operation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                         </td>
                         <td className="px-4 py-3 max-w-[200px]">
-                          <span className="text-[#111827] font-medium truncate block">{tx.libelle}</span>
+                          <span className="text-[12px] text-[#111827] font-medium truncate block">{tx.libelle}</span>
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
-                          <span className="text-xs text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded-md">{tx.categorie}</span>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: srcColor + '18', color: srcColor }}>
+                            {tx.source ?? tx.categorie ?? '—'}
+                          </span>
                         </td>
-                        <td className="px-4 py-3 hidden lg:table-cell">
-                          <span className="text-xs text-[#9CA3AF]">{tx.moyen_paiement ?? '—'}</span>
-                        </td>
-                        <td className="px-5 py-3 text-right whitespace-nowrap font-semibold">
+                        <td className="px-4 py-3 hidden lg:table-cell text-[11px] text-[#9CA3AF]">{tx.moyen_paiement ?? '—'}</td>
+                        <td className="px-5 py-3 text-right whitespace-nowrap font-bold text-[13px]">
                           <span className={tx.type === 'entree' ? 'text-emerald-600' : tx.type === 'sortie' ? 'text-red-500' : 'text-blue-500'}>
                             {tx.type === 'entree' ? '+' : tx.type === 'sortie' ? '−' : '↔'} {fmt(tx.montant)}
                           </span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── CASHFLOW ────────────────────────────────────────────────────────── */}
-      {activeTab === 'cashflow' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-            <h3 className="text-sm font-semibold text-[#111827] mb-1">Flux de trésorerie mensuel</h3>
-            <p className="text-xs text-[#9CA3AF] mb-5">Entrées nettes par mois — exercice {currentYear}</p>
-            {loading ? (
-              <div className="h-72 bg-[#F9FAFB] rounded-xl animate-pulse" />
-            ) : (
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={monthly} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                  <XAxis dataKey="mois" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
-                  <Tooltip
-                    formatter={(v) => fmt(Number(v))}
-                    contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }}
-                  />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="produits" name="Entrées"  fill="#10B981" radius={[4,4,0,0]} />
-                  <Bar dataKey="charges"  name="Sorties"  fill="#EF4444" radius={[4,4,0,0]} />
-                  <Bar dataKey="resultat" name="Net"      fill="#3B82F6" radius={[4,4,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-
-          {/* Résumé mensuel */}
-          <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-[#F3F4F6]">
-              <h3 className="text-sm font-semibold text-[#111827]">Récapitulatif par mois</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-[#F9FAFB] text-xs text-[#6B7280] uppercase tracking-wider">
-                    <th className="text-left px-5 py-3 font-medium">Mois</th>
-                    <th className="text-right px-4 py-3 font-medium">Produits</th>
-                    <th className="text-right px-4 py-3 font-medium">Charges</th>
-                    <th className="text-right px-5 py-3 font-medium">Résultat net</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthly.map((m, i) => (
-                    <tr key={i} className="border-t border-[#F3F4F6] hover:bg-[#F9FAFB]">
-                      <td className="px-5 py-3 font-medium text-[#374151]">{m.mois}</td>
-                      <td className="px-4 py-3 text-right text-emerald-600 font-medium">{fmt(m.produits)}</td>
-                      <td className="px-4 py-3 text-right text-red-500 font-medium">{fmt(m.charges)}</td>
-                      <td className={`px-5 py-3 text-right font-semibold ${m.resultat >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                        {m.resultat >= 0 ? '+' : ''}{fmt(m.resultat)}
-                      </td>
-                    </tr>
-                  ))}
-                  {monthly.length > 0 && (
-                    <tr className="border-t-2 border-[#E5E7EB] bg-[#F9FAFB] font-semibold text-sm">
-                      <td className="px-5 py-3 text-[#111827]">TOTAL {currentYear}</td>
-                      <td className="px-4 py-3 text-right text-emerald-600">{fmt(monthly.reduce((s, m) => s + m.produits, 0))}</td>
-                      <td className="px-4 py-3 text-right text-red-500">{fmt(monthly.reduce((s, m) => s + m.charges, 0))}</td>
-                      <td className={`px-5 py-3 text-right ${(kpi?.resultatNet ?? 0) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                        {(kpi?.resultatNet ?? 0) >= 0 ? '+' : ''}{fmt(kpi?.resultatNet ?? 0)}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── TIERS ────────────────────────────────────────────────────────────── */}
-      {activeTab === 'tiers' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-[#111827]">Clients — Créances</h3>
-                <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg">
-                  {fmt(kpi?.creancesClients ?? 0)}
-                </span>
-              </div>
-              <p className="text-sm text-[#6B7280]">
-                Accédez à la liste des clients avec leurs soldes et historiques via le module Facturation.
-              </p>
-              <a href="/dashboard/facturation" className="mt-4 flex items-center gap-1 text-xs text-[#F59E0B] font-medium hover:underline">
-                Gérer les clients <ChevronRight size={12} />
-              </a>
-            </div>
-            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-[#111827]">Fournisseurs — Dettes</h3>
-                <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-lg">
-                  {fmt(kpi?.dettesFournisseurs ?? 0)}
-                </span>
-              </div>
-              <p className="text-sm text-[#6B7280]">
-                Accédez à la liste des fournisseurs avec leurs soldes et historiques via le module Achats.
-              </p>
-              <a href="/dashboard/achats" className="mt-4 flex items-center gap-1 text-xs text-[#F59E0B] font-medium hover:underline">
-                Gérer les fournisseurs <ChevronRight size={12} />
-              </a>
-            </div>
-          </div>
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-sm text-blue-700">
-            <div className="flex items-start gap-2">
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <div>
-                <strong>Module Tiers en cours de déploiement.</strong> La gestion avancée des tiers (clients, fournisseurs, partenaires)
-                avec comptes OHADA liés, balances âgées et historique complet sera disponible prochainement.
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── TVA ──────────────────────────────────────────────────────────────── */}
-      {activeTab === 'tva' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <KpiCard
-              label="TVA collectée (estimée)"
-              value={loading ? '—' : fmtShort((kpi?.chiffreAffaires ?? 0) * 0.18) + ' FCFA'}
-              sub="CA × 18%"
-              icon={<ArrowUpRight size={16} />}
-              accent="#EF4444"
-              loading={loading}
-            />
-            <KpiCard
-              label="TVA déductible (estimée)"
-              value={loading ? '—' : fmtShort((kpi?.depensesTotal ?? 0) * 0.18) + ' FCFA'}
-              sub="Achats × 18%"
-              icon={<ArrowDownRight size={16} />}
-              accent="#10B981"
-              loading={loading}
-            />
-            <KpiCard
-              label="TVA nette à reverser"
-              value={loading ? '—' : fmtShort(kpi?.tvaSolde ?? 0) + ' FCFA'}
-              sub="Collectée − Déductible"
-              icon={<DollarSign size={16} />}
-              accent={(kpi?.tvaSolde ?? 0) >= 0 ? '#3B82F6' : '#10B981'}
-              loading={loading}
-            />
-          </div>
-
-          {/* Tableau TVA mensuel */}
-          <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-[#F3F4F6]">
-              <h3 className="text-sm font-semibold text-[#111827]">Déclarations TVA mensuelles</h3>
-              <p className="text-xs text-[#9CA3AF] mt-0.5">Taux Congo-Brazzaville : TVA 18% + Contribution d&apos;appui 5% sur TVA</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-[#F9FAFB] text-xs text-[#6B7280] uppercase tracking-wider">
-                    <th className="text-left px-5 py-3 font-medium">Mois</th>
-                    <th className="text-right px-4 py-3 font-medium">CA HT</th>
-                    <th className="text-right px-4 py-3 font-medium">TVA collectée</th>
-                    <th className="text-right px-4 py-3 font-medium">Achats HT</th>
-                    <th className="text-right px-4 py-3 font-medium">TVA déductible</th>
-                    <th className="text-right px-5 py-3 font-medium">Solde TVA</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthly.map((m, i) => {
-                    const tvaC = m.produits * 0.18
-                    const tvaD = m.charges  * 0.18
-                    const sol  = tvaC - tvaD
-                    return (
-                      <tr key={i} className="border-t border-[#F3F4F6] hover:bg-[#F9FAFB]">
-                        <td className="px-5 py-3 font-medium text-[#374151]">{m.mois}</td>
-                        <td className="px-4 py-3 text-right text-[#374151]">{fmt(m.produits)}</td>
-                        <td className="px-4 py-3 text-right text-red-500 font-medium">{fmt(tvaC)}</td>
-                        <td className="px-4 py-3 text-right text-[#374151]">{fmt(m.charges)}</td>
-                        <td className="px-4 py-3 text-right text-emerald-600 font-medium">{fmt(tvaD)}</td>
-                        <td className={`px-5 py-3 text-right font-semibold ${sol >= 0 ? 'text-[#1D4ED8]' : 'text-emerald-600'}`}>
-                          {fmt(sol)}
                         </td>
                       </tr>
                     )
@@ -950,12 +578,375 @@ export default function FinancePage() {
                 </tbody>
               </table>
             </div>
+          </SectionCard>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════
+          TAB : CASH FLOW
+      ══════════════════════════════════════════════════════════════════ */}
+      {tab === 'cashflow' && (
+        <div className="space-y-5">
+
+          {/* KPI cashflow */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <KpiCard label="Entrées YTD"  icon={<ArrowUpRight size={16} />}  accent="#10B981" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.ca_annee ?? 0) + ' FCFA'} />
+            <KpiCard label="Sorties YTD"  icon={<ArrowDownRight size={16} />} accent="#EF4444" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.dep_annee ?? 0) + ' FCFA'} />
+            <KpiCard label="Net YTD"      icon={<Activity size={16} />}
+              accent={(kpi?.resultat_net ?? 0) >= 0 ? '#3B82F6' : '#F97316'} loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.resultat_net ?? 0) + ' FCFA'} />
+            <KpiCard label="Cumul actuel" icon={<BarChart2 size={16} />} accent="#8B5CF6" loading={loading}
+              value={loading ? '—' : fmtShort(monthly[currentMonth]?.cumul ?? 0) + ' FCFA'}
+              sub="Position cumulée" />
           </div>
 
-          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-xs text-amber-800">
-            <strong>Note :</strong> Ces estimations sont calculées sur la base des transactions enregistrées dans le système.
-            Pour une déclaration officielle, consultez un expert-comptable agréé et rapprochez avec vos factures réelles.
-            TVA Congo : 18% + Contribution d&apos;Appui (CA) = 5% × TVA, soit TTC = HT × 1,189.
+          {/* BarChart cashflow + cumul */}
+          <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+            <h3 className="text-[13px] font-semibold text-[#111827] mb-1">Flux de trésorerie mensuel</h3>
+            <p className="text-[11px] text-[#9CA3AF] mb-5">Entrées · Sorties · Net mensuel · Cumul progressif — {currentYear}</p>
+            {loading ? <div className="h-72 bg-[#F9FAFB] rounded-xl animate-pulse" /> : (
+              <ResponsiveContainer width="100%" height={280}>
+                <ComposedChart data={monthly} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                  <XAxis dataKey="mois_label" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                  <Tooltip formatter={(v) => fmt(Number(v))}
+                    contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                  <ReferenceLine y={0} stroke="#E5E7EB" strokeWidth={1.5} />
+                  <Bar dataKey="entrees" name="Entrées"   fill="#10B981" radius={[4,4,0,0]} opacity={0.85} />
+                  <Bar dataKey="sorties" name="Sorties"   fill="#EF4444" radius={[4,4,0,0]} opacity={0.85} />
+                  <Line type="monotone" dataKey="net"   name="Net mensuel" stroke="#3B82F6" strokeWidth={2} dot={{ r: 3, fill: '#3B82F6' }} />
+                  <Line type="monotone" dataKey="cumul" name="Cumul"       stroke="#8B5CF6" strokeWidth={2} strokeDasharray="4 2" dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          {/* Table récapitulatif mensuel */}
+          <SectionCard title="Récapitulatif mensuel" sub={`Exercice ${currentYear}`}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#F9FAFB] text-[10px] text-[#6B7280] uppercase tracking-wider">
+                    <th className="text-left px-5 py-3 font-medium">Mois</th>
+                    <th className="text-right px-4 py-3 font-medium">Entrées</th>
+                    <th className="text-right px-4 py-3 font-medium">Sorties</th>
+                    <th className="text-right px-4 py-3 font-medium">Net</th>
+                    <th className="text-right px-5 py-3 font-medium">Cumul</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthly.map((m, i) => (
+                    <tr key={i} className={`border-t border-[#F3F4F6] hover:bg-[#F9FAFB] ${i === currentMonth ? 'bg-blue-50/40' : ''}`}>
+                      <td className="px-5 py-3 font-medium text-[#374151] text-[12px]">
+                        {m.mois_label} {i === currentMonth && <span className="ml-1 text-[10px] text-blue-500 font-bold">◀ actuel</span>}
+                      </td>
+                      <td className="px-4 py-3 text-right text-emerald-600 font-medium text-[12px]">{fmt(m.entrees)}</td>
+                      <td className="px-4 py-3 text-right text-red-500 font-medium text-[12px]">{fmt(m.sorties)}</td>
+                      <td className={`px-4 py-3 text-right font-semibold text-[12px] ${m.net >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {m.net >= 0 ? '+' : ''}{fmt(m.net)}
+                      </td>
+                      <td className={`px-5 py-3 text-right font-bold text-[12px] ${m.cumul >= 0 ? 'text-[#1D4ED8]' : 'text-red-500'}`}>
+                        {m.cumul >= 0 ? '+' : ''}{fmt(m.cumul)}
+                      </td>
+                    </tr>
+                  ))}
+                  {monthly.length > 0 && (
+                    <tr className="border-t-2 border-[#E5E7EB] bg-[#F9FAFB] font-bold text-[12px]">
+                      <td className="px-5 py-3 text-[#111827]">TOTAL {currentYear}</td>
+                      <td className="px-4 py-3 text-right text-emerald-600">{fmt(monthly.reduce((s, m) => s + m.entrees, 0))}</td>
+                      <td className="px-4 py-3 text-right text-red-500">{fmt(monthly.reduce((s, m) => s + m.sorties, 0))}</td>
+                      <td className={`px-4 py-3 text-right ${(kpi?.resultat_net ?? 0) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {fmt(kpi?.resultat_net ?? 0)}
+                      </td>
+                      <td className="px-5 py-3 text-right text-[#1D4ED8]">
+                        {fmt(monthly[monthly.length - 1]?.cumul ?? 0)}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════
+          TAB : SOURCES
+      ══════════════════════════════════════════════════════════════════ */}
+      {tab === 'sources' && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+            {/* Sources de revenus */}
+            <SectionCard title="Sources de revenus" sub={`${revenueSources.length} modules · ${fmt(totalCA)} total`}>
+              <div className="p-5 space-y-3">
+                {loading ? [...Array(4)].map((_, i) => <div key={i} className="h-10 bg-[#F3F4F6] rounded-lg animate-pulse" />) : (
+                  revenueSources.length === 0
+                    ? <p className="text-[12px] text-[#9CA3AF] text-center py-6">Aucune entrée enregistrée</p>
+                    : revenueSources.map((s, i) => {
+                      const pct  = totalCA > 0 ? Math.round((s.total / totalCA) * 100) : 0
+                      const color = SOURCE_COLORS[s.module_source] ?? '#94A3B8'
+                      const icon  = SOURCE_ICONS[s.module_source] ?? <DollarSign size={13} />
+                      return (
+                        <div key={i}>
+                          <div className="flex items-center justify-between text-[12px] mb-1.5">
+                            <div className="flex items-center gap-1.5 font-medium text-[#374151]">
+                              <span style={{ color }}>{icon}</span>
+                              {s.module_source}
+                              <span className="text-[10px] text-[#9CA3AF]">({s.nb_operations} op.)</span>
+                            </div>
+                            <span className="text-[#374151] font-semibold">{fmtShort(s.total)} FCFA <span className="text-[#9CA3AF] font-normal">({pct}%)</span></span>
+                          </div>
+                          <div className="h-2 bg-[#F3F4F6] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+                          </div>
+                        </div>
+                      )
+                    })
+                )}
+              </div>
+            </SectionCard>
+
+            {/* Sources de dépenses */}
+            <SectionCard title="Origines des dépenses" sub={`${expenseSources.length} modules · ${fmt(totalDep)} total`}>
+              <div className="p-5 space-y-3">
+                {loading ? [...Array(4)].map((_, i) => <div key={i} className="h-10 bg-[#F3F4F6] rounded-lg animate-pulse" />) : (
+                  expenseSources.length === 0
+                    ? <p className="text-[12px] text-[#9CA3AF] text-center py-6">Aucune sortie enregistrée</p>
+                    : expenseSources.map((s, i) => {
+                      const pct  = totalDep > 0 ? Math.round((s.total / totalDep) * 100) : 0
+                      const color = SOURCE_COLORS[s.module_source] ?? '#94A3B8'
+                      const icon  = SOURCE_ICONS[s.module_source] ?? <TrendingDown size={13} />
+                      return (
+                        <div key={i}>
+                          <div className="flex items-center justify-between text-[12px] mb-1.5">
+                            <div className="flex items-center gap-1.5 font-medium text-[#374151]">
+                              <span style={{ color }}>{icon}</span>
+                              {s.module_source}
+                              <span className="text-[10px] text-[#9CA3AF]">({s.nb_operations} op.)</span>
+                            </div>
+                            <span className="text-[#374151] font-semibold">{fmtShort(s.total)} FCFA <span className="text-[#9CA3AF] font-normal">({pct}%)</span></span>
+                          </div>
+                          <div className="h-2 bg-[#F3F4F6] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+                          </div>
+                        </div>
+                      )
+                    })
+                )}
+              </div>
+            </SectionCard>
+          </div>
+
+          {/* BarChart comparatif par module */}
+          {!loading && sources.length > 0 && (
+            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+              <h3 className="text-[13px] font-semibold text-[#111827] mb-1">Comparatif entrées / sorties par module</h3>
+              <p className="text-[11px] text-[#9CA3AF] mb-5">Vue consolidée de tous les flux par source — {currentYear}</p>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart
+                  data={[
+                    ...new Set(sources.map(s => s.module_source))
+                  ].map(mod => ({
+                    module: mod,
+                    entrees: sources.find(s => s.module_source === mod && s.type_flux === 'entree')?.total ?? 0,
+                    sorties: sources.find(s => s.module_source === mod && s.type_flux === 'sortie')?.total ?? 0,
+                  })).filter(d => d.entrees > 0 || d.sorties > 0)}
+                  margin={{ top: 4, right: 8, left: -20, bottom: 30 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                  <XAxis dataKey="module" tick={{ fontSize: 10, fill: '#9CA3AF' }} angle={-30} textAnchor="end" axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                  <Tooltip formatter={(v) => fmt(Number(v))}
+                    contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                  <Bar dataKey="entrees" name="Entrées" fill="#10B981" radius={[4,4,0,0]} />
+                  <Bar dataKey="sorties" name="Sorties" fill="#EF4444" radius={[4,4,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Ventilation CA par source */}
+          {kpi && !loading && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <GraduationCap size={16} className="text-[#3B82F6]" />
+                  <span className="text-[13px] font-semibold text-[#111827]">École</span>
+                </div>
+                <div className="text-[22px] font-bold text-[#111827]">{fmtShort(kpi.ca_ecole)} FCFA</div>
+                <div className="text-[11px] text-[#9CA3AF] mt-1">
+                  {kpi.ca_annee > 0 ? Math.round(kpi.ca_ecole / kpi.ca_annee * 100) : 0}% du CA total
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <FileText size={16} className="text-[#10B981]" />
+                  <span className="text-[13px] font-semibold text-[#111827]">Facturation</span>
+                </div>
+                <div className="text-[22px] font-bold text-[#111827]">{fmtShort(kpi.ca_facturation)} FCFA</div>
+                <div className="text-[11px] text-[#9CA3AF] mt-1">
+                  {kpi.ca_annee > 0 ? Math.round(kpi.ca_facturation / kpi.ca_annee * 100) : 0}% du CA total
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <DollarSign size={16} className="text-[#94A3B8]" />
+                  <span className="text-[13px] font-semibold text-[#111827]">Autres sources</span>
+                </div>
+                <div className="text-[22px] font-bold text-[#111827]">{fmtShort(kpi.ca_autres)} FCFA</div>
+                <div className="text-[11px] text-[#9CA3AF] mt-1">
+                  {kpi.ca_annee > 0 ? Math.round(kpi.ca_autres / kpi.ca_annee * 100) : 0}% du CA total
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════
+          TAB : PRÉVISIONS
+      ══════════════════════════════════════════════════════════════════ */}
+      {tab === 'previsions' && (
+        <div className="space-y-5">
+          {kpi && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <KpiCard label="Entrées prévues (90j)" icon={<ArrowUpRight size={16} />} accent="#10B981" loading={loading}
+                value={fmtShort(kpi.previsions_entrees) + ' FCFA'} sub="Probabilité pondérée" />
+              <KpiCard label="Sorties prévues (90j)" icon={<ArrowDownRight size={16} />} accent="#EF4444" loading={loading}
+                value={fmtShort(kpi.previsions_sorties) + ' FCFA'} sub="Probabilité pondérée" />
+              <KpiCard label="Net prévisionnel (90j)" icon={<Target size={16} />}
+                accent={kpi.previsions_net >= 0 ? '#3B82F6' : '#F97316'} loading={loading}
+                value={fmtShort(kpi.previsions_net) + ' FCFA'} sub="Entrées − Sorties prévues" />
+            </div>
+          )}
+
+          <SectionCard title="Prévisions de trésorerie" sub="30 prochaines opérations planifiées"
+            action={
+              <a href="/dashboard/tresorerie/previsions" className="text-[11px] text-[#10B981] hover:underline font-medium flex items-center gap-0.5">
+                Gérer <ChevronRight size={12} />
+              </a>
+            }>
+            {prevs.length === 0 ? (
+              <div className="p-12 text-center">
+                <Target size={32} className="text-[#E5E7EB] mx-auto mb-3" />
+                <p className="text-[12px] text-[#9CA3AF]">Aucune prévision — créez-en dans le module Trésorerie</p>
+                <a href="/dashboard/tresorerie/previsions"
+                  className="inline-flex items-center gap-1 mt-3 text-[12px] text-[#10B981] font-medium hover:underline">
+                  Ajouter des prévisions <ChevronRight size={12} />
+                </a>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#F3F4F6]">
+                {prevs.map(p => {
+                  const isEntry = p.type === 'entree'
+                  const probColor = p.probabilite >= 80 ? '#10B981' : p.probabilite >= 50 ? '#F59E0B' : '#EF4444'
+                  const StatusIcon = p.statut === 'réalisé' ? CheckCircle : p.statut === 'annulé' ? XCircle : Info
+                  return (
+                    <div key={p.id} className="flex items-center gap-4 px-5 py-3">
+                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isEntry ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[12px] font-medium text-[#374151] truncate">{p.libelle}</div>
+                        <div className="text-[10px] text-[#9CA3AF]">
+                          {new Date(p.date_prevue).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                          {' · '}proba {p.probabilite}%
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: probColor + '18', color: probColor }}>
+                          {p.probabilite}%
+                        </div>
+                        <div className={`text-[13px] font-bold ${isEntry ? 'text-emerald-600' : 'text-red-500'}`}>
+                          {isEntry ? '+' : '−'}{fmtShort(p.montant)}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </SectionCard>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════
+          TAB : TVA / FISCALITÉ
+      ══════════════════════════════════════════════════════════════════ */}
+      {tab === 'tva' && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <KpiCard label="TVA collectée" icon={<ArrowUpRight size={16} />} accent="#EF4444" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.tva_collectee ?? 0) + ' FCFA'}
+              sub={kpi?.tva_collectee === (kpi?.ca_annee ?? 0) * 0.18 ? 'Estimation (CA × 18%)' : 'Depuis déclarations'} />
+            <KpiCard label="TVA déductible" icon={<ArrowDownRight size={16} />} accent="#10B981" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.tva_deductible ?? 0) + ' FCFA'}
+              sub="Sur achats et charges" />
+            <KpiCard label="TVA nette à reverser" icon={<DollarSign size={16} />} accent="#2563EB" loading={loading}
+              value={loading ? '—' : fmtShort(kpi?.tva_nette ?? 0) + ' FCFA'}
+              sub={`+ CA Congo 5% = ${fmtShort(kpi?.ca_taxe ?? 0)} FCFA`} />
+          </div>
+
+          {/* Tableau TVA mensuel */}
+          <SectionCard title="Estimation TVA mensuelle" sub="Congo-Brazzaville : TVA 18% + Contribution d'appui 5%">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#F9FAFB] text-[10px] text-[#6B7280] uppercase tracking-wider">
+                    <th className="text-left px-5 py-3 font-medium">Mois</th>
+                    <th className="text-right px-4 py-3 font-medium">CA HT</th>
+                    <th className="text-right px-4 py-3 font-medium">TVA coll. 18%</th>
+                    <th className="text-right px-4 py-3 font-medium">Charges HT</th>
+                    <th className="text-right px-4 py-3 font-medium">TVA déd. 18%</th>
+                    <th className="text-right px-4 py-3 font-medium">Solde TVA</th>
+                    <th className="text-right px-5 py-3 font-medium">CA 5%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthly.map((m, i) => {
+                    const tvaC = Math.round(m.entrees * 0.18)
+                    const tvaD = Math.round(m.sorties * 0.18)
+                    const sol  = tvaC - tvaD
+                    const ca   = Math.round(sol * 0.05)
+                    return (
+                      <tr key={i} className={`border-t border-[#F3F4F6] hover:bg-[#F9FAFB] text-[12px] ${i === currentMonth ? 'bg-blue-50/30' : ''}`}>
+                        <td className="px-5 py-3 font-medium text-[#374151]">{m.mois_label}</td>
+                        <td className="px-4 py-3 text-right text-[#374151]">{fmt(m.entrees)}</td>
+                        <td className="px-4 py-3 text-right text-red-500 font-medium">{fmt(tvaC)}</td>
+                        <td className="px-4 py-3 text-right text-[#374151]">{fmt(m.sorties)}</td>
+                        <td className="px-4 py-3 text-right text-emerald-600 font-medium">{fmt(tvaD)}</td>
+                        <td className={`px-4 py-3 text-right font-semibold ${sol >= 0 ? 'text-[#1D4ED8]' : 'text-emerald-600'}`}>{fmt(sol)}</td>
+                        <td className="px-5 py-3 text-right text-[#6B7280]">{fmt(ca)}</td>
+                      </tr>
+                    )
+                  })}
+                  {monthly.length > 0 && (
+                    <tr className="border-t-2 border-[#E5E7EB] bg-[#F9FAFB] font-bold text-[12px]">
+                      <td className="px-5 py-3 text-[#111827]">TOTAL</td>
+                      <td className="px-4 py-3 text-right text-[#374151]">{fmt(kpi?.ca_annee ?? 0)}</td>
+                      <td className="px-4 py-3 text-right text-red-500">{fmt(kpi?.tva_collectee ?? 0)}</td>
+                      <td className="px-4 py-3 text-right text-[#374151]">{fmt(kpi?.dep_annee ?? 0)}</td>
+                      <td className="px-4 py-3 text-right text-emerald-600">{fmt(kpi?.tva_deductible ?? 0)}</td>
+                      <td className="px-4 py-3 text-right text-[#1D4ED8]">{fmt(kpi?.tva_nette ?? 0)}</td>
+                      <td className="px-5 py-3 text-right text-[#6B7280]">{fmt(kpi?.ca_taxe ?? 0)}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+
+          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-[11px] text-amber-800 flex gap-2">
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+            <div>
+              <strong>Note fiscale Congo-Brazzaville :</strong> TVA 18% + Contribution d&apos;Appui (CA) = 5% × TVA nette.
+              TTC = HT × 1,189. Pour une déclaration officielle, rapprochez avec vos factures réelles et consultez la DGI ou un expert-comptable agréé.
+              <a href="/dashboard/comptabilite/tva" className="ml-1 font-semibold hover:underline">Voir les déclarations officielles →</a>
+            </div>
           </div>
         </div>
       )}
