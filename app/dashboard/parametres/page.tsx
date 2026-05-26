@@ -93,7 +93,7 @@ export default function ParametresPage() {
 
   const CC_TYPES = CC_TYPE_VALUES.map(value => ({
     value,
-    label: t(`params.cc.${value}` as Parameters<typeof t>[0]),
+    label: t(`params.cc.${value}`),
   }))
   const CC_TYPE_LABELS: Record<string, string> = Object.fromEntries(CC_TYPES.map(tp => [tp.value, tp.label]))
 

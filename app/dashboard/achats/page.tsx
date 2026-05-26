@@ -1,8 +1,9 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Plus, X, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import { fmtFCFA } from '@/lib/admin-config'
@@ -11,9 +12,6 @@ type Fournisseur = { id: string; nom: string; contact: string; telephone: string
 type Achat = { id: string; fournisseur_id: string; description: string; montant: number; statut: string; date: string }
 type CostCenter = { id: string; code: string; nom: string }
 
-const TABS = ['Fournisseurs', 'Achats', 'Dettes']
-const STATUTS = ['impaye', 'partiel', 'paye']
-const STATUT_LABELS: Record<string, string> = { impaye: 'Impayé', partiel: 'Partiel', paye: 'Payé' }
 const STATUT_COLORS: Record<string, string> = {
   impaye: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
   partiel: 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30',
@@ -21,6 +19,7 @@ const STATUT_COLORS: Record<string, string> = {
 }
 
 export default function AchatsPage() {
+  const { t } = useLocale()
   const [tab, setTab] = useState(0)
   const [fournisseurs,  setFournisseurs]  = useState<Fournisseur[]>([])
   const [achats,        setAchats]        = useState<Achat[]>([])
@@ -31,6 +30,13 @@ export default function AchatsPage() {
   const [saving, setSaving] = useState(false)
   const [fForm, setFForm] = useState({ nom: '', contact: '', telephone: '', email: '' })
   const [aForm, setAForm] = useState({ fournisseur_id: '', description: '', montant: '', date: new Date().toISOString().split('T')[0], cost_center_id: '' })
+
+  const TABS = [t('achats.tabFournisseurs'), t('achats.tabAchats'), t('achats.tabDettes')]
+  const STATUT_LABELS: Record<string, string> = {
+    impaye: t('achats.statut.impaye'),
+    partiel: t('achats.statut.partiel'),
+    paye: t('achats.statut.paye'),
+  }
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -113,26 +119,26 @@ export default function AchatsPage() {
           <ShoppingCart size={18} className="text-[#7C3AED]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[var(--text)]">Achats & Fournisseurs</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">{t('achats.pageTitle')}</h1>
           <p className="text-xs text-[var(--text-secondary)]">
-            {fournisseurs.length} fournisseur{fournisseurs.length > 1 ? 's' : ''} ·
-            <span className="text-[#DC2626] ml-1">Dettes : {fmtFCFA(totalDu)}</span>
+            {fournisseurs.length} {fournisseurs.length > 1 ? t('achats.fournisseurPl') : t('achats.fournisseurSg')} ·
+            <span className="text-[#DC2626] ml-1">{t('achats.dettesLabel')} {fmtFCFA(totalDu)}</span>
           </p>
         </div>
         <button onClick={() => setModal(tab === 0 ? 'fournisseur' : 'achat')}
           className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/30 text-[#7C3AED] text-sm font-medium hover:bg-[#7C3AED]/20 transition-colors">
-          <Plus size={15} /> {tab === 0 ? 'Fournisseur' : 'Achat'}
+          <Plus size={15} /> {tab === 0 ? t('achats.btnFournisseur') : t('achats.btnAchat')}
         </button>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1">
-        {TABS.map((t, i) => (
+        {TABS.map((tabLabel, i) => (
           <button key={i} onClick={() => setTab(i)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
               tab === i ? 'bg-[#7C3AED]/10 text-[#7C3AED]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
             }`}>
-            {t}
+            {tabLabel}
             {i === 2 && debtsByFournisseur.length > 0 && (
               <span className="ml-1.5 text-xs bg-[#DC2626] text-white rounded-full px-1.5 py-0.5">{debtsByFournisseur.length}</span>
             )}
@@ -146,7 +152,7 @@ export default function AchatsPage() {
           {loading ? (
             <div className="p-8 flex justify-center"><Loader2 size={18} className="animate-spin text-[var(--text-secondary)]" /></div>
           ) : fournisseurs.length === 0 ? (
-            <div className="p-10 text-center text-[var(--text-secondary)] text-sm">Aucun fournisseur — ajoutez-en un</div>
+            <div className="p-10 text-center text-[var(--text-secondary)] text-sm">{t('achats.noFournisseur')}</div>
           ) : (
             <div className="divide-y divide-[var(--border)]">
               {fournisseurs.map(f => {
@@ -163,7 +169,7 @@ export default function AchatsPage() {
                     {dette > 0 && (
                       <div className="text-right">
                         <p className="text-sm font-semibold text-[#DC2626]">{fmtFCFA(dette)}</p>
-                        <p className="text-xs text-[var(--text-secondary)]">dû</p>
+                        <p className="text-xs text-[var(--text-secondary)]">{t('achats.du')}</p>
                       </div>
                     )}
                     {dette === 0 && <CheckCircle size={16} className="text-[#16A34A]" />}
@@ -182,7 +188,7 @@ export default function AchatsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[var(--border)]">
-                  {['Date', 'Description', 'Fournisseur', 'Montant', 'Statut', ''].map(h => (
+                  {[t('achats.colDate'), t('achats.colDescription'), t('achats.colFournisseur'), t('achats.colMontant'), t('achats.colStatut'), ''].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -190,7 +196,7 @@ export default function AchatsPage() {
               <tbody className="divide-y divide-[var(--border)]">
                 {loading && <tr><td colSpan={6} className="text-center py-8"><Loader2 size={18} className="animate-spin text-[var(--text-secondary)] mx-auto" /></td></tr>}
                 {!loading && achats.length === 0 && (
-                  <tr><td colSpan={6} className="text-center py-10 text-[var(--text-secondary)]">Aucun achat enregistré</td></tr>
+                  <tr><td colSpan={6} className="text-center py-10 text-[var(--text-secondary)]">{t('achats.noAchat')}</td></tr>
                 )}
                 {achats.map(a => {
                   const f = fournisseurs.find(f => f.id === a.fournisseur_id)
@@ -210,7 +216,7 @@ export default function AchatsPage() {
                       <td className="px-4 py-2.5">
                         {a.statut !== 'paye' && (
                           <button onClick={() => payerAchat(a.id)}
-                            className="text-xs text-[#16A34A] hover:underline">Payer</button>
+                            className="text-xs text-[#16A34A] hover:underline">{t('achats.payer')}</button>
                         )}
                       </td>
                     </tr>
@@ -223,7 +229,7 @@ export default function AchatsPage() {
             <div className="px-5 py-3 border-t border-[var(--border)] flex items-center justify-between bg-[#DC2626]/5">
               <span className="text-sm text-[var(--text-secondary)] flex items-center gap-2">
                 <AlertCircle size={14} className="text-[#DC2626]" />
-                Total non payé
+                {t('achats.totalNonPaye')}
               </span>
               <span className="text-sm font-bold text-[#DC2626]">{fmtFCFA(totalDu)}</span>
             </div>
@@ -237,8 +243,8 @@ export default function AchatsPage() {
           {debtsByFournisseur.length === 0 ? (
             <div className="p-10 text-center">
               <CheckCircle size={32} className="text-[#16A34A] mx-auto mb-3" />
-              <p className="text-sm text-[var(--text)] font-medium">Aucune dette fournisseur !</p>
-              <p className="text-xs text-[var(--text-secondary)] mt-1">Tous vos achats sont à jour</p>
+              <p className="text-sm text-[var(--text)] font-medium">{t('achats.noDette')}</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-1">{t('achats.achatsJour')}</p>
             </div>
           ) : (
             <div className="divide-y divide-[var(--border)]">
@@ -249,7 +255,9 @@ export default function AchatsPage() {
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <p className="text-sm font-semibold text-[var(--text)]">{f.nom}</p>
-                        <p className="text-xs text-[var(--text-secondary)]">{factures.length} achat{factures.length > 1 ? 's' : ''} impayé{factures.length > 1 ? 's' : ''}</p>
+                        <p className="text-xs text-[var(--text-secondary)]">
+                          {factures.length} {factures.length > 1 ? t('achats.achatPl') : t('achats.achatSg')} {factures.length > 1 ? t('achats.impayePl') : t('achats.impayeSg')}
+                        </p>
                       </div>
                       <p className="text-base font-bold text-[#DC2626]">{fmtFCFA(f.dette)}</p>
                     </div>
@@ -258,7 +266,7 @@ export default function AchatsPage() {
                         await Promise.all(factures.map(a => payerAchat(a.id)))
                       }}
                       className="w-full py-2 rounded-lg text-xs font-medium bg-[#16A34A]/10 border border-[#16A34A]/30 text-[#16A34A] hover:bg-[#16A34A]/20 transition-colors">
-                      Tout payer — {fmtFCFA(f.dette)}
+                      {t('achats.toutPayer')} {fmtFCFA(f.dette)}
                     </button>
                   </div>
                 )
@@ -278,15 +286,15 @@ export default function AchatsPage() {
               className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
               <button onClick={() => setModal(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
               <h3 className="text-base font-bold text-[var(--text)] mb-4">
-                {modal === 'fournisseur' ? '+ Nouveau fournisseur' : '+ Nouvel achat'}
+                {modal === 'fournisseur' ? t('achats.newFournisseur') : t('achats.newAchat')}
               </h3>
               {modal === 'fournisseur' ? (
                 <div className="space-y-3">
                   {[
-                    { key: 'nom', label: 'Nom *', placeholder: 'Nom du fournisseur' },
-                    { key: 'contact', label: 'Contact', placeholder: 'Personne de contact' },
-                    { key: 'telephone', label: 'Téléphone', placeholder: '0X XXX XXXX' },
-                    { key: 'email', label: 'Email', placeholder: 'email@example.com' },
+                    { key: 'nom', label: t('achats.nomLabel'), placeholder: t('achats.nomPlaceholder') },
+                    { key: 'contact', label: t('achats.contactLabel'), placeholder: t('achats.contactPlaceholder') },
+                    { key: 'telephone', label: t('achats.telephoneLabel'), placeholder: '0X XXX XXXX' },
+                    { key: 'email', label: t('achats.emailLabel'), placeholder: 'email@example.com' },
                   ].map(field => (
                     <div key={field.key}>
                       <label className="text-xs text-[var(--text-secondary)] mb-1 block">{field.label}</label>
@@ -297,57 +305,57 @@ export default function AchatsPage() {
                     </div>
                   ))}
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">{t('common.cancel')}</button>
                     <button onClick={saveFournisseur} disabled={saving || !fForm.nom}
                       className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#7C3AED] text-white hover:bg-[#7C3AED]/90 disabled:opacity-50 flex items-center justify-center gap-2">
-                      {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
+                      {saving && <Loader2 size={13} className="animate-spin" />} {t('common.save')}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Fournisseur</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('achats.fournisseurLabel')}</label>
                     <select value={aForm.fournisseur_id} onChange={e => setAForm(f => ({ ...f, fournisseur_id: e.target.value }))}
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
-                      <option value="">Sans fournisseur</option>
+                      <option value="">{t('achats.sansFournisseur')}</option>
                       {fournisseurs.map(f => <option key={f.id} value={f.id}>{f.nom}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Description *</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('achats.descriptionLabel')}</label>
                     <input value={aForm.description} onChange={e => setAForm(f => ({ ...f, description: e.target.value }))}
-                      placeholder="Décrivez l'achat..."
+                      placeholder={t('achats.descriptionPlaceholder')}
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#7C3AED]/50" />
                   </div>
                   {costCenters.length > 0 && (
                     <div>
-                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">Centre de coût (facultatif)</label>
+                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('achats.centreCout')}</label>
                       <select value={aForm.cost_center_id} onChange={e => setAForm(f => ({ ...f, cost_center_id: e.target.value }))}
                         className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
-                        <option value="">— Aucun centre —</option>
+                        <option value="">{t('achats.aucunCentre')}</option>
                         {costCenters.map(cc => <option key={cc.id} value={cc.id}>{cc.code} — {cc.nom}</option>)}
                       </select>
                     </div>
                   )}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">Montant (FCFA) *</label>
+                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('achats.montantLabel')}</label>
                       <input type="number" value={aForm.montant} onChange={e => setAForm(f => ({ ...f, montant: e.target.value }))}
                         placeholder="0"
                         className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#7C3AED]/50" />
                     </div>
                     <div>
-                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
+                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('achats.dateLabel')}</label>
                       <input type="date" value={aForm.date} onChange={e => setAForm(f => ({ ...f, date: e.target.value }))}
                         className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
                     </div>
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">Annuler</button>
+                    <button onClick={() => setModal(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)]">{t('common.cancel')}</button>
                     <button onClick={saveAchat} disabled={saving || !aForm.description || !aForm.montant}
                       className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[#7C3AED] text-white hover:bg-[#7C3AED]/90 disabled:opacity-50 flex items-center justify-center gap-2">
-                      {saving && <Loader2 size={13} className="animate-spin" />} Enregistrer
+                      {saving && <Loader2 size={13} className="animate-spin" />} {t('common.save')}
                     </button>
                   </div>
                 </div>

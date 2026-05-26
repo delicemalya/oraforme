@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import type { LucideIcon } from 'lucide-react'
 
 type ActionKey = 'can_view' | 'can_edit' | 'can_delete' | 'can_export' | 'can_validate' | 'can_approve'
@@ -58,15 +59,9 @@ const ACTIONS: { key: ActionKey; label: string; short: string; icon: LucideIcon;
 const COLORS = ['#2563EB','#16A34A','#DC2626','#7C3AED','#F59E0B','#0891B2','#EA580C','#64748B','#059669','#DB2777']
 const EP = (key = ''): RolePerm => ({ module_key: key, can_view: false, can_edit: false, can_delete: false, can_export: false, can_validate: false, can_approve: false })
 
-const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
-  { id: 'roles',   label: 'Rôles',       icon: Shield  },
-  { id: 'matrice', label: 'Permissions', icon: Lock    },
-  { id: 'membres', label: 'Membres',     icon: Users   },
-  { id: 'audit',   label: 'Historique',  icon: History },
-]
-
 export default function RolesPage() {
   const { tenantId, isOwner, role: userRole } = useTenant()
+  const { t } = useLocale()
   const [tab,      setTab]      = useState<Tab>('roles')
   const [roles,    setRoles]    = useState<Role[]>([])
   const [selRole,  setSelRole]  = useState<Role | null>(null)
@@ -82,6 +77,13 @@ export default function RolesPage() {
   const [nc,       setNc]       = useState('#2563EB')
   const [nf,       setNf]       = useState(false)
   const [openGrp,  setOpenGrp]  = useState<Set<string>>(new Set(['Pilotage','Finance & Compta','RH & Organisation','Commercial','Stock & Achats','Documents & IA']))
+
+  const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
+    { id: 'roles',   label: t('roles.tabRoles'),       icon: Shield  },
+    { id: 'matrice', label: t('roles.tabPermissions'), icon: Lock    },
+    { id: 'membres', label: t('roles.tabMembers'),     icon: Users   },
+    { id: 'audit',   label: t('roles.tabHistory'),     icon: History },
+  ]
 
   // ── Loaders ────────────────────────────────────────────────────────────────
 
@@ -163,7 +165,7 @@ export default function RolesPage() {
   }
 
   async function del(r: Role) {
-    if (!confirm(`Supprimer "${r.name}" ?`)) return
+    if (!confirm(`${t('common.delete')} "${r.name}" ?`)) return
     await supabase.from('roles').delete().eq('id', r.id)
     if (selRole?.id === r.id) { setSelRole(null); setPerms({}) }
     await loadRoles()
@@ -175,7 +177,7 @@ export default function RolesPage() {
   }
 
   async function defaults() {
-    if (!tenantId || !confirm('Créer les 8 rôles par défaut Oraforme ?')) return
+    if (!tenantId || !confirm(t('roles.createConfirm'))) return
     setSaving(true)
     await supabase.rpc('fn_create_default_roles', { p_tenant_id: tenantId })
     await loadRoles(); setSaving(false)
@@ -205,19 +207,19 @@ export default function RolesPage() {
             <Shield size={20} className="text-[#DC2626]" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[#0F172A]">Rôles & Droits</h1>
-            <p className="text-[11px] text-[#64748B]">RBAC Enterprise — 6 actions : voir · modifier · supprimer · exporter · valider · approuver</p>
+            <h1 className="text-lg font-bold text-[#0F172A]">{t('roles.title')}</h1>
+            <p className="text-[11px] text-[#64748B]">{t('roles.subtitle')}</p>
           </div>
         </div>
         {canManage && (
           <div className="flex gap-2">
             <button onClick={defaults} disabled={saving}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E2E8F0] text-[12px] font-semibold text-[#64748B] hover:bg-[#F8FAFC] transition-all">
-              <Settings size={13} /> Rôles par défaut
+              <Settings size={13} /> {t('roles.defaultRoles')}
             </button>
             <button onClick={() => setModal(true)}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[12px] font-semibold text-white" style={{ background: '#DC2626' }}>
-              <Plus size={13} /> Nouveau rôle
+              <Plus size={13} /> {t('roles.newRole')}
             </button>
           </div>
         )}
@@ -225,12 +227,12 @@ export default function RolesPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-2xl p-1.5 overflow-x-auto">
-        {TABS.map(t => {
-          const Icon = t.icon
+        {TABS.map(t_ => {
+          const Icon = t_.icon
           return (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold whitespace-nowrap transition-all ${tab === t.id ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#64748B] hover:bg-[#F1F5F9]'}`}>
-              <Icon size={12} />{t.label}
+            <button key={t_.id} onClick={() => setTab(t_.id)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold whitespace-nowrap transition-all ${tab === t_.id ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#64748B] hover:bg-[#F1F5F9]'}`}>
+              <Icon size={12} />{t_.label}
             </button>
           )
         })}
@@ -250,29 +252,29 @@ export default function RolesPage() {
                   </div>
                   <div>
                     <div className="text-[13px] font-bold text-[#0F172A]">{r.name}</div>
-                    {r.is_financial && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#EFF6FF] text-[#2563EB]">Financier</span>}
+                    {r.is_financial && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#EFF6FF] text-[#2563EB]">{t('roles.financial')}</span>}
                   </div>
                 </div>
                 {canManage && (
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={e => { e.stopPropagation(); clone(r) }} title="Cloner" className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#64748B]"><Copy size={12} /></button>
-                    <button onClick={e => { e.stopPropagation(); del(r) }} title="Supprimer" className="p-1.5 rounded-lg hover:bg-[#FEF2F2] text-[#DC2626]"><Trash2 size={12} /></button>
+                    <button onClick={e => { e.stopPropagation(); clone(r) }} title={t('roles.cloneRole')} className="p-1.5 rounded-lg hover:bg-[#F1F5F9] text-[#64748B]"><Copy size={12} /></button>
+                    <button onClick={e => { e.stopPropagation(); del(r) }} title={t('roles.deleteRole')} className="p-1.5 rounded-lg hover:bg-[#FEF2F2] text-[#DC2626]"><Trash2 size={12} /></button>
                   </div>
                 )}
               </div>
               {r.description && <p className="text-[11px] text-[#64748B] mb-3 line-clamp-2">{r.description}</p>}
               <div className="flex items-center gap-3 pt-3 border-t border-[#F8FAFC]">
-                <div className="text-center"><div className="text-[15px] font-bold text-[#0F172A]">{r.nb_membres ?? 0}</div><div className="text-[9px] text-[#94A3B8] uppercase">Membres</div></div>
+                <div className="text-center"><div className="text-[15px] font-bold text-[#0F172A]">{r.nb_membres ?? 0}</div><div className="text-[9px] text-[#94A3B8] uppercase">{t('roles.members')}</div></div>
                 <div className="h-5 w-px bg-[#E2E8F0]" />
-                <div className="text-center"><div className="text-[15px] font-bold text-[#0F172A]">{r.nb_permissions ?? 0}</div><div className="text-[9px] text-[#94A3B8] uppercase">Modules</div></div>
-                <div className="ml-auto text-[10px] text-[#94A3B8]">Voir permissions →</div>
+                <div className="text-center"><div className="text-[15px] font-bold text-[#0F172A]">{r.nb_permissions ?? 0}</div><div className="text-[9px] text-[#94A3B8] uppercase">{t('roles.modules')}</div></div>
+                <div className="ml-auto text-[10px] text-[#94A3B8]">{t('roles.viewPermissions')}</div>
               </div>
             </div>
           ))}
           {!loading && roles.length === 0 && (
             <div className="col-span-full flex flex-col items-center py-16 gap-3">
               <Shield size={40} className="text-[#E2E8F0]" />
-              <p className="text-[13px] text-[#94A3B8]">Aucun rôle — utilisez &quot;Rôles par défaut&quot; pour commencer</p>
+              <p className="text-[13px] text-[#94A3B8]">{t('roles.noRole')}</p>
             </div>
           )}
         </div>
@@ -296,7 +298,7 @@ export default function RolesPage() {
               {saving && <Loader2 size={14} className="text-[#94A3B8] animate-spin" />}
               <div className="relative">
                 <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-                <input type="text" placeholder="Filtrer modules..." value={q} onChange={e => setQ(e.target.value)}
+                <input type="text" placeholder={t('roles.filterModules')} value={q} onChange={e => setQ(e.target.value)}
                   className="pl-7 pr-3 py-2 text-[11px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 w-40" />
               </div>
             </div>
@@ -305,7 +307,7 @@ export default function RolesPage() {
           {!selRole ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
               <Shield size={32} className="text-[#E2E8F0] mx-auto mb-3" />
-              <p className="text-[13px] text-[#94A3B8]">Sélectionnez un rôle pour voir sa matrice</p>
+              <p className="text-[13px] text-[#94A3B8]">{t('roles.selectRole')}</p>
             </div>
           ) : (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
@@ -316,7 +318,7 @@ export default function RolesPage() {
                 </div>
                 <div>
                   <div className="text-[13px] font-bold text-[#0F172A]">{selRole.name}</div>
-                  <div className="text-[10px] text-[#64748B]">{selRole.description ?? 'Rôle personnalisé'}</div>
+                  <div className="text-[10px] text-[#64748B]">{selRole.description ?? t('roles.customRole')}</div>
                 </div>
                 {saving && <Loader2 size={13} className="ml-auto text-[#94A3B8] animate-spin" />}
               </div>
@@ -326,7 +328,7 @@ export default function RolesPage() {
                 <table className="w-full min-w-[680px]">
                   <thead>
                     <tr className="border-b border-[#F1F5F9] bg-[#FAFAFA]">
-                      <th className="text-left px-5 py-2.5 text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider w-52">Module</th>
+                      <th className="text-left px-5 py-2.5 text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider w-52">{t('nav.modules')}</th>
                       {ACTIONS.map(a => {
                         const AI = a.icon
                         return (
@@ -353,7 +355,7 @@ export default function RolesPage() {
                               <div className="flex items-center gap-2">
                                 {row.open ? <ChevronDown size={11} className="text-[#94A3B8]" /> : <ChevronRight size={11} className="text-[#94A3B8]" />}
                                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{row.grp as string}</span>
-                                <span className="text-[9px] text-[#94A3B8]">({row.count as number} modules)</span>
+                                <span className="text-[9px] text-[#94A3B8]">({row.count as number} {t('roles.modules')})</span>
                               </div>
                             </td>
                           </tr>
@@ -397,7 +399,7 @@ export default function RolesPage() {
         <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
           <div className="px-5 py-3.5 border-b border-[#F8FAFC] flex items-center gap-2">
             <Users size={14} className="text-[#94A3B8]" />
-            <span className="text-[13px] font-semibold text-[#0F172A]">Membres ({members.length})</span>
+            <span className="text-[13px] font-semibold text-[#0F172A]">{t('roles.tabMembers')} ({members.length})</span>
           </div>
           <div className="divide-y divide-[#F8FAFC]">
             {members.map(m => {
@@ -410,14 +412,14 @@ export default function RolesPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] font-medium text-[#0F172A] truncate">{email}</div>
-                    <div className="text-[10px] text-[#94A3B8]">Base: {m.role}{m.ecole_role_name && ` · ${m.ecole_role_name}`}</div>
+                    <div className="text-[10px] text-[#94A3B8]">{t('roles.baseRole')} {m.role}{m.ecole_role_name && ` · ${m.ecole_role_name}`}</div>
                   </div>
                   <div className="flex items-center gap-2">
                     {ar && <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg text-white" style={{ background: ar.color }}>{ar.name}</span>}
                     {canManage && (
                       <select value={m.dynamic_role_id ?? ''} onChange={e => assign(m.id, e.target.value || null)}
                         className="text-[11px] border border-[#E2E8F0] rounded-lg px-2 py-1 focus:outline-none">
-                        <option value="">— Aucun rôle —</option>
+                        <option value="">— {t('roles.role')} —</option>
                         {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                       </select>
                     )}
@@ -425,7 +427,7 @@ export default function RolesPage() {
                 </div>
               )
             })}
-            {members.length === 0 && <div className="py-12 text-center text-[13px] text-[#94A3B8]">Aucun membre</div>}
+            {members.length === 0 && <div className="py-12 text-center text-[13px] text-[#94A3B8]">{t('roles.noMember')}</div>}
           </div>
         </div>
       )}
@@ -434,9 +436,9 @@ export default function RolesPage() {
       {tab === 'audit' && (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
           <div className="px-5 py-3.5 border-b border-[#F8FAFC] flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[#0F172A]">Journal RBAC</span>
+            <span className="text-[13px] font-semibold text-[#0F172A]">{t('roles.rbacJournal')}</span>
             <button onClick={loadLogs} className="flex items-center gap-1 text-[11px] text-[#64748B] hover:text-[#0F172A]">
-              <RefreshCw size={12} /> Actualiser
+              <RefreshCw size={12} /> {t('common.refresh')}
             </button>
           </div>
           <div className="divide-y divide-[#F8FAFC]">
@@ -450,7 +452,7 @@ export default function RolesPage() {
                 <div className="text-[10px] text-[#94A3B8] shrink-0">{fmtD(log.created_at)}</div>
               </div>
             ))}
-            {logs.length === 0 && <div className="py-12 text-center text-[13px] text-[#94A3B8]">Aucun événement enregistré</div>}
+            {logs.length === 0 && <div className="py-12 text-center text-[13px] text-[#94A3B8]">{t('roles.noEvent')}</div>}
           </div>
         </div>
       )}
@@ -460,22 +462,22 @@ export default function RolesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="px-6 py-4 border-b border-[#F1F5F9] flex items-center justify-between">
-              <h2 className="text-[14px] font-bold text-[#0F172A]">Nouveau rôle</h2>
+              <h2 className="text-[14px] font-bold text-[#0F172A]">{t('roles.newRole')}</h2>
               <button onClick={() => setModal(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} className="text-[#64748B]" /></button>
             </div>
             <div className="px-6 py-5 space-y-4">
               <div>
-                <label className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1.5 block">Nom *</label>
+                <label className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1.5 block">{t('roles.nameLabel')}</label>
                 <input type="text" value={nm} onChange={e => setNm(e.target.value)} placeholder="Ex: Responsable Logistique"
                   className="w-full px-3 py-2.5 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20" />
               </div>
               <div>
-                <label className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1.5 block">Description</label>
+                <label className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1.5 block">{t('common.description')}</label>
                 <textarea value={nd} onChange={e => setNd(e.target.value)} rows={2}
                   className="w-full px-3 py-2.5 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none resize-none" />
               </div>
               <div>
-                <label className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1.5 block">Couleur</label>
+                <label className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1.5 block">{t('roles.colorLabel')}</label>
                 <div className="flex gap-2 flex-wrap">
                   {COLORS.map(c => (
                     <button key={c} onClick={() => setNc(c)}
@@ -486,14 +488,14 @@ export default function RolesPage() {
               </div>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={nf} onChange={e => setNf(e.target.checked)} className="w-4 h-4 rounded accent-[#DC2626]" />
-                <span className="text-[12px] text-[#374151]">Accès aux données financières</span>
+                <span className="text-[12px] text-[#374151]">{t('roles.financialAccess')}</span>
               </label>
             </div>
             <div className="px-6 py-4 border-t border-[#F1F5F9] flex gap-2 justify-end">
-              <button onClick={() => setModal(false)} className="px-4 py-2 rounded-xl text-[12px] font-semibold text-[#64748B] border border-[#E2E8F0] hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setModal(false)} className="px-4 py-2 rounded-xl text-[12px] font-semibold text-[#64748B] border border-[#E2E8F0] hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={createRole} disabled={!nm.trim() || saving}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[12px] font-semibold text-white disabled:opacity-50" style={{ background: '#DC2626' }}>
-                {saving ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />} Créer
+                {saving ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />} {t('common.create')}
               </button>
             </div>
           </div>

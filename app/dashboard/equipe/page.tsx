@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import type { LucideIcon } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -86,11 +87,11 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
 
 // ── Composants utilitaires ────────────────────────────────────────────────────
 
-function RoleBadge({ role }: { role: Role }) {
+function RoleBadge({ role, t }: { role: Role; t: (key: string) => string }) {
   const cfg = {
-    owner:  { label: 'Owner',         cls: 'bg-amber-500/15 text-[#DC2626] border-amber-500/20' },
-    admin:  { label: 'Administrateur', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
-    membre: { label: 'Membre',         cls: 'bg-gray-100 text-[var(--text-secondary)] border-gray-200' },
+    owner:  { label: 'Owner',                      cls: 'bg-amber-500/15 text-[#DC2626] border-amber-500/20' },
+    admin:  { label: t('equipe.roleAdmin'),         cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
+    membre: { label: t('equipe.roleMembre'),        cls: 'bg-gray-100 text-[var(--text-secondary)] border-gray-200' },
   }
   const { label, cls } = cfg[role]
   return (
@@ -122,6 +123,7 @@ function Toggle({ checked, onChange, disabled }: {
 
 export default function EquipePage() {
   const { tenantId, role: myRole, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
 
   const [secteur,      setSecteur]      = useState<string | null>(null)
   const [members,      setMembers]      = useState<Member[]>([])
@@ -231,7 +233,7 @@ export default function EquipePage() {
 
   // ── Retirer un membre ─────────────────────────────────────────────────────
   async function removeMember(member: Member) {
-    if (!confirm(`Retirer ${member.prenom} ${member.nom} de l'équipe ?`)) return
+    if (!confirm(t('equipe.removeConfirm').replace('{name}', `${member.prenom} ${member.nom}`))) return
     await supabase.from('user_permissions').delete().eq('profile_id', member.id)
     await supabase.from('profiles').update({ tenant_id: null }).eq('id', member.id)
     setMembers(prev => prev.filter(m => m.id !== member.id))
@@ -260,9 +262,9 @@ export default function EquipePage() {
     })
 
     if (error) {
-      setInviteMsg({ ok: false, text: 'Erreur lors de l\'invitation. Réessayez.' })
+      setInviteMsg({ ok: false, text: t('equipe.inviteError') })
     } else {
-      setInviteMsg({ ok: true, text: `Invitation envoyée à ${inviteEmail}` })
+      setInviteMsg({ ok: true, text: `${t('common.sent')} → ${inviteEmail}` })
       setInviteEmail('')
     }
     setInviting(false)
@@ -300,7 +302,7 @@ export default function EquipePage() {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
         <Lock size={32} className="text-gray-400" />
-        <p className="text-[var(--text-secondary)] text-sm">Seul le propriétaire peut gérer l'équipe.</p>
+        <p className="text-[var(--text-secondary)] text-sm">{t('equipe.noPermission')}</p>
       </div>
     )
   }
@@ -313,10 +315,10 @@ export default function EquipePage() {
         <div>
           <h1 className="text-xl font-bold text-[#101729]flex items-center gap-2">
             <UsersRound size={20} className="text-[#DC2626]" />
-            Gestion de l'équipe
+            {t('equipe.title')}
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-            Gérez les accès et permissions de chaque membre.
+            {t('equipe.subtitle')}
           </p>
         </div>
         <button
@@ -324,7 +326,7 @@ export default function EquipePage() {
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/20 text-[#DC2626] text-sm hover:bg-amber-500/30 transition"
         >
           <Plus size={14} />
-          Inviter un membre
+          {t('equipe.inviteMember')}
         </button>
       </div>
 
@@ -347,12 +349,12 @@ export default function EquipePage() {
             >
               <h2 className="text-base font-bold text-[#101729]mb-4 flex items-center gap-2">
                 <Send size={16} className="text-[#DC2626]" />
-                Inviter un membre
+                {t('equipe.inviteModal')}
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Email</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('equipe.inviteEmail')}</label>
                   <input
                     type="email"
                     value={inviteEmail}
@@ -363,7 +365,7 @@ export default function EquipePage() {
                 </div>
 
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Rôle</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('equipe.inviteRole')}</label>
                   <div className="flex gap-2">
                     {(['admin', 'membre'] as const).map(r => (
                       <button
@@ -377,14 +379,14 @@ export default function EquipePage() {
                             : 'bg-gray-50 text-[var(--text-secondary)] border border-[var(--border)]'
                         }`}
                       >
-                        {r === 'admin' ? 'Administrateur' : 'Membre'}
+                        {r === 'admin' ? t('equipe.roleAdmin') : t('equipe.roleMembre')}
                       </button>
                     ))}
                   </div>
                   <p className="text-[11px] text-[var(--text-secondary)] mt-2">
                     {inviteRole === 'admin'
-                      ? "L’administrateur a accès aux modules que vous lui assignez, avec droit de modification."
-                      : "Le membre a accès en lecture seule aux modules assignés."
+                      ? t('equipe.adminDesc')
+                      : t('equipe.membreDesc')
                     }
                   </p>
                 </div>
@@ -404,7 +406,7 @@ export default function EquipePage() {
                   onClick={() => setInviteOpen(false)}
                   className="flex-1 py-2 rounded-lg bg-gray-100 text-[var(--text-secondary)] text-sm hover:bg-gray-100 transition"
                 >
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={sendInvite}
@@ -412,7 +414,7 @@ export default function EquipePage() {
                   className="flex-1 py-2 rounded-lg bg-amber-500 text-black text-sm font-medium hover:bg-[#DC2626] disabled:opacity-40 transition flex items-center justify-center gap-2"
                 >
                   {inviting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                  Envoyer
+                  {t('equipe.inviteSend')}
                 </button>
               </div>
             </motion.div>
@@ -427,7 +429,7 @@ export default function EquipePage() {
         <div className="lg:col-span-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-[var(--border)]">
             <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
-              Membres ({members.length})
+              {t('equipe.membersCount')} ({members.length})
             </p>
           </div>
           <div className="divide-y divide-white/[0.04]">
@@ -449,7 +451,7 @@ export default function EquipePage() {
                     {member.prenom} {member.nom}
                   </div>
                   <div className="flex items-center gap-1 flex-wrap mt-0.5">
-                    <RoleBadge role={member.role} />
+                    <RoleBadge role={member.role} t={t} />
                     {member.dynamic_role_id && (() => {
                       const dr = dynamicRoles.find(r => r.id === member.dynamic_role_id)
                       return dr ? (
@@ -478,7 +480,7 @@ export default function EquipePage() {
           {!selected ? (
             <div className="flex flex-col items-center justify-center h-64 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center">
               <ShieldAlert size={28} className="text-gray-300 mb-3" />
-              <p className="text-sm text-[var(--text-secondary)]">Sélectionnez un membre pour gérer ses permissions.</p>
+              <p className="text-sm text-[var(--text-secondary)]">{t('equipe.selectMember')}</p>
             </div>
           ) : selected.role === 'owner' ? (
             <div className="flex flex-col items-center justify-center h-64 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-center">
@@ -487,7 +489,7 @@ export default function EquipePage() {
                 {selected.prenom} {selected.nom}
               </p>
               <p className="text-xs text-[var(--text-secondary)] mt-1">
-                Le propriétaire a accès à tous les modules.
+                {t('equipe.ownerAccess')}
               </p>
             </div>
           ) : (
@@ -503,7 +505,7 @@ export default function EquipePage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[#101729]">{selected.prenom} {selected.nom}</p>
-                    <RoleBadge role={selected.role} />
+                    <RoleBadge role={selected.role} t={t} />
                   </div>
                 </div>
 
@@ -514,9 +516,9 @@ export default function EquipePage() {
                       value={selected.dynamic_role_id ?? ''}
                       onChange={e => assignDynamicRole(selected, e.target.value || null)}
                       className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#101729] outline-none"
-                      title="Rôle métier"
+                      title={t('equipe.roleBusiness')}
                     >
-                      <option value="">— Rôle métier —</option>
+                      <option value="">{t('equipe.roleBusiness')}</option>
                       {dynamicRoles.map(r => (
                         <option key={r.id} value={r.id}>{r.name}</option>
                       ))}
@@ -528,14 +530,14 @@ export default function EquipePage() {
                     onChange={e => changeRole(selected, e.target.value as 'admin' | 'membre')}
                     className="bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[#101729] outline-none"
                   >
-                    <option value="admin">Administrateur</option>
-                    <option value="membre">Membre</option>
+                    <option value="admin">{t('equipe.roleAdmin')}</option>
+                    <option value="membre">{t('equipe.roleMembre')}</option>
                   </select>
                   {/* Retirer */}
                   <button
                     onClick={() => removeMember(selected)}
                     className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition"
-                    title="Retirer de l'équipe"
+                    title={t('equipe.removeConfirm').replace('{name}', '')}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -546,12 +548,12 @@ export default function EquipePage() {
               <div className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
-                    Accès aux modules
+                    {t('equipe.moduleAccess')}
                   </p>
                   <div className="flex items-center gap-4 text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">
-                    <span className="flex items-center gap-1"><Eye size={10} />Voir</span>
-                    <span className="flex items-center gap-1"><Edit3 size={10} />Modifier</span>
-                    <span className="flex items-center gap-1"><Trash2 size={10} />Suppr.</span>
+                    <span className="flex items-center gap-1"><Eye size={10} />{t('roles.can_view')}</span>
+                    <span className="flex items-center gap-1"><Edit3 size={10} />{t('roles.can_edit')}</span>
+                    <span className="flex items-center gap-1"><Trash2 size={10} />{t('roles.can_delete')}</span>
                   </div>
                 </div>
 
@@ -608,7 +610,7 @@ export default function EquipePage() {
                     className="flex items-center gap-2 px-5 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-[#DC2626] disabled:opacity-40 transition"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                    Enregistrer les permissions
+                    {t('equipe.savePerms')}
                   </button>
                 </div>
               </div>

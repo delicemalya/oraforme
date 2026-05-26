@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { useLocale } from '@/lib/hooks/useLocale'
 import ERPPageLayout, { ERPSectionCard } from '@/components/ui/ERPPageLayout'
 import { Building2, Save, Upload, Globe, Phone, Mail, MapPin, CheckCircle } from 'lucide-react'
 import { SECTOR_LABELS } from '@/lib/erp-sectors'
@@ -36,6 +37,7 @@ const DEVISES = ['FCFA', 'USD', 'EUR', 'XOF', 'XAF', 'GNF', 'CDF']
 
 export default function ProfilPage() {
   const { tenant, reload: refreshTenant } = useTenantContext()
+  const { t } = useLocale()
 
   const [profile, setProfile]   = useState<TenantProfile | null>(null)
   const [loading, setLoading]   = useState(true)
@@ -114,8 +116,8 @@ export default function ProfilPage() {
 
   return (
     <ERPPageLayout
-      title="Profil Entreprise"
-      subtitle="Informations, marque et coordonnées"
+      title={t('profil.title')}
+      subtitle={t('profil.subtitle')}
       icon={<Building2 size={18} />}
       color="#2563EB"
     >
@@ -127,7 +129,7 @@ export default function ProfilPage() {
         <form onSubmit={handleSave} className="space-y-5">
 
           {/* Identité */}
-          <ERPSectionCard title="Identité de l'entreprise">
+          <ERPSectionCard title={t('profil.identity')}>
             <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               {/* Logo preview */}
@@ -147,18 +149,18 @@ export default function ProfilPage() {
                 </div>
               )}
 
-              <Field label="Nom de l'entreprise *" required>
+              <Field label={`${t('profil.companyName')} *`} required>
                 <input required value={form.nom_entreprise}
                   onChange={e => setForm(p => ({...p, nom_entreprise: e.target.value}))}
                   className={inputCls} placeholder="Ma Société" />
               </Field>
 
-              <Field label="Secteur d'activité">
+              <Field label={t('profil.sector')}>
                 <input readOnly value={sectorLabel}
                   className={`${inputCls} bg-[#F8FAFC] cursor-not-allowed`} />
               </Field>
 
-              <Field label="URL Logo">
+              <Field label={t('profil.logoUrl')}>
                 <div className="relative">
                   <Upload size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input value={form.logo_url}
@@ -167,7 +169,7 @@ export default function ProfilPage() {
                 </div>
               </Field>
 
-              <Field label="Site web">
+              <Field label={t('profil.website')}>
                 <div className="relative">
                   <Globe size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input value={form.site_web}
@@ -177,20 +179,20 @@ export default function ProfilPage() {
               </Field>
 
               <div className="sm:col-span-2">
-                <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide block mb-1">Description</label>
+                <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide block mb-1">{t('profil.description')}</label>
                 <textarea value={form.description}
                   onChange={e => setForm(p => ({...p, description: e.target.value}))}
                   rows={2}
                   className={`${inputCls} resize-none`}
-                  placeholder="Décrivez votre activité en quelques mots…" />
+                  placeholder={t('profil.descPlaceholder')} />
               </div>
             </div>
           </ERPSectionCard>
 
           {/* Contact */}
-          <ERPSectionCard title="Coordonnées">
+          <ERPSectionCard title={t('profil.contact')}>
             <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Email contact">
+              <Field label={t('profil.emailContact')}>
                 <div className="relative">
                   <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input type="email" value={form.email_contact}
@@ -199,7 +201,7 @@ export default function ProfilPage() {
                 </div>
               </Field>
 
-              <Field label="Téléphone">
+              <Field label={t('profil.telephone')}>
                 <div className="relative">
                   <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input value={form.telephone}
@@ -208,7 +210,7 @@ export default function ProfilPage() {
                 </div>
               </Field>
 
-              <Field label="Adresse">
+              <Field label={t('profil.address')}>
                 <div className="relative">
                   <MapPin size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input value={form.adresse}
@@ -218,19 +220,19 @@ export default function ProfilPage() {
               </Field>
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Ville">
+                <Field label={t('profil.city')}>
                   <input value={form.ville}
                     onChange={e => setForm(p => ({...p, ville: e.target.value}))}
                     className={inputCls} placeholder="Kinshasa" />
                 </Field>
-                <Field label="Pays">
+                <Field label={t('profil.country')}>
                   <input value={form.pays}
                     onChange={e => setForm(p => ({...p, pays: e.target.value}))}
                     className={inputCls} placeholder="DRC" />
                 </Field>
               </div>
 
-              <Field label="Devise">
+              <Field label={t('profil.currency')}>
                 <select value={form.devise}
                   onChange={e => setForm(p => ({...p, devise: e.target.value}))}
                   className={`${inputCls} bg-white`}>
@@ -245,7 +247,7 @@ export default function ProfilPage() {
             {saved && (
               <div className="flex items-center gap-1.5 text-green-600 text-[13px] font-semibold">
                 <CheckCircle size={15} />
-                Profil mis à jour
+                {t('profil.updated')}
               </div>
             )}
             <button
@@ -254,7 +256,7 @@ export default function ProfilPage() {
               className="flex items-center gap-2 px-5 py-2.5 bg-[#2563EB] text-white rounded-xl text-[13px] font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
             >
               <Save size={14} />
-              {saving ? 'Enregistrement…' : 'Sauvegarder'}
+              {saving ? t('profil.saving') : t('profil.save')}
             </button>
           </div>
         </form>
