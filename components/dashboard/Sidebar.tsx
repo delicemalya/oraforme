@@ -45,12 +45,18 @@ const CORE_ICONS: Record<string, LucideIcon> = {
 }
 
 const SECTOR_ICONS: Record<string, LucideIcon> = {
+  // École — spécifique
+  'ecole-direction':        BarChart2,
+  'ecole-rh':               Users,
+  'ecole-comptabilite':     Calculator,
+  'ecole-miaa':             Bot,
   scolarite:                BookMarked,
   daac:                     Layers,
   'espace-formateur':       BookOpen,
   'espace-etudiant':        GraduationCap,
   'espace-parent':          HeartHandshake,
   'parametres-academiques': Settings,
+  // Autres secteurs
   restaurant:               ChefHat,
   cuisine:                  ChefHat,
   hotel:                    Hotel,

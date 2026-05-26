@@ -6,6 +6,7 @@ import {
   LayoutDashboard, Archive, Landmark, Smartphone, Wallet2,
   ArrowUpCircle, ArrowDownCircle, GitMerge, RefreshCw,
   TrendingUp, CheckCircle2, History, Bell, BarChart3, Receipt,
+  FileCheck, ArrowRightLeft,
 } from 'lucide-react'
 
 const TRESO_MODULES = [
@@ -16,6 +17,8 @@ const TRESO_MODULES = [
   { href: '/dashboard/tresorerie/wallets',        label: 'Wallets',          icon: Wallet2 },
   { href: '/dashboard/tresorerie/encaissements',  label: 'Encaissements',    icon: ArrowUpCircle },
   { href: '/dashboard/tresorerie/decaissements',  label: 'Décaissements',    icon: ArrowDownCircle },
+  { href: '/dashboard/tresorerie/cheques',        label: 'Chèques',          icon: FileCheck },
+  { href: '/dashboard/tresorerie/virements',      label: 'Virements',        icon: ArrowRightLeft },
   { href: '/dashboard/tresorerie/transferts',     label: 'Transferts',       icon: GitMerge },
   { href: '/dashboard/tresorerie/remboursements', label: 'Remboursements',   icon: RefreshCw },
   { href: '/dashboard/tresorerie/validations',    label: 'Validations',      icon: CheckCircle2 },

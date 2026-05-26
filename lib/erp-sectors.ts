@@ -41,12 +41,16 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
   roleFilter?: string[]   // Pour l'école : visibilité par rôle école
 }>>> = {
   ecole: [
-    { id: 'scolarite',              href: '/dashboard/ecole/scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',    roleFilter: ['DIRECTION_GENERALE', 'SCOLARITE', 'DAAC'] },
+    { id: 'ecole-direction',        href: '/dashboard/ecole/direction',              label: 'Direction École',        sublabel: 'Pilotage & KPIs école',    roleFilter: ['DIRECTION_GENERALE'] },
+    { id: 'ecole-rh',               href: '/dashboard/ecole/rh',                     label: 'RH École',               sublabel: 'Personnel & enseignants',  roleFilter: ['DIRECTION_GENERALE', 'RH_PAIE'] },
+    { id: 'ecole-comptabilite',     href: '/dashboard/ecole/comptabilite',           label: 'Comptabilité École',     sublabel: 'Finances & OHADA école',   roleFilter: ['DIRECTION_GENERALE', 'RAF'] },
+    { id: 'scolarite',              href: '/dashboard/ecole/scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     roleFilter: ['DIRECTION_GENERALE', 'SCOLARITE', 'DAAC'] },
     { id: 'daac',                   href: '/dashboard/ecole/daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     roleFilter: ['DIRECTION_GENERALE', 'DAAC'] },
     { id: 'espace-formateur',       href: '/dashboard/ecole/espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           roleFilter: ['FORMATEUR', 'DIRECTION_GENERALE', 'DAAC'] },
     { id: 'espace-etudiant',        href: '/dashboard/ecole/espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              roleFilter: ['ETUDIANT'] },
     { id: 'espace-parent',          href: '/dashboard/ecole/espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi scolarité',          roleFilter: ['PARENT'] },
     { id: 'parametres-academiques', href: '/dashboard/ecole/parametres-academiques', label: 'Paramètres académiques', sublabel: 'LMD & mentions',           roleFilter: ['DIRECTION_GENERALE', 'DAAC'] },
+    { id: 'ecole-miaa',             href: '/dashboard/ecole/miaa',                   label: 'MIAA+ École',            sublabel: 'IA assistant école',       roleFilter: ['DIRECTION_GENERALE', 'DAAC', 'FORMATEUR'] },
   ],
   restaurant: [
     { id: 'restaurant', href: '/dashboard/restaurant',         label: 'Caisse POS',     sublabel: 'Commandes & service'     },
@@ -73,7 +77,7 @@ export const PLATFORM_MODULES = [
   { id: 'notifications', href: '/dashboard/notifications',  label: 'Notifications',    sublabel: 'Alertes & messages'     },
   { id: 'profil',        href: '/dashboard/profil',         label: 'Profil Entreprise',sublabel: 'Marque & paramètres'    },
   { id: 'roles',         href: '/dashboard/roles',          label: 'Rôles & Droits',   sublabel: 'Permissions équipe'     },
-  { id: 'audit',         href: '/dashboard/audit',          label: 'Audit & Logs',     sublabel: 'Traçabilité'            },
+  { id: 'audit',         href: '/dashboard/audit',          label: 'Audit & Logs',     sublabel: 'Traçabilité système'    },
   { id: 'parametres',    href: '/dashboard/parametres',     label: 'Paramètres',       sublabel: 'Configuration'          },
 ] as const
 
