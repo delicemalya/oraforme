@@ -1,13 +1,10 @@
 'use client'
 
 /**
- * Sidebar Oraforme — Architecture blocs métiers
- * 8 blocs collapsibles : Pilotage | Finance & Compta | RH | Commercial |
- *                        Stock & Achats | Métier | Documents & IA | Paramètres
- *
- * Couleurs : active = #DC2626 / #FEF2F2, hover = #F8FAFC
- * Responsive : overlay mobile + sidebar desktop sticky
- * Permissions : owner > sector-role > user_permissions
+ * Sidebar Oraforme — Architecture blocs métiers colorés
+ * Fond blanc · Entêtes de blocs colorées · Items propres et espacés
+ * 8 blocs : Pilotage | Finance & Compta | RH | Commercial |
+ *           Stock & Achats | Métier | Documents & IA | Paramètres
  */
 
 import Link from 'next/link'
@@ -55,37 +52,72 @@ type NavGroup = {
   label: string
   icon:  LucideIcon
   items: NavItem[]
+  color: GroupColor
+}
+
+type GroupColor = {
+  header: string   // fond de l'entête
+  active: string   // fond item actif
+  text:   string   // texte item actif
+  dot:    string   // couleur accent
+}
+
+// ─── Palette des blocs ────────────────────────────────────────────────────────
+
+const COLORS: Record<string, GroupColor> = {
+  pilotage:    { header: '#2563EB', active: '#EFF6FF', text: '#1D4ED8', dot: '#2563EB' },
+  finance_ops: { header: '#16A34A', active: '#F0FDF4', text: '#15803D', dot: '#16A34A' },
+  rh_org:      { header: '#7C3AED', active: '#F5F3FF', text: '#6D28D9', dot: '#7C3AED' },
+  commercial:  { header: '#F59E0B', active: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
+  supply:      { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
+  metier:      { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
+  docs_ai:     { header: '#64748B', active: '#F8FAFC', text: '#334155', dot: '#64748B' },
+  params:      { header: '#475569', active: '#F1F5F9', text: '#334155', dot: '#475569' },
+}
+
+// Couleur métier selon secteur
+function getSectorColor(secteur: string): GroupColor {
+  const MAP: Record<string, GroupColor> = {
+    ecole:            { header: '#7C3AED', active: '#F5F3FF', text: '#6D28D9', dot: '#7C3AED' },
+    restaurant:       { header: '#EA580C', active: '#FFF7ED', text: '#C2410C', dot: '#EA580C' },
+    hotel:            { header: '#F59E0B', active: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
+    transport:        { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
+    transport_public: { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
+    commerce:         { header: '#F59E0B', active: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
+    supermarche:      { header: '#16A34A', active: '#F0FDF4', text: '#15803D', dot: '#16A34A' },
+    boutique:         { header: '#EC4899', active: '#FDF2F8', text: '#BE185D', dot: '#EC4899' },
+    sante:            { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
+    btp:              { header: '#92400E', active: '#FFFBEB', text: '#78350F', dot: '#92400E' },
+    banque:           { header: '#1D4ED8', active: '#EFF6FF', text: '#1E3A8A', dot: '#1D4ED8' },
+    ong:              { header: '#059669', active: '#ECFDF5', text: '#065F46', dot: '#059669' },
+    pharmacie:        { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
+    petrole:          { header: '#374151', active: '#F9FAFB', text: '#111827', dot: '#374151' },
+    agriculture:      { header: '#65A30D', active: '#F7FEE7', text: '#3F6212', dot: '#65A30D' },
+  }
+  return MAP[secteur] ?? COLORS.metier
 }
 
 // ─── Icon Registry ────────────────────────────────────────────────────────────
 
 const ICONS: Record<string, LucideIcon> = {
-  // Pilotage
   direction:     BarChart2,
   finance:       TrendingUp,
   analytics:     Activity,
   audit:         ShieldAlert,
   notifications: Bell,
-  // Finance & Compta
   comptabilite:  Calculator,
   tresorerie:    Wallet,
   facturation:   FileText,
   depenses:      Receipt,
-  // RH & Organisation
   rh:            Users,
   roles:         ShieldCheck,
-  // Commercial
   crm:           UsersRound,
-  // Stock & Achats
   stock:         Package,
   achats:        ShoppingCart,
-  // Documents & IA
   ged:           FolderOpen,
   bizbot:        Bot,
-  // Paramètres
   profil:        Building2,
   parametres:    Settings,
-  // École sector
   'ecole-direction':        BarChart2,
   'ecole-rh':               Users,
   'ecole-comptabilite':     Calculator,
@@ -96,89 +128,41 @@ const ICONS: Record<string, LucideIcon> = {
   'espace-etudiant':        GraduationCap,
   'espace-parent':          HeartHandshake,
   'parametres-academiques': Settings,
-  // Autres secteurs
   restaurant:   ChefHat,
   cuisine:      ChefHat,
   hotel:        Hotel,
   transport:    Truck,
-  // No-sector extras
   ecole:        GraduationCap,
 }
 
-// ─── Module Registry (all known modules) ─────────────────────────────────────
+// ─── Module Registry ──────────────────────────────────────────────────────────
 
 type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 
 const MODULE_DEFS: ModuleDef[] = [
   ...(CORE_ERP_MODULES as unknown as ModuleDef[]),
   ...(PLATFORM_MODULES as unknown as ModuleDef[]),
-  // Extras for no-sector owners
   { id: 'ecole',     label: 'École & Université',  sublabel: 'Gestion académique',      href: '/dashboard/ecole'      },
   { id: 'restaurant',label: 'Restauration POS',    sublabel: 'Service & commandes',     href: '/dashboard/restaurant' },
   { id: 'hotel',     label: 'Hôtellerie',           sublabel: 'Réservations & chambres', href: '/dashboard/hotel'      },
   { id: 'transport', label: 'Transport VTC',        sublabel: 'Flotte & courses',        href: '/dashboard/transport'  },
 ]
 
-function getModuleDef(id: string): ModuleDef | undefined {
-  return MODULE_DEFS.find(m => m.id === id)
-}
+const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 
-// ─── Sidebar Groups definition ────────────────────────────────────────────────
+// ─── Sidebar Group definitions ────────────────────────────────────────────────
 
-type GroupDef = { id: string; label: string; icon: LucideIcon; moduleIds: string[] }
-
-const SIDEBAR_GROUPS: GroupDef[] = [
-  {
-    id:        'pilotage',
-    label:     'Pilotage',
-    icon:      LayoutDashboard,
-    moduleIds: ['direction', 'finance', 'analytics', 'audit', 'notifications'],
-  },
-  {
-    id:        'finance_ops',
-    label:     'Finance & Compta',
-    icon:      Calculator,
-    moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses'],
-  },
-  {
-    id:        'rh_org',
-    label:     'RH & Organisation',
-    icon:      Users,
-    moduleIds: ['rh', 'roles'],
-  },
-  {
-    id:        'commercial',
-    label:     'Commercial',
-    icon:      UsersRound,
-    moduleIds: ['crm'],
-  },
-  {
-    id:        'supply',
-    label:     'Stock & Achats',
-    icon:      Package,
-    moduleIds: ['stock', 'achats'],
-  },
-  // Métier group is dynamic — built from SECTOR_SPECIFIC (sector tenants)
-  // or from no-sector modulesActifs (ecole/restaurant/hotel/transport)
-  {
-    id:        'docs_ai',
-    label:     'Documents & IA',
-    icon:      FolderOpen,
-    moduleIds: ['ged', 'bizbot'],
-  },
-  {
-    id:        'params',
-    label:     'Paramètres',
-    icon:      Settings,
-    moduleIds: ['profil', 'parametres'],
-  },
+const SIDEBAR_GROUPS = [
+  { id: 'pilotage',    label: 'Pilotage',          icon: LayoutDashboard, moduleIds: ['direction', 'finance', 'analytics', 'audit', 'notifications'] },
+  { id: 'finance_ops', label: 'Finance & Compta',  icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses'] },
+  { id: 'rh_org',      label: 'RH & Organisation', icon: Users,           moduleIds: ['rh', 'roles'] },
+  { id: 'commercial',  label: 'Commercial',         icon: UsersRound,      moduleIds: ['crm'] },
+  { id: 'supply',      label: 'Stock & Achats',     icon: Package,         moduleIds: ['stock', 'achats'] },
+  { id: 'docs_ai',     label: 'Documents & IA',     icon: FolderOpen,      moduleIds: ['ged', 'bizbot'] },
+  { id: 'params',      label: 'Paramètres',          icon: Settings,        moduleIds: ['profil', 'parametres'] },
 ]
 
-// ─── Platform-restricted (only owner / DG école) ──────────────────────────────
-
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
-
-// ─── All module IDs (for owner default activation) ───────────────────────────
 
 const ALL_MODULE_IDS = [
   ...CORE_ERP_MODULES.map(m => m.id),
@@ -186,36 +170,21 @@ const ALL_MODULE_IDS = [
   'ecole', 'restaurant', 'hotel', 'transport',
 ]
 
-// ─── Sector icon helper ───────────────────────────────────────────────────────
-
 function getSectorIcon(secteur: string): LucideIcon {
-  const MAP: Record<string, LucideIcon> = {
-    ecole:            GraduationCap,
-    restaurant:       ChefHat,
-    hotel:            Hotel,
-    transport:        Truck,
-    transport_public: Truck,
-    commerce:         Store,
-    supermarche:      Store,
-    boutique:         Store,
-    sante:            Activity,
-    btp:              Building2,
-    cabinet:          BookOpen,
-    boisson:          Package,
-    ong:              HeartHandshake,
-    banque:           Wallet,
-    pharmacie:        Package,
-    petrole:          Package,
-    agriculture:      Package,
+  const M: Record<string, LucideIcon> = {
+    ecole: GraduationCap, restaurant: ChefHat, hotel: Hotel,
+    transport: Truck, transport_public: Truck, commerce: Store,
+    supermarche: Store, boutique: Store, sante: Activity,
+    btp: Building2, banque: Wallet, ong: HeartHandshake,
   }
-  return MAP[secteur] ?? Settings
+  return M[secteur] ?? Settings
 }
 
-// ─── Sidebar Component ────────────────────────────────────────────────────────
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
-  const pathname   = usePathname()
-  const { t }      = useLocale()
+  const pathname = usePathname()
+  const { t }    = useLocale()
   const { tenant, loading: tenantLoading } = useTenantContext()
 
   const secteur      = tenant?.secteur    ?? null
@@ -228,7 +197,7 @@ export default function Sidebar() {
   const [permissions,   setPermissions]   = useState<Record<string, ModulePermission>>({})
   const [permsLoaded,   setPermsLoaded]   = useState(false)
 
-  // Accordion open state — all groups open by default
+  // Tous les blocs ouverts par défaut
   const [openGroups, setOpenGroups] = useState<Set<string>>(
     new Set([...SIDEBAR_GROUPS.map(g => g.id), 'metier'])
   )
@@ -241,35 +210,22 @@ export default function Sidebar() {
     })
   }
 
-  // ── Load permissions ──────────────────────────────────────────────────────
+  // ── Permissions ────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (!tenant) {
-      setModulesActifs([])
-      setPermissions({})
-      setPermsLoaded(true)
-      return
+      setModulesActifs([]); setPermissions({}); setPermsLoaded(true); return
     }
-
     if (tenant.role === 'owner') {
-      setModulesActifs(ALL_MODULE_IDS)
-      setPermissions({})
-      setPermsLoaded(true)
-      return
+      setModulesActifs(ALL_MODULE_IDS); setPermissions({}); setPermsLoaded(true); return
     }
-
     let cancelled = false
-
     async function loadPerms() {
       setPermsLoaded(false)
-
       if (!tenant!.secteur) {
         const { data: tmRows } = await supabase
-          .from('tenant_modules')
-          .select('module_key')
-          .eq('tenant_id', tenant!.tenantId)
-          .eq('enabled', true)
-
+          .from('tenant_modules').select('module_key')
+          .eq('tenant_id', tenant!.tenantId).eq('enabled', true)
         if (!cancelled) {
           setModulesActifs(
             tmRows && tmRows.length > 0
@@ -278,184 +234,99 @@ export default function Sidebar() {
           )
         }
       }
-
       const { data: perms } = await supabase
         .from('user_permissions')
         .select('module_key, can_view, can_edit, can_delete')
         .eq('profile_id', tenant!.profileId)
-
       if (cancelled) return
-
       const permMap: Record<string, ModulePermission> = {}
       for (const p of perms ?? []) {
-        permMap[p.module_key] = {
-          can_view:   p.can_view,
-          can_edit:   p.can_edit,
-          can_delete: p.can_delete,
-        }
+        permMap[p.module_key] = { can_view: p.can_view, can_edit: p.can_edit, can_delete: p.can_delete }
       }
       setPermissions(permMap)
       setPermsLoaded(true)
     }
-
     loadPerms()
     return () => { cancelled = true }
-  }, [
-    tenant?.userId,
-    tenant?.tenantId,
-    tenant?.role,
-    tenant?.secteur,
-    tenant?.profileId,
-  ]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tenant?.userId, tenant?.tenantId, tenant?.role, tenant?.secteur, tenant?.profileId]) // eslint-disable-line
 
   const loaded  = !tenantLoading && permsLoaded
   const isOwner = role === 'owner'
 
-  // ── Active route check ────────────────────────────────────────────────────
-
-  const isActive = useCallback((href: string, exact = false): boolean => {
-    return exact ? pathname === href : pathname.startsWith(href)
-  }, [pathname])
-
-  // ── Permission check for a module id ────────────────────────────────────
+  const isActive = useCallback((href: string, exact = false) =>
+    exact ? pathname === href : pathname.startsWith(href), [pathname])
 
   const canView = useCallback((id: string): boolean => {
     if (isOwner) return true
-
-    // Platform restricted → only owner or école DG
-    if (PLATFORM_RESTRICTED.has(id)) {
-      return ecoleRole === 'DIRECTION_GENERALE'
-    }
-
-    // École sector → ECOLE_CORE_ROLE_FILTER applies
+    if (PLATFORM_RESTRICTED.has(id)) return ecoleRole === 'DIRECTION_GENERALE'
     if (secteur === 'ecole') {
       const allowed = ECOLE_CORE_ROLE_FILTER[id]
-      if (allowed && allowed.length > 0) {
-        return ecoleRole ? allowed.includes(ecoleRole) : false
-      }
+      if (allowed?.length) return ecoleRole ? allowed.includes(ecoleRole) : false
       return permissions[id]?.can_view !== false
     }
-
-    // No-sector tenant → module must be active
     if (!secteur) {
       if (!modulesActifs.includes(id)) return false
       return permissions[id]?.can_view !== false
     }
-
-    // Sector tenant (non-école) → user permissions
     return permissions[id]?.can_view !== false
   }, [isOwner, ecoleRole, secteur, permissions, modulesActifs])
 
-  // ── Build visible groups ─────────────────────────────────────────────────
+  // ── Build groups ───────────────────────────────────────────────────────────
 
   const visibleGroups = useMemo((): NavGroup[] => {
     if (!loaded) return []
-
     return SIDEBAR_GROUPS.map(grp => {
       const items: NavItem[] = []
-
       for (const mid of grp.moduleIds) {
         if (!canView(mid)) continue
         const def = getModuleDef(mid)
         if (!def) continue
-        items.push({
-          id:       mid,
-          label:    def.label,
-          sublabel: def.sublabel,
-          icon:     ICONS[mid] ?? Settings,
-          href:     def.href,
-        })
+        items.push({ id: mid, label: def.label, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
       }
-
-      return { ...grp, items }
+      return { ...grp, items, color: COLORS[grp.id] }
     }).filter(g => g.items.length > 0)
   }, [loaded, canView])
 
-  // ── Sector "Métier" group (sector tenants) ───────────────────────────────
-
   const metierGroup = useMemo((): NavGroup | null => {
     if (!loaded) return null
-
-    // ── Case 1 : tenant has a sector → show SECTOR_SPECIFIC ──────────────
     if (secteur) {
       const sectorItems = (SECTOR_SPECIFIC[secteur as SectorId] ?? [])
-        .map(mod => ({
-          id:       mod.id,
-          label:    mod.label,
-          sublabel: mod.sublabel,
-          icon:     ICONS[mod.id] ?? Settings,
-          href:     mod.href,
-        }))
+        .map(mod => ({ id: mod.id, label: mod.label, sublabel: mod.sublabel, icon: ICONS[mod.id] ?? Settings, href: mod.href }))
         .filter(item => {
           if (isOwner) return true
           if (secteur === 'ecole') {
             const sItem = SECTOR_SPECIFIC['ecole']?.find(m => m.id === item.id)
-            const rf    = sItem?.roleFilter
-            if (!rf || rf.length === 0) return true
+            const rf = sItem?.roleFilter
+            if (!rf?.length) return true
             return ecoleRole ? rf.includes(ecoleRole) : false
           }
           return permissions[item.id]?.can_view !== false
         })
-
-      if (sectorItems.length === 0) return null
-
-      return {
-        id:    'metier',
-        label: SECTOR_LABELS[secteur] ?? secteur,
-        icon:  getSectorIcon(secteur),
-        items: sectorItems,
-      }
+      if (!sectorItems.length) return null
+      return { id: 'metier', label: SECTOR_LABELS[secteur] ?? secteur, icon: getSectorIcon(secteur), items: sectorItems, color: getSectorColor(secteur) }
     }
-
-    // ── Case 2 : no sector → show sector dashboards from modulesActifs ────
     const EXTRA_IDS = ['ecole', 'restaurant', 'hotel', 'transport']
     const extraItems: NavItem[] = []
-
     for (const mid of EXTRA_IDS) {
-      if (!modulesActifs.includes(mid)) continue
-      if (permissions[mid]?.can_view === false) continue
+      if (!modulesActifs.includes(mid) || permissions[mid]?.can_view === false) continue
       const def = getModuleDef(mid)
-      if (!def) continue
-      extraItems.push({
-        id:       mid,
-        label:    def.label,
-        sublabel: def.sublabel,
-        icon:     ICONS[mid] ?? Settings,
-        href:     def.href,
-      })
+      if (def) extraItems.push({ id: mid, label: def.label, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
     }
-
-    if (extraItems.length === 0) return null
-
-    return {
-      id:    'metier',
-      label: 'Modules Sectoriels',
-      icon:  Store,
-      items: extraItems,
-    }
+    if (!extraItems.length) return null
+    return { id: 'metier', label: 'Modules Sectoriels', icon: Store, items: extraItems, color: COLORS.metier }
   }, [loaded, secteur, isOwner, ecoleRole, permissions, modulesActifs])
-
-  // ── Dashboard href ────────────────────────────────────────────────────────
 
   const dashHref   = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
   const dashActive = isActive(dashHref, true)
-
-  // ── Logout ────────────────────────────────────────────────────────────────
 
   async function handleLogout() {
     await supabase.auth.signOut()
     window.location.href = '/login'
   }
 
-  // ── Style tokens ──────────────────────────────────────────────────────────
+  // ── NavItem renderer ───────────────────────────────────────────────────────
 
-  const ITEM_ACTIVE   = 'bg-[#FEF2F2] text-[#DC2626] border-l-2 border-[#DC2626] font-semibold'
-  const ITEM_INACTIVE = 'text-[#64748B] border-l-2 border-transparent hover:bg-[#F8FAFC] hover:text-[#0F172A]'
-  const ITEM_BASE     = 'flex items-center gap-2.5 pl-3 pr-2 py-2 rounded-r-lg text-[13px] transition-all duration-150'
-
-  // ── Sub-components ────────────────────────────────────────────────────────
-
-  function NavLink({ item }: { item: NavItem }) {
+  function NavLink({ item, color }: { item: NavItem; color: GroupColor }) {
     const active  = isActive(item.href, item.exact)
     const canEdit = isOwner || permissions[item.id]?.can_edit
     const Icon    = item.icon
@@ -463,24 +334,40 @@ export default function Sidebar() {
       <Link
         href={item.href}
         onClick={() => setMobileOpen(false)}
-        className={`${ITEM_BASE} ${active ? ITEM_ACTIVE : ITEM_INACTIVE}`}
+        className="flex items-center gap-2.5 mx-1 px-3 py-2 rounded-xl text-[12.5px] transition-all duration-150"
+        style={active
+          ? { background: color.active, color: color.text, fontWeight: 600 }
+          : undefined
+        }
       >
         <Icon
           size={13}
-          className={`shrink-0 ${active ? 'text-[#DC2626]' : 'text-[#94A3B8]'}`}
+          className="shrink-0 transition-colors"
+          style={{ color: active ? color.text : '#94A3B8' }}
         />
         <div className="flex-1 min-w-0">
-          <div className="truncate leading-tight">{item.label}</div>
+          <div
+            className="truncate leading-tight"
+            style={{ color: active ? color.text : '#374151' }}
+          >
+            {item.label}
+          </div>
           {item.sublabel && (
-            <div className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1 leading-none mt-0.5">
+            <div className="text-[10px] truncate leading-none mt-0.5 flex items-center gap-1"
+              style={{ color: '#94A3B8' }}>
               {item.sublabel}
               {!isOwner && !canEdit && <Lock size={7} className="text-[#CBD5E1] shrink-0" />}
             </div>
           )}
         </div>
+        {active && (
+          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color.dot }} />
+        )}
       </Link>
     )
   }
+
+  // ── Group block renderer ───────────────────────────────────────────────────
 
   function GroupBlock({ group }: { group: NavGroup }) {
     const isOpen    = openGroups.has(group.id)
@@ -488,32 +375,35 @@ export default function Sidebar() {
     const hasActive = group.items.some(item => isActive(item.href, item.exact))
 
     return (
-      <div>
+      <div className="mb-1.5">
+        {/* ── Entête colorée ── */}
         <button
           onClick={() => toggleGroup(group.id)}
-          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-150 ${
-            hasActive ? 'text-[#DC2626]' : 'text-[#94A3B8] hover:text-[#64748B]'
-          }`}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-150 group"
+          style={{ background: group.color.header }}
         >
-          <GroupIcon
-            size={10}
-            className={hasActive ? 'text-[#DC2626]' : 'text-[#CBD5E1]'}
-          />
-          <span className="flex-1 text-left">{group.label}</span>
+          <GroupIcon size={13} className="shrink-0 text-white/90" />
+          <span className="flex-1 text-left text-[11px] font-bold uppercase tracking-wider text-white/95">
+            {group.label}
+          </span>
           <ChevronDown
-            size={10}
-            className={`transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
+            size={11}
+            className="text-white/70 transition-transform duration-200"
+            style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
           />
         </button>
 
+        {/* ── Items ── */}
         <div
-          className={`overflow-hidden transition-all duration-200 ${
-            isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
-          }`}
+          className="overflow-hidden transition-all duration-200"
+          style={{
+            maxHeight: isOpen ? `${group.items.length * 64}px` : '0px',
+            opacity: isOpen ? 1 : 0,
+          }}
         >
-          <div className="space-y-0.5 pt-0.5 pl-1">
+          <div className="pt-1 pb-0.5 space-y-0.5">
             {group.items.map(item => (
-              <NavLink key={item.id} item={item} />
+              <NavLink key={item.id} item={item} color={group.color} />
             ))}
           </div>
         </div>
@@ -521,13 +411,13 @@ export default function Sidebar() {
     )
   }
 
-  // ── Sidebar content ───────────────────────────────────────────────────────
+  // ── Sidebar Content ────────────────────────────────────────────────────────
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden bg-white">
 
       {/* ── Logo ── */}
-      <div className="border-b border-[#E5E7EB] shrink-0 px-4 py-3">
+      <div className="shrink-0 px-4 pt-4 pb-3 border-b border-[#F1F5F9]">
         <div className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-icon.png" alt="oraforme" width={32} height={32} className="shrink-0" />
@@ -535,13 +425,16 @@ export default function Sidebar() {
             oraforme
           </span>
           {secteur && (
-            <span className="ml-auto shrink-0 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#FEF2F2] text-[#DC2626]">
+            <span
+              className="ml-auto shrink-0 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md text-white"
+              style={{ background: getSectorColor(secteur).header }}
+            >
               {(SECTOR_LABELS[secteur] ?? secteur).split(/[ &]/)[0]}
             </span>
           )}
         </div>
         {role && role !== 'owner' && (
-          <div className="mt-1.5">
+          <div className="mt-2">
             <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
               role === 'admin' ? 'bg-blue-100 text-blue-600' : 'bg-[#F8FAFC] text-[#64748B] border border-[#E5E7EB]'
             }`}>
@@ -552,37 +445,40 @@ export default function Sidebar() {
       </div>
 
       {/* ── Navigation ── */}
-      <nav className="flex-1 px-2 py-3 overflow-y-auto scrollbar-hide">
+      <nav className="flex-1 px-2 py-3 overflow-y-auto scrollbar-hide space-y-0.5">
 
-        {/* Dashboard — toujours en tête */}
+        {/* Dashboard — standalone, toujours premier */}
         <Link
           href={dashHref}
           onClick={() => setMobileOpen(false)}
-          className={`${ITEM_BASE} mb-2 ${dashActive ? ITEM_ACTIVE : ITEM_INACTIVE}`}
+          className="flex items-center gap-2.5 mx-1 px-3 py-2.5 rounded-xl text-[12.5px] font-semibold transition-all duration-150 mb-3"
+          style={dashActive
+            ? { background: '#0F172A', color: '#FFFFFF' }
+            : { color: '#374151' }
+          }
         >
           <LayoutDashboard
-            size={13}
-            className={`shrink-0 ${dashActive ? 'text-[#DC2626]' : 'text-[#94A3B8]'}`}
+            size={14}
+            className="shrink-0"
+            style={{ color: dashActive ? '#FFFFFF' : '#94A3B8' }}
           />
-          <span className="font-medium">{t('nav.dashboard')}</span>
+          <span>{t('nav.dashboard')}</span>
+          {dashActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/60" />}
         </Link>
 
-        {/* Loading skeleton */}
+        {/* Skeleton */}
         {!loaded && (
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-2 px-1">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-8 rounded-lg bg-[#F1F5F9] animate-pulse" />
+              <div key={i} className="h-9 rounded-xl animate-pulse" style={{ background: `hsl(${210 + i * 30}, 60%, 92%)` }} />
             ))}
           </div>
         )}
 
-        {/* ── Blocs métiers ── */}
+        {/* ── Blocs colorés ── */}
         {loaded && (
-          <div className="space-y-0.5">
-
-            {/* 1-5 & 7-8 : groupes universels */}
-            {visibleGroups.map((group, idx) => {
-              // Insérer le bloc Métier après "Stock & Achats" (group id = 'supply')
+          <>
+            {visibleGroups.map(group => {
               const insertMetierAfter = group.id === 'supply'
               return (
                 <div key={group.id}>
@@ -594,46 +490,51 @@ export default function Sidebar() {
               )
             })}
 
-            {/* Si supply n'est pas visible mais metierGroup existe, l'ajouter à la fin */}
+            {/* Métier si supply absent */}
             {!visibleGroups.find(g => g.id === 'supply') && metierGroup && (
               <GroupBlock group={metierGroup} />
             )}
 
-            {/* Marketplace (owner, no sector) */}
+            {/* Marketplace */}
             {isOwner && !secteur && (
               <Link
                 href="/dashboard/modules"
                 onClick={() => setMobileOpen(false)}
-                className={`${ITEM_BASE} mt-1 ${isActive('/dashboard/modules') ? ITEM_ACTIVE : ITEM_INACTIVE}`}
+                className="flex items-center gap-2.5 mx-1 px-3 py-2 rounded-xl text-[12.5px] transition-all duration-150"
+                style={isActive('/dashboard/modules')
+                  ? { background: '#F1F5F9', color: '#0F172A', fontWeight: 600 }
+                  : { color: '#64748B' }
+                }
               >
-                <Store
-                  size={13}
-                  className={`shrink-0 ${isActive('/dashboard/modules') ? 'text-[#DC2626]' : 'text-[#94A3B8]'}`}
-                />
+                <Store size={13} className="shrink-0" style={{ color: isActive('/dashboard/modules') ? '#0F172A' : '#94A3B8' }} />
                 <span>{t('nav.modules')}</span>
               </Link>
             )}
-          </div>
+          </>
         )}
       </nav>
 
-      {/* ── Bottom actions ── */}
-      <div className="px-2 py-3 border-t border-[#E5E7EB] shrink-0 space-y-0.5">
+      {/* ── Bottom ── */}
+      <div className="shrink-0 px-2 py-3 border-t border-[#F1F5F9] space-y-0.5">
         {isSuperAdmin && (
           <Link
             href="/admin"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-2.5 pl-3 pr-2 py-2 rounded-lg text-[13px] text-[#DC2626] hover:bg-[#FEF2F2] transition-all duration-150"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium transition-all duration-150"
+            style={{ color: '#DC2626' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <ShieldAlert size={13} className="shrink-0" />
-            <span className="font-medium">Admin oraforme</span>
+            <span>Admin oraforme</span>
             <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#DC2626] animate-pulse" />
           </Link>
         )}
-
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2.5 pl-3 pr-2 py-2 rounded-lg text-[13px] text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-all duration-150"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] text-[#64748B] transition-all duration-150"
+          onMouseEnter={e => { e.currentTarget.style.background = '#FEF2F2'; e.currentTarget.style.color = '#DC2626' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B' }}
         >
           <LogOut size={13} className="shrink-0" />
           <span>Déconnexion</span>
@@ -644,24 +545,24 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col bg-white border-r border-[#E5E7EB] h-screen sticky top-0">
+      {/* Desktop */}
+      <aside className="hidden lg:flex w-58 shrink-0 flex-col bg-white border-r border-[#E5E7EB] h-screen sticky top-0" style={{ width: 228 }}>
         <SidebarContent />
       </aside>
 
-      {/* ── Mobile toggle button ── */}
+      {/* Mobile toggle */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white border border-[#E5E7EB] text-[#0F172A] shadow-sm"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl bg-white border border-[#E5E7EB] text-[#0F172A] shadow-sm"
         onClick={() => setMobileOpen(o => !o)}
         aria-label="Menu"
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
 
-      {/* ── Mobile overlay ── */}
+      {/* Mobile overlay */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="w-56 bg-white border-r border-[#E5E7EB] h-full shadow-xl">
+          <div style={{ width: 228 }} className="bg-white border-r border-[#E5E7EB] h-full shadow-2xl">
             <SidebarContent />
           </div>
           <div
