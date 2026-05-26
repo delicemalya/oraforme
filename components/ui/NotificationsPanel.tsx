@@ -1,8 +1,8 @@
 ﻿'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, X, CheckCheck, Info, AlertTriangle, CheckCircle, XCircle, ExternalLink } from 'lucide-react'
+import { Bell, X, CheckCheck, Info, AlertTriangle, CheckCircle, XCircle, ExternalLink, Wifi, WifiOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
@@ -23,6 +23,9 @@ const TYPE_CONFIG = {
   error:   { icon: XCircle,       color: '#DC2626', bg: '#DC262615' },
 }
 
+// Polling interval when WebSocket is unavailable (30 secondes)
+const POLL_INTERVAL_MS = 30_000
+
 function timeAgo(date: string): string {
   const diff = Date.now() - new Date(date).getTime()
   const mins = Math.floor(diff / 60000)
@@ -37,31 +40,96 @@ export default function NotificationsPanel() {
   const [open, setOpen] = useState(false)
   const [notifs, setNotifs] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
+  const [realtimeOk, setRealtimeOk] = useState<boolean | null>(null) // null = en cours de détection
   const ref = useRef<HTMLDivElement>(null)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
   const unread = notifs.filter(n => !n.read).length
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true)
-      const { data } = await supabase
+  // ─── Chargement des notifications REST (toujours fiable) ─────────────────
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true)
+    try {
+      const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(20)
-      setNotifs(data ?? [])
-      setLoading(false)
+      if (!error) setNotifs(data ?? [])
+    } catch {
+      // REST inaccessible — on garde les données actuelles
+    } finally {
+      if (!silent) setLoading(false)
     }
+  }, [])
+
+  // ─── Démarrer le polling de secours ──────────────────────────────────────
+  const startPolling = useCallback(() => {
+    if (pollRef.current) return // déjà actif
+    pollRef.current = setInterval(() => load(true), POLL_INTERVAL_MS)
+  }, [load])
+
+  // ─── Arrêter le polling ───────────────────────────────────────────────────
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current)
+      pollRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    // 1. Chargement initial via REST
     load()
 
-    // Real-time subscription
-    const channel = supabase
-      .channel('notifications')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload) => {
-        setNotifs(prev => [payload.new as Notification, ...prev])
-      })
-      .subscribe()
+    // 2. Tentative de connexion WebSocket Realtime
+    let wsTimeout: ReturnType<typeof setTimeout> | null = null
 
-    return () => { supabase.removeChannel(channel) }
+    const channel = supabase
+      .channel('notif-panel-v2')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications' },
+        (payload) => {
+          // WebSocket actif → annuler le timeout de fallback
+          if (wsTimeout) { clearTimeout(wsTimeout); wsTimeout = null }
+          setRealtimeOk(true)
+          stopPolling()
+          setNotifs(prev => [payload.new as Notification, ...prev])
+        }
+      )
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          setRealtimeOk(true)
+          stopPolling()
+          if (wsTimeout) { clearTimeout(wsTimeout); wsTimeout = null }
+        } else if (
+          status === 'CHANNEL_ERROR' ||
+          status === 'TIMED_OUT' ||
+          status === 'CLOSED' ||
+          err
+        ) {
+          // WebSocket échoue → basculer sur le polling
+          setRealtimeOk(false)
+          startPolling()
+        }
+      })
+
+    channelRef.current = channel
+
+    // Timeout de sécurité : si après 6s le WS n'est pas SUBSCRIBED → polling
+    wsTimeout = setTimeout(() => {
+      if (realtimeOk === null) {
+        setRealtimeOk(false)
+        startPolling()
+      }
+    }, 6000)
+
+    return () => {
+      if (wsTimeout) clearTimeout(wsTimeout)
+      stopPolling()
+      supabase.removeChannel(channel)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -113,6 +181,17 @@ export default function NotificationsPanel() {
                 <h3 className="text-sm font-bold text-[var(--text)]">Notifications</h3>
                 {unread > 0 && (
                   <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#DC2626] text-white rounded-full">{unread}</span>
+                )}
+                {/* Indicateur Realtime */}
+                {realtimeOk === true && (
+                  <span title="Temps réel actif" className="flex items-center gap-0.5 text-[9px] text-green-600">
+                    <Wifi size={9} /> Live
+                  </span>
+                )}
+                {realtimeOk === false && (
+                  <span title="Mode polling (WebSocket indisponible)" className="flex items-center gap-0.5 text-[9px] text-[var(--text-secondary)]">
+                    <WifiOff size={9} /> Polling
+                  </span>
                 )}
               </div>
               <div className="flex items-center gap-2">
