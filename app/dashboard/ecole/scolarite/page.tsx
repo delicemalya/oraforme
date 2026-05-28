@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   type Etudiant, type FraisScolaire, type PaiementScolaire, type Note,
   type ClasseEcole, type PlanningEcole, type Absence, type Enseignant,
@@ -27,24 +28,14 @@ import {
 type SubTab = 'inscriptions' | 'paiements' | 'notes' | 'classes' | 'planning' | 'absences'
            | 'matieres' | 'sessions' | 'examens' | 'attestations'
 
-const SUB_TABS: { id: SubTab; label: string; icon: React.ElementType }[] = [
-  { id: 'inscriptions',  label: 'Inscriptions',      icon: Users2 },
-  { id: 'paiements',     label: 'Paiements & Frais', icon: CreditCard },
-  { id: 'notes',         label: 'Notes & Bulletins', icon: BookOpen },
-  { id: 'classes',       label: 'Classes',           icon: School },
-  { id: 'planning',      label: 'Planning',          icon: Calendar },
-  { id: 'absences',      label: 'Absences',          icon: ClipboardList },
-  { id: 'matieres',      label: 'Matières',          icon: BookOpenCheck },
-  { id: 'sessions',      label: 'Sessions',          icon: CalendarRange },
-  { id: 'examens',       label: 'Examens & Notes',   icon: FlaskConical },
-  { id: 'attestations',  label: 'Attestations',      icon: ScrollText },
-]
+// SUB_TABS is built inside the component (uses t())
 
 // ── Inscriptions ──────────────────────────────────────────────────────────────
 
 function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
   tenantId: string; etudiants: Etudiant[]; onRefresh: () => void; nomEcole: string
 }) {
+  const { t } = useLocale()
   const [filter,   setFilter]   = useState<'tous' | StatutEtu>('tous')
   const [search,   setSearch]   = useState('')
   const [selected, setSelected] = useState<Etudiant | null>(null)
@@ -103,10 +94,10 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
   }
 
   const kpis = [
-    { label: 'Total',     value: etudiants.length,                                    color: '#DC2626' },
-    { label: 'Actifs',    value: etudiants.filter(e => e.statut === 'actif').length,   color: '#0F172A' },
-    { label: 'Suspendus', value: etudiants.filter(e => e.statut === 'suspendu').length,color: '#DC2626' },
-    { label: 'Diplômés',  value: etudiants.filter(e => e.statut === 'diplome').length, color: '#7C3AED' },
+    { label: t('ecole.scolarite.kpi.total'),     value: etudiants.length,                                    color: '#DC2626' },
+    { label: t('ecole.scolarite.kpi.actifs'),    value: etudiants.filter(e => e.statut === 'actif').length,   color: '#0F172A' },
+    { label: t('ecole.scolarite.kpi.suspendus'), value: etudiants.filter(e => e.statut === 'suspendu').length,color: '#DC2626' },
+    { label: t('ecole.scolarite.kpi.diplomes'),  value: etudiants.filter(e => e.statut === 'diplome').length, color: '#7C3AED' },
   ]
 
   return (
@@ -127,10 +118,10 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
-            <input className="pl-7 pr-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none w-44" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)} />
+            <input className="pl-7 pr-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-xs text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none w-44" placeholder={t('ecole.scolarite.searchPlh')} value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#DC2626', color: '#0F172A' }}>
-            <Plus size={13} /> Inscrire
+            <Plus size={13} /> {t('ecole.scolarite.newStudent')}
           </button>
         </div>
       </div>
@@ -1030,6 +1021,21 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
 
 export default function ScolaritePage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
+
+  const SUB_TABS: { id: SubTab; label: string; icon: React.ElementType }[] = [
+    { id: 'inscriptions',  label: t('ecole.tab.inscriptions'), icon: Users2      },
+    { id: 'paiements',     label: t('ecole.tab.paiements'),    icon: CreditCard  },
+    { id: 'notes',         label: t('ecole.tab.notes'),        icon: BookOpen    },
+    { id: 'classes',       label: t('ecole.tab.classes'),      icon: School      },
+    { id: 'planning',      label: t('ecole.tab.planning'),     icon: Calendar    },
+    { id: 'absences',      label: t('ecole.tab.absences'),     icon: ClipboardList },
+    { id: 'matieres',      label: t('ecole.tab.matieres'),     icon: BookOpenCheck },
+    { id: 'sessions',      label: t('ecole.tab.sessions'),     icon: CalendarRange },
+    { id: 'examens',       label: t('ecole.tab.examens'),      icon: FlaskConical },
+    { id: 'attestations',  label: t('ecole.tab.attestations'), icon: ScrollText  },
+  ]
+
   const [subTab,      setSubTab]      = useState<SubTab>('inscriptions')
   const [etudiants,   setEtudiants]   = useState<Etudiant[]>([])
   const [classes,     setClasses]     = useState<ClasseEcole[]>([])
@@ -1061,7 +1067,7 @@ export default function ScolaritePage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-        <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+        <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
       </div>
     )
   }
@@ -1070,8 +1076,8 @@ export default function ScolaritePage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Scolarité</h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {etudiants.length} étudiant(s) inscrits</p>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.scolarite.title')}</h1>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {etudiants.length} {t('ecole.scolarite.subtitle')}</p>
         </div>
         <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors">
           <RefreshCw size={14} />
@@ -1079,13 +1085,13 @@ export default function ScolaritePage() {
       </div>
 
       <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-fit flex-wrap">
-        {SUB_TABS.map(t => {
-          const Icon = t.icon
+        {SUB_TABS.map(tab_ => {
+          const Icon = tab_.icon
           return (
-            <button key={t.id} onClick={() => setSubTab(t.id)}
+            <button key={tab_.id} onClick={() => setSubTab(tab_.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#DC2626' : 'transparent', color: subTab === t.id ? '#0F172A' : '#64748B' }}>
-              <Icon size={12} /> {t.label}
+              style={{ background: subTab === tab_.id ? '#DC2626' : 'transparent', color: subTab === tab_.id ? '#0F172A' : '#64748B' }}>
+              <Icon size={12} /> {tab_.label}
             </button>
           )
         })}

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -7,16 +7,9 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { fmt, KpiCard, FI } from '../_lib/shared'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 type SubTab = 'journal' | 'grandlivre' | 'bilan' | 'tresorerie' | 'previsions'
-
-const SUB_TABS = [
-  { id: 'journal'    as SubTab, label: 'Journal OHADA', icon: BookOpen  },
-  { id: 'grandlivre' as SubTab, label: 'Grand Livre',   icon: TrendingUp},
-  { id: 'bilan'      as SubTab, label: 'Bilan',         icon: BarChart2 },
-  { id: 'tresorerie' as SubTab, label: 'Trésorerie',    icon: Wallet    },
-  { id: 'previsions' as SubTab, label: 'Prévisions IA', icon: Sparkles  },
-]
 
 interface JournalEntry {
   id: string; date: string; libelle: string; type: string
@@ -58,6 +51,7 @@ const COMPTES_OHADA = [
 // ── Journal ───────────────────────────────────────────────────────────────────
 
 function SectionJournal({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [entries,  setEntries]  = useState<JournalEntry[]>([])
   const [loading,  setLoading]  = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -103,9 +97,9 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total Recettes" value={fmt(totalRecettes) + ' FCFA'} color="#0F172A" />
-        <KpiCard label="Total Dépenses" value={fmt(totalDepenses) + ' FCFA'} color="#DC2626" />
-        <KpiCard label="Solde" value={fmt(Math.abs(solde)) + ' FCFA'} sub={solde >= 0 ? 'Excédent' : 'Déficit'} color={solde >= 0 ? '#0F172A' : '#DC2626'} />
+        <KpiCard label={t('ecole.compta.kpi.produits')} value={fmt(totalRecettes) + ' FCFA'} color="#0F172A" />
+        <KpiCard label={t('ecole.compta.kpi.charges')} value={fmt(totalDepenses) + ' FCFA'} color="#DC2626" />
+        <KpiCard label={t('ecole.compta.kpi.solde')} value={fmt(Math.abs(solde)) + ' FCFA'} sub={solde >= 0 ? 'Excédent' : 'Déficit'} color={solde >= 0 ? '#0F172A' : '#DC2626'} />
       </div>
 
       <div className="flex items-center gap-2 justify-between flex-wrap">
@@ -118,7 +112,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
           ))}
         </div>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#00b9a7', color: '#fff' }}>
-          <Plus size={13} /> Saisir une écriture
+          <Plus size={13} /> {t('ecole.compta.addEntry')}
         </button>
       </div>
 
@@ -154,16 +148,16 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
             </div>
             <div className="flex gap-2">
               <button onClick={add} disabled={saving || !form.libelle || !form.montant_ht} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#00b9a7', color: '#fff' }}>
-                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
+                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} {t('common.save')}
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune écriture comptable.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">{t('ecole.compta.noData')}</div>
       ) : (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <table className="w-full text-xs">
@@ -175,24 +169,24 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
               </tr>
             </thead>
             <tbody>
-              {displayed.map(e => (
-                <tr key={e.id} className="border-t border-[var(--border)] hover:bg-gray-50">
-                  <td className="px-4 py-2.5 text-[var(--text-secondary)] font-mono">{new Date(e.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+              {displayed.map(entry => (
+                <tr key={entry.id} className="border-t border-[var(--border)] hover:bg-gray-50">
+                  <td className="px-4 py-2.5 text-[var(--text-secondary)] font-mono">{new Date(entry.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                   <td className="px-4 py-2.5">
                     <span className="text-[10px] font-mono bg-[#00b9a7]/10 text-[#00b9a7] px-1.5 py-0.5 rounded">
-                      {e.categorie.split('—')[0]?.trim() || e.categorie}
+                      {entry.categorie.split('—')[0]?.trim() || entry.categorie}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-[#101729] max-w-[200px] truncate">{e.libelle}</td>
+                  <td className="px-4 py-2.5 text-[#101729] max-w-[200px] truncate">{entry.libelle}</td>
                   <td className="px-4 py-2.5">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={e.type === 'recette' ? { color: '#0F172A', background: '#0F172A18' } : { color: '#DC2626', background: '#DC262618' }}>
-                      {e.type === 'recette' ? 'Recette' : 'Dépense'}
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={entry.type === 'recette' ? { color: '#0F172A', background: '#0F172A18' } : { color: '#DC2626', background: '#DC262618' }}>
+                      {entry.type === 'recette' ? 'Recette' : 'Dépense'}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-[var(--text-secondary)]">{fmt(e.montant_ht)}</td>
-                  <td className="px-4 py-2.5 text-[var(--text-secondary)]">{e.tva}%</td>
-                  <td className="px-4 py-2.5 font-semibold" style={{ color: e.type === 'recette' ? '#0F172A' : '#DC2626' }}>
-                    {fmt(e.montant_ttc)} FCFA
+                  <td className="px-4 py-2.5 text-[var(--text-secondary)]">{fmt(entry.montant_ht)}</td>
+                  <td className="px-4 py-2.5 text-[var(--text-secondary)]">{entry.tva}%</td>
+                  <td className="px-4 py-2.5 font-semibold" style={{ color: entry.type === 'recette' ? '#0F172A' : '#DC2626' }}>
+                    {fmt(entry.montant_ttc)} FCFA
                   </td>
                 </tr>
               ))}
@@ -207,6 +201,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
 // ── Grand Livre ───────────────────────────────────────────────────────────────
 
 function SectionGrandLivre({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [entries,  setEntries]  = useState<JournalEntry[]>([])
   const [loading,  setLoading]  = useState(true)
   const [selected, setSelected] = useState<string | null>(null)
@@ -221,22 +216,22 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={18} /></div>
 
   const byAccount: Record<string, JournalEntry[]> = {}
-  entries.forEach(e => {
-    const code = e.categorie.split('—')[0]?.trim() || e.categorie
+  entries.forEach(entry => {
+    const code = entry.categorie.split('—')[0]?.trim() || entry.categorie
     if (!byAccount[code]) byAccount[code] = []
-    byAccount[code].push(e)
+    byAccount[code].push(entry)
   })
 
-  const accounts = Object.entries(byAccount).map(([code, entries]) => ({
+  const accounts = Object.entries(byAccount).map(([code, acEntries]) => ({
     code,
     label: COMPTES_OHADA.find(c => c.code === code.trim())?.label ?? code,
-    entries,
-    totalRecettes: entries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ttc, 0),
-    totalDepenses: entries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ttc, 0),
-    solde:         entries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ttc, 0) - entries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ttc, 0),
+    entries: acEntries,
+    totalRecettes: acEntries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ttc, 0),
+    totalDepenses: acEntries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ttc, 0),
+    solde:         acEntries.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ttc, 0) - acEntries.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ttc, 0),
   })).sort((a, b) => a.code.localeCompare(b.code))
 
-  if (accounts.length === 0) return <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune écriture dans le journal.</div>
+  if (accounts.length === 0) return <div className="text-center py-12 text-[var(--text-secondary)] text-xs">{t('ecole.compta.noData')}</div>
 
   return (
     <div className="flex gap-5">
@@ -278,12 +273,12 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
                 <table className="w-full text-xs">
                   <thead><tr style={{ background: '#F9FAFB' }}>{['Date', 'Libellé', 'Débit', 'Crédit'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                   <tbody>
-                    {account.entries.map(e => (
-                      <tr key={e.id} className="border-t border-[var(--border)]">
-                        <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(e.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
-                        <td className="px-4 py-2.5 text-[#101729]">{e.libelle}</td>
-                        <td className="px-4 py-2.5">{e.type === 'depense' ? <span className="text-[#DC2626] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
-                        <td className="px-4 py-2.5">{e.type === 'recette' ? <span className="text-[#DC2626] font-semibold">{fmt(e.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
+                    {account.entries.map(entry => (
+                      <tr key={entry.id} className="border-t border-[var(--border)]">
+                        <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(entry.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
+                        <td className="px-4 py-2.5 text-[#101729]">{entry.libelle}</td>
+                        <td className="px-4 py-2.5">{entry.type === 'depense' ? <span className="text-[#DC2626] font-semibold">{fmt(entry.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
+                        <td className="px-4 py-2.5">{entry.type === 'recette' ? <span className="text-[#DC2626] font-semibold">{fmt(entry.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -304,6 +299,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
 // ── Bilan ─────────────────────────────────────────────────────────────────────
 
 function SectionBilan({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [entries,  setEntries]  = useState<JournalEntry[]>([])
   const [loading,  setLoading]  = useState(true)
   const [annee,    setAnnee]    = useState(new Date().getFullYear())
@@ -343,14 +339,14 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
           </select>
         </div>
         <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729]">
-          <Download size={12} /> Exporter PDF
+          <Download size={12} /> {t('ecole.compta.export')}
         </button>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total Produits"  value={fmt(recettes) + ' FCFA'}         color="#0F172A" />
-        <KpiCard label="Total Charges"   value={fmt(depenses) + ' FCFA'}         color="#DC2626" />
-        <KpiCard label="Résultat net"     value={fmt(Math.abs(resultat)) + ' FCFA'} sub={resultat >= 0 ? 'Bénéfice' : 'Perte'} color={resultat >= 0 ? '#0F172A' : '#DC2626'} />
+        <KpiCard label={t('ecole.compta.kpi.produits')}  value={fmt(recettes) + ' FCFA'}         color="#0F172A" />
+        <KpiCard label={t('ecole.compta.kpi.charges')}   value={fmt(depenses) + ' FCFA'}         color="#DC2626" />
+        <KpiCard label={t('ecole.compta.kpi.solde')}     value={fmt(Math.abs(resultat)) + ' FCFA'} sub={resultat >= 0 ? 'Bénéfice' : 'Perte'} color={resultat >= 0 ? '#0F172A' : '#DC2626'} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -425,6 +421,7 @@ interface Transaction {
 }
 
 function SectionTresorerie({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading,      setLoading]      = useState(true)
   const [saving,       setSaving]       = useState(false)
@@ -462,9 +459,9 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
     setShowForm(false); setSaving(false); load()
   }
 
-  const displayed = transactions.filter(t => filter === 'tous' || t.type === filter)
-  const totalEntrees = transactions.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-  const totalSorties = transactions.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
+  const displayed = transactions.filter(tx => filter === 'tous' || tx.type === filter)
+  const totalEntrees = transactions.filter(tx => tx.type === 'entree').reduce((s, tx) => s + tx.montant, 0)
+  const totalSorties = transactions.filter(tx => tx.type === 'sortie').reduce((s, tx) => s + tx.montant, 0)
   const solde        = totalEntrees - totalSorties
 
   return (
@@ -474,7 +471,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
         {[
           { label: 'Total Entrées',  val: totalEntrees, color: '#0F172A', icon: ArrowUpCircle },
           { label: 'Total Sorties',  val: totalSorties, color: '#DC2626', icon: ArrowDownCircle },
-          { label: 'Solde Net',      val: solde,        color: solde >= 0 ? '#0F172A' : '#DC2626', icon: Wallet },
+          { label: t('ecole.compta.kpi.tresorerie'), val: solde, color: solde >= 0 ? '#0F172A' : '#DC2626', icon: Wallet },
         ].map(k => (
           <div key={k.label} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg shrink-0" style={{ background: `${k.color}22` }}>
@@ -560,10 +557,10 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
                 </select>
               </div>
               <div className="flex gap-2 items-end">
-                <button onClick={() => setShowForm(false)} className="flex-1 py-2 rounded-lg bg-gray-100 text-[var(--text-secondary)] text-xs hover:bg-gray-200 transition">Annuler</button>
+                <button onClick={() => setShowForm(false)} className="flex-1 py-2 rounded-lg bg-gray-100 text-[var(--text-secondary)] text-xs hover:bg-gray-200 transition">{t('common.cancel')}</button>
                 <button onClick={add} disabled={saving || !form.montant || !form.label}
                   className="flex-1 py-2 rounded-lg bg-[#00b9a7] text-white text-xs font-medium hover:bg-[#00b9a7] disabled:opacity-40 transition flex items-center justify-center gap-1">
-                  {saving ? <Loader2 size={11} className="animate-spin" /> : <Check size={11} />} Enregistrer
+                  {saving ? <Loader2 size={11} className="animate-spin" /> : <Check size={11} />} {t('common.save')}
                 </button>
               </div>
             </div>
@@ -578,7 +575,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
         ) : displayed.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-[var(--text-secondary)]">
             <Wallet size={28} className="mb-2" />
-            <p className="text-xs">Aucune transaction enregistrée.</p>
+            <p className="text-xs">{t('ecole.compta.noData')}</p>
           </div>
         ) : (
           <table className="w-full text-xs">
@@ -591,23 +588,23 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
               </tr>
             </thead>
             <tbody>
-              {displayed.map(t => {
-                const isEntree = t.type === 'entree'
+              {displayed.map(tx => {
+                const isEntree = tx.type === 'entree'
                 return (
-                  <tr key={t.id} className="border-b border-[var(--border)] hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(t.date || t.created_at).toLocaleDateString('fr-FR')}</td>
-                    <td className="px-4 py-2.5 text-[#101729]">{t.label || t.description || t.source || '—'}</td>
+                  <tr key={tx.id} className="border-b border-[var(--border)] hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(tx.date || tx.created_at).toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-2.5 text-[#101729]">{tx.label || tx.description || tx.source || '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                        t.source === 'paiements_scolaires' ? 'bg-amber-500/10 text-[#DC2626]'
-                        : t.source === 'manuel' ? 'bg-gray-100 text-[var(--text-secondary)]'
+                        tx.source === 'paiements_scolaires' ? 'bg-amber-500/10 text-[#DC2626]'
+                        : tx.source === 'manuel' ? 'bg-gray-100 text-[var(--text-secondary)]'
                         : 'bg-blue-500/10 text-blue-600'
                       }`}>
-                        {t.source === 'paiements_scolaires' ? 'Scolarité' : t.source === 'manuel' ? 'Manuel' : (t.source ?? '—')}
+                        {tx.source === 'paiements_scolaires' ? 'Scolarité' : tx.source === 'manuel' ? 'Manuel' : (tx.source ?? '—')}
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-right font-semibold" style={{ color: isEntree ? '#0F172A' : '#DC2626' }}>
-                      {isEntree ? '+' : '-'}{fmt(t.montant)} FCFA
+                      {isEntree ? '+' : '-'}{fmt(tx.montant)} FCFA
                     </td>
                   </tr>
                 )
@@ -673,7 +670,6 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
         })
 
         // Project next 3 months from regression on solde
-        const soldes   = hist.map(h => h.solde)
         const recettes = hist.map(h => h.recettes)
         const depenses = hist.map(h => h.depenses)
         const rReg = linearRegression(recettes)
@@ -832,7 +828,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
       {data.length === 0 && (
         <div className="text-center py-12 text-[var(--text-secondary)] text-xs">
           <Sparkles size={24} className="mx-auto mb-3 opacity-30" />
-          Aucune donnée comptable pour générer des prévisions.
+          {t('ecole.compta.noData')}
         </div>
       )}
     </div>
@@ -843,9 +839,18 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
 
 export default function ComptabilitePage() {
   useRoleGuard(['DIRECTION_GENERALE', 'RAF'])
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [subTab,   setSubTab]   = useState<SubTab>('journal')
   const [nomEcole, setNomEcole] = useState('Mon École')
+
+  const SUB_TABS = [
+    { id: 'journal'    as SubTab, label: t('ecole.compta.tab.journal'),     icon: BookOpen  },
+    { id: 'grandlivre' as SubTab, label: t('ecole.compta.tab.grandlivre'),  icon: TrendingUp},
+    { id: 'bilan'      as SubTab, label: t('ecole.compta.tab.bilan'),       icon: BarChart2 },
+    { id: 'tresorerie' as SubTab, label: t('ecole.compta.tab.tresorerie'),  icon: Wallet    },
+    { id: 'previsions' as SubTab, label: t('ecole.compta.tab.previsions'),  icon: Sparkles  },
+  ]
 
   useEffect(() => {
     if (!tenantId) return
@@ -855,7 +860,7 @@ export default function ComptabilitePage() {
 
   if (tenantLoading) return (
     <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-      <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+      <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
     </div>
   )
 
@@ -863,20 +868,20 @@ export default function ComptabilitePage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Comptabilité OHADA</h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · Plan comptable OHADA · Exonéré TVA éducation</p>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.compta.title')}</h1>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {t('ecole.compta.subtitle')}</p>
         </div>
         <button onClick={() => window.location.reload()} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><RefreshCw size={14} /></button>
       </div>
 
       <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-fit">
-        {SUB_TABS.map(t => {
-          const Icon = t.icon
+        {SUB_TABS.map(tab_ => {
+          const Icon = tab_.icon
           return (
-            <button key={t.id} onClick={() => setSubTab(t.id)}
+            <button key={tab_.id} onClick={() => setSubTab(tab_.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#00b9a7' : 'transparent', color: subTab === t.id ? '#fff' : 'var(--text-secondary)' }}>
-              <Icon size={12} /> {t.label}
+              style={{ background: subTab === tab_.id ? '#00b9a7' : 'transparent', color: subTab === tab_.id ? '#fff' : 'var(--text-secondary)' }}>
+              <Icon size={12} /> {tab_.label}
             </button>
           )
         })}

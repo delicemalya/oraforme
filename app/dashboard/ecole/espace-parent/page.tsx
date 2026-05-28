@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -15,6 +15,7 @@ import {
   NIVEAUX, PERIODES, fmt, calcMoyenne, getMention, MENTIONS,
   StatutBadge, Avatar, KpiCard,
 } from '../_lib/shared'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Résoudre le rôle école du user ────────────────────────────────────────────
 
@@ -37,6 +38,7 @@ async function getEcoleRole(): Promise<{ role: string | null; email: string | nu
 function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
   etudiant: Etudiant; onBack: () => void; accentColor?: string
 }) {
+  const { t } = useLocale()
   const [notes,     setNotes]     = useState<Note[]>([])
   const [paiements, setPaiements] = useState<PaiementScolaire[]>([])
   const [absences,  setAbsences]  = useState<Absence[]>([])
@@ -114,28 +116,28 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
       ) : (
         <>
           <div className="grid grid-cols-4 gap-3">
-            <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}           color="#0F172A" />
-            <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#64748B'} sub={mention?.label} />
-            <KpiCard label="Absences"         value={totalAbs}                            color="#DC2626" sub={`${justifiedAbs} justifiées`} />
-            <KpiCard label="Alertes"          value={nbAlerts}                            color="#DC2626" sub="non lues" />
+            <KpiCard label={t('ecole.parent.kpi.paye')}     value={`${fmt(totalPaye)} FCFA`}           color="#0F172A" />
+            <KpiCard label={t('ecole.parent.kpi.moyenne')}  value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#64748B'} sub={mention?.label} />
+            <KpiCard label={t('ecole.parent.kpi.absences')} value={totalAbs}                            color="#DC2626" sub={`${justifiedAbs} justifiées`} />
+            <KpiCard label={t('ecole.parent.kpi.alerts')}   value={nbAlerts}                            color="#DC2626" sub="non lues" />
           </div>
 
           {/* Tabs */}
           <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-fit">
             {[
-              { id: 'notes'     as const, label: 'Résultats',  icon: BookOpen,      count: notes.length },
-              { id: 'paiements' as const, label: 'Paiements',  icon: CreditCard,    count: paiements.length },
-              { id: 'absences'  as const, label: 'Absences',   icon: ClipboardList, count: totalAbs },
-              { id: 'alertes'   as const, label: 'Alertes',    icon: Bell,          count: nbAlerts },
-            ].map(t => {
-              const Icon = t.icon
+              { id: 'notes'     as const, label: t('ecole.parent.tab.notes'),     icon: BookOpen,      count: notes.length },
+              { id: 'paiements' as const, label: t('ecole.parent.tab.paiements'), icon: CreditCard,    count: paiements.length },
+              { id: 'absences'  as const, label: t('ecole.parent.tab.absences'),  icon: ClipboardList, count: totalAbs },
+              { id: 'alertes'   as const, label: t('ecole.parent.tab.alertes'),   icon: Bell,          count: nbAlerts },
+            ].map(tab_ => {
+              const Icon = tab_.icon
               return (
-                <button key={t.id} onClick={() => setActiveTab(t.id)}
+                <button key={tab_.id} onClick={() => setActiveTab(tab_.id)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all relative"
-                  style={{ background: activeTab === t.id ? accentColor : 'transparent', color: activeTab === t.id ? '#fff' : '#64748B' }}>
-                  <Icon size={12} /> {t.label}
-                  {t.count > 0 && activeTab !== t.id && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-gray-100 text-[var(--text-secondary)]">{t.count}</span>
+                  style={{ background: activeTab === tab_.id ? accentColor : 'transparent', color: activeTab === tab_.id ? '#fff' : '#64748B' }}>
+                  <Icon size={12} /> {tab_.label}
+                  {tab_.count > 0 && activeTab !== tab_.id && (
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-gray-100 text-[var(--text-secondary)]">{tab_.count}</span>
                   )}
                 </button>
               )
@@ -146,7 +148,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
           {activeTab === 'notes' && (
             <div className="space-y-4">
               {notes.length === 0 ? (
-                <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune note disponible.</div>
+                <div className="text-center py-10 text-[var(--text-secondary)] text-xs">{t('ecole.parent.noNotes')}</div>
               ) : PERIODES.map(p => {
                 const pNotes = notes.filter(n => n.periode === p.value)
                 if (pNotes.length === 0) return null
@@ -190,7 +192,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
           {/* Paiements */}
           {activeTab === 'paiements' && (
             paiements.length === 0 ? (
-              <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucun paiement enregistré.</div>
+              <div className="text-center py-10 text-[var(--text-secondary)] text-xs">{t('ecole.parent.noPaiements')}</div>
             ) : (
               <div className="rounded-xl border border-[var(--border)] overflow-hidden">
                 <table className="w-full text-xs">
@@ -218,7 +220,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
           {/* Absences */}
           {activeTab === 'absences' && (
             absences.length === 0 ? (
-              <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune absence enregistrée.</div>
+              <div className="text-center py-10 text-[var(--text-secondary)] text-xs">{t('ecole.parent.noAbsences')}</div>
             ) : (
               <div className="rounded-xl border border-[var(--border)] overflow-hidden">
                 <table className="w-full text-xs">
@@ -247,7 +249,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
             notifs.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-[var(--text-secondary)]">
                 <CheckCircle size={28} className="mb-2 opacity-30" />
-                <p className="text-xs">Aucune alerte pour cet enfant</p>
+                <p className="text-xs">{t('ecole.parent.noAlerts')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -276,6 +278,7 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
 
 export default function EspaceParentPage() {
   useRoleGuard(['PARENT'])
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [ecoleRole,  setEcoleRole]  = useState<string | null>(null)
   const [userEmail,  setUserEmail]  = useState<string | null>(null)
@@ -322,7 +325,7 @@ export default function EspaceParentPage() {
   }
 
   if (tenantLoading || initLoading) {
-    return <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]"><Loader2 className="animate-spin mr-2" size={18} /> Chargement…</div>
+    return <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]"><Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}</div>
   }
 
   // ── Vue PARENT ────────────────────────────────────────────────────────────────
@@ -332,8 +335,8 @@ export default function EspaceParentPage() {
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-[#101729]">Espace Parent</h1>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">Dossier de votre enfant</p>
+              <h1 className="text-xl font-bold text-[#101729]">{t('ecole.parent.title')}</h1>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">{t('ecole.parent.subtitle')}</p>
             </div>
             {children.length > 1 && (
               <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)] px-3 py-2 rounded-lg">
@@ -349,14 +352,14 @@ export default function EspaceParentPage() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Espace Parent</h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Suivi de vos enfants</p>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.parent.title')}</h1>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{t('ecole.parent.subtitle')}</p>
         </div>
 
         {children.length === 0 ? (
           <div className="rounded-xl border border-[#DC2626]/20 p-8 flex flex-col items-center text-center" style={{ background: 'rgba(240,163,10,0.04)' }}>
             <AlertCircle size={32} className="text-[#DC2626] mb-3" />
-            <p className="text-sm font-semibold text-[#101729] mb-1">Aucun enfant trouvé</p>
+            <p className="text-sm font-semibold text-[#101729] mb-1">{t('ecole.parent.noStudent')}</p>
             <p className="text-xs text-[var(--text-secondary)] max-w-sm">
               Aucun étudiant n&apos;est associé à l&apos;email <strong className="text-[#101729]">{userEmail}</strong>.<br/>
               Contactez l&apos;administration pour lier votre compte à votre enfant.
@@ -388,7 +391,7 @@ export default function EspaceParentPage() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Espace Parent</h1>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.parent.title')}</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">Administration · Dossier famille</p>
         </div>
         <DossierEtudiant etudiant={selected} onBack={() => { setSelected(null); setResults([]) }} accentColor="#00b9a7" />
@@ -399,8 +402,8 @@ export default function EspaceParentPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-[#101729]">Espace Parent</h1>
-        <p className="text-xs text-[var(--text-secondary)] mt-0.5">Recherche par téléphone, email, nom du parent ou de l&apos;enfant</p>
+        <h1 className="text-xl font-bold text-[#101729]">{t('ecole.parent.title')}</h1>
+        <p className="text-xs text-[var(--text-secondary)] mt-0.5">{t('ecole.parent.subtitle')}</p>
       </div>
 
       <div className="rounded-xl border border-[#00b9a7]/20 p-4 space-y-3" style={{ background: 'rgba(0,185,167,0.04)' }}>
@@ -409,7 +412,7 @@ export default function EspaceParentPage() {
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
               className="w-full pl-9 pr-4 py-2.5 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-sm text-[#101729] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#00b9a7]"
-              placeholder="Tél, email parent, nom de l'enfant…"
+              placeholder={t('ecole.parent.searchPlh')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && searchByParent()}
@@ -450,7 +453,7 @@ export default function EspaceParentPage() {
       {!searching && results.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-[var(--text-secondary)]">
           <HeartHandshake size={40} className="mb-4 opacity-20" />
-          <p className="text-sm">Recherchez un parent ou un élève</p>
+          <p className="text-sm">{t('ecole.parent.noStudent')}</p>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmt, KpiCard, type Etudiant, type PaiementScolaire, type Note, type Absence } from '../_lib/shared'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -33,17 +34,6 @@ interface SchoolContext {
   notes: Note[]
   absences: Absence[]
 }
-
-// ── Quick prompts ──────────────────────────────────────────────────────────────
-
-const QUICK_PROMPTS = [
-  { label: 'Analyse des paiements', icon: CreditCard, prompt: 'Analyse les paiements du mois en cours et identifie les impayés critiques.' },
-  { label: 'Taux d\'absence', icon: ClipboardList, prompt: 'Quel est le taux d\'absence global ? Quels élèves sont les plus absents ?' },
-  { label: 'Performance académique', icon: BookOpen, prompt: 'Donne-moi une vue globale des résultats académiques par classe et par période.' },
-  { label: 'Élèves à risque', icon: AlertTriangle, prompt: 'Identifie les élèves à risque : impayés + absences + notes faibles cumulés.' },
-  { label: 'Rapport direction', icon: BarChart2, prompt: 'Génère un résumé exécutif pour la direction : effectifs, finances, résultats.' },
-  { label: 'Recommandations RH', icon: Users, prompt: 'Quelles recommandations RH peux-tu faire en fonction de l\'activité scolaire actuelle ?' },
-]
 
 // ── Insight Card ───────────────────────────────────────────────────────────────
 
@@ -98,6 +88,17 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
 
 export default function MiaaPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
+
+  const QUICK_PROMPTS = [
+    { label: t('ecole.miaa.prompt.paiements'), icon: CreditCard,    prompt: 'Analyse les paiements du mois en cours et identifie les impayés critiques.' },
+    { label: t('ecole.miaa.prompt.absences'),  icon: ClipboardList, prompt: 'Quel est le taux d\'absence global ? Quels élèves sont les plus absents ?' },
+    { label: t('ecole.miaa.prompt.perf'),      icon: BookOpen,      prompt: 'Donne-moi une vue globale des résultats académiques par classe et par période.' },
+    { label: t('ecole.miaa.prompt.risque'),    icon: AlertTriangle, prompt: 'Identifie les élèves à risque : impayés + absences + notes faibles cumulés.' },
+    { label: t('ecole.miaa.prompt.rapport'),   icon: BarChart2,     prompt: 'Génère un résumé exécutif pour la direction : effectifs, finances, résultats.' },
+    { label: t('ecole.miaa.prompt.rh'),        icon: Users,         prompt: 'Quelles recommandations RH peux-tu faire en fonction de l\'activité scolaire actuelle ?' },
+  ]
+
   const [ctx, setCtx] = useState<SchoolContext | null>(null)
   const [loadingCtx, setLoadingCtx] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -174,7 +175,6 @@ export default function MiaaPage() {
     if (!ctx) return 'Aucun contexte chargé.'
 
     const annee = new Date().getFullYear()
-    const impayesSuspendus = ctx.etudiants.filter(e => e.statut === 'suspendu').length
     const absParEtu = ctx.absences.length / Math.max(ctx.totalEtudiants, 1)
 
     const notesMoy = ctx.notes.length
@@ -206,7 +206,6 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
 
     try {
       const contextSummary = buildContextSummary()
-      // Inject school data into the message so the route's system prompt stays intact
       const messageWithContext = ctx
         ? `${contextSummary}\n\nQuestion : ${userText}`
         : userText
@@ -247,8 +246,8 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
 
   // ── Computed insights ─────────────────────────────────────────────────────────
   const tauxSuspension = ctx ? ((ctx.suspendus / Math.max(ctx.totalEtudiants, 1)) * 100).toFixed(1) : '—'
-  const tauxAbsence = ctx ? ((ctx.absences.length / Math.max(ctx.totalEtudiants, 1))).toFixed(1) : '—'
-  const moyenneNotes = ctx && ctx.notes.length
+  const tauxAbsence    = ctx ? ((ctx.absences.length / Math.max(ctx.totalEtudiants, 1))).toFixed(1) : '—'
+  const moyenneNotes   = ctx && ctx.notes.length
     ? ((ctx.notes.reduce((s, n) => s + (n.note / n.note_max) * 20, 0) / ctx.notes.length)).toFixed(1)
     : '—'
 
@@ -272,7 +271,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
             <h1 className="text-lg font-bold text-[#101729] flex items-center gap-2">
               MIAA+ <Sparkles size={14} className="text-orange-400" />
             </h1>
-            <p className="text-xs text-[var(--text-secondary)]">Assistant IA scolaire — analyse & insights en temps réel</p>
+            <p className="text-xs text-[var(--text-secondary)]">{t('ecole.miaa.subtitle')}</p>
           </div>
         </div>
         <button
@@ -281,7 +280,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-400 text-xs hover:bg-orange-500/30 transition disabled:opacity-50"
         >
           {loadingCtx ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
-          {ctx ? 'Actualiser' : 'Charger le contexte'}
+          {ctx ? t('common.refresh') : t('ecole.miaa.loadCtx')}
         </button>
       </div>
 
@@ -295,24 +294,24 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
             className="grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0"
           >
             <InsightCard
-              icon={GraduationCap} label="Élèves actifs" color="#DC2626"
+              icon={GraduationCap} label={t('ecole.miaa.kpi.actifs')} color="#DC2626"
               value={ctx.actifs.toString()} sub={`${ctx.totalEtudiants} total`}
               trend={ctx.actifs > ctx.suspendus ? 'up' : 'warn'}
             />
             <InsightCard
-              icon={CreditCard} label="Revenus (année)" color="#0F172A"
-              value={fmt(ctx.revenusAnnee)} sub="paiements scolaires"
+              icon={CreditCard} label={t('ecole.miaa.kpi.revenuAnnee')} color="#0F172A"
+              value={fmt(ctx.revenusAnnee)} sub={t('ecole.scolarite.tab.paiements') ?? ''}
               trend="up"
             />
             <InsightCard
-              icon={AlertTriangle} label="Taux suspension" color="#DC2626"
-              value={`${tauxSuspension}%`} sub={`${ctx.suspendus} élèves bloqués`}
+              icon={AlertTriangle} label={t('ecole.miaa.kpi.suspendus')} color="#DC2626"
+              value={`${tauxSuspension}%`} sub={`${ctx.suspendus} ${t('ecole.scolarite.kpi.suspendus')}`}
               trend={parseFloat(tauxSuspension) > 10 ? 'warn' : 'up'}
             />
             <InsightCard
-              icon={BookOpen} label="Moy. générale" color="#7C3AED"
+              icon={BookOpen} label={t('ecole.etu.kpi.moyenne')} color="#7C3AED"
               value={moyenneNotes === '—' ? '—' : `${moyenneNotes}/20`}
-              sub={`${ctx.notes.length} notes saisies`}
+              sub={`${ctx.notes.length} notes`}
               trend={parseFloat(moyenneNotes) >= 10 ? 'up' : 'down'}
             />
           </motion.div>
@@ -348,7 +347,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
           {/* Quick prompts */}
           {!ctx && (
             <div className="px-4 pb-2">
-              <p className="text-[11px] text-[var(--text-secondary)] mb-2 uppercase tracking-wide">Suggestions</p>
+              <p className="text-[11px] text-[var(--text-secondary)] mb-2 uppercase tracking-wide">{t('ecole.miaa.thinking')}</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_PROMPTS.slice(0, 3).map(qp => (
                   <button
@@ -370,7 +369,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder={ctx ? 'Posez votre question…' : 'Chargez le contexte puis posez votre question…'}
+              placeholder={t('ecole.miaa.placeholder')}
               className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder:text-[var(--text-muted)] outline-none focus:border-orange-500/40 transition"
             />
             <button
@@ -388,7 +387,7 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex-1">
             <div className="flex items-center gap-2 mb-4">
               <Lightbulb size={14} className="text-orange-400" />
-              <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wide">Analyses rapides</span>
+              <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wide">{t('ecole.miaa.send')}</span>
             </div>
             <div className="space-y-2">
               {QUICK_PROMPTS.map(qp => (
@@ -411,32 +410,32 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
             <div className="flex items-center gap-2 mb-3">
               <div className={`w-2 h-2 rounded-full ${ctx ? 'bg-[#00b9a7]' : 'bg-[#DC2626]'} animate-pulse`} />
               <span className="text-xs text-[var(--text-secondary)]">
-                {ctx ? 'Contexte actif' : 'Sans contexte'}
+                {ctx ? t('ecole.miaa.loadCtx') : t('common.loading')}
               </span>
             </div>
             {ctx && (
               <div className="space-y-1.5 text-[11px] text-[var(--text-secondary)]">
                 <div className="flex justify-between">
-                  <span>Élèves</span>
+                  <span>{t('ecole.miaa.kpi.etudiants')}</span>
                   <span className="text-[#101729]">{ctx.totalEtudiants}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Notes</span>
+                  <span>{t('ecole.tab.notes')}</span>
                   <span className="text-[#101729]">{ctx.notes.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Absences</span>
+                  <span>{t('ecole.tab.absences')}</span>
                   <span className="text-[#101729]">{ctx.absences.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Paiements</span>
+                  <span>{t('ecole.tab.paiements')}</span>
                   <span className="text-[#101729]">{ctx.paiementsRecents.length}+</span>
                 </div>
               </div>
             )}
             {!ctx && (
               <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
-                Cliquez sur «Charger le contexte» pour activer l'analyse IA de vos données.
+                {t('ecole.miaa.welcome')}
               </p>
             )}
           </div>

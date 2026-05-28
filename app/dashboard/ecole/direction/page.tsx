@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -15,26 +15,17 @@ import {
   type TypeEvent, TYPE_EVENT, fmt, generateCode, KpiCard, Avatar, FI,
 } from '../_lib/shared'
 import { SectionDiplomes, SectionSoutenances } from '../_lib/academic-sections'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 type SubTab = 'vue' | 'finances' | 'evenements' | 'bourses' | 'partenaires' | 'communication'
            | 'diplomes' | 'soutenances'
-
-const SUB_TABS = [
-  { id: 'vue'          as SubTab, label: 'Vue Globale',   icon: TrendingUp  },
-  { id: 'finances'     as SubTab, label: 'Finances',      icon: DollarSign  },
-  { id: 'evenements'   as SubTab, label: 'Événements',    icon: Calendar    },
-  { id: 'bourses'      as SubTab, label: 'Bourses',       icon: Award       },
-  { id: 'partenaires'  as SubTab, label: 'Partenaires',   icon: Handshake   },
-  { id: 'communication'as SubTab, label: 'Communication', icon: Megaphone   },
-  { id: 'diplomes'     as SubTab, label: 'Diplômes',      icon: GraduationCap },
-  { id: 'soutenances'  as SubTab, label: 'Soutenances',   icon: Swords      },
-]
 
 // ── Vue Globale ───────────────────────────────────────────────────────────────
 
 function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
   tenantId: string; etudiants: Etudiant[]; enseignants: Enseignant[]; classes: ClasseEcole[]; onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [revenuMois,   setRevenuMois]   = useState(0)
   const [revenuAnnee,  setRevenuAnnee]  = useState(0)
   const [impayeCount,  setImpayeCount]  = useState(0)
@@ -89,10 +80,10 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
   }
 
   const kpis = [
-    { label: 'Revenu du mois',   value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#0F172A' },
-    { label: 'Revenu de l\'année', value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#DC2626' },
-    { label: 'Étudiants',        value: etudiants.filter(e => e.statut === 'actif').length, color: '#DC2626' },
-    { label: 'Impayés',          value: statsLoading ? '…' : impayeCount,                  color: '#DC2626' },
+    { label: t('ecole.direction.kpi.revenuMois'),  value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#0F172A' },
+    { label: t('ecole.direction.kpi.revenuAnnee'), value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#DC2626' },
+    { label: t('ecole.direction.kpi.etudiants'),   value: etudiants.filter(e => e.statut === 'actif').length, color: '#DC2626' },
+    { label: t('ecole.direction.kpi.impayes'),     value: statsLoading ? '…' : impayeCount,                  color: '#DC2626' },
   ]
 
   return (
@@ -102,32 +93,32 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <KpiCard label="Enseignants actifs" value={enseignants.filter(e => e.statut === 'actif').length} color="#7C3AED" />
-        <KpiCard label="Classes" value={classes.length} color="#0F172A" />
-        <KpiCard label="Diplômés" value={etudiants.filter(e => e.statut === 'diplome').length} color="#7C3AED" />
+        <KpiCard label={t('ecole.direction.kpi.enseignants')} value={enseignants.filter(e => e.statut === 'actif').length} color="#7C3AED" />
+        <KpiCard label={t('ecole.direction.kpi.classes')}     value={classes.length} color="#0F172A" />
+        <KpiCard label={t('ecole.direction.kpi.diplomes')}    value={etudiants.filter(e => e.statut === 'diplome').length} color="#7C3AED" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(248,81,73,0.04)' }}>
           <div className="flex items-center gap-2">
             <AlertTriangle size={14} className="text-[#DC2626]" />
-            <p className="text-xs font-bold text-[#DC2626]">Gestion des impayés</p>
+            <p className="text-xs font-bold text-[#DC2626]">{t('ecole.direction.kpi.gestionImpayes')}</p>
           </div>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-            Suspendre automatiquement les étudiants actifs sans paiement cette année. Un code de déblocage est généré pour chacun.
+            {t('ecole.direction.kpi.gestionImpayesDesc')}
           </p>
           <button onClick={autoBlock} disabled={blocking || impayeCount === 0 || statsLoading}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
             style={{ background: '#00b9a7', color: '#fff' }}>
             {blocking ? <Loader2 className="animate-spin" size={12} /> : <Unlock size={12} />}
-            Bloquer {impayeCount} impayé(s)
+            {t('ecole.direction.block')} {impayeCount}
           </button>
         </div>
 
         <div className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
-          <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Effectifs par classe</p>
+          <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">{t('ecole.direction.kpi.effectifsClasse')}</p>
           {classes.length === 0 ? (
-            <p className="text-xs text-[var(--text-secondary)]">Aucune classe configurée.</p>
+            <p className="text-xs text-[var(--text-secondary)]">{t('ecole.direction.kpi.noClasse')}</p>
           ) : (
             <div className="space-y-2">
               {classes.map(c => {
@@ -153,11 +144,11 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
       {recentPaie.length > 0 && (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <div className="px-4 py-3 border-b border-[var(--border)]" style={{ background: '#FFFFFF' }}>
-            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Derniers paiements</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{t('ecole.direction.kpi.derniersPaiements')}</p>
           </div>
           <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Étudiant', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+            <thead><tr style={{ background: '#FFFFFF' }}>{[t('common.date'), t('common.student'), t('common.label'), t('common.method'), t('common.amount')].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
             <tbody>
               {recentPaie.map(p => {
                 const etu = etudiants.find(e => e.id === p.etudiant_id)
@@ -183,6 +174,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
 // ── Finances ──────────────────────────────────────────────────────────────────
 
 function SectionFinances({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [paiements, setPaiements] = useState<PaiementScolaire[]>([])
   const [loading,   setLoading]   = useState(true)
   const [periode,   setPeriode]   = useState<'mois' | 'annee' | 'tout'>('mois')
@@ -209,7 +201,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-lg p-1 w-fit">
-        {([['mois', 'Ce mois'], ['annee', 'Cette année'], ['tout', 'Tout']] as const).map(([k, l]) => (
+        {([['mois', t('ecole.direction.periode.mois')], ['annee', t('ecole.direction.periode.annee')], ['tout', t('ecole.direction.periode.tout')]] as const).map(([k, l]) => (
           <button key={k} onClick={() => setPeriode(k)} className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
             style={{ background: periode === k ? '#00b9a7' : 'transparent', color: periode === k ? '#fff' : 'var(--text-secondary)' }}>
             {l}
@@ -218,14 +210,14 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total encaissé" value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#0F172A" />
-        <KpiCard label="Nb paiements"   value={loading ? '…' : paiements.length}         color="#DC2626" />
-        <KpiCard label="Moyenne/paiement" value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#DC2626" />
+        <KpiCard label={t('ecole.direction.fin.totalEncaisse')}   value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#0F172A" />
+        <KpiCard label={t('ecole.direction.fin.nbPaiements')}     value={loading ? '…' : paiements.length}         color="#DC2626" />
+        <KpiCard label={t('ecole.direction.fin.moyenne')}         value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#DC2626" />
       </div>
 
       {Object.keys(byMethod).length > 0 && (
         <div className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
-          <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Répartition par mode de paiement</p>
+          <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-3">{t('ecole.direction.fin.repartitionMode')}</p>
           <div className="space-y-2">
             {Object.entries(byMethod).sort((a, b) => b[1] - a[1]).map(([method, amount]) => {
               const pct = totalPaye > 0 ? (amount / totalPaye) * 100 : 0
@@ -248,11 +240,11 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       {!loading && paiements.length > 0 && (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <div className="px-4 py-3 border-b border-[var(--border)]" style={{ background: '#FFFFFF' }}>
-            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Historique</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">{t('ecole.direction.fin.historique')}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Libellé', 'Méthode', 'Montant'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: '#FFFFFF' }}>{[t('common.date'), t('common.label'), t('common.method'), t('common.amount')].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {paiements.slice(0, 50).map(p => (
                   <tr key={p.id} className="border-t border-[var(--border)]">
@@ -274,6 +266,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
 // ── Événements ────────────────────────────────────────────────────────────────
 
 function SectionEvenements({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [planning,   setPlanning]   = useState<PlanningEcole[]>([])
   const [loading,    setLoading]    = useState(true)
   const [showForm,   setShowForm]   = useState(false)
@@ -310,15 +303,15 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
     <div className="space-y-4">
       <div className="flex items-center gap-2 justify-between flex-wrap">
         <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-lg p-1">
-          {(['tous', 'examen', 'conge_scolaire', 'evenement', 'conseil', 'autre'] as const).map(t => (
-            <button key={t} onClick={() => setFilterType(t)} className="px-2.5 py-1.5 rounded-md text-xs font-medium transition-all"
-              style={{ background: filterType === t ? '#00b9a7' : 'transparent', color: filterType === t ? '#fff' : 'var(--text-secondary)' }}>
-              {t === 'tous' ? 'Tous' : TYPE_EVENT[t as TypeEvent]?.label ?? t}
+          {(['tous', 'examen', 'conge_scolaire', 'evenement', 'conseil', 'autre'] as const).map(item => (
+            <button key={item} onClick={() => setFilterType(item)} className="px-2.5 py-1.5 rounded-md text-xs font-medium transition-all"
+              style={{ background: filterType === item ? '#00b9a7' : 'transparent', color: filterType === item ? '#fff' : 'var(--text-secondary)' }}>
+              {item === 'tous' ? t('common.all') : TYPE_EVENT[item as TypeEvent]?.label ?? item}
             </button>
           ))}
         </div>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#00b9a7', color: '#fff' }}>
-          <Plus size={13} /> Programmer
+          <Plus size={13} /> {t('ecole.direction.newEvent')}
         </button>
       </div>
 
@@ -326,43 +319,43 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(56,139,253,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
-              <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
+              <FI label={t('common.titleField')} value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.type')}</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
                   {(Object.entries(TYPE_EVENT) as [TypeEvent, { label: string }][]).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>
-              <FI label="Date début *" value={form.date_debut} onChange={v => setForm(p => ({ ...p, date_debut: v }))} type="date" />
-              <FI label="Date fin"     value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
+              <FI label={t('common.dateStart')} value={form.date_debut} onChange={v => setForm(p => ({ ...p, date_debut: v }))} type="date" />
+              <FI label={t('common.dateEnd')}   value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
               <div className="col-span-2">
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Description</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.description')}</label>
                 <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none resize-none" />
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#00b9a7', color: '#fff' }}>
-                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
+                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} {t('common.save')}
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun événement planifié.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">{t('ecole.direction.noEvent')}</div>
       ) : (
         <div className="space-y-2">
           {displayed.map(p => {
-            const t = TYPE_EVENT[p.type] ?? TYPE_EVENT.autre
+            const ev = TYPE_EVENT[p.type] ?? TYPE_EVENT.autre
             return (
               <div key={p.id} className="rounded-xl border border-[var(--border)] p-4 flex items-start gap-4" style={{ background: '#FFFFFF', opacity: p.date_debut < today ? 0.5 : 1 }}>
-                <div className="rounded-lg p-2.5 shrink-0" style={{ background: t.bg }}><Calendar size={14} style={{ color: t.color }} /></div>
+                <div className="rounded-lg p-2.5 shrink-0" style={{ background: ev.bg }}><Calendar size={14} style={{ color: ev.color }} /></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-[#101729]">{p.titre}</p>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: t.color, background: t.bg }}>{t.label}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: ev.color, background: ev.bg }}>{ev.label}</span>
                   </div>
                   {p.description && <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">{p.description}</p>}
                   <p className="text-[10px] text-[var(--text-secondary)] mt-1">
@@ -383,6 +376,7 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
 // ── Bourses ───────────────────────────────────────────────────────────────────
 
 function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: Etudiant[] }) {
+  const { t } = useLocale()
   const [bourses, setBourses] = useState<{ id: string; etudiant_id: string; montant: number; libelle: string; created_at: string }[]>([])
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
@@ -406,9 +400,9 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <KpiCard label="Total bourses accordées" value={fmt(total) + ' FCFA'} color="#7C3AED" />
+        <KpiCard label={t('ecole.direction.kpi.totalBourses')} value={fmt(total) + ' FCFA'} color="#7C3AED" />
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#7C3AED', color: '#fff' }}>
-          <Plus size={13} /> Accorder une bourse
+          <Plus size={13} /> {t('ecole.direction.newBourse')}
         </button>
       </div>
 
@@ -417,34 +411,34 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#7C3AED]/30 p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Étudiant *</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.student')} *</label>
                 <select value={form.etudiant_id} onChange={e => setForm(p => ({ ...p, etudiant_id: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
-                  <option value="">— Choisir —</option>
+                  <option value="">— {t('common.choose')} —</option>
                   {etudiants.map(e => <option key={e.id} value={e.id}>{e.prenom} {e.nom} ({e.numero_id})</option>)}
                 </select>
               </div>
-              <FI label="Montant (FCFA) *" value={form.montant} onChange={v => setForm(p => ({ ...p, montant: v }))} type="number" />
+              <FI label={t('ecole.direction.bourse.montant')} value={form.montant} onChange={v => setForm(p => ({ ...p, montant: v }))} type="number" />
               <div className="col-span-2">
-                <FI label="Libellé *" value={form.libelle} onChange={v => setForm(p => ({ ...p, libelle: v }))} placeholder="Bourse d'excellence, Aide sociale…" />
+                <FI label={t('common.label')} value={form.libelle} onChange={v => setForm(p => ({ ...p, libelle: v }))} placeholder={t('ecole.direction.bourse.libellePlaceholder')} />
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={add} disabled={saving || !form.etudiant_id || !form.montant || !form.libelle} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#7C3AED', color: '#fff' }}>
-                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Accorder
+                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} {t('ecole.direction.newBourse')}
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {bourses.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune bourse accordée.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">{t('ecole.direction.noBourse')}</div>
       ) : (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr style={{ background: '#FFFFFF' }}>{['Étudiant', 'Libellé', 'Montant', 'Date'].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+              <thead><tr style={{ background: '#FFFFFF' }}>{[t('common.student'), t('common.label'), t('common.amount'), t('common.date')].map(h => <th key={h} className="text-left px-4 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
               <tbody>
                 {bourses.map(b => {
                   const etu = etudiants.find(e => e.id === b.etudiant_id)
@@ -476,6 +470,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
 // ── Partenaires ───────────────────────────────────────────────────────────────
 
 function SectionPartenaires({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [partenaires, setPartenaires] = useState<{ id: string; nom: string; type: string; contact: string | null; description: string | null; created_at: string }[]>([])
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
@@ -503,34 +498,34 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
     <div className="space-y-4">
       <div className="flex justify-end">
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#ff7000', color: '#fff' }}>
-          <Plus size={13} /> Ajouter un partenaire
+          <Plus size={13} /> {t('ecole.direction.newPartner')}
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
             <div className="grid grid-cols-2 gap-3">
-              <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
+              <FI label={t('common.nameField')} value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.type')}</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
-                  {['entreprise', 'ong', 'gouvernement', 'universite', 'autre'].map(t => <option key={t} value={t} className="capitalize">{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                  {['entreprise', 'ong', 'gouvernement', 'universite', 'autre'].map(item => <option key={item} value={item} className="capitalize">{item.charAt(0).toUpperCase() + item.slice(1)}</option>)}
                 </select>
               </div>
-              <FI label="Contact" value={form.contact} onChange={v => setForm(p => ({ ...p, contact: v }))} placeholder="Téléphone ou email" />
-              <FI label="Description" value={form.description} onChange={v => setForm(p => ({ ...p, description: v }))} placeholder="Type de partenariat…" />
+              <FI label={t('common.contact')} value={form.contact} onChange={v => setForm(p => ({ ...p, contact: v }))} placeholder={t('ecole.direction.partner.contactPlaceholder')} />
+              <FI label={t('common.description')} value={form.description} onChange={v => setForm(p => ({ ...p, description: v }))} placeholder={t('ecole.direction.partner.descPlaceholder')} />
             </div>
             <div className="flex gap-2">
               <button onClick={add} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#ff7000', color: '#fff' }}>
-                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
+                {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} {t('common.save')}
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
       {partenaires.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun partenaire enregistré.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">{t('ecole.direction.noPartner')}</div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {partenaires.map(p => (
@@ -555,6 +550,7 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
 // ── Communication ─────────────────────────────────────────────────────────────
 
 function SectionCommunication({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [annonces, setAnnonces] = useState<{ id: string; titre: string; message: string; cible: string; created_at: string }[]>([])
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
@@ -582,37 +578,37 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
     <div className="space-y-4">
       <div className="flex justify-end">
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#7C3AED', color: '#fff' }}>
-          <Megaphone size={13} /> Nouvelle annonce
+          <Megaphone size={13} /> {t('ecole.direction.sendMessage')}
         </button>
       </div>
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#7C3AED]/30 p-4 space-y-3" style={{ background: 'rgba(236,72,153,0.04)' }}>
             <div className="space-y-3">
-              <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
+              <FI label={t('common.titleField')} value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Destinataires</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('ecole.direction.comm.destinataires')}</label>
                 <select value={form.cible} onChange={e => setForm(p => ({ ...p, cible: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none">
                   {['tous', 'etudiants', 'parents', 'enseignants'].map(c => <option key={c} value={c} className="capitalize">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Message *</label>
-                <textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} rows={3} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none resize-none" placeholder="Rédigez votre annonce…" />
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.message')} *</label>
+                <textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} rows={3} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none resize-none" placeholder={t('ecole.direction.comm.messagePlaceholder')} />
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={add} disabled={saving || !form.titre || !form.message} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#7C3AED', color: '#fff' }}>
-                {saving ? <Loader2 className="animate-spin" size={12} /> : <Megaphone size={12} />} Publier
+                {saving ? <Loader2 className="animate-spin" size={12} /> : <Megaphone size={12} />} {t('ecole.direction.comm.publier')}
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {annonces.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune annonce publiée.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">{t('ecole.direction.comm.noAnnonce')}</div>
       ) : (
         <div className="space-y-3">
           {annonces.map(a => (
@@ -641,6 +637,19 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
 export default function DirectionPage() {
   useRoleGuard(['DIRECTION_GENERALE'])
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
+
+  const SUB_TABS = [
+    { id: 'vue'          as SubTab, label: t('ecole.direction.tab.vue'),           icon: TrendingUp  },
+    { id: 'finances'     as SubTab, label: t('ecole.direction.tab.finances'),      icon: DollarSign  },
+    { id: 'evenements'   as SubTab, label: t('ecole.direction.tab.evenements'),    icon: Calendar    },
+    { id: 'bourses'      as SubTab, label: t('ecole.direction.tab.bourses'),       icon: Award       },
+    { id: 'partenaires'  as SubTab, label: t('ecole.direction.tab.partenaires'),   icon: Handshake   },
+    { id: 'communication'as SubTab, label: t('ecole.direction.tab.communication'), icon: Megaphone   },
+    { id: 'diplomes'     as SubTab, label: t('ecole.direction.tab.diplomes'),      icon: GraduationCap },
+    { id: 'soutenances'  as SubTab, label: t('ecole.direction.tab.soutenances'),   icon: Swords      },
+  ]
+
   const [subTab,     setSubTab]     = useState<SubTab>('vue')
   const [etudiants,  setEtudiants]  = useState<Etudiant[]>([])
   const [enseignants,setEnseignants]= useState<Enseignant[]>([])
@@ -668,7 +677,7 @@ export default function DirectionPage() {
 
   if (tenantLoading || loading) return (
     <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-      <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+      <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
     </div>
   )
 
@@ -676,20 +685,20 @@ export default function DirectionPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Direction Générale</h1>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.direction.title')}</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole}</p>
         </div>
         <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><RefreshCw size={14} /></button>
       </div>
 
       <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl p-1 w-fit flex-wrap">
-        {SUB_TABS.map(t => {
-          const Icon = t.icon
+        {SUB_TABS.map(tab_ => {
+          const Icon = tab_.icon
           return (
-            <button key={t.id} onClick={() => setSubTab(t.id)}
+            <button key={tab_.id} onClick={() => setSubTab(tab_.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#00b9a7' : 'transparent', color: subTab === t.id ? '#fff' : 'var(--text-secondary)' }}>
-              <Icon size={12} /> {t.label}
+              style={{ background: subTab === tab_.id ? '#00b9a7' : 'transparent', color: subTab === tab_.id ? '#fff' : 'var(--text-secondary)' }}>
+              <Icon size={12} /> {tab_.label}
             </button>
           )
         })}

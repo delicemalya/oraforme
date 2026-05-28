@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -14,6 +14,7 @@ import {
   type Enseignant, type ClasseEcole, type Exam, type ExamGrade,
   TYPES_EXAM, fmt, Avatar, FI, KpiCard,
 } from '../_lib/shared'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -75,7 +76,7 @@ function Badge({ statut }: { statut: string }) {
 // ── Toast ─────────────────────────────────────────────────────────────────────
 
 function Toast({ msg, onClose }: { msg: string; onClose: () => void }) {
-  useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t) }, [onClose])
+  useEffect(() => { const timer = setTimeout(onClose, 3000); return () => clearTimeout(timer) }, [onClose])
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"
@@ -89,6 +90,7 @@ function Toast({ msg, onClose }: { msg: string; onClose: () => void }) {
 
 export default function EspaceFormateurPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [tab,         setTab]        = useState<Tab>('dashboard')
   const [enseignant,  setEnseignant] = useState<Enseignant | null>(null)
   const [classes,     setClasses]    = useState<ClasseEcole[]>([])
@@ -174,7 +176,7 @@ export default function EspaceFormateurPage() {
   if (tenantLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-        <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+        <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
       </div>
     )
   }
@@ -210,14 +212,14 @@ export default function EspaceFormateurPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-xl border border-[var(--border)]" style={{ background: '#FFFFFF' }}>
-        {TABS.map(t => {
-          const Icon = t.icon
-          const active = tab === t.id
+        {TABS.map(tab_ => {
+          const Icon = tab_.icon
+          const active = tab === tab_.id
           return (
-            <button key={t.id} onClick={() => setTab(t.id)}
+            <button key={tab_.id} onClick={() => setTab(tab_.id)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? 'text-white shadow' : 'text-[var(--text-secondary)] hover:text-[#101729]'}`}
               style={active ? { background: '#00b9a7' } : {}}>
-              <Icon size={12} />{t.label}
+              <Icon size={12} />{tab_.label}
             </button>
           )
         })}
@@ -309,6 +311,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
   tenantId: string; enseignant: Enseignant; cours: CoursNumerique[]
   onRefresh: () => void; showToast: (m: string) => void
 }) {
+  const { t } = useLocale()
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [form, setForm] = useState({ titre: '', description: '', matiere: enseignant.matiere ?? '', niveau: '', statut: 'brouillon' as 'brouillon' | 'publie' })
@@ -374,7 +377,7 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
                 className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] resize-none" placeholder="Contenu, objectifs, plan…" />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)] hover:border-[#00b9a7]/40">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)] hover:border-[#00b9a7]/40">{t('common.cancel')}</button>
               <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#00b9a7', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
@@ -417,6 +420,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
   tenantId: string; enseignant: Enseignant; devoirs: Devoir[]
   classes: ClasseEcole[]; onRefresh: () => void; showToast: (m: string) => void
 }) {
+  const { t } = useLocale()
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [form, setForm] = useState({ titre: '', description: '', matiere: enseignant.matiere ?? '', classe: '', date_remise: '' })
@@ -481,7 +485,7 @@ function TabDevoirs({ tenantId, enseignant, devoirs, classes, onRefresh, showToa
                 className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] resize-none" placeholder="Instructions détaillées…" />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] hover:text-[#101729] border border-[var(--border)]">{t('common.cancel')}</button>
               <button onClick={save} disabled={saving || !form.titre.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#DC2626', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
@@ -524,6 +528,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
   tenantId: string; enseignant: Enseignant; exams: Exam[]
   classes: ClasseEcole[]; onRefresh: () => void; showToast: (m: string) => void
 }) {
+  const { t } = useLocale()
   const [showForm,   setShowForm]  = useState(false)
   const [saving,     setSaving]    = useState(false)
   const [selectedEx, setSelectedEx]= useState<Exam | null>(null)
@@ -554,11 +559,11 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
         ? supabase.from('etudiants').select('id, nom, prenom, classe').eq('tenant_id', tenantId).eq('classe', classes.find(c => c.id === classeId)?.nom ?? '')
         : supabase.from('etudiants').select('id, nom, prenom, classe').eq('tenant_id', tenantId).limit(100),
     ])
-    const grades = (g ?? []) as ExamGrade[]
+    const gradesList = (g ?? []) as ExamGrade[]
     const etudiantsData = (e ?? []) as { id: string; nom: string; prenom: string; classe: string | null }[]
     setEtudiants(etudiantsData)
     const enriched = etudiantsData.map(etu => {
-      const gr = grades.find(g => g.etudiant_id === etu.id)
+      const gr = gradesList.find(g => g.etudiant_id === etu.id)
       return gr ? { ...gr, nom: etu.nom, prenom: etu.prenom } : { id: '', exam_id: exam.id, etudiant_id: etu.id, note: null, absent: false, commentaire: null, created_at: '', nom: etu.nom, prenom: etu.prenom }
     })
     setGrades(enriched)
@@ -585,7 +590,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
         </button>
         <div className="rounded-xl border border-[#00b9a7]/30 p-4" style={{ background: 'rgba(0,185,167,0.06)' }}>
           <p className="text-sm font-bold text-[#101729]">{selectedEx.nom}</p>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{TYPES_EXAM.find(t => t.value === selectedEx.type_exam)?.label} · /{ selectedEx.note_max} pts · Coeff. {selectedEx.coefficient}</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{TYPES_EXAM.find(item => item.value === selectedEx.type_exam)?.label} · /{ selectedEx.note_max} pts · Coeff. {selectedEx.coefficient}</p>
         </div>
         {loadingG ? (
           <div className="flex justify-center py-8"><Loader2 className="animate-spin text-[var(--text-secondary)]" size={18} /></div>
@@ -634,7 +639,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
                 <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Type</label>
                 <select value={form.type_exam} onChange={e => setForm(p => ({ ...p, type_exam: e.target.value as Exam['type_exam'] }))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]">
-                  {TYPES_EXAM.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  {TYPES_EXAM.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
                 </select>
               </div>
             </div>
@@ -652,7 +657,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             </div>
             <FI label="Date de l'examen" value={form.date_exam} onChange={v => setForm(p => ({ ...p, date_exam: v }))} type="date" />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
               <button onClick={save} disabled={saving || !form.nom.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#00b9a7', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Créer
               </button>
@@ -673,7 +678,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-[#101729] truncate">{ex.nom}</p>
-              <p className="text-[10px] text-[var(--text-secondary)]">{TYPES_EXAM.find(t => t.value === ex.type_exam)?.label} · /{ ex.note_max} pts · Coeff. {ex.coefficient}</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">{TYPES_EXAM.find(item => item.value === ex.type_exam)?.label} · /{ ex.note_max} pts · Coeff. {ex.coefficient}</p>
             </div>
             <ChevronRight size={14} className="text-[var(--text-secondary)] group-hover:text-[#00b9a7] transition-colors" />
           </motion.div>
@@ -689,6 +694,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
   tenantId: string; enseignant: Enseignant; heures: TeacherHour[]
   onRefresh: () => void; showToast: (m: string) => void
 }) {
+  const { t } = useLocale()
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [form, setForm] = useState({
@@ -765,7 +771,7 @@ function TabHeures({ tenantId, enseignant, heures, onRefresh, showToast }: {
               <FI label="Description" value={form.description} onChange={v => setForm(p => ({ ...p, description: v }))} />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-3 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
               <button onClick={save} disabled={saving || !form.heures || !form.date_declaration} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40" style={{ background: '#0F172A', color: '#fff' }}>
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Déclarer
               </button>

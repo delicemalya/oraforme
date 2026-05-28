@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { writeComptaEntry, modeToAccount } from '@/lib/compta-sync-client'
 import { type Enseignant, type StatutEnseignant, STATUT_ENS, fmt, Avatar, FI, KpiCard } from '../_lib/shared'
@@ -18,15 +19,7 @@ import { ProfilDrawer, type ProfilPerson, type EmployeFull, type StaffFull } fro
 
 type SubTab = 'employes' | 'enseignants' | 'staff' | 'conges' | 'paie' | 'recrutement' | 'heures'
 
-const SUB_TABS = [
-  { id: 'employes'     as SubTab, label: 'Employés',          icon: UserPlus   },
-  { id: 'enseignants'  as SubTab, label: 'Enseignants',       icon: Users2     },
-  { id: 'staff'        as SubTab, label: 'Staff',             icon: AlertCircle},
-  { id: 'conges'       as SubTab, label: 'Congés',            icon: CalendarOff},
-  { id: 'paie'         as SubTab, label: 'Paie',              icon: DollarSign },
-  { id: 'heures'       as SubTab, label: 'Heures Formateurs', icon: Clock      },
-  { id: 'recrutement'  as SubTab, label: 'Recrutement',       icon: FileText   },
-]
+// SUB_TABS built inside RhPage component (uses t())
 
 // ── Employés (dossier RH complet) ────────────────────────────────────────────
 
@@ -40,6 +33,7 @@ type Employe = {
 }
 
 function SectionEmployes({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [employes,   setEmployes]   = useState<Employe[]>([])
   const [loading,    setLoading]    = useState(false)
   const [search,     setSearch]     = useState('')
@@ -61,10 +55,10 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
   })
 
   const kpis = [
-    { label: 'Total',       value: employes.length,                                              color: '#DC2626' },
-    { label: 'Actifs',      value: employes.filter(e => e.statut === 'actif').length,            color: '#0F172A' },
-    { label: 'Formateurs',  value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#7C3AED' },
-    { label: 'Temporaires', value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#DC2626' },
+    { label: t('ecole.rh.kpi.total'),    value: employes.length,                                              color: '#DC2626' },
+    { label: t('ecole.rh.kpi.actifs'),   value: employes.filter(e => e.statut === 'actif').length,            color: '#0F172A' },
+    { label: 'Formateurs',               value: employes.filter(e => e.type_employe === 'formateur').length,  color: '#7C3AED' },
+    { label: 'Temporaires',              value: employes.filter(e => e.type_employe === 'temporaire').length, color: '#DC2626' },
   ]
 
   return (
@@ -2041,6 +2035,18 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
 export default function RhPage() {
   useRoleGuard(['DIRECTION_GENERALE', 'RAF', 'RH_PAIE'])
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
+
+  const SUB_TABS = [
+    { id: 'employes'     as SubTab, label: t('ecole.rh.tab.liste'),     icon: UserPlus    },
+    { id: 'enseignants'  as SubTab, label: t('ecole.tab.matieres'),     icon: Users2      },
+    { id: 'staff'        as SubTab, label: 'Staff',                     icon: AlertCircle },
+    { id: 'conges'       as SubTab, label: t('ecole.rh.kpi.conges'),    icon: CalendarOff },
+    { id: 'paie'         as SubTab, label: t('ecole.rh.tab.paie'),      icon: DollarSign  },
+    { id: 'heures'       as SubTab, label: t('ecole.formateur.tab.planning'), icon: Clock },
+    { id: 'recrutement'  as SubTab, label: t('ecole.rh.tab.contrats'),  icon: FileText    },
+  ]
+
   const [subTab,     setSubTab]     = useState<SubTab>('employes')
   const [enseignants,setEnseignants]= useState<Enseignant[]>([])
   const [loading,    setLoading]    = useState(true)
@@ -2062,7 +2068,7 @@ export default function RhPage() {
 
   if (tenantLoading || loading) return (
     <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-      <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+      <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
     </div>
   )
 
@@ -2070,20 +2076,20 @@ export default function RhPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">RH & Paie</h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {enseignants.length} enseignant(s)</p>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.rh.title')}</h1>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {enseignants.length} {t('ecole.rh.subtitle')}</p>
         </div>
         <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><RefreshCw size={14} /></button>
       </div>
 
       <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-fit flex-wrap">
-        {SUB_TABS.map(t => {
-          const Icon = t.icon
+        {SUB_TABS.map(tab_ => {
+          const Icon = tab_.icon
           return (
-            <button key={t.id} onClick={() => setSubTab(t.id)}
+            <button key={tab_.id} onClick={() => setSubTab(tab_.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: subTab === t.id ? '#7C3AED' : 'transparent', color: subTab === t.id ? '#fff' : 'rgba(255,255,255,0.5)' }}>
-              <Icon size={12} /> {t.label}
+              style={{ background: subTab === tab_.id ? '#7C3AED' : 'transparent', color: subTab === tab_.id ? '#fff' : 'rgba(255,255,255,0.5)' }}>
+              <Icon size={12} /> {tab_.label}
             </button>
           )
         })}

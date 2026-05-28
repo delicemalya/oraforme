@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -15,6 +15,7 @@ import {
   NIVEAUX, PERIODES, fmt, generateCode, calcMoyenne, getMention, MENTIONS,
   StatutBadge, Avatar, KpiCard,
 } from '../_lib/shared'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 const STORAGE_KEY = 'oraforme_student_numero_id'
 
@@ -47,6 +48,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
   onToggleBlock?: () => void
   isAdmin: boolean
 }) {
+  const { t } = useLocale()
   const [activeTab, setActiveTab] = useState<'notes' | 'paiements' | 'absences' | 'alertes'>('notes')
 
   const totalPaye      = paiements.filter(p => p.statut === 'paye').reduce((s, p) => s + p.montant, 0)
@@ -73,13 +75,13 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
             <button onClick={onToggleBlock} disabled={blocking}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
               style={etudiant.statut === 'suspendu' ? { background: '#0F172A', color: '#fff' } : { background: '#DC2626', color: '#fff' }}>
-              {blocking ? <Loader2 size={12} className="animate-spin" /> : etudiant.statut === 'suspendu' ? <><Unlock size={12} /> Débloquer</> : <><Lock size={12} /> Suspendre</>}
+              {blocking ? <Loader2 size={12} className="animate-spin" /> : etudiant.statut === 'suspendu' ? <><Unlock size={12} /> {t('ecole.etu.unlock')}</> : <><Lock size={12} /> {t('ecole.etu.suspend')}</>}
             </button>
           )}
         </div>
         {isAdmin && etudiant.statut === 'suspendu' && etudiant.code_deblocage && (
           <div className="mt-3 pt-3 border-t border-[var(--border)]">
-            <p className="text-[10px] text-[var(--text-secondary)]">Code de déblocage : <span className="font-mono font-bold text-[#DC2626]">{etudiant.code_deblocage}</span></p>
+            <p className="text-[10px] text-[var(--text-secondary)]">{t('ecole.etu.code')} : <span className="font-mono font-bold text-[#DC2626]">{etudiant.code_deblocage}</span></p>
           </div>
         )}
       </div>
@@ -89,7 +91,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         <div className="rounded-xl border border-[#DC2626]/30 p-4 flex items-start gap-3" style={{ background: 'rgba(248,81,73,0.06)' }}>
           <AlertCircle size={16} className="text-[#DC2626] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-[#DC2626]">Accès suspendu</p>
+            <p className="text-sm font-bold text-[#DC2626]">{t('ecole.etu.blocked')}</p>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">Un solde impayé a été détecté. Régularisez votre situation auprès de l&apos;administration.</p>
           </div>
         </div>
@@ -97,27 +99,27 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
 
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
-        <KpiCard label="Total payé"       value={`${fmt(totalPaye)} FCFA`}              color="#0F172A" />
-        <KpiCard label="Moyenne générale" value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#64748B'} sub={mention?.label} />
-        <KpiCard label="Absences"         value={totalAbs}                               color="#DC2626" sub={`${justifiedAbs} justifiées`} />
-        <KpiCard label="Alertes"          value={nbAlerts}                               color="#DC2626" sub="non lues" />
+        <KpiCard label={t('ecole.etu.kpi.paye')}     value={`${fmt(totalPaye)} FCFA`}              color="#0F172A" />
+        <KpiCard label={t('ecole.etu.kpi.moyenne')}  value={moyenneGlobale !== null ? `${moyenneGlobale.toFixed(2)}/20` : '—'} color={mention?.color ?? '#64748B'} sub={mention?.label} />
+        <KpiCard label={t('ecole.etu.kpi.absences')} value={totalAbs}                               color="#DC2626" sub={`${justifiedAbs} justifiées`} />
+        <KpiCard label={t('ecole.etu.kpi.alerts')}   value={nbAlerts}                               color="#DC2626" sub="non lues" />
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1 w-fit">
         {[
-          { id: 'notes'     as const, label: 'Mes notes',    icon: BookOpen,      count: notes.length },
-          { id: 'paiements' as const, label: 'Paiements',    icon: CreditCard,    count: paiements.length },
-          { id: 'absences'  as const, label: 'Absences',     icon: ClipboardList, count: totalAbs },
-          { id: 'alertes'   as const, label: 'Notifications',icon: Bell,          count: nbAlerts },
-        ].map(t => {
-          const Icon = t.icon
+          { id: 'notes'     as const, label: t('ecole.etu.tab.notes'),     icon: BookOpen,      count: notes.length },
+          { id: 'paiements' as const, label: t('ecole.etu.tab.paiements'), icon: CreditCard,    count: paiements.length },
+          { id: 'absences'  as const, label: t('ecole.etu.tab.absences'),  icon: ClipboardList, count: totalAbs },
+          { id: 'alertes'   as const, label: t('ecole.etu.tab.alertes'),   icon: Bell,          count: nbAlerts },
+        ].map(tab_ => {
+          const Icon = tab_.icon
           return (
-            <button key={t.id} onClick={() => setActiveTab(t.id)}
+            <button key={tab_.id} onClick={() => setActiveTab(tab_.id)}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
-              style={{ background: activeTab === t.id ? '#00b9a7' : 'transparent', color: activeTab === t.id ? '#fff' : 'var(--text-secondary)' }}>
-              <Icon size={12} />{t.label}
-              {t.count > 0 && activeTab !== t.id && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] bg-gray-100 text-[var(--text-secondary)]">{t.count}</span>}
+              style={{ background: activeTab === tab_.id ? '#00b9a7' : 'transparent', color: activeTab === tab_.id ? '#fff' : 'var(--text-secondary)' }}>
+              <Icon size={12} />{tab_.label}
+              {tab_.count > 0 && activeTab !== tab_.id && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] bg-gray-100 text-[var(--text-secondary)]">{tab_.count}</span>}
             </button>
           )
         })}
@@ -127,7 +129,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {activeTab === 'notes' && (
         <div className="space-y-4">
           {notes.length === 0 ? (
-            <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune note enregistrée.</div>
+            <div className="text-center py-10 text-[var(--text-secondary)] text-xs">{t('ecole.etu.noNotes')}</div>
           ) : PERIODES.map(p => {
             const pNotes = notes.filter(n => n.periode === p.value)
             if (pNotes.length === 0) return null
@@ -174,7 +176,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {/* Paiements */}
       {activeTab === 'paiements' && (
         paiements.length === 0 ? (
-          <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucun paiement enregistré.</div>
+          <div className="text-center py-10 text-[var(--text-secondary)] text-xs">{t('ecole.etu.noPaiements')}</div>
         ) : (
           <div className="rounded-xl border border-[var(--border)] overflow-hidden">
             <table className="w-full text-xs">
@@ -202,7 +204,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
       {/* Absences */}
       {activeTab === 'absences' && (
         absences.length === 0 ? (
-          <div className="text-center py-10 text-[var(--text-secondary)] text-xs">Aucune absence enregistrée.</div>
+          <div className="text-center py-10 text-[var(--text-secondary)] text-xs">{t('ecole.etu.noAbsences')}</div>
         ) : (
           <div className="rounded-xl border border-[var(--border)] overflow-hidden">
             <table className="w-full text-xs">
@@ -231,7 +233,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
         notifs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-[var(--text-secondary)]">
             <CheckCircle size={28} className="mb-2 opacity-30" />
-            <p className="text-xs">Aucune notification</p>
+            <p className="text-xs">{t('ecole.etu.noAlerts')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -258,6 +260,7 @@ function DossierEtudiant({ etudiant, notes, paiements, absences, notifs, loading
 
 export default function EspaceEtudiantPage() {
   useRoleGuard(['ETUDIANT'])
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [ecoleRole,   setEcoleRole]   = useState<string | null>(null)
   const [selected,    setSelected]    = useState<Etudiant | null>(null)
@@ -388,7 +391,7 @@ export default function EspaceEtudiantPage() {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-[var(--text-secondary)] gap-3">
         <Loader2 className="animate-spin" size={24} />
-        <p className="text-sm">{autoLoading ? 'Chargement de votre dossier…' : 'Chargement…'}</p>
+        <p className="text-sm">{t('common.loading')}</p>
       </div>
     )
   }
@@ -401,8 +404,8 @@ export default function EspaceEtudiantPage() {
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-[#101729]">Mon Dossier</h1>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">Résultats, paiements, absences</p>
+              <h1 className="text-xl font-bold text-[#101729]">{t('ecole.etu.title')}</h1>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">{t('ecole.etu.subtitle')}</p>
             </div>
             <button onClick={() => { setSelected(null); localStorage.removeItem(STORAGE_KEY) }} className="px-3 py-2 rounded-lg text-xs border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729]">
               Changer de compte
@@ -416,8 +419,8 @@ export default function EspaceEtudiantPage() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Espace Étudiant</h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">Accédez à votre dossier scolaire</p>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.etu.title')}</h1>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{t('ecole.etu.subtitle')}</p>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -425,12 +428,12 @@ export default function EspaceEtudiantPage() {
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: '#0F172A' }}>
             <User size={28} className="text-white" />
           </div>
-          <h2 className="text-lg font-bold text-[#101729] mb-1">Accès à mon dossier</h2>
+          <h2 className="text-lg font-bold text-[#101729] mb-1">{t('ecole.etu.access')}</h2>
           <p className="text-xs text-[var(--text-secondary)] mb-6 max-w-sm">Entrez votre numéro étudiant (visible sur votre carte ou attestation d&apos;inscription)</p>
           <div className="flex gap-2 w-full max-w-sm">
             <input
               className="flex-1 px-4 py-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-sm text-[#101729] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#00b9a7] text-center font-mono tracking-widest"
-              placeholder="Ex : ETU-2024-001"
+              placeholder={t('ecole.etu.searchPlh')}
               value={studentId}
               onChange={e => { setStudentId(e.target.value); setIdError(null) }}
               onKeyDown={e => e.key === 'Enter' && lookupByNumeroId()}
@@ -456,7 +459,7 @@ export default function EspaceEtudiantPage() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Espace Étudiant</h1>
+          <h1 className="text-xl font-bold text-[#101729]">{t('ecole.etu.title')}</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">Administration · Dossier élève</p>
         </div>
         <button onClick={() => { setSelected(null); setAdminResults([]) }} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[#101729]">
@@ -470,8 +473,8 @@ export default function EspaceEtudiantPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-[#101729]">Espace Étudiant</h1>
-        <p className="text-xs text-[var(--text-secondary)] mt-0.5">Accédez au dossier complet d&apos;un étudiant — résultats, paiements, absences</p>
+        <h1 className="text-xl font-bold text-[#101729]">{t('ecole.etu.title')}</h1>
+        <p className="text-xs text-[var(--text-secondary)] mt-0.5">{t('ecole.etu.subtitle')}</p>
       </div>
 
       <div className="rounded-xl border border-[#0F172A]/20 p-4 space-y-3" style={{ background: 'rgba(0,185,167,0.04)' }}>
@@ -480,7 +483,7 @@ export default function EspaceEtudiantPage() {
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
               className="w-full pl-9 pr-4 py-2.5 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-sm text-[#101729] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#00b9a7]"
-              placeholder="N° étudiant, nom, prénom…"
+              placeholder={t('ecole.etu.searchPlh')}
               value={adminSearch}
               onChange={e => setAdminSearch(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && adminSearchStudents()}
@@ -516,7 +519,7 @@ export default function EspaceEtudiantPage() {
       {!adminSearching && adminResults.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-[var(--text-secondary)]">
           <GraduationCap size={40} className="mb-4 opacity-20" />
-          <p className="text-sm">Recherchez un étudiant par nom ou numéro</p>
+          <p className="text-sm">{t('ecole.etu.noStudent')}</p>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
@@ -15,25 +15,27 @@ import {
   SectionMatieres, SectionSessions, SectionExamens,
   SectionAttestations, SectionDiplomes, SectionSoutenances,
 } from '../_lib/academic-sections'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type TabId = 'matieres' | 'sessions' | 'examens' | 'attestations' | 'diplomes' | 'soutenances'
-
-const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: 'matieres',     label: 'Matières',        icon: BookOpenCheck },
-  { id: 'sessions',     label: 'Sessions',         icon: BookOpen      },
-  { id: 'examens',      label: 'Examens & Notes', icon: Layers        },
-  { id: 'attestations', label: 'Attestations',     icon: FileText      },
-  { id: 'diplomes',     label: 'Diplômes',         icon: GraduationCap },
-  { id: 'soutenances',  label: 'Soutenances',      icon: Swords        },
-]
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DaacPage() {
   useRoleGuard(['DIRECTION_GENERALE', 'DAAC'])
   const { tenantId } = useTenant()
+  const { t } = useLocale()
+
+  const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+    { id: 'matieres',     label: t('ecole.tab.matieres'),     icon: BookOpenCheck },
+    { id: 'sessions',     label: t('ecole.tab.sessions'),     icon: BookOpen      },
+    { id: 'examens',      label: t('ecole.tab.examens'),      icon: Layers        },
+    { id: 'attestations', label: t('ecole.tab.attestations'), icon: FileText      },
+    { id: 'diplomes',     label: t('ecole.tab.diplomes'),     icon: GraduationCap },
+    { id: 'soutenances',  label: t('ecole.tab.soutenances'),  icon: Swords        },
+  ]
 
   const [tab,          setTab]          = useState<TabId>('sessions')
   const [etudiants,    setEtudiants]    = useState<Etudiant[]>([])
@@ -80,9 +82,9 @@ export default function DaacPage() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-xl font-bold text-[var(--text)]">DAAC — Direction des Affaires Académiques</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">{t('ecole.daac.title')}</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-            Programmes, sessions, examens, délibérations, diplômes & soutenances
+            {t('ecole.daac.subtitle')}
           </p>
         </motion.div>
 
@@ -90,24 +92,24 @@ export default function DaacPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
           className="grid grid-cols-2 lg:grid-cols-4 gap-3"
         >
-          <KpiCard label="Étudiants actifs"    value={actifs}         color="#DC2626" />
-          <KpiCard label="Sessions en cours"   value={sessionEnCours} color="#DC2626" />
-          <KpiCard label="Diplômes en attente" value={dipEnAttente}   color="#7C3AED" />
-          <KpiCard label="Soutenances planif." value={souPlanifie}    color="#0F172A" />
+          <KpiCard label={t('ecole.daac.kpi.actifs')}      value={actifs}         color="#DC2626" />
+          <KpiCard label={t('ecole.daac.kpi.sessions')}    value={sessionEnCours} color="#DC2626" />
+          <KpiCard label={t('ecole.daac.kpi.diplomes')}    value={dipEnAttente}   color="#7C3AED" />
+          <KpiCard label={t('ecole.daac.kpi.soutenances')} value={souPlanifie}    color="#0F172A" />
         </motion.div>
 
         {/* Tabs */}
         <div className="flex gap-1 p-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-x-auto">
-          {TABS.map(t => (
+          {TABS.map(tab_ => (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tab_.id}
+              onClick={() => setTab(tab_.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
-                tab === t.id ? 'bg-[#00b9a7] text-white' : 'text-[var(--text-secondary)] hover:text-[#101729]'
+                tab === tab_.id ? 'bg-[#00b9a7] text-white' : 'text-[var(--text-secondary)] hover:text-[#101729]'
               }`}
             >
-              <t.icon size={12} />
-              {t.label}
+              <tab_.icon size={12} />
+              {tab_.label}
             </button>
           ))}
         </div>
