@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   ArrowRightLeft, Plus, Check, X, Clock, Loader2,
   ChevronLeft, Search, Filter, Building2,
@@ -39,8 +40,8 @@ function fmtFCFA(n: number) {
   return new Intl.NumberFormat('fr-CG', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(n)
 }
 
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+function fmtDate(d: string, intlLocale = 'fr-FR') {
+  return new Date(d).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 const STATUT_BADGE: Record<string, { label: string; cls: string }> = {
@@ -53,6 +54,8 @@ const STATUT_BADGE: Record<string, { label: string; cls: string }> = {
 
 export default function VirementsPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [virements, setVirements]       = useState<Virement[]>([])
   const [comptes, setComptes]           = useState<CompteBancaire[]>([])
   const [loading, setLoading]           = useState(true)
@@ -114,7 +117,7 @@ export default function VirementsPage() {
   }
 
   const handleExecute = async (id: string) => {
-    if (!confirm('Exécuter ce virement ?')) return
+    if (!confirm(t('treso.virements.confirmValid'))) return
     const { error: err } = await supabase.from('virements')
       .update({ statut: 'execute', date_execution: new Date().toISOString() })
       .eq('id', id).eq('tenant_id', tenantId)
@@ -162,16 +165,16 @@ export default function VirementsPage() {
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Virements</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>{t('treso.virements.title')}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-            Ordres de virement bancaire
+            {t('treso.virements.subtitle')}
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-white font-medium text-sm transition-opacity hover:opacity-90"
           style={{ background: 'var(--primary)' }}>
-          <Plus className="w-4 h-4" /> Nouveau virement
+          <Plus className="w-4 h-4" /> {t('treso.virements.new')}
         </button>
       </div>
 
@@ -207,7 +210,7 @@ export default function VirementsPage() {
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
           <input
-            type="text" placeholder="Rechercher…" value={search} onChange={e => setSearch(e.target.value)}
+            type="text" placeholder={t('treso.virements.searchPlh')} value={search} onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 rounded-xl text-sm border outline-none"
             style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
           />
@@ -216,10 +219,10 @@ export default function VirementsPage() {
           value={filterStatut} onChange={e => setFilterStatut(e.target.value)}
           className="px-3 py-2 rounded-xl text-sm border outline-none"
           style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-          <option value="all">Tous statuts</option>
-          <option value="en_attente">En attente</option>
-          <option value="execute">Exécuté</option>
-          <option value="rejete">Rejeté</option>
+          <option value="all">{t('treso.virements.filterAll')}</option>
+          <option value="en_attente">{t('treso.virements.stat.pending')}</option>
+          <option value="execute">{t('treso.virements.stat.valide')}</option>
+          <option value="rejete">{t('treso.virements.stat.rejete')}</option>
         </select>
       </div>
 
@@ -228,12 +231,12 @@ export default function VirementsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr style={{ background: 'var(--bg)' }}>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>Date</th>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>Libellé</th>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>Référence</th>
-              <th className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--text-secondary)' }}>Montant</th>
-              <th className="px-4 py-3 text-center font-semibold" style={{ color: 'var(--text-secondary)' }}>Statut</th>
-              <th className="px-4 py-3 text-center font-semibold" style={{ color: 'var(--text-secondary)' }}>Actions</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>{t('treso.virements.colDate')}</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>{t('treso.virements.colBenef')}</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>{t('treso.virements.colRef')}</th>
+              <th className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--text-secondary)' }}>{t('treso.virements.colMontant')}</th>
+              <th className="px-4 py-3 text-center font-semibold" style={{ color: 'var(--text-secondary)' }}>{t('treso.virements.colStatut')}</th>
+              <th className="px-4 py-3 text-center font-semibold" style={{ color: 'var(--text-secondary)' }}>{t('treso.virements.colActions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -241,7 +244,7 @@ export default function VirementsPage() {
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center" style={{ color: 'var(--text-secondary)' }}>
                   <ArrowRightLeft className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  Aucun virement
+                  {t('treso.virements.empty')}
                 </td>
               </tr>
             )}
@@ -251,7 +254,7 @@ export default function VirementsPage() {
                 <tr key={v.id}
                   className="border-t transition-colors hover:bg-gray-50"
                   style={{ borderColor: 'var(--border)', background: i % 2 === 0 ? 'var(--surface)' : 'transparent' }}>
-                  <td className="px-4 py-3" style={{ color: 'var(--text)' }}>{fmtDate(v.date_virement)}</td>
+                  <td className="px-4 py-3" style={{ color: 'var(--text)' }}>{fmtDate(v.date_virement, intlLocale)}</td>
                   <td className="px-4 py-3 font-medium" style={{ color: 'var(--text)' }}>{v.libelle}</td>
                   <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>{v.reference || '—'}</td>
                   <td className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--text)' }}>{fmtFCFA(v.montant)}</td>
@@ -270,13 +273,13 @@ export default function VirementsPage() {
                           onClick={() => handleExecute(v.id)}
                           className="px-3 py-1 rounded-lg text-xs font-medium text-white transition-opacity hover:opacity-80"
                           style={{ background: 'var(--success)' }}>
-                          Exécuter
+                          {t('common.validate')}
                         </button>
                         <button
                           onClick={() => handleReject(v.id)}
                           className="px-3 py-1 rounded-lg text-xs font-medium transition-opacity hover:opacity-80"
                           style={{ background: 'var(--danger)', color: 'white' }}>
-                          Rejeter
+                          {t('common.reject')}
                         </button>
                       </div>
                     )}
@@ -296,7 +299,7 @@ export default function VirementsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)' }}>
           <div className="w-full max-w-lg rounded-2xl shadow-2xl" style={{ background: 'var(--surface)' }}>
             <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--border)' }}>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>Nouveau virement</h2>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>{t('treso.virements.modalTitle')}</h2>
               <button onClick={() => setShowForm(false)} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
                 <X className="w-4 h-4" />
               </button>
@@ -365,13 +368,13 @@ export default function VirementsPage() {
                 <button type="button" onClick={() => setShowForm(false)}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors hover:bg-gray-50"
                   style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium text-white flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50"
                   style={{ background: 'var(--primary)' }}>
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Créer le virement
+                  {t('treso.virements.new')}
                 </button>
               </div>
             </form>

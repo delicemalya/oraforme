@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   DollarSign, Package, TrendingUp, TrendingDown,
@@ -40,8 +41,9 @@ interface CategoryValuation {
 const METHODE_OPTIONS = ['CMP', 'FIFO', 'LIFO', 'PMP']
 
 export default function ValorisationPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [products, setProducts] = useState<ProductValuation[]>([])
   const [categories, setCategories] = useState<CategoryValuation[]>([])
@@ -154,9 +156,9 @@ export default function ValorisationPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <DollarSign size={20} className="text-[#16A34A]" />
-            Valorisation du Stock
+            {t('stock.valorisation.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">CMP, FIFO — valeur du stock, marges et rotation</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.valorisation.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <select value={methode} onChange={e => setMethode(e.target.value)}
@@ -165,7 +167,7 @@ export default function ValorisationPage() {
           </select>
           <button onClick={load}
             className="flex items-center gap-1.5 border border-[#E2E8F0] text-[#374151] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC]">
-            <RefreshCw size={13} /> Recalculer
+            <RefreshCw size={13} /> {t('common.refresh')}
           </button>
         </div>
       </div>
@@ -173,10 +175,10 @@ export default function ValorisationPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Valeur stock total', value: fmtFCFA(totalValeur), icon: DollarSign, color: '#16A34A', bg: '#F0FDF4', sub: `${methode}` },
-          { label: 'Marge brute potentielle', value: fmtFCFA(totalMarge), icon: TrendingUp, color: '#2563EB', bg: '#EFF6FF', sub: `Moy. ${avgMarge.toFixed(1)}%` },
-          { label: 'Ruptures de stock', value: nbRuptures, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2', sub: 'produits à 0' },
-          { label: 'Produits valorisés', value: products.length, icon: Package, color: '#D97706', bg: '#FFFBEB', sub: `${categories.length} catégories` },
+          { label: t('stock.valorisation.totalValue'), value: fmtFCFA(totalValeur), icon: DollarSign, color: '#16A34A', bg: '#F0FDF4', sub: `${methode}` },
+          { label: t('stock.valorisation.colValeur'), value: fmtFCFA(totalMarge), icon: TrendingUp, color: '#2563EB', bg: '#EFF6FF', sub: `Moy. ${avgMarge.toFixed(1)}%` },
+          { label: t('stock.alertes.critical'), value: nbRuptures, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2', sub: 'produits à 0' },
+          { label: t('stock.valorisation.colArticle'), value: products.length, icon: Package, color: '#D97706', bg: '#FFFBEB', sub: `${categories.length} catégories` },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -225,7 +227,7 @@ export default function ValorisationPage() {
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher un produit…"
+            placeholder={t('stock.valorisation.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
         </div>
         <select value={categorieFilter} onChange={e => setCategorieFilter(e.target.value)}
@@ -238,28 +240,28 @@ export default function ValorisationPage() {
       {/* Product table */}
       <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Calcul en cours…</div>
+          <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Produit</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Catégorie</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Stock</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.valorisation.colArticle')}</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.page.colCat')}</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.valorisation.colQty')}</th>
                   <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">
-                    CMP/{methode}
+                    {t('stock.valorisation.colPuMoyen')}/{methode}
                   </th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Prix vente</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Valeur stock</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.page.colPrix')}</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.valorisation.colValeur')}</th>
                   <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Marge</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Rotation</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Statut</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.valorisation.colRotation')}</th>
+                  <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.page.colStatut')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-12 text-sm text-[#64748B]">Aucun produit trouvé</td></tr>
+                  <tr><td colSpan={9} className="text-center py-12 text-sm text-[#64748B]">{t('stock.valorisation.empty')}</td></tr>
                 ) : filtered.map(p => (
                   <tr key={p.id} className="border-b border-[#F8FAFC] hover:bg-[#FAFAFA]">
                     <td className="px-4 py-3">

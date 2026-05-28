@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   Smartphone, Plus, Check, X, Loader2, ChevronLeft,
   ArrowUpCircle, ArrowDownCircle, TrendingUp, Eye,
@@ -38,8 +39,8 @@ interface WalletOp {
 function fmtFCFA(n: number) {
   return new Intl.NumberFormat('fr-CG', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(n)
 }
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+function fmtDate(d: string, intlLocale = 'fr-FR') {
+  return new Date(d).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 const OPERATEUR_COLORS: Record<string, string> = {
@@ -52,6 +53,8 @@ const OPERATEUR_COLORS: Record<string, string> = {
 
 export default function WalletsPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [wallets, setWallets]         = useState<Wallet[]>([])
   const [ops, setOps]                 = useState<WalletOp[]>([])
   const [selectedWallet, setSelected] = useState<string | null>(null)
@@ -153,16 +156,16 @@ export default function WalletsPage() {
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Mobile Money</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>{t('treso.wallets.title')}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-            Wallets Airtel, MTN, Orange…
+            {t('treso.wallets.subtitle')}
           </p>
         </div>
         <button
           onClick={() => setShowAddW(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-white font-medium text-sm transition-opacity hover:opacity-90"
           style={{ background: 'var(--primary)' }}>
-          <Plus className="w-4 h-4" /> Ajouter wallet
+          <Plus className="w-4 h-4" /> {t('treso.wallets.newWallet')}
         </button>
       </div>
 
@@ -183,7 +186,7 @@ export default function WalletsPage() {
           {wallets.length === 0 && (
             <div className="rounded-2xl border p-8 text-center" style={{ borderColor: 'var(--border)' }}>
               <Smartphone className="w-10 h-10 mx-auto mb-3 opacity-20" />
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Aucun wallet configuré</p>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('treso.wallets.empty')}</p>
             </div>
           )}
           {wallets.map(w => {
@@ -270,7 +273,7 @@ export default function WalletsPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>{op.libelle}</p>
                         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          {fmtDate(op.date_operation)}
+                          {fmtDate(op.date_operation, intlLocale)}
                           {op.frais > 0 && ` · Frais: ${fmtFCFA(op.frais)}`}
                         </p>
                       </div>
@@ -291,7 +294,7 @@ export default function WalletsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)' }}>
           <div className="w-full max-w-md rounded-2xl shadow-2xl" style={{ background: 'var(--surface)' }}>
             <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--border)' }}>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>Nouveau wallet Mobile Money</h2>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>{t('treso.wallets.newWallet')}</h2>
               <button onClick={() => setShowAddW(false)} className="p-2 rounded-xl hover:bg-gray-100"><X className="w-4 h-4" /></button>
             </div>
             <form onSubmit={handleAddWallet} className="p-6 space-y-4">
@@ -336,7 +339,7 @@ export default function WalletsPage() {
                 <button type="button" onClick={() => setShowAddW(false)}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium border"
                   style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium text-white flex items-center justify-center gap-2 disabled:opacity-50"
@@ -409,7 +412,7 @@ export default function WalletsPage() {
                 <button type="button" onClick={() => setShowAddOp(false)}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium border"
                   style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium text-white flex items-center justify-center gap-2 disabled:opacity-50"

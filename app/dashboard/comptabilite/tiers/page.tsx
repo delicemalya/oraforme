@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
 import { Users, Plus, Search, Download, ChevronDown, ChevronRight, X, Save, TrendingUp, TrendingDown } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Tier {
   id: string; tenant_id: string; type: 'client' | 'fournisseur' | 'partenaire'
@@ -47,6 +48,7 @@ const TYPE_DEFAULT_ACCOUNT: Record<string, string> = {
 
 export default function TiersPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [tiers, setTiers]         = useState<Tier[]>([])
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]     = useState(true)
@@ -156,7 +158,7 @@ export default function TiersPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Tiers…
+      {t('common.loading')}
     </div>
   )
 
@@ -168,9 +170,9 @@ export default function TiersPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Users size={22} className="text-[#2563EB]" />
-            Comptes Tiers
+            {t('compta.tiers.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Clients, fournisseurs & partenaires · OHADA</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('compta.tiers.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
@@ -179,11 +181,11 @@ export default function TiersPage() {
           </select>
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-[12px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
-            <Download size={13} /> CSV
+            <Download size={13} /> {t('common.export')} CSV
           </button>
           <button onClick={() => { setForm(EMPTY_FORM); setEditId(null); setModal(true) }}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold hover:bg-[#1D4ED8]">
-            <Plus size={13} /> Nouveau tiers
+            <Plus size={13} /> {t('compta.tiers.addTiers')}
           </button>
         </div>
       </div>
@@ -208,23 +210,29 @@ export default function TiersPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="flex gap-1">
-          {TYPES.map(t => (
-            <button key={t.id}
-              onClick={() => setFilterType(t.id)}
+          {TYPES.map(typ => {
+            const typeLabel = typ.id === 'all' ? t('compta.tiers.allTypes')
+              : typ.id === 'client' ? t('compta.tiers.clients')
+              : typ.id === 'fournisseur' ? t('compta.tiers.fournisseurs')
+              : typ.label
+            return (
+            <button key={typ.id}
+              onClick={() => setFilterType(typ.id)}
               className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition-all ${
-                filterType === t.id
+                filterType === typ.id
                   ? 'text-white border-transparent'
                   : 'bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]'
               }`}
-              style={filterType === t.id ? { background: t.color } : {}}>
-              {t.label}
+              style={filterType === typ.id ? { background: typ.color } : {}}>
+              {typeLabel}
             </button>
-          ))}
+            )
+          })}
         </div>
         <div className="relative flex-1">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher par nom, code, NIF…"
+            placeholder={t('compta.tiers.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-[12px] border border-[#E2E8F0] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
         </div>
       </div>
@@ -233,7 +241,7 @@ export default function TiersPage() {
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-20 text-center">
           <Users size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[13px] text-[#94A3B8]">Aucun tiers trouvé</p>
+          <p className="text-[13px] text-[#94A3B8]">{t('compta.tiers.empty')}</p>
           <button onClick={() => { setForm(EMPTY_FORM); setEditId(null); setModal(true) }}
             className="mt-3 px-4 py-2 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold">
             + Créer un tiers
@@ -435,11 +443,11 @@ export default function TiersPage() {
             <div className="px-6 pb-5 flex justify-end gap-2">
               <button onClick={() => { setModal(false); setForm(EMPTY_FORM); setEditId(null) }}
                 className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={save} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

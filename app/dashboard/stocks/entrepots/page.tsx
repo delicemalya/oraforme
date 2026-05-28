@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Warehouse, Plus, Edit2, Trash2, X, Save, Search,
@@ -41,8 +42,9 @@ const EMPTY_FORM = {
 }
 
 export default function EntrepotsPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [entrepots, setEntrepots] = useState<Entrepot[]>([])
   const [loading, setLoading] = useState(true)
@@ -190,23 +192,23 @@ export default function EntrepotsPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Warehouse size={20} className="text-[#16A34A]" />
-            Entrepôts & Sites de Stockage
+            {t('stock.entrepots.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Gestion multi-entrepôts et suivi par site</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.entrepots.subtitle')}</p>
         </div>
         <button onClick={openCreate}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouvel entrepôt
+          <Plus size={14} /> {t('stock.entrepots.new')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total entrepôts', value: entrepots.length, icon: Warehouse, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Entrepôts actifs', value: actifs.length, icon: Building2, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Valeur totale', value: fmtFCFA(totalValeur), icon: TrendingUp, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Transferts possibles', value: actifs.length >= 2 ? 'Oui' : 'Non', icon: ArrowLeftRight, color: actifs.length >= 2 ? '#16A34A' : '#DC2626', bg: '#F8FAFC' },
+          { label: t('stock.entrepots.title'), value: entrepots.length, icon: Warehouse, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.entrepots.colNom'), value: actifs.length, icon: Building2, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.entrepots.colValeur'), value: fmtFCFA(totalValeur), icon: TrendingUp, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.transferts.title'), value: actifs.length >= 2 ? 'Oui' : 'Non', icon: ArrowLeftRight, color: actifs.length >= 2 ? '#16A34A' : '#DC2626', bg: '#F8FAFC' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -225,22 +227,22 @@ export default function EntrepotsPage() {
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher un entrepôt…"
+            placeholder={t('stock.entrepots.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
         </div>
       </div>
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-[#64748B] text-sm">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-[#64748B] text-sm">{t('common.loading')}</div>
       ) : entrepots.length === 0 ? (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
           <Warehouse size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-          <p className="text-sm font-semibold text-[#0F172A]">Aucun entrepôt configuré</p>
+          <p className="text-sm font-semibold text-[#0F172A]">{t('stock.entrepots.empty')}</p>
           <p className="text-xs text-[#64748B] mt-1">Créez votre premier entrepôt pour commencer le suivi multi-sites</p>
           <button onClick={openCreate}
             className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-            Créer un entrepôt
+            {t('stock.entrepots.new')}
           </button>
         </div>
       ) : (

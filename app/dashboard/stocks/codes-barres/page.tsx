@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   QrCode, Search, Printer, RefreshCw,
   Grid3X3, List, Tag, X, CheckCircle2
@@ -21,6 +22,7 @@ interface Product {
 
 export default function CodesBarresPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -120,9 +122,9 @@ export default function CodesBarresPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <QrCode size={20} className="text-[#16A34A]" />
-            Codes-barres & QR Codes
+            {t('stock.codesbarre.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Génération, impression et gestion des codes produits</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.codesbarre.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setViewMode(m => m === 'list' ? 'grid' : 'list')}
@@ -133,20 +135,20 @@ export default function CodesBarresPage() {
           <button onClick={() => generateAll(filtered)} disabled={generating}
             className="flex items-center gap-1.5 border border-[#E2E8F0] text-[#374151] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC] disabled:opacity-50">
             <RefreshCw size={13} className={generating ? 'animate-spin' : ''} />
-            {generating ? 'Génération…' : 'Régénérer QR'}
+            {generating ? t('common.loading') : t('stock.codesbarre.generate')}
           </button>
           <button onClick={handlePrint}
             className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] shadow-sm">
-            <Printer size={13} /> Imprimer ({selected.size})
+            <Printer size={13} /> {t('stock.codesbarre.print')} ({selected.size})
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Produits actifs', value: products.length, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Avec code-barres', value: products.filter(p => p.code_barre).length, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Sans code-barres', value: products.filter(p => !p.code_barre).length, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.page.addProduct'), value: products.length, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.codesbarre.generate'), value: products.filter(p => p.code_barre).length, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.codesbarre.printAll'), value: products.filter(p => !p.code_barre).length, color: '#D97706', bg: '#FFFBEB' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -163,7 +165,7 @@ export default function CodesBarresPage() {
       <div className="bg-white border border-[#E2E8F0] rounded-2xl p-3 flex gap-3 items-center">
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher par nom, SKU, code-barres…"
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('stock.codesbarre.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
         </div>
         <label className="flex items-center gap-2 text-xs text-[#374151] cursor-pointer whitespace-nowrap">
@@ -174,7 +176,7 @@ export default function CodesBarresPage() {
       </div>
 
       {loading ? (
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : viewMode === 'list' ? (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
@@ -191,7 +193,7 @@ export default function CodesBarresPage() {
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-12 text-sm text-[#64748B]">Aucun produit</td></tr>
+                  <tr><td colSpan={6} className="text-center py-12 text-sm text-[#64748B]">{t('stock.codesbarre.empty')}</td></tr>
                 ) : filtered.map(p => (
                   <tr key={p.id} className={`border-b border-[#F8FAFC] hover:bg-[#FAFAFA] ${selected.has(p.id) ? 'bg-[#F0FDF4]' : ''}`}>
                     <td className="px-4 py-3">

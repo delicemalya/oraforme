@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { Scale, Plus, X, Search, Edit2, Trash2, AlertTriangle } from 'lucide-react'
 
 interface UnitConversion {
@@ -37,6 +38,7 @@ const emptyForm = { unite_source: '', unite_cible: '', facteur: '', categorie: '
 
 export default function MultiUnitesPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [conversions, setConversions] = useState<UnitConversion[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -133,9 +135,9 @@ export default function MultiUnitesPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Scale size={20} className="text-[#16A34A]" />
-            Multi-unités & Conversions
+            {t('stock.multiunites.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Définissez les règles de conversion entre unités de mesure</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.multiunites.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={importExemples}
@@ -144,7 +146,7 @@ export default function MultiUnitesPage() {
           </button>
           <button onClick={openCreate}
             className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] shadow-sm">
-            <Plus size={14} /> Nouvelle conversion
+            <Plus size={14} /> {t('stock.multiunites.new')}
           </button>
         </div>
       </div>
@@ -168,17 +170,17 @@ export default function MultiUnitesPage() {
           <div className="bg-white border border-[#E2E8F0] rounded-2xl p-3">
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher une unité…"
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('stock.multiunites.title')}
                 className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
             </div>
           </div>
 
           {loading ? (
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl flex items-center justify-center py-16 text-sm text-[#64748B]">Chargement…</div>
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl flex items-center justify-center py-16 text-sm text-[#64748B]">{t('common.loading')}</div>
           ) : filtered.length === 0 ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl flex flex-col items-center justify-center py-16 gap-3">
               <Scale size={32} className="text-[#E2E8F0]" />
-              <p className="text-sm text-[#64748B]">Aucune conversion définie</p>
+              <p className="text-sm text-[#64748B]">{t('stock.multiunites.empty')}</p>
               <button onClick={importExemples} className="text-xs text-[#16A34A] underline">Importer les conversions standards</button>
             </div>
           ) : Object.entries(grouped).map(([cat, group]) => (
@@ -259,7 +261,7 @@ export default function MultiUnitesPage() {
             <div className="flex items-center justify-between p-5 border-b border-[#F1F5F9]">
               <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
                 <Scale size={15} className="text-[#16A34A]" />
-                {editItem ? 'Modifier la conversion' : 'Nouvelle conversion'}
+                {editItem ? t('stock.multiunites.title') : t('stock.multiunites.new')}
               </h2>
               <button onClick={() => setShowModal(false)}><X size={18} className="text-[#94A3B8]" /></button>
             </div>

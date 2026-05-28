@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Users2, Plus, Edit2, Trash2, X, Save, Search,
@@ -52,8 +53,9 @@ const EMPTY_FORM = {
 const CONDITIONS = ['Comptant', '7 jours', '15 jours', '30 jours', '45 jours', '60 jours', '90 jours', 'Sur commande']
 
 export default function FournisseursPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [fournisseurs, setFournisseurs] = useState<Fournisseur[]>([])
   const [loading, setLoading] = useState(true)
@@ -205,23 +207,23 @@ export default function FournisseursPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Users2 size={20} className="text-[#16A34A]" />
-            Fournisseurs
+            {t('stock.fournisseurs.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Base de données fournisseurs et conditions</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.fournisseurs.subtitle')}</p>
         </div>
         <button onClick={openCreate}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouveau fournisseur
+          <Plus size={14} /> {t('stock.fournisseurs.new')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total fournisseurs', value: fournisseurs.length, icon: Users2, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Fournisseurs actifs', value: actifs, icon: Building2, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Total achats', value: fmtFCFA(totalAchats), icon: TrendingUp, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Commandes totales', value: fournisseurs.reduce((s, f) => s + (f.nb_commandes || 0), 0), icon: FileText, color: '#7C3AED', bg: '#F5F3FF' },
+          { label: t('stock.fournisseurs.title'), value: fournisseurs.length, icon: Users2, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.fournisseurs.colNom'), value: actifs, icon: Building2, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.page.colValeur'), value: fmtFCFA(totalAchats), icon: TrendingUp, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.mouvements.title'), value: fournisseurs.reduce((s, f) => s + (f.nb_commandes || 0), 0), icon: FileText, color: '#7C3AED', bg: '#F5F3FF' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -240,23 +242,23 @@ export default function FournisseursPage() {
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher un fournisseur…"
+            placeholder={t('stock.fournisseurs.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
         </div>
       </div>
 
       {/* Table */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
           {filtered.length === 0 ? (
             <div className="p-12 text-center">
               <Users2 size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucun fournisseur trouvé</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('stock.fournisseurs.empty')}</p>
               <button onClick={openCreate}
                 className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-                Ajouter un fournisseur
+                {t('stock.fournisseurs.new')}
               </button>
             </div>
           ) : (
@@ -264,12 +266,12 @@ export default function FournisseursPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Fournisseur</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Contact</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Localisation</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Conditions</th>
-                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Commandes</th>
-                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Total achats</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.fournisseurs.colNom')}</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.fournisseurs.colContact')}</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.entrepots.colAdresse')}</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.fournisseurs.colDelai')}</th>
+                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.mouvements.title')}</th>
+                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.page.colValeur')}</th>
                     <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Note</th>
                     <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Actions</th>
                   </tr>
@@ -348,7 +350,7 @@ export default function FournisseursPage() {
           <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
               <h2 className="text-sm font-bold text-[#0F172A]">
-                {editTarget ? 'Modifier le fournisseur' : 'Nouveau fournisseur'}
+                {editTarget ? t('stock.fournisseurs.modalTitle') : t('stock.fournisseurs.new')}
               </h2>
               <button onClick={() => setShowModal(false)}><X size={16} className="text-[#94A3B8]" /></button>
             </div>

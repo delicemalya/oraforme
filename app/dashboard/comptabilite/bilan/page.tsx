@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
 import { getActifAccounts, getPassifAccounts, OHADA_ACCOUNTS } from '@/lib/accounting-engine'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { TrendingUp, TrendingDown, Download, FileText, BarChart2 } from 'lucide-react'
 
 interface Movement { date_operation: string; debit_account: string; credit_account: string; montant: number }
@@ -19,6 +20,7 @@ const YEARS = [2024, 2025, 2026, 2027]
 
 export default function BilanPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]     = useState(true)
   const [year, setYear]           = useState(new Date().getFullYear())
@@ -170,7 +172,7 @@ export default function BilanPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement états financiers…
+      {t('common.loading')}
     </div>
   )
 
@@ -182,9 +184,9 @@ export default function BilanPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <TrendingUp size={22} className="text-[#2563EB]" />
-            Bilan & Compte de Résultat
+            {t('compta.bilan.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">États financiers OHADA · Exercice {year}</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('compta.bilan.subtitle')} · {year}</p>
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
@@ -201,16 +203,16 @@ export default function BilanPage() {
       {/* Tabs */}
       <div className="flex rounded-xl border border-[#E2E8F0] overflow-hidden bg-white">
         {[
-          { id: 'bilan',    label: 'Bilan',              icon: BarChart2  },
-          { id: 'resultat', label: 'Compte de Résultat', icon: FileText   },
-          { id: 'sig',      label: 'SIG',                icon: TrendingUp },
-        ].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id as typeof tab)}
+          { id: 'bilan',    label: t('compta.rapports.bilan'),  icon: BarChart2  },
+          { id: 'resultat', label: t('compta.rapports.cr'),      icon: FileText   },
+          { id: 'sig',      label: 'SIG',                        icon: TrendingUp },
+        ].map(tab_ => (
+          <button key={tab_.id} onClick={() => setTab(tab_.id as typeof tab)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-semibold transition-all ${
-              tab === t.id ? 'bg-[#2563EB] text-white' : 'text-[#64748B] hover:bg-[#F8FAFC]'
+              tab === tab_.id ? 'bg-[#2563EB] text-white' : 'text-[#64748B] hover:bg-[#F8FAFC]'
             }`}>
-            <t.icon size={13} />
-            {t.label}
+            <tab_.icon size={13} />
+            {tab_.label}
           </button>
         ))}
       </div>
@@ -222,7 +224,7 @@ export default function BilanPage() {
           {/* ACTIF */}
           <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
             <div className="bg-[#2563EB] text-white px-4 py-3">
-              <p className="text-[13px] font-extrabold">ACTIF</p>
+              <p className="text-[13px] font-extrabold">{t('compta.bilan.actif')}</p>
               <p className="text-[20px] font-extrabold mt-0.5">{fmtFCFA(totalActif)}</p>
             </div>
             {actifGroups.map(g => (
@@ -248,7 +250,7 @@ export default function BilanPage() {
               </div>
             ))}
             <div className="flex justify-between px-4 py-3 bg-[#2563EB] text-white">
-              <span className="font-bold">TOTAL ACTIF</span>
+              <span className="font-bold">{t('compta.bilan.totalActif')}</span>
               <span className="font-extrabold text-[15px]">{fmtFCFA(totalActif)}</span>
             </div>
           </div>
@@ -256,7 +258,7 @@ export default function BilanPage() {
           {/* PASSIF */}
           <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
             <div className="bg-[#16A34A] text-white px-4 py-3">
-              <p className="text-[13px] font-extrabold">PASSIF & CAPITAUX PROPRES</p>
+              <p className="text-[13px] font-extrabold">{t('compta.bilan.passif')}</p>
               <p className="text-[20px] font-extrabold mt-0.5">{fmtFCFA(totalPassif)}</p>
             </div>
             {passifGroups.map(g => (
@@ -282,7 +284,7 @@ export default function BilanPage() {
               </div>
             ))}
             <div className="flex justify-between px-4 py-3 bg-[#16A34A] text-white">
-              <span className="font-bold">TOTAL PASSIF</span>
+              <span className="font-bold">{t('compta.bilan.totalPassif')}</span>
               <span className="font-extrabold text-[15px]">{fmtFCFA(totalPassif)}</span>
             </div>
           </div>

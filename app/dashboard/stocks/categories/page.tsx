@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Grid3X3, Plus, Edit2, Trash2, X, Save, Search,
@@ -49,8 +50,9 @@ const EMPTY_FORM = {
 }
 
 export default function CategoriesPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -213,24 +215,24 @@ export default function CategoriesPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Grid3X3 size={20} className="text-[#16A34A]" />
-            Catégories de Produits
+            {t('stock.categories.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Organisation hiérarchique du catalogue</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.categories.subtitle')}</p>
         </div>
         <button onClick={openCreate}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
           <Plus size={14} />
-          Nouvelle catégorie
+          {t('stock.categories.new')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Catégories', value: categories.length, icon: Grid3X3, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Produits classés', value: totalProduits, icon: Package, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Valeur totale', value: fmtFCFA(totalValeur), icon: TrendingUp, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Produits faibles', value: totalFaibles, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
+          { label: t('stock.categories.title'), value: categories.length, icon: Grid3X3, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.categories.colNom'), value: totalProduits, icon: Package, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.categories.colValeur'), value: fmtFCFA(totalValeur), icon: TrendingUp, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.alertes.low'), value: totalFaibles, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -251,7 +253,7 @@ export default function CategoriesPage() {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher une catégorie…"
+            placeholder={t('stock.categories.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20"
           />
         </div>
@@ -259,15 +261,15 @@ export default function CategoriesPage() {
 
       {/* Category Grid */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-[#64748B] text-sm">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-[#64748B] text-sm">{t('common.loading')}</div>
       ) : categories.length === 0 ? (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
           <Grid3X3 size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-          <p className="text-sm font-semibold text-[#0F172A]">Aucune catégorie</p>
+          <p className="text-sm font-semibold text-[#0F172A]">{t('stock.categories.empty')}</p>
           <p className="text-xs text-[#64748B] mt-1">Créez votre première catégorie pour organiser votre catalogue</p>
           <button onClick={openCreate}
             className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-            Créer une catégorie
+            {t('stock.categories.new')}
           </button>
         </div>
       ) : (
@@ -393,7 +395,7 @@ export default function CategoriesPage() {
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
               <h2 className="text-sm font-bold text-[#0F172A]">
-                {editTarget ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
+                {editTarget ? t('stock.categories.modalTitle') : t('stock.categories.new')}
               </h2>
               <button onClick={() => setShowModal(false)} className="text-[#94A3B8] hover:text-[#0F172A]">
                 <X size={16} />
@@ -409,7 +411,7 @@ export default function CategoriesPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">Nom *</label>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('stock.categories.formNom')} *</label>
                   <input
                     value={form.nom}
                     onChange={e => setForm(f => ({
@@ -434,7 +436,7 @@ export default function CategoriesPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-[#374151] mb-1">Description</label>
+                <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('stock.categories.formDesc')}</label>
                 <textarea
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
@@ -553,9 +555,9 @@ export default function CategoriesPage() {
             <div className="w-12 h-12 bg-[#FEF2F2] rounded-full flex items-center justify-center mx-auto mb-3">
               <Trash2 size={20} className="text-[#DC2626]" />
             </div>
-            <h3 className="text-sm font-bold text-[#0F172A] mb-1">Supprimer la catégorie</h3>
+            <h3 className="text-sm font-bold text-[#0F172A] mb-1">{t('stock.categories.deleteConfirm')}</h3>
             <p className="text-xs text-[#64748B] mb-4">
-              Supprimer <strong>{deleteTarget.nom}</strong> ? Cette action est irréversible.
+              {t('stock.categories.deleteConfirm')} <strong>{deleteTarget.nom}</strong> ?
               {deleteTarget.nb_produits ? ` ${deleteTarget.nb_produits} produit(s) seront sans catégorie.` : ''}
             </p>
             <div className="flex gap-2">

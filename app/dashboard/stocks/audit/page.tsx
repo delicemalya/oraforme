@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Shield, Search, RefreshCw, Download,
@@ -30,6 +31,7 @@ const PER_PAGE = 50
 
 export default function AuditPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -109,9 +111,9 @@ export default function AuditPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Shield size={20} className="text-[#16A34A]" />
-            Audit & Traçabilité des Stocks
+            {t('stock.audit.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Journal complet de tous les mouvements et modifications de stocks</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.audit.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="flex items-center gap-1.5 border border-[#E2E8F0] text-[#374151] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC]">
@@ -119,17 +121,17 @@ export default function AuditPage() {
           </button>
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] shadow-sm">
-            <Download size={13} /> Exporter CSV
+            <Download size={13} /> {t('common.export')}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total mouvements', value: total, icon: Clock, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Entrées (page)', value: `${totalEntrees.toLocaleString()} u`, icon: ArrowUpCircle, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Sorties (page)', value: `${totalSorties.toLocaleString()} u`, icon: ArrowDownCircle, color: '#DC2626', bg: '#FEF2F2' },
-          { label: 'Ajustements (page)', value: totalAjustements, icon: AlertTriangle, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.audit.colDate'), value: total, icon: Clock, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.mouvements.type.entree'), value: `${totalEntrees.toLocaleString()} u`, icon: ArrowUpCircle, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.mouvements.type.sortie'), value: `${totalSorties.toLocaleString()} u`, icon: ArrowDownCircle, color: '#DC2626', bg: '#FEF2F2' },
+          { label: t('stock.mouvements.type.ajust'), value: totalAjustements, icon: AlertTriangle, color: '#D97706', bg: '#FFFBEB' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -147,12 +149,12 @@ export default function AuditPage() {
         <div className="flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher produit, référence, entrepôt…"
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('stock.audit.searchPlh')}
               className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
           </div>
           <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
             className="px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none">
-            <option value="">Tous types</option>
+            <option value="">{t('stock.audit.filterAll')}</option>
             {Object.entries(TYPE_CONFIG).map(([v,s]) => <option key={v} value={v}>{s.label}</option>)}
           </select>
           <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
@@ -178,19 +180,19 @@ export default function AuditPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Date & Heure</th>
-                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Type</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Produit</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Entrepôt</th>
-                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Quantité</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.audit.colDate')}</th>
+                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.audit.colType')}</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.audit.colArticle')}</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.entrepots.colNom')}</th>
+                    <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.audit.colQty')}</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Coût unit.</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Référence</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.audit.colRef')}</th>
                     <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B] hidden lg:table-cell">Notes</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.length === 0 ? (
-                    <tr><td colSpan={8} className="text-center py-12 text-sm text-[#64748B]">Aucun mouvement trouvé</td></tr>
+                    <tr><td colSpan={8} className="text-center py-12 text-sm text-[#64748B]">{t('stock.audit.empty')}</td></tr>
                   ) : filtered.map(l => {
                     const cfg = TYPE_CONFIG[l.type] || { color: '#64748B', bg: '#F8FAFC', label: l.type, icon: 'adj' as const }
                     const isIn = ['entree','reception'].includes(l.type)
@@ -237,15 +239,15 @@ export default function AuditPage() {
               </table>
             </div>
             <div className="flex items-center justify-between px-4 py-3 border-t border-[#F1F5F9]">
-              <span className="text-[11px] text-[#94A3B8]">{total} mouvements au total — Page {page+1}</span>
+              <span className="text-[11px] text-[#94A3B8]">{total} {t('stock.audit.title')} — Page {page+1}</span>
               <div className="flex items-center gap-2">
                 <button onClick={() => setPage(p => Math.max(0, p-1))} disabled={page === 0}
                   className="px-3 py-1.5 text-xs border border-[#E2E8F0] rounded-lg disabled:opacity-40 hover:bg-[#F8FAFC]">
-                  ← Précédent
+                  ← {t('common.prev')}
                 </button>
                 <button onClick={() => setPage(p => p+1)} disabled={(page+1)*PER_PAGE >= total}
                   className="px-3 py-1.5 text-xs border border-[#E2E8F0] rounded-lg disabled:opacity-40 hover:bg-[#F8FAFC]">
-                  Suivant →
+                  {t('common.next')} →
                 </button>
               </div>
             </div>

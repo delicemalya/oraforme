@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Shuffle, Plus, X, RefreshCw, Search,
@@ -34,6 +35,7 @@ const emptyForm = {
 
 export default function TransfertsPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [transferts, setTransferts] = useState<Transfert[]>([])
   const [warehouses, setWarehouses] = useState<WH[]>([])
   const [products, setProducts] = useState<Prod[]>([])
@@ -131,10 +133,10 @@ export default function TransfertsPage() {
     load()
   }
 
-  const filtered = transferts.filter(t => {
+  const filtered = transferts.filter(tr => {
     const q = search.toLowerCase()
-    const ms = !q || t.numero.toLowerCase().includes(q) || (t.product_nom||'').toLowerCase().includes(q) || (t.source_nom||'').toLowerCase().includes(q)
-    return ms && (!filtreStatut || t.statut === filtreStatut)
+    const ms = !q || tr.numero.toLowerCase().includes(q) || (tr.product_nom||'').toLowerCase().includes(q) || (tr.source_nom||'').toLowerCase().includes(q)
+    return ms && (!filtreStatut || tr.statut === filtreStatut)
   })
 
   const getStatut = (v: string) => STATUTS.find(s => s.value === v) || STATUTS[0]
@@ -145,9 +147,9 @@ export default function TransfertsPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Shuffle size={20} className="text-[#16A34A]" />
-            Transferts Inter-entrepôts
+            {t('stock.transferts.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Déplacements de stocks entre entrepôts avec traçabilité complète</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.transferts.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="flex items-center gap-1.5 border border-[#E2E8F0] text-[#374151] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC]">
@@ -155,17 +157,17 @@ export default function TransfertsPage() {
           </button>
           <button onClick={() => { setForm(emptyForm); setError(''); setShowModal(true) }}
             className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] shadow-sm">
-            <Plus size={14} /> Nouveau transfert
+            <Plus size={14} /> {t('stock.transferts.new')}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total transferts', value: transferts.length, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Ce mois', value: transferts.filter(t => t.created_at?.startsWith(new Date().toISOString().slice(0,7))).length, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Validés', value: transferts.filter(t => t.statut === 'validé').length, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'En attente', value: transferts.filter(t => t.statut === 'en_attente').length, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.transferts.title'), value: transferts.length, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.page.stat.ok'), value: transferts.filter(tr => tr.created_at?.startsWith(new Date().toISOString().slice(0,7))).length, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.transferts.colStatut'), value: transferts.filter(tr => tr.statut === 'validé').length, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.page.stat.low'), value: transferts.filter(tr => tr.statut === 'en_attente').length, color: '#D97706', bg: '#FFFBEB' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -182,59 +184,59 @@ export default function TransfertsPage() {
       <div className="bg-white border border-[#E2E8F0] rounded-2xl p-3 flex gap-3">
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un transfert…"
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('stock.transferts.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
         </div>
         <select value={filtreStatut} onChange={e => setFiltreStatut(e.target.value)}
           className="px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none">
-          <option value="">Tous statuts</option>
+          <option value="">{t('stock.mouvements.filterAll')}</option>
           {STATUTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
       </div>
 
       <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+          <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
-                  {['N°','Produit','Source','','Destination','Qté','Date','Statut','Actions'].map(h => (
+                  {[t('stock.audit.colRef'), t('stock.transferts.colArticle'), t('stock.transferts.colSource'), '', t('stock.transferts.colDest'), t('stock.transferts.colQty'), t('stock.transferts.colDate'), t('stock.transferts.colStatut'), 'Actions'].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-12 text-sm text-[#64748B]">Aucun transfert</td></tr>
-                ) : filtered.map(t => {
-                  const st = getStatut(t.statut)
+                  <tr><td colSpan={9} className="text-center py-12 text-sm text-[#64748B]">{t('stock.transferts.empty')}</td></tr>
+                ) : filtered.map(tr => {
+                  const st = getStatut(tr.statut)
                   return (
-                    <tr key={t.id} className="border-b border-[#F8FAFC] hover:bg-[#FAFAFA]">
-                      <td className="px-4 py-3"><span className="text-xs font-mono font-bold text-[#374151]">{t.numero}</span></td>
+                    <tr key={tr.id} className="border-b border-[#F8FAFC] hover:bg-[#FAFAFA]">
+                      <td className="px-4 py-3"><span className="text-xs font-mono font-bold text-[#374151]">{tr.numero}</span></td>
                       <td className="px-4 py-3">
-                        <p className="text-xs font-bold text-[#0F172A]">{t.product_nom}</p>
-                        <span className="text-[10px] font-mono text-[#94A3B8]">{t.product_sku}</span>
+                        <p className="text-xs font-bold text-[#0F172A]">{tr.product_nom}</p>
+                        <span className="text-[10px] font-mono text-[#94A3B8]">{tr.product_sku}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-1"><Warehouse size={11} className="text-[#DC2626]" /><span className="text-xs text-[#374151]">{t.source_nom}</span></div>
+                        <div className="flex items-center gap-1"><Warehouse size={11} className="text-[#DC2626]" /><span className="text-xs text-[#374151]">{tr.source_nom}</span></div>
                       </td>
                       <td className="px-4 py-3"><ChevronRight size={14} className="text-[#94A3B8]" /></td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-1"><Warehouse size={11} className="text-[#16A34A]" /><span className="text-xs text-[#374151]">{t.destination_nom}</span></div>
+                        <div className="flex items-center gap-1"><Warehouse size={11} className="text-[#16A34A]" /><span className="text-xs text-[#374151]">{tr.destination_nom}</span></div>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-xs font-bold text-[#0F172A]">{t.quantite?.toLocaleString()}</span>
-                        <span className="text-[10px] text-[#94A3B8] ml-1">{t.product_unite}</span>
+                        <span className="text-xs font-bold text-[#0F172A]">{tr.quantite?.toLocaleString()}</span>
+                        <span className="text-[10px] text-[#94A3B8] ml-1">{tr.product_unite}</span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#64748B]">{t.date_transfert ? new Date(t.date_transfert).toLocaleDateString('fr-FR') : '—'}</td>
+                      <td className="px-4 py-3 text-xs text-[#64748B]">{tr.date_transfert ? new Date(tr.date_transfert).toLocaleDateString('fr-FR') : '—'}</td>
                       <td className="px-4 py-3">
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: st.color, background: st.bg }}>{st.label}</span>
                       </td>
                       <td className="px-4 py-3">
-                        {t.statut === 'en_attente' && (
-                          <button onClick={() => handleAnnuler(t)} className="text-[11px] text-[#DC2626] hover:underline">Annuler</button>
+                        {tr.statut === 'en_attente' && (
+                          <button onClick={() => handleAnnuler(tr)} className="text-[11px] text-[#DC2626] hover:underline">Annuler</button>
                         )}
                       </td>
                     </tr>
@@ -251,7 +253,7 @@ export default function TransfertsPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
             <div className="flex items-center justify-between p-5 border-b border-[#F1F5F9]">
               <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
-                <Shuffle size={16} className="text-[#16A34A]" /> Nouveau transfert inter-entrepôt
+                <Shuffle size={16} className="text-[#16A34A]" /> {t('stock.transferts.new')}
               </h2>
               <button onClick={() => setShowModal(false)}><X size={18} className="text-[#94A3B8]" /></button>
             </div>

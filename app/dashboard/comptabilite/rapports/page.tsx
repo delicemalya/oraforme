@@ -11,6 +11,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
 import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
 import { FileText, Download, BarChart2, TrendingUp, Scale, Receipt, BookOpen, Printer } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Movement {
   id: string; date_operation: string; libelle: string
@@ -39,6 +40,7 @@ function computeSoldeRange(movements: Movement[], from: number, to: number): num
 
 export default function RapportsPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]     = useState(true)
   const [year, setYear]           = useState(new Date().getFullYear())
@@ -185,29 +187,29 @@ export default function RapportsPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Rapports…
+      {t('common.loading')}
     </div>
   )
 
   const REPORTS = [
     {
-      id: 'bilan',      icon: Scale,    label: 'Bilan Comptable',
-      desc: 'Actif / Passif OHADA', color: '#2563EB',
+      id: 'bilan',      icon: Scale,    label: t('compta.rapports.bilan'),
+      desc: t('compta.rapports.actif') + ' / ' + t('compta.rapports.passif'), color: '#2563EB',
       onExport: exportBilan,
       kpis: [
-        { label: 'Total Actif',  value: fmtFCFA(bilanData.total_actif) },
-        { label: 'Total Passif', value: fmtFCFA(bilanData.total_passif) },
+        { label: t('compta.rapports.actif'),  value: fmtFCFA(bilanData.total_actif) },
+        { label: t('compta.rapports.passif'), value: fmtFCFA(bilanData.total_passif) },
         { label: 'Équilibre',    value: Math.abs(bilanData.total_actif - bilanData.total_passif) < 1 ? '✓ OK' : '⚠ Écart' },
       ],
     },
     {
-      id: 'cr',         icon: TrendingUp, label: 'Compte de Résultat',
-      desc: 'Produits / Charges / Résultat net', color: '#16A34A',
+      id: 'cr',         icon: TrendingUp, label: t('compta.rapports.cr'),
+      desc: t('compta.rapports.produits') + ' / ' + t('compta.rapports.charges') + ' / ' + t('compta.rapports.resultat'), color: '#16A34A',
       onExport: exportCR,
       kpis: [
-        { label: 'Total Produits', value: fmtFCFA(crData.produits) },
-        { label: 'Total Charges',  value: fmtFCFA(crData.charges) },
-        { label: 'Résultat Net',   value: fmtFCFA(crData.resultat_net) },
+        { label: t('compta.rapports.produits'), value: fmtFCFA(crData.produits) },
+        { label: t('compta.rapports.charges'),  value: fmtFCFA(crData.charges) },
+        { label: t('compta.rapports.resultat'), value: fmtFCFA(crData.resultat_net) },
       ],
     },
     {
@@ -240,10 +242,10 @@ export default function RapportsPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <FileText size={22} className="text-[#2563EB]" />
-            Rapports Financiers
+            {t('compta.rapports.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            Export CSV · Bilan, CR, Balance, TVA · SYSCOHADA
+            {t('compta.rapports.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -290,7 +292,7 @@ export default function RapportsPage() {
                   <button onClick={r.onExport}
                     className="flex items-center gap-1 text-[11px] px-3 py-1.5 rounded-lg text-white font-semibold hover:opacity-90"
                     style={{ background: r.color }}>
-                    <Download size={11} /> CSV
+                    <Download size={11} /> {t('compta.rapports.exportXLS')}
                   </button>
                 </div>
               </div>

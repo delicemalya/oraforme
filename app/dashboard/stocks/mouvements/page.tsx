@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   ArrowLeftRight, ArrowUpCircle, ArrowDownCircle, RotateCcw,
@@ -39,8 +40,9 @@ const TYPE_CONFIG: Record<string, { label: string; icon: any; color: string; bg:
 const PAGE_SIZE = 30
 
 export default function MouvementsPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading] = useState(true)
@@ -137,23 +139,23 @@ export default function MouvementsPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <ArrowLeftRight size={20} className="text-[#16A34A]" />
-            Mouvements de Stock
+            {t('stock.mouvements.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Historique complet de toutes les transactions de stock</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.mouvements.subtitle')}</p>
         </div>
         <button onClick={exportCSV}
           className="flex items-center gap-1.5 border border-[#E2E8F0] text-[#374151] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC] transition-colors">
-          <Download size={13} /> Exporter CSV
+          <Download size={13} /> {t('common.export')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Entrées ce mois', value: stats.entrees.toLocaleString(), icon: TrendingUp, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Sorties ce mois', value: stats.sorties.toLocaleString(), icon: TrendingDown, color: '#DC2626', bg: '#FEF2F2' },
-          { label: 'Ajustements', value: stats.ajustements, icon: RefreshCw, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Valeur mouvements', value: fmtFCFA(stats.valeur_mouvement), icon: Package, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.mouvements.type.entree'), value: stats.entrees.toLocaleString(), icon: TrendingUp, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.mouvements.type.sortie'), value: stats.sorties.toLocaleString(), icon: TrendingDown, color: '#DC2626', bg: '#FEF2F2' },
+          { label: t('stock.mouvements.type.ajust'), value: stats.ajustements, icon: RefreshCw, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.valorisation.title'), value: fmtFCFA(stats.valeur_mouvement), icon: Package, color: '#2563EB', bg: '#EFF6FF' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -173,12 +175,12 @@ export default function MouvementsPage() {
           <div className="relative md:col-span-2">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
             <input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Rechercher produit, SKU, référence…"
+              placeholder={t('stock.mouvements.searchPlh')}
               className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
           </div>
           <select value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(0) }}
             className="px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20">
-            <option value="">Tous les types</option>
+            <option value="">{t('stock.mouvements.filterAll')}</option>
             {Object.entries(TYPE_CONFIG).map(([k, v]) => (
               <option key={k} value={k}>{v.label}</option>
             ))}
@@ -198,23 +200,23 @@ export default function MouvementsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Date & Heure</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Type</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Produit</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Entrepôt</th>
-                <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Quantité</th>
+                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.mouvements.colDate')}</th>
+                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.mouvements.colType')}</th>
+                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.mouvements.colArticle')}</th>
+                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.entrepots.colNom')}</th>
+                <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.mouvements.colQty')}</th>
                 <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Coût unit.</th>
-                <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Valeur</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Référence</th>
+                <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.page.colValeur')}</th>
+                <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.audit.colRef')}</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} className="text-center py-12 text-[#64748B] text-sm">Chargement…</td></tr>
+                <tr><td colSpan={8} className="text-center py-12 text-[#64748B] text-sm">{t('common.loading')}</td></tr>
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={8} className="text-center py-12">
                   <ArrowLeftRight size={32} className="mx-auto text-[#CBD5E1] mb-2" />
-                  <p className="text-sm text-[#64748B]">Aucun mouvement trouvé</p>
+                  <p className="text-sm text-[#64748B]">{t('stock.mouvements.empty')}</p>
                 </td></tr>
               ) : filtered.map(m => {
                 const cfg = TYPE_CONFIG[m.type] || TYPE_CONFIG.entree

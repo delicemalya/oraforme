@@ -8,9 +8,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
-import { BarChart2, Download, CheckCircle2, AlertTriangle, Filter } from 'lucide-react'
+import { BarChart2, Download, CheckCircle2, AlertTriangle } from 'lucide-react'
 
 interface Movement { id: string; date_operation: string; libelle: string; debit_account: string; credit_account: string; montant: number }
 
@@ -21,16 +22,21 @@ interface BalanceLine {
 }
 
 const YEARS = [2024, 2025, 2026, 2027]
-const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
 export default function BalancePage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]     = useState(true)
   const [year, setYear]           = useState(new Date().getFullYear())
   const [periode, setPeriode]     = useState<'annee' | number>('annee')
   const [filterClasse, setFilterClasse] = useState('all')
   const [showZero, setShowZero]   = useState(false)
+
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
+  const MONTHS = Array.from({ length: 12 }, (_, i) =>
+    new Intl.DateTimeFormat(intlLocale, { month: 'long' }).format(new Date(2024, i, 1))
+  )
 
   useEffect(() => {
     if (!tenantId) return
@@ -98,9 +104,13 @@ export default function BalancePage() {
   /* CSV */
   function exportCSV() {
     const rows = balanceLines.map(l => ({
-      'N° Compte': l.number, Intitulé: l.name, Classe: l.classe, Type: l.type,
-      'Total Débit': l.total_debit, 'Total Crédit': l.total_credit,
-      'Solde Débiteur': l.solde_debiteur, 'Solde Créditeur': l.solde_crediteur,
+      [t('compta.balance.colCompte')]: l.number,
+      [t('compta.balance.colIntitule')]: l.name,
+      Classe: l.classe, Type: l.type,
+      [t('compta.balance.colDebit')]: l.total_debit,
+      [t('compta.balance.colCredit')]: l.total_credit,
+      [t('compta.balance.colSolde') + ' D']: l.solde_debiteur,
+      [t('compta.balance.colSolde') + ' C']: l.solde_crediteur,
     }))
     if (!rows.length) return
     const csv = '﻿' + [Object.keys(rows[0]).join(';'), ...rows.map(r => Object.values(r).join(';'))].join('\n')
@@ -112,7 +122,7 @@ export default function BalancePage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Balance…
+      {t('common.loading')}
     </div>
   )
 
@@ -124,10 +134,10 @@ export default function BalancePage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <BarChart2 size={22} className="text-[#2563EB]" />
-            Balance Générale
+            {t('compta.balance.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            Totaux mouvements et soldes par compte · SYSCOHADA
+            {t('compta.balance.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -137,8 +147,8 @@ export default function BalancePage() {
           </select>
           <select value={String(periode)} onChange={e => setPeriode(e.target.value === 'annee' ? 'annee' : Number(e.target.value))}
             className="border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-[12px] bg-white focus:outline-none">
-            <option value="annee">Année entière</option>
-            {MONTHS_FR.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+            <option value="annee">{t('common.year')}</option>
+            {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </select>
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-[12px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
@@ -158,18 +168,18 @@ export default function BalancePage() {
           : <AlertTriangle size={16} />}
         <p className="text-[12px] font-bold">
           {isBalanced
-            ? `Balance équilibrée — ${balanceLines.length} comptes mouvementés`
-            : `Balance déséquilibrée — Écart: ${fmtFCFA(Math.abs(totDebit - totCredit))}`}
+            ? `${t('compta.balance.equilibreOk')} — ${balanceLines.length} comptes`
+            : `${t('compta.balance.equilibreKo')} — ${t('compta.rapproch.ecart')}: ${fmtFCFA(Math.abs(totDebit - totCredit))}`}
         </p>
       </div>
 
       {/* Totaux KPI */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Mouvements Débit',   value: fmtFCFA(totDebit),  color: '#2563EB' },
-          { label: 'Total Mouvements Crédit',  value: fmtFCFA(totCredit), color: '#16A34A' },
-          { label: 'Total Soldes Débiteurs',   value: fmtFCFA(totSoldD),  color: '#8B5CF6' },
-          { label: 'Total Soldes Créditeurs',  value: fmtFCFA(totSoldC),  color: '#D97706' },
+          { label: t('compta.balance.colDebit'),   value: fmtFCFA(totDebit),  color: '#2563EB' },
+          { label: t('compta.balance.colCredit'),  value: fmtFCFA(totCredit), color: '#16A34A' },
+          { label: t('compta.balance.colSolde') + ' D', value: fmtFCFA(totSoldD),  color: '#8B5CF6' },
+          { label: t('compta.balance.colSolde') + ' C', value: fmtFCFA(totSoldC),  color: '#D97706' },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-3">
             <div className="text-[16px] font-extrabold truncate" style={{ color: k.color }}>{k.value}</div>
@@ -182,13 +192,13 @@ export default function BalancePage() {
       <div className="flex items-center gap-2">
         <select value={filterClasse} onChange={e => setFilterClasse(e.target.value)}
           className="border border-[#E2E8F0] rounded-lg px-3 py-1.5 text-[12px] bg-white focus:outline-none">
-          <option value="all">Toutes classes</option>
+          <option value="all">{t('compta.plan.allClasses')}</option>
           {[1,2,3,4,5,6,7].map(c => <option key={c} value={c}>Classe {c}</option>)}
         </select>
         <label className="flex items-center gap-1.5 text-[12px] text-[#64748B] cursor-pointer">
           <input type="checkbox" checked={showZero} onChange={e => setShowZero(e.target.checked)}
             className="rounded" />
-          Afficher comptes à zéro
+          {t('compta.balance.empty')}
         </label>
       </div>
 
@@ -196,7 +206,7 @@ export default function BalancePage() {
       {balanceLines.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-20 text-center">
           <BarChart2 size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[13px] text-[#94A3B8]">Aucun mouvement pour cette période</p>
+          <p className="text-[13px] text-[#94A3B8]">{t('compta.balance.empty')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
@@ -204,12 +214,12 @@ export default function BalancePage() {
             <table className="w-full text-[12px]">
               <thead className="bg-[#0F172A] text-white">
                 <tr>
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold w-24">N° Compte</th>
-                  <th className="px-4 py-3 text-left text-[11px] font-semibold">Intitulé</th>
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold">Mvt Débit</th>
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold">Mvt Crédit</th>
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold border-l border-white/20">Solde Déb.</th>
-                  <th className="px-4 py-3 text-right text-[11px] font-semibold">Solde Cré.</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold w-24">{t('compta.balance.colCompte')}</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold">{t('compta.balance.colIntitule')}</th>
+                  <th className="px-4 py-3 text-right text-[11px] font-semibold">{t('compta.balance.colDebit')}</th>
+                  <th className="px-4 py-3 text-right text-[11px] font-semibold">{t('compta.balance.colCredit')}</th>
+                  <th className="px-4 py-3 text-right text-[11px] font-semibold border-l border-white/20">{t('compta.balance.colSolde')} D</th>
+                  <th className="px-4 py-3 text-right text-[11px] font-semibold">{t('compta.balance.colSolde')} C</th>
                 </tr>
               </thead>
               <tbody>
@@ -248,7 +258,7 @@ export default function BalancePage() {
                       {/* Class subtotal */}
                       <tr key={`cl-${cl}-tot`} className="bg-[#F8FAFC] border-b-2 border-[#E2E8F0]">
                         <td colSpan={2} className="px-4 py-1.5 text-[11px] font-bold text-[#64748B] italic">
-                          Sous-total Classe {cl}
+                          Classe {cl} — {t('compta.balance.totalRow')}
                         </td>
                         <td className="px-4 py-1.5 text-right text-[11px] font-bold text-[#2563EB]">{fmtFCFA(clD)}</td>
                         <td className="px-4 py-1.5 text-right text-[11px] font-bold text-[#16A34A]">{fmtFCFA(clC)}</td>
@@ -261,7 +271,7 @@ export default function BalancePage() {
 
                 {/* Grand total */}
                 <tr className="bg-[#0F172A] text-white">
-                  <td colSpan={2} className="px-4 py-3 font-extrabold text-[12px]">TOTAL GÉNÉRAL</td>
+                  <td colSpan={2} className="px-4 py-3 font-extrabold text-[12px]">{t('compta.balance.totalRow')}</td>
                   <td className="px-4 py-3 text-right font-extrabold">{fmtFCFA(totDebit)}</td>
                   <td className="px-4 py-3 text-right font-extrabold">{fmtFCFA(totCredit)}</td>
                   <td className="px-4 py-3 text-right font-extrabold border-l border-white/20">{fmtFCFA(totSoldD)}</td>

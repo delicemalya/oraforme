@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   AlertTriangle, Bell, CheckCircle2, Package,
@@ -48,8 +49,9 @@ const TYPE_CONFIG: Record<string, { label: string; icon: any }> = {
 }
 
 export default function AlertesStocksPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [alertes, setAlertes] = useState<StockAlerte[]>([])
   const [loading, setLoading] = useState(true)
@@ -168,24 +170,24 @@ export default function AlertesStocksPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <AlertTriangle size={20} className="text-[#16A34A]" />
-            Alertes Stocks
+            {t('stock.alertes.title')}
             {nonLues.length > 0 && (
               <span className="bg-[#DC2626] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                 {nonLues.length}
               </span>
             )}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Surveillance automatique — ruptures, stocks faibles, surplus</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.alertes.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <button onClick={load}
             className="flex items-center gap-1.5 border border-[#E2E8F0] text-[#374151] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC]">
-            <RefreshCw size={13} /> Actualiser
+            <RefreshCw size={13} /> {t('common.refresh')}
           </button>
           {nonLues.length > 0 && (
             <button onClick={markAllLues}
               className="flex items-center gap-1.5 border border-[#E2E8F0] text-[#374151] px-3 py-2 rounded-xl text-xs font-semibold hover:bg-[#F8FAFC]">
-              <CheckCircle2 size={13} /> Tout marquer lu
+              <CheckCircle2 size={13} /> {t('stock.alertes.colAction')}
             </button>
           )}
         </div>
@@ -194,7 +196,7 @@ export default function AlertesStocksPage() {
       {/* Tabs */}
       <div className="flex gap-1 bg-[#F1F5F9] p-1 rounded-xl w-fit">
         {[
-          { id: 'alertes', label: `Alertes (${alertes.length})`, icon: Bell },
+          { id: 'alertes', label: `${t('stock.alertes.title')} (${alertes.length})`, icon: Bell },
           { id: 'config', label: 'Configuration', icon: Settings },
         ].map(tab => (
           <button key={tab.id}
@@ -213,9 +215,9 @@ export default function AlertesStocksPage() {
           {/* KPIs */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Alertes actives', value: nonLues.length, icon: Bell, color: '#DC2626', bg: '#FEF2F2' },
-              { label: 'Ruptures', value: ruptures.length, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
-              { label: 'Stocks faibles', value: faibles.length, icon: TrendingDown, color: '#D97706', bg: '#FFFBEB' },
+              { label: t('stock.alertes.title'), value: nonLues.length, icon: Bell, color: '#DC2626', bg: '#FEF2F2' },
+              { label: t('stock.alertes.critical'), value: ruptures.length, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
+              { label: t('stock.alertes.low'), value: faibles.length, icon: TrendingDown, color: '#D97706', bg: '#FFFBEB' },
               { label: 'Priorité haute', value: hautes.length, icon: Zap, color: '#7C3AED', bg: '#F5F3FF' },
             ].map(k => (
               <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
@@ -257,13 +259,13 @@ export default function AlertesStocksPage() {
 
           {/* Alert list */}
           {loading ? (
-            <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Analyse du stock…</div>
+            <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
           ) : (
             <div className="space-y-2">
               {filtered.length === 0 ? (
                 <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
                   <CheckCircle2 size={40} className="mx-auto text-[#16A34A] mb-3" />
-                  <p className="text-sm font-semibold text-[#0F172A]">Aucune alerte active !</p>
+                  <p className="text-sm font-semibold text-[#0F172A]">{t('stock.alertes.empty')}</p>
                   <p className="text-xs text-[#64748B] mt-1">Tous les stocks sont dans les niveaux normaux</p>
                 </div>
               ) : filtered.map(alert => {
@@ -294,9 +296,9 @@ export default function AlertesStocksPage() {
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-[11px] font-mono text-[#94A3B8]">{alert.product_sku}</span>
                         <span className="text-[11px] text-[#64748B]">
-                          Stock actuel: <strong style={{ color: prCfg.color }}>{alert.stock_actuel} {alert.product_unite}</strong>
+                          {t('stock.alertes.colQty')}: <strong style={{ color: prCfg.color }}>{alert.stock_actuel} {alert.product_unite}</strong>
                         </span>
-                        <span className="text-[11px] text-[#94A3B8]">Seuil: {alert.seuil}</span>
+                        <span className="text-[11px] text-[#94A3B8]">{t('stock.alertes.colSeuil')}: {alert.seuil}</span>
                       </div>
                     </div>
                     {!alert.lue && (

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   BookOpen, Loader2, Search,
   Download, RefreshCw,
@@ -30,33 +31,27 @@ interface JournalEntry {
 function fmtFCFA(n: number) {
   return new Intl.NumberFormat('fr-CG', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(n)
 }
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
-}
 
-const SOURCE_LABELS: Record<string, { label: string; cls: string }> = {
-  facture:   { label: 'Facture',       cls: 'bg-blue-100 text-blue-700'   },
-  achat:     { label: 'Achat',         cls: 'bg-purple-100 text-purple-700' },
-  paie:      { label: 'Paie',          cls: 'bg-pink-100 text-pink-700'   },
-  cheque:    { label: 'Chèque',        cls: 'bg-yellow-100 text-yellow-700' },
-  virement:  { label: 'Virement',      cls: 'bg-indigo-100 text-indigo-700' },
-  caisse:    { label: 'Caisse',        cls: 'bg-green-100 text-green-700' },
-  transfer:  { label: 'Transfert',     cls: 'bg-teal-100 text-teal-700'  },
-  mobile:    { label: 'Mobile Money',  cls: 'bg-orange-100 text-orange-700' },
-  tva:       { label: 'TVA',           cls: 'bg-red-100 text-red-700'    },
-  stock:     { label: 'Stock',         cls: 'bg-cyan-100 text-cyan-700'  },
-  manuel:    { label: 'Manuel',        cls: 'bg-gray-100 text-gray-700'  },
+const SOURCE_CSS: Record<string, string> = {
+  facture:   'bg-blue-100 text-blue-700',
+  achat:     'bg-purple-100 text-purple-700',
+  paie:      'bg-pink-100 text-pink-700',
+  cheque:    'bg-yellow-100 text-yellow-700',
+  virement:  'bg-indigo-100 text-indigo-700',
+  caisse:    'bg-green-100 text-green-700',
+  transfer:  'bg-teal-100 text-teal-700',
+  mobile:    'bg-orange-100 text-orange-700',
+  tva:       'bg-red-100 text-red-700',
+  stock:     'bg-cyan-100 text-cyan-700',
+  manuel:    'bg-gray-100 text-gray-700',
 }
-
-const MONTHS = [
-  'Janvier','Février','Mars','Avril','Mai','Juin',
-  'Juillet','Août','Septembre','Octobre','Novembre','Décembre',
-]
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function JournalPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t, locale } = useLocale()
+
   const [entries, setEntries]         = useState<JournalEntry[]>([])
   const [loading, setLoading]         = useState(true)
   const [search, setSearch]           = useState('')
@@ -65,6 +60,32 @@ export default function JournalPage() {
   const [filterYear, setFilterYear]   = useState(new Date().getFullYear())
   const [page, setPage]               = useState(0)
   const PAGE_SIZE = 50
+
+  // Locale-aware month names
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
+  const MONTHS = Array.from({ length: 12 }, (_, i) =>
+    new Intl.DateTimeFormat(intlLocale, { month: 'long' }).format(new Date(2024, i, 1))
+  )
+
+  // Locale-aware date formatting
+  function fmtDate(d: string) {
+    return new Date(d).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short', year: 'numeric' })
+  }
+
+  // Source labels from i18n
+  const SOURCE_KEYS: Record<string, string> = {
+    facture:  'compta.journal.src.facture',
+    achat:    'compta.journal.src.facture',
+    paie:     'compta.journal.src.paie',
+    cheque:   'compta.journal.src.cheque',
+    virement: 'compta.journal.src.virement',
+    caisse:   'compta.journal.src.caisse',
+    transfer: 'compta.journal.src.transfer',
+    mobile:   'compta.journal.src.mobile',
+    tva:      'compta.journal.src.tva',
+    stock:    'compta.journal.src.stock',
+    manuel:   'compta.journal.src.manuel',
+  }
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -117,7 +138,7 @@ export default function JournalPage() {
 
   const exportCSV = () => {
     const rows = [
-      ['Date','Pièce','N° Débit','N° Crédit','Montant','Libellé','Source'],
+      [t('common.date'), t('compta.journal.colPiece'), t('compta.journal.colDebit'), t('compta.journal.colCredit'), t('common.amount'), t('compta.journal.colLabel'), t('compta.journal.colSource')],
       ...filtered.map(e => [
         fmtDate(e.date), e.piece_number || '', e.account_debit, e.account_credit,
         e.amount.toString(), `"${e.description}"`, e.source || '',
@@ -147,16 +168,16 @@ export default function JournalPage() {
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Journal Comptable OHADA</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>{t('compta.journal.title')}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-            Écritures en partie double — générées automatiquement par les triggers
+            {t('compta.journal.subtitle')}
           </p>
         </div>
         <button
           onClick={exportCSV}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-colors hover:bg-gray-50"
           style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
-          <Download className="w-4 h-4" /> Exporter CSV
+          <Download className="w-4 h-4" /> {t('common.export')} CSV
         </button>
         <button
           onClick={load}
@@ -177,7 +198,7 @@ export default function JournalPage() {
             {MONTHS[filterMonth - 1]} {filterYear}
           </p>
           <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-            {filtered.length} écriture(s) affichée(s)
+            {filtered.length} {t('compta.journal.empty').toLowerCase()}
           </p>
         </div>
         <button onClick={nextMonth} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
@@ -188,21 +209,20 @@ export default function JournalPage() {
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="rounded-2xl border p-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Total débit</p>
+          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('compta.journal.totalDebit')}</p>
           <p className="text-xl font-bold" style={{ color: 'var(--info)' }}>{fmtFCFA(totalDebit)}</p>
         </div>
         <div className="rounded-2xl border p-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Total crédit</p>
+          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('compta.journal.totalCredit')}</p>
           <p className="text-xl font-bold" style={{ color: 'var(--success)' }}>{fmtFCFA(totalCredit)}</p>
         </div>
         <div className="rounded-2xl border p-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Équilibre</p>
-          <p className="text-xl font-bold text-green-600">✓ Équilibré</p>
+          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('compta.journal.balance')}</p>
+          <p className="text-xl font-bold text-green-600">{t('compta.journal.balanced')}</p>
         </div>
         <div className="rounded-2xl border p-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Exercice</p>
+          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('common.year')}</p>
           <p className="text-xl font-bold" style={{ color: 'var(--text)' }}>{filterYear}</p>
-          <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Fiscal year</p>
         </div>
       </div>
 
@@ -211,7 +231,7 @@ export default function JournalPage() {
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
           <input
-            type="text" placeholder="Libellé, N° compte, pièce…"
+            type="text" placeholder={t('compta.journal.searchPlh')}
             value={search} onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 rounded-xl text-sm border outline-none"
             style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
@@ -221,9 +241,9 @@ export default function JournalPage() {
           value={filterSource} onChange={e => { setFilterSource(e.target.value); setPage(0) }}
           className="px-3 py-2 rounded-xl text-sm border outline-none"
           style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-          <option value="all">Toutes sources</option>
-          {Object.entries(SOURCE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v.label}</option>
+          <option value="all">{t('compta.journal.filterAll')}</option>
+          {Object.entries(SOURCE_KEYS).map(([k, tKey]) => (
+            <option key={k} value={k}>{t(tKey)}</option>
           ))}
         </select>
         <select
@@ -239,14 +259,14 @@ export default function JournalPage() {
         <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr style={{ background: 'var(--bg)' }}>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '100px' }}>Date</th>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '100px' }}>Pièce</th>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>Libellé</th>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '120px' }}>N° Débit</th>
-              <th className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--text-secondary)', width: '140px' }}>Débit</th>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '120px' }}>N° Crédit</th>
-              <th className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--text-secondary)', width: '140px' }}>Crédit</th>
-              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '110px' }}>Source</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '100px' }}>{t('compta.journal.colDate')}</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '100px' }}>{t('compta.journal.colPiece')}</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>{t('compta.journal.colLabel')}</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '120px' }}>{t('compta.journal.colDebit')}</th>
+              <th className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--text-secondary)', width: '140px' }}>{t('compta.journal.colDebit')}</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '120px' }}>{t('compta.journal.colCredit')}</th>
+              <th className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--text-secondary)', width: '140px' }}>{t('compta.journal.colCredit')}</th>
+              <th className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)', width: '110px' }}>{t('compta.journal.colSource')}</th>
             </tr>
           </thead>
           <tbody>
@@ -261,13 +281,15 @@ export default function JournalPage() {
               <tr>
                 <td colSpan={8} className="px-4 py-12 text-center" style={{ color: 'var(--text-secondary)' }}>
                   <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  Aucune écriture pour cette période
-                  <p className="text-xs mt-1">Les écritures sont créées automatiquement par les triggers lors de chaque opération financière.</p>
+                  {t('compta.journal.empty')}
+                  <p className="text-xs mt-1">{t('compta.journal.subtitle')}</p>
                 </td>
               </tr>
             )}
             {!loading && filtered.map((e, i) => {
-              const src = SOURCE_LABELS[e.source || ''] || { label: e.source || '—', cls: 'bg-gray-100 text-gray-700' }
+              const srcKey = SOURCE_KEYS[e.source || '']
+              const srcLabel = srcKey ? t(srcKey) : (e.source || '—')
+              const srcCls = SOURCE_CSS[e.source || ''] || 'bg-gray-100 text-gray-700'
               return (
                 <tr key={e.id}
                   className="border-t transition-colors hover:bg-gray-50"
@@ -292,8 +314,8 @@ export default function JournalPage() {
                     {fmtFCFA(e.amount)}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${src.cls}`}>
-                      {src.label}
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${srcCls}`}>
+                      {srcLabel}
                     </span>
                   </td>
                 </tr>
@@ -304,7 +326,7 @@ export default function JournalPage() {
             <tfoot>
               <tr style={{ background: 'var(--bg)', borderTop: '2px solid var(--border)' }}>
                 <td colSpan={4} className="px-4 py-3 font-semibold text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  TOTAL PÉRIODE
+                  {t('treso.historique.totalPeriod').toUpperCase()}
                 </td>
                 <td className="px-4 py-3 text-right font-bold" style={{ color: 'var(--info)' }}>
                   {fmtFCFA(totalDebit)}
@@ -328,21 +350,21 @@ export default function JournalPage() {
             onClick={() => setPage(p => p - 1)}
             className="px-4 py-2 rounded-xl text-sm font-medium border disabled:opacity-30 hover:bg-gray-50 transition-colors"
             style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
-            ← Précédent
+            ← {t('common.previous')}
           </button>
-          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Page {page + 1}</span>
+          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('common.period')} {page + 1}</span>
           <button
             onClick={() => setPage(p => p + 1)}
             className="px-4 py-2 rounded-xl text-sm font-medium border hover:bg-gray-50 transition-colors"
             style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
-            Suivant →
+            {t('common.next')} →
           </button>
         </div>
       )}
 
       {/* Legend */}
       <div className="rounded-2xl border p-4" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
-        <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>PLAN COMPTABLE OHADA — COMPTES UTILISÉS</p>
+        <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>{t('compta.plan.title').toUpperCase()}</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
           {[
             ['310000', 'Stocks marchandises'],

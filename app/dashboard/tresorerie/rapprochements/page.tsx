@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Receipt, Plus, Download, Check, X, Loader2,
@@ -30,6 +31,8 @@ interface ReligneLigne {
 
 export default function RapprochmentsPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [banques, setBanques]       = useState<CompteBancaire[]>([])
   const [selectedBanque, setSelectedBanque] = useState<CompteBancaire | null>(null)
   const [lignes, setLignes]         = useState<ReligneLigne[]>([])
@@ -132,8 +135,8 @@ export default function RapprochmentsPage() {
             <Receipt size={20} className="text-teal-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Rapprochements bancaires</h1>
-            <p className="text-xs text-[#64748B]">Vérification soldes comptables vs relevés bancaires</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.rapproch.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.rapproch.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -143,7 +146,7 @@ export default function RapprochmentsPage() {
           </button>
           <button onClick={() => setShowAdd(true)} disabled={!selectedBanque}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-600 rounded-xl hover:bg-teal-700 shadow-sm disabled:opacity-40">
-            <Plus size={14} /> Ajouter ligne
+            <Plus size={14} /> {t('treso.rapproch.import')}
           </button>
         </div>
       </div>
@@ -178,11 +181,11 @@ export default function RapprochmentsPage() {
             <h3 className="text-sm font-bold text-[#0F172A] mb-4">État du rapprochement — {selectedBanque.intitule}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               <div>
-                <div className="text-xs text-[#64748B] mb-1">Solde comptable</div>
+                <div className="text-xs text-[#64748B] mb-1">{t('treso.rapproch.soldeCompta')}</div>
                 <div className="text-lg font-bold text-[#0F172A]">{fmtFCFA(soldeCompta)}</div>
               </div>
               <div>
-                <div className="text-xs text-[#64748B] mb-1">Solde relevé bancaire</div>
+                <div className="text-xs text-[#64748B] mb-1">{t('treso.rapproch.soldeBanque')}</div>
                 <input
                   type="number"
                   value={soldeReleve}
@@ -192,7 +195,7 @@ export default function RapprochmentsPage() {
                 />
               </div>
               <div>
-                <div className="text-xs text-[#64748B] mb-1">Écart</div>
+                <div className="text-xs text-[#64748B] mb-1">{t('treso.rapproch.ecart')}</div>
                 <div className={`text-lg font-bold ${Math.abs(ecart) < 100 ? 'text-green-600' : 'text-red-600'}`}>
                   {ecart >= 0 ? '+' : ''}{fmtFCFA(ecart)}
                 </div>
@@ -243,7 +246,7 @@ export default function RapprochmentsPage() {
                             <Circle size={10} className="text-amber-300" />
                           </button>
                         </td>
-                        <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(l.date_operation).toLocaleDateString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(l.date_operation).toLocaleDateString(intlLocale)}</td>
                         <td className="px-4 py-3 text-xs font-medium text-[#0F172A]">{l.libelle}</td>
                         <td className="px-4 py-3 text-xs font-semibold text-red-600">{l.debit > 0 ? fmtFCFA(l.debit) : '—'}</td>
                         <td className="px-4 py-3 text-xs font-semibold text-green-600">{l.credit > 0 ? fmtFCFA(l.credit) : '—'}</td>
@@ -281,7 +284,7 @@ export default function RapprochmentsPage() {
                             <Check size={10} className="text-white" />
                           </button>
                         </td>
-                        <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(l.date_operation).toLocaleDateString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(l.date_operation).toLocaleDateString(intlLocale)}</td>
                         <td className="px-4 py-3 text-xs font-medium text-[#0F172A] line-through opacity-60">{l.libelle}</td>
                         <td className="px-4 py-3 text-xs font-semibold text-red-400">{l.debit > 0 ? fmtFCFA(l.debit) : '—'}</td>
                         <td className="px-4 py-3 text-xs font-semibold text-green-400">{l.credit > 0 ? fmtFCFA(l.credit) : '—'}</td>

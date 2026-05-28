@@ -10,6 +10,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { Receipt, Download, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react'
 
 interface Movement {
@@ -24,7 +25,6 @@ interface DeclarationMois {
   statut: 'a_declarer' | 'declaree' | 'payee'
 }
 
-const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const TVA_RATE   = 0.18
 const CA_RATE    = 0.05   // Contribution d'Appui = 5% sur TVA collectée
 const YEARS      = [2024, 2025, 2026, 2027]
@@ -36,10 +36,16 @@ const CA_ACCT              = ['447000', '447100']              // 447 — Contri
 
 export default function TVAPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]     = useState(true)
   const [year, setYear]           = useState(new Date().getFullYear())
   const [selectedMois, setSelectedMois] = useState<number | null>(null)
+
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
+  const MONTHS_FR = Array.from({ length: 12 }, (_, i) =>
+    new Intl.DateTimeFormat(intlLocale, { month: 'long' }).format(new Date(2024, i, 1))
+  )
 
   useEffect(() => {
     if (!tenantId) return
@@ -124,7 +130,7 @@ export default function TVAPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement TVA…
+      {t('common.loading')}
     </div>
   )
 
@@ -136,10 +142,10 @@ export default function TVAPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Receipt size={22} className="text-[#2563EB]" />
-            TVA & Fiscalité
+            {t('compta.tva.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            TVA 18% + Contribution d'Appui 5% · Congo-Brazzaville · Exercice {year}
+            {t('compta.tva.subtitle')} · {year}
           </p>
         </div>
         <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -68,6 +69,8 @@ const EMPTY_FORM = {
 
 export default function RemboursementsPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [rows, setRows]           = useState<Remboursement[]>([])
   const [loading, setLoading]     = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -199,8 +202,8 @@ export default function RemboursementsPage() {
             <RefreshCw size={20} className="text-orange-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Remboursements</h1>
-            <p className="text-xs text-[#64748B]">Gestion des remboursements clients, fournisseurs et salariés</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.rembours.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.rembours.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -209,7 +212,7 @@ export default function RemboursementsPage() {
           </button>
           <button onClick={() => { setForm({ ...EMPTY_FORM }); setShowModal(true) }}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-orange-600 rounded-xl hover:bg-orange-700 shadow-sm">
-            <Plus size={14} /> Nouvelle demande
+            <Plus size={14} /> {t('treso.rembours.new')}
           </button>
         </div>
       </div>
@@ -235,7 +238,7 @@ export default function RemboursementsPage() {
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher…"
+            placeholder={t('treso.rembours.searchPlh')}
             className="pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
         </div>
         <select value={filterType} onChange={e => setFilterType(e.target.value)}
@@ -260,14 +263,14 @@ export default function RemboursementsPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-[#94A3B8]">
             <RefreshCw size={32} className="mb-2 opacity-30" />
-            <p className="text-sm">Aucun remboursement trouvé</p>
+            <p className="text-sm">{t('treso.rembours.empty')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-[#F8FAFC]">
                 <tr>
-                  {['Date', 'Libellé / Tiers', 'Type', 'Montant demandé', 'Remboursé', 'Statut', 'Actions'].map(h => (
+                  {[t('treso.rembours.colDate'), t('treso.rembours.colBenef'), 'Type', t('treso.rembours.colMontant'), t('treso.rembours.colMotif'), t('treso.rembours.colStatut'), 'Actions'].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -278,7 +281,7 @@ export default function RemboursementsPage() {
                   const pct = r.montant > 0 ? Math.round((r.montant_rembourse / r.montant) * 100) : 0
                   return (
                     <tr key={r.id} className={`border-t border-[#F1F5F9] hover:bg-[#F8FAFC] ${i % 2 === 0 ? '' : 'bg-[#FAFBFC]'}`}>
-                      <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(r.date_demande).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(r.date_demande).toLocaleDateString(intlLocale)}</td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-medium text-[#0F172A]">{r.libelle}</div>
                         <div className="text-[10px] text-[#94A3B8]">{r.tiers}</div>
@@ -309,11 +312,11 @@ export default function RemboursementsPage() {
                             <>
                               <button onClick={() => executeRemboursement(r)}
                                 className="px-2 py-1 text-[10px] font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700">
-                                Rembourser
+                                {t('common.approve')}
                               </button>
                               <button onClick={() => rejeter(r)}
                                 className="px-2 py-1 text-[10px] font-semibold text-red-600 bg-red-50 rounded-lg hover:bg-red-100">
-                                Rejeter
+                                {t('common.reject')}
                               </button>
                             </>
                           )}
@@ -340,7 +343,7 @@ export default function RemboursementsPage() {
               <button onClick={() => setSelected(null)} className="p-2 hover:bg-[#F1F5F9] rounded-xl"><X size={16} /></button>
             </div>
             {[
-              ['Date demande', new Date(selected.date_demande).toLocaleDateString('fr-FR')],
+              ['Date demande', new Date(selected.date_demande).toLocaleDateString(intlLocale)],
               ['Libellé', selected.libelle],
               ['Tiers', selected.tiers],
               ['Type', TYPES_REMB.find(t => t.value === selected.type)?.label ?? selected.type],
@@ -420,7 +423,7 @@ export default function RemboursementsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={saveDemande} disabled={saving || !form.montant || !form.libelle || !form.tiers}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-orange-600 rounded-xl hover:bg-orange-700 disabled:opacity-50">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}

@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
 import { Landmark, Plus, Upload, Download, CheckCircle2, AlertTriangle, X, Save } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Movement {
   id: string; date_operation: string; libelle: string
@@ -33,6 +34,7 @@ const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','A
 
 export default function RapprochementPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [movements, setMovements]   = useState<Movement[]>([])
   const [releve, setReleve]         = useState<LigneReleve[]>([])
   const [loading, setLoading]       = useState(true)
@@ -155,7 +157,7 @@ export default function RapprochementPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Rapprochement…
+      {t('common.loading')}
     </div>
   )
 
@@ -167,10 +169,10 @@ export default function RapprochementPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Landmark size={22} className="text-[#2563EB]" />
-            Rapprochement Bancaire
+            {t('compta.rapproch.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            Comparaison relevé bancaire vs journal comptable · OHADA Classe 5
+            {t('compta.rapproch.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -188,7 +190,7 @@ export default function RapprochementPage() {
           </select>
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-[12px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
-            <Download size={13} /> CSV
+            <Download size={13} /> {t('common.export')} CSV
           </button>
           <button onClick={() => setModalAdd(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold">
@@ -207,7 +209,7 @@ export default function RapprochementPage() {
           <p className="text-[10px] text-[#94A3B8] mt-1">Entrez le solde du relevé bancaire reçu</p>
         </div>
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-4">
-          <div className="text-[11px] font-bold text-[#64748B] mb-1">Solde comptable {compte}</div>
+          <div className="text-[11px] font-bold text-[#64748B] mb-1">{t('compta.rapproch.soldeCompta')} {compte}</div>
           <div className="text-[22px] font-extrabold text-[#0F172A]">{fmtFCFA(soldeComptable)}</div>
           <div className="text-[10px] text-[#94A3B8] mt-1">D'après journal_entries au {MONTHS_FR[mois-1]}</div>
         </div>
@@ -219,7 +221,7 @@ export default function RapprochementPage() {
           <div className="flex items-center gap-2 mb-1">
             {isBalanced ? <CheckCircle2 size={14} className="text-[#16A34A]" /> : <AlertTriangle size={14} className="text-[#DC2626]" />}
             <span className={`text-[11px] font-bold ${isBalanced ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
-              {isBalanced ? 'Rapprochement OK' : 'Écart détecté'}
+              {isBalanced ? t('compta.rapproch.ok') : t('compta.rapproch.ecart')}
             </span>
           </div>
           <div className={`text-[22px] font-extrabold ${isBalanced ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
@@ -252,7 +254,7 @@ export default function RapprochementPage() {
       {mvsMois.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-16 text-center">
           <Landmark size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[13px] text-[#94A3B8]">Aucun mouvement sur le compte {compte} pour {MONTHS_FR[mois-1]}</p>
+          <p className="text-[13px] text-[#94A3B8]">{t('compta.rapproch.empty')} {compte} — {MONTHS_FR[mois-1]}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
@@ -376,11 +378,11 @@ export default function RapprochementPage() {
             <div className="px-5 pb-5 flex justify-end gap-2">
               <button onClick={() => setModalAdd(false)}
                 className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={saveLigneManuelle} disabled={saving}
                 className="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? 'Ajout…' : 'Ajouter'}
+                <Save size={13} /> {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

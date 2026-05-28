@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
 import { List, Search, Plus, Download, X, CheckCircle2, ToggleLeft, ToggleRight } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 interface PlanCompte {
   id?: string; numero: string; intitule: string
@@ -43,6 +44,7 @@ const EMPTY_FORM: { numero: string; intitule: string; classe: number; type_compt
 
 export default function PlanComptablePage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [customComptes, setCustomComptes] = useState<PlanCompte[]>([])
   const [loading, setLoading]             = useState(true)
   const [search, setSearch]               = useState('')
@@ -162,7 +164,7 @@ export default function PlanComptablePage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement plan comptable…
+      {t('common.loading')}
     </div>
   )
 
@@ -174,20 +176,20 @@ export default function PlanComptablePage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <List size={22} className="text-[#2563EB]" />
-            Plan Comptable OHADA
+            {t('compta.plan.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            {allComptes.length} comptes · Classes 1-9 · SYSCOHADA révisé
+            {t('compta.plan.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-[12px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
-            <Download size={13} /> CSV
+            <Download size={13} /> {t('common.export')} CSV
           </button>
           <button onClick={() => setShowForm(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg">
-            <Plus size={13} /> Ajouter compte
+            <Plus size={13} /> {t('compta.plan.addClass')}
           </button>
         </div>
       </div>
@@ -212,12 +214,12 @@ export default function PlanComptablePage() {
         <div className="relative flex-1">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher par numéro ou intitulé…"
+            placeholder={t('compta.plan.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-[12px] border border-[#E2E8F0] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
         </div>
         <select value={filterClasse} onChange={e => setFilterClasse(e.target.value)}
           className="border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] bg-white focus:outline-none">
-          <option value="all">Toutes classes</option>
+          <option value="all">{t('compta.plan.allClasses')}</option>
           {Object.entries(CLASSES_LABELS).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
@@ -274,11 +276,11 @@ export default function PlanComptablePage() {
                 <button onClick={handleSave} disabled={saving}
                   className="flex-1 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
                   {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                  Enregistrer
+                  {t('common.save')}
                 </button>
                 <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM) }}
                   className="px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-[12px] text-[#64748B]">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -299,7 +301,7 @@ export default function PlanComptablePage() {
                 <span className="text-[10px] text-[#94A3B8]">{clLines.length} compte{clLines.length > 1 ? 's' : ''}</span>
               </div>
               {clLines.length === 0 ? (
-                <p className="px-4 py-2 text-[11px] text-[#94A3B8]">Aucun compte dans cette classe</p>
+                <p className="px-4 py-2 text-[11px] text-[#94A3B8]">{t('compta.plan.empty')}</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-[12px]">

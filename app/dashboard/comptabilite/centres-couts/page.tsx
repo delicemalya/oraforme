@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
 import { Layers, Plus, Download, ChevronDown, ChevronRight, X, Save } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 interface CentreCout {
   id: string; tenant_id: string
@@ -38,6 +39,7 @@ const YEARS = [2024, 2025, 2026, 2027]
 
 export default function CentresCoutsPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [centres, setCentres]   = useState<CentreCout[]>([])
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]   = useState(true)
@@ -120,7 +122,7 @@ export default function CentresCoutsPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Centres de Coûts…
+      {t('common.loading')}
     </div>
   )
 
@@ -132,9 +134,9 @@ export default function CentresCoutsPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Layers size={22} className="text-[#2563EB]" />
-            Centres de Coûts
+            {t('compta.cc.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Analytique par département / projet · Exercice {year}</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('compta.cc.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
@@ -143,11 +145,11 @@ export default function CentresCoutsPage() {
           </select>
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-[12px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
-            <Download size={13} /> CSV
+            <Download size={13} /> {t('common.export')} CSV
           </button>
           <button onClick={() => { setForm(EMPTY_FORM); setEditId(null); setModal(true) }}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold">
-            <Plus size={13} /> Nouveau centre
+            <Plus size={13} /> {t('compta.cc.newCenter')}
           </button>
         </div>
       </div>
@@ -173,7 +175,7 @@ export default function CentresCoutsPage() {
       {centresWithData.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-20 text-center">
           <Layers size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[13px] text-[#94A3B8]">Aucun centre de coût configuré</p>
+          <p className="text-[13px] text-[#94A3B8]">{t('compta.cc.empty')}</p>
           <button onClick={() => { setForm(EMPTY_FORM); setModal(true) }}
             className="mt-3 px-4 py-2 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold">
             + Créer un centre de coût
@@ -358,10 +360,10 @@ export default function CentresCoutsPage() {
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
               <button onClick={() => { setModal(false); setForm(EMPTY_FORM); setEditId(null) }}
-                className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+                className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={save} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#2563EB] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? '…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

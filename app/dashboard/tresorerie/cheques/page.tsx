@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   FileCheck, Plus, Check, X, Clock, Loader2,
   ChevronLeft, Search, AlertTriangle,
@@ -35,22 +36,19 @@ function fmtFCFA(n: number) {
   return new Intl.NumberFormat('fr-CG', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(n)
 }
 
-function fmtDate(d: string | null) {
-  if (!d) return '—'
-  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
-}
-
-const STATUT_BADGE: Record<string, { label: string; cls: string }> = {
-  en_attente: { label: 'En attente',  cls: 'bg-yellow-100 text-yellow-800' },
-  encaisse:   { label: 'Encaissé',    cls: 'bg-green-100 text-green-800'   },
-  rejete:     { label: 'Rejeté',      cls: 'bg-red-100 text-red-800'       },
-  annule:     { label: 'Annulé',      cls: 'bg-gray-100 text-gray-600'     },
+const STATUT_CSS: Record<string, string> = {
+  en_attente: 'bg-yellow-100 text-yellow-800',
+  encaisse:   'bg-green-100 text-green-800',
+  rejete:     'bg-red-100 text-red-800',
+  annule:     'bg-gray-100 text-gray-600',
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function ChequesPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t, locale } = useLocale()
+
   const [cheques, setCheques]           = useState<Cheque[]>([])
   const [comptes, setComptes]           = useState<CompteBancaire[]>([])
   const [loading, setLoading]           = useState(true)
@@ -66,6 +64,13 @@ export default function ChequesPage() {
     date_emission: new Date().toISOString().slice(0, 10),
     date_echeance: '', banque: '', motif: '', compte_bancaire_id: '',
   })
+
+  // Locale-aware date formatting
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
+  function fmtDate(d: string | null) {
+    if (!d) return '—'
+    return new Date(d).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short', year: 'numeric' })
+  }
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -106,28 +111,28 @@ export default function ChequesPage() {
     })
     setSaving(false)
     if (err) { notify(err.message, true); return }
-    notify('Chèque enregistré ✓')
+    notify(t('treso.cheques.notifCreated'))
     setShowForm(false)
     setForm({ numero_cheque: '', beneficiaire: '', montant: '', date_emission: new Date().toISOString().slice(0, 10), date_echeance: '', banque: '', motif: '', compte_bancaire_id: '' })
     load()
   }
 
   const handleEncaisser = async (id: string) => {
-    if (!confirm('Marquer ce chèque comme encaissé ?')) return
+    if (!confirm(t('treso.cheques.confirmEncaiss'))) return
     const { error: err } = await supabase.from('cheques')
       .update({ statut: 'encaisse', date_encaissement: new Date().toISOString().slice(0, 10) })
       .eq('id', id).eq('tenant_id', tenantId)
     if (err) { notify(err.message, true); return }
-    notify('Chèque encaissé ✓')
+    notify(t('treso.cheques.notifEncaisse'))
     load()
   }
 
   const handleRejeter = async (id: string) => {
-    if (!confirm('Marquer ce chèque comme rejeté ?')) return
+    if (!confirm(t('treso.cheques.confirmRejet'))) return
     const { error: err } = await supabase.from('cheques')
       .update({ statut: 'rejete' }).eq('id', id).eq('tenant_id', tenantId)
     if (err) { notify(err.message, true); return }
-    notify('Chèque marqué rejeté')
+    notify(t('treso.cheques.notifRejete'))
     load()
   }
 
@@ -165,16 +170,16 @@ export default function ChequesPage() {
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Chèques</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>{t('treso.cheques.title')}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-            Suivi des chèques émis et reçus
+            {t('treso.cheques.subtitle')}
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-white font-medium text-sm transition-opacity hover:opacity-90"
           style={{ background: 'var(--primary)' }}>
-          <Plus className="w-4 h-4" /> Nouveau chèque
+          <Plus className="w-4 h-4" /> {t('treso.cheques.new')}
         </button>
       </div>
 
@@ -184,10 +189,10 @@ export default function ChequesPage() {
       {/* KPI Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'En attente', val: fmtFCFA(totals.attente), sub: `${cheques.filter(c => c.statut === 'en_attente').length} chèque(s)`, cls: 'text-yellow-600' },
-          { label: 'Encaissés',  val: fmtFCFA(totals.encaisse), sub: `${cheques.filter(c => c.statut === 'encaisse').length} chèque(s)`, cls: 'text-green-600' },
-          { label: 'Rejetés',    val: `${cheques.filter(c => c.statut === 'rejete').length}`, sub: 'chèque(s) rejeté(s)', cls: 'text-red-600' },
-          { label: 'Échus',      val: `${cheques.filter(isEcheanceDepassee).length}`, sub: 'chèque(s) en retard', cls: 'text-orange-600' },
+          { label: t('treso.cheques.kpi.attente'),   val: fmtFCFA(totals.attente),  sub: `${cheques.filter(c => c.statut === 'en_attente').length} cheque(s)`, cls: 'text-yellow-600' },
+          { label: t('treso.cheques.kpi.encaisses'), val: fmtFCFA(totals.encaisse), sub: `${cheques.filter(c => c.statut === 'encaisse').length} cheque(s)`, cls: 'text-green-600' },
+          { label: t('treso.cheques.kpi.rejetes'),   val: `${cheques.filter(c => c.statut === 'rejete').length}`, sub: t('treso.cheques.stat.rejete'), cls: 'text-red-600' },
+          { label: t('treso.cheques.kpi.echus'),     val: `${cheques.filter(isEcheanceDepassee).length}`, sub: t('treso.cheques.kpi.retard'), cls: 'text-orange-600' },
         ].map((k, i) => (
           <div key={i} className="rounded-2xl p-4 border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
             <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{k.label}</p>
@@ -202,7 +207,7 @@ export default function ChequesPage() {
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
           <input
-            type="text" placeholder="N° chèque, bénéficiaire…" value={search}
+            type="text" placeholder={t('treso.cheques.searchPlh')} value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 rounded-xl text-sm border outline-none"
             style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
@@ -212,11 +217,11 @@ export default function ChequesPage() {
           value={filterStatut} onChange={e => setFilterStatut(e.target.value)}
           className="px-3 py-2 rounded-xl text-sm border outline-none"
           style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-          <option value="all">Tous statuts</option>
-          <option value="en_attente">En attente</option>
-          <option value="encaisse">Encaissé</option>
-          <option value="rejete">Rejeté</option>
-          <option value="annule">Annulé</option>
+          <option value="all">{t('treso.cheques.filterAll')}</option>
+          <option value="en_attente">{t('treso.cheques.stat.attente')}</option>
+          <option value="encaisse">{t('treso.cheques.stat.encaisse')}</option>
+          <option value="rejete">{t('treso.cheques.stat.rejete')}</option>
+          <option value="annule">{t('treso.cheques.stat.annule')}</option>
         </select>
       </div>
 
@@ -225,7 +230,16 @@ export default function ChequesPage() {
         <table className="w-full text-sm">
           <thead>
             <tr style={{ background: 'var(--bg)' }}>
-              {['N° Chèque', 'Bénéficiaire', 'Banque', 'Émission', 'Échéance', 'Montant', 'Statut', 'Actions'].map(h => (
+              {[
+                t('treso.cheques.colNum'),
+                t('treso.cheques.colBenef'),
+                t('treso.cheques.colBanque'),
+                t('treso.cheques.colEmis'),
+                t('treso.cheques.colEcheance'),
+                t('treso.cheques.colMontant'),
+                t('treso.cheques.colStatut'),
+                t('treso.cheques.colActions'),
+              ].map(h => (
                 <th key={h} className="px-4 py-3 text-left font-semibold" style={{ color: 'var(--text-secondary)' }}>{h}</th>
               ))}
             </tr>
@@ -235,12 +249,13 @@ export default function ChequesPage() {
               <tr>
                 <td colSpan={8} className="px-4 py-12 text-center" style={{ color: 'var(--text-secondary)' }}>
                   <FileCheck className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  Aucun chèque
+                  {t('treso.cheques.empty')}
                 </td>
               </tr>
             )}
             {filtered.map((c, i) => {
-              const badge = STATUT_BADGE[c.statut] || { label: c.statut, cls: 'bg-gray-100 text-gray-700' }
+              const badgeCls = STATUT_CSS[c.statut] || 'bg-gray-100 text-gray-700'
+              const badgeLabel = t(`treso.cheques.stat.${c.statut === 'en_attente' ? 'attente' : c.statut === 'encaisse' ? 'encaisse' : c.statut === 'rejete' ? 'rejete' : 'annule'}`)
               const echu  = isEcheanceDepassee(c)
               return (
                 <tr key={c.id}
@@ -258,8 +273,8 @@ export default function ChequesPage() {
                   </td>
                   <td className="px-4 py-3 font-semibold" style={{ color: 'var(--text)' }}>{fmtFCFA(c.montant)}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${badge.cls}`}>
-                      {badge.label}
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${badgeCls}`}>
+                      {badgeLabel}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -269,13 +284,13 @@ export default function ChequesPage() {
                           onClick={() => handleEncaisser(c.id)}
                           className="px-3 py-1 rounded-lg text-xs font-medium text-white transition-opacity hover:opacity-80"
                           style={{ background: 'var(--success)' }}>
-                          Encaisser
+                          {t('treso.cheques.encaisser')}
                         </button>
                         <button
                           onClick={() => handleRejeter(c.id)}
                           className="px-3 py-1 rounded-lg text-xs font-medium text-white transition-opacity hover:opacity-80"
                           style={{ background: 'var(--danger)' }}>
-                          Rejeter
+                          {t('treso.cheques.rejeter')}
                         </button>
                       </div>
                     )}
@@ -295,7 +310,7 @@ export default function ChequesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)' }}>
           <div className="w-full max-w-lg rounded-2xl shadow-2xl" style={{ background: 'var(--surface)' }}>
             <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--border)' }}>
-              <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>Enregistrer un chèque</h2>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--text)' }}>{t('treso.cheques.modalTitle')}</h2>
               <button onClick={() => setShowForm(false)} className="p-2 rounded-xl hover:bg-gray-100">
                 <X className="w-4 h-4" />
               </button>
@@ -303,14 +318,14 @@ export default function ChequesPage() {
             <form onSubmit={handleCreate} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>N° Chèque *</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formNum')}</label>
                   <input type="text" required value={form.numero_cheque}
                     onChange={e => setForm(f => ({ ...f, numero_cheque: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl text-sm border outline-none"
                     style={{ borderColor: 'var(--border)', background: 'var(--bg)' }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Banque</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formBanque')}</label>
                   <input type="text" value={form.banque}
                     onChange={e => setForm(f => ({ ...f, banque: e.target.value }))}
                     placeholder="BGFI, LCB…"
@@ -319,7 +334,7 @@ export default function ChequesPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Bénéficiaire *</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formBenef')}</label>
                 <input type="text" required value={form.beneficiaire}
                   onChange={e => setForm(f => ({ ...f, beneficiaire: e.target.value }))}
                   className="w-full px-3 py-2 rounded-xl text-sm border outline-none"
@@ -327,14 +342,14 @@ export default function ChequesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Montant (FCFA) *</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formMontant')}</label>
                   <input type="number" required min="1" value={form.montant}
                     onChange={e => setForm(f => ({ ...f, montant: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl text-sm border outline-none"
                     style={{ borderColor: 'var(--border)', background: 'var(--bg)' }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Date émission</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formEmis')}</label>
                   <input type="date" value={form.date_emission}
                     onChange={e => setForm(f => ({ ...f, date_emission: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl text-sm border outline-none"
@@ -343,28 +358,28 @@ export default function ChequesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Date échéance</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formEcheance')}</label>
                   <input type="date" value={form.date_echeance}
                     onChange={e => setForm(f => ({ ...f, date_echeance: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl text-sm border outline-none"
                     style={{ borderColor: 'var(--border)', background: 'var(--bg)' }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Compte bancaire</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formCompte')}</label>
                   <select value={form.compte_bancaire_id}
                     onChange={e => setForm(f => ({ ...f, compte_bancaire_id: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl text-sm border outline-none"
                     style={{ borderColor: 'var(--border)', background: 'var(--bg)' }}>
-                    <option value="">— Aucun —</option>
+                    <option value="">{t('treso.cheques.formNoCompte')}</option>
                     {comptes.map(c => <option key={c.id} value={c.id}>{c.intitule} ({c.banque})</option>)}
                   </select>
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Motif</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('treso.cheques.formMotif')}</label>
                 <input type="text" value={form.motif}
                   onChange={e => setForm(f => ({ ...f, motif: e.target.value }))}
-                  placeholder="Objet du paiement (optionnel)"
+                  placeholder={t('treso.cheques.formMotifPlh')}
                   className="w-full px-3 py-2 rounded-xl text-sm border outline-none"
                   style={{ borderColor: 'var(--border)', background: 'var(--bg)' }} />
               </div>
@@ -372,13 +387,13 @@ export default function ChequesPage() {
                 <button type="button" onClick={() => setShowForm(false)}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors hover:bg-gray-50"
                   style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium text-white flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50"
                   style={{ background: 'var(--primary)' }}>
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Enregistrer
+                  {t('common.save')}
                 </button>
               </div>
             </form>

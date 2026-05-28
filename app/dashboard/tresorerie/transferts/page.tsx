@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -74,6 +75,8 @@ const EMPTY_FORM = {
 
 export default function TransfertsPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [rows, setRows]         = useState<Transfert[]>([])
   const [banques, setBanques]   = useState<CompteBancaire[]>([])
   const [caisses, setCaisses]   = useState<Caisse[]>([])
@@ -286,8 +289,8 @@ export default function TransfertsPage() {
             <GitMerge size={20} className="text-purple-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Transferts internes</h1>
-            <p className="text-xs text-[#64748B]">Mouvements inter-comptes avec écriture comptable automatique</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.transfers.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.transfers.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -296,7 +299,7 @@ export default function TransfertsPage() {
           </button>
           <button onClick={() => { setForm({ ...EMPTY_FORM }); setShowModal(true) }}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-xl hover:bg-purple-700 shadow-sm">
-            <Plus size={14} /> Nouveau transfert
+            <Plus size={14} /> {t('treso.transfers.new')}
           </button>
         </div>
       </div>
@@ -322,7 +325,7 @@ export default function TransfertsPage() {
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher…"
+            placeholder={t('treso.transfers.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
         </div>
         <div className="flex items-center gap-1.5">
@@ -342,7 +345,7 @@ export default function TransfertsPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-[#94A3B8]">
             <GitMerge size={32} className="mb-2 opacity-30" />
-            <p className="text-sm font-medium">Aucun transfert trouvé</p>
+            <p className="text-sm font-medium">{t('treso.transfers.empty')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -361,7 +364,7 @@ export default function TransfertsPage() {
                   return (
                     <tr key={r.id} className={`border-t border-[#F1F5F9] hover:bg-[#F8FAFC] ${i % 2 === 0 ? '' : 'bg-[#FAFBFC]'}`}>
                       <td className="px-4 py-3 text-xs text-[#64748B] whitespace-nowrap">
-                        {new Date(r.date_transfert).toLocaleDateString('fr-FR')}
+                        {new Date(r.date_transfert).toLocaleDateString(intlLocale)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
@@ -425,7 +428,7 @@ export default function TransfertsPage() {
             </div>
             <div className="space-y-2">
               {[
-                ['Date', new Date(selected.date_transfert).toLocaleDateString('fr-FR')],
+                ['Date', new Date(selected.date_transfert).toLocaleDateString(intlLocale)],
                 ['Libellé', selected.libelle || '—'],
                 ['Frais', selected.frais > 0 ? fmtFCFA(selected.frais) : '—'],
                 ['Statut', selected.statut],
@@ -517,7 +520,7 @@ export default function TransfertsPage() {
             )}
 
             <div className="flex justify-end gap-2 pt-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={saveTransfert} disabled={saving || !form.montant || !form.source_id || !form.dest_id}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-purple-600 rounded-xl hover:bg-purple-700 disabled:opacity-50">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}

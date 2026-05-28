@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   Shield, Plus, AlertTriangle, X, User,
   ChevronDown, ChevronUp, FileText, Trash2,
@@ -81,6 +82,7 @@ const EMPTY_FORM = {
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function SanctionsPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [sanctions, setSanctions]   = useState<Sanction[]>([])
   const [employes, setEmployes]     = useState<Employe[]>([])
   const [loading, setLoading]       = useState(true)
@@ -180,26 +182,26 @@ export default function SanctionsPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Shield size={22} className="text-[#F59E0B]" />
-            Sanctions & Discipline
+            {t('rh.sanctions.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Gestion des mesures disciplinaires</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('rh.sanctions.subtitle')}</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setError(null) }}
           className="flex items-center gap-1.5 px-4 py-2 bg-[#F59E0B] hover:bg-[#D97706] text-white text-[12px] font-bold rounded-lg shadow-sm"
         >
           <Plus size={14} />
-          Nouvelle sanction
+          {t('rh.sanctions.new')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'En cours',       value: enCours,      color: '#DC2626' },
-          { label: 'Avertissements', value: avertTotal,   color: '#D97706' },
-          { label: 'Suspensions',    value: suspensions,  color: '#7C3AED' },
-          { label: 'Licenciements',  value: licenciements, color: '#0F172A' },
+          { label: t('rh.sanctions.colStatut'), value: enCours,      color: '#DC2626' },
+          { label: t('rh.sanctions.type.avert'), value: avertTotal,   color: '#D97706' },
+          { label: t('rh.sanctions.type.suspension'), value: suspensions,  color: '#7C3AED' },
+          { label: t('rh.sanctions.type.licencie'), value: licenciements, color: '#0F172A' },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-4 text-center">
             <div className="text-[26px] font-extrabold" style={{ color: k.color }}>{k.value}</div>
@@ -213,7 +215,7 @@ export default function SanctionsPage() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
-              <h2 className="font-bold text-[#0F172A] text-[15px]">Nouvelle sanction disciplinaire</h2>
+              <h2 className="font-bold text-[#0F172A] text-[15px]">{t('rh.sanctions.new')}</h2>
               <button onClick={() => setShowForm(false)}><X size={18} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-4">
@@ -242,7 +244,7 @@ export default function SanctionsPage() {
                     onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30"
                   >
-                    {TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    {TYPES.map(typ => <option key={typ.value} value={typ.value}>{typ.label}</option>)}
                   </select>
                 </div>
                 <div>
@@ -327,19 +329,19 @@ export default function SanctionsPage() {
         >
           Tous ({sanctions.length})
         </button>
-        {TYPES.map(t => {
-          const count = sanctions.filter(s => s.type === t.value).length
+        {TYPES.map(typ => {
+          const count = sanctions.filter(s => s.type === typ.value).length
           if (count === 0) return null
           return (
             <button
-              key={t.value}
-              onClick={() => setFilterType(t.value)}
+              key={typ.value}
+              onClick={() => setFilterType(typ.value)}
               className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all ${
-                filterType === t.value ? 'text-white shadow-sm' : 'text-[#64748B] hover:bg-[#F8FAFC]'
+                filterType === typ.value ? 'text-white shadow-sm' : 'text-[#64748B] hover:bg-[#F8FAFC]'
               }`}
-              style={filterType === t.value ? { background: t.color } : {}}
+              style={filterType === typ.value ? { background: typ.color } : {}}
             >
-              {t.label} ({count})
+              {typ.label} ({count})
             </button>
           )
         })}
@@ -349,8 +351,8 @@ export default function SanctionsPage() {
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-20 text-center">
           <Shield size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[14px] font-semibold text-[#64748B]">Aucune sanction enregistrée</p>
-          <p className="text-[12px] text-[#94A3B8] mt-1">Cliquez sur &quot;Nouvelle sanction&quot; pour commencer</p>
+          <p className="text-[14px] font-semibold text-[#64748B]">{t('rh.sanctions.empty')}</p>
+          <p className="text-[12px] text-[#94A3B8] mt-1">{t('rh.sanctions.new')}</p>
         </div>
       ) : (
         <div className="space-y-2">

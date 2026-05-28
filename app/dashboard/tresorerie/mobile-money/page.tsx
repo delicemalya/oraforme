@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import { Smartphone, Plus, X, Save, TrendingUp, TrendingDown, Download, AlertTriangle } from 'lucide-react'
@@ -34,6 +35,8 @@ function getBg(op: string)    { return OPERATEURS.find(o => o.id === op)?.bg    
 
 export default function MobileMoneyPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [wallets,   setWallets]   = useState<Wallet[]>([])
   const [ops,       setOps]       = useState<WalletOp[]>([])
   const [selected,  setSelected]  = useState<Wallet | null>(null)
@@ -131,7 +134,7 @@ export default function MobileMoneyPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24">
       <div className="w-6 h-6 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mr-2" />
-      <span className="text-[#94A3B8] text-[13px]">Chargement Mobile Money…</span>
+      <span className="text-[#94A3B8] text-[13px]">{t('common.loading')}</span>
     </div>
   )
 
@@ -148,9 +151,9 @@ export default function MobileMoneyPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Smartphone size={22} className="text-[#8B5CF6]" />
-            Mobile Money
+            {t('mm.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">MTN · Airtel · Orange · Congo-Brazzaville</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('mm.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           {selected && (
@@ -171,7 +174,7 @@ export default function MobileMoneyPage() {
           )}
           <button onClick={() => setWalletModal(true)}
             className="flex items-center gap-1.5 px-3 py-2 bg-[#8B5CF6] text-white rounded-lg text-[12px] font-semibold">
-            <Plus size={13} /> Nouveau wallet
+            <Plus size={13} /> {t('mm.newTransaction')}
           </button>
         </div>
       </div>
@@ -197,7 +200,7 @@ export default function MobileMoneyPage() {
       {wallets.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#E2E8F0] py-16 text-center">
           <Smartphone size={36} className="mx-auto mb-3 text-[#E2E8F0]" />
-          <p className="text-[13px] text-[#94A3B8] mb-3">Aucun wallet Mobile Money configuré</p>
+          <p className="text-[13px] text-[#94A3B8] mb-3">{t('mm.empty')}</p>
           <button onClick={() => setWalletModal(true)}
             className="px-4 py-2 bg-[#8B5CF6] text-white rounded-lg text-[12px] font-semibold">
             Créer mon premier wallet
@@ -251,13 +254,13 @@ export default function MobileMoneyPage() {
             <span className="text-[11px] text-[#64748B]">{ops.length} entrées</span>
           </div>
           {ops.length === 0 ? (
-            <div className="py-10 text-center text-[#94A3B8] text-[12px]">Aucune opération enregistrée</div>
+            <div className="py-10 text-center text-[#94A3B8] text-[12px]">{t('mm.empty')}</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-[12px]">
                 <thead className="bg-[#F8FAFC]">
                   <tr>
-                    {['Date','Libellé','Type','Montant','Frais','Référence'].map(h => (
+                    {[t('mm.colDate'), 'Libellé', t('mm.colType'), t('mm.colMontant'), 'Frais', t('mm.colRef')].map(h => (
                       <th key={h} className="px-3 py-2.5 text-left text-[10px] font-semibold text-[#94A3B8] uppercase">{h}</th>
                     ))}
                   </tr>
@@ -266,7 +269,7 @@ export default function MobileMoneyPage() {
                   {ops.map(o => (
                     <tr key={o.id} className="border-t border-[#F8FAFC] hover:bg-[#F8FAFC]">
                       <td className="px-3 py-2 text-[#64748B]">
-                        {new Date(o.date_operation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                        {new Date(o.date_operation).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short' })}
                       </td>
                       <td className="px-3 py-2 font-medium text-[#0F172A]">{o.libelle}</td>
                       <td className="px-3 py-2">
@@ -275,7 +278,7 @@ export default function MobileMoneyPage() {
                           o.type === 'frais'  ? 'bg-[#FFFBEB] text-[#D97706]' :
                           'bg-[#FEF2F2] text-[#DC2626]'
                         }`}>
-                          {o.type === 'entree' ? 'Dépôt' : o.type === 'frais' ? 'Frais' : 'Retrait'}
+                          {o.type === 'entree' ? t('mm.type.depot') : o.type === 'frais' ? 'Frais' : t('mm.type.retrait')}
                         </span>
                       </td>
                       <td className={`px-3 py-2 font-extrabold ${o.type === 'entree' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
@@ -330,10 +333,10 @@ export default function MobileMoneyPage() {
               ))}
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setOpModal(null)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+              <button onClick={() => setOpModal(null)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={() => saveOp(opModal)} disabled={saving}
                 className={`flex items-center gap-1.5 px-5 py-2 text-white rounded-lg text-[12px] font-semibold disabled:opacity-60 ${opModal === 'entree' ? 'bg-[#16A34A]' : 'bg-[#DC2626]'}`}>
-                <Save size={13} /> {saving ? '…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? '…' : t('common.save')}
               </button>
             </div>
           </div>
@@ -378,7 +381,7 @@ export default function MobileMoneyPage() {
               ))}
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setWalletModal(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+              <button onClick={() => setWalletModal(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={createWallet} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#8B5CF6] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
                 <Save size={13} /> {saving ? '…' : 'Créer'}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -69,6 +70,8 @@ const EMPTY_FORM = {
 
 export default function ValidationsPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [rows, setRows]             = useState<DemandePaiement[]>([])
   const [loading, setLoading]       = useState(true)
   const [showModal, setShowModal]   = useState(false)
@@ -213,8 +216,8 @@ export default function ValidationsPage() {
             <CheckCircle2 size={20} className="text-green-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Validations & Approbations</h1>
-            <p className="text-xs text-[#64748B]">Circuit de validation : Demande → RAF → DG → Comptable → Exécution</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.validations.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.validations.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -223,7 +226,7 @@ export default function ValidationsPage() {
           </button>
           <button onClick={() => { setForm({ ...EMPTY_FORM }); setShowModal(true) }}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 shadow-sm">
-            <Plus size={14} /> Nouvelle demande
+            <Plus size={14} /> {t('treso.validations.approveAll')}
           </button>
         </div>
       </div>
@@ -300,14 +303,14 @@ export default function ValidationsPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-[#94A3B8]">
             <CheckCircle2 size={32} className="mb-2 opacity-30" />
-            <p className="text-sm">Aucune demande trouvée</p>
+            <p className="text-sm">{t('treso.validations.empty')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-[#F8FAFC]">
                 <tr>
-                  {['Date', 'Libellé / Bénéficiaire', 'Montant', 'Urgence', 'Étape suivante', 'Statut', 'Actions'].map(h => (
+                  {[t('treso.validations.colDate'), t('treso.validations.colLabel'), t('treso.validations.colMontant'), 'Urgence', 'Étape suivante', 'Statut', 'Actions'].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -318,7 +321,7 @@ export default function ValidationsPage() {
                   const canAct = flow?.next !== null
                   return (
                     <tr key={r.id} className={`border-t border-[#F1F5F9] hover:bg-[#F8FAFC] ${i % 2 === 0 ? '' : 'bg-[#FAFBFC]'}`}>
-                      <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(r.date_demande).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-xs text-[#64748B]">{new Date(r.date_demande).toLocaleDateString(intlLocale)}</td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-medium text-[#0F172A]">{r.libelle}</div>
                         <div className="text-[10px] text-[#94A3B8]">{r.beneficiaire}</div>
@@ -346,11 +349,11 @@ export default function ValidationsPage() {
                             <>
                               <button onClick={() => { setValidating({ id: r.id, action: 'valider' }); setSelected(r) }}
                                 className="px-2 py-1 text-[10px] font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700">
-                                Valider
+                                {t('treso.validations.approve')}
                               </button>
                               <button onClick={() => { setValidating({ id: r.id, action: 'rejeter' }); setSelected(r) }}
                                 className="px-2 py-1 text-[10px] font-semibold text-red-600 bg-red-50 rounded-lg hover:bg-red-100">
-                                Rejeter
+                                {t('treso.validations.reject')}
                               </button>
                             </>
                           )}
@@ -392,7 +395,7 @@ export default function ValidationsPage() {
             <div className="flex justify-end gap-2">
               <button onClick={() => { setValidating(null); setSelected(null) }}
                 className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => executeValidation(selected, validating.action)}
@@ -401,7 +404,7 @@ export default function ValidationsPage() {
                   validating.action === 'valider' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
                 }`}>
                 {validationSaving ? <Loader2 size={13} className="animate-spin" /> : (validating.action === 'valider' ? <Check size={13} /> : <X size={13} />)}
-                {validating.action === 'valider' ? 'Confirmer la validation' : 'Confirmer le rejet'}
+                {validating.action === 'valider' ? t('treso.validations.confirmApp') : t('treso.validations.confirmRej')}
               </button>
             </div>
           </div>
@@ -417,7 +420,7 @@ export default function ValidationsPage() {
               <button onClick={() => setSelected(null)} className="p-2 hover:bg-[#F1F5F9] rounded-xl"><X size={16} /></button>
             </div>
             {[
-              ['Date', new Date(selected.date_demande).toLocaleDateString('fr-FR')],
+              ['Date', new Date(selected.date_demande).toLocaleDateString(intlLocale)],
               ['Libellé', selected.libelle],
               ['Bénéficiaire', selected.beneficiaire],
               ['Montant', fmtFCFA(selected.montant)],
@@ -509,7 +512,7 @@ export default function ValidationsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={saveDemande} disabled={saving || !form.montant || !form.libelle || !form.beneficiaire}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 disabled:opacity-50">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}

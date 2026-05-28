@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { Gift, Plus, X, Trash2, Users, DollarSign } from 'lucide-react'
 
 /* ─── Types ─────────────────────────────────────────────── */
@@ -70,6 +71,7 @@ const EMPTY_FORM = {
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function AvantagesPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [avantages, setAvantages] = useState<Avantage[]>([])
   const [employes, setEmployes]   = useState<Employe[]>([])
   const [loading, setLoading]     = useState(true)
@@ -170,26 +172,26 @@ export default function AvantagesPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Gift size={22} className="text-[#F59E0B]" />
-            Avantages & Bénéfices
+            {t('rh.avantages.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Gestion des avantages en nature et bénéfices employés</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('rh.avantages.subtitle')}</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setError(null) }}
           className="flex items-center gap-1.5 px-4 py-2 bg-[#F59E0B] hover:bg-[#D97706] text-white text-[12px] font-bold rounded-lg shadow-sm"
         >
           <Plus size={14} />
-          Nouvel avantage
+          {t('rh.avantages.new')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Avantages actifs',     value: totalActifs.toString(),         color: '#F59E0B', icon: Gift     },
-          { label: 'Charge mensuelle',     value: totalMontant > 0 ? fmtFCFA(totalMontant) : '—', color: '#16A34A', icon: DollarSign },
-          { label: 'Bénéficiaires',        value: beneficiaires.toString(),       color: '#2563EB', icon: Users    },
-          { label: 'Avantages globaux',    value: globaux.toString(),             color: '#8B5CF6', icon: Gift     },
+          { label: t('rh.avantages.colStatut'), value: totalActifs.toString(),         color: '#F59E0B', icon: Gift     },
+          { label: t('rh.avantages.colMontant'), value: totalMontant > 0 ? fmtFCFA(totalMontant) : '—', color: '#16A34A', icon: DollarSign },
+          { label: t('rh.avantages.colBeneficiaires'), value: beneficiaires.toString(),       color: '#2563EB', icon: Users    },
+          { label: t('rh.avantages.title'), value: globaux.toString(),             color: '#8B5CF6', icon: Gift     },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: k.color + '18' }}>
@@ -208,7 +210,7 @@ export default function AvantagesPage() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
-              <h2 className="font-bold text-[#0F172A] text-[15px]">Nouvel avantage</h2>
+              <h2 className="font-bold text-[#0F172A] text-[15px]">{t('rh.avantages.new')}</h2>
               <button onClick={() => setShowForm(false)}><X size={18} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-4">
@@ -239,7 +241,7 @@ export default function AvantagesPage() {
                     onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30"
                   >
-                    {TYPES.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
+                    {TYPES.map(typ => <option key={typ.value} value={typ.value}>{typ.icon} {typ.label}</option>)}
                   </select>
                 </div>
                 <div>
@@ -321,19 +323,19 @@ export default function AvantagesPage() {
         >
           Tous ({avantages.length})
         </button>
-        {TYPES.map(t => {
-          const cnt = avantages.filter(a => a.type === t.value).length
+        {TYPES.map(typ => {
+          const cnt = avantages.filter(a => a.type === typ.value).length
           if (cnt === 0) return null
           return (
             <button
-              key={t.value}
-              onClick={() => setFilterType(t.value)}
+              key={typ.value}
+              onClick={() => setFilterType(typ.value)}
               className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap ${
-                filterType === t.value ? 'text-white' : 'text-[#64748B] hover:bg-[#F8FAFC]'
+                filterType === typ.value ? 'text-white' : 'text-[#64748B] hover:bg-[#F8FAFC]'
               }`}
-              style={filterType === t.value ? { background: t.color } : {}}
+              style={filterType === typ.value ? { background: typ.color } : {}}
             >
-              {t.icon} {t.label} ({cnt})
+              {typ.icon} {typ.label} ({cnt})
             </button>
           )
         })}
@@ -343,13 +345,13 @@ export default function AvantagesPage() {
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-20 text-center">
           <Gift size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[14px] font-semibold text-[#64748B]">Aucun avantage enregistré</p>
-          <p className="text-[12px] text-[#94A3B8] mt-1">Ajoutez des avantages pour vos employés</p>
+          <p className="text-[14px] font-semibold text-[#64748B]">{t('rh.avantages.empty')}</p>
+          <p className="text-[12px] text-[#94A3B8] mt-1">{t('rh.avantages.new')}</p>
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {filtered.map(a => {
-            const typeConf = TYPES.find(t => t.value === a.type) || { icon: '🎁', color: '#94A3B8', label: a.type }
+            const typeConf = TYPES.find(typ => typ.value === a.type) || { icon: '🎁', color: '#94A3B8', label: a.type }
             const isActif = a.statut === 'actif'
             return (
               <div

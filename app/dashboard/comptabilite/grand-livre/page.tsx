@@ -7,34 +7,38 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
-import { Scale, Search, Download, ChevronDown, ChevronRight, Filter } from 'lucide-react'
+import { Scale, Search, Download, ChevronDown, ChevronRight } from 'lucide-react'
 
 interface Movement { id: string; date_operation: string; libelle: string; debit_account: string; credit_account: string; montant: number; source: string }
 interface AccountSummary { number: string; name: string; classe: number; type: string; total_debit: number; total_credit: number; solde: number; movements: Movement[] }
-
-const CLASSES = [
-  { id: 'all', label: 'Toutes classes' },
-  { id: '1', label: 'Cl. 1 — Capitaux' },
-  { id: '2', label: 'Cl. 2 — Immobilisations' },
-  { id: '3', label: 'Cl. 3 — Stocks' },
-  { id: '4', label: 'Cl. 4 — Tiers' },
-  { id: '5', label: 'Cl. 5 — Trésorerie' },
-  { id: '6', label: 'Cl. 6 — Charges' },
-  { id: '7', label: 'Cl. 7 — Produits' },
-]
 
 const YEARS = [2024, 2025, 2026, 2027]
 
 export default function GrandLivrePage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]     = useState(true)
   const [search, setSearch]       = useState('')
   const [classe, setClasse]       = useState('all')
   const [year, setYear]           = useState(new Date().getFullYear())
   const [expanded, setExpanded]   = useState<string | null>(null)
+
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
+
+  const CLASSES = [
+    { id: 'all', label: t('compta.grandlivre.allAccounts') },
+    { id: '1', label: 'Cl. 1 — Capitaux' },
+    { id: '2', label: 'Cl. 2 — Immobilisations' },
+    { id: '3', label: 'Cl. 3 — Stocks' },
+    { id: '4', label: 'Cl. 4 — Tiers' },
+    { id: '5', label: 'Cl. 5 — Trésorerie' },
+    { id: '6', label: 'Cl. 6 — Charges' },
+    { id: '7', label: 'Cl. 7 — Produits' },
+  ]
 
   useEffect(() => {
     if (!tenantId) return
@@ -114,10 +118,12 @@ export default function GrandLivrePage() {
   function exportCSV() {
     const rows = filtered.flatMap(a =>
       a.movements.map(m => ({
-        Compte: a.number, Intitulé: a.name,
-        Date: m.date_operation, Libellé: m.libelle,
-        Débit: m.debit_account === a.number ? m.montant : 0,
-        Crédit: m.credit_account === a.number ? m.montant : 0,
+        [t('compta.grandlivre.colCompte')]: a.number,
+        [t('compta.grandlivre.colLabel')]: a.name,
+        [t('compta.grandlivre.colDate')]: m.date_operation,
+        [t('compta.grandlivre.colLabel')]: m.libelle,
+        [t('compta.grandlivre.colDebit')]: m.debit_account === a.number ? m.montant : 0,
+        [t('compta.grandlivre.colCredit')]: m.credit_account === a.number ? m.montant : 0,
         Source: m.source,
       }))
     )
@@ -131,7 +137,7 @@ export default function GrandLivrePage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Grand Livre…
+      {t('common.loading')}
     </div>
   )
 
@@ -143,10 +149,10 @@ export default function GrandLivrePage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Scale size={22} className="text-[#2563EB]" />
-            Grand Livre
+            {t('compta.grandlivre.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            Soldes et mouvements par compte OHADA · Exercice {year}
+            {t('compta.grandlivre.subtitle')} · {year}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -156,7 +162,7 @@ export default function GrandLivrePage() {
           </select>
           <button onClick={exportCSV}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-[12px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
-            <Download size={13} /> Export CSV
+            <Download size={13} /> {t('common.export')} CSV
           </button>
         </div>
       </div>
@@ -164,10 +170,14 @@ export default function GrandLivrePage() {
       {/* KPIs */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Total Débit',  value: totalDebit,              color: '#2563EB' },
-          { label: 'Total Crédit', value: totalCredit,             color: '#16A34A' },
-          { label: 'Équilibre',    value: Math.abs(totalDebit - totalCredit), color: Math.abs(totalDebit - totalCredit) < 1 ? '#16A34A' : '#DC2626',
-            badge: Math.abs(totalDebit - totalCredit) < 1 ? '✓ Équilibré' : '⚠ Déséquilibre' },
+          { label: t('compta.grandlivre.totalDebit'),  value: totalDebit,  color: '#2563EB' },
+          { label: t('compta.grandlivre.totalCredit'), value: totalCredit, color: '#16A34A' },
+          {
+            label: t('compta.journal.balance'),
+            value: Math.abs(totalDebit - totalCredit),
+            color: Math.abs(totalDebit - totalCredit) < 1 ? '#16A34A' : '#DC2626',
+            badge: Math.abs(totalDebit - totalCredit) < 1 ? t('compta.journal.balanced') : t('compta.journal.unbalanced'),
+          },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-4">
             <div className="text-[18px] font-extrabold truncate" style={{ color: k.color }}>{fmtFCFA(k.value)}</div>
@@ -182,7 +192,7 @@ export default function GrandLivrePage() {
         <div className="relative flex-1">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher par N° compte ou intitulé…"
+            placeholder={t('compta.grandlivre.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-[12px] border border-[#E2E8F0] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
         </div>
         <select value={classe} onChange={e => setClasse(e.target.value)}
@@ -195,7 +205,7 @@ export default function GrandLivrePage() {
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-20 text-center">
           <Scale size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[13px] text-[#94A3B8]">Aucune écriture pour cet exercice</p>
+          <p className="text-[13px] text-[#94A3B8]">{t('compta.grandlivre.empty')}</p>
         </div>
       ) : (
         <div className="space-y-1">
@@ -231,7 +241,7 @@ export default function GrandLivrePage() {
                     <table className="w-full text-[11px]">
                       <thead className="bg-[#F8FAFC]">
                         <tr>
-                          {['Date','Libellé','Débit','Crédit','Source'].map(h => (
+                          {[t('compta.grandlivre.colDate'), t('compta.grandlivre.colLabel'), t('compta.grandlivre.colDebit'), t('compta.grandlivre.colCredit'), 'Source'].map(h => (
                             <th key={h} className="px-3 py-2 text-left text-[10px] font-semibold text-[#94A3B8] uppercase">{h}</th>
                           ))}
                         </tr>
@@ -240,7 +250,7 @@ export default function GrandLivrePage() {
                         {acc.movements.sort((a, b) => a.date_operation.localeCompare(b.date_operation)).map(m => (
                           <tr key={m.id} className="border-t border-[#F8FAFC] hover:bg-[#F8FAFC]">
                             <td className="px-3 py-1.5 text-[#64748B] whitespace-nowrap">
-                              {new Date(m.date_operation).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                              {new Date(m.date_operation).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short' })}
                             </td>
                             <td className="px-3 py-1.5 max-w-[200px] truncate font-medium text-[#0F172A]">{m.libelle}</td>
                             <td className="px-3 py-1.5 text-right font-bold text-[#2563EB]">
@@ -258,11 +268,13 @@ export default function GrandLivrePage() {
                         ))}
                         {/* Cumul */}
                         <tr className="bg-[#F8FAFC] border-t-2 border-[#E2E8F0]">
-                          <td colSpan={2} className="px-3 py-2 text-[11px] font-bold text-[#0F172A]">Total compte {acc.number}</td>
+                          <td colSpan={2} className="px-3 py-2 text-[11px] font-bold text-[#0F172A]">
+                            {t('compta.grandlivre.totalDebit').replace('Total ', '')} {acc.number}
+                          </td>
                           <td className="px-3 py-2 text-right font-extrabold text-[#2563EB]">{fmtFCFA(acc.total_debit)}</td>
                           <td className="px-3 py-2 text-right font-extrabold text-[#16A34A]">{fmtFCFA(acc.total_credit)}</td>
                           <td className="px-3 py-2 text-right font-extrabold" style={{ color: soldeColor }}>
-                            Solde: {fmtFCFA(Math.abs(acc.solde))} {acc.solde >= 0 ? 'D' : 'C'}
+                            {t('compta.grandlivre.solde')}: {fmtFCFA(Math.abs(acc.solde))} {acc.solde >= 0 ? 'D' : 'C'}
                           </td>
                         </tr>
                       </tbody>
@@ -275,11 +287,11 @@ export default function GrandLivrePage() {
 
           {/* Grand total */}
           <div className="bg-[#0F172A] rounded-xl px-4 py-3 flex items-center gap-4 text-white">
-            <span className="flex-1 text-[12px] font-bold">TOTAUX — {filtered.length} compte{filtered.length > 1 ? 's' : ''}</span>
-            <span className="text-[12px] hidden md:block">Total Débit: <strong>{fmtFCFA(totalDebit)}</strong></span>
-            <span className="text-[12px] hidden md:block">Total Crédit: <strong>{fmtFCFA(totalCredit)}</strong></span>
+            <span className="flex-1 text-[12px] font-bold">{t('compta.balance.totalRow')} — {filtered.length} compte{filtered.length > 1 ? 's' : ''}</span>
+            <span className="text-[12px] hidden md:block">{t('compta.grandlivre.totalDebit')}: <strong>{fmtFCFA(totalDebit)}</strong></span>
+            <span className="text-[12px] hidden md:block">{t('compta.grandlivre.totalCredit')}: <strong>{fmtFCFA(totalCredit)}</strong></span>
             <span className={`text-[12px] font-bold ${Math.abs(totalDebit - totalCredit) < 1 ? 'text-[#4ADE80]' : 'text-[#FCA5A5]'}`}>
-              {Math.abs(totalDebit - totalCredit) < 1 ? '✓ Équilibré' : `Écart: ${fmtFCFA(Math.abs(totalDebit - totalCredit))}`}
+              {Math.abs(totalDebit - totalCredit) < 1 ? t('compta.journal.balanced') : `${t('compta.rapproch.ecart')}: ${fmtFCFA(Math.abs(totalDebit - totalCredit))}`}
             </span>
           </div>
         </div>

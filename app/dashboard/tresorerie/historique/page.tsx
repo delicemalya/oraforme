@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   History, Search, Download, Loader2, ArrowUpCircle, ArrowDownCircle,
@@ -39,6 +40,8 @@ const PAGE_SIZE = 50
 
 export default function HistoriquePage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'
   const [rows, setRows]             = useState<Transaction[]>([])
   const [total, setTotal]           = useState(0)
   const [loading, setLoading]       = useState(true)
@@ -108,8 +111,8 @@ export default function HistoriquePage() {
             <History size={20} className="text-slate-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Historique des transactions</h1>
-            <p className="text-xs text-[#64748B]">{total.toLocaleString('fr-FR')} opérations enregistrées</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.historique.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.historique.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -150,7 +153,7 @@ export default function HistoriquePage() {
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
               <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Libellé…"
+                placeholder={t('treso.historique.searchPlh')}
                 className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
             </div>
             <select value={filterType} onChange={e => setFilterType(e.target.value)}
@@ -213,14 +216,14 @@ export default function HistoriquePage() {
         ) : rows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-[#94A3B8]">
             <History size={32} className="mb-2 opacity-30" />
-            <p className="text-sm">Aucune transaction trouvée</p>
+            <p className="text-sm">{t('treso.historique.empty')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-[#F8FAFC]">
                 <tr>
-                  {['Date', 'Libellé', 'Type', 'Source', 'Catégorie', 'Montant', ''].map(h => (
+                  {[t('treso.historique.colDate'), t('treso.historique.colLabel'), t('treso.historique.colType'), 'Source', 'Catégorie', t('treso.historique.colMontant'), ''].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -232,7 +235,7 @@ export default function HistoriquePage() {
                   return (
                     <tr key={r.id} className={`border-t border-[#F1F5F9] hover:bg-[#F8FAFC] transition-colors ${i % 2 === 0 ? '' : 'bg-[#FAFBFC]'}`}>
                       <td className="px-4 py-3 text-xs text-[#64748B] whitespace-nowrap">
-                        {new Date(r.date).toLocaleDateString('fr-FR')}
+                        {new Date(r.date).toLocaleDateString(intlLocale)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-medium text-[#0F172A] max-w-xs truncate">{r.libelle}</div>
@@ -306,7 +309,7 @@ export default function HistoriquePage() {
               )
             })()}
             {[
-              ['Date', new Date(selected.date).toLocaleDateString('fr-FR')],
+              ['Date', new Date(selected.date).toLocaleDateString(intlLocale)],
               ['Libellé', selected.libelle],
               ['Type', selected.type],
               ['Source', selected.source || '—'],
@@ -314,7 +317,7 @@ export default function HistoriquePage() {
               ['Référence', selected.reference || '—'],
               ['Compte', selected.compte || '—'],
               ['Notes', selected.notes || '—'],
-              ['Créé le', new Date(selected.created_at).toLocaleDateString('fr-FR')],
+              ['Créé le', new Date(selected.created_at).toLocaleDateString(intlLocale)],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between text-xs gap-4">
                 <span className="text-[#64748B] shrink-0">{k}</span>

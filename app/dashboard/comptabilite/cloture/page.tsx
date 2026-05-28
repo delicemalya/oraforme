@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
 import { Lock, CheckCircle2, AlertTriangle, Clock, ChevronRight, RefreshCw } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Movement {
   id: string; date_operation: string; debit_account: string
@@ -44,6 +45,7 @@ const STEPS_CLOTURE = [
 
 export default function CloturePage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [movements, setMovements]   = useState<Movement[]>([])
   const [clotures, setClotures]     = useState<ClotureRecord[]>([])
   const [loading, setLoading]       = useState(true)
@@ -149,7 +151,7 @@ export default function CloturePage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Clôture…
+      {t('common.loading')}
     </div>
   )
 
@@ -161,10 +163,10 @@ export default function CloturePage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Lock size={22} className="text-[#2563EB]" />
-            Clôture Comptable
+            {t('compta.cloture.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            Validation et clôture des périodes comptables · OHADA
+            {t('compta.cloture.subtitle')}
           </p>
         </div>
         <select value={year} onChange={e => setYear(Number(e.target.value))}
@@ -256,7 +258,7 @@ export default function CloturePage() {
                       <div className="text-[11px] font-bold" style={{
                         color: isCloture ? '#16A34A' : '#D97706'
                       }}>
-                        {isCloture ? 'Clôturé' : m.nb_ecritures === 0 ? 'Vide' : 'Ouvert'}
+                        {isCloture ? t('compta.cloture.stat.cloture') : m.nb_ecritures === 0 ? t('compta.cloture.stat.ouvert') : t('compta.cloture.stat.ouvert')}
                       </div>
                       <div className="text-[9px] text-[#94A3B8]">Statut</div>
                     </div>
@@ -275,7 +277,7 @@ export default function CloturePage() {
                         onClick={() => cloturerMois(m.mois)}
                         disabled={!!isProcessing}
                         className="flex items-center gap-1 text-[11px] px-3 py-1.5 bg-[#2563EB] text-white rounded-lg font-semibold hover:bg-[#1D4ED8] shrink-0">
-                        <Lock size={11} /> {isProcessing ? '…' : 'Clôturer'}
+                        <Lock size={11} /> {isProcessing ? t('common.loading') : t('compta.cloture.confirm')}
                       </button>
                     ) : (
                       <span className="text-[11px] text-[#DC2626] font-bold shrink-0">Déséquilibre</span>
