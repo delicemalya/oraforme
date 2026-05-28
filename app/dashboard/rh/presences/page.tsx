@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   Clock, Check, X, Plus, AlertTriangle,
   CheckCircle, XCircle, Calendar, Users, Search,
@@ -69,6 +70,7 @@ function weekDays(anchor: Date): string[] {
 
 export default function PresencesPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [presences, setPresences] = useState<Presence[]>([])
   const [employes,  setEmployes]  = useState<Employe[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -168,7 +170,7 @@ export default function PresencesPage() {
 
   function exportCSV() {
     const rows = [
-      ['Date', 'Employé', 'Type', 'Arrivée', 'Départ', 'Motif'],
+      [t('rh.presences.colDate'), t('rh.presences.colEmployee'), t('rh.presences.colStatus'), t('rh.presences.colArrival'), t('rh.presences.colDeparture'), t('rh.presences.colReason')],
       ...presences.map(p => [
         p.date,
         (p.employes as unknown as { nom: string })?.nom ?? p.employe_id,
@@ -195,17 +197,17 @@ export default function PresencesPage() {
             <Clock size={18} className="text-green-600" />
           </div>
           <div>
-            <h1 className="text-[20px] font-bold text-[#0F172A]">Présences & Pointage</h1>
-            <p className="text-[11px] text-[#64748B]">{employes.length} employés actifs · {selDate}</p>
+            <h1 className="text-[20px] font-bold text-[#0F172A]">{t('rh.presences.title')}</h1>
+            <p className="text-[11px] text-[#64748B]">{employes.length} {t('rh.presences.subtitle')} · {selDate}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[12px] font-semibold hover:bg-[#F8FAFC]">
-            <Download size={13} /> Exporter
+            <Download size={13} /> {t('rh.presences.export')}
           </button>
           <button onClick={() => setShowForm(true)}
             className="flex items-center gap-1.5 px-3 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold hover:bg-amber-600 shadow-sm">
-            <Plus size={13} /> Pointer
+            <Plus size={13} /> {t('rh.presences.record')}
           </button>
         </div>
       </div>
@@ -213,9 +215,9 @@ export default function PresencesPage() {
       {/* Stats du jour */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Présents',  val: presents, color: '#10B981' },
-          { label: 'Absents',   val: absents,  color: '#EF4444' },
-          { label: 'Retards',   val: retards,  color: '#F59E0B' },
+          { label: t('rh.presences.presents'), val: presents, color: '#10B981' },
+          { label: t('rh.presences.absents'),  val: absents,  color: '#EF4444' },
+          { label: t('rh.presences.lates'),    val: retards,  color: '#F59E0B' },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-2xl border border-[#E2E8F0] p-4 shadow-sm text-center">
             <p className="text-[28px] font-bold tabular-nums" style={{ color: k.color }}>{k.val}</p>
@@ -259,7 +261,7 @@ export default function PresencesPage() {
         {/* Search */}
         <div className="relative mb-3">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-          <input type="text" placeholder="Rechercher un employé…" value={search} onChange={e => setSearch(e.target.value)}
+          <input type="text" placeholder={t('rh.presences.searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-2 text-[12px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300" />
         </div>
 
@@ -269,7 +271,7 @@ export default function PresencesPage() {
             {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-[#F1F5F9] rounded-xl animate-pulse" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-8 text-[12px] text-[#94A3B8]">Aucun employé actif</div>
+          <div className="text-center py-8 text-[12px] text-[#94A3B8]">{t('rh.presences.noEmployee')}</div>
         ) : (
           <div className="space-y-1.5">
             {filtered.map(emp => {
@@ -287,11 +289,11 @@ export default function PresencesPage() {
                   </div>
                   {/* Quick status buttons */}
                   <div className="flex items-center gap-1">
-                    {((['present', 'absent', 'retard', 'permission'] as TypePresence[])).map(t => {
-                      const c = TYPE_CONFIG[t]
-                      const isActive = pres?.type === t
+                    {((['present', 'absent', 'retard', 'permission'] as TypePresence[])).map(t2 => {
+                      const c = TYPE_CONFIG[t2]
+                      const isActive = pres?.type === t2
                       return (
-                        <button key={t} onClick={() => quickToggle(emp.id, t)}
+                        <button key={t2} onClick={() => quickToggle(emp.id, t2)}
                           title={c.label}
                           className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
                             isActive ? '' : 'opacity-30 hover:opacity-70'
@@ -319,13 +321,20 @@ export default function PresencesPage() {
       {presences.length > 0 && (
         <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden shadow-sm">
           <div className="px-5 py-3 border-b border-[#E2E8F0]">
-            <h3 className="text-[13px] font-bold text-[#0F172A]">Pointages détaillés</h3>
+            <h3 className="text-[13px] font-bold text-[#0F172A]">{t('rh.presences.detailedTitle')}</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                  {['Date', 'Employé', 'Statut', 'Arrivée', 'Départ', 'Motif'].map(h => (
+                  {[
+                    t('rh.presences.colDate'),
+                    t('rh.presences.colEmployee'),
+                    t('rh.presences.colStatus'),
+                    t('rh.presences.colArrival'),
+                    t('rh.presences.colDeparture'),
+                    t('rh.presences.colReason'),
+                  ].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -363,22 +372,22 @@ export default function PresencesPage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-            <h2 className="text-[16px] font-bold text-[#0F172A] mb-5">Enregistrer une présence</h2>
+            <h2 className="text-[16px] font-bold text-[#0F172A] mb-5">{t('rh.presences.modalTitle')}</h2>
             <form onSubmit={savePresence} className="space-y-3">
               <div>
-                <label className={lCls}>Employé *</label>
+                <label className={lCls}>{t('rh.presences.employee')}</label>
                 <select required value={form.employe_id} onChange={e => setForm(p => ({...p, employe_id: e.target.value}))} className={iCls}>
-                  <option value="">Sélectionner…</option>
+                  <option value="">{t('rh.presences.selectEmployee')}</option>
                   {employes.map(e => <option key={e.id} value={e.id}>{e.nom}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={lCls}>Date *</label>
+                  <label className={lCls}>{t('rh.presences.date')}</label>
                   <input required type="date" value={form.date} onChange={e => setForm(p => ({...p, date: e.target.value}))} className={iCls} />
                 </div>
                 <div>
-                  <label className={lCls}>Statut *</label>
+                  <label className={lCls}>{t('rh.presences.status')}</label>
                   <select value={form.type} onChange={e => setForm(p => ({...p, type: e.target.value as TypePresence}))} className={iCls}>
                     {Object.entries(TYPE_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                   </select>
@@ -386,29 +395,29 @@ export default function PresencesPage() {
                 {(form.type === 'present' || form.type === 'retard' || form.type === 'teletravail') && (
                   <>
                     <div>
-                      <label className={lCls}>Heure arrivée</label>
+                      <label className={lCls}>{t('rh.presences.arrival')}</label>
                       <input type="time" value={form.heure_arrivee} onChange={e => setForm(p => ({...p, heure_arrivee: e.target.value}))} className={iCls} />
                     </div>
                     <div>
-                      <label className={lCls}>Heure départ</label>
+                      <label className={lCls}>{t('rh.presences.departure')}</label>
                       <input type="time" value={form.heure_depart} onChange={e => setForm(p => ({...p, heure_depart: e.target.value}))} className={iCls} />
                     </div>
                   </>
                 )}
               </div>
               <div>
-                <label className={lCls}>Motif (optionnel)</label>
+                <label className={lCls}>{t('rh.presences.reason')}</label>
                 <input value={form.motif} onChange={e => setForm(p => ({...p, motif: e.target.value}))}
-                  placeholder="Raison de l'absence, retard…" className={iCls} />
+                  placeholder={t('rh.presences.reasonPlaceholder')} className={iCls} />
               </div>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setShowForm(false)}
                   className="flex-1 py-2.5 border border-[#E2E8F0] rounded-xl text-[13px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#F59E0B] text-white rounded-xl text-[13px] font-bold disabled:opacity-50 hover:bg-amber-600">
-                  {saving ? '…' : <><Check size={14} /> Enregistrer</>}
+                  {saving ? '…' : <><Check size={14} /> {t('common.save')}</>}
                 </button>
               </div>
             </form>

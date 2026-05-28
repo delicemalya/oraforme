@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { useLocale } from '@/lib/hooks/useLocale'
 import ERPPageLayout, {
   ERPSectionCard, ERPEmptyState, ERPStatusBadge,
   type ERPTab,
@@ -52,20 +53,24 @@ const EXT_ICONS: Record<string, React.ReactNode> = {
   jpeg: <Image size={16} className="text-purple-500" />,
 }
 
-const CATEGORIES = [
-  'Tous', 'Contrats', 'Factures', 'RH', 'Comptabilité',
-  'Juridique', 'Commercial', 'Technique', 'Autre',
-]
-
-const TABS: ERPTab[] = [
-  { id: 'actifs',   label: 'Documents actifs' },
-  { id: 'archives', label: 'Archives' },
-]
-
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function GEDPage() {
   const { tenant } = useTenantContext()
+  const { t } = useLocale()
+
+  const CATEGORIES = [
+    { key: 'ged.cat.all',       value: 'Tous' },
+    { key: 'ged.cat.contrats',  value: 'Contrats' },
+    { key: 'ged.cat.factures',  value: 'Factures' },
+    { key: 'ged.cat.rh',        value: 'RH' },
+    { key: 'ged.cat.compta',    value: 'Comptabilité' },
+    { key: 'ged.cat.juridique', value: 'Juridique' },
+    { key: 'ged.cat.commercial',value: 'Commercial' },
+    { key: 'ged.cat.technique', value: 'Technique' },
+    { key: 'ged.cat.autre',     value: 'Autre' },
+  ]
+
   const [docs,     setDocs]     = useState<Document[]>([])
   const [loading,  setLoading]  = useState(true)
   const [search,   setSearch]   = useState('')
@@ -118,7 +123,7 @@ export default function GEDPage() {
   }
 
   async function deleteDoc(id: string) {
-    if (!confirm('Supprimer ce document définitivement ?')) return
+    if (!confirm(t('ged.deleteConfirm'))) return
     await supabase.from('documents').delete().eq('id', id)
     loadDocs()
   }
@@ -135,14 +140,14 @@ export default function GEDPage() {
   const archCnt  = docs.filter(d => d.statut === 'archive').length
 
   const tabsWithBadge: ERPTab[] = [
-    { id: 'actifs',   label: 'Documents actifs', badge: actifCnt },
-    { id: 'archives', label: 'Archives',          badge: archCnt },
+    { id: 'actifs',   label: t('ged.tabActive'),    badge: actifCnt },
+    { id: 'archives', label: t('ged.tabArchives'),   badge: archCnt },
   ]
 
   return (
     <ERPPageLayout
-      title="GED Documents"
-      subtitle="Gestion électronique des documents"
+      title={t('ged.title')}
+      subtitle={t('ged.subtitle')}
       icon={<FolderOpen size={18} />}
       color="#64748B"
       tabs={tabsWithBadge}
@@ -154,7 +159,7 @@ export default function GEDPage() {
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#F59E0B] text-white text-[13px] font-semibold hover:bg-amber-600 transition-colors shadow-sm"
         >
           <Plus size={14} />
-          Ajouter document
+          {t('ged.addBtn')}
         </button>
       }
     >
@@ -163,7 +168,7 @@ export default function GEDPage() {
         <div className="relative flex-1 min-w-[200px]">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input
-            type="text" placeholder="Rechercher un document…"
+            type="text" placeholder={t('ged.searchPlaceholder')}
             value={search} onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300"
           />
@@ -171,13 +176,13 @@ export default function GEDPage() {
         <div className="flex items-center gap-1.5 flex-wrap">
           {CATEGORIES.map(c => (
             <button
-              key={c}
-              onClick={() => setCat(c)}
+              key={c.value}
+              onClick={() => setCat(c.value)}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
-                cat === c ? 'bg-[#F59E0B] text-white' : 'border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]'
+                cat === c.value ? 'bg-[#F59E0B] text-white' : 'border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]'
               }`}
             >
-              {c}
+              {t(c.key)}
             </button>
           ))}
         </div>
@@ -191,13 +196,13 @@ export default function GEDPage() {
         <ERPSectionCard>
           <ERPEmptyState
             icon={<FolderOpen size={48} />}
-            title="Aucun document"
-            description="Ajoutez vos contrats, factures, documents RH et plus encore."
+            title={t('ged.noDocument')}
+            description={t('ged.noDocumentDesc')}
             action={
               <button onClick={() => setShowNew(true)}
                 className="flex items-center gap-1.5 px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-[13px] font-semibold">
                 <Plus size={14} />
-                Ajouter un document
+                {t('ged.addDocument')}
               </button>
             }
           />
@@ -232,6 +237,7 @@ export default function GEDPage() {
                     </a>
                     {tab === 'actifs' && (
                       <button onClick={() => archiveDoc(doc.id)}
+                        title={t('ged.archiveBtn')}
                         className="p-1.5 rounded-lg hover:bg-amber-50 text-[#64748B] hover:text-amber-600 transition-colors">
                         <ArchiveX size={14} />
                       </button>
@@ -254,31 +260,31 @@ export default function GEDPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
             <h2 className="text-[16px] font-bold text-[#0F172A] mb-4 flex items-center gap-2">
               <Upload size={16} className="text-[#F59E0B]" />
-              Ajouter un document
+              {t('ged.modalTitle')}
             </h2>
             <form onSubmit={addDoc} className="space-y-3">
               <div>
-                <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">Nom du document *</label>
+                <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">{t('ged.nomLabel')}</label>
                 <input required value={form.nom} onChange={e => setForm(p => ({...p, nom: e.target.value}))}
                   className="mt-1 w-full px-3 py-2 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300"
                   placeholder="Contrat_prestataire_2026.pdf" />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">URL du fichier *</label>
+                <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">{t('ged.urlLabel')}</label>
                 <input required value={form.url} onChange={e => setForm(p => ({...p, url: e.target.value}))}
                   className="mt-1 w-full px-3 py-2 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300"
                   placeholder="https://..." />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">Catégorie</label>
+                  <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">{t('ged.categorieLabel')}</label>
                   <select value={form.categorie} onChange={e => setForm(p => ({...p, categorie: e.target.value}))}
                     className="mt-1 w-full px-3 py-2 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white">
-                    {CATEGORIES.filter(c => c !== 'Tous').map(c => <option key={c}>{c}</option>)}
+                    {CATEGORIES.filter(c => c.value !== 'Tous').map(c => <option key={c.value} value={c.value}>{t(c.key)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">Type</label>
+                  <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">{t('ged.typeLabel')}</label>
                   <select value={form.type} onChange={e => setForm(p => ({...p, type: e.target.value}))}
                     className="mt-1 w-full px-3 py-2 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white">
                     {['pdf', 'doc', 'docx', 'xls', 'xlsx', 'png', 'jpg', 'autre'].map(t => <option key={t}>{t}</option>)}
@@ -288,11 +294,11 @@ export default function GEDPage() {
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setShowNew(false)}
                   className="flex-1 py-2.5 border border-[#E2E8F0] rounded-xl text-[13px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 bg-[#F59E0B] text-white rounded-xl text-[13px] font-semibold hover:bg-amber-600 disabled:opacity-50">
-                  {saving ? 'Enregistrement…' : 'Ajouter'}
+                  {saving ? t('ged.saving') : t('ged.addSubmit')}
                 </button>
               </div>
             </form>

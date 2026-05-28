@@ -1,10 +1,11 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChefHat, Clock, CheckCircle, Loader2, RefreshCw, ArrowRight } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 type StatutCmd = 'en_attente' | 'en_preparation' | 'pret' | 'livre' | 'annule'
 interface CmdItem { nom: string; quantite: number; prix: number }
@@ -34,18 +35,19 @@ const NEXT_STATUS: Partial<Record<StatutCmd, StatutCmd>> = {
   pret:           'livre',
 }
 
-const STATUS_CONFIG: Partial<Record<StatutCmd, { label: string; color: string; bg: string; border: string }>> = {
-  en_attente:    { label: 'En attente',     color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
-  en_preparation:{ label: 'En préparation', color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
-  pret:          { label: 'Prêt à servir',  color: '#16A34A', bg: '#16A34A18', border: '#16A34A40' },
-  livre:         { label: 'Livré',          color: '#7C3AED', bg: '#7C3AED18', border: '#7C3AED40' },
-}
-
 export default function CuisinePage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [commandes, setCommandes] = useState<Commande[]>([])
   const [loading,   setLoading]   = useState(true)
   const [advancing, setAdvancing] = useState<string | null>(null)
+
+  const STATUS_CONFIG: Partial<Record<StatutCmd, { label: string; color: string; bg: string; border: string }>> = {
+    en_attente:    { label: t('resto.waiting'),    color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
+    en_preparation:{ label: t('resto.inPrep'),     color: '#DC2626', bg: '#DC262618', border: '#DC262640' },
+    pret:          { label: t('resto.readyToServe'),color: '#16A34A', bg: '#16A34A18', border: '#16A34A40' },
+    livre:         { label: t('resto.delivered'),  color: '#7C3AED', bg: '#7C3AED18', border: '#7C3AED40' },
+  }
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -100,9 +102,9 @@ export default function CuisinePage() {
             <ChefHat size={20} className="text-[#DC2626]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#101729]">Écran Cuisine</h1>
+            <h1 className="text-xl font-bold text-[#101729]">{t('resto.cuisine.title')}</h1>
             <p className="text-xs text-[var(--text-secondary)]">
-              {commandes.length} commande(s) active(s) · Mise à jour auto toutes les 10s
+              {commandes.length} {t('resto.cuisine.subtitle')}
             </p>
           </div>
         </div>
@@ -110,7 +112,7 @@ export default function CuisinePage() {
           onClick={load}
           className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-xs transition-colors"
         >
-          <RefreshCw size={13} /> Actualiser
+          <RefreshCw size={13} /> {t('common.refresh')}
         </button>
       </div>
 
@@ -118,8 +120,8 @@ export default function CuisinePage() {
       {commandes.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-[var(--text-secondary)]">
           <ChefHat size={40} className="opacity-20 mb-3" />
-          <p className="text-sm">Aucune commande en attente</p>
-          <p className="text-xs mt-1 opacity-60">La liste s&apos;actualise automatiquement</p>
+          <p className="text-sm">{t('resto.cuisine.noOrder')}</p>
+          <p className="text-xs mt-1 opacity-60">{t('resto.cuisine.autoRefresh')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -161,7 +163,7 @@ export default function CuisinePage() {
                           <div className="flex items-start justify-between">
                             <div>
                               <p className="text-sm font-bold text-[#101729]">
-                                {cmd.table_num ? `Table ${cmd.table_num}` : (cmd.client_nom || 'Client')}
+                                {cmd.table_num ? `${t('resto.table')} ${cmd.table_num}` : (cmd.client_nom || 'Client')}
                               </p>
                               <p className="text-xs text-[var(--text-secondary)] capitalize">
                                 {cmd.mode?.replace('_', ' ')}
@@ -205,7 +207,7 @@ export default function CuisinePage() {
                               {advancing === cmd.id ? (
                                 <Loader2 className="animate-spin" size={13} />
                               ) : status === 'pret' ? (
-                                <><CheckCircle size={13} /> Marquer livré</>
+                                <><CheckCircle size={13} /> {t('resto.cuisine.markDelivered')}</>
                               ) : (
                                 <><ArrowRight size={13} /> {nextCfg.label}</>
                               )}
@@ -218,7 +220,7 @@ export default function CuisinePage() {
 
                   {cmds.length === 0 && (
                     <div className="text-center py-8 text-[var(--text-secondary)] text-xs border border-dashed border-[var(--border)] rounded-xl">
-                      Aucune commande
+                      {t('resto.cuisine.noCmd')}
                     </div>
                   )}
                 </div>

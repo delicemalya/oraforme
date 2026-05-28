@@ -1,9 +1,10 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   Settings, BookOpen, Award, ToggleLeft, ToggleRight,
   Plus, Trash2, Save, RefreshCw, AlertTriangle, CheckCircle,
@@ -65,14 +66,6 @@ const DEFAULT: AcademicSettings = {
   ],
 }
 
-const TABS = [
-  { id: 'general',      label: 'Général',              icon: Settings  },
-  { id: 'mentions',     label: 'Mentions',             icon: Award     },
-  { id: 'lmd',          label: 'Règles LMD',           icon: BookOpen  },
-  { id: 'compensation', label: 'Compensation & Rattr.', icon: ToggleLeft },
-] as const
-type Tab = typeof TABS[number]['id']
-
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 function Toggle({ value, onChange, label, sub }: {
@@ -120,17 +113,21 @@ function SLabel({ text }: { text: string }) {
 
 // ── Tab: Général ──────────────────────────────────────────────────────────────
 
-function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void }) {
-  const SYSTEMS: { value: SystemType; label: string; desc: string }[] = [
-    { value: 'classique', label: 'Classique',  desc: 'Notes sur 20, trimestres ou semestres, sans crédits ECTS' },
-    { value: 'lmd',       label: 'LMD',        desc: 'Licence–Master–Doctorat avec crédits ECTS et UE' },
-    { value: 'hybride',   label: 'Hybride',    desc: 'Mélange classique + LMD selon le niveau des étudiants' },
+function TabGeneral({ s, setS, t }: {
+  s: AcademicSettings
+  setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void
+  t: (key: string) => string
+}) {
+  const SYSTEMS: { value: SystemType; labelKey: string; descKey: string }[] = [
+    { value: 'classique', labelKey: 'acad.sysClassique', descKey: 'acad.sysClassiqueDesc' },
+    { value: 'lmd',       labelKey: 'acad.sysLMD',       descKey: 'acad.sysLMDDesc' },
+    { value: 'hybride',   labelKey: 'acad.sysHybride',   descKey: 'acad.sysHybrideDesc' },
   ]
 
   return (
     <div className="space-y-5">
       <div>
-        <SLabel text="Système pédagogique" />
+        <SLabel text={t('acad.sysLabel')} />
         <div className="space-y-2">
           {SYSTEMS.map(sys => (
             <button
@@ -149,8 +146,8 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
                 {s.system_type === sys.value && <div className="w-2 h-2 rounded-full bg-[#DC2626]" />}
               </div>
               <div>
-                <div className="text-sm font-semibold text-[var(--text)]">{sys.label}</div>
-                <div className="text-xs text-[var(--text-secondary)] mt-0.5">{sys.desc}</div>
+                <div className="text-sm font-semibold text-[var(--text)]">{t(sys.labelKey)}</div>
+                <div className="text-xs text-[var(--text-secondary)] mt-0.5">{t(sys.descKey)}</div>
               </div>
             </button>
           ))}
@@ -158,7 +155,7 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
       </div>
 
       <div>
-        <SLabel text="Barème de notation" />
+        <SLabel text={t('acad.bareme')} />
         <div className="flex gap-3">
           {([20, 100] as const).map(n => (
             <button
@@ -171,14 +168,14 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
                   : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--border)]'
               }`}
             >
-              Sur {n}
+              {t('acad.sur')} {n}
             </button>
           ))}
         </div>
         <p className="text-xs text-[var(--text-secondary)] mt-2">
           {s.note_sur === 100
-            ? 'Les notes sont saisies sur 100. Les moyennes sont converties sur 20 pour les rapports.'
-            : 'Notation standard sur 20 points.'}
+            ? t('acad.baremeDesc100')
+            : t('acad.baremeDesc20')}
         </p>
       </div>
     </div>
@@ -187,11 +184,15 @@ function TabGeneral({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Academ
 
 // ── Tab: Mentions ─────────────────────────────────────────────────────────────
 
-function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void }) {
+function TabMentions({ s, setS, t }: {
+  s: AcademicSettings
+  setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void
+  t: (key: string) => string
+}) {
   function addMention() {
     setS(p => ({
       ...p,
-      mentions: [...p.mentions, { min: 0, label: 'Nouvelle mention', color: '#64748B' }],
+      mentions: [...p.mentions, { min: 0, label: t('acad.newMention'), color: '#64748B' }],
     }))
   }
 
@@ -212,7 +213,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
   return (
     <div className="space-y-4">
       <p className="text-xs text-[var(--text-secondary)]">
-        Les mentions s&apos;appliquent automatiquement selon la moyenne générale. Elles sont triées du seuil le plus haut au plus bas.
+        {t('acad.mentionsDesc')}
       </p>
 
       <div className="space-y-2">
@@ -223,7 +224,7 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
               <div
                 className="w-8 h-8 rounded-lg border border-[var(--border)] cursor-pointer"
                 style={{ background: m.color }}
-                title="Changer la couleur"
+                title={t('acad.colorChange')}
               />
               <input
                 type="color"
@@ -280,12 +281,12 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
         className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-[var(--border)] text-[var(--text-secondary)] text-sm hover:border-[#DC2626]/40 hover:text-[#DC2626] transition-colors"
       >
         <Plus size={14} />
-        Ajouter une mention
+        {t('acad.addMention')}
       </button>
 
       {/* Aperçu trié */}
       <div className="mt-4 p-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl">
-        <div className="text-xs text-[var(--text-secondary)] mb-2 font-semibold uppercase tracking-wider">Aperçu (ordre appliqué)</div>
+        <div className="text-xs text-[var(--text-secondary)] mb-2 font-semibold uppercase tracking-wider">{t('acad.apercu')}</div>
         <div className="flex flex-wrap gap-2">
           {sorted.map((m, i) => (
             <div
@@ -305,7 +306,11 @@ function TabMentions({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: Acade
 
 // ── Tab: LMD ──────────────────────────────────────────────────────────────────
 
-function TabLMD({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void }) {
+function TabLMD({ s, setS, t }: {
+  s: AcademicSettings
+  setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void
+  t: (key: string) => string
+}) {
   const isLMD = s.system_type === 'lmd' || s.system_type === 'hybride'
 
   return (
@@ -313,53 +318,53 @@ function TabLMD({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: AcademicSe
       {!isLMD && (
         <div className="flex items-center gap-2 p-3 rounded-lg bg-[#DC2626]/8 border border-[#DC2626]/20 text-[#DC2626] text-xs">
           <AlertTriangle size={13} />
-          Ces règles s&apos;appliquent uniquement en mode LMD ou Hybride. Changez le système dans l&apos;onglet Général.
+          {t('acad.lmdWarning')}
         </div>
       )}
 
       <div>
-        <SLabel text="Moyennes de validation" />
+        <SLabel text={t('acad.validationAvg')} />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <NumInput
-            label="Validation UE"
+            label={t('acad.validUE')}
             value={s.moyenne_validation_ue}
             onChange={v => setS(p => ({ ...p, moyenne_validation_ue: v }))}
             min={0} max={s.note_sur} step={0.5}
-            sub="Moyenne minimale pour valider une unité d'enseignement"
+            sub={t('acad.validUESub')}
           />
           <NumInput
-            label="Validation semestre"
+            label={t('acad.validSemestre')}
             value={s.moyenne_validation_semestre}
             onChange={v => setS(p => ({ ...p, moyenne_validation_semestre: v }))}
             min={0} max={s.note_sur} step={0.5}
-            sub="Moyenne minimale pour valider le semestre"
+            sub={t('acad.validSemestreSub')}
           />
           <NumInput
-            label="Validation année"
+            label={t('acad.validAnnee')}
             value={s.moyenne_validation_annee}
             onChange={v => setS(p => ({ ...p, moyenne_validation_annee: v }))}
             min={0} max={s.note_sur} step={0.5}
-            sub="Moyenne annuelle requise pour passer en année supérieure"
+            sub={t('acad.validAnneeSub')}
           />
         </div>
       </div>
 
       <div>
-        <SLabel text="Crédits ECTS" />
+        <SLabel text={t('acad.creditsECTS')} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <NumInput
-            label="Crédits par semestre"
+            label={t('acad.creditsSemestre')}
             value={s.credits_par_semestre}
             onChange={v => setS(p => ({ ...p, credits_par_semestre: Math.round(v) }))}
             min={1} max={60} step={1}
-            sub="Standard LMD : 30 crédits par semestre"
+            sub={t('acad.creditsSemestreSub')}
           />
           <NumInput
-            label="Crédits par année"
+            label={t('acad.creditsAnnee')}
             value={s.credits_par_annee}
             onChange={v => setS(p => ({ ...p, credits_par_annee: Math.round(v) }))}
             min={1} max={120} step={1}
-            sub="Standard LMD : 60 crédits par année"
+            sub={t('acad.creditsAnneeSub')}
           />
         </div>
       </div>
@@ -369,70 +374,74 @@ function TabLMD({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: AcademicSe
 
 // ── Tab: Compensation & Rattrapage ────────────────────────────────────────────
 
-function TabCompensation({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void }) {
+function TabCompensation({ s, setS, t }: {
+  s: AcademicSettings
+  setS: (fn: (prev: AcademicSettings) => AcademicSettings) => void
+  t: (key: string) => string
+}) {
   const anyComp = s.compensation_matieres || s.compensation_ue || s.compensation_semestre || s.compensation_annuelle
 
   return (
     <div className="space-y-5">
       <div>
-        <SLabel text="Compensation" />
+        <SLabel text={t('acad.compensation')} />
         <div className="space-y-2">
           <Toggle
             value={s.compensation_matieres}
             onChange={v => setS(p => ({ ...p, compensation_matieres: v }))}
-            label="Compensation entre matières"
-            sub="Une bonne note dans une matière peut compenser une note insuffisante dans une autre"
+            label={t('acad.compMatieres')}
+            sub={t('acad.compMatieresSub')}
           />
           <Toggle
             value={s.compensation_ue}
             onChange={v => setS(p => ({ ...p, compensation_ue: v }))}
-            label="Compensation entre UE"
-            sub="Compensation entre les unités d'enseignement d'un même semestre (LMD)"
+            label={t('acad.compUE')}
+            sub={t('acad.compUESub')}
           />
           <Toggle
             value={s.compensation_semestre}
             onChange={v => setS(p => ({ ...p, compensation_semestre: v }))}
-            label="Compensation entre semestres"
-            sub="Le S2 peut compenser un S1 insuffisant si la moyenne globale est atteinte"
+            label={t('acad.compSemestre')}
+            sub={t('acad.compSemestreSub')}
           />
           <Toggle
             value={s.compensation_annuelle}
             onChange={v => setS(p => ({ ...p, compensation_annuelle: v }))}
-            label="Compensation annuelle"
-            sub="Compensation sur l'ensemble de l'année académique"
+            label={t('acad.compAnnuelle')}
+            sub={t('acad.compAnnuelleSub')}
           />
         </div>
       </div>
 
       {anyComp && (
         <div>
-          <SLabel text="Seuil de compensation" />
+          <SLabel text={t('acad.seuilComp')} />
           <NumInput
-            label={`Note minimale compensable (sur ${s.note_sur})`}
+            label={`${t('acad.noteMinComp')} (${t('acad.sur')} ${s.note_sur})`}
             value={s.seuil_note_compensable}
             onChange={v => setS(p => ({ ...p, seuil_note_compensable: v }))}
             min={0} max={s.note_sur} step={0.5}
-            sub="Une note inférieure à ce seuil ne peut pas être compensée, même avec de bonnes notes ailleurs"
+            sub={t('acad.noteMinCompSub')}
           />
         </div>
       )}
 
       <div>
-        <SLabel text="Session de rattrapage" />
+        <SLabel text={t('acad.rattrapage')} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <NumInput
-            label={`Seuil d'accès au rattrapage (sur ${s.note_sur})`}
+            label={`${t('acad.seuilRattrapage')} (${t('acad.sur')} ${s.note_sur})`}
             value={s.seuil_acces_rattrapage}
             onChange={v => setS(p => ({ ...p, seuil_acces_rattrapage: v }))}
             min={0} max={s.note_sur} step={0.5}
-            sub="Moyenne minimale pour être admis à une session de rattrapage"
+            sub={t('acad.seuilRattrapageSub')}
           />
           <NumInput
-            label="Nb max matières en rattrapage"
+            label={t('acad.maxMatieres')}
             value={s.nb_max_matieres_rattrapage}
             onChange={v => setS(p => ({ ...p, nb_max_matieres_rattrapage: Math.round(v) }))}
             min={1} max={20} step={1}
-            sub="Nombre maximum de matières qu'un étudiant peut repasser"
+            sub={t('acad.maxMatieresSub')}
           />
         </div>
 
@@ -440,8 +449,8 @@ function TabCompensation({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: A
           <Toggle
             value={s.conservation_meilleure_note}
             onChange={v => setS(p => ({ ...p, conservation_meilleure_note: v }))}
-            label="Conserver la meilleure note"
-            sub="En cas de rattrapage, on retient la meilleure des deux notes (session normale vs rattrapage)"
+            label={t('acad.conserverNote')}
+            sub={t('acad.conserverNoteSub')}
           />
         </div>
       </div>
@@ -453,8 +462,17 @@ function TabCompensation({ s, setS }: { s: AcademicSettings; setS: (fn: (prev: A
 
 export default function ParametresAcademiquesPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
-  const [tab, setTab]       = useState<Tab>('general')
+  const TABS = [
+    { id: 'general',      label: t('acad.tabGeneral'),      icon: Settings  },
+    { id: 'mentions',     label: t('acad.tabMentions'),     icon: Award     },
+    { id: 'lmd',          label: t('acad.tabLMD'),          icon: BookOpen  },
+    { id: 'compensation', label: t('acad.tabCompensation'), icon: ToggleLeft },
+  ] as const
+  type Tab = typeof TABS[number]['id']
+
+  const [tab, setTab]           = useState<Tab>('general')
   const [settings, setSettings] = useState<AcademicSettings>(DEFAULT)
   const [loading, setLoading]   = useState(true)
   const [saving, setSaving]     = useState(false)
@@ -489,18 +507,18 @@ export default function ParametresAcademiquesPage() {
       .upsert(payload, { onConflict: 'tenant_id' })
     setSaving(false)
     if (error) {
-      setToast({ ok: false, msg: 'Erreur lors de l\'enregistrement' })
+      setToast({ ok: false, msg: t('acad.saveError') })
     } else {
-      setToast({ ok: true, msg: 'Paramètres académiques sauvegardés' })
+      setToast({ ok: true, msg: t('acad.saved') })
     }
     setTimeout(() => setToast(null), 3500)
   }
 
   const tabContent: Record<Tab, React.ReactNode> = {
-    general:      <TabGeneral      s={settings} setS={setSettings} />,
-    mentions:     <TabMentions     s={settings} setS={setSettings} />,
-    lmd:          <TabLMD          s={settings} setS={setSettings} />,
-    compensation: <TabCompensation s={settings} setS={setSettings} />,
+    general:      <TabGeneral      s={settings} setS={setSettings} t={t} />,
+    mentions:     <TabMentions     s={settings} setS={setSettings} t={t} />,
+    lmd:          <TabLMD          s={settings} setS={setSettings} t={t} />,
+    compensation: <TabCompensation s={settings} setS={setSettings} t={t} />,
   }
 
   return (
@@ -513,9 +531,9 @@ export default function ParametresAcademiquesPage() {
           className="flex items-center justify-between"
         >
           <div>
-            <h1 className="text-xl font-bold text-[var(--text)]">Paramètres académiques</h1>
+            <h1 className="text-xl font-bold text-[var(--text)]">{t('acad.title')}</h1>
             <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-              Règles LMD, mentions, compensation & rattrapage
+              {t('acad.subtitle')}
             </p>
           </div>
           <button
@@ -527,7 +545,7 @@ export default function ParametresAcademiquesPage() {
               ? <RefreshCw size={14} className="animate-spin" />
               : <Save size={14} />
             }
-            Enregistrer
+            {t('acad.save')}
           </button>
         </motion.div>
 
@@ -550,18 +568,18 @@ export default function ParametresAcademiquesPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 p-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-x-auto">
-          {TABS.map(t => (
+          {TABS.map(tabItem => (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tabItem.id}
+              onClick={() => setTab(tabItem.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
-                tab === t.id
+                tab === tabItem.id
                   ? 'bg-[#00b9a7] text-white'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
               }`}
             >
-              <t.icon size={13} />
-              {t.label}
+              <tabItem.icon size={13} />
+              {tabItem.label}
             </button>
           ))}
         </div>
@@ -591,7 +609,7 @@ export default function ParametresAcademiquesPage() {
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00b9a7] text-white text-sm font-semibold hover:bg-[#DC2626]/90 disabled:opacity-50 transition-all"
           >
             {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
-            Enregistrer les paramètres
+            {t('acad.saveParams')}
           </button>
         </div>
     </div>

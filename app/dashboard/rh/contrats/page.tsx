@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { FileText, Plus, AlertTriangle, CheckCircle, Clock, X, Check, Download, Eye } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -56,8 +57,8 @@ function daysLeft(dateStr?: string) {
   return Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000)
 }
 
-function fmtDate(s?: string) {
-  if (!s) return 'Indéterminé'
+function fmtDate(s?: string, undetermined?: string) {
+  if (!s) return undetermined ?? 'Indéterminé'
   return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
@@ -65,6 +66,7 @@ function fmtDate(s?: string) {
 
 export default function ContratsPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [employes,  setEmployes]  = useState<Employe[]>([])
   const [loading,   setLoading]   = useState(true)
   const [filter,    setFilter]    = useState<string>('tous')
@@ -106,7 +108,7 @@ export default function ContratsPage() {
   }
 
   async function handleTerminate(emp: Employe) {
-    if (!confirm(`Résilier le contrat de ${emp.nom} ?`)) return
+    if (!confirm(`${t('rh.contrats.confirmTerminate')} ${emp.nom} ?`)) return
     await supabase.from('employes').update({
       statut: 'licencie',
       date_fin_contrat: new Date().toISOString().slice(0, 10),
@@ -141,7 +143,7 @@ export default function ContratsPage() {
   function printContract(emp: Employe) {
     const w = window.open('', '_blank')
     if (!w) return
-    w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/><title>Contrat — ${emp.nom}</title>
+    w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/><title>${t('rh.contrats.printTitle')} — ${emp.nom}</title>
 <style>body{font-family:Arial,sans-serif;font-size:12px;color:#111;max-width:700px;margin:40px auto;padding:0 30px}
 h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
 .meta{color:#888;font-size:11px;margin-bottom:24px}
@@ -152,22 +154,22 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
 .sign{margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
 .sign-box{border-top:2px solid #111;padding-top:8px;text-align:center;font-size:11px}
 </style></head><body>
-<h1>CONTRAT DE TRAVAIL</h1>
-<p class="meta">Type: ${TYPE_CONFIG[emp.contrat]?.label ?? emp.contrat} · Généré le ${new Date().toLocaleDateString('fr-FR')}</p>
-<div class="section"><h3>Employé</h3>
-<div class="row"><span class="label">Nom complet</span><span class="value">${emp.nom}</span></div>
-<div class="row"><span class="label">Email</span><span class="value">${emp.email || '—'}</span></div>
-<div class="row"><span class="label">Poste</span><span class="value">${emp.poste || '—'}</span></div>
+<h1>${t('rh.contrats.printTitle')}</h1>
+<p class="meta">Type: ${TYPE_CONFIG[emp.contrat]?.label ?? emp.contrat} · ${t('rh.contrats.generated')} ${new Date().toLocaleDateString('fr-FR')}</p>
+<div class="section"><h3>${t('rh.contrats.printEmployee')}</h3>
+<div class="row"><span class="label">${t('rh.contrats.printFullName')}</span><span class="value">${emp.nom}</span></div>
+<div class="row"><span class="label">${t('rh.contrats.printEmail')}</span><span class="value">${emp.email || '—'}</span></div>
+<div class="row"><span class="label">${t('rh.contrats.printPosition')}</span><span class="value">${emp.poste || '—'}</span></div>
 </div>
-<div class="section"><h3>Conditions</h3>
-<div class="row"><span class="label">Type de contrat</span><span class="value">${TYPE_CONFIG[emp.contrat]?.label ?? emp.contrat}</span></div>
-<div class="row"><span class="label">Date d'embauche</span><span class="value">${fmtDate(emp.date_embauche)}</span></div>
-<div class="row"><span class="label">Date de fin</span><span class="value">${fmtDate(emp.date_fin_contrat)}</span></div>
-<div class="row"><span class="label">Salaire brut mensuel</span><span class="value">${fmt(emp.salaire_base)} FCFA</span></div>
+<div class="section"><h3>${t('rh.contrats.printConditions')}</h3>
+<div class="row"><span class="label">${t('rh.contrats.printContractType')}</span><span class="value">${TYPE_CONFIG[emp.contrat]?.label ?? emp.contrat}</span></div>
+<div class="row"><span class="label">${t('rh.contrats.printHireDate')}</span><span class="value">${fmtDate(emp.date_embauche, t('rh.contrats.undetermined'))}</span></div>
+<div class="row"><span class="label">${t('rh.contrats.printEndDate')}</span><span class="value">${fmtDate(emp.date_fin_contrat, t('rh.contrats.undetermined'))}</span></div>
+<div class="row"><span class="label">${t('rh.contrats.printGrossSalary')}</span><span class="value">${fmt(emp.salaire_base)} FCFA</span></div>
 </div>
 <div class="sign">
-<div class="sign-box">Signature Employeur<br/><br/>Date: ___________</div>
-<div class="sign-box">Signature Employé<br/><br/>Date: ___________</div>
+<div class="sign-box">${t('rh.contrats.signEmployer')}<br/><br/>${t('rh.contrats.signDate')}</div>
+<div class="sign-box">${t('rh.contrats.signEmployee')}<br/><br/>${t('rh.contrats.signDate')}</div>
 </div>
 </body></html>`)
     w.document.close()
@@ -183,8 +185,8 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
             <FileText size={18} className="text-purple-600" />
           </div>
           <div>
-            <h1 className="text-[20px] font-bold text-[#0F172A]">Contrats</h1>
-            <p className="text-[11px] text-[#64748B]">{employes.length} employés · {expiringCount} contrats expirant</p>
+            <h1 className="text-[20px] font-bold text-[#0F172A]">{t('rh.contrats.title')}</h1>
+            <p className="text-[11px] text-[#64748B]">{employes.length} {t('rh.contrats.subtitle')} · {expiringCount} {t('rh.contrats.filterExpiring').toLowerCase()}</p>
           </div>
         </div>
       </div>
@@ -195,13 +197,13 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
           {expiredCount > 0 && (
             <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-2xl p-4">
               <AlertTriangle size={16} className="text-red-600 shrink-0" />
-              <p className="text-[13px] font-bold text-red-700">{expiredCount} contrat{expiredCount > 1 ? 's' : ''} expiré{expiredCount > 1 ? 's' : ''} — Régulariser immédiatement</p>
+              <p className="text-[13px] font-bold text-red-700">{expiredCount} {t('rh.contrats.filterExpired').toLowerCase()} — {t('rh.contrats.expired')}</p>
             </div>
           )}
           {expiringCount > 0 && (
             <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-2xl p-4">
               <Clock size={16} className="text-amber-600 shrink-0" />
-              <p className="text-[13px] font-bold text-amber-700">{expiringCount} contrat{expiringCount > 1 ? 's' : ''} expire{expiringCount > 1 ? 'nt' : ''} dans moins de 30 jours</p>
+              <p className="text-[13px] font-bold text-amber-700">{expiringCount} {t('rh.contrats.expiringSoon')}</p>
             </div>
           )}
         </div>
@@ -210,13 +212,13 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
       {/* Filtres */}
       <div className="flex gap-1.5 flex-wrap">
         {[
-          { id: 'tous',     label: `Tous (${employes.length})` },
+          { id: 'tous',     label: `${t('rh.contrats.filterAll')} (${employes.length})` },
           { id: 'cdi',      label: 'CDI' },
           { id: 'cdd',      label: 'CDD' },
           { id: 'stage',    label: 'Stage' },
           { id: 'vacation', label: 'Vacation' },
-          { id: 'expirant', label: `Expirant (${expiringCount})`, alert: expiringCount > 0 },
-          { id: 'expire',   label: `Expirés (${expiredCount})`,   alert: expiredCount > 0 },
+          { id: 'expirant', label: `${t('rh.contrats.filterExpiring')} (${expiringCount})`, alert: expiringCount > 0 },
+          { id: 'expire',   label: `${t('rh.contrats.filterExpired')} (${expiredCount})`,   alert: expiredCount > 0 },
         ].map(f => (
           <button key={f.id} onClick={() => setFilter(f.id)}
             className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all ${
@@ -241,7 +243,15 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
           <table className="w-full text-sm min-w-[600px]">
             <thead>
               <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                {['Employé', 'Type contrat', 'Début', 'Fin / Échéance', 'Salaire brut', 'Statut', 'Actions'].map(h => (
+                {[
+                  t('rh.contrats.colEmployee'),
+                  t('rh.contrats.colType'),
+                  t('rh.contrats.colStart'),
+                  t('rh.contrats.colEnd'),
+                  t('rh.contrats.colSalary'),
+                  t('rh.contrats.colStatus'),
+                  t('rh.contrats.colActions'),
+                ].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-[10px] font-bold text-[#64748B] uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -265,15 +275,17 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
                         {cfg.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-[12px] text-[#64748B]">{fmtDate(emp.date_embauche)}</td>
+                    <td className="px-4 py-3 text-[12px] text-[#64748B]">{fmtDate(emp.date_embauche, t('rh.contrats.undetermined'))}</td>
                     <td className="px-4 py-3">
                       <div>
                         <p className={`text-[12px] font-semibold ${isExp ? 'text-red-600' : isWarn ? 'text-amber-600' : 'text-[#0F172A]'}`}>
-                          {fmtDate(emp.date_fin_contrat)}
+                          {fmtDate(emp.date_fin_contrat, t('rh.contrats.undetermined'))}
                         </p>
                         {days !== null && (
                           <p className={`text-[10px] ${isExp ? 'text-red-500' : isWarn ? 'text-amber-500' : 'text-[#94A3B8]'}`}>
-                            {isExp ? `Expiré depuis ${Math.abs(days)}j` : `Dans ${days} j`}
+                            {isExp
+                              ? `${t('rh.contrats.expiredSince')} ${Math.abs(days)}${t('rh.contrats.days')}`
+                              : `${t('rh.contrats.inDays')} ${days} ${t('rh.contrats.days')}`}
                           </p>
                         )}
                       </div>
@@ -285,18 +297,18 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
                         isWarn ? 'bg-amber-100 text-amber-700' :
                         'bg-green-100 text-green-700'
                       }`}>
-                        {isExp ? <><AlertTriangle size={9} />Expiré</> :
-                         isWarn ? <><Clock size={9} />Expire bientôt</> :
-                         <><CheckCircle size={9} />Actif</>}
+                        {isExp ? <><AlertTriangle size={9} />{t('rh.contrats.statusExpired')}</> :
+                         isWarn ? <><Clock size={9} />{t('rh.contrats.statusExpireSoon')}</> :
+                         <><CheckCircle size={9} />{t('rh.contrats.statusActive')}</>}
                       </span>
                     </td>
                     <td className="px-4 py-3" onClick={ev => ev.stopPropagation()}>
                       <div className="flex items-center gap-1">
-                        <button onClick={() => printContract(emp)} title="Imprimer"
+                        <button onClick={() => printContract(emp)} title={t('rh.contrats.print')}
                           className="p-1.5 rounded-lg hover:bg-blue-50 text-[#94A3B8] hover:text-blue-600 transition-colors">
                           <Download size={13} />
                         </button>
-                        <button onClick={() => setSelected(emp)} title="Détails"
+                        <button onClick={() => setSelected(emp)} title={t('common.view') ?? 'Détails'}
                           className="p-1.5 rounded-lg hover:bg-amber-50 text-[#94A3B8] hover:text-amber-600 transition-colors">
                           <Eye size={13} />
                         </button>
@@ -306,7 +318,7 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
                 )
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-10 text-center text-[12px] text-[#94A3B8]">Aucun contrat trouvé</td></tr>
+                <tr><td colSpan={7} className="px-4 py-10 text-center text-[12px] text-[#94A3B8]">{t('rh.contrats.noData')}</td></tr>
               )}
             </tbody>
           </table>
@@ -329,10 +341,10 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
 
               <div className="space-y-2">
                 {[
-                  ['Type contrat',   TYPE_CONFIG[selected.contrat]?.label ?? selected.contrat],
-                  ['Début',          fmtDate(selected.date_embauche)],
-                  ['Fin',            fmtDate(selected.date_fin_contrat)],
-                  ['Salaire brut',   `${fmt(selected.salaire_base)} FCFA`],
+                  [t('rh.contrats.detailType'),   TYPE_CONFIG[selected.contrat]?.label ?? selected.contrat],
+                  [t('rh.contrats.detailStart'),   fmtDate(selected.date_embauche, t('rh.contrats.undetermined'))],
+                  [t('rh.contrats.detailEnd'),     fmtDate(selected.date_fin_contrat, t('rh.contrats.undetermined'))],
+                  [t('rh.contrats.detailSalary'),  `${fmt(selected.salaire_base)} FCFA`],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between bg-[#F8FAFC] rounded-xl px-3 py-2">
                     <span className="text-[11px] text-[#64748B]">{k}</span>
@@ -345,8 +357,8 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
                 <div className={`rounded-xl p-3 ${daysLeft(selected.date_fin_contrat)! < 0 ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}`}>
                   <p className={`text-[12px] font-bold ${daysLeft(selected.date_fin_contrat)! < 0 ? 'text-red-700' : 'text-amber-700'}`}>
                     {daysLeft(selected.date_fin_contrat)! < 0
-                      ? `Contrat expiré depuis ${Math.abs(daysLeft(selected.date_fin_contrat)!)} jours`
-                      : `Expire dans ${daysLeft(selected.date_fin_contrat)} jours`}
+                      ? `${t('rh.contrats.expiredDays')} ${Math.abs(daysLeft(selected.date_fin_contrat)!)} ${t('rh.contrats.days')}`
+                      : `${t('rh.contrats.expireInDays')} ${daysLeft(selected.date_fin_contrat)} ${t('rh.contrats.days')}`}
                   </p>
                 </div>
               )}
@@ -354,15 +366,15 @@ h1{font-size:20px;font-weight:800;color:#F59E0B;margin-bottom:4px}
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <button onClick={() => handleRenew(selected)}
                   className="flex items-center justify-center gap-1.5 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded-xl text-[12px] font-semibold hover:bg-green-100">
-                  <Check size={13} /> Renouveler
+                  <Check size={13} /> {t('rh.contrats.renew')}
                 </button>
                 <button onClick={() => printContract(selected)}
                   className="flex items-center justify-center gap-1.5 py-2.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl text-[12px] font-semibold hover:bg-blue-100">
-                  <Download size={13} /> Imprimer
+                  <Download size={13} /> {t('rh.contrats.print')}
                 </button>
                 <button onClick={() => handleTerminate(selected)}
                   className="col-span-2 flex items-center justify-center gap-1.5 py-2.5 bg-red-50 border border-red-200 text-red-600 rounded-xl text-[12px] font-semibold hover:bg-red-100">
-                  <X size={13} /> Résilier le contrat
+                  <X size={13} /> {t('rh.contrats.terminate')}
                 </button>
               </div>
             </div>

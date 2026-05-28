@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   GitBranch, Users, ChevronDown, ChevronRight,
   User, Building2, Search, Download, ZoomIn, ZoomOut,
@@ -115,7 +116,7 @@ function EmpCard({ emp, isRoot = false }: { emp: Employe; isRoot?: boolean }) {
 }
 
 /* ─── Org Tree Node ──────────────────────────────────────── */
-function OrgTreeNode({ node }: { node: OrgNode }) {
+function OrgTreeNode({ node, collapseTip }: { node: OrgNode; collapseTip: string }) {
   const [expanded, setExpanded] = useState(true)
   const hasChildren = node.children.length > 0
   const color = getDeptColor(node.employe.departement || '')
@@ -153,7 +154,7 @@ function OrgTreeNode({ node }: { node: OrgNode }) {
               <div key={child.employe.id} className="flex flex-col items-center">
                 {/* Top connector */}
                 <div className="w-px h-4 bg-[#CBD5E1]" />
-                <OrgTreeNode node={child} />
+                <OrgTreeNode node={child} collapseTip={collapseTip} />
               </div>
             ))}
           </div>
@@ -207,6 +208,7 @@ function DeptCard({ dept }: { dept: DepartmentGroup }) {
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function OrganigrammePage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [employes, setEmployes] = useState<Employe[]>([])
   const [loading, setLoading]   = useState(true)
   const [view, setView]         = useState<'tree' | 'dept'>('dept')
@@ -239,7 +241,7 @@ export default function OrganigrammePage() {
       : employes
 
     for (const emp of filtered) {
-      const dept = emp.departement || 'Non assigné'
+      const dept = emp.departement || t('rh.org.unassigned')
       if (!map.has(dept)) map.set(dept, [])
       map.get(dept)!.push(emp)
     }
@@ -277,7 +279,7 @@ export default function OrganigrammePage() {
     return (
       <div className="flex items-center justify-center py-24 text-[#94A3B8]">
         <div className="w-6 h-6 border-2 border-[#F59E0B] border-t-transparent rounded-full animate-spin mr-2" />
-        Chargement de l&apos;organigramme…
+        {t('rh.org.loading')}
       </div>
     )
   }
@@ -290,9 +292,9 @@ export default function OrganigrammePage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <GitBranch size={22} className="text-[#F59E0B]" />
-            Organigramme
+            {t('rh.org.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Structure organisationnelle de l&apos;entreprise</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('rh.org.subtitle')}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -302,7 +304,7 @@ export default function OrganigrammePage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Rechercher…"
+              placeholder={t('rh.org.searchPlaceholder')}
               className="pl-7 pr-3 py-1.5 text-[12px] border border-[#E2E8F0] rounded-lg w-44 focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30"
             />
           </div>
@@ -319,7 +321,7 @@ export default function OrganigrammePage() {
                     : 'text-[#64748B] hover:bg-[#F8FAFC]'
                 }`}
               >
-                {v === 'dept' ? 'Départements' : 'Hiérarchie'}
+                {v === 'dept' ? t('rh.org.viewDept') : t('rh.org.viewTree')}
               </button>
             ))}
           </div>
@@ -329,10 +331,10 @@ export default function OrganigrammePage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Effectif actif',     value: totalActifs,   icon: Users,    color: '#F59E0B' },
-          { label: 'Départements',       value: totalDepts,    icon: Building2, color: '#2563EB' },
-          { label: 'Managers',           value: managersCount, icon: User,     color: '#8B5CF6' },
-          { label: 'Avec hiérarchie',    value: withManager,   icon: GitBranch, color: '#16A34A' },
+          { label: t('rh.org.kpiActive'),        value: totalActifs,   icon: Users,    color: '#F59E0B' },
+          { label: t('rh.org.kpiDepts'),          value: totalDepts,    icon: Building2, color: '#2563EB' },
+          { label: t('rh.org.kpiManagers'),       value: managersCount, icon: User,     color: '#8B5CF6' },
+          { label: t('rh.org.kpiWithHierarchy'),  value: withManager,   icon: GitBranch, color: '#16A34A' },
         ].map(kpi => (
           <div key={kpi.label} className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex items-center gap-3">
             <div
@@ -353,8 +355,8 @@ export default function OrganigrammePage() {
       {employes.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <GitBranch size={40} className="text-[#E2E8F0] mb-3" />
-          <p className="text-[14px] font-semibold text-[#64748B]">Aucun employé actif</p>
-          <p className="text-[12px] text-[#94A3B8] mt-1">Ajoutez des employés dans le module Employés</p>
+          <p className="text-[14px] font-semibold text-[#64748B]">{t('rh.org.noEmployee')}</p>
+          <p className="text-[12px] text-[#94A3B8] mt-1">{t('rh.org.addEmployee')}</p>
         </div>
       )}
 
@@ -371,14 +373,14 @@ export default function OrganigrammePage() {
       {view === 'tree' && employes.length > 0 && (
         <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6 overflow-auto">
           <p className="text-[11px] text-[#94A3B8] mb-6 text-center">
-            Cliquez sur <ChevronDown size={11} className="inline" /> pour réduire/développer les branches
+            {t('common.click') ?? 'Cliquez sur'} <ChevronDown size={11} className="inline" /> {t('rh.org.collapseTip')}
           </p>
           {orgTree.length === 0 ? (
-            <p className="text-center text-[13px] text-[#94A3B8]">Aucune hiérarchie définie</p>
+            <p className="text-center text-[13px] text-[#94A3B8]">{t('rh.org.noHierarchy')}</p>
           ) : (
             <div className="flex gap-8 items-start justify-center flex-wrap">
               {orgTree.map(node => (
-                <OrgTreeNode key={node.employe.id} node={node} />
+                <OrgTreeNode key={node.employe.id} node={node} collapseTip={t('rh.org.collapseTip')} />
               ))}
             </div>
           )}
@@ -388,7 +390,7 @@ export default function OrganigrammePage() {
       {/* Legend */}
       {view === 'dept' && departments.length > 0 && (
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-4">
-          <p className="text-[11px] font-semibold text-[#64748B] mb-2">Légende des couleurs</p>
+          <p className="text-[11px] font-semibold text-[#64748B] mb-2">{t('rh.org.legend')}</p>
           <div className="flex flex-wrap gap-2">
             {Object.entries(DEPT_COLORS).map(([dept, color]) => (
               <span key={dept} className="flex items-center gap-1 text-[11px] text-[#64748B]">
