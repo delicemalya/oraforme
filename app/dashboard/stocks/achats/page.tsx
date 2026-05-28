@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -49,8 +50,9 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string; 
 }
 
 export default function AchatsPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -244,22 +246,22 @@ export default function AchatsPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <ShoppingCart size={20} className="text-[#16A34A]" />
-            Achats & Approvisionnement
+            {t('stock.achats.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Workflow complet: Commande → Réception → Paiement → OHADA</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.achats.subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouvel achat
+          <Plus size={14} /> {t('stock.achats.newPurchase')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total achats', value: purchases.length, icon: ShoppingCart, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.achats.kpi.total'), value: purchases.length, icon: ShoppingCart, color: '#16A34A', bg: '#F0FDF4' },
           { label: 'En attente', value: purchases.filter(p => p.statut === 'commandé').length, icon: AlertTriangle, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Achats ce mois', value: fmtFCFA(totalMois), icon: TrendingUp, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.achats.kpi.valeur'), value: fmtFCFA(totalMois), icon: TrendingUp, color: '#2563EB', bg: '#EFF6FF' },
           { label: 'Payés', value: purchases.filter(p => p.statut === 'payé').length, icon: CheckCircle2, color: '#16A34A', bg: '#F0FDF4' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
@@ -293,13 +295,13 @@ export default function AchatsPage() {
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
               <ShoppingCart size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucun achat trouvé</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('stock.achats.noPurchases')}</p>
               <button onClick={() => setShowCreate(true)}
                 className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
                 Créer un achat
@@ -502,12 +504,12 @@ export default function AchatsPage() {
             <div className="flex gap-2 p-5 border-t border-[#E2E8F0]">
               <button onClick={() => setShowCreate(false)}
                 className="flex-1 px-4 py-2 border border-[#E2E8F0] text-[#374151] text-xs font-semibold rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={handleCreate} disabled={saving}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] disabled:opacity-50">
                 <Save size={13} />
-                {saving ? 'Création…' : 'Créer l\'achat'}
+                {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

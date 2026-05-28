@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -44,8 +45,9 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string }
 }
 
 export default function RetoursPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [retours, setRetours] = useState<Retour[]>([])
   const [products, setProducts] = useState<Product[]>([])
@@ -220,23 +222,23 @@ export default function RetoursPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <RotateCcw size={20} className="text-[#16A34A]" />
-            Retours de Stock
+            {t('stock.retours.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Retours clients et fournisseurs avec impact stock et OHADA</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.retours.subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouveau retour
+          <Plus size={14} /> {t('stock.retours.newReturn')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total retours', value: retours.length, icon: RotateCcw, color: '#7C3AED', bg: '#F5F3FF' },
+          { label: t('stock.retours.kpi.total'), value: retours.length, icon: RotateCcw, color: '#7C3AED', bg: '#F5F3FF' },
           { label: 'En attente', value: enAttente, icon: AlertTriangle, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Retours clients', value: retours.filter(r => r.type_retour === 'client').length, icon: Users, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Valeur validée', value: fmtFCFA(totalValeur), icon: Package, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.retours.tab.client'), value: retours.filter(r => r.type_retour === 'client').length, icon: Users, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.retours.kpi.valeur'), value: fmtFCFA(totalValeur), icon: Package, color: '#16A34A', bg: '#F0FDF4' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -262,13 +264,13 @@ export default function RetoursPage() {
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
           {filtered.length === 0 ? (
             <div className="p-12 text-center">
               <RotateCcw size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucun retour enregistré</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('stock.retours.noReturns')}</p>
               <button onClick={() => setShowCreate(true)}
                 className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
                 Enregistrer un retour
@@ -300,7 +302,7 @@ export default function RetoursPage() {
                           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                             r.type_retour === 'client' ? 'bg-[#EFF6FF] text-[#2563EB]' : 'bg-[#F5F3FF] text-[#7C3AED]'
                           }`}>
-                            {r.type_retour === 'client' ? 'Client' : 'Fournisseur'}
+                            {r.type_retour === 'client' ? t('stock.retours.tab.client') : t('stock.retours.tab.fournisseur')}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -364,14 +366,14 @@ export default function RetoursPage() {
               <div>
                 <label className="block text-[11px] font-semibold text-[#374151] mb-2">Type de retour</label>
                 <div className="flex rounded-xl border border-[#E2E8F0] overflow-hidden">
-                  {['client', 'fournisseur'].map(t => (
-                    <button key={t} onClick={() => setForm(f => ({ ...f, type_retour: t as any, motif: '' }))}
+                  {(['client', 'fournisseur'] as const).map(tab_ => (
+                    <button key={tab_} onClick={() => setForm(f => ({ ...f, type_retour: tab_, motif: '' }))}
                       className={`flex-1 py-2 text-xs font-semibold transition-colors ${
-                        form.type_retour === t
+                        form.type_retour === tab_
                           ? 'bg-[#16A34A] text-white'
                           : 'bg-white text-[#64748B] hover:bg-[#F8FAFC]'
                       }`}>
-                      {t === 'client' ? '👤 Retour client' : '🏭 Retour fournisseur'}
+                      {tab_ === 'client' ? `👤 ${t('stock.retours.tab.client')}` : `🏭 ${t('stock.retours.tab.fournisseur')}`}
                     </button>
                   ))}
                 </div>
@@ -444,12 +446,12 @@ export default function RetoursPage() {
             <div className="flex gap-2 p-5 border-t border-[#E2E8F0]">
               <button onClick={() => setShowCreate(false)}
                 className="flex-1 px-4 py-2 border border-[#E2E8F0] text-[#374151] text-xs font-semibold rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={handleCreate} disabled={saving}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] disabled:opacity-50">
                 <Save size={13} />
-                {saving ? 'Enregistrement…' : 'Créer le retour'}
+                {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

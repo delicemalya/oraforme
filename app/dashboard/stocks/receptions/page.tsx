@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -54,8 +55,9 @@ const CONFORMITE_CONFIG: Record<string, { label: string; color: string; bg: stri
 }
 
 export default function ReceptionsPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
 
   const [receptions, setReceptions] = useState<Reception[]>([])
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -247,22 +249,22 @@ export default function ReceptionsPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <Truck size={20} className="text-[#16A34A]" />
-            Réceptions de Marchandises
+            {t('stock.receptions.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Contrôle qualité, mise en stock et écriture OHADA automatique</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.receptions.subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouvelle réception
+          <Plus size={14} /> {t('stock.receptions.newReception')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total réceptions', value: receptions.length, icon: Truck, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Ce mois', value: receptions.filter(r => r.date_reception >= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]).length, icon: Calendar, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Non conformes', value: 0, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
+          { label: t('stock.receptions.kpi.total'), value: receptions.length, icon: Truck, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.receptions.kpi.valeur'), value: fmtFCFA(receptions.reduce((s, r) => s + (r.valeur_total || 0), 0)), icon: Calendar, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.receptions.kpi.fournisseurs'), value: new Set(receptions.map(r => r.supplier_id).filter(Boolean)).size, icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
           { label: 'Entrepôts actifs', value: warehouses.length, icon: Warehouse, color: '#D97706', bg: '#FFFBEB' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
@@ -282,23 +284,23 @@ export default function ReceptionsPage() {
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher une réception…"
+            placeholder={t('stock.receptions.noReceptions')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
         </div>
       </div>
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
               <Truck size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucune réception enregistrée</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('stock.receptions.noReceptions')}</p>
               <button onClick={() => setShowCreate(true)}
                 className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-                Enregistrer une réception
+                {t('stock.receptions.newReception')}
               </button>
             </div>
           ) : filtered.map(rec => {
@@ -334,7 +336,7 @@ export default function ReceptionsPage() {
                         </span>
                       )}
                       <span className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
-                        <Calendar size={11} /> {new Date(rec.date_reception).toLocaleDateString('fr-FR')}
+                        <Calendar size={11} /> {new Date(rec.date_reception).toLocaleDateString(locale)}
                       </span>
                     </div>
                   </div>
@@ -400,7 +402,7 @@ export default function ReceptionsPage() {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
-              <h2 className="text-sm font-bold text-[#0F172A]">Nouvelle réception</h2>
+              <h2 className="text-sm font-bold text-[#0F172A]">{t('stock.receptions.newReception')}</h2>
               <button onClick={() => setShowCreate(false)}><X size={16} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-4">
@@ -530,12 +532,12 @@ export default function ReceptionsPage() {
             <div className="flex gap-2 p-5 border-t border-[#E2E8F0]">
               <button onClick={() => setShowCreate(false)}
                 className="flex-1 px-4 py-2 border border-[#E2E8F0] text-[#374151] text-xs font-semibold rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={handleCreate} disabled={saving}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] disabled:opacity-50">
                 <Save size={13} />
-                {saving ? 'Enregistrement…' : 'Valider la réception'}
+                {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

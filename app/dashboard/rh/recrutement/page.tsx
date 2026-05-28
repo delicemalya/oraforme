@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -94,11 +95,12 @@ function ScoreBadge({ score }: { score: number }) {
 }
 
 function StatutBadge({ statut }: { statut: string }) {
+  const { t } = useLocale()
   const map: Record<string, { label: string; color: string }> = {
-    nouveau:  { label: 'Nouveau',  color: '#DC2626' },
-    retenu:   { label: 'Retenu',   color: '#16A34A' },
-    rejete:   { label: 'Rejeté',  color: '#DC2626' },
-    entretien:{ label: 'Entretien',color: '#DC2626' },
+    nouveau:   { label: 'Nouveau',   color: '#DC2626' },
+    retenu:    { label: 'Retenu',    color: '#16A34A' },
+    rejete:    { label: 'Rejeté',   color: '#DC2626' },
+    entretien: { label: 'Entretien', color: '#DC2626' },
   }
   const s = map[statut] ?? map.nouveau
   return (
@@ -153,6 +155,7 @@ const MOTS_CLES = ['Comptabilité', 'Finance', 'IT', 'RH', 'Marketing', 'Juridiq
 function TabOffres({ tenantId, offres, onRefresh }: {
   tenantId: string; offres: Offre[]; onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving]     = useState(false)
   const [form, setForm]         = useState({
@@ -226,7 +229,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 px-3 py-2 bg-[var(--primary)] text-white rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors"
         >
-          <Plus size={13} /> Créer une offre
+          <Plus size={13} /> {t('rh.recrutement.newPosting')}
         </motion.button>
       </div>
 
@@ -262,7 +265,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
               onToggle={v => setForm(f => ({ ...f, mots_cles: toggle(f.mots_cles, v as string) }))} />
             <div className="flex gap-2 pt-1">
               <button onClick={() => setShowForm(false)} className="px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-                Annuler
+                {t('common.cancel')}
               </button>
               <motion.button
                 whileTap={{ scale: 0.96 }}
@@ -271,7 +274,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
                 className="flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-xs font-bold hover:bg-[#E09000] transition-colors disabled:opacity-50"
               >
                 {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                {saving ? 'Création...' : 'Créer l\'offre'}
+                {saving ? t('common.loading') : 'Créer l\'offre'}
               </motion.button>
             </div>
           </motion.div>
@@ -281,7 +284,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
       {offres.length === 0 ? (
         <div className="text-center py-12 text-[var(--text-secondary)]">
           <Briefcase size={36} className="mx-auto mb-3 opacity-50" />
-          <p className="text-sm">Aucune offre créée. Commencez par créer votre première offre.</p>
+          <p className="text-sm">{t('rh.recrutement.noPostings')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -336,6 +339,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
 function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
   tenantId: string; offres: Offre[]; candidats: Candidat[]; onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [selectedOffre, setSelectedOffre] = useState<string>('all')
   const [uploading,     setUploading]     = useState(false)
   const [progress,      setProgress]      = useState(0)
@@ -796,19 +800,20 @@ function TabAgent({ candidats }: { candidats: Candidat[] }) {
 
 // ── Page principale ───────────────────────────────────────────────────────────
 
-const TABS = [
-  { id: 'offres',     label: "Offres d'emploi", icon: Briefcase },
-  { id: 'candidats',  label: 'Candidats reçus',  icon: Users     },
-  { id: 'top',        label: 'Top Candidats',    icon: Star      },
-  { id: 'agent',      label: 'Agent IA',         icon: Bot       },
-]
-
 export default function RecrutementPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [activeTab,  setActiveTab]  = useState('offres')
   const [offres,     setOffres]     = useState<Offre[]>([])
   const [candidats,  setCandidats]  = useState<Candidat[]>([])
   const [dataLoading,setDataLoading]= useState(true)
+
+  const TABS = [
+    { id: 'offres',    label: t('rh.recrutement.tab.postes'),     icon: Briefcase },
+    { id: 'candidats', label: t('rh.recrutement.tab.candidats'),  icon: Users     },
+    { id: 'top',       label: 'Top Candidats',                    icon: Star      },
+    { id: 'agent',     label: 'Agent IA',                         icon: Bot       },
+  ]
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -836,21 +841,21 @@ export default function RecrutementPage() {
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-lg font-bold text-[var(--text)]">Recrutement IA</h1>
+        <h1 className="text-lg font-bold text-[var(--text)]">{t('rh.recrutement.title')}</h1>
         <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-          Analysez vos CVs avec l'IA · {offres.length} offre{offres.length !== 1 ? 's' : ''} · {candidats.length} candidat{candidats.length !== 1 ? 's' : ''}
+          {t('rh.recrutement.subtitle')} · {offres.length} offre{offres.length !== 1 ? 's' : ''} · {candidats.length} candidat{candidats.length !== 1 ? 's' : ''}
         </p>
       </div>
 
       {/* Tab bar */}
       <div className="flex gap-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-1">
-        {TABS.map(tab => {
-          const Icon = tab.icon
-          const active = activeTab === tab.id
+        {TABS.map(tab_ => {
+          const Icon = tab_.icon
+          const active = activeTab === tab_.id
           return (
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              key={tab_.id}
+              onClick={() => setActiveTab(tab_.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all flex-1 justify-center ${
                 active
                   ? 'bg-[var(--primary)] text-white'
@@ -858,7 +863,7 @@ export default function RecrutementPage() {
               }`}
             >
               <Icon size={13} />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="hidden sm:inline">{tab_.label}</span>
             </button>
           )
         })}

@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   User, FileText, Calendar, Clock, DollarSign,
   Download, Bell, ChevronRight, Star, Shield,
@@ -69,8 +70,8 @@ function fmtFCFA(n: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 }
 
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+function fmtDate(d: string, intlLocale: string) {
+  return new Date(d).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function anciennete(dateStr: string | null) {
@@ -101,6 +102,8 @@ const PRESENCE_TYPES: Record<string, { label: string; color: string }> = {
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function PortailPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale
   const [tab, setTab] = useState<'accueil' | 'paie' | 'conges' | 'presences' | 'profil'>('accueil')
 
   /* Data */
@@ -183,17 +186,17 @@ export default function PortailPage() {
     return (
       <div className="flex items-center justify-center py-24 text-[#94A3B8]">
         <div className="w-6 h-6 border-2 border-[#F59E0B] border-t-transparent rounded-full animate-spin mr-2" />
-        Chargement du portail…
+        {t('common.loading')}
       </div>
     )
   }
 
   const TABS = [
-    { id: 'accueil',   label: 'Accueil',   icon: User        },
-    { id: 'paie',      label: 'Mes fiches', icon: DollarSign  },
-    { id: 'conges',    label: 'Congés',    icon: Calendar    },
-    { id: 'presences', label: 'Présences', icon: Clock       },
-    { id: 'profil',    label: 'Mon profil', icon: Shield      },
+    { id: 'accueil',   label: t('rh.portail.myInfo'),     icon: User        },
+    { id: 'paie',      label: t('rh.portail.myPayslips'), icon: DollarSign  },
+    { id: 'conges',    label: t('rh.portail.myLeaves'),   icon: Calendar    },
+    { id: 'presences', label: 'Présences',                icon: Clock       },
+    { id: 'profil',    label: 'Mon profil',               icon: Shield      },
   ] as const
 
   return (
@@ -206,7 +209,7 @@ export default function PortailPage() {
             {firstEmp ? firstEmp.nom.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase() : 'EMP'}
           </div>
           <div>
-            <div className="text-[20px] font-extrabold">{firstEmp?.nom ?? 'Portail Employé'}</div>
+            <div className="text-[20px] font-extrabold">{firstEmp?.nom ?? t('rh.portail.title')}</div>
             <div className="text-[13px] text-slate-300 mt-0.5">
               {firstEmp?.poste ?? '—'} · {firstEmp?.departement ?? '—'}
             </div>
@@ -232,18 +235,18 @@ export default function PortailPage() {
 
       {/* Tabs */}
       <div className="flex items-center gap-0.5 overflow-x-auto bg-white rounded-xl border border-[#E2E8F0] p-1">
-        {TABS.map(t => (
+        {TABS.map(tab_ => (
           <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
+            key={tab_.id}
+            onClick={() => setTab(tab_.id)}
             className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-semibold rounded-lg whitespace-nowrap transition-all ${
-              tab === t.id
+              tab === tab_.id
                 ? 'bg-[#F59E0B] text-white shadow-sm'
                 : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
             }`}
           >
-            <t.icon size={13} />
-            {t.label}
+            <tab_.icon size={13} />
+            {tab_.label}
           </button>
         ))}
       </div>
@@ -360,7 +363,7 @@ export default function PortailPage() {
                         <p className="text-[12px] font-semibold text-[#0F172A]">
                           Congé {c.type} — {c.nb_jours ?? '?'} jour{(c.nb_jours ?? 0) > 1 ? 's' : ''}
                         </p>
-                        <p className="text-[11px] text-[#64748B]">{fmtDate(c.date_debut)} → {fmtDate(c.date_fin)}</p>
+                        <p className="text-[11px] text-[#64748B]">{fmtDate(c.date_debut, intlLocale)} → {fmtDate(c.date_fin, intlLocale)}</p>
                       </div>
                       <span className="text-[10px] px-2 py-0.5 rounded font-semibold" style={{ background: st.bg, color: st.color }}>
                         {st.label}
@@ -378,7 +381,7 @@ export default function PortailPage() {
       {tab === 'paie' && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-[14px] font-bold text-[#0F172A]">Mes fiches de paie ({bulletins.length})</p>
+            <p className="text-[14px] font-bold text-[#0F172A]">{t('rh.portail.myPayslips')} ({bulletins.length})</p>
           </div>
           {bulletins.length === 0 ? (
             <div className="bg-white rounded-xl border border-[#E2E8F0] py-16 text-center">
@@ -510,7 +513,7 @@ export default function PortailPage() {
                         <p className="text-[12px] font-semibold text-[#0F172A]">
                           {c.type.charAt(0).toUpperCase() + c.type.slice(1)} — {c.nb_jours ?? '?'} jour{(c.nb_jours ?? 0) > 1 ? 's' : ''}
                         </p>
-                        <p className="text-[11px] text-[#64748B]">{fmtDate(c.date_debut)} → {fmtDate(c.date_fin)}</p>
+                        <p className="text-[11px] text-[#64748B]">{fmtDate(c.date_debut, intlLocale)} → {fmtDate(c.date_fin, intlLocale)}</p>
                         {c.motif && <p className="text-[10px] text-[#94A3B8] italic">{c.motif}</p>}
                       </div>
                       <span className="text-[10px] px-2 py-0.5 rounded font-semibold" style={{ background: st.bg, color: st.color }}>
@@ -534,15 +537,15 @@ export default function PortailPage() {
           ) : (
             <div className="space-y-1">
               {presences.map(p => {
-                const t = PRESENCE_TYPES[p.type] || { label: p.type, color: '#94A3B8' }
+                const ptype = PRESENCE_TYPES[p.type] || { label: p.type, color: '#94A3B8' }
                 return (
                   <div key={p.id} className="flex items-center gap-3 py-2 border-b border-[#F1F5F9] last:border-0">
-                    <span className="w-2 h-2 rounded-full" style={{ background: t.color }} />
+                    <span className="w-2 h-2 rounded-full" style={{ background: ptype.color }} />
                     <span className="text-[12px] font-semibold text-[#0F172A] w-24">
-                      {fmtDate(p.date)}
+                      {fmtDate(p.date, intlLocale)}
                     </span>
-                    <span className="text-[11px] px-2 py-0.5 rounded font-semibold" style={{ background: t.color + '18', color: t.color }}>
-                      {t.label}
+                    <span className="text-[11px] px-2 py-0.5 rounded font-semibold" style={{ background: ptype.color + '18', color: ptype.color }}>
+                      {ptype.label}
                     </span>
                     {p.heure_arrivee && (
                       <span className="text-[11px] text-[#64748B]">
@@ -568,7 +571,7 @@ export default function PortailPage() {
               { label: 'Poste',           value: firstEmp.poste        },
               { label: 'Département',     value: firstEmp.departement  },
               { label: 'Type de contrat', value: firstEmp.type_contrat },
-              { label: 'Date d\'entrée',  value: firstEmp.date_debut_contrat ? fmtDate(firstEmp.date_debut_contrat) : null },
+              { label: 'Date d\'entrée',  value: firstEmp.date_debut_contrat ? fmtDate(firstEmp.date_debut_contrat, intlLocale) : null },
               { label: 'Email pro',       value: firstEmp.email_pro    },
               { label: 'Téléphone',       value: firstEmp.telephone    },
               { label: 'Ancienneté',      value: anciennete(firstEmp.date_debut_contrat) },

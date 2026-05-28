@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   TrendingUp, Plus, Download, Check, X, Loader2, Eye,
@@ -62,6 +63,7 @@ const EMPTY_FORM = {
 
 export default function PrevisionsPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [rows, setRows]           = useState<Prevision[]>([])
   const [loading, setLoading]     = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -166,8 +168,8 @@ export default function PrevisionsPage() {
             <TrendingUp size={20} className="text-cyan-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Prévisions de trésorerie</h1>
-            <p className="text-xs text-[#64748B]">Planification cashflow — 12 mois glissants</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.previsions.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.previsions.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -176,7 +178,7 @@ export default function PrevisionsPage() {
           </button>
           <button onClick={() => { setForm({ ...EMPTY_FORM, periode: selectedPeriode }); setShowModal(true) }}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#0891B2] rounded-xl hover:bg-[#0E7490] shadow-sm">
-            <Plus size={14} /> Ajouter prévision
+            <Plus size={14} /> {t('treso.previsions.generate')}
           </button>
         </div>
       </div>
@@ -208,7 +210,7 @@ export default function PrevisionsPage() {
         <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <ArrowUpCircle size={14} className="text-green-500" />
-            <span className="text-xs text-[#64748B]">Entrées prévues</span>
+            <span className="text-xs text-[#64748B]">{t('treso.previsions.kpi.entrees')}</span>
           </div>
           <div className="text-lg font-bold text-green-600">{fmtFCFA(totalPrevuEntrees)}</div>
           <div className="text-[10px] text-[#94A3B8] mt-1">Réel: {fmtFCFA(actuals.entrees)}</div>
@@ -216,7 +218,7 @@ export default function PrevisionsPage() {
         <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <ArrowDownCircle size={14} className="text-red-500" />
-            <span className="text-xs text-[#64748B]">Sorties prévues</span>
+            <span className="text-xs text-[#64748B]">{t('treso.previsions.kpi.sorties')}</span>
           </div>
           <div className="text-lg font-bold text-red-600">{fmtFCFA(totalPrevuSorties)}</div>
           <div className="text-[10px] text-[#94A3B8] mt-1">Réel: {fmtFCFA(actuals.sorties)}</div>
@@ -224,7 +226,7 @@ export default function PrevisionsPage() {
         <div className={`bg-white border rounded-2xl p-4 ${cashflowPrevu >= 0 ? 'border-green-200' : 'border-red-200'}`}>
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp size={14} className={cashflowPrevu >= 0 ? 'text-green-500' : 'text-red-500'} />
-            <span className="text-xs text-[#64748B]">Cashflow prévu</span>
+            <span className="text-xs text-[#64748B]">{t('treso.previsions.kpi.solde')}</span>
           </div>
           <div className={`text-lg font-bold ${cashflowPrevu >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {cashflowPrevu >= 0 ? '+' : ''}{fmtFCFA(cashflowPrevu)}
@@ -294,7 +296,7 @@ export default function PrevisionsPage() {
         ) : periodRows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-[#94A3B8]">
             <TrendingUp size={28} className="mb-2 opacity-30" />
-            <p className="text-sm">Aucune prévision pour {selectedPeriode}</p>
+            <p className="text-sm">{t('treso.previsions.noData')}</p>
             <button onClick={() => { setForm({ ...EMPTY_FORM, periode: selectedPeriode }); setShowModal(true) }}
               className="mt-2 text-xs text-[#0891B2] hover:underline">Ajouter une prévision</button>
           </div>
@@ -422,7 +424,7 @@ export default function PrevisionsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={savePrevision} disabled={saving || !form.montant_prevu || !form.libelle}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-[#0891B2] rounded-xl hover:bg-[#0E7490] disabled:opacity-50">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}

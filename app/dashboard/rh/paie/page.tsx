@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -266,6 +267,7 @@ function NumInput({ value, onChange, disabled }: {
 
 export default function PaiePage() {
   const { tenantId, loading: loadingTenant } = useTenant()
+  const { t, locale } = useLocale()
 
   const now = new Date()
   const [mois,  setMois]  = useState(now.getMonth() + 1)
@@ -459,7 +461,7 @@ export default function PaiePage() {
   if (loadingTenant) {
     return (
       <div className="flex items-center justify-center h-64 text-[var(--text-secondary)]">
-        <Loader2 className="animate-spin mr-2" size={18} /> Chargement…
+        <Loader2 className="animate-spin mr-2" size={18} /> {t('common.loading')}
       </div>
     )
   }
@@ -469,9 +471,9 @@ export default function PaiePage() {
       {/* Header */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#101729]">Gestion de la Paie</h1>
+          <h1 className="text-xl font-bold text-[#101729]">{t('rh.paie.title')}</h1>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-            Congo-Brazzaville · CNSS 5,04 % / 14,16 % · IRPP progressif
+            {t('rh.paie.subtitle')}
           </p>
         </div>
 
@@ -542,28 +544,28 @@ export default function PaiePage() {
       {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard
-          label="Masse salariale brute"
+          label={t('rh.paie.kpi.masseSalariale')}
           value={`${fmt(totalBrut)} FCFA`}
           sub={`${rows.length} employés actifs`}
           color="#DC2626"
           icon={DollarSign}
         />
         <KpiCard
-          label="Total net à payer"
+          label={t('rh.paie.kpi.net')}
           value={`${fmt(totalNet)} FCFA`}
           sub={`Économie salariés : ${fmt(totalBrut - totalNet)} FCFA`}
           color="#16A34A"
           icon={TrendingUp}
         />
         <KpiCard
-          label="Charges patronales CNSS"
+          label={t('rh.paie.kpi.cnss')}
           value={`${fmt(totalPatro)} FCFA`}
           sub="Taux 14,16 % plafonné"
           color="#DC2626"
           icon={Building2}
         />
         <KpiCard
-          label="Coût total employeur"
+          label={t('rh.paie.kpi.employes')}
           value={`${fmt(totalCout)} FCFA`}
           sub={`IRPP total : ${fmt(totalIRPP)} FCFA`}
           color="#DC2626"
@@ -589,11 +591,11 @@ export default function PaiePage() {
           }}
         >
           {saving ? (
-            <><Loader2 className="animate-spin" size={15} /> Génération…</>
+            <><Loader2 className="animate-spin" size={15} /> {t('common.loading')}</>
           ) : saved ? (
-            <><Check size={15} /> Paies enregistrées !</>
+            <><Check size={15} /> {t('common.save')} !</>
           ) : (
-            <><FileText size={15} /> Générer toutes les paies — {MOIS_LABELS[mois]} {annee}</>
+            <><FileText size={15} /> {t('rh.paie.run')} — {MOIS_LABELS[mois]} {annee}</>
           )}
         </motion.button>
       </div>
@@ -601,12 +603,12 @@ export default function PaiePage() {
       {/* Tableau principal */}
       {loading ? (
         <div className="flex items-center justify-center h-32 text-[var(--text-secondary)]">
-          <Loader2 className="animate-spin mr-2" size={16} /> Chargement de la paie…
+          <Loader2 className="animate-spin mr-2" size={16} /> {t('common.loading')}
         </div>
       ) : rows.length === 0 ? (
         <div className="text-center py-16 text-[var(--text-secondary)]">
           <Users size={32} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Aucun employé actif trouvé.</p>
+          <p className="text-sm">{t('rh.paie.noPayroll')}</p>
         </div>
       ) : (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
@@ -731,13 +733,13 @@ export default function PaiePage() {
                     <td className="px-3 py-3 text-center">
                       <button
                         onClick={() => printBulletin(row, mois, annee, entreprise)}
-                        title="Imprimer le bulletin"
+                        title={t('common.print')}
                         className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium
                                    bg-[var(--surface)] hover:bg-gray-200 text-[var(--text-secondary)] hover:text-[#101729]
                                    border border-[var(--border)] transition-colors"
                       >
                         <Printer size={11} />
-                        Bulletin
+                        {t('common.print')}
                       </button>
                     </td>
                   </motion.tr>
@@ -826,7 +828,7 @@ export default function PaiePage() {
               className="mt-3 w-full py-2 rounded-lg text-xs font-semibold text-[#16A34A] border border-[#16A34A]/40
                          hover:bg-[#16A34A]/10 transition-colors disabled:opacity-50"
             >
-              {saving ? 'Enregistrement…' : 'Sauvegarder les modifications'}
+              {saving ? t('common.loading') : t('common.save')}
             </button>
           </div>
         </motion.div>

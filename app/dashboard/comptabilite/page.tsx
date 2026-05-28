@@ -18,6 +18,7 @@ import {
   CheckCircle2, ArrowUpRight, ArrowDownRight, Activity,
   CreditCard, Building2, Smartphone,
 } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface JournalEntry {
@@ -34,8 +35,6 @@ interface DoubleEntry {
 }
 
 /* ─── Helpers ────────────────────────────────────────────── */
-const MONTHS_FR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
-
 function calcTVACongo(ht: number) {
   const tva = Math.round(ht * 0.18)
   const ca  = Math.round(tva * 0.05)
@@ -45,25 +44,30 @@ function calcTVACongo(ht: number) {
 const CATS_RECETTE = ["Vente / Chiffre d'affaires", 'Frais de scolarité', 'Prestation de services', 'Virement reçu', 'Autre recette']
 const CATS_DEPENSE = ['Salaires', 'CNSS', 'Achats / Fournisseur', 'Loyer', 'Impôts / Taxes', 'Charges diverses', 'Frais bancaires', 'Autre dépense']
 
-/* ─── Modules quick-access ───────────────────────────────── */
-const COMPTA_QUICK = [
-  { href: '/dashboard/comptabilite/journal',         label: 'Journal',         icon: BookOpen,   color: '#2563EB', desc: 'Écritures chronologiques'   },
-  { href: '/dashboard/comptabilite/grand-livre',     label: 'Grand Livre',     icon: Scale,      color: '#16A34A', desc: 'Solde par compte'            },
-  { href: '/dashboard/comptabilite/balance',         label: 'Balance',         icon: BarChart2,  color: '#8B5CF6', desc: 'Totaux débit/crédit'        },
-  { href: '/dashboard/comptabilite/bilan',           label: 'Bilan & Résultat',icon: TrendingUp, color: '#F59E0B', desc: 'États financiers OHADA'      },
-  { href: '/dashboard/comptabilite/plan-comptable',  label: 'Plan Comptable',  icon: List,       color: '#0891B2', desc: 'Comptes OHADA Classes 1-9'   },
-  { href: '/dashboard/comptabilite/tiers',           label: 'Tiers',           icon: Users,      color: '#D97706', desc: 'Clients & fournisseurs'      },
-  { href: '/dashboard/comptabilite/immobilisations', label: 'Immobilisations', icon: Package,    color: '#DC2626', desc: 'Amortissements auto'         },
-  { href: '/dashboard/comptabilite/tva',             label: 'TVA & Fiscalité', icon: Percent,    color: '#0F172A', desc: 'Déclarations TVA Congo'       },
-  { href: '/dashboard/comptabilite/rapprochement',   label: 'Rapprochement',   icon: GitMerge,   color: '#64748B', desc: 'Banques & caisses'           },
-  { href: '/dashboard/comptabilite/cloture',         label: 'Clôture',         icon: Lock,       color: '#7C3AED', desc: 'Clôture mensuelle/annuelle'  },
-  { href: '/dashboard/comptabilite/rapports',        label: 'Rapports',        icon: Download,   color: '#059669', desc: 'PDF · Excel · SYSCOHADA'     },
-  { href: '/dashboard/comptabilite/centres-couts',   label: 'Centres de coûts',icon: Layers,     color: '#EA580C', desc: 'Analytique par projet'       },
-]
-
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function ComptabilitePage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+
+  /* ─── Locale-aware month names ───────────────────────────── */
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es-ES' : locale === 'de' ? 'de-DE' : 'fr-FR'
+  const MONTHS_FR = Array.from({ length: 12 }, (_, i) => new Intl.DateTimeFormat(intlLocale, { month: 'short' }).format(new Date(2024, i, 1)))
+
+  /* ─── Modules quick-access (inside component for i18n) ───── */
+  const COMPTA_QUICK = [
+    { href: '/dashboard/comptabilite/journal',         label: t('compta.overview.journal'),         icon: BookOpen,   color: '#2563EB', desc: 'Écritures chronologiques'   },
+    { href: '/dashboard/comptabilite/grand-livre',     label: 'Grand Livre',                        icon: Scale,      color: '#16A34A', desc: 'Solde par compte'            },
+    { href: '/dashboard/comptabilite/balance',         label: 'Balance',                            icon: BarChart2,  color: '#8B5CF6', desc: 'Totaux débit/crédit'        },
+    { href: '/dashboard/comptabilite/bilan',           label: 'Bilan & Résultat',                   icon: TrendingUp, color: '#F59E0B', desc: 'États financiers OHADA'      },
+    { href: '/dashboard/comptabilite/plan-comptable',  label: 'Plan Comptable',                     icon: List,       color: '#0891B2', desc: 'Comptes OHADA Classes 1-9'   },
+    { href: '/dashboard/comptabilite/tiers',           label: 'Tiers',                              icon: Users,      color: '#D97706', desc: 'Clients & fournisseurs'      },
+    { href: '/dashboard/comptabilite/immobilisations', label: 'Immobilisations',                    icon: Package,    color: '#DC2626', desc: 'Amortissements auto'         },
+    { href: '/dashboard/comptabilite/tva',             label: t('compta.overview.kpi.tva'),         icon: Percent,    color: '#0F172A', desc: 'Déclarations TVA Congo'       },
+    { href: '/dashboard/comptabilite/rapprochement',   label: 'Rapprochement',                      icon: GitMerge,   color: '#64748B', desc: 'Banques & caisses'           },
+    { href: '/dashboard/comptabilite/cloture',         label: 'Clôture',                            icon: Lock,       color: '#7C3AED', desc: 'Clôture mensuelle/annuelle'  },
+    { href: '/dashboard/comptabilite/rapports',        label: 'Rapports',                           icon: Download,   color: '#059669', desc: 'PDF · Excel · SYSCOHADA'     },
+    { href: '/dashboard/comptabilite/centres-couts',   label: 'Centres de coûts',                   icon: Layers,     color: '#EA580C', desc: 'Analytique par projet'       },
+  ]
 
   /* State */
   const [recettesTotal,  setRecettesTotal]  = useState(0)
@@ -222,7 +226,7 @@ export default function ComptabilitePage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement comptabilité…
+      {t('common.loading')}
     </div>
   )
 
@@ -234,10 +238,10 @@ export default function ComptabilitePage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Scale size={22} className="text-[#2563EB]" />
-            Comptabilité OHADA
+            {t('compta.overview.title')}
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
-            Double entrée · TVA Congo (18% + 5% CA) · SYSCOHADA
+            {t('compta.overview.subtitle')}
           </p>
         </div>
         <button
@@ -245,7 +249,7 @@ export default function ComptabilitePage() {
           className="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg shadow-sm"
         >
           <Plus size={14} />
-          Nouvelle écriture
+          {t('compta.overview.newEntry')}
         </button>
       </div>
 
@@ -253,25 +257,25 @@ export default function ComptabilitePage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           {
-            label: 'Recettes HT',
+            label: t('compta.overview.kpi.ca'),
             value: fmtFCFA(recettesTotal),
             icon: ArrowUpRight, color: '#16A34A',
             trend: recettesTotal > depensesTotal ? '▲ Excédent' : undefined,
           },
           {
-            label: 'Dépenses HT',
+            label: t('compta.overview.kpi.charges'),
             value: fmtFCFA(depensesTotal),
             icon: ArrowDownRight, color: '#DC2626',
           },
           {
-            label: resultat >= 0 ? 'Résultat net' : 'Déficit',
+            label: t('compta.overview.kpi.solde'),
             value: fmtFCFA(Math.abs(resultat)),
             icon: resultat >= 0 ? TrendingUp : TrendingDown,
             color: resultat >= 0 ? '#2563EB' : '#DC2626',
             trend: resultat >= 0 ? '✓ Bénéfice' : '⚠ Perte',
           },
           {
-            label: 'TVA collectée',
+            label: t('compta.overview.kpi.tva'),
             value: fmtFCFA(tvaCollectee),
             icon: Percent, color: '#D97706',
             trend: tvaAReverse > 0 ? `~${fmtFCFA(tvaAReverse)} à reverser` : undefined,
@@ -298,8 +302,8 @@ export default function ComptabilitePage() {
           <div className="flex items-center justify-between mb-2">
             <p className="text-[13px] font-bold text-[#0F172A]">Cashflow 6 mois</p>
             <div className="flex items-center gap-3 text-[10px]">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#16A34A] inline-block" /> Recettes</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#DC2626] inline-block" /> Dépenses</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#16A34A] inline-block" /> {t('compta.overview.kpi.ca')}</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#DC2626] inline-block" /> {t('compta.overview.kpi.charges')}</span>
               <span className="text-[#94A3B8]">(en milliers FCFA)</span>
             </div>
           </div>
@@ -316,10 +320,10 @@ export default function ComptabilitePage() {
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col gap-3">
           <p className="text-[13px] font-bold text-[#0F172A]">Résumé financier</p>
           {[
-            { label: 'Recettes HT',        value: recettesTotal,         color: '#16A34A' },
-            { label: 'TVA collectée',       value: tvaCollectee,          color: '#D97706' },
-            { label: 'Dépenses HT',         value: depensesTotal,         color: '#DC2626' },
-            { label: 'Résultat brut',       value: Math.abs(resultat),    color: resultat >= 0 ? '#2563EB' : '#DC2626' },
+            { label: t('compta.overview.kpi.ca'),        value: recettesTotal,         color: '#16A34A' },
+            { label: t('compta.overview.kpi.tva'),       value: tvaCollectee,          color: '#D97706' },
+            { label: t('compta.overview.kpi.charges'),   value: depensesTotal,         color: '#DC2626' },
+            { label: t('compta.overview.kpi.solde'),     value: Math.abs(resultat),    color: resultat >= 0 ? '#2563EB' : '#DC2626' },
           ].map(r => (
             <div key={r.label} className="flex justify-between items-center py-1.5 border-b border-[#F1F5F9] last:border-0">
               <span className="text-[12px] text-[#64748B]">{r.label}</span>
@@ -342,7 +346,7 @@ export default function ComptabilitePage() {
             <div className="flex items-start gap-2 p-3 rounded-lg bg-[#FEF3C7] border border-[#FDE68A]">
               <AlertTriangle size={14} className="text-[#D97706] shrink-0 mt-0.5" />
               <div>
-                <p className="text-[12px] font-bold text-[#D97706]">TVA à reverser estimée : {fmtFCFA(tvaAReverse)}</p>
+                <p className="text-[12px] font-bold text-[#D97706]">{t('compta.overview.kpi.tva')} à reverser estimée : {fmtFCFA(tvaAReverse)}</p>
                 <p className="text-[11px] text-[#D97706]/80">Pensez à déclarer votre TVA mensuelle dans le module Fiscalité.</p>
               </div>
               <Link href="/dashboard/comptabilite/tva" className="ml-auto text-[11px] font-bold text-[#D97706] underline whitespace-nowrap">
@@ -353,7 +357,7 @@ export default function ComptabilitePage() {
           {recentEntries.length === 0 && (
             <div className="flex items-start gap-2 p-3 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE]">
               <Activity size={14} className="text-[#2563EB] shrink-0 mt-0.5" />
-              <p className="text-[12px] text-[#2563EB]">Aucune écriture comptable — cliquez sur &quot;Nouvelle écriture&quot; pour commencer.</p>
+              <p className="text-[12px] text-[#2563EB]">{t('compta.overview.noEntries')} — cliquez sur &quot;{t('compta.overview.newEntry')}&quot; pour commencer.</p>
             </div>
           )}
         </div>
@@ -361,7 +365,7 @@ export default function ComptabilitePage() {
 
       {/* ── Quick module grid ─────────────────────────────────── */}
       <div>
-        <h2 className="text-[14px] font-bold text-[#0F172A] mb-3">Modules comptables</h2>
+        <h2 className="text-[14px] font-bold text-[#0F172A] mb-3">{t('compta.overview.modules')}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {COMPTA_QUICK.map(mod => (
             <Link key={mod.href} href={mod.href}>
@@ -380,20 +384,20 @@ export default function ComptabilitePage() {
       {/* ── Dernières écritures ───────────────────────────────── */}
       <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
         <div className="flex items-center justify-between mb-4">
-          <p className="text-[13px] font-bold text-[#0F172A]">Dernières écritures</p>
+          <p className="text-[13px] font-bold text-[#0F172A]">{t('compta.overview.recentEntries')}</p>
           <Link href="/dashboard/comptabilite/journal" className="text-[11px] text-[#2563EB] font-semibold hover:underline">
             Voir tout →
           </Link>
         </div>
         {recentEntries.length === 0 ? (
-          <p className="text-center py-6 text-[12px] text-[#94A3B8]">Aucune écriture</p>
+          <p className="text-center py-6 text-[12px] text-[#94A3B8]">{t('compta.overview.noEntries')}</p>
         ) : (
           <div className="space-y-1">
             {recentEntries.map(e => (
               <div key={e.id} className="flex items-center gap-3 py-2 border-b border-[#F1F5F9] last:border-0">
                 <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${e.type === 'recette' ? 'bg-[#16A34A]' : 'bg-[#DC2626]'}`} />
                 <span className="text-[11px] text-[#94A3B8] w-20 shrink-0">
-                  {new Date(e.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' })}
+                  {new Date(e.date).toLocaleDateString(intlLocale, { day:'2-digit', month:'short' })}
                 </span>
                 <span className="text-[12px] text-[#0F172A] flex-1 truncate">{e.libelle}</span>
                 <span className="text-[11px] text-[#94A3B8] truncate hidden sm:block w-24">{e.categorie}</span>
@@ -410,16 +414,16 @@ export default function ComptabilitePage() {
       {recentDouble.length > 0 && (
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-[13px] font-bold text-[#0F172A]">Partie double — récente</p>
+            <p className="text-[13px] font-bold text-[#0F172A]">{t('compta.overview.doubleEntry')}</p>
             <Link href="/dashboard/comptabilite/journal" className="text-[11px] text-[#2563EB] font-semibold hover:underline">
-              Journal complet →
+              {t('compta.overview.journal')} complet →
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-[11px]">
               <thead>
                 <tr className="border-b border-[#E2E8F0]">
-                  {['Date','Libellé','Débit','Crédit','Montant','Source'].map(h => (
+                  {[t('audit.colDate'),'Libellé','Débit','Crédit','Montant','Source'].map(h => (
                     <th key={h} className="pb-2 text-left text-[10px] font-semibold text-[#94A3B8] uppercase pr-3">{h}</th>
                   ))}
                 </tr>
@@ -428,7 +432,7 @@ export default function ComptabilitePage() {
                 {recentDouble.map(e => (
                   <tr key={e.id} className="border-b border-[#F8FAFC] hover:bg-[#F8FAFC]">
                     <td className="py-1.5 pr-3 whitespace-nowrap text-[#64748B]">
-                      {new Date(e.date_operation).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' })}
+                      {new Date(e.date_operation).toLocaleDateString(intlLocale, { day:'2-digit', month:'short' })}
                     </td>
                     <td className="py-1.5 pr-3 max-w-[200px] truncate font-medium text-[#0F172A]">{e.libelle}</td>
                     <td className="py-1.5 pr-3">
@@ -461,7 +465,7 @@ export default function ComptabilitePage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
               <div>
-                <h2 className="font-bold text-[#0F172A] text-[15px]">Nouvelle écriture comptable</h2>
+                <h2 className="font-bold text-[#0F172A] text-[15px]">{t('compta.overview.addEntry')}</h2>
                 <p className="text-[11px] text-[#94A3B8] mt-0.5">Double entrée OHADA · TVA Congo automatique</p>
               </div>
               <button onClick={() => { setShowModal(false); resetForm() }}><X size={18} className="text-[#94A3B8]" /></button>
@@ -471,14 +475,14 @@ export default function ComptabilitePage() {
 
               {/* Type toggle */}
               <div className="flex rounded-xl border border-[#E2E8F0] overflow-hidden">
-                {(['recette', 'depense'] as const).map(t => (
-                  <button key={t} onClick={() => { setFormType(t); setFormCat('') }}
+                {(['recette', 'depense'] as const).map(tab_ => (
+                  <button key={tab_} onClick={() => { setFormType(tab_); setFormCat('') }}
                     className={`flex-1 py-2.5 text-[12px] font-bold transition-all ${
-                      formType === t
-                        ? t === 'recette' ? 'bg-[#16A34A] text-white' : 'bg-[#DC2626] text-white'
+                      formType === tab_
+                        ? tab_ === 'recette' ? 'bg-[#16A34A] text-white' : 'bg-[#DC2626] text-white'
                         : 'text-[#64748B] hover:bg-[#F8FAFC]'
                     }`}>
-                    {t === 'recette' ? '⬆ Recette' : '⬇ Dépense'}
+                    {tab_ === 'recette' ? `⬆ ${t('compta.overview.recette')}` : `⬇ ${t('compta.overview.depense')}`}
                   </button>
                 ))}
               </div>
@@ -561,11 +565,11 @@ export default function ComptabilitePage() {
                 <button onClick={handleSave} disabled={saving}
                   className="flex-1 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
                   {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                  Enregistrer l&apos;écriture
+                  {t('common.save')}
                 </button>
                 <button onClick={() => { setShowModal(false); resetForm() }}
                   className="px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-[12px] text-[#64748B] hover:bg-[#F8FAFC]">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>

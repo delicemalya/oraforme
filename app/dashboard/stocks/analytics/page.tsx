@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   BarChart3, TrendingUp, TrendingDown, Package,
@@ -33,8 +34,9 @@ type Period = '3m' | '6m' | '12m'
 const MONTHS_FR = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
 export default function StocksAnalyticsPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [period, setPeriod] = useState<Period>('6m')
   const [data, setData] = useState<MonthData[]>([])
@@ -199,9 +201,9 @@ export default function StocksAnalyticsPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <BarChart3 size={20} className="text-[#16A34A]" />
-            Analytics Stocks
+            {t('stock.analytics.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Tendances, rotation, valorisation et performance</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.analytics.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 bg-[#F1F5F9] rounded-xl p-1">
@@ -224,12 +226,12 @@ export default function StocksAnalyticsPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
-          { label: 'Valeur stock', value: fmtFCFA(summary.valeur_stock), icon: DollarSign, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.analytics.kpi.valeur'), value: fmtFCFA(summary.valeur_stock), icon: DollarSign, color: '#16A34A', bg: '#F0FDF4' },
           { label: 'Achats période', value: fmtFCFA(summary.total_achats), icon: ArrowUpCircle, color: '#2563EB', bg: '#EFF6FF' },
           { label: 'Sorties période', value: fmtFCFA(summary.total_sorties_val), icon: ArrowDownCircle, color: '#DC2626', bg: '#FEF2F2' },
           { label: 'Produits actifs', value: summary.nb_produits, icon: Package, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Fournisseurs', value: summary.nb_fournisseurs, icon: Users2, color: '#7C3AED', bg: '#F5F3FF' },
-          { label: 'Rotation stock', value: summary.rotation_moy.toFixed(2) + 'x', icon: RefreshCw, color: '#0891B2', bg: '#ECFEFF' },
+          { label: t('stock.analytics.kpi.ruptures'), value: summary.nb_fournisseurs, icon: Users2, color: '#7C3AED', bg: '#F5F3FF' },
+          { label: t('stock.analytics.kpi.rotation'), value: summary.rotation_moy.toFixed(2) + 'x', icon: RefreshCw, color: '#0891B2', bg: '#ECFEFF' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-1.5 mb-2">
@@ -246,7 +248,7 @@ export default function StocksAnalyticsPage() {
       {/* Bar chart: Entrées vs Sorties (valeur) */}
       {loading ? (
         <div className="flex items-center justify-center py-20 bg-white border border-[#E2E8F0] rounded-2xl text-sm text-[#64748B]">
-          Chargement des données…
+          {t('common.loading')}
         </div>
       ) : (
         <>

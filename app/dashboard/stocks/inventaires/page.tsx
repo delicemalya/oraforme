@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -56,8 +57,9 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string }
 }
 
 export default function InventairesPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t } = useLocale()
 
   const [inventaires, setInventaires] = useState<Inventaire[]>([])
   const [warehouses, setWarehouses] = useState<any[]>([])
@@ -278,23 +280,23 @@ export default function InventairesPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <ClipboardList size={20} className="text-[#16A34A]" />
-            Inventaires Physiques
+            {t('stock.inventaires.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Comptage physique et ajustements automatiques OHADA</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.inventaires.subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouvel inventaire
+          <Plus size={14} /> {t('stock.inventaires.newInventory')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total inventaires', value: inventaires.length, icon: ClipboardList, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.inventaires.kpi.total'), value: inventaires.length, icon: ClipboardList, color: '#16A34A', bg: '#F0FDF4' },
           { label: 'En cours', value: enCours, icon: Play, color: '#D97706', bg: '#FFFBEB' },
           { label: 'Validés', value: inventaires.filter(i => i.statut === 'validé').length, icon: CheckCircle2, color: '#2563EB', bg: '#EFF6FF' },
-          { label: 'Écarts cumulés', value: fmtFCFA(totalEcart), icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
+          { label: t('stock.inventaires.kpi.ecarts'), value: fmtFCFA(totalEcart), icon: AlertTriangle, color: '#DC2626', bg: '#FEF2F2' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -320,13 +322,13 @@ export default function InventairesPage() {
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
               <ClipboardList size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucun inventaire</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('stock.inventaires.noInventories')}</p>
               <button onClick={() => setShowCreate(true)}
                 className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
                 Créer un inventaire
@@ -373,7 +375,7 @@ export default function InventairesPage() {
                       <p className="text-xs font-bold" style={{ color: (inv.ecart_valeur || 0) >= 0 ? '#16A34A' : '#DC2626' }}>
                         {(inv.ecart_valeur || 0) >= 0 ? '+' : ''}{fmtFCFA(inv.ecart_valeur || 0)}
                       </p>
-                      <p className="text-[10px] text-[#94A3B8]">Écart valeur</p>
+                      <p className="text-[10px] text-[#94A3B8]">{t('stock.inventaires.kpi.valeur')}</p>
                     </div>
                   )}
 
@@ -404,7 +406,7 @@ export default function InventairesPage() {
                 {isOpen && (
                   <div className="border-t border-[#F1F5F9]">
                     {lignesLoading ? (
-                      <div className="p-6 text-center text-sm text-[#64748B]">Chargement des lignes…</div>
+                      <div className="p-6 text-center text-sm text-[#64748B]">{t('common.loading')}</div>
                     ) : lignes.length === 0 ? (
                       <div className="p-6 text-center text-sm text-[#64748B]">Aucune ligne d'inventaire</div>
                     ) : (
@@ -517,12 +519,12 @@ export default function InventairesPage() {
             <div className="flex gap-2 p-5 border-t border-[#E2E8F0]">
               <button onClick={() => setShowCreate(false)}
                 className="flex-1 px-4 py-2 border border-[#E2E8F0] text-[#374151] text-xs font-semibold rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={handleCreate} disabled={saving}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] disabled:opacity-50">
                 <Save size={13} />
-                {saving ? 'Création…' : 'Créer l\'inventaire'}
+                {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

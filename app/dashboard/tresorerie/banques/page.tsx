@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -36,6 +37,8 @@ function today() { return new Date().toISOString().split('T')[0] }
 
 export default function BanquesPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-US' : locale
   const [comptes,  setComptes]  = useState<CompteBancaire[]>([])
   const [cheques,  setCheques]  = useState<Cheque[]>([])
   const [virements,setVirements]= useState<Virement[]>([])
@@ -201,7 +204,7 @@ export default function BanquesPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24">
       <div className="w-6 h-6 border-2 border-[#0891B2] border-t-transparent rounded-full animate-spin mr-2" />
-      <span className="text-[#94A3B8] text-[13px]">Chargement Banques…</span>
+      <span className="text-[#94A3B8] text-[13px]">{t('common.loading')}</span>
     </div>
   )
 
@@ -222,9 +225,9 @@ export default function BanquesPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Landmark size={22} className="text-[#0891B2]" />
-            Comptes Bancaires
+            {t('treso.banques.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Multi-banques · Chèques · Virements · Congo-Brazzaville</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('treso.banques.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={exportCSV}
@@ -234,7 +237,7 @@ export default function BanquesPage() {
           {tab === 'comptes' && (
             <button onClick={() => setModalCompte(true)}
               className="flex items-center gap-1.5 px-3 py-2 bg-[#0891B2] text-white rounded-lg text-[12px] font-semibold">
-              <Plus size={13} /> Nouveau compte
+              <Plus size={13} /> {t('treso.banques.newAccount')}
             </button>
           )}
           {tab === 'cheques' && (
@@ -255,10 +258,10 @@ export default function BanquesPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total banques',       value: fmtFCFA(totalBanque), color: '#0891B2' },
-          { label: 'Comptes actifs',       value: comptes.length,       color: '#0F172A', isMoney: false },
-          { label: 'Chèques en attente',   value: chequesEnAttente.length, color: '#7C3AED', isMoney: false },
-          { label: 'Virements en attente', value: virementsEnAttente.length, color: '#D97706', isMoney: false },
+          { label: t('treso.banques.kpi.total'),    value: fmtFCFA(totalBanque), color: '#0891B2' },
+          { label: t('treso.banques.kpi.accounts'), value: comptes.length,       color: '#0F172A', isMoney: false },
+          { label: t('treso.banques.kpi.movement'), value: chequesEnAttente.length, color: '#7C3AED', isMoney: false },
+          { label: 'Virements en attente',           value: virementsEnAttente.length, color: '#D97706', isMoney: false },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-3">
             <div className="text-[16px] font-extrabold" style={{ color: k.color }}>
@@ -275,14 +278,14 @@ export default function BanquesPage() {
           { id: 'comptes',   label: 'Comptes',   icon: Landmark },
           { id: 'cheques',   label: 'Chèques',   icon: FileText },
           { id: 'virements', label: 'Virements', icon: Send },
-        ].map(t => {
-          const Icon = t.icon
+        ].map(tab_ => {
+          const Icon = tab_.icon
           return (
-            <button key={t.id} onClick={() => setTab(t.id as typeof tab)}
+            <button key={tab_.id} onClick={() => setTab(tab_.id as typeof tab)}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold rounded-t-lg border-b-2 transition-all ${
-                tab === t.id ? 'text-[#0891B2] border-[#0891B2]' : 'text-[#64748B] border-transparent hover:text-[#0F172A]'
+                tab === tab_.id ? 'text-[#0891B2] border-[#0891B2]' : 'text-[#64748B] border-transparent hover:text-[#0F172A]'
               }`}>
-              <Icon size={13} /> {t.label}
+              <Icon size={13} /> {tab_.label}
             </button>
           )
         })}
@@ -293,7 +296,7 @@ export default function BanquesPage() {
         comptes.length === 0 ? (
           <div className="bg-white rounded-xl border border-[#E2E8F0] py-16 text-center">
             <Landmark size={32} className="mx-auto mb-2 text-[#E2E8F0]" />
-            <p className="text-[13px] text-[#94A3B8] mb-3">Aucun compte bancaire configuré</p>
+            <p className="text-[13px] text-[#94A3B8] mb-3">{t('treso.banques.noAccounts')}</p>
             <button onClick={() => setModalCompte(true)} className="px-4 py-2 bg-[#0891B2] text-white rounded-lg text-[12px] font-semibold">
               Ajouter un compte
             </button>
@@ -363,7 +366,7 @@ export default function BanquesPage() {
                     <td className="px-3 py-2.5 text-[#94A3B8]">{c.banque_tiree || '—'}</td>
                     <td className="px-3 py-2.5 font-extrabold text-[#0F172A]">{fmtFCFA(c.montant)}</td>
                     <td className="px-3 py-2.5 text-[#64748B]">
-                      {c.date_echeance ? new Date(c.date_echeance).toLocaleDateString('fr-FR') : '—'}
+                      {c.date_echeance ? new Date(c.date_echeance).toLocaleDateString(intlLocale) : '—'}
                     </td>
                     <td className="px-3 py-2.5">
                       <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold w-fit ${statusColor(c.statut)}`}>
@@ -415,7 +418,7 @@ export default function BanquesPage() {
                 {virements.map(v => (
                   <tr key={v.id} className="border-t border-[#F1F5F9] hover:bg-[#F8FAFC]">
                     <td className="px-3 py-2.5 text-[#64748B]">
-                      {new Date(v.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                      {new Date(v.date).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short' })}
                     </td>
                     <td className="px-3 py-2.5 text-[#64748B]">{v.compte_source_label || '—'}</td>
                     <td className="px-3 py-2.5 font-semibold text-[#0F172A]">{v.compte_dest_label}</td>
@@ -481,10 +484,10 @@ export default function BanquesPage() {
               ))}
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setModalCompte(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+              <button onClick={() => setModalCompte(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={saveCompte} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#0891B2] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? '…' : 'Créer'}
+                <Save size={13} /> {saving ? '…' : t('common.save')}
               </button>
             </div>
           </div>
@@ -501,10 +504,10 @@ export default function BanquesPage() {
             </div>
             <div className="p-5 space-y-3">
               <div className="flex gap-2">
-                {(['emis', 'recu'] as const).map(t => (
-                  <button key={t} onClick={() => setChequeType(t)}
-                    className={`flex-1 py-2 rounded-lg text-[12px] font-bold border ${chequeType === t ? 'bg-[#7C3AED] text-white border-[#7C3AED]' : 'bg-white border-[#E2E8F0] text-[#64748B]'}`}>
-                    {t === 'emis' ? 'Chèque émis ↗' : 'Chèque reçu ↙'}
+                {(['emis', 'recu'] as const).map(item => (
+                  <button key={item} onClick={() => setChequeType(item)}
+                    className={`flex-1 py-2 rounded-lg text-[12px] font-bold border ${chequeType === item ? 'bg-[#7C3AED] text-white border-[#7C3AED]' : 'bg-white border-[#E2E8F0] text-[#64748B]'}`}>
+                    {item === 'emis' ? 'Chèque émis ↗' : 'Chèque reçu ↙'}
                   </button>
                 ))}
               </div>
@@ -545,10 +548,10 @@ export default function BanquesPage() {
               </div>
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setModalCheque(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+              <button onClick={() => setModalCheque(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={saveCheque} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#7C3AED] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? '…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? '…' : t('common.save')}
               </button>
             </div>
           </div>
@@ -589,10 +592,10 @@ export default function BanquesPage() {
               ))}
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setModalVirement(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+              <button onClick={() => setModalVirement(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={saveVirement} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#0F172A] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? '…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? '…' : t('common.save')}
               </button>
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   FileText, Plus, X, Save, Search, ChevronDown, ChevronRight,
@@ -53,8 +54,9 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string; 
 const TVA_RATES = [0, 5, 10, 16, 18, 20]
 
 export default function CommandesPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
 
   const [orders, setOrders] = useState<PurchaseOrder[]>([])
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -211,22 +213,22 @@ export default function CommandesPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <FileText size={20} className="text-[#16A34A]" />
-            Bons de Commande Fournisseurs
+            {t('stock.commandes.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Commandes officielles avec TVA, workflow et suivi</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.commandes.subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouveau bon de commande
+          <Plus size={14} /> {t('stock.commandes.newOrder')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total commandes', value: orders.length, icon: FileText, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'En attente livraison', value: enAttente, icon: Clock, color: '#D97706', bg: '#FFFBEB' },
-          { label: 'Volume ce mois', value: fmtFCFA(totalMois), icon: Package, color: '#2563EB', bg: '#EFF6FF' },
+          { label: t('stock.commandes.kpi.total'), value: orders.length, icon: FileText, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.commandes.kpi.pending'), value: enAttente, icon: Clock, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.commandes.kpi.valeur'), value: fmtFCFA(totalMois), icon: Package, color: '#2563EB', bg: '#EFF6FF' },
           { label: 'Commandes reçues', value: orders.filter(o => o.statut === 'reçu').length, icon: Truck, color: '#16A34A', bg: '#F0FDF4' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
@@ -260,16 +262,16 @@ export default function CommandesPage() {
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
               <FileText size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucune commande trouvée</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('stock.commandes.noOrders')}</p>
               <button onClick={() => setShowCreate(true)}
                 className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-                Créer un bon de commande
+                {t('stock.commandes.newOrder')}
               </button>
             </div>
           ) : filtered.map(ord => {
@@ -289,7 +291,12 @@ export default function CommandesPage() {
                       <p className="text-sm font-bold text-[#0F172A]">{ord.numero}</p>
                       <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
                         style={{ color: cfg.color, background: cfg.bg }}>
-                        <StatusIcon size={10} /> {cfg.label}
+                        <StatusIcon size={10} />
+                        {ord.statut === 'brouillon' ? t('stock.commandes.stat.brouillon')
+                          : ord.statut === 'envoyé' ? t('stock.commandes.stat.envoye')
+                          : ord.statut === 'reçu' ? t('stock.commandes.stat.recu')
+                          : ord.statut === 'annulé' ? t('stock.commandes.stat.annule')
+                          : cfg.label}
                       </span>
                       {isLate && (
                         <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF2F2] text-[#DC2626]">
@@ -302,11 +309,11 @@ export default function CommandesPage() {
                         <Building2 size={11} /> {ord.supplier_nom || 'Sans fournisseur'}
                       </span>
                       <span className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
-                        <Calendar size={11} /> {new Date(ord.date_commande).toLocaleDateString('fr-FR')}
+                        <Calendar size={11} /> {new Date(ord.date_commande).toLocaleDateString(locale)}
                       </span>
                       {ord.date_livraison_prevue && (
                         <span className={`flex items-center gap-1 text-[11px] ${isLate ? 'text-[#DC2626] font-semibold' : 'text-[#94A3B8]'}`}>
-                          <Truck size={11} /> Livraison: {new Date(ord.date_livraison_prevue).toLocaleDateString('fr-FR')}
+                          <Truck size={11} /> Livraison: {new Date(ord.date_livraison_prevue).toLocaleDateString(locale)}
                         </span>
                       )}
                     </div>
@@ -404,7 +411,7 @@ export default function CommandesPage() {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
-              <h2 className="text-sm font-bold text-[#0F172A]">Nouveau bon de commande</h2>
+              <h2 className="text-sm font-bold text-[#0F172A]">{t('stock.commandes.newOrder')}</h2>
               <button onClick={() => setShowCreate(false)}><X size={16} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-4">
@@ -524,12 +531,12 @@ export default function CommandesPage() {
             <div className="flex gap-2 p-5 border-t border-[#E2E8F0]">
               <button onClick={() => setShowCreate(false)}
                 className="flex-1 px-4 py-2 border border-[#E2E8F0] text-[#374151] text-xs font-semibold rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={handleCreate} disabled={saving}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] disabled:opacity-50">
                 <Save size={13} />
-                {saving ? 'Création…' : 'Créer le bon de commande'}
+                {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

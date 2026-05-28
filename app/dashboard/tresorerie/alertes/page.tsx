@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Bell, Plus, Check, X, Loader2, Eye,
@@ -57,6 +58,7 @@ const SEVERITY_CONFIG: Record<string, { color: string; bg: string; Icon: React.E
 
 export default function AlertesPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [configs, setConfigs]       = useState<AlertConfig[]>([])
   const [alertes, setAlertes]       = useState<AlerteActive[]>([])
   const [loading, setLoading]       = useState(true)
@@ -232,7 +234,7 @@ export default function AlertesPage() {
             )}
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Alertes financières</h1>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.alertes.title')}</h1>
             <p className="text-xs text-[#64748B]">
               {criticalCount > 0 && <span className="text-red-600 font-semibold">{criticalCount} critique{criticalCount > 1 ? 's' : ''} · </span>}
               {unreadCount} alerte{unreadCount > 1 ? 's' : ''} non lue{unreadCount > 1 ? 's' : ''}
@@ -241,22 +243,41 @@ export default function AlertesPage() {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex bg-[#F1F5F9] rounded-xl p-0.5">
-            {(['alertes', 'config'] as const).map(t => (
-              <button key={t} onClick={() => setTab(t)}
+            {(['alertes', 'config'] as const).map(tab_ => (
+              <button key={tab_} onClick={() => setTab(tab_)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                  tab === t ? 'bg-white text-[#0F172A] shadow-sm' : 'text-[#64748B]'
+                  tab === tab_ ? 'bg-white text-[#0F172A] shadow-sm' : 'text-[#64748B]'
                 }`}>
-                {t === 'alertes' ? 'Alertes' : 'Configuration'}
+                {tab_ === 'alertes' ? 'Alertes' : 'Configuration'}
               </button>
             ))}
           </div>
           {tab === 'config' && (
             <button onClick={() => setShowModal(true)}
               className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 shadow-sm">
-              <Plus size={14} /> Nouvelle règle
+              <Plus size={14} /> {t('treso.alertes.newAlert')}
             </button>
           )}
         </div>
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: t('treso.alertes.kpi.active'), value: allAlerts.length, color: 'text-[#0891B2]', bg: 'bg-cyan-50', icon: Bell },
+          { label: t('treso.alertes.kpi.critical'), value: criticalCount, color: 'text-red-600', bg: 'bg-red-50', icon: AlertCircle },
+          { label: t('treso.alertes.kpi.warning'), value: allAlerts.filter(a => a.severity === 'warning').length, color: 'text-amber-600', bg: 'bg-amber-50', icon: AlertTriangle },
+        ].map(k => (
+          <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${k.bg}`}>
+                <k.icon size={14} className={k.color} />
+              </div>
+              <span className="text-[11px] text-[#64748B]">{k.label}</span>
+            </div>
+            <p className={`text-lg font-bold ${k.color}`}>{k.value}</p>
+          </div>
+        ))}
       </div>
 
       {loading ? (
@@ -266,7 +287,7 @@ export default function AlertesPage() {
           {allAlerts.length === 0 ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
               <CheckCircle2 size={32} className="text-green-500 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucune alerte active</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('treso.alertes.noAlerts')}</p>
               <p className="text-xs text-[#94A3B8]">Tous les indicateurs sont dans les limites normales</p>
             </div>
           ) : (
@@ -380,11 +401,11 @@ export default function AlertesPage() {
               <div>
                 <label className="block text-xs font-medium text-[#374151] mb-1">Type d'alerte</label>
                 <select value={form.type} onChange={e => {
-                  const t = ALERT_TYPES.find(a => a.value === e.target.value)
-                  setForm(f => ({ ...f, type: e.target.value, seuil: String(t?.seuil_default ?? 0), libelle: t?.label ?? '' }))
+                  const alertType = ALERT_TYPES.find(a => a.value === e.target.value)
+                  setForm(f => ({ ...f, type: e.target.value, seuil: String(alertType?.seuil_default ?? 0), libelle: alertType?.label ?? '' }))
                 }}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]">
-                  {ALERT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  {ALERT_TYPES.map(alertType => <option key={alertType.value} value={alertType.value}>{alertType.label}</option>)}
                 </select>
               </div>
               <div>
@@ -399,11 +420,11 @@ export default function AlertesPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={saveConfig} disabled={saving || !form.libelle}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
-                Créer la règle
+                {t('common.save')}
               </button>
             </div>
           </div>

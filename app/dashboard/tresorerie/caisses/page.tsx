@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -26,6 +27,8 @@ function today() { return new Date().toISOString().split('T')[0] }
 
 export default function CaissesPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-US' : locale
   const [caisses,      setCaisses]      = useState<Caisse[]>([])
   const [ops,          setOps]          = useState<CaisseOp[]>([])
   const [selected,     setSelected]     = useState<Caisse | null>(null)
@@ -118,7 +121,7 @@ export default function CaissesPage() {
     if (clotureSolde !== '') {
       await supabase.from('caisses').update({ solde: parseFloat(clotureSolde) }).eq('id', selected.id)
     }
-    showToast(`Caisse clôturée pour le ${new Date(clotureDate).toLocaleDateString('fr-FR')}`)
+    showToast(`Caisse clôturée pour le ${new Date(clotureDate).toLocaleDateString(intlLocale)}`)
     setClotureSolde(''); load(); loadOps(selected.id)
     setSaving(false)
   }
@@ -144,7 +147,7 @@ export default function CaissesPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#D97706] border-t-transparent rounded-full animate-spin mr-2" />
-      Chargement Caisses…
+      {t('common.loading')}
     </div>
   )
 
@@ -161,13 +164,13 @@ export default function CaissesPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Archive size={22} className="text-[#D97706]" />
-            Gestion des Caisses
+            {t('treso.caisses.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Espèces · Dépenses · Approvisionnements · Clôture</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('treso.caisses.subtitle')}</p>
         </div>
         <button onClick={() => setShowNewCaisse(true)}
           className="flex items-center gap-1.5 px-3 py-2 bg-[#D97706] text-white rounded-lg text-[12px] font-semibold">
-          <Plus size={13} /> Nouvelle caisse
+          <Plus size={13} /> {t('treso.caisses.newCaisse')}
         </button>
       </div>
 
@@ -175,7 +178,7 @@ export default function CaissesPage() {
       {caisses.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#E2E8F0] py-16 text-center">
           <Archive size={36} className="mx-auto mb-3 text-[#E2E8F0]" />
-          <p className="text-[13px] text-[#94A3B8] mb-3">Aucune caisse configurée</p>
+          <p className="text-[13px] text-[#94A3B8] mb-3">{t('treso.caisses.noCaisses')}</p>
           <button onClick={() => setShowNewCaisse(true)}
             className="px-4 py-2 bg-[#D97706] text-white rounded-lg text-[12px] font-semibold">
             Créer ma première caisse
@@ -211,10 +214,10 @@ export default function CaissesPage() {
               {/* KPIs today */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { label: 'Solde actuel',           value: selected.solde,   color: '#D97706', isMoney: true },
-                  { label: 'Dépenses non clôturées', value: totalDep,         color: '#DC2626', isMoney: true },
-                  { label: 'Approvisionnements',     value: totalApp,         color: '#16A34A', isMoney: true },
-                  { label: 'Opérations aujourd\'hui', value: todayOps.length, color: '#0891B2', isMoney: false },
+                  { label: t('treso.caisses.kpi.total'),    value: selected.solde,   color: '#D97706', isMoney: true },
+                  { label: t('treso.caisses.kpi.caisses'),  value: totalDep,         color: '#DC2626', isMoney: true },
+                  { label: t('treso.caisses.kpi.movement'), value: totalApp,         color: '#16A34A', isMoney: true },
+                  { label: 'Opérations aujourd\'hui',        value: todayOps.length, color: '#0891B2', isMoney: false },
                 ].map(k => (
                   <div key={k.label} className="bg-white rounded-xl border border-[#E2E8F0] p-3">
                     <div className="text-[16px] font-extrabold" style={{ color: k.color }}>
@@ -232,12 +235,12 @@ export default function CaissesPage() {
                   { id: 'journal', label: 'Journal' },
                   { id: 'cloture', label: 'Clôture' },
                   { id: 'params',  label: 'Paramétrage' },
-                ].map(t => (
-                  <button key={t.id} onClick={() => setTab(t.id as typeof tab)}
+                ].map(tab_ => (
+                  <button key={tab_.id} onClick={() => setTab(tab_.id as typeof tab)}
                     className={`px-4 py-2 text-[12px] font-semibold rounded-t-lg border-b-2 transition-all ${
-                      tab === t.id ? 'text-[#D97706] border-[#D97706]' : 'text-[#64748B] border-transparent hover:text-[#0F172A]'
+                      tab === tab_.id ? 'text-[#D97706] border-[#D97706]' : 'text-[#64748B] border-transparent hover:text-[#0F172A]'
                     }`}>
-                    {t.label}
+                    {tab_.label}
                   </button>
                 ))}
               </div>
@@ -282,7 +285,7 @@ export default function CaissesPage() {
                           {selectedOps.map(o => (
                             <tr key={o.id} className="border-t border-[#F8FAFC] hover:bg-[#F8FAFC]">
                               <td className="px-3 py-2 text-[#64748B]">
-                                {new Date(o.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                                {new Date(o.date).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short' })}
                               </td>
                               <td className="px-3 py-2">
                                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
@@ -326,7 +329,7 @@ export default function CaissesPage() {
                         {ops.map(o => (
                           <tr key={o.id} className={`border-t border-[#F8FAFC] ${o.cloture_date ? 'opacity-60' : ''} hover:bg-[#F8FAFC]`}>
                             <td className="px-3 py-1.5 text-[#64748B]">
-                              {new Date(o.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                              {new Date(o.date).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short' })}
                             </td>
                             <td className="px-3 py-1.5">
                               <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
@@ -341,7 +344,7 @@ export default function CaissesPage() {
                             </td>
                             <td className="px-3 py-1.5">
                               {o.cloture_date
-                                ? <span className="text-[#16A34A] text-[9px]">✓ {new Date(o.cloture_date).toLocaleDateString('fr-FR')}</span>
+                                ? <span className="text-[#16A34A] text-[9px]">✓ {new Date(o.cloture_date).toLocaleDateString(intlLocale)}</span>
                                 : <span className="text-[#94A3B8] text-[9px]">Non clôturé</span>}
                             </td>
                           </tr>
@@ -466,10 +469,10 @@ export default function CaissesPage() {
               )}
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setShowNewOp(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+              <button onClick={() => setShowNewOp(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={saveOp} disabled={saving}
                 className={`flex items-center gap-1.5 px-5 py-2 text-white rounded-lg text-[12px] font-semibold disabled:opacity-60 ${opType === 'depense' ? 'bg-[#DC2626]' : 'bg-[#16A34A]'}`}>
-                <Save size={13} /> {saving ? '…' : 'Enregistrer'}
+                <Save size={13} /> {saving ? '…' : t('common.save')}
               </button>
             </div>
           </div>
@@ -481,7 +484,7 @@ export default function CaissesPage() {
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-              <h2 className="text-[15px] font-extrabold text-[#D97706]">Nouvelle caisse</h2>
+              <h2 className="text-[15px] font-extrabold text-[#D97706]">{t('treso.caisses.newCaisse')}</h2>
               <button onClick={() => setShowNewCaisse(false)}><X size={16} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-3">
@@ -502,10 +505,10 @@ export default function CaissesPage() {
               </div>
             </div>
             <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setShowNewCaisse(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">Annuler</button>
+              <button onClick={() => setShowNewCaisse(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
               <button onClick={createCaisse} disabled={saving}
                 className="flex items-center gap-1.5 px-5 py-2 bg-[#D97706] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? '…' : 'Créer'}
+                <Save size={13} /> {saving ? '…' : t('common.save')}
               </button>
             </div>
           </div>

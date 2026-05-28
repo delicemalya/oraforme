@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   FolderOpen, Plus, X, Trash2, Download, Eye,
   FileText, Search, Archive, RefreshCw,
@@ -62,8 +63,8 @@ function getExt(filename: string | null) {
   return filename.split('.').pop()?.toLowerCase() || 'fichier'
 }
 
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+function fmtDate(d: string, intlLocale: string) {
+  return new Date(d).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function isExpiringSoon(expiration: string | null) {
@@ -92,6 +93,8 @@ const EMPTY_FORM = {
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function DocumentsRHPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale
   const [documents, setDocuments]   = useState<DocumentRH[]>([])
   const [employes, setEmployes]     = useState<Employe[]>([])
   const [loading, setLoading]       = useState(true)
@@ -196,7 +199,7 @@ export default function DocumentsRHPage() {
     return (
       <div className="flex items-center justify-center py-24 text-[#94A3B8]">
         <div className="w-6 h-6 border-2 border-[#F59E0B] border-t-transparent rounded-full animate-spin mr-2" />
-        Chargement…
+        {t('common.loading')}
       </div>
     )
   }
@@ -209,16 +212,16 @@ export default function DocumentsRHPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <FolderOpen size={22} className="text-[#F59E0B]" />
-            Documents RH
+            {t('rh.documents.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Gestion des documents du personnel</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('rh.documents.subtitle')}</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setError(null) }}
           className="flex items-center gap-1.5 px-4 py-2 bg-[#F59E0B] hover:bg-[#D97706] text-white text-[12px] font-bold rounded-lg shadow-sm"
         >
           <Plus size={14} />
-          Ajouter document
+          {t('rh.documents.newDoc')}
         </button>
       </div>
 
@@ -355,10 +358,10 @@ export default function DocumentsRHPage() {
                   className="flex-1 py-2.5 bg-[#F59E0B] hover:bg-[#D97706] text-white text-[12px] font-bold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                  Enregistrer
+                  {t('common.save')}
                 </button>
                 <button onClick={() => setShowForm(false)} className="px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-[12px] text-[#64748B] hover:bg-[#F8FAFC]">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -373,7 +376,7 @@ export default function DocumentsRHPage() {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher par titre ou employé…"
+            placeholder={t('rh.documents.searchPlh')}
             className="w-full pl-8 pr-3 py-2 text-[12px] border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 bg-white"
           />
         </div>
@@ -399,6 +402,14 @@ export default function DocumentsRHPage() {
         {CATEGORIES.map(cat => {
           const cnt = documents.filter(d => d.categorie === cat.value && (showArchived || d.statut !== 'archive')).length
           if (cnt === 0) return null
+
+          /* Translate tabs for contrat / attestation / autre */
+          const catLabel =
+            cat.value === 'contrat'     ? t('rh.documents.tab.contrats')     :
+            cat.value === 'attestation' ? t('rh.documents.tab.attestations') :
+            cat.value === 'autre'       ? t('rh.documents.tab.autres')       :
+            cat.label
+
           return (
             <button
               key={cat.value}
@@ -408,7 +419,7 @@ export default function DocumentsRHPage() {
               }`}
               style={filterCat === cat.value ? { background: cat.color } : {}}
             >
-              {cat.icon} {cat.label} ({cnt})
+              {cat.icon} {catLabel} ({cnt})
             </button>
           )
         })}
@@ -418,7 +429,7 @@ export default function DocumentsRHPage() {
       {visible.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] py-20 text-center">
           <FolderOpen size={36} className="mx-auto mb-2 text-[#E2E8F0]" />
-          <p className="text-[14px] font-semibold text-[#64748B]">Aucun document trouvé</p>
+          <p className="text-[14px] font-semibold text-[#64748B]">{t('rh.documents.noDocuments')}</p>
           <p className="text-[12px] text-[#94A3B8] mt-1">Ajoutez des documents pour les retrouver ici</p>
         </div>
       ) : (
@@ -460,10 +471,10 @@ export default function DocumentsRHPage() {
                         {doc.employes ? doc.employes.nom : 'Document général'}
                       </span>
                       {doc.date_document && (
-                        <span className="text-[10px] text-[#94A3B8]">{fmtDate(doc.date_document)}</span>
+                        <span className="text-[10px] text-[#94A3B8]">{fmtDate(doc.date_document, intlLocale)}</span>
                       )}
                       {doc.expiration && (
-                        <span className="text-[10px] text-[#94A3B8]">expire: {fmtDate(doc.expiration)}</span>
+                        <span className="text-[10px] text-[#94A3B8]">expire: {fmtDate(doc.expiration, intlLocale)}</span>
                       )}
                     </div>
                   </div>

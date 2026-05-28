@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   BarChart3, TrendingUp, TrendingDown, ArrowUpCircle, ArrowDownCircle,
@@ -48,6 +49,7 @@ function getLast12Months(): string[] {
 
 export default function AnalyticsPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [loading, setLoading]       = useState(true)
   const [monthlyData, setMonthlyData] = useState<MonthData[]>([])
   const [accountBalances, setAccountBalances] = useState<AccountBalance[]>([])
@@ -178,8 +180,8 @@ export default function AnalyticsPage() {
             <BarChart3 size={20} className="text-[#0891B2]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Analytics Trésorerie</h1>
-            <p className="text-xs text-[#64748B]">Analyse financière — 12 mois glissants</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.analytics.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.analytics.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -207,7 +209,7 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
-                label: 'Trésorerie totale', value: kpis.totalComptes,
+                label: t('treso.analytics.kpi.cashflow'), value: kpis.totalComptes,
                 color: 'text-[#0891B2]', bg: 'bg-cyan-50', icon: BarChart3, badge: null,
               },
               {
@@ -221,7 +223,7 @@ export default function AnalyticsPage() {
                 badge: sortPct !== null ? { pct: sortPct, up: parseFloat(sortPct) < 0 } : null,
               },
               {
-                label: 'Cashflow net', value: kpis.cashflowNet,
+                label: t('treso.analytics.kpi.ratio'), value: kpis.cashflowNet,
                 color: kpis.cashflowNet >= 0 ? 'text-green-600' : 'text-red-600',
                 bg: kpis.cashflowNet >= 0 ? 'bg-green-50' : 'bg-red-50',
                 icon: kpis.cashflowNet >= 0 ? TrendingUp : TrendingDown, badge: null,

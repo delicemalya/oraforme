@@ -12,6 +12,7 @@ import {
   FileText, CreditCard, ShoppingCart, Wallet,
   Eye, Activity,
 } from 'lucide-react'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -62,6 +63,9 @@ const PAGE_SIZE = 50
 
 export default function AuditPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es-ES' : locale === 'de' ? 'de-DE' : 'fr-FR'
 
   // ── State ──────────────────────────────────────────────────────────────────
   const [entries, setEntries] = useState<AuditEntry[]>([])
@@ -136,15 +140,15 @@ export default function AuditPage() {
 
         const { data } = await q.limit(200)
         if (data) {
-          data.forEach(t => {
+          data.forEach(tx => {
             allEntries.push({
-              id: t.id,
+              id: tx.id,
               type: 'paiement',
               module: 'tresorerie',
-              description: t.description ?? `Transaction ${t.type}`,
-              montant: t.montant,
-              created_at: t.created_at,
-              metadata: { reference: t.reference },
+              description: tx.description ?? `Transaction ${tx.type}`,
+              montant: tx.montant,
+              created_at: tx.created_at,
+              metadata: { reference: tx.reference },
             })
           })
         }
@@ -280,7 +284,7 @@ export default function AuditPage() {
   // ── CSV Export ─────────────────────────────────────────────────────────────
   const exportCSV = async () => {
     if (!tenantId) return
-    const rows = [['Module', 'Type', 'Description', 'Montant', 'Quantité', 'Date']]
+    const rows = [[t('audit.colModule'), t('audit.colAction'), t('audit.colDetails'), 'Montant', 'Quantité', t('audit.colDate')]]
     entries.forEach(e => {
       rows.push([
         MODULE_CONFIG[e.module]?.label ?? e.module,
@@ -288,7 +292,7 @@ export default function AuditPage() {
         e.description,
         e.montant ? String(e.montant) : '',
         e.quantite ? String(e.quantite) : '',
-        new Date(e.created_at).toLocaleString('fr-FR'),
+        new Date(e.created_at).toLocaleString(intlLocale),
       ])
     })
     const csv = '﻿' + rows.map(r => r.map(c => `"${c}"`).join(';')).join('\n')
@@ -300,7 +304,7 @@ export default function AuditPage() {
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
-  const fmtDate = (d: string) => new Date(d).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  const fmtDate = (d: string) => new Date(d).toLocaleString(intlLocale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -315,8 +319,8 @@ export default function AuditPage() {
             <Shield size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[#0F172A]">Audit & Logs Système</h1>
-            <p className="text-[11px] text-[#64748B]">Traçabilité complète de toutes les opérations</p>
+            <h1 className="text-lg font-bold text-[#0F172A]">{t('audit.title')}</h1>
+            <p className="text-[11px] text-[#64748B]">{t('audit.subtitle')}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -333,7 +337,7 @@ export default function AuditPage() {
             style={{ background: '#1E293B' }}
           >
             <Download size={13} />
-            Export CSV
+            {t('audit.export')}
           </button>
         </div>
       </div>
@@ -356,7 +360,7 @@ export default function AuditPage() {
                   <Icon size={13} style={{ color: k.color }} />
                 </div>
               </div>
-              <div className="text-xl font-bold text-[#0F172A]">{k.value.toLocaleString('fr-FR')}</div>
+              <div className="text-xl font-bold text-[#0F172A]">{k.value.toLocaleString(intlLocale)}</div>
               <div className="text-[10px] text-[#64748B] mt-0.5">{k.label}</div>
             </div>
           )
@@ -372,7 +376,7 @@ export default function AuditPage() {
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
             <input
               type="text"
-              placeholder="Rechercher..."
+              placeholder={t('audit.searchPlh')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-8 pr-3 py-2 text-[12px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E293B]/20"
@@ -393,7 +397,7 @@ export default function AuditPage() {
                 }`}
                 style={moduleFilter === m ? { background: m === 'all' ? '#1E293B' : MODULE_CONFIG[m]?.color ?? '#1E293B' } : {}}
               >
-                {m === 'all' ? 'Tous' : MODULE_CONFIG[m]?.label ?? m}
+                {m === 'all' ? t('audit.filterAll') : MODULE_CONFIG[m]?.label ?? m}
               </button>
             ))}
           </div>
@@ -423,10 +427,10 @@ export default function AuditPage() {
           <div className="flex items-center gap-2">
             <Activity size={14} className="text-[#94A3B8]" />
             <span className="text-[12px] font-semibold text-[#0F172A]">
-              Journal d'activité
+              Journal d&apos;activité
             </span>
             <span className="text-[11px] text-[#94A3B8]">
-              ({total.toLocaleString('fr-FR')} entrées)
+              ({total.toLocaleString(intlLocale)} entrées)
             </span>
           </div>
 
@@ -457,11 +461,12 @@ export default function AuditPage() {
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-8 h-8 border-2 border-[#1E293B] border-t-transparent rounded-full animate-spin" />
+            <span className="ml-3 text-[13px] text-[#94A3B8]">{t('common.loading')}</span>
           </div>
         ) : entries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Eye size={32} className="text-[#E2E8F0]" />
-            <p className="text-[13px] text-[#94A3B8]">Aucune activité trouvée</p>
+            <p className="text-[13px] text-[#94A3B8]">{t('audit.noEvents')}</p>
           </div>
         ) : (
           <div className="divide-y divide-[#F8FAFC]">
@@ -517,7 +522,7 @@ export default function AuditPage() {
                       </div>
                     ) : entry.quantite !== undefined && entry.quantite !== null ? (
                       <div className="text-[12px] font-bold text-[#0F172A]">
-                        {entry.quantite.toLocaleString('fr-FR')} u.
+                        {entry.quantite.toLocaleString(intlLocale)} u.
                       </div>
                     ) : null}
                   </div>

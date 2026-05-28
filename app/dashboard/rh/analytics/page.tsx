@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   BarChart2, TrendingUp, TrendingDown, Users,
   DollarSign, Clock, AlertTriangle, Award,
@@ -165,6 +166,8 @@ function ProgressBar({ value, max, color, label, sublabel }: {
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function AnalyticsRHPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale
   const [employes, setEmployes]     = useState<Employe[]>([])
   const [bulletins, setBulletins]   = useState<BulletinPaie[]>([])
   const [conges, setConges]         = useState<Conge[]>([])
@@ -338,7 +341,7 @@ export default function AnalyticsRHPage() {
     return (
       <div className="flex items-center justify-center py-24 text-[#94A3B8]">
         <div className="w-6 h-6 border-2 border-[#F59E0B] border-t-transparent rounded-full animate-spin mr-2" />
-        Chargement des analytics…
+        {t('common.loading')}
       </div>
     )
   }
@@ -356,9 +359,9 @@ export default function AnalyticsRHPage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <BarChart2 size={22} className="text-[#F59E0B]" />
-            Analytics RH
+            {t('rh.analytics.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">Indicateurs clés de performance RH</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">{t('rh.analytics.subtitle')}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -390,7 +393,7 @@ export default function AnalyticsRHPage() {
       {/* KPIs row 1 */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <KpiCard
-          label="Effectif actif"
+          label={t('rh.analytics.kpi.headcount')}
           value={analytics.actifs.toString()}
           sub={`${analytics.inactifs} inactif${analytics.inactifs > 1 ? 's' : ''}`}
           icon={Users}
@@ -399,7 +402,7 @@ export default function AnalyticsRHPage() {
             ? undefined : undefined}
         />
         <KpiCard
-          label="Masse salariale"
+          label={t('rh.analytics.kpi.payroll')}
           value={analytics.masseSalarialeCurrent > 0 ? fmtFCFA(analytics.masseSalarialeCurrent) : '—'}
           sub="Ce mois"
           icon={DollarSign}
@@ -409,7 +412,7 @@ export default function AnalyticsRHPage() {
             : undefined}
         />
         <KpiCard
-          label="Taux de turnover"
+          label={t('rh.analytics.kpi.turnover')}
           value={analytics.turnover + '%'}
           sub={`${analytics.departed} départ${analytics.departed > 1 ? 's' : ''}`}
           icon={TrendingDown}

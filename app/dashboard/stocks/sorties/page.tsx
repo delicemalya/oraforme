@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -53,8 +54,9 @@ const TYPE_SORTIE: Record<string, { label: string; color: string; bg: string }> 
 }
 
 export default function SortiesPage() {
-  
+
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
 
   const [sorties, setSorties] = useState<Sortie[]>([])
   const [warehouses, setWarehouses] = useState<Warehouse[]>([])
@@ -270,22 +272,22 @@ export default function SortiesPage() {
         <div>
           <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
             <TrendingDown size={20} className="text-[#16A34A]" />
-            Sorties de Stock
+            {t('stock.sorties.title')}
           </h1>
-          <p className="text-xs text-[#64748B] mt-0.5">Ventes, pertes, dons, usages internes avec écriture OHADA</p>
+          <p className="text-xs text-[#64748B] mt-0.5">{t('stock.sorties.subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)}
           className="flex items-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-          <Plus size={14} /> Nouvelle sortie
+          <Plus size={14} /> {t('stock.sorties.newSortie')}
         </button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total sorties', value: sorties.length, icon: TrendingDown, color: '#DC2626', bg: '#FEF2F2' },
-          { label: 'Ventes', value: sorties.filter(s => s.type_sortie === 'vente').length, icon: Package, color: '#16A34A', bg: '#F0FDF4' },
-          { label: 'Pertes', value: sorties.filter(s => s.type_sortie === 'perte').length, icon: AlertTriangle, color: '#D97706', bg: '#FFFBEB' },
+          { label: t('stock.sorties.kpi.total'), value: sorties.length, icon: TrendingDown, color: '#DC2626', bg: '#FEF2F2' },
+          { label: t('stock.sorties.kpi.valeur'), value: fmtFCFA(totalMois), icon: Package, color: '#16A34A', bg: '#F0FDF4' },
+          { label: t('stock.sorties.kpi.count'), value: sorties.filter(s => s.type_sortie === 'vente').length, icon: AlertTriangle, color: '#D97706', bg: '#FFFBEB' },
           { label: 'Ce mois', value: sorties.filter(s => s.date_sortie >= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]).length, icon: Calendar, color: '#2563EB', bg: '#EFF6FF' },
         ].map(k => (
           <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
@@ -305,23 +307,23 @@ export default function SortiesPage() {
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher une sortie…"
+            placeholder={t('stock.sorties.noSorties')}
             className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
         </div>
       </div>
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">Chargement…</div>
+        <div className="flex items-center justify-center py-20 text-sm text-[#64748B]">{t('common.loading')}</div>
       ) : (
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center">
               <TrendingDown size={40} className="mx-auto text-[#CBD5E1] mb-3" />
-              <p className="text-sm font-semibold text-[#0F172A]">Aucune sortie enregistrée</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{t('stock.sorties.noSorties')}</p>
               <button onClick={() => setShowCreate(true)}
                 className="mt-4 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] transition-colors">
-                Enregistrer une sortie
+                {t('stock.sorties.newSortie')}
               </button>
             </div>
           ) : filtered.map(s => {
@@ -356,7 +358,7 @@ export default function SortiesPage() {
                         </span>
                       )}
                       <span className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
-                        <Calendar size={11} /> {new Date(s.date_sortie).toLocaleDateString('fr-FR')}
+                        <Calendar size={11} /> {new Date(s.date_sortie).toLocaleDateString(locale)}
                       </span>
                     </div>
                   </div>
@@ -415,7 +417,7 @@ export default function SortiesPage() {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
-              <h2 className="text-sm font-bold text-[#0F172A]">Nouvelle sortie de stock</h2>
+              <h2 className="text-sm font-bold text-[#0F172A]">{t('stock.sorties.newSortie')}</h2>
               <button onClick={() => setShowCreate(false)}><X size={16} className="text-[#94A3B8]" /></button>
             </div>
             <div className="p-5 space-y-4">
@@ -548,12 +550,12 @@ export default function SortiesPage() {
             <div className="flex gap-2 p-5 border-t border-[#E2E8F0]">
               <button onClick={() => setShowCreate(false)}
                 className="flex-1 px-4 py-2 border border-[#E2E8F0] text-[#374151] text-xs font-semibold rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={handleCreate} disabled={saving}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-[#16A34A] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#15803D] disabled:opacity-50">
                 <Save size={13} />
-                {saving ? 'Enregistrement…' : 'Valider la sortie'}
+                {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>

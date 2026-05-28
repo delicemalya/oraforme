@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
@@ -78,6 +79,8 @@ const EMPTY_FORM = {
 
 export default function EncaissementsPage() {
   const { tenantId } = useTenant()
+  const { t, locale } = useLocale()
+  const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-US' : locale
   const [rows, setRows]             = useState<Encaissement[]>([])
   const [banques, setBanques]       = useState<CompteBancaire[]>([])
   const [caisses, setCaisses]       = useState<Caisse[]>([])
@@ -305,8 +308,8 @@ export default function EncaissementsPage() {
             <ArrowUpCircle size={20} className="text-green-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Encaissements</h1>
-            <p className="text-xs text-[#64748B]">Gestion des entrées de trésorerie</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('treso.encaissements.title')}</h1>
+            <p className="text-xs text-[#64748B]">{t('treso.encaissements.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -315,7 +318,7 @@ export default function EncaissementsPage() {
           </button>
           <button onClick={() => { setForm({ ...EMPTY_FORM }); setShowModal(true) }}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors shadow-sm">
-            <Plus size={14} /> Nouvel encaissement
+            <Plus size={14} /> {t('treso.encaissements.newEntry')}
           </button>
         </div>
       </div>
@@ -323,9 +326,9 @@ export default function EncaissementsPage() {
       {/* KPIs */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Encaissé ce mois', value: totalMois, color: 'green', icon: ArrowUpCircle },
-          { label: 'En attente de validation', value: totalEnAttente, color: 'amber', icon: AlertCircle },
-          { label: 'Total encaissé (validé)', value: totalAll, color: 'cyan', icon: Check },
+          { label: t('treso.encaissements.kpi.mois'), value: totalMois, color: 'green', icon: ArrowUpCircle },
+          { label: t('treso.encaissements.kpi.count'), value: totalEnAttente, color: 'amber', icon: AlertCircle },
+          { label: t('treso.encaissements.kpi.total'), value: totalAll, color: 'cyan', icon: Check },
         ].map(k => {
           const Icon = k.icon
           const colorMap: Record<string, string> = {
@@ -407,11 +410,12 @@ export default function EncaissementsPage() {
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 size={24} className="animate-spin text-[#0891B2]" />
+            <span className="ml-2 text-xs text-[#94A3B8]">{t('common.loading')}</span>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-[#94A3B8]">
             <ArrowUpCircle size={32} className="mb-2 opacity-30" />
-            <p className="text-sm font-medium">Aucun encaissement trouvé</p>
+            <p className="text-sm font-medium">{t('treso.encaissements.noEntries')}</p>
             <p className="text-xs mt-1">Ajustez les filtres ou créez un nouvel encaissement</p>
           </div>
         ) : (
@@ -430,7 +434,7 @@ export default function EncaissementsPage() {
                   return (
                     <tr key={r.id} className={`border-t border-[#F1F5F9] hover:bg-[#F8FAFC] transition-colors ${i % 2 === 0 ? '' : 'bg-[#FAFBFC]'}`}>
                       <td className="px-4 py-3 text-xs text-[#64748B] whitespace-nowrap">
-                        {new Date(r.date_operation).toLocaleDateString('fr-FR')}
+                        {new Date(r.date_operation).toLocaleDateString(intlLocale)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-medium text-[#0F172A]">{r.libelle}</div>
@@ -486,7 +490,7 @@ export default function EncaissementsPage() {
             </div>
             <div className="space-y-3">
               {[
-                ['Date', new Date(selected.date_operation).toLocaleDateString('fr-FR')],
+                ['Date', new Date(selected.date_operation).toLocaleDateString(intlLocale)],
                 ['Libellé', selected.libelle],
                 ['Tiers', selected.tiers || '—'],
                 ['Montant', fmtFCFA(selected.montant)],
@@ -512,7 +516,7 @@ export default function EncaissementsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#0F172A]">Nouvel encaissement</h3>
+              <h3 className="text-base font-bold text-[#0F172A]">{t('treso.encaissements.newEntry')}</h3>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-[#F1F5F9] rounded-xl">
                 <X size={16} />
               </button>
@@ -588,12 +592,12 @@ export default function EncaissementsPage() {
             <div className="flex justify-end gap-2 pt-2">
               <button onClick={() => setShowModal(false)}
                 className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">
-                Annuler
+                {t('common.cancel')}
               </button>
               <button onClick={saveEncaissement} disabled={saving || !form.montant || !form.libelle}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 disabled:opacity-50 transition-colors">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
-                Enregistrer
+                {t('common.save')}
               </button>
             </div>
           </div>

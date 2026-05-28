@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import {
   Package, Plus, Search, Download, Check, X, Loader2, Eye,
@@ -56,6 +57,7 @@ const EMPTY_FORM = {
 
 export default function ProduitsPage() {
   const { tenantId } = useTenant()
+  const { t } = useLocale()
   const [products, setProducts]     = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [suppliers, setSuppliers]   = useState<Supplier[]>([])
@@ -211,8 +213,8 @@ export default function ProduitsPage() {
             <Package size={20} className="text-green-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#0F172A]">Catalogue produits</h1>
-            <p className="text-xs text-[#64748B]">{products.length} produit{products.length > 1 ? 's' : ''} — Valeur totale: {fmtFCFA(products.reduce((s, p) => s + (p.stock_actuel * p.prix_achat), 0))}</p>
+            <h1 className="text-xl font-bold text-[#0F172A]">{t('stock.produits.title')}</h1>
+            <p className="text-xs text-[#64748B]">{products.length} produit{products.length > 1 ? 's' : ''} — {t('stock.produits.subtitle')}: {fmtFCFA(products.reduce((s, p) => s + (p.stock_actuel * p.prix_achat), 0))}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -221,7 +223,7 @@ export default function ProduitsPage() {
           </button>
           <button onClick={openCreate}
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#16A34A] rounded-xl hover:bg-green-700 shadow-sm">
-            <Plus size={14} /> Nouveau produit
+            <Plus size={14} /> {t('stock.produits.newProduct')}
           </button>
         </div>
       </div>
@@ -232,7 +234,7 @@ export default function ProduitsPage() {
           <div className="relative col-span-2 md:col-span-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
             <input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Nom, SKU, code-barres…"
+              placeholder={t('stock.produits.searchPlh')}
               className="w-full pl-8 pr-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
           </div>
           <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
@@ -257,6 +259,21 @@ export default function ProduitsPage() {
         </div>
       </div>
 
+      {/* KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: t('stock.produits.kpi.total'), value: products.length },
+          { label: t('stock.produits.kpi.valeur'), value: fmtFCFA(totalValeur) },
+          { label: t('stock.produits.kpi.rupture'), value: products.filter(p => p.stock_actuel <= 0).length },
+          { label: t('stock.produits.kpi.alerte'), value: products.filter(p => p.stock_actuel > 0 && p.stock_actuel <= p.seuil_alerte).length },
+        ].map(k => (
+          <div key={k.label} className="bg-white border border-[#E2E8F0] rounded-2xl p-4">
+            <p className="text-[11px] text-[#64748B] mb-1">{k.label}</p>
+            <p className="text-lg font-bold text-[#0F172A]">{k.value}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Table */}
       <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#E2E8F0] flex items-center justify-between">
@@ -269,8 +286,8 @@ export default function ProduitsPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-[#94A3B8]">
             <Package size={32} className="mb-2 opacity-30" />
-            <p className="text-sm font-medium">Aucun produit trouvé</p>
-            <button onClick={openCreate} className="mt-2 text-xs text-[#16A34A] hover:underline">Créer le premier produit</button>
+            <p className="text-sm font-medium">{t('stock.produits.noProducts')}</p>
+            <button onClick={openCreate} className="mt-2 text-xs text-[#16A34A] hover:underline">{t('stock.produits.newProduct')}</button>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -408,7 +425,7 @@ export default function ProduitsPage() {
             </div>
             <p className="text-xs text-red-600">Cette action est irréversible. Tous les mouvements liés seront également supprimés.</p>
             <div className="flex gap-2">
-              <button onClick={() => setConfirmDel(null)} className="flex-1 py-2 text-xs font-medium border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setConfirmDel(null)} className="flex-1 py-2 text-xs font-medium border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={() => deleteProduct(confirmDel)} className="flex-1 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700">Supprimer</button>
             </div>
           </div>
@@ -421,7 +438,7 @@ export default function ProduitsPage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-[#0F172A]">
-                {editItem ? 'Modifier le produit' : 'Nouveau produit'}
+                {editItem ? 'Modifier le produit' : t('stock.produits.newProduct')}
               </h3>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-[#F1F5F9] rounded-xl"><X size={16} /></button>
             </div>
@@ -526,11 +543,11 @@ export default function ProduitsPage() {
             )}
 
             <div className="flex justify-end gap-2 pt-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={save} disabled={saving || !form.nom || !form.prix_achat}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-[#16A34A] rounded-xl hover:bg-green-700 disabled:opacity-50">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
-                {editItem ? 'Mettre à jour' : 'Créer le produit'}
+                {saving ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </div>
