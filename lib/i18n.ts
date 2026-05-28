@@ -653,6 +653,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     'invoice.sent':           'Envoyées',
     'invoice.paid2':          'Payées',
     'invoice.cancelled':      'Annulées',
+    'invoice.notFound':       'Facture introuvable',
+    'invoice.sentSuccess':    'Envoyée !',
+    'invoice.markedSent':     'Facture marquée comme envoyée !',
 
     // Trésorerie — nouvelles clés
     'treso.enterprise':       'Trésorerie Enterprise',
@@ -2149,6 +2152,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     'invoice.lbl.envoyee':     'SENT',
     'invoice.lbl.brouillon':   'DRAFT',
     'invoice.lbl.annulee':     'CANCELLED',
+    'invoice.notFound':        'Invoice not found',
+    'invoice.sentSuccess':     'Sent!',
+    'invoice.markedSent':      'Invoice marked as sent!',
 
     // Nav complements (en)
     'nav.scolarite':           'Student Records',

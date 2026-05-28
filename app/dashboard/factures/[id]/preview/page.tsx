@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -80,6 +81,7 @@ export default function InvoicePreviewPage() {
   const { id }         = useParams<{ id: string }>()
   const router         = useRouter()
   const { tenantId }   = useTenant()
+  const { t }          = useLocale()
 
   const [facture,     setFacture]     = useState<Facture | null>(null)
   const [lignes,      setLignes]      = useState<Ligne[]>([])

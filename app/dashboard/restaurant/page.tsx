@@ -1,8 +1,9 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
 import Link from 'next/link'
 import {
@@ -32,22 +33,7 @@ interface StockArticle { id: string; nom: string; quantite: number; unite: strin
 interface AchatLigne { article_id?: string; article_nom: string; quantite: number; prix_unitaire: number }
 interface Achat      { id: string; fournisseur_nom: string; date_achat: string; total: number; mode_paiement: string; lignes: AchatLigne[]; note: string | null; created_at: string }
 
-const TABS = [
-  { key: 'caisse',    label: '🧾 Caisse' },
-  { key: 'commandes', label: '📋 Commandes' },
-  { key: 'menu',      label: '🍽️ Menu' },
-  { key: 'tables',    label: '📍 Tables & QR' },
-  { key: 'recettes',  label: '📖 Recettes' },
-  { key: 'achats',    label: '🛒 Achats' },
-  { key: 'rapport',   label: '📊 Rapport du jour' },
-] as const
-type TabKey = typeof TABS[number]['key']
-
-const MODES_PAIE: { key: ModePaie; label: string; color: string }[] = [
-  { key: 'especes', label: 'Espèces',    color: '#0F172A' },
-  { key: 'airtel',  label: 'Airtel Money', color: '#E53935' },
-  { key: 'mtn',     label: 'MTN MoMo',   color: '#DC2626' },
-]
+type TabKey = 'caisse' | 'commandes' | 'menu' | 'tables' | 'recettes' | 'achats' | 'rapport'
 
 const TABLE_COLORS: Record<string, string> = {
   libre:   '#64748B',
@@ -60,6 +46,7 @@ function qrUrl(data: string) { return `https://api.qrserver.com/v1/create-qr-cod
 
 export default function RestaurantPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
+  const { t } = useLocale()
   const [tab, setTab]               = useState<TabKey>('caisse')
   const [menu, setMenu]             = useState<MenuItem[]>([])
   const [commandes, setCommandes]   = useState<Commande[]>([])
@@ -103,10 +90,26 @@ export default function RestaurantPage() {
     lignes: [{ article_id: '', article_nom: '', quantite: 0, prix_unitaire: 0 }] as AchatLigne[],
   })
 
+  const MODES_PAIE: { key: ModePaie; label: string; color: string }[] = [
+    { key: 'especes', label: t('resto.dineIn') === 'Sur place' ? 'Espèces' : 'Cash',    color: '#0F172A' },
+    { key: 'airtel',  label: 'Airtel Money', color: '#E53935' },
+    { key: 'mtn',     label: 'MTN MoMo',   color: '#DC2626' },
+  ]
+
+  const TABS: { key: TabKey; label: string }[] = [
+    { key: 'caisse',    label: t('resto.tabCaisse') },
+    { key: 'commandes', label: t('resto.tabCommandes') },
+    { key: 'menu',      label: t('resto.tabMenu') },
+    { key: 'tables',    label: t('resto.tabTables') },
+    { key: 'recettes',  label: t('resto.tabRecettes') },
+    { key: 'achats',    label: t('resto.tabAchats') },
+    { key: 'rapport',   label: t('resto.tabRapport') },
+  ]
+
   const fetchAll = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const [m, c, t, r, s, a] = await Promise.all([
+    const [m, c, tb, r, s, a] = await Promise.all([
       supabase.from('resto_menu').select('*').eq('tenant_id', tenantId).order('categorie'),
       supabase.from('resto_commandes').select('*').eq('tenant_id', tenantId)
         .order('created_at', { ascending: false }).limit(100),
@@ -117,7 +120,7 @@ export default function RestaurantPage() {
     ])
     setMenu((m.data ?? []) as MenuItem[])
     setCommandes((c.data ?? []) as Commande[])
-    setTables((t.data ?? []) as RestoTable[])
+    setTables((tb.data ?? []) as RestoTable[])
     setRecettes((r.data ?? []) as Recette[])
     setStockArticles((s.data ?? []) as StockArticle[])
     setAchats((a.data ?? []) as Achat[])
@@ -160,14 +163,13 @@ export default function RestaurantPage() {
         body: JSON.stringify({ items: panier, table_num: tableNum, mode, mode_paiement: modePaie }),
       })
       const data = await res.json()
-      if (!res.ok) { showToast('Erreur : ' + data.error); return }
+      if (!res.ok) { showToast(t('resto.errorOrder') + data.error); return }
       setReceipt({ commandeId: data.commandeId, numeroRecu: data.numeroRecu, fiscal: data.fiscal })
-      // Marquer la table comme occupée
       if (tableNum) {
-        const tableId = tables.find(t => String(t.numero) === tableNum)?.id
+        const tableId = tables.find(tb => String(tb.numero) === tableNum)?.id
         if (tableId) {
           await supabase.from('resto_tables').update({ statut: 'occupee' }).eq('id', tableId)
-          setTables(ts => ts.map(t => t.id === tableId ? { ...t, statut: 'occupee' } : t))
+          setTables(ts => ts.map(tb => tb.id === tableId ? { ...tb, statut: 'occupee' } : tb))
         }
       }
       setPanier([]); setTableNum('')
@@ -232,8 +234,8 @@ export default function RestaurantPage() {
         body: JSON.stringify(achatForm),
       })
       const data = await res.json()
-      if (!res.ok) { showToast('Erreur : ' + data.error); return }
-      showToast('Achat enregistré !')
+      if (!res.ok) { showToast(t('resto.errorOrder') + data.error); return }
+      showToast(t('resto.purchaseSaved'))
       setShowAchatForm(false)
       setAchatForm({ fournisseur_nom: '', date_achat: new Date().toISOString().split('T')[0], mode_paiement: 'especes', note: '', lignes: [{ article_id: '', article_nom: '', quantite: 0, prix_unitaire: 0 }] })
       fetchAll()
@@ -252,7 +254,7 @@ export default function RestaurantPage() {
   async function annulerCommande(id: string) {
     await supabase.from('resto_commandes').update({ statut: 'annule' }).eq('id', id)
     setCommandes(c => c.map(x => x.id === id ? { ...x, statut: 'annule' as StatutCmd } : x))
-    showToast('Commande annulée')
+    showToast(t('resto.cancelOrder'))
   }
 
   // ── MENU ────────────────────────────────────────────────────────────────────
@@ -303,7 +305,7 @@ export default function RestaurantPage() {
 
   async function deleteTable(id: string) {
     await supabase.from('resto_tables').delete().eq('id', id)
-    setTables(t => t.filter(x => x.id !== id))
+    setTables(tb => tb.filter(x => x.id !== id))
   }
 
   const publicUrl = typeof window !== 'undefined' ? `${window.location.origin}/resto/${tenantId}` : ''
@@ -330,7 +332,6 @@ export default function RestaurantPage() {
   cmdsLivrees.forEach(c => (c.items as CmdItem[]).forEach(it => { platCount[it.nom] = (platCount[it.nom] ?? 0) + it.quantite }))
   const topPlats = Object.entries(platCount).sort(([,a],[,b]) => b-a).slice(0,5).map(([nom,q]) => ({ nom, q }))
 
-  // CA par heure
   const chartHeure = Array.from({ length: 14 }, (_, i) => {
     const h = 8 + i
     const total = cmdsLivrees
@@ -353,7 +354,7 @@ export default function RestaurantPage() {
       benefice_net: caDuJour,
       cloture_at: new Date().toISOString(),
     }, { onConflict: 'tenant_id,date' })
-    showToast('Caisse clôturée avec succès !')
+    showToast(t('resto.cashierClosed'))
   }
 
   if (tenantLoading || loading) {
@@ -375,11 +376,11 @@ export default function RestaurantPage() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text)]">Restaurant & POS</h1>
+          <h1 className="text-2xl font-bold text-[var(--text)]">{t('resto.title')}</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-            CA du jour : <span className="text-[#DC2626] font-semibold">{fmtFCFA(caDuJour)}</span>
-            {' · '}{cmdsDuJour.length} commande{cmdsDuJour.length > 1 ? 's' : ''}
-            {enPrepa > 0 && <span className="text-[#DC2626]"> · {enPrepa} en attente</span>}
+            {t('resto.caToday')} : <span className="text-[#DC2626] font-semibold">{fmtFCFA(caDuJour)}</span>
+            {' · '}{cmdsDuJour.length} {t('resto.orders')}
+            {enPrepa > 0 && <span className="text-[#DC2626]"> · {enPrepa} {t('resto.waiting')}</span>}
           </p>
         </div>
         <div className="flex gap-2">
@@ -388,17 +389,17 @@ export default function RestaurantPage() {
           </button>
           <Link href="/dashboard/restaurant/cuisine"
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#DC2626]/40 text-[#DC2626] text-xs font-semibold hover:bg-[#DC2626]/10 transition-colors">
-            <Monitor size={13} /> Écran Cuisine
+            <Monitor size={13} /> {t('resto.kitchenScreen')}
           </Link>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-1 mb-5 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-1 w-fit">
-        {TABS.map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${tab === t.key ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'}`}>
-            {t.label}
+        {TABS.map(tabItem => (
+          <button key={tabItem.key} onClick={() => setTab(tabItem.key)}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${tab === tabItem.key ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'}`}>
+            {tabItem.label}
           </button>
         ))}
       </div>
@@ -409,10 +410,10 @@ export default function RestaurantPage() {
           {/* KPIs du jour */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
             {[
-              { label: "CA aujourd'hui",   val: fmtFCFA(caDuJour),           color: '#DC2626', icon: DollarSign },
-              { label: 'Commandes',        val: cmdsDuJour.length,            color: '#DC2626', icon: ShoppingCart },
-              { label: 'En attente/prép',  val: enPrepa,                      color: enPrepa > 0 ? '#DC2626' : '#0F172A', icon: Clock },
-              { label: 'Plats au menu',    val: menu.filter(m=>m.disponible).length, color: '#0F172A', icon: ChefHat },
+              { label: t('resto.kpiCaToday'),  val: fmtFCFA(caDuJour),           color: '#DC2626', icon: DollarSign },
+              { label: t('resto.kpiOrders'),   val: cmdsDuJour.length,            color: '#DC2626', icon: ShoppingCart },
+              { label: t('resto.kpiWaiting'),  val: enPrepa,                      color: enPrepa > 0 ? '#DC2626' : '#0F172A', icon: Clock },
+              { label: t('resto.kpiDishes'),   val: menu.filter(m=>m.disponible).length, color: '#0F172A', icon: ChefHat },
             ].map(k => {
               const Icon = k.icon
               return (
@@ -432,7 +433,7 @@ export default function RestaurantPage() {
             <div className="flex flex-wrap gap-1.5 mb-4">
               <button onClick={() => setCatFilter('')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!catFilter ? 'bg-[#DC2626]/15 text-[#DC2626] border border-[#DC2626]/30' : 'text-[var(--text-secondary)] hover:text-[var(--text)] border border-[var(--border)]'}`}>
-                Tous
+                {t('resto.allCategories')}
               </button>
               {categories.map(cat => (
                 <button key={cat} onClick={() => setCatFilter(cat === catFilter ? '' : cat)}
@@ -449,7 +450,7 @@ export default function RestaurantPage() {
               {filteredMenu.length === 0 ? (
                 <div className="text-center py-16 text-[var(--text-secondary)]">
                   <ChefHat size={32} className="mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">Aucun plat — ajoutez-en dans l&apos;onglet Menu</p>
+                  <p className="text-sm">{t('resto.noDish')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -464,7 +465,7 @@ export default function RestaurantPage() {
                       <p className="text-sm font-medium text-[var(--text)] leading-tight">{item.nom}</p>
                       <p className="text-xs font-bold text-[#DC2626] mt-1">{fmtFCFA(item.prix)}</p>
                       {!item.disponible && (
-                        <span className="absolute top-2 right-2 text-[9px] bg-[#DC2626]/15 text-[#DC2626] px-1 py-0.5 rounded font-bold">INDISPO</span>
+                        <span className="absolute top-2 right-2 text-[9px] bg-[#DC2626]/15 text-[#DC2626] px-1 py-0.5 rounded font-bold">{t('resto.indispo')}</span>
                       )}
                     </button>
                   ))}
@@ -476,7 +477,7 @@ export default function RestaurantPage() {
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 flex flex-col h-fit sticky top-6">
               <div className="flex items-center gap-2 mb-4">
                 <ShoppingCart size={16} className="text-[#DC2626]" />
-                <h3 className="font-semibold text-[var(--text)] text-sm">Commande en cours</h3>
+                <h3 className="font-semibold text-[var(--text)] text-sm">{t('resto.currentOrder')}</h3>
                 {panier.length > 0 && (
                   <button onClick={() => setPanier([])} className="ml-auto text-[var(--text-secondary)] hover:text-[#DC2626] transition-colors">
                     <Trash2 size={13} />
@@ -488,20 +489,20 @@ export default function RestaurantPage() {
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <select value={tableNum} onChange={e => setTableNum(e.target.value)}
                   className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#DC2626]">
-                  <option value="">À emporter</option>
-                  {tables.map(t => <option key={t.id} value={String(t.numero)}>Table {t.numero}{t.nom ? ` — ${t.nom}` : ''}</option>)}
+                  <option value="">{t('resto.takeaway')}</option>
+                  {tables.map(tb => <option key={tb.id} value={String(tb.numero)}>{t('resto.table')} {tb.numero}{tb.nom ? ` — ${tb.nom}` : ''}</option>)}
                 </select>
                 <select value={mode} onChange={e => setMode(e.target.value as ModeCmd)}
                   className="px-2 py-2 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-xs focus:outline-none focus:border-[#DC2626]">
-                  <option value="sur_place">Sur place</option>
-                  <option value="emporter">À emporter</option>
-                  <option value="livraison">Livraison</option>
+                  <option value="sur_place">{t('resto.dineIn')}</option>
+                  <option value="emporter">{t('resto.takeaway')}</option>
+                  <option value="livraison">{t('resto.delivery')}</option>
                 </select>
               </div>
 
               {/* Articles */}
               {panier.length === 0 ? (
-                <p className="text-xs text-[var(--text-secondary)] text-center py-6">Sélectionnez des plats</p>
+                <p className="text-xs text-[var(--text-secondary)] text-center py-6">{t('resto.selectDishes')}</p>
               ) : (
                 <div className="space-y-2 mb-4">
                   {panier.map(item => (
@@ -527,16 +528,16 @@ export default function RestaurantPage() {
                   <>
                     <div className="border-t border-[var(--border)] pt-3 mb-3 space-y-1">
                       <div className="flex justify-between text-xs text-[var(--text-secondary)]">
-                        <span>Sous-total HT</span><span>{fmtFCFA(sousTotal)}</span>
+                        <span>{t('resto.subtotalHT')}</span><span>{fmtFCFA(sousTotal)}</span>
                       </div>
                       <div className="flex justify-between text-xs text-[var(--text-secondary)]">
-                        <span>TVA (18%)</span><span>{fmtFCFA(tva)}</span>
+                        <span>{t('resto.tva')}</span><span>{fmtFCFA(tva)}</span>
                       </div>
                       <div className="flex justify-between text-xs text-[var(--text-secondary)]">
-                        <span>CA (5% TVA)</span><span>{fmtFCFA(ca)}</span>
+                        <span>{t('resto.ca')}</span><span>{fmtFCFA(ca)}</span>
                       </div>
                       <div className="flex justify-between text-sm font-bold text-[var(--text)] border-t border-[var(--border)] pt-1.5">
-                        <span>Total TTC</span><span className="text-[#DC2626]">{fmtFCFA(ttc)}</span>
+                        <span>{t('resto.totalTTC')}</span><span className="text-[#DC2626]">{fmtFCFA(ttc)}</span>
                       </div>
                     </div>
 
@@ -556,7 +557,7 @@ export default function RestaurantPage() {
                     <button onClick={passerCommande} disabled={savingCmd}
                       className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold hover:bg-[#DC2626]/90 disabled:opacity-50 transition-colors">
                       {savingCmd ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
-                      Valider & Imprimer reçu
+                      {t('resto.validatePrint')}
                     </button>
                   </>
                 )
@@ -570,22 +571,22 @@ export default function RestaurantPage() {
       {tab === 'commandes' && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-[var(--text-secondary)]">{commandes.length} commande(s) récentes</p>
+            <p className="text-sm text-[var(--text-secondary)]">{commandes.length} {t('resto.recentOrders')}</p>
             <div className="flex gap-2">
               <button onClick={fetchAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] text-xs transition-colors">
-                <RefreshCw size={12} /> Actualiser
+                <RefreshCw size={12} /> {t('resto.refresh')}
               </button>
               <Link href="/dashboard/restaurant/cuisine"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#DC2626]/10 border border-[#DC2626]/30 text-[#DC2626] text-xs font-semibold">
-                <Monitor size={12} /> Écran Cuisine
+                <Monitor size={12} /> {t('resto.kitchenScreen')}
               </Link>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { key: ['en_attente', 'en_preparation'] as StatutCmd[], label: 'En préparation', color: '#DC2626', nextStatut: 'pret' as StatutCmd, btnLabel: 'Marquer prêt' },
-              { key: ['pret'] as StatutCmd[], label: 'Prêt à servir', color: '#DC2626', nextStatut: 'livre' as StatutCmd, btnLabel: 'Marquer livré' },
-              { key: ['livre'] as StatutCmd[], label: 'Livré', color: '#0F172A', nextStatut: null, btnLabel: '' },
+              { key: ['en_attente', 'en_preparation'] as StatutCmd[], label: t('resto.inPrep'),       color: '#DC2626', nextStatut: 'pret' as StatutCmd,   btnLabel: t('resto.markReady') },
+              { key: ['pret'] as StatutCmd[],                         label: t('resto.readyToServe'), color: '#DC2626', nextStatut: 'livre' as StatutCmd,  btnLabel: t('resto.markDelivered') },
+              { key: ['livre'] as StatutCmd[],                        label: t('resto.delivered'),    color: '#0F172A', nextStatut: null,                  btnLabel: '' },
             ].map(col => {
               const cols = commandes.filter(c => (col.key as string[]).includes(c.statut))
               return (
@@ -597,7 +598,7 @@ export default function RestaurantPage() {
                   </div>
                   <div className="p-3 space-y-2 min-h-[200px]">
                     {cols.length === 0 && (
-                      <p className="text-xs text-[var(--text-secondary)] text-center pt-8">Aucune commande</p>
+                      <p className="text-xs text-[var(--text-secondary)] text-center pt-8">{t('resto.noOrder')}</p>
                     )}
                     {cols.map(cmd => (
                       <div key={cmd.id} className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-3">
@@ -606,7 +607,7 @@ export default function RestaurantPage() {
                             {cmd.numero_recu ?? cmd.id.slice(0,8)}
                           </span>
                           <span className="text-xs text-[var(--text-secondary)]">
-                            {cmd.table_num ? `Table ${cmd.table_num}` : 'Emporter'}
+                            {cmd.table_num ? `${t('resto.table')} ${cmd.table_num}` : t('resto.takeOut')}
                           </span>
                         </div>
                         <div className="flex flex-wrap gap-1 mb-2">
@@ -621,7 +622,7 @@ export default function RestaurantPage() {
                           <div className="flex items-center gap-1">
                             {cmd.statut === 'en_attente' && (
                               <button onClick={() => annulerCommande(cmd.id)}
-                                title="Annuler"
+                                title={t('common.cancel')}
                                 className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors">
                                 <Ban size={10} />
                               </button>
@@ -651,20 +652,20 @@ export default function RestaurantPage() {
           <div className="flex justify-end mb-4">
             <button onClick={() => setShowMenuForm(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#DC2626]/90 transition-colors">
-              <Plus size={15} /> Ajouter un plat
+              <Plus size={15} /> {t('resto.addDish')}
             </button>
           </div>
           {menu.length === 0 ? (
             <div className="text-center py-16 text-[var(--text-secondary)]">
               <ChefHat size={40} className="mx-auto mb-3 opacity-20" />
-              <p className="text-sm">Menu vide — ajoutez des plats</p>
+              <p className="text-sm">{t('resto.emptyMenu')}</p>
             </div>
           ) : (
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border)]">
-                    {['Plat', 'Catégorie', 'Prix', 'Statut', ''].map(h => (
+                    {[t('resto.colDish'), t('resto.colCategory'), t('resto.colPrice'), t('resto.colStatus'), ''].map(h => (
                       <th key={h} className="text-left px-4 py-3 text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
@@ -678,7 +679,7 @@ export default function RestaurantPage() {
                       <td className="px-4 py-3">
                         <button onClick={() => toggleDispo(item.id, item.disponible)}
                           className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all ${item.disponible ? 'bg-[#1a3570]/10 text-[#1a3570] hover:bg-red-500/10 hover:text-red-400' : 'bg-red-500/10 text-red-400 hover:bg-[#1a3570]/10 hover:text-[#1a3570]'}`}>
-                          {item.disponible ? '● Disponible' : '● Indisponible'}
+                          {item.disponible ? t('resto.available') : t('resto.unavailable')}
                         </button>
                       </td>
                       <td className="px-4 py-3">
@@ -697,27 +698,27 @@ export default function RestaurantPage() {
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowMenuForm(false)} />
               <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
                 <button onClick={() => setShowMenuForm(false)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
-                <h3 className="text-base font-bold text-[var(--text)] mb-4">Ajouter un plat</h3>
+                <h3 className="text-base font-bold text-[var(--text)] mb-4">{t('resto.addDishTitle')}</h3>
                 <div className="space-y-3">
                   <div className="grid grid-cols-4 gap-2">
                     <div>
-                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">Emoji</label>
+                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.emojiLabel')}</label>
                       <input value={menuForm.emoji} onChange={e => setMenuForm(p => ({ ...p, emoji: e.target.value }))}
                         className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none text-center" />
                     </div>
                     <div className="col-span-3">
-                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">Nom du plat *</label>
+                      <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.dishNameLabel')}</label>
                       <input value={menuForm.nom} onChange={e => setMenuForm(p => ({ ...p, nom: e.target.value }))} placeholder="Poulet Yassa"
                         className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Catégorie</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.categoryLabel')}</label>
                     <input value={menuForm.categorie} onChange={e => setMenuForm(p => ({ ...p, categorie: e.target.value }))} placeholder="Plats, Entrées, Desserts…"
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">Prix (FCFA)</label>
+                    <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.priceLabel')}</label>
                     <input type="number" value={menuForm.prix} onChange={e => setMenuForm(p => ({ ...p, prix: e.target.value }))} placeholder="3500"
                       className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                   </div>
@@ -725,12 +726,12 @@ export default function RestaurantPage() {
                 <div className="flex gap-2 mt-5">
                   <button onClick={() => setShowMenuForm(false)}
                     className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-                    Annuler
+                    {t('common.cancel')}
                   </button>
                   <button onClick={saveMenuItem} disabled={savingMenu || !menuForm.nom}
                     className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 disabled:opacity-50 flex items-center justify-center gap-2">
                     {savingMenu && <Loader2 size={13} className="animate-spin" />}
-                    Ajouter
+                    {t('common.add')}
                   </button>
                 </div>
               </div>
@@ -744,64 +745,64 @@ export default function RestaurantPage() {
         <div className="space-y-5">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
-              <Table2 size={15} className="text-[#DC2626]" /> Ajouter une table
+              <Table2 size={15} className="text-[#DC2626]" /> {t('resto.addTableTitle')}
             </h3>
             <div className="grid grid-cols-3 gap-3 mb-3">
               <div>
-                <label className="text-xs text-[var(--text-secondary)] mb-1 block">N° Table *</label>
+                <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.tableNum')}</label>
                 <input type="number" placeholder="1" value={tableForm.numero} onChange={e => setTableForm(p=>({...p,numero:e.target.value}))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
               </div>
               <div>
-                <label className="text-xs text-[var(--text-secondary)] mb-1 block">Nom</label>
+                <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.tableName')}</label>
                 <input placeholder="VIP, Terrasse…" value={tableForm.nom} onChange={e => setTableForm(p=>({...p,nom:e.target.value}))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
               </div>
               <div>
-                <label className="text-xs text-[var(--text-secondary)] mb-1 block">Capacité</label>
+                <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.tableCapacity')}</label>
                 <input type="number" placeholder="4" value={tableForm.capacite} onChange={e => setTableForm(p=>({...p,capacite:e.target.value}))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
               </div>
             </div>
             <button onClick={addTable} disabled={addingTable || !tableForm.numero}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#DC2626]/90 disabled:opacity-50 transition-colors">
-              {addingTable ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Créer la table
+              {addingTable ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} {t('resto.createTable')}
             </button>
           </div>
 
           {tables.length === 0 ? (
             <div className="text-center py-12 text-[var(--text-secondary)]">
               <Table2 size={32} className="mx-auto mb-3 opacity-20" />
-              <p className="text-sm">Aucune table configurée</p>
+              <p className="text-sm">{t('resto.noTable')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {tables.map(t => {
-                const tableUrl = `${publicUrl}?table=${t.numero}`
-                const color = TABLE_COLORS[t.statut] ?? '#64748B'
+              {tables.map(tb => {
+                const tableUrl = `${publicUrl}?table=${tb.numero}`
+                const color = TABLE_COLORS[tb.statut] ?? '#64748B'
                 return (
-                  <div key={t.id} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 text-center hover:border-[#DC2626]/30 transition-colors">
+                  <div key={tb.id} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5 text-center hover:border-[#DC2626]/30 transition-colors">
                     <div className="w-3 h-3 rounded-full mx-auto mb-2" style={{ background: color }} />
                     <p className="text-base font-bold text-[#101729] mb-0.5">
-                      Table {t.numero}{t.nom ? ` — ${t.nom}` : ''}
+                      {t('resto.table')} {tb.numero}{tb.nom ? ` — ${tb.nom}` : ''}
                     </p>
-                    <p className="text-xs text-[var(--text-secondary)] capitalize mb-4">{t.statut} · {t.capacite} places</p>
+                    <p className="text-xs text-[var(--text-secondary)] capitalize mb-4">{tb.statut} · {tb.capacite} {t('resto.places')}</p>
                     <div className="bg-white p-2 rounded-xl mx-auto w-fit mb-4">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={qrUrl(tableUrl)} alt={`QR Table ${t.numero}`} width={100} height={100} className="rounded" />
+                      <img src={qrUrl(tableUrl)} alt={`QR Table ${tb.numero}`} width={100} height={100} className="rounded" />
                     </div>
                     <div className="space-y-2">
                       <button onClick={() => { navigator.clipboard.writeText(tableUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
                         className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-xs transition-colors">
-                        {copied ? <><Check size={12} className="text-[#DC2626]" /> Copié !</> : <><Copy size={12} /> Copier lien</>}
+                        {copied ? <><Check size={12} className="text-[#DC2626]" /> {t('resto.copied')}</> : <><Copy size={12} /> {t('resto.copyLink')}</>}
                       </button>
                       <a href={tableUrl} target="_blank" rel="noopener noreferrer"
                         className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-[#DC2626]/30 text-[#DC2626] hover:bg-[#DC2626]/10 text-xs transition-colors">
-                        <ExternalLink size={12} /> Page client
+                        <ExternalLink size={12} /> {t('resto.clientPage')}
                       </a>
-                      <button onClick={() => deleteTable(t.id)}
+                      <button onClick={() => deleteTable(tb.id)}
                         className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-[var(--text-secondary)] hover:text-red-400 text-xs transition-colors">
-                        <Trash2 size={12} /> Supprimer
+                        <Trash2 size={12} /> {t('common.delete')}
                       </button>
                     </div>
                   </div>
@@ -817,17 +818,17 @@ export default function RestaurantPage() {
         <div className="space-y-5">
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[var(--text)] mb-1 flex items-center gap-2">
-              <BookOpen size={15} className="text-[#DC2626]" /> Recettes — ingrédients par plat
+              <BookOpen size={15} className="text-[#DC2626]" /> {t('resto.recipesTitle')}
             </h3>
             <p className="text-xs text-[var(--text-secondary)] mb-4">
-              Liez les ingrédients (stock) à chaque plat. Le stock se décrémente automatiquement à chaque vente.
+              {t('resto.recipesDesc')}
             </p>
 
             <div className="mb-5">
-              <label className="text-xs text-[var(--text-secondary)] mb-1 block">Sélectionner un plat</label>
+              <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.selectDish')}</label>
               <select value={selectedMenuItem} onChange={e => setSelectedMenuItem(e.target.value)}
                 className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[#DC2626]/50">
-                <option value="">— Choisir un plat du menu —</option>
+                <option value="">{t('resto.selectDishOption')}</option>
                 {menu.map(m => <option key={m.id} value={m.id}>{m.emoji} {m.nom}</option>)}
               </select>
             </div>
@@ -836,17 +837,17 @@ export default function RestaurantPage() {
               <div>
                 {/* Ingrédients actuels */}
                 <div className="mb-4">
-                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Ingrédients actuels</p>
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">{t('resto.currentIngredients')}</p>
                   {recettesDuPlat.length === 0 ? (
                     <p className="text-xs text-[var(--text-secondary)] py-3 text-center border border-dashed border-[var(--border)] rounded-lg">
-                      Aucun ingrédient — ajoutez-en ci-dessous
+                      {t('resto.noIngredients')}
                     </p>
                   ) : (
                     <div className="bg-[var(--surface)] rounded-xl overflow-hidden">
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="border-b border-[var(--border)]">
-                            {['Ingrédient', 'Qté / portion', 'Unité', ''].map(h => (
+                            {[t('resto.colIngredient'), t('resto.colQtyPortion'), t('resto.colUnit'), ''].map(h => (
                               <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)] uppercase">{h}</th>
                             ))}
                           </tr>
@@ -872,32 +873,32 @@ export default function RestaurantPage() {
 
                 {/* Ajouter un ingrédient */}
                 <div className="border border-dashed border-[var(--border)] rounded-xl p-4">
-                  <p className="text-xs font-semibold text-[var(--text-secondary)] mb-3">Ajouter un ingrédient</p>
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] mb-3">{t('resto.addIngredientSection')}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-3">
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Depuis le stock</label>
+                      <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">{t('resto.fromStock')}</label>
                       <select value={recetteForm.article_id} onChange={e => {
                         const art = stockArticles.find(a => a.id === e.target.value)
                         setRecetteForm(p => ({ ...p, article_id: e.target.value, article_nom: art?.nom || p.article_nom }))
                       }} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none">
-                        <option value="">— Sélectionner un article —</option>
+                        <option value="">— {t('common.search')} —</option>
                         {stockArticles.map(a => <option key={a.id} value={a.id}>{a.nom} ({a.quantite} {a.unite})</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Ou saisir manuellement</label>
+                      <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">{t('resto.orManual')}</label>
                       <input value={recetteForm.article_nom} onChange={e => setRecetteForm(p => ({ ...p, article_nom: e.target.value, article_id: '' }))}
-                        placeholder="Nom ingrédient" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#64748B] outline-none" />
+                        placeholder={t('resto.ingredientName')} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#64748B] outline-none" />
                     </div>
                     <div className="flex gap-1">
                       <div className="flex-1">
-                        <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Qté</label>
+                        <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">{t('resto.qty')}</label>
                         <input type="number" step="0.01" min="0" value={recetteForm.quantite}
                           onChange={e => setRecetteForm(p => ({ ...p, quantite: e.target.value }))}
                           placeholder="0.5" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
                       </div>
                       <div className="flex-1">
-                        <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Unité</label>
+                        <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">{t('resto.unit')}</label>
                         <input value={recetteForm.unite} onChange={e => setRecetteForm(p => ({ ...p, unite: e.target.value }))}
                           placeholder="kg, L, u" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none" />
                       </div>
@@ -906,7 +907,7 @@ export default function RestaurantPage() {
                   <button onClick={addRecette} disabled={savingRecette || !recetteForm.article_nom.trim() || !recetteForm.quantite}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-semibold disabled:opacity-50 transition-colors">
                     {savingRecette ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
-                    Ajouter l&apos;ingrédient
+                    {t('resto.addIngredientBtn')}
                   </button>
                 </div>
               </div>
@@ -915,13 +916,13 @@ export default function RestaurantPage() {
             {!selectedMenuItem && menu.length > 0 && (
               <div className="text-center py-10 text-[var(--text-secondary)]">
                 <Package size={28} className="mx-auto mb-2 opacity-30" />
-                <p className="text-xs">Sélectionnez un plat pour gérer sa recette</p>
+                <p className="text-xs">{t('resto.selectDishPrompt')}</p>
               </div>
             )}
             {menu.length === 0 && (
               <div className="text-center py-10 text-[var(--text-secondary)]">
                 <ChefHat size={28} className="mx-auto mb-2 opacity-30" />
-                <p className="text-xs">Ajoutez d&apos;abord des plats dans l&apos;onglet Menu</p>
+                <p className="text-xs">{t('resto.addDishFirst')}</p>
               </div>
             )}
           </div>
@@ -932,10 +933,10 @@ export default function RestaurantPage() {
       {tab === 'achats' && (
         <div className="space-y-5">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-[var(--text-secondary)]">{achats.length} achat(s) récent(s)</p>
+            <p className="text-sm text-[var(--text-secondary)]">{achats.length} {t('resto.recentPurchases')}</p>
             <button onClick={() => setShowAchatForm(v => !v)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[#DC2626]/90 transition-colors">
-              <Plus size={15} /> Nouvel achat
+              <Plus size={15} /> {t('resto.newPurchase')}
             </button>
           </div>
 
@@ -943,21 +944,21 @@ export default function RestaurantPage() {
           {showAchatForm && (
             <div className="bg-[var(--card-bg)] border border-[#DC2626]/30 rounded-xl p-5">
               <h3 className="text-sm font-semibold text-[#DC2626] mb-4 flex items-center gap-2">
-                <Truck size={14} /> Enregistrer un achat fournisseur
+                <Truck size={14} /> {t('resto.purchaseTitle')}
               </h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Fournisseur *</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.supplier')}</label>
                   <input value={achatForm.fournisseur_nom} onChange={e => setAchatForm(p => ({ ...p, fournisseur_nom: e.target.value }))}
-                    placeholder="Nom du fournisseur" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
+                    placeholder={t('resto.supplierName')} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none focus:border-[#DC2626]/50" />
                 </div>
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Date</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.date')}</label>
                   <input type="date" value={achatForm.date_achat} onChange={e => setAchatForm(p => ({ ...p, date_achat: e.target.value }))}
                     className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none" />
                 </div>
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Mode de paiement</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.paymentMode')}</label>
                   <select value={achatForm.mode_paiement} onChange={e => setAchatForm(p => ({ ...p, mode_paiement: e.target.value }))}
                     className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">
                     <option value="especes">Espèces</option>
@@ -968,23 +969,23 @@ export default function RestaurantPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">Note</label>
+                  <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('resto.note')}</label>
                   <input value={achatForm.note} onChange={e => setAchatForm(p => ({ ...p, note: e.target.value }))}
-                    placeholder="Optionnel" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none" />
+                    placeholder={t('common.optional')} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] placeholder-[#64748B] outline-none" />
                 </div>
               </div>
 
               {/* Lignes articles */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Articles</p>
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('resto.articleLines')}</p>
                   <button onClick={addAchatLigne} className="text-xs text-[#DC2626] hover:underline flex items-center gap-1">
-                    <Plus size={11} /> Ajouter une ligne
+                    <Plus size={11} /> {t('resto.addLine')}
                   </button>
                 </div>
                 <div className="space-y-2">
                   <div className="hidden sm:grid grid-cols-12 gap-2 mb-1">
-                    {['Article *', '', 'Qté', 'Prix unitaire', 'Total', ''].map((h, i) => (
+                    {[t('resto.articleName'), '', t('resto.purchaseQty'), t('resto.unitPrice'), t('resto.purchaseTotal'), ''].map((h, i) => (
                       <div key={i} className={`text-[10px] text-[var(--text-secondary)] uppercase ${i === 0 ? 'col-span-4' : i === 1 ? 'col-span-2' : i === 2 ? 'col-span-2' : i === 3 ? 'col-span-2' : i === 4 ? 'col-span-1' : 'col-span-1'}`}>{h}</div>
                     ))}
                   </div>
@@ -992,7 +993,7 @@ export default function RestaurantPage() {
                     <div key={i} className="grid grid-cols-12 gap-2 items-center">
                       <div className="col-span-4">
                         <input value={ligne.article_nom} onChange={e => updateAchatLigne(i, 'article_nom', e.target.value)}
-                          placeholder="Ingrédient / article" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#64748B] outline-none" />
+                          placeholder={t('resto.articleName')} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] placeholder-[#64748B] outline-none" />
                       </div>
                       <div className="col-span-2">
                         <select value={ligne.article_id ?? ''} onChange={e => {
@@ -1000,19 +1001,19 @@ export default function RestaurantPage() {
                           if (art) updateAchatLigne(i, 'article_nom', art.nom)
                           updateAchatLigne(i, 'article_id', e.target.value)
                         }} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-[10px] text-[var(--text)] outline-none">
-                          <option value="">Stock…</option>
+                          <option value="">{t('resto.stockSelect')}</option>
                           {stockArticles.map(a => <option key={a.id} value={a.id}>{a.nom}</option>)}
                         </select>
                       </div>
                       <div className="col-span-2">
                         <input type="number" min="0" step="0.1" value={ligne.quantite || ''}
                           onChange={e => updateAchatLigne(i, 'quantite', e.target.value)}
-                          placeholder="Qté" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
+                          placeholder={t('resto.purchaseQty')} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
                       </div>
                       <div className="col-span-2">
                         <input type="number" min="0" value={ligne.prix_unitaire || ''}
                           onChange={e => updateAchatLigne(i, 'prix_unitaire', e.target.value)}
-                          placeholder="Prix" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
+                          placeholder={t('resto.unitPrice')} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] outline-none text-right" />
                       </div>
                       <div className="col-span-1 text-right">
                         <span className="text-xs font-semibold text-[#DC2626]">
@@ -1030,7 +1031,7 @@ export default function RestaurantPage() {
                 {achatForm.lignes.length > 0 && (
                   <div className="flex justify-end mt-3 pt-2 border-t border-[var(--border)]">
                     <span className="text-sm font-bold text-[#DC2626]">
-                      Total : {fmtFCFA(achatForm.lignes.reduce((s, l) => s + (l.quantite || 0) * (l.prix_unitaire || 0), 0))}
+                      {t('common.total')} : {fmtFCFA(achatForm.lignes.reduce((s, l) => s + (l.quantite || 0) * (l.prix_unitaire || 0), 0))}
                     </span>
                   </div>
                 )}
@@ -1038,12 +1039,12 @@ export default function RestaurantPage() {
 
               <div className="flex gap-2">
                 <button onClick={() => setShowAchatForm(false)} className="px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button onClick={saveAchat} disabled={savingAchat || !achatForm.fournisseur_nom.trim() || !achatForm.lignes.length}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 disabled:opacity-50 transition-colors">
                   {savingAchat && <Loader2 size={13} className="animate-spin" />}
-                  Enregistrer l&apos;achat
+                  {t('resto.savePurchase')}
                 </button>
               </div>
             </div>
@@ -1053,15 +1054,15 @@ export default function RestaurantPage() {
           {achats.length === 0 ? (
             <div className="text-center py-16 text-[var(--text-secondary)]">
               <Truck size={32} className="mx-auto mb-3 opacity-20" />
-              <p className="text-sm">Aucun achat enregistré</p>
-              <p className="text-xs mt-1">Enregistrez vos achats fournisseurs pour mettre à jour le stock</p>
+              <p className="text-sm">{t('resto.noPurchase')}</p>
+              <p className="text-xs mt-1">{t('resto.noPurchaseDesc')}</p>
             </div>
           ) : (
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border)]">
-                    {['Date', 'Fournisseur', 'Mode', 'Articles', 'Total', ''].map(h => (
+                    {[t('resto.colDate'), t('resto.colSupplier'), t('resto.colMode'), t('resto.colArticles'), t('resto.colTotal'), ''].map(h => (
                       <th key={h} className="text-left px-4 py-3 text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
@@ -1072,7 +1073,7 @@ export default function RestaurantPage() {
                       <td className="px-4 py-3 text-[var(--text-secondary)]">{new Date(a.date_achat).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 font-medium text-[var(--text)]">{a.fournisseur_nom}</td>
                       <td className="px-4 py-3 text-[var(--text-secondary)] capitalize">{a.mode_paiement}</td>
-                      <td className="px-4 py-3 text-[var(--text-secondary)]">{(a.lignes as AchatLigne[]).length} article(s)</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{(a.lignes as AchatLigne[]).length} {t('resto.article')}</td>
                       <td className="px-4 py-3 font-semibold text-[#DC2626]">{fmtFCFA(a.total)}</td>
                       <td className="px-4 py-3">
                         <button onClick={() => deleteAchat(a.id)} className="text-[var(--text-secondary)] hover:text-red-400 transition-colors">
@@ -1094,10 +1095,10 @@ export default function RestaurantPage() {
           {/* KPIs */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: 'CA TTC', val: fmtFCFA(caDuJour), color: '#DC2626' },
-              { label: 'CA HT', val: fmtFCFA(calculerTVACongo(caDuJour).ht), color: '#DC2626' },
-              { label: 'TVA collectée', val: fmtFCFA(calculerTVACongo(caDuJour).tva), color: '#7C3AED' },
-              { label: 'Nb commandes', val: cmdsDuJour.length, color: '#0F172A' },
+              { label: t('resto.rapportCaTTC'),    val: fmtFCFA(caDuJour),                          color: '#DC2626' },
+              { label: t('resto.rapportCaHT'),     val: fmtFCFA(calculerTVACongo(caDuJour).ht),     color: '#DC2626' },
+              { label: t('resto.rapportTVA'),      val: fmtFCFA(calculerTVACongo(caDuJour).tva),    color: '#7C3AED' },
+              { label: t('resto.rapportNbOrders'), val: cmdsDuJour.length,                           color: '#0F172A' },
             ].map(k => (
               <div key={k.label} className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4">
                 <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{k.label}</p>
@@ -1109,7 +1110,7 @@ export default function RestaurantPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* CA par heure */}
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-[var(--text)] mb-4">CA par heure</h3>
+              <h3 className="text-sm font-semibold text-[var(--text)] mb-4">{t('resto.caByHour')}</h3>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={chartHeure}>
                   <XAxis dataKey="heure" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -1125,9 +1126,9 @@ export default function RestaurantPage() {
 
             {/* Répartition paiements */}
             <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-[var(--text)] mb-4">Répartition paiements</h3>
+              <h3 className="text-sm font-semibold text-[var(--text)] mb-4">{t('resto.paymentBreakdown')}</h3>
               {chartPaie.length === 0 ? (
-                <div className="flex items-center justify-center h-40 text-[var(--text-secondary)] text-sm">Aucun paiement aujourd&apos;hui</div>
+                <div className="flex items-center justify-center h-40 text-[var(--text-secondary)] text-sm">{t('resto.noPaymentToday')}</div>
               ) : (
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
@@ -1146,9 +1147,9 @@ export default function RestaurantPage() {
 
           {/* Top 5 plats */}
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[var(--text)] mb-4">Top 5 plats du jour</h3>
+            <h3 className="text-sm font-semibold text-[var(--text)] mb-4">{t('resto.top5Dishes')}</h3>
             {topPlats.length === 0 ? (
-              <p className="text-sm text-[var(--text-secondary)]">Aucune vente aujourd&apos;hui</p>
+              <p className="text-sm text-[var(--text-secondary)]">{t('resto.noSaleToday')}</p>
             ) : (
               <div className="space-y-2">
                 {topPlats.map((p, i) => (
@@ -1169,7 +1170,7 @@ export default function RestaurantPage() {
           {stockArticles.some(a => a.quantite <= 0 || (a.seuil_alerte !== null && a.quantite <= a.seuil_alerte)) && (
             <div className="bg-[var(--card-bg)] border border-[#DC2626]/40 rounded-xl p-5">
               <h3 className="text-sm font-semibold text-[#DC2626] mb-3 flex items-center gap-2">
-                <AlertTriangle size={15} /> Alertes stock
+                <AlertTriangle size={15} /> {t('resto.stockAlerts')}
               </h3>
               <div className="space-y-2">
                 {stockArticles
@@ -1179,7 +1180,7 @@ export default function RestaurantPage() {
                     <div key={a.id} className="flex items-center justify-between text-xs">
                       <span className="text-[var(--text)] font-medium">{a.nom}</span>
                       <span className={`font-bold ${a.quantite <= 0 ? 'text-[#DC2626]' : 'text-[#DC2626]'}`}>
-                        {a.quantite <= 0 ? 'RUPTURE' : `${a.quantite} ${a.unite} (seuil : ${a.seuil_alerte})`}
+                        {a.quantite <= 0 ? t('resto.rupture') : `${a.quantite} ${a.unite} (${t('resto.threshold')} ${a.seuil_alerte})`}
                       </span>
                     </div>
                   ))}
@@ -1190,14 +1191,14 @@ export default function RestaurantPage() {
           {/* Clôture caisse */}
           <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
-              <AlertTriangle size={15} className="text-[#DC2626]" /> Clôture de caisse
+              <AlertTriangle size={15} className="text-[#DC2626]" /> {t('resto.closeCaisse')}
             </h3>
             <p className="text-xs text-[var(--text-secondary)] mb-4">
-              La clôture enregistre le rapport journalier dans Supabase et lie les données à la trésorerie.
+              {t('resto.closeCaisseDesc')}
             </p>
             <button onClick={cloturerCaisse}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#DC2626]/10 border border-[#DC2626]/30 text-[#DC2626] text-sm font-semibold hover:bg-[#DC2626]/20 transition-colors">
-              <BarChart2 size={15} /> Clôturer la caisse du jour
+              <BarChart2 size={15} /> {t('resto.closeCaisseBtn')}
             </button>
           </div>
         </div>
@@ -1211,35 +1212,35 @@ export default function RestaurantPage() {
             <button onClick={() => setReceipt(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
             <div className="text-center mb-5">
               <CheckCircle size={40} className="text-[#DC2626] mx-auto mb-3" />
-              <h3 className="text-base font-bold text-[var(--text)]">Commande enregistrée !</h3>
-              <p className="text-sm text-[var(--text-secondary)] mt-1">Reçu N° <span className="text-[#DC2626] font-bold">{receipt.numeroRecu}</span></p>
+              <h3 className="text-base font-bold text-[var(--text)]">{t('resto.orderSaved')}</h3>
+              <p className="text-sm text-[var(--text-secondary)] mt-1">{t('resto.receiptNum')} <span className="text-[#DC2626] font-bold">{receipt.numeroRecu}</span></p>
             </div>
             <div className="bg-[var(--surface)] rounded-xl p-4 mb-5 space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-[var(--text-secondary)]">Sous-total HT</span>
+                <span className="text-[var(--text-secondary)]">{t('resto.subtotalHT')}</span>
                 <span className="text-[var(--text)]">{fmtFCFA(receipt.fiscal.ht)}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-[var(--text-secondary)]">TVA (18%)</span>
+                <span className="text-[var(--text-secondary)]">{t('resto.tva')}</span>
                 <span className="text-[var(--text)]">{fmtFCFA(receipt.fiscal.tva)}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-[var(--text-secondary)]">CA (5% TVA)</span>
+                <span className="text-[var(--text-secondary)]">{t('resto.ca')}</span>
                 <span className="text-[var(--text)]">{fmtFCFA(receipt.fiscal.ca)}</span>
               </div>
               <div className="flex justify-between text-sm font-bold border-t border-[var(--border)] pt-2">
-                <span className="text-[var(--text)]">Total TTC</span>
+                <span className="text-[var(--text)]">{t('resto.totalTTC')}</span>
                 <span className="text-[#DC2626]">{fmtFCFA(receipt.fiscal.ttc)}</span>
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setReceipt(null)}
                 className="flex-1 px-4 py-2 rounded-lg text-sm bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-                Fermer
+                {t('resto.close')}
               </button>
               <a href={`/api/resto/receipt/${receipt.commandeId}`} target="_blank" rel="noopener noreferrer"
                 className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--primary)] text-white hover:bg-[#DC2626]/90 transition-colors flex items-center justify-center gap-2">
-                <TrendingUp size={13} /> Télécharger PDF
+                <TrendingUp size={13} /> {t('resto.downloadPDF')}
               </a>
             </div>
           </div>
