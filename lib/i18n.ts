@@ -950,7 +950,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'treso.libellePlaceholder':     'Libellé…',
     'treso.libelle':                'Libellé',
     'treso.source':                 'Source',
-    'treso.noTransaction':          'Aucune transaction trouvée',
     'treso.detailTransaction':      'Détail transaction',
     'treso.refPrefix':              'Réf:',
     'treso.debut':                  'Début',
@@ -2204,18 +2203,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'ged.cat.autre':                'Autre',
     'ged.archiveBtn':               'Archiver',
 
-    // ── Common fields missing ─────────────────────────────────
-    'common.student':     'Étudiant',
-    'common.label':       'Libellé',
-    'common.method':      'Méthode',
-    'common.choose':      'Choisir',
-    'common.contact':     'Contact',
-    'common.message':     'Message',
-    'common.nameField':   'Nom',
-    'common.titleField':  'Titre',
-    'common.dateStart':   'Date de début',
-    'common.dateEnd':     'Date de fin',
-
     // ── École direction extra keys ────────────────────────────
     'ecole.direction.periode.tout':   'Toutes périodes',
     'ecole.direction.periode.mois':   'Ce mois',
@@ -2858,8 +2845,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'stock.valorisation.colRotation':'Rotation',
 
     // ── RH sous-pages complémentaires ─────────────────────────────
-    'rh.sanctions.title':            'Sanctions & Avertissements',
-    'rh.sanctions.subtitle':         'Gestion disciplinaire',
     'rh.sanctions.new':              'Nouvelle sanction',
     'rh.sanctions.searchPlh':        'Rechercher un employé…',
     'rh.sanctions.empty':            'Aucune sanction enregistrée',
@@ -2873,8 +2858,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'rh.sanctions.type.suspension':  'Suspension',
     'rh.sanctions.type.licencie':    'Licenciement',
 
-    'rh.avantages.title':            'Avantages & Bénéfices',
-    'rh.avantages.subtitle':         'Primes, indemnités et avantages en nature',
     'rh.avantages.new':              'Nouvel avantage',
     'rh.avantages.searchPlh':        'Rechercher un avantage…',
     'rh.avantages.empty':            'Aucun avantage configuré',
@@ -5184,8 +5167,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'stock.valorisation.colRotation':'Turnover',
 
     // ── HR supplementary pages ─────────────────────────────────────
-    'rh.sanctions.title':            'Disciplinary Actions',
-    'rh.sanctions.subtitle':         'Disciplinary management',
     'rh.sanctions.new':              'New action',
     'rh.sanctions.searchPlh':        'Search an employee…',
     'rh.sanctions.empty':            'No disciplinary actions recorded',
@@ -5199,8 +5180,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'rh.sanctions.type.suspension':  'Suspension',
     'rh.sanctions.type.licencie':    'Dismissal',
 
-    'rh.avantages.title':            'Benefits & Perks',
-    'rh.avantages.subtitle':         'Bonuses, allowances and in-kind benefits',
     'rh.avantages.new':              'New benefit',
     'rh.avantages.searchPlh':        'Search a benefit…',
     'rh.avantages.empty':            'No benefits configured',
@@ -5478,11 +5457,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'compta.overview.doubleEntry':   'Double-entry ledger',
     'compta.overview.journal':       'Journal',
 
-    // ── AUDIT ──────────────────────────────────────────────────
-    'audit.title':                   'Audit Trail',
-    'audit.subtitle':                'Activity log and system event history',
+    // ── AUDIT supplementary keys ──────────────────────────────
     'audit.searchPlh':               'Search an event…',
-    'audit.filterAll':               'All',
     'audit.noEvents':                'No events',
     'audit.export':                  'Export',
     'audit.colDate':                 'Date',

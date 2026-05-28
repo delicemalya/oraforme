@@ -647,6 +647,7 @@ function monthLabel(yyyy: number, mm: number): string {
 }
 
 function SectionPrevisions({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [data,    setData]    = useState<MonthData[]>([])
   const [loading, setLoading] = useState(true)
 
