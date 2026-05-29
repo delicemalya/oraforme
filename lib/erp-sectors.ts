@@ -56,8 +56,21 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'restaurant', href: '/dashboard/restaurant',         label: 'Caisse POS',     sublabel: 'Commandes & service'     },
     { id: 'cuisine',    href: '/dashboard/restaurant/cuisine', label: 'Cuisine',        sublabel: 'Cuisine & préparation'   },
   ],
+  sante: [
+    { id: 'sante',               href: '/dashboard/sante',                label: 'Clinique',        sublabel: 'Tableau de bord santé'     },
+    { id: 'sante-patients',      href: '/dashboard/sante/patients',       label: 'Patients',        sublabel: 'Dossiers & antécédents'    },
+    { id: 'sante-rdv',          href: '/dashboard/sante/rendez-vous',    label: 'Rendez-vous',     sublabel: 'Agenda & planification'    },
+    { id: 'sante-consultations', href: '/dashboard/sante/consultations',  label: 'Consultations',   sublabel: 'Actes médicaux & ordonnances' },
+    { id: 'sante-medecins',      href: '/dashboard/sante/medecins',       label: 'Médecins',        sublabel: 'Personnel médical'         },
+  ],
+  pharmacie: [
+    { id: 'pharmacie',           href: '/dashboard/pharmacie',            label: 'Pharmacie',       sublabel: 'Tableau de bord'           },
+    { id: 'pharmacie-meds',     href: '/dashboard/pharmacie/medicaments',label: 'Médicaments',     sublabel: 'Stock & catalogue'         },
+    { id: 'pharmacie-ventes',   href: '/dashboard/pharmacie/ventes',     label: 'Ventes / POS',    sublabel: 'Caisse & ordonnances'      },
+  ],
   hotel: [
-    { id: 'hotel', href: '/dashboard/hotel', label: 'Hébergement', sublabel: 'Réservations & chambres' },
+    { id: 'hotel',         href: '/dashboard/hotel',               label: 'Hébergement',    sublabel: 'Réservations & chambres' },
+    { id: 'housekeeping',  href: '/dashboard/hotel/housekeeping',  label: 'Housekeeping',   sublabel: 'Ménage & entretien'      },
   ],
   transport: [
     { id: 'transport', href: '/dashboard/transport', label: 'Flotte VTC', sublabel: 'Véhicules & courses' },

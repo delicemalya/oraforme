@@ -49,8 +49,10 @@ export default async function DashboardPage() {
   const secteur   = tenant?.secteur_activite ?? null
   const ecoleRole = (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null
 
-  // École sector → single dashboard, avoid duplicate experience
-  if (secteur === 'ecole') redirect('/dashboard/ecole')
+  // Sector-specific dashboards — redirect to dedicated experience
+  if (secteur === 'ecole')     redirect('/dashboard/ecole')
+  if (secteur === 'sante')     redirect('/dashboard/sante')
+  if (secteur === 'pharmacie') redirect('/dashboard/pharmacie')
 
   // ── Résoudre isFinancial depuis le rôle dynamique ─────────────────────────
   // DIRECTION_GENERALE is treated as financial — same full access as owner

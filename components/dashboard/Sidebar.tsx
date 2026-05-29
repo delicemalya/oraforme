@@ -22,6 +22,7 @@ import {
   Layers, Activity, TrendingUp,
   Bell, FolderOpen, Building2,
   ChevronDown, Calendar, CheckSquare,
+  Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -134,8 +135,17 @@ const ICONS: Record<string, LucideIcon> = {
   restaurant:   ChefHat,
   cuisine:      ChefHat,
   hotel:        Hotel,
+  housekeeping: Sparkles,
   transport:    Truck,
   ecole:        GraduationCap,
+  sante:               Heart,
+  'sante-patients':    UserRound,
+  'sante-rdv':         CalendarClock,
+  'sante-consultations': Stethoscope,
+  'sante-medecins':    Activity,
+  pharmacie:           Pill,
+  'pharmacie-meds':    Package,
+  'pharmacie-ventes':  ShoppingCart,
 }
 
 // ─── Module Registry ──────────────────────────────────────────────────────────
@@ -145,10 +155,19 @@ type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 const MODULE_DEFS: ModuleDef[] = [
   ...(CORE_ERP_MODULES as unknown as ModuleDef[]),
   ...(PLATFORM_MODULES as unknown as ModuleDef[]),
-  { id: 'ecole',     label: 'École & Université',  sublabel: 'Gestion académique',      href: '/dashboard/ecole'      },
-  { id: 'restaurant',label: 'Restauration POS',    sublabel: 'Service & commandes',     href: '/dashboard/restaurant' },
-  { id: 'hotel',     label: 'Hôtellerie',           sublabel: 'Réservations & chambres', href: '/dashboard/hotel'      },
-  { id: 'transport', label: 'Transport VTC',        sublabel: 'Flotte & courses',        href: '/dashboard/transport'  },
+  { id: 'ecole',                 label: 'École & Université',       sublabel: 'Gestion académique',         href: '/dashboard/ecole'                      },
+  { id: 'restaurant',            label: 'Restauration POS',         sublabel: 'Service & commandes',        href: '/dashboard/restaurant'                 },
+  { id: 'hotel',                 label: 'Hôtellerie',               sublabel: 'Réservations & chambres',    href: '/dashboard/hotel'                      },
+  { id: 'housekeeping',          label: 'Housekeeping',             sublabel: 'Ménage & entretien',         href: '/dashboard/hotel/housekeeping'         },
+  { id: 'transport',             label: 'Transport VTC',            sublabel: 'Flotte & courses',           href: '/dashboard/transport'                  },
+  { id: 'sante',                 label: 'Clinique',                 sublabel: 'Tableau de bord santé',      href: '/dashboard/sante'                      },
+  { id: 'sante-patients',        label: 'Patients',                 sublabel: 'Dossiers & antécédents',     href: '/dashboard/sante/patients'             },
+  { id: 'sante-rdv',             label: 'Rendez-vous',              sublabel: 'Agenda & planification',     href: '/dashboard/sante/rendez-vous'          },
+  { id: 'sante-consultations',   label: 'Consultations',            sublabel: 'Actes médicaux',             href: '/dashboard/sante/consultations'        },
+  { id: 'sante-medecins',        label: 'Médecins',                 sublabel: 'Personnel médical',          href: '/dashboard/sante/medecins'             },
+  { id: 'pharmacie',             label: 'Pharmacie',                sublabel: 'Tableau de bord',            href: '/dashboard/pharmacie'                  },
+  { id: 'pharmacie-meds',        label: 'Médicaments',              sublabel: 'Stock & catalogue',          href: '/dashboard/pharmacie/medicaments'      },
+  { id: 'pharmacie-ventes',      label: 'Ventes / POS',             sublabel: 'Caisse & ordonnances',       href: '/dashboard/pharmacie/ventes'           },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -192,9 +211,18 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   ecole:        'nav.ecole',
   restaurant:   'nav.restaurant',
   hotel:        'nav.hotel',
+  housekeeping: 'nav.housekeeping',
   transport:    'nav.transport',
   mobilemoney:  'nav.mobilemoney',
   workflows:    'nav.workflows',
+  sante:               'nav.sante',
+  'sante-patients':    'nav.sante_patients',
+  'sante-rdv':         'nav.sante_rdv',
+  'sante-consultations': 'nav.sante_consultations',
+  'sante-medecins':    'nav.sante_medecins',
+  pharmacie:           'nav.pharmacie',
+  'pharmacie-meds':    'nav.pharmacie_meds',
+  'pharmacie-ventes':  'nav.pharmacie_ventes',
 }
 
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
@@ -202,8 +230,10 @@ const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
 const ALL_MODULE_IDS = [
   ...CORE_ERP_MODULES.map(m => m.id),
   ...PLATFORM_MODULES.map(m => m.id),
-  'ecole', 'restaurant', 'hotel', 'transport',
+  'ecole', 'restaurant', 'hotel', 'housekeeping', 'transport',
   'calendrier', 'taches',
+  'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
+  'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
