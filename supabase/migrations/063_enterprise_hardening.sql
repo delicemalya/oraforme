@@ -100,10 +100,9 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- transactions (ledger central)
-CREATE INDEX IF NOT EXISTS idx_transactions_tenant_date   ON transactions(tenant_id, date_operation DESC);
-CREATE INDEX IF NOT EXISTS idx_transactions_tenant_source ON transactions(tenant_id, source);
-CREATE INDEX IF NOT EXISTS idx_transactions_tenant_type   ON transactions(tenant_id, type);
+-- transactions — colonne date (pas date_operation), pas de colonne source
+CREATE INDEX IF NOT EXISTS idx_transactions_tenant_date ON transactions(tenant_id, date DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_tenant_type ON transactions(tenant_id, type);
 
 -- journal_entries (OHADA)
 CREATE INDEX IF NOT EXISTS idx_je_tenant_date   ON journal_entries(tenant_id, date_operation DESC);
