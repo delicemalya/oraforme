@@ -276,7 +276,7 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data } = await supabase.from('planning_ecole').select('*').eq('tenant_id', tenantId).order('date_debut')
+    const { data } = await supabase.from('planning_ecole').select('*').eq('tenant_id', tenantId).order('date_debut').limit(200)
     setPlanning((data ?? []) as PlanningEcole[])
     setLoading(false)
   }, [tenantId])
@@ -383,7 +383,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
   const [form, setForm] = useState({ etudiant_id: '', montant: '', libelle: '' })
 
   useEffect(() => {
-    supabase.from('bourses_etudiants').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
+    supabase.from('bourses_etudiants').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200)
       .then(({ data }) => setBourses((data ?? []) as typeof bourses))
   }, [tenantId])
 
@@ -477,7 +477,7 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
   const [form, setForm] = useState({ nom: '', type: 'entreprise', contact: '', description: '' })
 
   useEffect(() => {
-    supabase.from('partenaires_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
+    supabase.from('partenaires_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200)
       .then(({ data }) => setPartenaires((data ?? []) as typeof partenaires))
   }, [tenantId])
 
@@ -557,7 +557,7 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
   const [form, setForm] = useState({ titre: '', message: '', cible: 'tous' })
 
   useEffect(() => {
-    supabase.from('annonces_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
+    supabase.from('annonces_ecole').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200)
       .then(({ data }) => setAnnonces((data ?? []) as typeof annonces))
   }, [tenantId])
 
@@ -661,10 +661,10 @@ export default function DirectionPage() {
     if (!tenantId) return
     setLoading(true)
     const [{ data: etus }, { data: tenant }, { data: ens }, { data: cls }] = await Promise.all([
-      supabase.from('etudiants').select('*').eq('tenant_id', tenantId).order('nom'),
+      supabase.from('etudiants').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
       supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).limit(1).maybeSingle(),
-      supabase.from('enseignants').select('*').eq('tenant_id', tenantId),
-      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId),
+      supabase.from('enseignants').select('*').eq('tenant_id', tenantId).limit(200),
+      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId).limit(200),
     ])
     setEtudiants((etus ?? []) as Etudiant[])
     setEnseignants((ens ?? []) as Enseignant[])

@@ -78,11 +78,12 @@ export default function RetoursPage() {
         .select('*, products(nom, sku), suppliers(nom)')
         .eq('tenant_id', tenantId)
         .order('date_retour', { ascending: false })
+        .limit(200)
 
       if (e1?.code === '42P01') { setRetours([]); setLoading(false); return }
 
-      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, prix_vente, unite').eq('tenant_id', tenantId)
-      const { data: sups } = await supabase.from('suppliers').select('id, nom').eq('tenant_id', tenantId).eq('actif', true)
+      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, prix_vente, unite').eq('tenant_id', tenantId).limit(200)
+      const { data: sups } = await supabase.from('suppliers').select('id, nom').eq('tenant_id', tenantId).eq('actif', true).limit(200)
 
       setProducts(prods || [])
       setSuppliers(sups || [])

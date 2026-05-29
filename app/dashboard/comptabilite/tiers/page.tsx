@@ -70,11 +70,11 @@ export default function TiersPage() {
           .select('*')
           .eq('tenant_id', tenantId)
           .eq('actif', true)
-          .order('type').order('nom'),
+          .order('type').order('nom').limit(200),
         supabase.from('journal_entries')
           .select('id, date_operation, libelle, debit_account, credit_account, montant, source')
           .eq('tenant_id', tenantId)
-          .eq('fiscal_year', year),
+          .eq('fiscal_year', year).limit(200),
       ])
       setTiers((tiersRes.data || []) as Tier[])
       setMovements((mvRes.data || []) as Movement[])
@@ -132,7 +132,7 @@ export default function TiersPage() {
     }
     setSaving(false); setModal(false); setForm(EMPTY_FORM); setEditId(null)
     // Refresh
-    const { data } = await supabase.from('tiers').select('*').eq('tenant_id', tenantId).eq('actif', true).order('type').order('nom')
+    const { data } = await supabase.from('tiers').select('*').eq('tenant_id', tenantId).eq('actif', true).order('type').order('nom').limit(200)
     setTiers((data || []) as Tier[])
   }
 

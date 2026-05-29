@@ -54,7 +54,7 @@ export default function MobileMoneyPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const { data, error } = await supabase.from('wallets').select('*').eq('tenant_id', tenantId).order('created_at')
+    const { data, error } = await supabase.from('wallets').select('*').eq('tenant_id', tenantId).order('created_at').limit(200)
     if (!error) setWallets((data || []) as Wallet[])
     setLoading(false)
   }, [tenantId])

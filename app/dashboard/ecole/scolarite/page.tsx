@@ -126,11 +126,11 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
         </div>
       </div>
 
-      {/* -- Grille de cartes Étudiants ------------------------------------- */}
+      {/* -- Grille de cartes ï¿½tudiants ------------------------------------- */}
       {displayed.length === 0 ? (
         <div className="text-center py-16 text-[var(--text-secondary)] text-xs space-y-2">
           <Users2 size={32} className="mx-auto opacity-20" />
-          <p className="font-medium">Aucun étudiant trouvé.</p>
+          <p className="font-medium">Aucun ï¿½tudiant trouvï¿½.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -162,7 +162,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   </div>
                   <div>
                     <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-wide">Classe</p>
-                    <p className="text-[10px] text-[#101729] mt-0.5 truncate">{e.classe ?? '—'}</p>
+                    <p className="text-[10px] text-[#101729] mt-0.5 truncate">{e.classe ?? 'ï¿½'}</p>
                   </div>
                 </div>
 
@@ -195,7 +195,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   <button onClick={() => setSelected(selected?.id === e.id ? null : e)}
                     className="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-white transition-all hover:opacity-90"
                     style={{ background: selected?.id === e.id ? '#DC2626' : '#DC2626' }}>
-                    {selected?.id === e.id ? 'Fermer' : 'Gérer'}
+                    {selected?.id === e.id ? 'Fermer' : 'Gï¿½rer'}
                   </button>
                 </div>
               </motion.div>
@@ -216,18 +216,18 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   <Avatar nom={selected.nom} prenom={selected.prenom} photoUrl={selected.photo_url} size={40} />
                   <div>
                     <p className="text-sm font-bold text-[#101729]">{selected.prenom} {selected.nom}</p>
-                    <p className="text-[10px] font-mono text-[#7C3AED]">{selected.numero_id} · {selected.classe ?? selected.niveau}</p>
+                    <p className="text-[10px] font-mono text-[#7C3AED]">{selected.numero_id} ï¿½ {selected.classe ?? selected.niveau}</p>
                   </div>
                 </div>
                 <button onClick={() => setSelected(null)} className="text-[var(--text-secondary)] hover:text-white"><X size={15} /></button>
               </div>
 
               <div className="space-y-1 text-xs text-[var(--text-secondary)]">
-                {selected.date_naissance && <p>Né(e) le : <span className="text-white">{new Date(selected.date_naissance).toLocaleDateString('fr-FR')}</span></p>}
+                {selected.date_naissance && <p>Nï¿½(e) le : <span className="text-white">{new Date(selected.date_naissance).toLocaleDateString('fr-FR')}</span></p>}
                 {selected.adresse && <p>Adresse : <span className="text-white">{selected.adresse}</span></p>}
                 {selected.tel_parent && <p>Parent : <span className="text-white">{selected.tel_parent}</span></p>}
-                {selected.nom_pere && <p>Père : <span className="text-white">{selected.nom_pere}</span></p>}
-                {selected.nom_mere && <p>Mère : <span className="text-white">{selected.nom_mere}</span></p>}
+                {selected.nom_pere && <p>Pï¿½re : <span className="text-white">{selected.nom_pere}</span></p>}
+                {selected.nom_mere && <p>Mï¿½re : <span className="text-white">{selected.nom_mere}</span></p>}
               </div>
 
               <div>
@@ -249,12 +249,12 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                 <div className="border border-[#DC2626]/20 rounded-lg p-3" style={{ background: 'rgba(240,163,10,0.06)' }}>
                   {selected.code_deblocage ? (
                     <>
-                      <p className="text-[10px] text-[var(--text-secondary)] mb-1">Code de déblocage :</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] mb-1">Code de dï¿½blocage :</p>
                       <p className="text-xl font-mono font-bold text-[#DC2626] tracking-widest">{selected.code_deblocage}</p>
                     </>
                   ) : (
                     <button onClick={() => handleGenCode(selected.id)} disabled={genCode} className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#DC2626]/15 text-[#DC2626] text-xs font-semibold">
-                      {genCode ? <Loader2 className="animate-spin" size={12} /> : <Unlock size={12} />} Générer code déblocage
+                      {genCode ? <Loader2 className="animate-spin" size={12} /> : <Unlock size={12} />} Gï¿½nï¿½rer code dï¿½blocage
                     </button>
                   )}
                 </div>
@@ -275,12 +275,12 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
             <motion.div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <motion.div className="w-full max-w-3xl bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl shadow-2xl" initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 16 }} onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-                  <h2 className="text-base font-bold text-[#101729]">Inscrire un étudiant</h2>
+                  <h2 className="text-base font-bold text-[#101729]">Inscrire un ï¿½tudiant</h2>
                   <button onClick={() => setShowForm(false)} className="text-[var(--text-secondary)] hover:text-[#101729]"><X size={18} /></button>
                 </div>
                 <div className="p-6 grid grid-cols-2 gap-5">
                   <div className="col-span-2"><p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Informations personnelles</p></div>
-                  {([['Prénom *', 'prenom', 'Éric'], ['Nom *', 'nom', 'MBEMBA'], ['Date de naissance', 'date_naissance', '', 'date'], ['Lieu de naissance', 'lieu_naissance', 'Brazzaville'], ['Nationalité', 'nationalite', 'Congolaise'], ['Adresse', 'adresse', '']] as [string,string,string,string?][]).map(([label, key, ph, type]) => (
+                  {([['Prï¿½nom *', 'prenom', 'ï¿½ric'], ['Nom *', 'nom', 'MBEMBA'], ['Date de naissance', 'date_naissance', '', 'date'], ['Lieu de naissance', 'lieu_naissance', 'Brazzaville'], ['Nationalitï¿½', 'nationalite', 'Congolaise'], ['Adresse', 'adresse', '']] as [string,string,string,string?][]).map(([label, key, ph, type]) => (
                     <FI key={key} label={label} value={(form as Record<string, string>)[key]} onChange={v => sf(key, v)} placeholder={ph} type={type || 'text'} />
                   ))}
                   <div>
@@ -289,12 +289,12 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                       {NIVEAUX.map(n => <option key={n.value} value={n.value} className="bg-[var(--card-bg)]">{n.label}</option>)}
                     </select>
                   </div>
-                  <FI label="Classe / Filière" value={form.classe} onChange={v => sf('classe', v)} placeholder="Terminale A, L3 Informatique…" />
-                  <FI label="Année scolaire" value={form.annee_scolaire} onChange={v => sf('annee_scolaire', v)} placeholder="2024-2025" />
-                  <FI label="Photo (URL)" value={form.photo_url} onChange={v => sf('photo_url', v)} placeholder="https://…/photo.jpg" />
+                  <FI label="Classe / Filiï¿½re" value={form.classe} onChange={v => sf('classe', v)} placeholder="Terminale A, L3 Informatiqueï¿½" />
+                  <FI label="Annï¿½e scolaire" value={form.annee_scolaire} onChange={v => sf('annee_scolaire', v)} placeholder="2024-2025" />
+                  <FI label="Photo (URL)" value={form.photo_url} onChange={v => sf('photo_url', v)} placeholder="https://ï¿½/photo.jpg" />
 
                   <div className="col-span-2 border-t border-[var(--border)] pt-4"><p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Parents & Tuteur</p></div>
-                  {([['Nom du père', 'nom_pere', ''], ['Nom de la mère', 'nom_mere', ''], ['Téléphone parent', 'tel_parent', '+242 06…'], ['Email parent', 'email_parent', ''], ['Profession', 'profession_parent', ''], ['Nom tuteur', 'nom_tuteur', ''], ['Tél tuteur', 'tel_tuteur', ''], ['Lien (ex: oncle)', 'lien_tuteur', '']] as [string,string,string][]).map(([label, key, ph]) => (
+                  {([['Nom du pï¿½re', 'nom_pere', ''], ['Nom de la mï¿½re', 'nom_mere', ''], ['Tï¿½lï¿½phone parent', 'tel_parent', '+242 06ï¿½'], ['Email parent', 'email_parent', ''], ['Profession', 'profession_parent', ''], ['Nom tuteur', 'nom_tuteur', ''], ['Tï¿½l tuteur', 'tel_tuteur', ''], ['Lien (ex: oncle)', 'lien_tuteur', '']] as [string,string,string][]).map(([label, key, ph]) => (
                     <FI key={key} label={label} value={(form as Record<string, string>)[key]} onChange={v => sf(key, v)} placeholder={ph} />
                   ))}
 
@@ -328,13 +328,13 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
   const [paieForm,     setPaieForm]     = useState({ libelle: '', montant: '', frais_id: '', methode: 'especes' })
 
   const loadFrais = useCallback(async () => {
-    const { data } = await supabase.from('frais_scolaires').select('*').eq('tenant_id', tenantId).order('ordre').order('created_at')
+    const { data } = await supabase.from('frais_scolaires').select('*').eq('tenant_id', tenantId).order('ordre').order('created_at').limit(200)
     setFrais((data ?? []) as FraisScolaire[])
   }, [tenantId])
 
   const loadPaiements = useCallback(async () => {
     if (!selectedId) return
-    const { data } = await supabase.from('paiements_scolaires').select('*').eq('etudiant_id', selectedId).order('created_at', { ascending: false })
+    const { data } = await supabase.from('paiements_scolaires').select('*').eq('etudiant_id', selectedId).order('created_at', { ascending: false }).limit(200)
     setPaiements((data ?? []) as PaiementScolaire[])
   }, [selectedId])
 
@@ -362,20 +362,20 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
     const montant = Number(paieForm.montant)
     const today   = new Date().toISOString().split('T')[0]
     const etu     = etudiants.find(e => e.id === selectedId)
-    const desc    = `Scolarité — ${paieForm.libelle}${etu ? ` — ${etu.prenom} ${etu.nom}` : ''}`
+    const desc    = `Scolaritï¿½ ï¿½ ${paieForm.libelle}${etu ? ` ï¿½ ${etu.prenom} ${etu.nom}` : ''}`
     await supabase.from('paiements_scolaires').insert({
       tenant_id: tenantId, etudiant_id: selectedId, frais_id: paieForm.frais_id || null,
       libelle: paieForm.libelle, montant, annee: new Date().getFullYear(), statut: 'paye', methode: paieForm.methode,
     })
     await supabase.from('transactions').insert({
-      tenant_id: tenantId, type: 'entree', categorie: 'Scolarité',
+      tenant_id: tenantId, type: 'entree', categorie: 'Scolaritï¿½',
       description: desc, montant, mode_paiement: paieForm.methode,
       date: today, reference: etu?.numero_id ?? null, source: 'paiement_scolaire',
     })
     await supabase.from('journal_comptable').insert({
       tenant_id: tenantId, date: today, libelle: desc,
       type: 'recette', montant_ht: montant, tva: 0, ca: 0,
-      montant_ttc: montant, categorie: '701 — Prestations éducatives',
+      montant_ttc: montant, categorie: '701 ï¿½ Prestations ï¿½ducatives',
     })
 
     // Notify parent + direction of payment received
@@ -384,8 +384,8 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
         await supabase.from('notifications').insert({
           tenant_id: tenantId, etudiant_id: selectedId,
           type: 'paiement_scolaire',
-          titre: `Paiement reçu — ${etu.prenom} ${etu.nom}`,
-          message: `Paiement de ${new Intl.NumberFormat('fr-FR').format(montant)} FCFA reçu pour « ${paieForm.libelle} ». Méthode : ${paieForm.methode}.`,
+          titre: `Paiement reï¿½u ï¿½ ${etu.prenom} ${etu.nom}`,
+          message: `Paiement de ${new Intl.NumberFormat('fr-FR').format(montant)} FCFA reï¿½u pour ï¿½ ${paieForm.libelle} ï¿½. Mï¿½thode : ${paieForm.methode}.`,
           destinataire_role: 'PARENT',
           destinataire_contact: etu.tel_parent ?? etu.email_parent ?? null,
           date_event: today, read: false,
@@ -395,8 +395,8 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
         await supabase.from('notifications').insert({
           tenant_id: tenantId, etudiant_id: selectedId,
           type: 'paiement_scolaire',
-          titre: `Paiement scolarité — ${etu.prenom} ${etu.nom}`,
-          message: `${new Intl.NumberFormat('fr-FR').format(montant)} FCFA reçus via ${paieForm.methode} — ${paieForm.libelle}.`,
+          titre: `Paiement scolaritï¿½ ï¿½ ${etu.prenom} ${etu.nom}`,
+          message: `${new Intl.NumberFormat('fr-FR').format(montant)} FCFA reï¿½us via ${paieForm.methode} ï¿½ ${paieForm.libelle}.`,
           destinataire_role: 'DIRECTION_GENERALE',
           date_event: today, read: false,
         })
@@ -418,7 +418,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
   return (
     <div className="flex gap-5">
       <div className="w-56 shrink-0 rounded-xl border border-[var(--border)] overflow-hidden h-fit" style={{ background: '#FFFFFF' }}>
-        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiants</p></div>
+        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">ï¿½tudiants</p></div>
         <div className="overflow-y-auto max-h-[520px]">
           {etudiants.map(e => (
             <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-[var(--border)] ${selectedId === e.id ? 'bg-[#DC2626]/10' : 'hover:bg-gray-50'}`}>
@@ -434,7 +434,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
 
       {!selectedEtu ? (
         <div className="flex-1 flex items-center justify-center text-[var(--text-secondary)] h-64">
-          <div className="text-center"><CreditCard size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sélectionnez un étudiant</p></div>
+          <div className="text-center"><CreditCard size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sï¿½lectionnez un ï¿½tudiant</p></div>
         </div>
       ) : (
         <div className="flex-1 min-w-0 space-y-4">
@@ -443,26 +443,26 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
               <Avatar nom={selectedEtu.nom} prenom={selectedEtu.prenom} photoUrl={selectedEtu.photo_url} size={40} />
               <div>
                 <p className="text-sm font-bold text-[#101729]">{selectedEtu.prenom} {selectedEtu.nom}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{selectedEtu.numero_id} · {selectedEtu.classe ?? selectedEtu.niveau}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{selectedEtu.numero_id} ï¿½ {selectedEtu.classe ?? selectedEtu.niveau}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-[10px] text-[var(--text-secondary)]">Total payé</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">Total payï¿½</p>
               <p className="text-lg font-bold text-[#DC2626]">{fmt(totalPaye)} FCFA</p>
             </div>
           </div>
 
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Frais configurés</p>
+              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Frais configurï¿½s</p>
               <div className="flex gap-2">
-                {frais.length === 0 && <button onClick={initFrais} className="text-[10px] text-[#DC2626] hover:underline">Initialiser frais par défaut</button>}
+                {frais.length === 0 && <button onClick={initFrais} className="text-[10px] text-[#DC2626] hover:underline">Initialiser frais par dï¿½faut</button>}
                 <button onClick={() => setShowNewFrais(p => !p)} className="text-[10px] text-[#DC2626] hover:underline flex items-center gap-1"><Plus size={10} /> Ajouter</button>
               </div>
             </div>
             {showNewFrais && (
               <div className="flex gap-2 mb-3">
-                <input className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729]" placeholder="Libellé" value={fraisForm.libelle} onChange={e => setFraisForm(p => ({ ...p, libelle: e.target.value }))} />
+                <input className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729]" placeholder="Libellï¿½" value={fraisForm.libelle} onChange={e => setFraisForm(p => ({ ...p, libelle: e.target.value }))} />
                 <input type="number" className="w-24 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] text-right" placeholder="Montant" value={fraisForm.montant} onChange={e => setFraisForm(p => ({ ...p, montant: e.target.value }))} />
                 <button onClick={addFrais} disabled={saving} className="px-3 py-1.5 rounded-md bg-[#DC2626]/15 text-[#DC2626] text-xs font-semibold"><Check size={12} /></button>
               </div>
@@ -481,13 +481,13 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
             <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Enregistrer un paiement</p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Libellé</label>
-                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={paieForm.libelle} onChange={e => setPaieForm(p => ({ ...p, libelle: e.target.value }))} placeholder="Mensualité Octobre…" />
+                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Libellï¿½</label>
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={paieForm.libelle} onChange={e => setPaieForm(p => ({ ...p, libelle: e.target.value }))} placeholder="Mensualitï¿½ Octobreï¿½" />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Frais (optionnel)</label>
                 <select className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={paieForm.frais_id} onChange={e => setPaieForm(p => ({ ...p, frais_id: e.target.value, libelle: e.target.value ? frais.find(f => f.id === e.target.value)?.libelle ?? p.libelle : p.libelle }))}>
-                  <option value="" className="bg-[var(--card-bg)]">— Manuel —</option>
+                  <option value="" className="bg-[var(--card-bg)]">ï¿½ Manuel ï¿½</option>
                   {frais.map(f => <option key={f.id} value={f.id} className="bg-[var(--card-bg)]">{f.libelle} ({fmt(f.montant)} FCFA)</option>)}
                 </select>
               </div>
@@ -496,7 +496,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
                 <input type="number" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729] text-right" value={paieForm.montant} onChange={e => setPaieForm(p => ({ ...p, montant: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Méthode</label>
+                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Mï¿½thode</label>
                 <select className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={paieForm.methode} onChange={e => setPaieForm(p => ({ ...p, methode: e.target.value }))}>
                   {['especes', 'mobile_money', 'virement', 'cheque'].map(m => <option key={m} value={m} className="bg-[var(--card-bg)]">{m.replace('_', ' ')}</option>)}
                 </select>
@@ -511,7 +511,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
               <div className="px-4 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Historique</p></div>
               <table className="w-full text-xs">
-                <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Libellé', 'Méthode', 'Montant', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Libellï¿½', 'Mï¿½thode', 'Montant', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                 <tbody>
                   {paiements.map(p => (
                     <tr key={p.id} className="border-t border-[var(--border)]">
@@ -548,7 +548,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
 
   useEffect(() => {
     if (!selectedId) return
-    supabase.from('notes_etudiants').select('*').eq('etudiant_id', selectedId)
+    supabase.from('notes_etudiants').select('*').eq('etudiant_id', selectedId).limit(200)
       .then(({ data }) => setNotes((data ?? []) as Note[]))
   }, [selectedId])
 
@@ -577,7 +577,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
   return (
     <div className="flex gap-5">
       <div className="w-52 shrink-0 rounded-xl border border-[var(--border)] overflow-hidden h-fit" style={{ background: '#FFFFFF' }}>
-        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiant</p></div>
+        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">ï¿½tudiant</p></div>
         {etudiants.map(e => (
           <button key={e.id} onClick={() => setSelectedId(e.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors border-b border-[var(--border)] ${selectedId === e.id ? 'bg-[#DC2626]/10' : 'hover:bg-gray-50'}`}>
             <Avatar nom={e.nom} prenom={e.prenom} photoUrl={e.photo_url} size={24} />
@@ -588,7 +588,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
 
       {!selectedEtu ? (
         <div className="flex-1 flex items-center justify-center text-[var(--text-secondary)]">
-          <div className="text-center"><BookOpen size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sélectionnez un étudiant</p></div>
+          <div className="text-center"><BookOpen size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sï¿½lectionnez un ï¿½tudiant</p></div>
         </div>
       ) : (
         <div className="flex-1 min-w-0 space-y-4">
@@ -613,8 +613,8 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
             <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Ajouter une note</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
               <div className="sm:col-span-2">
-                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Matière *</label>
-                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} placeholder="Mathématiques…" />
+                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Matiï¿½re *</label>
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} placeholder="Mathï¿½matiquesï¿½" />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Type</label>
@@ -643,7 +643,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
           {periodeNotes.length > 0 ? (
             <div className="rounded-xl border border-[var(--border)] overflow-hidden">
               <table className="w-full text-xs">
-                <thead><tr style={{ background: '#FFFFFF' }}>{['Matière', 'Type', 'Note', '/Max', 'Coeff.', 'Moy /20', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: '#FFFFFF' }}>{['Matiï¿½re', 'Type', 'Note', '/Max', 'Coeff.', 'Moy /20', ''].map(h => <th key={h} className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                 <tbody>
                   {periodeNotes.map(n => {
                     const moy20 = (n.note / n.note_max) * 20
@@ -654,7 +654,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
                         <td className="px-3 py-2 text-[var(--text-secondary)] capitalize">{n.type_note}</td>
                         <td className="px-3 py-2 font-bold text-[#101729]">{n.note}</td>
                         <td className="px-3 py-2 text-[var(--text-secondary)]">{n.note_max}</td>
-                        <td className="px-3 py-2 text-[var(--text-secondary)]">×{n.coefficient}</td>
+                        <td className="px-3 py-2 text-[var(--text-secondary)]">ï¿½{n.coefficient}</td>
                         <td className="px-3 py-2"><span className="font-bold px-1.5 py-0.5 rounded text-[10px]" style={{ color: m.color, background: m.color + '20' }}>{moy20.toFixed(2)}</span></td>
                         <td className="px-3 py-2"><button onClick={() => delNote(n.id)} className="text-[var(--text-secondary)] hover:text-red-400"><Trash2 size={11} /></button></td>
                       </tr>
@@ -707,14 +707,14 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
             <p className="text-xs font-bold text-[#DC2626]">Nouvelle classe</p>
             <div className="grid grid-cols-2 gap-3">
-              <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} placeholder="Terminale A, L1 Info…" />
+              <FI label="Nom *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} placeholder="Terminale A, L1 Infoï¿½" />
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Niveau</label>
                 <select value={form.niveau} onChange={e => setForm(p => ({ ...p, niveau: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   {NIVEAUX.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
                 </select>
               </div>
-              <FI label="Année scolaire" value={form.annee_scolaire} onChange={v => setForm(p => ({ ...p, annee_scolaire: v }))} />
+              <FI label="Annï¿½e scolaire" value={form.annee_scolaire} onChange={v => setForm(p => ({ ...p, annee_scolaire: v }))} />
               <FI label="Nb. places" value={form.nb_places} onChange={v => setForm(p => ({ ...p, nb_places: v }))} type="number" />
             </div>
             <div className="flex gap-2">
@@ -727,7 +727,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
         )}
       </AnimatePresence>
       {classes.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune classe enregistrée.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucune classe enregistrï¿½e.</div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {classes.map(c => {
@@ -737,7 +737,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-bold text-[#101729]">{c.nom}</p>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{niv?.label ?? c.niveau} · {c.annee_scolaire}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{niv?.label ?? c.niveau} ï¿½ {c.annee_scolaire}</p>
                   </div>
                   <button onClick={() => del(c.id)} className="text-[var(--text-secondary)] hover:text-red-400"><Trash2 size={12} /></button>
                 </div>
@@ -783,8 +783,8 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label="Total événements" value={planning.length} color="#DC2626" />
-        <KpiCard label="À venir" value={planning.filter(p => p.date_debut >= today).length} color="#0F172A" />
+        <KpiCard label="Total ï¿½vï¿½nements" value={planning.length} color="#DC2626" />
+        <KpiCard label="ï¿½ venir" value={planning.filter(p => p.date_debut >= today).length} color="#0F172A" />
         <KpiCard label="Examens" value={planning.filter(p => p.type === 'examen').length} color="#DC2626" />
       </div>
 
@@ -804,7 +804,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(240,163,10,0.04)' }}>
-            <p className="text-xs font-bold text-[#DC2626]">Nouvel événement</p>
+            <p className="text-xs font-bold text-[#DC2626]">Nouvel ï¿½vï¿½nement</p>
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
@@ -813,7 +813,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
                   {(Object.entries(TYPE_EVENT) as [TypeEvent, { label: string }][]).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>
-              <FI label="Date début *" value={form.date_debut} onChange={v => setForm(p => ({ ...p, date_debut: v }))} type="date" />
+              <FI label="Date dï¿½but *" value={form.date_debut} onChange={v => setForm(p => ({ ...p, date_debut: v }))} type="date" />
               <FI label="Date fin"     value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
               <div className="col-span-2">
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Description</label>
@@ -831,7 +831,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
       </AnimatePresence>
 
       {displayed.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun événement planifié.</div>
+        <div className="text-center py-12 text-[var(--text-secondary)] text-xs">Aucun ï¿½vï¿½nement planifiï¿½.</div>
       ) : (
         <div className="space-y-2">
           {displayed.map(p => {
@@ -874,7 +874,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
   useEffect(() => {
     if (!selectedId) return
     supabase.from('absences_etudiants').select('*').eq('etudiant_id', selectedId)
-      .order('date_absence', { ascending: false })
+      .order('date_absence', { ascending: false }).limit(200)
       .then(({ data }) => setAbsences((data ?? []) as Absence[]))
   }, [selectedId])
 
@@ -903,8 +903,8 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
         await supabase.from('notifications').insert({
           ...notifBase,
           type: 'absence_etudiant',
-          titre: `Absence — ${etu.prenom} ${etu.nom}`,
-          message: `${etu.prenom} ${etu.nom} était absent(e)${matLabel} le ${new Date(form.date_absence).toLocaleDateString('fr-FR')}${form.justifiee ? ' (justifiée)' : ''}.`,
+          titre: `Absence ï¿½ ${etu.prenom} ${etu.nom}`,
+          message: `${etu.prenom} ${etu.nom} ï¿½tait absent(e)${matLabel} le ${new Date(form.date_absence).toLocaleDateString('fr-FR')}${form.justifiee ? ' (justifiï¿½e)' : ''}.`,
           destinataire_role: 'PARENT',
           destinataire_contact: etu.tel_parent ?? etu.email_parent ?? null,
         })
@@ -913,8 +913,8 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
         await supabase.from('notifications').insert({
           ...notifBase,
           type: 'absence_etudiant',
-          titre: `Absence signalée — ${etu.prenom} ${etu.nom}`,
-          message: `Absence${matLabel} marquée le ${new Date(form.date_absence).toLocaleDateString('fr-FR')}.`,
+          titre: `Absence signalï¿½e ï¿½ ${etu.prenom} ${etu.nom}`,
+          message: `Absence${matLabel} marquï¿½e le ${new Date(form.date_absence).toLocaleDateString('fr-FR')}.`,
           destinataire_role: 'DIRECTION_GENERALE',
         })
       } catch {}
@@ -936,7 +936,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
   return (
     <div className="flex gap-5">
       <div className="w-52 shrink-0 rounded-xl border border-[var(--border)] overflow-hidden h-fit" style={{ background: '#FFFFFF' }}>
-        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Étudiant</p></div>
+        <div className="px-3 py-2 border-b border-[var(--border)]"><p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">ï¿½tudiant</p></div>
         <div className="overflow-y-auto max-h-[480px]">
           {etudiants.map(e => (
             <button key={e.id} onClick={() => setSelectedId(e.id)}
@@ -950,14 +950,14 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
 
       {!selectedEtu ? (
         <div className="flex-1 flex items-center justify-center text-[var(--text-secondary)]">
-          <div className="text-center"><ClipboardList size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sélectionnez un étudiant</p></div>
+          <div className="text-center"><ClipboardList size={28} className="mx-auto mb-2 opacity-30" /><p className="text-sm">Sï¿½lectionnez un ï¿½tudiant</p></div>
         </div>
       ) : (
         <div className="flex-1 min-w-0 space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <KpiCard label="Total absences"  value={totalAbs}            color="#DC2626" />
-            <KpiCard label="Justifiées"      value={justified}           color="#0F172A" />
-            <KpiCard label="Non justifiées"  value={totalAbs - justified} color="#DC2626" />
+            <KpiCard label="Justifiï¿½es"      value={justified}           color="#0F172A" />
+            <KpiCard label="Non justifiï¿½es"  value={totalAbs - justified} color="#DC2626" />
           </div>
 
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4">
@@ -968,17 +968,17 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
                 <input type="date" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.date_absence} onChange={e => setForm(p => ({ ...p, date_absence: e.target.value }))} />
               </div>
               <div>
-                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Matière</label>
-                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" placeholder="Mathématiques…" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} />
+                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Matiï¿½re</label>
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" placeholder="Mathï¿½matiquesï¿½" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} />
               </div>
               <div>
                 <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Motif</label>
-                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" placeholder="Maladie…" value={form.motif} onChange={e => setForm(p => ({ ...p, motif: e.target.value }))} />
+                <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" placeholder="Maladieï¿½" value={form.motif} onChange={e => setForm(p => ({ ...p, motif: e.target.value }))} />
               </div>
               <div className="flex items-end pb-1">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.justifiee} onChange={e => setForm(p => ({ ...p, justifiee: e.target.checked }))} className="accent-[#DC2626]" />
-                  <span className="text-xs text-[var(--text-secondary)]">Justifiée</span>
+                  <span className="text-xs text-[var(--text-secondary)]">Justifiï¿½e</span>
                 </label>
               </div>
             </div>
@@ -988,20 +988,20 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
           </div>
 
           {absences.length === 0 ? (
-            <div className="text-center py-8 text-[var(--text-secondary)] text-xs">Aucune absence enregistrée.</div>
+            <div className="text-center py-8 text-[var(--text-secondary)] text-xs">Aucune absence enregistrï¿½e.</div>
           ) : (
             <div className="rounded-xl border border-[var(--border)] overflow-hidden">
               <table className="w-full text-xs">
-                <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Matière', 'Motif', 'Statut', ''].map(h => <th key={h} className="text-left px-3 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: '#FFFFFF' }}>{['Date', 'Matiï¿½re', 'Motif', 'Statut', ''].map(h => <th key={h} className="text-left px-3 py-2.5 text-[10px] text-[var(--text-secondary)]">{h}</th>)}</tr></thead>
                 <tbody>
                   {absences.map(a => (
                     <tr key={a.id} className="border-t border-[var(--border)]">
                       <td className="px-3 py-2.5 text-[var(--text-secondary)]">{new Date(a.date_absence + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
-                      <td className="px-3 py-2.5 text-[#101729]">{a.matiere ?? '—'}</td>
-                      <td className="px-3 py-2.5 text-[var(--text-secondary)]">{a.motif ?? '—'}</td>
+                      <td className="px-3 py-2.5 text-[#101729]">{a.matiere ?? 'ï¿½'}</td>
+                      <td className="px-3 py-2.5 text-[var(--text-secondary)]">{a.motif ?? 'ï¿½'}</td>
                       <td className="px-3 py-2.5">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={a.justifiee ? { color: '#0F172A', background: '#0F172A20' } : { color: '#DC2626', background: '#DC262620' }}>
-                          {a.justifiee ? 'Justifiée' : 'Non justifiée'}
+                          {a.justifiee ? 'Justifiï¿½e' : 'Non justifiï¿½e'}
                         </span>
                       </td>
                       <td className="px-3 py-2.5"><button onClick={() => delAbsence(a.id)} className="text-[var(--text-secondary)] hover:text-red-400"><Trash2 size={11} /></button></td>
@@ -1042,7 +1042,7 @@ export default function ScolaritePage() {
   const [planning,    setPlanning]    = useState<PlanningEcole[]>([])
   const [enseignants, setEnseignants] = useState<Enseignant[]>([])
   const [loading,     setLoading]     = useState(true)
-  const [nomEcole,    setNomEcole]    = useState('Mon École')
+  const [nomEcole,    setNomEcole]    = useState('Mon ï¿½cole')
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -1077,7 +1077,7 @@ export default function ScolaritePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[#101729]">{t('ecole.scolarite.title')}</h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} · {etudiants.length} {t('ecole.scolarite.subtitle')}</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{nomEcole} ï¿½ {etudiants.length} {t('ecole.scolarite.subtitle')}</p>
         </div>
         <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors">
           <RefreshCw size={14} />

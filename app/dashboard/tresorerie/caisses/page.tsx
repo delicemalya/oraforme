@@ -50,7 +50,7 @@ export default function CaissesPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const { data } = await supabase.from('caisses').select('*').eq('tenant_id', tenantId).order('created_at')
+    const { data } = await supabase.from('caisses').select('*').eq('tenant_id', tenantId).order('created_at').limit(200)
     setCaisses((data || []) as Caisse[])
     setLoading(false)
   }, [tenantId])

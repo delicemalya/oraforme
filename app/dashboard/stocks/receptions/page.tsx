@@ -90,13 +90,14 @@ export default function ReceptionsPage() {
         .select('*, suppliers(nom), warehouses(nom), purchase_orders(numero)')
         .eq('tenant_id', tenantId)
         .order('date_reception', { ascending: false })
+        .limit(200)
 
       if (e1?.code === '42P01') { setReceptions([]); setLoading(false); return }
 
-      const { data: sups } = await supabase.from('suppliers').select('id, nom').eq('tenant_id', tenantId).eq('actif', true)
-      const { data: wares } = await supabase.from('warehouses').select('id, nom').eq('tenant_id', tenantId).eq('actif', true)
-      const { data: orders } = await supabase.from('purchase_orders').select('id, numero, supplier_id').eq('tenant_id', tenantId).eq('statut', 'confirmé')
-      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, unite').eq('tenant_id', tenantId)
+      const { data: sups } = await supabase.from('suppliers').select('id, nom').eq('tenant_id', tenantId).eq('actif', true).limit(200)
+      const { data: wares } = await supabase.from('warehouses').select('id, nom').eq('tenant_id', tenantId).eq('actif', true).limit(200)
+      const { data: orders } = await supabase.from('purchase_orders').select('id, numero, supplier_id').eq('tenant_id', tenantId).eq('statut', 'confirmé').limit(200)
+      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, unite').eq('tenant_id', tenantId).limit(200)
 
       setSuppliers(sups || [])
       setWarehouses(wares || [])

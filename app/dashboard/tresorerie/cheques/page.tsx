@@ -79,7 +79,7 @@ export default function ChequesPage() {
       supabase.from('cheques').select('*').eq('tenant_id', tenantId)
         .order('date_emission', { ascending: false }).limit(100),
       supabase.from('comptes_bancaires').select('id, intitule, banque')
-        .eq('tenant_id', tenantId).eq('actif', true),
+        .eq('tenant_id', tenantId).eq('actif', true).limit(200),
     ])
     setCheques(c || [])
     setComptes(cb || [])

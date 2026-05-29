@@ -78,9 +78,9 @@ export default function ProduitsPage() {
     setLoading(true)
     try {
       const [{ data: prods }, { data: cats }, { data: supps }] = await Promise.all([
-        supabase.from('products').select('*').eq('tenant_id', tenantId).order('nom'),
-        supabase.from('product_categories').select('id,nom,code').eq('tenant_id', tenantId).order('nom'),
-        supabase.from('suppliers').select('id,nom').eq('tenant_id', tenantId).order('nom'),
+        supabase.from('products').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+        supabase.from('product_categories').select('id,nom,code').eq('tenant_id', tenantId).order('nom').limit(200),
+        supabase.from('suppliers').select('id,nom').eq('tenant_id', tenantId).order('nom').limit(200),
       ])
       setProducts(prods ?? [])
       setCategories(cats ?? [])

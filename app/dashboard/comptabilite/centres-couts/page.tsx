@@ -55,11 +55,11 @@ export default function CentresCoutsPage() {
     ;(async () => {
       setLoading(true)
       const [ccR, mvR] = await Promise.all([
-        supabase.from('centres_couts').select('*').eq('tenant_id', tenantId).order('code'),
+        supabase.from('centres_couts').select('*').eq('tenant_id', tenantId).order('code').limit(200),
         supabase.from('journal_entries')
           .select('id, date_operation, libelle, debit_account, credit_account, montant, centre_cout, source')
           .eq('tenant_id', tenantId)
-          .eq('fiscal_year', year),
+          .eq('fiscal_year', year).limit(200),
       ])
       if (ccR.error?.code !== '42P01') setCentres((ccR.data || []) as CentreCout[])
       setMovements((mvR.data || []) as Movement[])
@@ -102,7 +102,7 @@ export default function CentresCoutsPage() {
       await supabase.from('centres_couts').insert(payload)
     }
     setSaving(false); setModal(false); setForm(EMPTY_FORM); setEditId(null)
-    const { data } = await supabase.from('centres_couts').select('*').eq('tenant_id', tenantId).order('code')
+    const { data } = await supabase.from('centres_couts').select('*').eq('tenant_id', tenantId).order('code').limit(200)
     setCentres((data || []) as CentreCout[])
   }
 

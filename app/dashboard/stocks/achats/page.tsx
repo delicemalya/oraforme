@@ -92,7 +92,7 @@ export default function AchatsPage() {
       setSuppliers(sups || [])
       setProducts(prods || [])
 
-      const list = (purch || []).map((p: any) => ({
+      const list = (purch || []).map((p: Purchase & { suppliers?: { nom: string } | null }) => ({
         ...p,
         supplier_nom: p.suppliers?.nom,
       }))
@@ -108,7 +108,7 @@ export default function AchatsPage() {
       .from('purchase_items')
       .select('*, products(nom, sku)')
       .eq('purchase_id', purchaseId)
-    setItems((data || []).map((i: any) => ({
+    setItems((data || []).map((i: PurchaseItem & { products?: { nom: string; sku: string } | null }) => ({
       ...i,
       product_nom: i.products?.nom,
       product_sku: i.products?.sku,
@@ -123,7 +123,7 @@ export default function AchatsPage() {
 
   const addLine = () => setForm(f => ({ ...f, lines: [...f.lines, { product_id: '', quantity: 1, unit_price: 0 }] }))
   const removeLine = (i: number) => setForm(f => ({ ...f, lines: f.lines.filter((_, idx) => idx !== i) }))
-  const updateLine = (i: number, field: string, val: any) => {
+  const updateLine = (i: number, field: keyof PurchaseItem | string, val: string | number) => {
     setForm(f => {
       const lines = [...f.lines]
       lines[i] = { ...lines[i], [field]: val }

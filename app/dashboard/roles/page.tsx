@@ -90,7 +90,7 @@ export default function RolesPage() {
   const loadRoles = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const { data } = await supabase.from('v_roles_summary').select('*').eq('tenant_id', tenantId).order('created_at')
+    const { data } = await supabase.from('v_roles_summary').select('*').eq('tenant_id', tenantId).order('created_at').limit(200)
     setRoles((data as Role[] | null) ?? [])
     setLoading(false)
   }, [tenantId])
@@ -114,7 +114,7 @@ export default function RolesPage() {
     if (!tenantId) return
     const { data } = await supabase.from('profiles')
       .select('id, user_id, role, ecole_role_name, dynamic_role_id, users:user_id(email)')
-      .eq('tenant_id', tenantId)
+      .eq('tenant_id', tenantId).limit(200)
     setMembers((data as Member[] | null) ?? [])
   }, [tenantId])
 

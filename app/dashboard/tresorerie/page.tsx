@@ -11,6 +11,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
+import { captureSupabaseError } from '@/lib/monitoring'
 import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import Link from 'next/link'
@@ -80,6 +81,9 @@ export default function TresorerieDashboard() {
       supabase.from('comptes_bancaires').select('id,banque,intitule,solde').eq('tenant_id', tenantId).eq('actif', true),
       supabase.from('wallets').select('id,operateur,intitule,solde').eq('tenant_id', tenantId).eq('actif', true),
     ])
+    captureSupabaseError('load transactions', txR.error, { module: 'tresorerie', tenant_id: tenantId })
+    captureSupabaseError('load caisses', cR.error, { module: 'tresorerie', tenant_id: tenantId })
+    captureSupabaseError('load comptes_bancaires', bR.error, { module: 'tresorerie', tenant_id: tenantId })
     setTransactions((txR.data || []) as Transaction[])
     setCaisses((cR.data || []) as Caisse[])
     setBanques((bR.data || []) as CompteBancaire[])

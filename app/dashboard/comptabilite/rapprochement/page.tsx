@@ -55,12 +55,12 @@ export default function RapprochementPage() {
           .select('id, date_operation, libelle, debit_account, credit_account, montant, source')
           .eq('tenant_id', tenantId)
           .eq('fiscal_year', year)
-          .order('date_operation'),
+          .order('date_operation').limit(200),
         supabase.from('rapprochement_bancaire')
           .select('*')
           .eq('tenant_id', tenantId)
           .eq('compte', compte)
-          .order('date_operation'),
+          .order('date_operation').limit(200),
       ])
       setMovements((mvR.data || []) as Movement[])
       if (rlR.error?.code !== '42P01') setReleve((rlR.data || []) as LigneReleve[])
@@ -121,7 +121,7 @@ export default function RapprochementPage() {
       })
     }
     const { data } = await supabase.from('rapprochement_bancaire')
-      .select('*').eq('tenant_id', tenantId).eq('compte', compte).order('date_operation')
+      .select('*').eq('tenant_id', tenantId).eq('compte', compte).order('date_operation').limit(200)
     setReleve((data || []) as LigneReleve[])
   }
 
@@ -133,7 +133,7 @@ export default function RapprochementPage() {
     })
     setSaving(false); setModalAdd(false); setNewLigne({})
     const { data } = await supabase.from('rapprochement_bancaire')
-      .select('*').eq('tenant_id', tenantId).eq('compte', compte).order('date_operation')
+      .select('*').eq('tenant_id', tenantId).eq('compte', compte).order('date_operation').limit(200)
     setReleve((data || []) as LigneReleve[])
   }
 

@@ -80,8 +80,8 @@ export default function DepensesPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     const [{ data: dep }, { data: cc }] = await Promise.all([
-      supabase.from('depenses').select('*').eq('tenant_id', tenantId).order('date', { ascending: false }),
-      supabase.from('cost_centers').select('id, code, nom').eq('tenant_id', tenantId).order('code'),
+      supabase.from('depenses').select('*').eq('tenant_id', tenantId).order('date', { ascending: false }).limit(200),
+      supabase.from('cost_centers').select('id, code, nom').eq('tenant_id', tenantId).order('code').limit(200),
     ])
     setDepenses(dep ?? [])
     setCostCenters(cc ?? [])

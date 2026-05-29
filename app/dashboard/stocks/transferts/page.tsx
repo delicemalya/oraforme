@@ -52,9 +52,9 @@ export default function TransfertsPage() {
     setLoading(true)
     try {
       const [{ data: tr }, { data: wh }, { data: pr }] = await Promise.all([
-        supabase.from('stock_transferts').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
-        supabase.from('warehouses').select('id,nom,ville').eq('tenant_id', tenantId),
-        supabase.from('products').select('id,nom,sku,unite,stock_actuel,prix_achat').eq('tenant_id', tenantId).eq('statut','actif').order('nom'),
+        supabase.from('stock_transferts').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
+        supabase.from('warehouses').select('id,nom,ville').eq('tenant_id', tenantId).limit(200),
+        supabase.from('products').select('id,nom,sku,unite,stock_actuel,prix_achat').eq('tenant_id', tenantId).eq('statut','actif').order('nom').limit(200),
       ])
       setWarehouses(wh || [])
       setProducts(pr || [])

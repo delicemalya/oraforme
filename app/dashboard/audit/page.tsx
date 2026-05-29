@@ -278,8 +278,7 @@ export default function AuditPage() {
         if (dateFrom) q = q.gte('created_at', dateFrom)
         if (dateTo)   q = q.lte('created_at', dateTo + 'T23:59:59')
         const { data } = await q.limit(200)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(data ?? []).forEach((m: any) => {
+        ;(data ?? []).forEach((m: { id: string; type: string; quantite: number; created_at: string; products?: { nom: string } | { nom: string }[] | null }) => {
           const prodNom: string = Array.isArray(m.products) ? (m.products[0]?.nom ?? 'produit') : (m.products?.nom ?? 'produit')
           all.push({
             id: m.id, action: 'CREATE', module: 'stock', niveau: 'info',
@@ -296,8 +295,7 @@ export default function AuditPage() {
         if (dateFrom) q = q.gte('created_at', dateFrom)
         if (dateTo)   q = q.lte('created_at', dateTo + 'T23:59:59')
         const { data } = await q.limit(200)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(data ?? []).forEach((tx: any) => {
+        ;(data ?? []).forEach((tx: { id: string; type: string; montant: number; description: string | null; created_at: string }) => {
           all.push({
             id: tx.id, action: 'PAYMENT', module: 'tresorerie', niveau: 'info',
             entite_label: tx.description ?? `Transaction ${tx.type}`,
@@ -312,8 +310,7 @@ export default function AuditPage() {
         if (dateFrom) q = q.gte('created_at', dateFrom)
         if (dateTo)   q = q.lte('created_at', dateTo + 'T23:59:59')
         const { data } = await q.limit(200)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(data ?? []).forEach((f: any) => {
+        ;(data ?? []).forEach((f: { id: string; total: number; statut: string; created_at: string; client_name: string | null; client_nom: string | null }) => {
           all.push({
             id: f.id, action: 'CREATE', module: 'facturation', niveau: 'info',
             entite: 'factures',

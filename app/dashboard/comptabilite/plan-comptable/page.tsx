@@ -65,6 +65,7 @@ export default function PlanComptablePage() {
         .select('*')
         .eq('tenant_id', tenantId)
         .order('numero')
+        .limit(200)
       setCustomComptes((data || []) as PlanCompte[])
       setLoading(false)
     })()
@@ -125,7 +126,7 @@ export default function PlanComptablePage() {
 
     if (err) { setError(err.message); setSaving(false); return }
 
-    const { data } = await supabase.from('plan_comptable').select('*').eq('tenant_id', tenantId).order('numero')
+    const { data } = await supabase.from('plan_comptable').select('*').eq('tenant_id', tenantId).order('numero').limit(200)
     setCustomComptes((data || []) as PlanCompte[])
     setSaveOk(true)
     setTimeout(() => { setSaveOk(false); setShowForm(false); setForm(EMPTY_FORM) }, 1200)

@@ -80,7 +80,7 @@ export default function VirementsPage() {
       supabase.from('virements').select('*').eq('tenant_id', tenantId)
         .order('created_at', { ascending: false }).limit(100),
       supabase.from('comptes_bancaires').select('id, intitule, banque, solde')
-        .eq('tenant_id', tenantId).eq('actif', true),
+        .eq('tenant_id', tenantId).eq('actif', true).limit(200),
     ])
     setVirements(v || [])
     setComptes(c || [])

@@ -75,7 +75,7 @@ export default function ClientsPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const { data } = await supabase.from('clients').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
+    const { data } = await supabase.from('clients').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200)
     setClients((data ?? []) as Client[])
     setLoading(false)
   }, [tenantId])

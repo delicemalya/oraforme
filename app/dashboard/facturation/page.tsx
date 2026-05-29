@@ -15,6 +15,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerTVACongo, formaterMontant, genererNumeroFacture } from '@/lib/fiscalite-congo'
 import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
+import { captureSupabaseError } from '@/lib/monitoring'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -325,10 +326,12 @@ export default function FacturationPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const [{ data: facs }, { data: cfg }] = await Promise.all([
+    const [{ data: facs, error: facErr }, { data: cfg, error: cfgErr }] = await Promise.all([
       supabase.from('factures').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
       supabase.from('entreprise_config').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: true }).limit(1).maybeSingle(),
     ])
+    captureSupabaseError('load factures', facErr, { module: 'facturation', tenant_id: tenantId })
+    captureSupabaseError('load entreprise_config', cfgErr, { module: 'facturation', tenant_id: tenantId })
     setFactures((facs ?? []) as Facture[])
     if (cfg) setConfig(cfg as EntrepriseConfig)
     setLoading(false)

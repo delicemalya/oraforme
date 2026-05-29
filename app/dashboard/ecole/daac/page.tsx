@@ -51,12 +51,12 @@ export default function DaacPage() {
     if (!tenantId) return
     setLoading(true)
     const [etuRes, ensRes, clRes, sesRes, dipRes, defRes, tenantRes] = await Promise.all([
-      supabase.from('etudiants').select('*').eq('tenant_id', tenantId).order('nom'),
-      supabase.from('enseignants').select('*').eq('tenant_id', tenantId).order('nom'),
-      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId).order('nom'),
-      supabase.from('sessions_ecole').select('*').eq('tenant_id', tenantId).order('date_debut', { ascending: false }),
-      supabase.from('diplomas').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
-      supabase.from('defenses').select('*').eq('tenant_id', tenantId).order('date_soutenance', { ascending: false }),
+      supabase.from('etudiants').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+      supabase.from('enseignants').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+      supabase.from('sessions_ecole').select('*').eq('tenant_id', tenantId).order('date_debut', { ascending: false }).limit(200),
+      supabase.from('diplomas').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
+      supabase.from('defenses').select('*').eq('tenant_id', tenantId).order('date_soutenance', { ascending: false }).limit(200),
       supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).limit(1).maybeSingle(),
     ])
     setEtudiants((etuRes.data ?? []) as Etudiant[])

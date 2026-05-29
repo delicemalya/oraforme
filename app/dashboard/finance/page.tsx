@@ -236,9 +236,9 @@ export default function FinancePage() {
     if (!tenantId) return
     setLTreso(true)
     const [{ data: bq }, { data: ca }, { data: mo }] = await Promise.all([
-      supabase.from('comptes_bancaires')    .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true),
-      supabase.from('caisses')              .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true),
-      supabase.from('mobile_money_wallets') .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true),
+      supabase.from('comptes_bancaires')    .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+      supabase.from('caisses')              .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+      supabase.from('mobile_money_wallets') .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
     ])
     const items: TresoItem[] = [
       ...((bq ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'banque',  nom: r.nom, solde: r.solde ?? 0 })),

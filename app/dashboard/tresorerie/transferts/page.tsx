@@ -103,9 +103,9 @@ export default function TransfertsPage() {
       const [{ data: tr }, { data: ban }, { data: cai }, { data: wal }] = await Promise.all([
         supabase.from('transferts').select('*').eq('tenant_id', tenantId)
           .order('date_transfert', { ascending: false }).limit(200),
-        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('wallets').select('id,operateur,intitule,numero,solde').eq('tenant_id', tenantId).eq('actif', true),
+        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('wallets').select('id,operateur,intitule,numero,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
       ])
       setRows(tr ?? [])
       setBanques(ban ?? [])

@@ -180,10 +180,10 @@ export default function AnalyticsRHPage() {
     ;(async () => {
       setLoading(true)
       const [empR, bulR, conR, evalR] = await Promise.all([
-        supabase.from('employes').select('*').eq('tenant_id', tenantId).order('created_at'),
+        supabase.from('employes').select('*').eq('tenant_id', tenantId).order('created_at').limit(200),
         supabase.from('bulletins_paie').select('*').eq('tenant_id', tenantId)
           .order('annee', { ascending: false }).order('mois', { ascending: false }).limit(200),
-        supabase.from('conges').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
+        supabase.from('conges').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
         supabase.from('evaluations').select('*').eq('tenant_id', tenantId)
           .order('created_at', { ascending: false }).limit(100),
       ])

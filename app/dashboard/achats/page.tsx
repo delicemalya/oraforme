@@ -41,9 +41,9 @@ export default function AchatsPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     const [{ data: f }, { data: a }, { data: cc }] = await Promise.all([
-      supabase.from('fournisseurs').select('*').eq('tenant_id', tenantId).order('nom'),
-      supabase.from('achats').select('*').eq('tenant_id', tenantId).order('date', { ascending: false }),
-      supabase.from('cost_centers').select('id, code, nom').eq('tenant_id', tenantId).order('code'),
+      supabase.from('fournisseurs').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+      supabase.from('achats').select('*').eq('tenant_id', tenantId).order('date', { ascending: false }).limit(200),
+      supabase.from('cost_centers').select('id, code, nom').eq('tenant_id', tenantId).order('code').limit(200),
     ])
     setFournisseurs(f ?? [])
     setAchats(a ?? [])

@@ -209,7 +209,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
   useEffect(() => {
     setLoading(true)
     supabase.from('journal_comptable').select('*').eq('tenant_id', tenantId)
-      .order('date', { ascending: true })
+      .order('date', { ascending: true }).limit(200)
       .then(({ data }) => { setEntries((data ?? []) as JournalEntry[]); setLoading(false) })
   }, [tenantId])
 
@@ -309,7 +309,7 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
     const start = new Date(annee, 0, 1).toISOString()
     const end   = new Date(annee, 11, 31, 23, 59, 59).toISOString()
     supabase.from('journal_comptable').select('*').eq('tenant_id', tenantId)
-      .gte('date', start.split('T')[0]).lte('date', end.split('T')[0])
+      .gte('date', start.split('T')[0]).lte('date', end.split('T')[0]).limit(200)
       .then(({ data }) => { setEntries((data ?? []) as JournalEntry[]); setLoading(false) })
   }, [tenantId, annee])
 
@@ -654,7 +654,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
   useEffect(() => {
     setLoading(true)
     supabase.from('journal_comptable').select('date, type, montant_ttc').eq('tenant_id', tenantId)
-      .order('date', { ascending: true })
+      .order('date', { ascending: true }).limit(200)
       .then(({ data: rows }) => {
         const byMonth: Record<string, { r: number; d: number }> = {}
         ;(rows ?? []).forEach(row => {

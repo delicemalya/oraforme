@@ -155,12 +155,12 @@ export default function RapportsPage() {
     const yearEnd   = `${selectedYear}-12-31`
 
     const [facRes, depRes, achRes, empRes, txRes, bpRes, fyRes] = await Promise.all([
-      supabase.from('factures').select('total, montant_ht, tva, ca, statut').eq('tenant_id', tid),
-      supabase.from('depenses').select('montant, categorie').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
-      supabase.from('achats').select('montant, statut').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
-      supabase.from('employes').select('salaire_base, statut').eq('tenant_id', tid),
-      supabase.from('transactions').select('montant, type, source, categorie').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
-      supabase.from('bulletins_paie').select('net, cnss_salarie, cnss_patronal, statut').eq('tenant_id', tid),
+      supabase.from('factures').select('total, montant_ht, tva, ca, statut').eq('tenant_id', tid).limit(200),
+      supabase.from('depenses').select('montant, categorie').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd).limit(200),
+      supabase.from('achats').select('montant, statut').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd).limit(200),
+      supabase.from('employes').select('salaire_base, statut').eq('tenant_id', tid).limit(200),
+      supabase.from('transactions').select('montant, type, source, categorie').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd).limit(200),
+      supabase.from('bulletins_paie').select('net, cnss_salarie, cnss_patronal, statut').eq('tenant_id', tid).limit(200),
       supabase.from('fiscal_years').select('solde_ouverture').eq('tenant_id', tid).eq('annee', selectedYear).maybeSingle(),
     ])
 

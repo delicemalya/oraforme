@@ -63,11 +63,11 @@ export default function CloturePage() {
         supabase.from('journal_entries')
           .select('id, date_operation, debit_account, credit_account, montant')
           .eq('tenant_id', tenantId)
-          .eq('fiscal_year', year),
+          .eq('fiscal_year', year).limit(200),
         supabase.from('clotures_comptables')
           .select('*')
           .eq('tenant_id', tenantId)
-          .eq('annee', year),
+          .eq('annee', year).limit(200),
       ])
       setMovements((mvR.data || []) as Movement[])
       if (clR.error?.code !== '42P01') setClotures((clR.data || []) as ClotureRecord[])
@@ -122,7 +122,7 @@ export default function CloturePage() {
     }
     setProcessing(null)
     const { data } = await supabase.from('clotures_comptables')
-      .select('*').eq('tenant_id', tenantId).eq('annee', year)
+      .select('*').eq('tenant_id', tenantId).eq('annee', year).limit(200)
     setClotures((data || []) as ClotureRecord[])
   }
 
@@ -136,7 +136,7 @@ export default function CloturePage() {
       .eq('annee', year)
     setProcessing(null)
     const { data } = await supabase.from('clotures_comptables')
-      .select('*').eq('tenant_id', tenantId).eq('annee', year)
+      .select('*').eq('tenant_id', tenantId).eq('annee', year).limit(200)
     setClotures((data || []) as ClotureRecord[])
   }
 

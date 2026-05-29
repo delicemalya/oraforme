@@ -10,6 +10,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { captureSupabaseError } from '@/lib/monitoring'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -286,7 +287,7 @@ export default function PaiePage() {
     if (!tenantId) return
     setLoading(true)
 
-    const [{ data: emps }, { data: buls }, { data: tenant }] = await Promise.all([
+    const [{ data: emps, error: empsErr }, { data: buls, error: bulsErr }, { data: tenant }] = await Promise.all([
       supabase
         .from('employes')
         .select('id,nom,poste,contrat,salaire_base,cnss,statut')
@@ -307,6 +308,8 @@ export default function PaiePage() {
         .maybeSingle(),
     ])
 
+    captureSupabaseError('load employes', empsErr, { module: 'rh/paie', tenant_id: tenantId })
+    captureSupabaseError('load bulletins_paie', bulsErr, { module: 'rh/paie', tenant_id: tenantId })
     if (tenant?.nom_entreprise) setEntreprise(tenant.nom_entreprise)
 
     const empList: Employe[] = emps ?? []

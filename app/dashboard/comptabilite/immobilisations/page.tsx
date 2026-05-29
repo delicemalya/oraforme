@@ -63,8 +63,8 @@ export default function ImmobilisationsPage() {
     ;(async () => {
       setLoading(true)
       const [iR, aR] = await Promise.all([
-        supabase.from('immobilisations').select('*').eq('tenant_id', tenantId).order('date_acquisition', { ascending: false }),
-        supabase.from('amortissements').select('*').eq('tenant_id', tenantId),
+        supabase.from('immobilisations').select('*').eq('tenant_id', tenantId).order('date_acquisition', { ascending: false }).limit(200),
+        supabase.from('amortissements').select('*').eq('tenant_id', tenantId).limit(200),
       ])
       if (iR.error?.code !== '42P01') setImmobs((iR.data || []) as Immobilisation[])
       if (aR.error?.code !== '42P01') setAmorts((aR.data || []) as Amortissement[])
@@ -123,7 +123,7 @@ export default function ImmobilisationsPage() {
       await supabase.from('immobilisations').insert(payload)
     }
     setSaving(false); setModal(false); setForm(EMPTY_FORM); setEditId(null)
-    const { data } = await supabase.from('immobilisations').select('*').eq('tenant_id', tenantId).order('date_acquisition', { ascending: false })
+    const { data } = await supabase.from('immobilisations').select('*').eq('tenant_id', tenantId).order('date_acquisition', { ascending: false }).limit(200)
     setImmobs((data || []) as Immobilisation[])
   }
 
@@ -138,7 +138,7 @@ export default function ImmobilisationsPage() {
       immobilisation_id: imm.id, tenant_id: tenantId,
       exercice, dotation: imm.dotation_annuelle, cumul_amort: cumul, valeur_nette: vn,
     })
-    const { data } = await supabase.from('amortissements').select('*').eq('tenant_id', tenantId)
+    const { data } = await supabase.from('amortissements').select('*').eq('tenant_id', tenantId).limit(200)
     setAmorts((data || []) as Amortissement[])
   }
 

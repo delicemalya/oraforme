@@ -819,8 +819,8 @@ export default function RecrutementPage() {
     if (!tenantId) return
     setDataLoading(true)
     const [offresRes, candidatsRes] = await Promise.all([
-      supabase.from('offres_emploi').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
-      supabase.from('cv_candidats').select('*').eq('tenant_id', tenantId).order('score', { ascending: false }),
+      supabase.from('offres_emploi').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
+      supabase.from('cv_candidats').select('*').eq('tenant_id', tenantId).order('score', { ascending: false }).limit(200),
     ])
     setOffres(offresRes.data as Offre[] ?? [])
     setCandidats(candidatsRes.data as Candidat[] ?? [])

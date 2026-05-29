@@ -89,11 +89,12 @@ export default function SortiesPage() {
         .select('*, warehouses(nom)')
         .eq('tenant_id', tenantId)
         .order('date_sortie', { ascending: false })
+        .limit(200)
 
       if (e1?.code === '42P01') { setSorties([]); setLoading(false); return }
 
-      const { data: wares } = await supabase.from('warehouses').select('id, nom').eq('tenant_id', tenantId).eq('actif', true)
-      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_vente, prix_achat, unite, stock_actuel').eq('tenant_id', tenantId)
+      const { data: wares } = await supabase.from('warehouses').select('id, nom').eq('tenant_id', tenantId).eq('actif', true).limit(200)
+      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_vente, prix_achat, unite, stock_actuel').eq('tenant_id', tenantId).limit(200)
 
       setWarehouses(wares || [])
       setProducts(prods || [])

@@ -62,9 +62,9 @@ export default function BanquesPage() {
     if (!tenantId) return
     setLoading(true)
     const [cR, chR, vR] = await Promise.all([
-      supabase.from('comptes_bancaires').select('*').eq('tenant_id', tenantId).eq('actif', true).order('created_at'),
-      supabase.from('cheques').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
-      supabase.from('virements').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
+      supabase.from('comptes_bancaires').select('*').eq('tenant_id', tenantId).eq('actif', true).order('created_at').limit(200),
+      supabase.from('cheques').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
+      supabase.from('virements').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
     ])
     setComptes((cR.data || []) as CompteBancaire[])
     setCheques((chR.data || []) as Cheque[])
