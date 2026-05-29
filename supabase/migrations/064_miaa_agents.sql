@@ -155,17 +155,14 @@ DROP VIEW IF EXISTS v_admin_dashboard CASCADE;
 
 CREATE OR REPLACE VIEW v_admin_dashboard AS
 SELECT
-  (SELECT COUNT(*) FROM tenants)                                          AS nb_tenants,
-  (SELECT COUNT(*) FROM admin_alerts WHERE lu = false)                    AS alertes_non_lues,
+  (SELECT COUNT(*) FROM tenants)                                                  AS nb_tenants,
+  (SELECT COUNT(*) FROM admin_alerts WHERE lu = false)                            AS alertes_non_lues,
   (SELECT COUNT(*) FROM admin_alerts WHERE severity = 'critique' AND lu = false) AS alertes_critiques,
   (SELECT AVG(latence_ms) FROM performance_logs
-     WHERE created_at >= NOW() - INTERVAL '1 hour')                      AS latence_avg_ms,
+     WHERE created_at >= NOW() - INTERVAL '1 hour')                              AS latence_avg_ms,
   (SELECT COUNT(*) FROM miaa_conversations
-     WHERE created_at >= NOW() - INTERVAL '24 hours')                    AS miaa_conversations_24h,
-  (SELECT COUNT(*) FROM error_logs
-     WHERE occurred_at >= NOW() - INTERVAL '24 hours'
-       AND level IN ('error','critical'))                                  AS erreurs_24h,
-  NOW()                                                                   AS calculee_a;
+     WHERE created_at >= NOW() - INTERVAL '24 hours')                            AS miaa_conversations_24h,
+  NOW()                                                                           AS calculee_a;
 
 COMMENT ON VIEW v_admin_dashboard IS
   'KPIs super-admin en temps réel. Lecture via service_role uniquement.';
