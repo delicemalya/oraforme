@@ -6,6 +6,7 @@ import {
   FileText, Plus, Trash2, Eye, Edit3, Send, Download,
   CheckCircle, Clock, AlertTriangle, XCircle, Search,
   Loader2, X, MessageCircle, Settings, ExternalLink, Mail,
+  DollarSign, RotateCcw, BarChart2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -16,7 +17,7 @@ import { calculerTVACongo, formaterMontant, genererNumeroFacture } from '@/lib/f
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type StatutFac = 'brouillon' | 'envoyee' | 'payee' | 'retard' | 'annulee'
+type StatutFac = 'brouillon' | 'envoyee' | 'payee' | 'partiellement_payee' | 'retard' | 'annulee'
 
 interface FactureLigne { id?: string; description: string; price: number; quantity: number; total: number }
 interface Facture {
@@ -37,6 +38,12 @@ interface Facture {
   notes: string | null
   statut: StatutFac
   created_at: string
+  type: 'facture' | 'proforma' | 'avoir' | 'recurrente'
+  facture_ref_id: string | null
+  remise_pct: number
+  montant_paye: number
+  moyen_paiement: string | null
+  devis_id: string | null
 }
 interface EntrepriseConfig {
   prefixe_facture: string
@@ -48,11 +55,12 @@ interface EntrepriseConfig {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const STATUT_CONFIG: Record<StatutFac, { label: string; color: string; bg: string; icon: React.ElementType }> = {
-  brouillon: { label: 'Brouillon',  color: '#64748B', bg: '#64748B18', icon: Clock },
-  envoyee:   { label: 'Envoyée',    color: '#DC2626', bg: '#DC262618', icon: Send },
-  payee:     { label: 'Payée',      color: '#0F172A', bg: '#0F172A18', icon: CheckCircle },
-  retard:    { label: 'En retard',  color: '#DC2626', bg: '#DC262618', icon: AlertTriangle },
-  annulee:   { label: 'Annulée',   color: '#64748B', bg: '#48495818', icon: XCircle },
+  brouillon:          { label: 'Brouillon',  color: '#64748B', bg: '#64748B18', icon: Clock },
+  envoyee:            { label: 'Envoyée',    color: '#DC2626', bg: '#DC262618', icon: Send },
+  payee:              { label: 'Payée',      color: '#0F172A', bg: '#0F172A18', icon: CheckCircle },
+  partiellement_payee: { label: 'Partiel',  color: '#F59E0B', bg: '#F59E0B18', icon: Clock },
+  retard:             { label: 'En retard',  color: '#DC2626', bg: '#DC262618', icon: AlertTriangle },
+  annulee:            { label: 'Annulée',   color: '#64748B', bg: '#48495818', icon: XCircle },
 }
 
 const fmt = formaterMontant
@@ -126,6 +134,154 @@ function FormInput({ label, value, onChange, placeholder, type = 'text' }: {
   )
 }
 
+// ── PaymentModal ──────────────────────────────────────────────────────────────
+
+function PaymentModal({ facture, onClose, onPaid, tenantId }: {
+  facture: Facture
+  onClose: () => void
+  onPaid: () => void
+  tenantId: string
+}) {
+  const resteARegler = facture.total - (facture.montant_paye ?? 0)
+  const [montant, setMontant] = useState(resteARegler)
+  const [mode, setMode] = useState<string>('especes')
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+  const [reference, setReference] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const modes = [
+    { value: 'especes',      label: 'Espèces' },
+    { value: 'banque',       label: 'Banque' },
+    { value: 'mobile_money', label: 'Mobile Money' },
+    { value: 'carte',        label: 'Carte' },
+    { value: 'virement',     label: 'Virement' },
+    { value: 'cheque',       label: 'Chèque' },
+  ]
+
+  const isPTotal = montant >= resteARegler
+
+  async function handlePay() {
+    if (!montant || montant <= 0) return
+    setSaving(true)
+    await supabase.from('paiements_factures').insert({
+      tenant_id: tenantId,
+      facture_id: facture.id,
+      montant: Math.min(montant, resteARegler),
+      mode_paiement: mode,
+      date,
+      reference: reference || null,
+    })
+    setSaving(false)
+    onPaid()
+    onClose()
+  }
+
+  return (
+    <>
+      <motion.div
+        className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose}
+      />
+      <motion.div
+        className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      >
+        <motion.div
+          className="relative w-full max-w-md bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl shadow-2xl"
+          initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+            <div>
+              <h3 className="text-base font-bold text-[#101729]">Encaisser un paiement</h3>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                Reste à régler : <span className="font-semibold text-[#DC2626]">{fmt(resteARegler)}</span>
+              </p>
+            </div>
+            <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><X size={18} /></button>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Mode paiement */}
+            <div>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Mode de paiement</label>
+              <select
+                value={mode}
+                onChange={e => setMode(e.target.value)}
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]"
+              >
+                {modes.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+              </select>
+            </div>
+
+            {/* Montant */}
+            <div>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Montant</label>
+              <input
+                type="number"
+                min={0}
+                max={resteARegler}
+                value={montant || ''}
+                onChange={e => setMontant(Math.min(Number(e.target.value), resteARegler))}
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7] text-right"
+              />
+              <div className="mt-1.5 flex justify-end">
+                {isPTotal
+                  ? <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: '#16A34A18', color: '#16A34A' }}>Paiement total</span>
+                  : <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: '#F59E0B18', color: '#F59E0B' }}>Paiement partiel</span>
+                }
+              </div>
+            </div>
+
+            {/* Date */}
+            <div>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Date</label>
+              <input
+                type="date"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]"
+              />
+            </div>
+
+            {/* Référence optionnelle */}
+            <div>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Référence (optionnel)</label>
+              <input
+                type="text"
+                value={reference}
+                onChange={e => setReference(e.target.value)}
+                placeholder="N° chèque, reçu mobile money…"
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] placeholder-[var(--text-secondary)] focus:outline-none focus:border-[#00b9a7]"
+              />
+            </div>
+
+            {/* Boutons */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={onClose}
+                className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] text-sm font-medium transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handlePay}
+                disabled={saving || !montant || montant <= 0}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm text-white disabled:opacity-40 transition-opacity hover:opacity-90"
+                style={{ background: '#16A34A' }}
+              >
+                {saving ? <Loader2 className="animate-spin" size={14} /> : <><DollarSign size={14} /> Enregistrer</>}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </>
+  )
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function FacturationPage() {
@@ -149,6 +305,7 @@ export default function FacturationPage() {
   const [confirmStatut,  setConfirmStatut]  = useState<{ id: string; current: StatutFac; next: StatutFac } | null>(null)
   const [saving,         setSaving]         = useState(false)
   const [dlLoading,      setDlLoading]      = useState<string | null>(null)
+  const [paymentFac,     setPaymentFac]     = useState<Facture | null>(null)
 
   // Form fields
   const [clientNom,     setClientNom]     = useState('')
@@ -326,6 +483,41 @@ export default function FacturationPage() {
     setConfirmStatut(null)
   }
 
+  // ── Avoir ─────────────────────────────────────────────────────────────────────
+
+  async function creerAvoir(facture: Facture) {
+    if (!tenantId) return
+    const { count } = await supabase.from('factures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId)
+    const avoirNum = `AV-${new Date().getFullYear()}-${String((count ?? 0) + 1).padStart(4, '0')}`
+    const { data: lignesAvoir } = await supabase.from('facture_lignes').select('*').eq('invoice_id', facture.id)
+    const { data: av } = await supabase.from('factures').insert({
+      tenant_id: tenantId,
+      invoice_number: avoirNum,
+      type: 'avoir',
+      facture_ref_id: facture.id,
+      client_name: facture.client_name ?? facture.client_nom,
+      client_nom: facture.client_name ?? facture.client_nom,
+      client_address: facture.client_address,
+      client_phone: facture.client_phone,
+      client_email: facture.client_email,
+      date: new Date().toISOString().split('T')[0],
+      subtotal: -(facture.subtotal ?? facture.montant_ht ?? 0),
+      montant_ht: -(facture.subtotal ?? facture.montant_ht ?? 0),
+      tva: -(facture.tva ?? 0),
+      ca: -(facture.ca ?? 0),
+      total: -(facture.total ?? 0),
+      notes: `Avoir sur facture ${facture.invoice_number ?? facture.id.slice(0, 8)}`,
+      statut: 'envoyee',
+    }).select('id').single()
+    if (av?.id && lignesAvoir?.length) {
+      await supabase.from('facture_lignes').insert(
+        lignesAvoir.map((l: FactureLigne) => ({ invoice_id: av.id, description: l.description, price: -l.price, quantity: l.quantity, total: -l.total }))
+      )
+    }
+    showToast('Avoir créé : ' + avoirNum)
+    load()
+  }
+
   // ── PDF ───────────────────────────────────────────────────────────────────────
 
   async function downloadPDF(id: string, num: string) {
@@ -372,7 +564,8 @@ export default function FacturationPage() {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
   const totalCeMois    = factures.filter(f => (f.date ?? f.created_at) >= startOfMonth).length
   const totalEncaisse  = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0)
-  const totalEnAttente = factures.filter(f => f.statut === 'envoyee' || f.statut === 'brouillon').reduce((s, f) => s + (f.total ?? 0), 0)
+  const totalEnAttente = factures.filter(f => f.statut === 'envoyee' || f.statut === 'brouillon' || f.statut === 'partiellement_payee').reduce((s, f) => s + (f.total ?? 0), 0)
+  const totalPartiels  = factures.filter(f => f.statut === 'partiellement_payee').length
   const totalEnRetard  = factures.filter(f => f.statut === 'retard').reduce((s, f) => s + (f.total ?? 0), 0)
 
   const viewedFac = viewId ? factures.find(f => f.id === viewId) ?? null : null
@@ -407,6 +600,12 @@ export default function FacturationPage() {
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">TVA 18 % + CA 5 % · Congo-Brazzaville</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/dashboard/devis" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#DC2626]/40 text-xs font-medium transition-colors">
+            <FileText size={13} /> Devis
+          </Link>
+          <Link href="/dashboard/facturation/rapports" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#DC2626]/40 text-xs font-medium transition-colors">
+            <BarChart2 size={13} /> Rapports
+          </Link>
           <Link href="/dashboard/parametres" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#00b9a7]/40 text-xs font-medium transition-colors">
             <Settings size={13} /> {t('invoice.settings')}
           </Link>
@@ -422,23 +621,25 @@ export default function FacturationPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <KpiCard label={t('invoice.thisMonth')} value={`${totalCeMois} facture${totalCeMois !== 1 ? 's' : ''}`} color="#DC2626"  icon={FileText} />
-        <KpiCard label={t('invoice.collected')} value={fmt(totalEncaisse)}  color="#0F172A"  icon={CheckCircle} />
+        <KpiCard label={t('invoice.collected')} value={fmt(totalEncaisse)}  color="#16A34A"  icon={CheckCircle} />
         <KpiCard label={t('invoice.waiting')}   value={fmt(totalEnAttente)} color="#DC2626"  icon={Clock} />
         <KpiCard label={t('invoice.late')}      value={fmt(totalEnRetard)}  color="#DC2626"  icon={AlertTriangle} />
+        <KpiCard label="Paiements partiels"     value={`${totalPartiels} facture${totalPartiels !== 1 ? 's' : ''}`} color="#F59E0B" icon={DollarSign} />
       </div>
 
       {/* Filters + Search */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div className="flex gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-1 flex-wrap">
           {([
-            ['toutes',    t('invoice.all')],
-            ['brouillon', t('invoice.drafts')],
-            ['envoyee',   t('invoice.sent')],
-            ['payee',     t('invoice.paid2')],
-            ['retard',    t('invoice.late')],
-            ['annulee',   t('invoice.cancelled')],
+            ['toutes',              t('invoice.all')],
+            ['brouillon',           t('invoice.drafts')],
+            ['envoyee',             t('invoice.sent')],
+            ['payee',               t('invoice.paid2')],
+            ['partiellement_payee', 'Partiel'],
+            ['retard',              t('invoice.late')],
+            ['annulee',             t('invoice.cancelled')],
           ] as const).map(([val, label]) => (
             <button
               key={val}
@@ -491,9 +692,17 @@ export default function FacturationPage() {
                       className="border-b border-[var(--border)] hover:bg-gray-50 transition-colors group"
                     >
                       <td className="px-4 py-3">
-                        <span className="text-xs font-mono font-semibold text-[#DC2626]">
-                          {f.invoice_number ?? f.id.slice(0, 8).toUpperCase()}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-mono font-semibold text-[#DC2626]">
+                            {f.invoice_number ?? f.id.slice(0, 8).toUpperCase()}
+                          </span>
+                          {f.type === 'avoir' && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#DC262618', color: '#DC2626' }}>AVOIR</span>
+                          )}
+                          {f.type === 'proforma' && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#64748B18', color: '#64748B' }}>PROFORMA</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <p className="text-sm font-medium text-[#101729]">{f.client_name ?? f.client_nom}</p>
@@ -532,6 +741,12 @@ export default function FacturationPage() {
                             icon={dlLoading === f.id ? <Loader2 className="animate-spin" size={13} /> : <Download size={13} />}
                             hoverClass="hover:text-[#DC2626]"
                           />
+                          {f.statut !== 'payee' && f.statut !== 'annulee' && (
+                            <ActionBtn title="Encaisser" onClick={() => setPaymentFac(f)} icon={<DollarSign size={13} />} hoverClass="hover:text-[#16A34A]" />
+                          )}
+                          {f.statut === 'payee' && (f.type === 'facture' || !f.type) && (
+                            <ActionBtn title="Créer un avoir" onClick={() => creerAvoir(f)} icon={<RotateCcw size={13} />} hoverClass="hover:text-[#F59E0B]" />
+                          )}
                           <ActionBtn title="Supprimer" onClick={() => del(f.id)} icon={<Trash2 size={13} />} hoverClass="hover:text-red-400" />
                         </div>
                       </td>
@@ -881,6 +1096,18 @@ export default function FacturationPage() {
               </motion.div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* ── PAYMENT MODAL ────────────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {paymentFac && tenantId && (
+          <PaymentModal
+            facture={paymentFac}
+            tenantId={tenantId}
+            onClose={() => setPaymentFac(null)}
+            onPaid={() => { load(); showToast('Paiement enregistré !') }}
+          />
         )}
       </AnimatePresence>
 
