@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerTVACongo, formaterMontant, genererNumeroFacture } from '@/lib/fiscalite-congo'
+import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -1157,6 +1158,7 @@ export default function FacturationPage() {
         )}
       </AnimatePresence>
 
+      <MIAAAssistant module="facturation" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }

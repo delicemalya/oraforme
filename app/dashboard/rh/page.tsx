@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -1221,6 +1222,7 @@ export default function RHPage() {
           {activeTab === 'rapports'  && <TabRapports employes={employes} conges={conges} />}
         </motion.div>
       </AnimatePresence>
+      <MIAAAssistant module="rh" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }

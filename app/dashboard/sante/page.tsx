@@ -10,6 +10,7 @@ import {
   Loader2, ChevronRight, Activity,
 } from 'lucide-react'
 import Link from 'next/link'
+import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 
 interface Stats {
   totalPatients: number
@@ -218,6 +219,7 @@ export default function SantePage() {
           ))}
         </div>
       </div>
+      <MIAAAssistant module="sante" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }

@@ -16,6 +16,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 
 // Types kept for backward-compat
 export type EcoleRole =
@@ -58,7 +59,7 @@ type OverviewData = {
   recentPaie: { id: string; montant: number; methode: string; libelle: string; created_at: string }[]
 }
 
-// -- KPI Card — fond neutre, icône couleur token -------------------------------
+// -- KPI Card ï¿½ fond neutre, icï¿½ne couleur token -------------------------------
 
 function StatCard({
   icon: Icon, label, value, sub, color, href, badge, i,
@@ -141,7 +142,7 @@ function RevenueCard({
           <p style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4 }}>
             {fmt(cfg.value)} <span style={{ fontSize: 16, fontWeight: 600 }}>FCFA</span>
           </p>
-          <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{cfg.sub} · {cfg.nb} paiement{cfg.nb !== 1 ? 's' : ''}</p>
+          <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{cfg.sub} ï¿½ {cfg.nb} paiement{cfg.nb !== 1 ? 's' : ''}</p>
         </div>
       </Link>
     </motion.div>
@@ -155,9 +156,9 @@ export default function EcoleOverviewPage() {
   const { t } = useLocale()
   const [data,     setData]     = useState<OverviewData | null>(null)
   const [loading,  setLoading]  = useState(true)
-  const [nomEcole, setNomEcole] = useState('École')
+  const [nomEcole, setNomEcole] = useState('ï¿½cole')
 
-  const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+  const MOIS = ['Jan', 'Fï¿½v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoï¿½', 'Sep', 'Oct', 'Nov', 'Dï¿½c']
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -278,7 +279,7 @@ export default function EcoleOverviewPage() {
   return (
     <div className="flex flex-col gap-6 pb-10">
 
-      {/* -- Banner — fond orange plat ------------------------------------------ */}
+      {/* -- Banner ï¿½ fond orange plat ------------------------------------------ */}
       <motion.div {...fade(0)} style={{ background: '#DC2626', borderRadius: 12, padding: '20px 24px' }}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
@@ -293,7 +294,7 @@ export default function EcoleOverviewPage() {
               {t('school.dashSubtitle')}
             </p>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
-              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> · {t('nav.dashboard')}
+              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> ï¿½ {t('nav.dashboard')}
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
               <Link href="/dashboard/ecole/scolarite"
@@ -326,15 +327,15 @@ export default function EcoleOverviewPage() {
       {/* -- 5 KPI Cards ------------------------------------------------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
         <StatCard i={1} icon={GraduationCap} label={t('school.enrolled')}
-          value={d.nbEtudiants} sub={`${d.nbActifs} ${t('common.active').toLowerCase()} · ${d.nbSuspendus} suspendus`}
+          value={d.nbEtudiants} sub={`${d.nbActifs} ${t('common.active').toLowerCase()} ï¿½ ${d.nbSuspendus} suspendus`}
           color="#DC2626" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% ${t('common.active').toLowerCase()}`} />
 
         <StatCard i={2} icon={Users} label={t('school.agents')}
-          value={nbAgents} sub={`${d.nbEmployes} ${t('rh.employees').toLowerCase()} · ${d.nbStaff} staff direction`}
+          value={nbAgents} sub={`${d.nbEmployes} ${t('rh.employees').toLowerCase()} ï¿½ ${d.nbStaff} staff direction`}
           color="#DC2626" href="/dashboard/ecole/rh" badge={t('rh.employees')} />
 
         <StatCard i={3} icon={BookOpen} label={t('school.trainers')}
-          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} ${t('rh.employees').toLowerCase()} · ${d.nbEnsPrestataires} prestataires`}
+          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} ${t('rh.employees').toLowerCase()} ï¿½ ${d.nbEnsPrestataires} prestataires`}
           color="#7C3AED" href="/dashboard/ecole/rh" badge={t('common.active')} />
 
         <RevenueCard i={4}
@@ -357,7 +358,7 @@ export default function EcoleOverviewPage() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{t('school.cashflowAnalysis')}</p>
-              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')} — 8 {t('school.lastMonths')}</p>
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')} ï¿½ 8 {t('school.lastMonths')}</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-secondary)' }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#DC2626' }} />
@@ -394,7 +395,7 @@ export default function EcoleOverviewPage() {
                 fontSize: 11, fontWeight: 700,
                 color: recoveryRate >= 80 ? '#DC2626' : recoveryRate >= 50 ? '#DC2626' : '#DC2626',
               }}>
-                {recoveryRate >= 80 ? `? ${t('school.onTrack')}` : recoveryRate >= 50 ? '? À surveiller' : '? Retard'}
+                {recoveryRate >= 80 ? `? ${t('school.onTrack')}` : recoveryRate >= 50 ? '? ï¿½ surveiller' : '? Retard'}
               </span>
             </div>
             <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden', marginBottom: 12 }}>
@@ -407,8 +408,8 @@ export default function EcoleOverviewPage() {
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {d.montantImpayes > 0
-                ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
-                : <>{t('school.noUnpaid')} — <strong style={{ color: '#DC2626' }}>{t('school.excellent')}</strong></>
+                ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayï¿½s sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
+                : <>{t('school.noUnpaid')} ï¿½ <strong style={{ color: '#DC2626' }}>{t('school.excellent')}</strong></>
               }
             </p>
           </div>
@@ -448,7 +449,7 @@ export default function EcoleOverviewPage() {
         </div>
       </motion.div>
 
-      {/* -- Transactions récentes ----------------------------------------------- */}
+      {/* -- Transactions rï¿½centes ----------------------------------------------- */}
       <motion.div {...fade(9)} style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
           <div>
@@ -514,20 +515,21 @@ export default function EcoleOverviewPage() {
         )}
       </motion.div>
 
-      {/* -- Alerte impayés ----------------------------------------------------- */}
+      {/* -- Alerte impayï¿½s ----------------------------------------------------- */}
       {d.nbImpayes > 0 && (
         <motion.div {...fade(10)} style={{ background: 'rgba(245,30,51,0.06)', border: '1px solid rgba(245,30,51,0.2)', borderRadius: 12, padding: '16px 20px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <AlertTriangle size={17} style={{ color: '#DC2626', flexShrink: 0, marginTop: 1 }} />
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{t('school.unpaid')} {t('common.pending').toLowerCase()}</p>
             <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA {t('school.recovery').toLowerCase()}.{' '}
+              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} ï¿½ {fmt(d.montantImpayes)} FCFA {t('school.recovery').toLowerCase()}.{' '}
               <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>{t('common.validate')} ?</Link>
             </p>
           </div>
         </motion.div>
       )}
 
+      <MIAAAssistant module="ecole" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }

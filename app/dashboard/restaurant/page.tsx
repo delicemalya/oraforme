@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
+import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 import Link from 'next/link'
 import {
   ChefHat, Plus, ShoppingCart, Trash2, CheckCircle, X,
@@ -1246,6 +1247,7 @@ export default function RestaurantPage() {
           </div>
         </div>
       )}
+      <MIAAAssistant module="restaurant" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }
