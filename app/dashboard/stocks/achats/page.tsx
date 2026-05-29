@@ -82,12 +82,12 @@ export default function AchatsPage() {
         .from('purchases')
         .select('*, suppliers(nom)')
         .eq('tenant_id', tenantId)
-        .order('date', { ascending: false })
+        .order('date', { ascending: false }).limit(200)
 
       if (e1?.code === '42P01') { setPurchases([]); setLoading(false); return }
 
-      const { data: sups } = await supabase.from('suppliers').select('id, nom, code').eq('tenant_id', tenantId).eq('actif', true)
-      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, unite').eq('tenant_id', tenantId)
+      const { data: sups } = await supabase.from('suppliers').select('id, nom, code').eq('tenant_id', tenantId).eq('actif', true).limit(200)
+      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, unite').eq('tenant_id', tenantId).limit(200)
 
       setSuppliers(sups || [])
       setProducts(prods || [])

@@ -87,12 +87,12 @@ export default function CommandesPage() {
         .from('purchase_orders')
         .select('*, suppliers(nom)')
         .eq('tenant_id', tenantId)
-        .order('date_commande', { ascending: false })
+        .order('date_commande', { ascending: false }).limit(200)
 
       if (e1?.code === '42P01') { setOrders([]); setLoading(false); return }
 
-      const { data: sups } = await supabase.from('suppliers').select('id, nom, conditions_paiement').eq('tenant_id', tenantId).eq('actif', true)
-      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, unite').eq('tenant_id', tenantId)
+      const { data: sups } = await supabase.from('suppliers').select('id, nom, conditions_paiement').eq('tenant_id', tenantId).eq('actif', true).limit(200)
+      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, unite').eq('tenant_id', tenantId).limit(200)
 
       setSuppliers(sups || [])
       setProducts(prods || [])

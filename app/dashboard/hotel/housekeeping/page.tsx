@@ -72,9 +72,9 @@ export default function HousekeepingPage() {
     const [{ data: t }, { data: c }] = await Promise.all([
       supabase.from('hotel_housekeeping')
         .select('id, chambre_id, statut, priorite, type_tache, assignee, notes, date_tache, heure_debut, heure_fin, created_at')
-        .eq('tenant_id', tenantId).gte('date_tache', today).order('priorite').order('created_at'),
+        .eq('tenant_id', tenantId).gte('date_tache', today).order('priorite').order('created_at').limit(200),
       supabase.from('hotel_chambres')
-        .select('id, numero, type').eq('tenant_id', tenantId).eq('actif', true).order('numero'),
+        .select('id, numero, type').eq('tenant_id', tenantId).eq('actif', true).order('numero').limit(200),
     ])
 
     const chambreMap = Object.fromEntries((c ?? []).map(ch => [ch.id, ch.numero]))

@@ -63,7 +63,7 @@ export default function PharmaciePage() {
       supabase.from('pharmacie_medicaments').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('actif', true),
       supabase.from('pharmacie_medicaments').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('actif', true).lte('stock_actuel', 5),
       supabase.from('pharmacie_medicaments').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('actif', true).lte('date_expiration', in30days).not('date_expiration', 'is', null),
-      supabase.from('pharmacie_ventes').select('montant_total').eq('tenant_id', tenantId).eq('statut', 'valide').gte('created_at', startMois),
+      supabase.from('pharmacie_ventes').select('montant_total').eq('tenant_id', tenantId).eq('statut', 'valide').gte('created_at', startMois).limit(200),
       supabase.from('pharmacie_medicaments').select('id, nom_commercial, dci, forme, dosage, prix_vente, stock_actuel, stock_min, date_expiration, ordonnance_requise, actif').eq('tenant_id', tenantId).eq('actif', true).order('stock_actuel').limit(10),
     ])
 

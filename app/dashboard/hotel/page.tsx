@@ -75,8 +75,8 @@ export default function HotelPage() {
     setLoading(true)
     try {
       const [{ data: ch }, { data: rs }] = await Promise.all([
-        supabase.from('hotel_chambres').select('*').eq('tenant_id', tenantId).order('numero'),
-        supabase.from('hotel_reservations').select('*').eq('tenant_id', tenantId).order('date_arrivee', { ascending: false }),
+        supabase.from('hotel_chambres').select('*').eq('tenant_id', tenantId).order('numero').limit(200),
+        supabase.from('hotel_reservations').select('*').eq('tenant_id', tenantId).order('date_arrivee', { ascending: false }).limit(200),
       ])
       setChambres(ch || [])
       setReservations(rs || [])

@@ -64,8 +64,8 @@ export default function RendezVousPage() {
         .eq('tenant_id', tenantId)
         .order('date_heure', { ascending: false })
         .limit(100),
-      supabase.from('clinique_patients').select('id, nom, prenom').eq('tenant_id', tenantId).eq('actif', true).order('nom'),
-      supabase.from('clinique_medecins').select('id, nom, prenom, specialite').eq('tenant_id', tenantId).eq('actif', true).order('nom'),
+      supabase.from('clinique_patients').select('id, nom, prenom').eq('tenant_id', tenantId).eq('actif', true).order('nom').limit(200),
+      supabase.from('clinique_medecins').select('id, nom, prenom, specialite').eq('tenant_id', tenantId).eq('actif', true).order('nom').limit(200),
     ])
     setRdvs((rdvData ?? []) as RDV[])
     setPatients(pats ?? [])

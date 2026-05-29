@@ -333,9 +333,9 @@ export default function EspaceEtudiantPage() {
     setSelected(etu)
     setLoadingData(true)
     const [{ data: n }, { data: p }, { data: a }, { data: notifData }] = await Promise.all([
-      supabase.from('notes_etudiants').select('*').eq('etudiant_id', etu.id).order('created_at', { ascending: false }),
-      supabase.from('paiements_scolaires').select('*').eq('etudiant_id', etu.id).order('created_at', { ascending: false }),
-      supabase.from('absences_etudiants').select('*').eq('etudiant_id', etu.id).order('date_absence', { ascending: false }),
+      supabase.from('notes_etudiants').select('*').eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(200),
+      supabase.from('paiements_scolaires').select('*').eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(200),
+      supabase.from('absences_etudiants').select('*').eq('etudiant_id', etu.id).order('date_absence', { ascending: false }).limit(200),
       supabase.from('notifications').select('id,titre,message,read,created_at').eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(20),
     ])
     setNotes((n ?? []) as Note[])

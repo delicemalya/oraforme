@@ -125,9 +125,9 @@ export default function DecaissementsPage() {
       const [{ data: dec }, { data: ban }, { data: cai }, { data: wal }] = await Promise.all([
         supabase.from('decaissements').select('*').eq('tenant_id', tenantId)
           .order('date_operation', { ascending: false }).limit(200),
-        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('wallets').select('id,operateur,intitule,numero,solde').eq('tenant_id', tenantId).eq('actif', true),
+        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('wallets').select('id,operateur,intitule,numero,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
       ])
       setRows(dec ?? [])
       setBanques(ban ?? [])

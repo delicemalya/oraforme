@@ -82,11 +82,11 @@ export default function InventairesPage() {
         .from('stock_inventories')
         .select('*, warehouses(nom)')
         .eq('tenant_id', tenantId)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }).limit(200)
 
       if (e1?.code === '42P01') { setInventaires([]); setLoading(false); return }
 
-      const { data: wares } = await supabase.from('warehouses').select('id, nom').eq('tenant_id', tenantId).eq('actif', true)
+      const { data: wares } = await supabase.from('warehouses').select('id, nom').eq('tenant_id', tenantId).eq('actif', true).limit(200)
       setWarehouses(wares || [])
 
       // Compute stats per inventory
@@ -119,7 +119,7 @@ export default function InventairesPage() {
       .from('stock_inventory_items')
       .select('*, products(nom, sku, unite)')
       .eq('inventaire_id', invId)
-      .order('created_at')
+      .order('created_at').limit(200)
 
     setLignes((data || []).map((l: any) => ({
       ...l,

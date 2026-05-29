@@ -73,10 +73,10 @@ export default function AnalyticsPage() {
 
       const [{ data: txs }, { data: banques }, { data: caisses }, { data: wallets }] = await Promise.all([
         supabase.from('transactions').select('date,type,montant,categorie')
-          .eq('tenant_id', tenantId).gte('date', from).lte('date', to),
-        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('wallets').select('id,intitule,operateur,solde').eq('tenant_id', tenantId).eq('actif', true),
+          .eq('tenant_id', tenantId).gte('date', from).lte('date', to).limit(200),
+        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('wallets').select('id,intitule,operateur,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
       ])
 
       // Monthly breakdown

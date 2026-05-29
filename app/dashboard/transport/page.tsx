@@ -96,7 +96,7 @@ export default function TransportPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     const [{ data: ch }, { data: co }] = await Promise.all([
-      supabase.from('chauffeurs').select('*').eq('tenant_id', tenantId).order('nom'),
+      supabase.from('chauffeurs').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
       supabase.from('courses').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(100),
     ])
     setChauffeurs(ch ?? [])

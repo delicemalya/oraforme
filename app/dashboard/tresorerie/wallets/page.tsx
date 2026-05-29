@@ -74,7 +74,7 @@ export default function WalletsPage() {
     setLoading(true)
     const { data } = await supabase
       .from('mobile_money_wallets').select('*').eq('tenant_id', tenantId)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }).limit(200)
     setWallets(data || [])
     setLoading(false)
   }, [tenantId])

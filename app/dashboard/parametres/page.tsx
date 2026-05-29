@@ -128,7 +128,7 @@ export default function ParametresPage() {
   const loadCostCenters = useCallback(async () => {
     if (!tenantId) return
     setCcLoading(true)
-    const { data } = await supabase.from('cost_centers').select('*').eq('tenant_id', tenantId).order('code')
+    const { data } = await supabase.from('cost_centers').select('*').eq('tenant_id', tenantId).order('code').limit(200)
     setCostCenters(data ?? [])
     setCcLoading(false)
   }, [tenantId])

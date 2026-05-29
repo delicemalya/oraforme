@@ -57,7 +57,7 @@ export default function MultiUnitesPage() {
     try {
       const { data, error: e } = await supabase
         .from('unit_conversions').select('*').eq('tenant_id', tenantId)
-        .order('categorie').order('unite_source')
+        .order('categorie').order('unite_source').limit(200)
       if (e?.code === '42P01') { setConversions([]); setLoading(false); return }
       setConversions(data || [])
     } catch { setConversions([]) }

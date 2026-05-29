@@ -66,8 +66,8 @@ export default function ConsultationsPage() {
         .eq('tenant_id', tenantId)
         .order('date_consult', { ascending: false })
         .limit(100),
-      supabase.from('clinique_patients').select('id, nom, prenom').eq('tenant_id', tenantId).eq('actif', true).order('nom'),
-      supabase.from('clinique_medecins').select('id, nom, prenom, specialite').eq('tenant_id', tenantId).eq('actif', true).order('nom'),
+      supabase.from('clinique_patients').select('id, nom, prenom').eq('tenant_id', tenantId).eq('actif', true).order('nom').limit(200),
+      supabase.from('clinique_medecins').select('id, nom, prenom, specialite').eq('tenant_id', tenantId).eq('actif', true).order('nom').limit(200),
     ])
     setConsults((cData ?? []) as Consultation[])
     setPatients(pats ?? [])

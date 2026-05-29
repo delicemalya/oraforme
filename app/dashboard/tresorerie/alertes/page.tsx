@@ -80,14 +80,14 @@ export default function AlertesPage() {
     setLoading(true)
     try {
       const [{ data: cfgs }, { data: alts }, { data: caisses }, { data: banques }, { data: wallets }, { data: txs }] = await Promise.all([
-        supabase.from('alertes_config').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
+        supabase.from('alertes_config').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
         supabase.from('alertes_tresorerie').select('*').eq('tenant_id', tenantId)
           .order('created_at', { ascending: false }).limit(50),
-        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true),
-        supabase.from('wallets').select('id,intitule,operateur,solde').eq('tenant_id', tenantId).eq('actif', true),
+        supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('comptes_bancaires').select('id,intitule,banque,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+        supabase.from('wallets').select('id,intitule,operateur,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
         supabase.from('transactions').select('type,montant,date').eq('tenant_id', tenantId)
-          .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10)),
+          .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10)).limit(200),
       ])
 
       if (cfgs) setConfigs(cfgs)

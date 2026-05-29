@@ -988,8 +988,8 @@ export default function RHPage() {
     if (!tenantId) return
     setLoading(true)
     const [empRes, congesRes, bulRes] = await Promise.all([
-      supabase.from('employes').select('*').eq('tenant_id', tenantId).order('nom'),
-      supabase.from('conges').select('*, employes(nom)').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
+      supabase.from('employes').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+      supabase.from('conges').select('*, employes(nom)').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
       supabase.from('bulletins_paie').select('id, employe_id, mois, annee, net, statut, created_at, employes(nom)')
         .eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(10),
     ])

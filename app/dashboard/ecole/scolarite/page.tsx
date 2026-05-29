@@ -1048,11 +1048,11 @@ export default function ScolaritePage() {
     if (!tenantId) return
     setLoading(true)
     const [{ data: etus }, { data: tenant }, { data: cls }, { data: plan }, { data: ens }] = await Promise.all([
-      supabase.from('etudiants').select('*').eq('tenant_id', tenantId).order('nom'),
+      supabase.from('etudiants').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
       supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).limit(1).maybeSingle(),
-      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId).order('nom'),
-      supabase.from('planning_ecole').select('*').eq('tenant_id', tenantId).order('date_debut'),
-      supabase.from('enseignants').select('*').eq('tenant_id', tenantId).order('nom'),
+      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+      supabase.from('planning_ecole').select('*').eq('tenant_id', tenantId).order('date_debut').limit(200),
+      supabase.from('enseignants').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
     ])
     setEtudiants((etus ?? []) as Etudiant[])
     setClasses((cls ?? []) as ClasseEcole[])

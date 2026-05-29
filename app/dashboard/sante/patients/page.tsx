@@ -70,6 +70,7 @@ export default function PatientsPage() {
       .eq('tenant_id', tenantId)
       .eq('actif', true)
       .order('created_at', { ascending: false })
+      .limit(200)
     setPatients(data ?? [])
     setLoading(false)
   }, [tenantId])

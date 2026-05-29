@@ -90,7 +90,7 @@ export default function EvaluationsPage() {
     const [evRes, empRes] = await Promise.all([
       supabase.from('evaluations').select('*, employes(nom, poste)')
         .eq('tenant_id', tenantId!).order('created_at', { ascending: false }).limit(100),
-      supabase.from('employes').select('id, nom, poste').eq('tenant_id', tenantId!).eq('statut', 'actif').order('nom'),
+      supabase.from('employes').select('id, nom, poste').eq('tenant_id', tenantId!).eq('statut', 'actif').order('nom').limit(200),
     ])
     setEvals((evRes.data  ?? []) as Evaluation[])
     setEmployes((empRes.data ?? []) as Employe[])

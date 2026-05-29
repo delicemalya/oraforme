@@ -39,7 +39,7 @@ export default function MedecinsPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const { data } = await supabase.from('clinique_medecins').select('*').eq('tenant_id', tenantId).eq('actif', true).order('nom')
+    const { data } = await supabase.from('clinique_medecins').select('*').eq('tenant_id', tenantId).eq('actif', true).order('nom').limit(200)
     setMedecins(data ?? [])
     setLoading(false)
   }, [tenantId])

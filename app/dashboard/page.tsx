@@ -75,6 +75,7 @@ export default async function DashboardPage() {
     .select('module_key')
     .eq('tenant_id', tid)
     .eq('enabled', true)
+    .limit(200)
 
   const modulesActifs: string[] =
     (tmRows && tmRows.length > 0)
@@ -101,12 +102,12 @@ export default async function DashboardPage() {
       supabase.from('factures').select('id, total', { count: 'exact' })
         .eq('tenant_id', tid).in('statut', ['brouillon', 'envoyee']),
       supabase.from('factures').select('total').eq('tenant_id', tid).eq('statut', 'payee')
-        .gte('created_at', startOfMonth.toISOString()),
+        .gte('created_at', startOfMonth.toISOString()).limit(200),
       supabase.from('factures').select('id, client_nom, total, statut, created_at')
         .eq('tenant_id', tid).order('created_at', { ascending: false }).limit(10),
       supabase.from('factures').select('created_at, total').eq('tenant_id', tid)
-        .gte('created_at', sevenDaysAgo.toISOString()),
-      supabase.from('factures').select('statut').eq('tenant_id', tid),
+        .gte('created_at', sevenDaysAgo.toISOString()).limit(200),
+      supabase.from('factures').select('statut').eq('tenant_id', tid).limit(200),
     ])
 
     nbPending     = pendingRes.count ?? 0
@@ -205,9 +206,9 @@ export default async function DashboardPage() {
     if (isFinancial) {
       const [paieRes, impayesRes] = await Promise.all([
         supabase.from('paiements_scolaires').select('montant')
-          .eq('tenant_id', tid).eq('mois', moisCourant).eq('annee', anneeCourante),
+          .eq('tenant_id', tid).eq('mois', moisCourant).eq('annee', anneeCourante).limit(200),
         supabase.from('paiements_scolaires').select('montant')
-          .eq('tenant_id', tid).eq('statut', 'en_attente'),
+          .eq('tenant_id', tid).eq('statut', 'en_attente').limit(200),
       ])
       ecoleFinancials = {
         revenusMois:         paieRes.data?.reduce((s, p) => s + Number(p.montant ?? 0), 0) ?? 0,

@@ -93,7 +93,7 @@ export default function PrevisionsPage() {
       const { data: txs } = await supabase.from('transactions')
         .select('type, montant')
         .eq('tenant_id', tenantId)
-        .gte('date', from).lt('date', to)
+        .gte('date', from).lt('date', to).limit(200)
 
       const entrees = (txs ?? []).filter(t => t.type === 'entree').reduce((s: number, t: { montant: number }) => s + t.montant, 0)
       const sorties = (txs ?? []).filter(t => t.type === 'sortie').reduce((s: number, t: { montant: number }) => s + t.montant, 0)

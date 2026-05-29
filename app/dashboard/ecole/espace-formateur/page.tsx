@@ -134,18 +134,18 @@ export default function EspaceFormateurPage() {
     setEnseignant(ens as Enseignant | null)
 
     const [clRes, hRes, cRes, dRes, eRes] = await Promise.all([
-      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId),
+      supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId).limit(200),
       ens
-        ? supabase.from('teacher_hours').select('*').eq('tenant_id', tenantId).eq('enseignant_id', ens.id).order('date_declaration', { ascending: false })
+        ? supabase.from('teacher_hours').select('*').eq('tenant_id', tenantId).eq('enseignant_id', ens.id).order('date_declaration', { ascending: false }).limit(200)
         : { data: [] },
       ens
-        ? supabase.from('cours_numeriques').select('*').eq('tenant_id', tenantId).eq('enseignant_id', ens.id).order('created_at', { ascending: false })
+        ? supabase.from('cours_numeriques').select('*').eq('tenant_id', tenantId).eq('enseignant_id', ens.id).order('created_at', { ascending: false }).limit(200)
         : { data: [] },
       ens
-        ? supabase.from('devoirs').select('*').eq('tenant_id', tenantId).eq('enseignant_id', ens.id).order('created_at', { ascending: false })
+        ? supabase.from('devoirs').select('*').eq('tenant_id', tenantId).eq('enseignant_id', ens.id).order('created_at', { ascending: false }).limit(200)
         : { data: [] },
       ens
-        ? supabase.from('exams').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false })
+        ? supabase.from('exams').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200)
         : { data: [] },
     ])
 
@@ -159,7 +159,7 @@ export default function EspaceFormateurPage() {
     if (ens) {
       const { data: emp } = await supabase.from('employes').select('id').eq('tenant_id', tenantId).ilike('email', ens.email ?? '').maybeSingle()
       if (emp) {
-        const { data: buls } = await supabase.from('bulletins_paie').select('*').eq('tenant_id', tenantId).eq('employe_id', emp.id).order('annee', { ascending: false }).order('mois', { ascending: false })
+        const { data: buls } = await supabase.from('bulletins_paie').select('*').eq('tenant_id', tenantId).eq('employe_id', emp.id).order('annee', { ascending: false }).order('mois', { ascending: false }).limit(200)
         setBulletins((buls ?? []) as BulletinPaie[])
       }
     }

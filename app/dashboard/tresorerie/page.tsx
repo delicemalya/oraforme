@@ -77,9 +77,9 @@ export default function TresorerieDashboard() {
     const [txR, cR, bR, wR] = await Promise.all([
       supabase.from('transactions').select('id,type,categorie,description,montant,date,mode_paiement,source,created_at')
         .eq('tenant_id', tenantId).gte('date', sinceStr).order('date', { ascending: false }).limit(200),
-      supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true),
-      supabase.from('comptes_bancaires').select('id,banque,intitule,solde').eq('tenant_id', tenantId).eq('actif', true),
-      supabase.from('wallets').select('id,operateur,intitule,solde').eq('tenant_id', tenantId).eq('actif', true),
+      supabase.from('caisses').select('id,nom,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+      supabase.from('comptes_bancaires').select('id,banque,intitule,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+      supabase.from('wallets').select('id,operateur,intitule,solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
     ])
     captureSupabaseError('load transactions', txR.error, { module: 'tresorerie', tenant_id: tenantId })
     captureSupabaseError('load caisses', cR.error, { module: 'tresorerie', tenant_id: tenantId })

@@ -111,12 +111,12 @@ export default function RestaurantPage() {
     if (!tenantId) return
     setLoading(true)
     const [m, c, tb, r, s, a] = await Promise.all([
-      supabase.from('resto_menu').select('*').eq('tenant_id', tenantId).order('categorie'),
+      supabase.from('resto_menu').select('*').eq('tenant_id', tenantId).order('categorie').limit(200),
       supabase.from('resto_commandes').select('*').eq('tenant_id', tenantId)
         .order('created_at', { ascending: false }).limit(100),
-      supabase.from('resto_tables').select('*').eq('tenant_id', tenantId).order('numero'),
-      supabase.from('resto_recettes').select('*').eq('tenant_id', tenantId),
-      supabase.from('stock_articles').select('id,nom,quantite,unite,seuil_alerte').eq('tenant_id', tenantId).order('nom'),
+      supabase.from('resto_tables').select('*').eq('tenant_id', tenantId).order('numero').limit(200),
+      supabase.from('resto_recettes').select('*').eq('tenant_id', tenantId).limit(200),
+      supabase.from('stock_articles').select('id,nom,quantite,unite,seuil_alerte').eq('tenant_id', tenantId).order('nom').limit(200),
       supabase.from('resto_achats').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(30),
     ])
     setMenu((m.data ?? []) as MenuItem[])

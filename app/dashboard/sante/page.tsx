@@ -82,14 +82,14 @@ export default function SantePage() {
       supabase.from('clinique_consultations').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).gte('date_consult', startMois),
       supabase.from('clinique_rdv').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('statut', 'planifie').gte('date_heure', new Date().toISOString()),
       supabase.from('clinique_patients').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).gte('created_at', startMois),
-      supabase.from('clinique_consultations').select('montant').eq('tenant_id', tenantId).gte('date_consult', startMois),
+      supabase.from('clinique_consultations').select('montant').eq('tenant_id', tenantId).gte('date_consult', startMois).limit(200),
       supabase.from('clinique_rdv')
         .select('id, date_heure, motif, statut, clinique_patients(nom, prenom, telephone), clinique_medecins(nom, prenom, specialite)')
         .eq('tenant_id', tenantId)
         .gte('date_heure', today)
         .lt('date_heure', today + 'T23:59:59')
         .not('statut', 'in', '("annule","absent")')
-        .order('date_heure'),
+        .order('date_heure').limit(200),
     ])
 
     const revenuMois = (consults ?? []).reduce((s: number, c: { montant: number }) => s + (c.montant || 0), 0)

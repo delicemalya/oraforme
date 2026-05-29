@@ -44,7 +44,7 @@ export default function MedicamentsPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
-    const { data } = await supabase.from('pharmacie_medicaments').select('*').eq('tenant_id', tenantId).eq('actif', true).order('nom_commercial')
+    const { data } = await supabase.from('pharmacie_medicaments').select('*').eq('tenant_id', tenantId).eq('actif', true).order('nom_commercial').limit(200)
     setMeds(data ?? [])
     setLoading(false)
   }, [tenantId])

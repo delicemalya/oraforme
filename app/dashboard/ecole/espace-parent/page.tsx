@@ -50,9 +50,9 @@ function DossierEtudiant({ etudiant, onBack, accentColor = '#00b9a7' }: {
     async function load() {
       setLoading(true)
       const [{ data: n }, { data: p }, { data: a }, { data: notifData }] = await Promise.all([
-        supabase.from('notes_etudiants').select('*').eq('etudiant_id', etudiant.id).order('created_at', { ascending: false }),
-        supabase.from('paiements_scolaires').select('*').eq('etudiant_id', etudiant.id).order('created_at', { ascending: false }),
-        supabase.from('absences_etudiants').select('*').eq('etudiant_id', etudiant.id).order('date_absence', { ascending: false }),
+        supabase.from('notes_etudiants').select('*').eq('etudiant_id', etudiant.id).order('created_at', { ascending: false }).limit(200),
+        supabase.from('paiements_scolaires').select('*').eq('etudiant_id', etudiant.id).order('created_at', { ascending: false }).limit(200),
+        supabase.from('absences_etudiants').select('*').eq('etudiant_id', etudiant.id).order('date_absence', { ascending: false }).limit(200),
         supabase.from('notifications').select('id,titre,message,read,created_at').eq('etudiant_id', etudiant.id).order('created_at', { ascending: false }).limit(20),
       ])
       setNotes((n ?? []) as Note[])
@@ -304,7 +304,7 @@ export default function EspaceParentPage() {
     if (role === 'PARENT' && email) {
       // Auto-load children whose parent email matches
       const { data } = await supabase.from('etudiants').select('*').eq('tenant_id', tenantId)
-        .or(`email_parent.ilike.${email},tel_parent.ilike.${email}`)
+        .or(`email_parent.ilike.${email},tel_parent.ilike.${email}`).limit(200)
       setChildren((data ?? []) as Etudiant[])
       // Auto-select if only one child
       if ((data ?? []).length === 1) setSelected((data as Etudiant[])[0])
