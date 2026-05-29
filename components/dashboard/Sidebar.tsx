@@ -72,6 +72,7 @@ const COLORS: Record<string, GroupColor> = {
   supply:      { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
   metier:      { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
   docs_ai:     { header: '#64748B', active: '#F8FAFC', text: '#334155', dot: '#64748B' },
+  collab:      { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
   params:      { header: '#475569', active: '#F1F5F9', text: '#334155', dot: '#475569' },
 }
 
