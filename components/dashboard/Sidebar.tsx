@@ -23,6 +23,7 @@ import {
   Bell, FolderOpen, Building2,
   ChevronDown, Calendar, CheckSquare,
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
+  CreditCard,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -146,6 +147,7 @@ const ICONS: Record<string, LucideIcon> = {
   pharmacie:           Pill,
   'pharmacie-meds':    Package,
   'pharmacie-ventes':  ShoppingCart,
+  abonnement:          CreditCard,
 }
 
 // ─── Module Registry ──────────────────────────────────────────────────────────
@@ -168,6 +170,7 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'pharmacie',             label: 'Pharmacie',                sublabel: 'Tableau de bord',            href: '/dashboard/pharmacie'                  },
   { id: 'pharmacie-meds',        label: 'Médicaments',              sublabel: 'Stock & catalogue',          href: '/dashboard/pharmacie/medicaments'      },
   { id: 'pharmacie-ventes',      label: 'Ventes / POS',             sublabel: 'Caisse & ordonnances',       href: '/dashboard/pharmacie/ventes'           },
+  { id: 'abonnement',            label: 'Abonnement',               sublabel: 'Plans & facturation',        href: '/dashboard/abonnement'                 },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -183,7 +186,7 @@ const SIDEBAR_GROUPS = [
   { id: 'supply',      labelKey: 'nav.supply',      icon: Package,         moduleIds: ['stock', 'achats'] },
   { id: 'docs_ai',     labelKey: 'nav.docs_ai',     icon: FolderOpen,      moduleIds: ['ged', 'bizbot'] },
   { id: 'collab',      labelKey: 'nav.collab',      icon: CheckSquare,     moduleIds: ['calendrier', 'taches'] },
-  { id: 'params',      labelKey: 'nav.params',      icon: Settings,        moduleIds: ['profil', 'parametres'] },
+  { id: 'params',      labelKey: 'nav.params',      icon: Settings,        moduleIds: ['profil', 'abonnement', 'parametres'] },
 ]
 
 // Mapping module ID → clé i18n (pour les labels des items du menu)
@@ -223,6 +226,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   pharmacie:           'nav.pharmacie',
   'pharmacie-meds':    'nav.pharmacie_meds',
   'pharmacie-ventes':  'nav.pharmacie_ventes',
+  abonnement:          'nav.abonnement',
 }
 
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
@@ -234,6 +238,7 @@ const ALL_MODULE_IDS = [
   'calendrier', 'taches',
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
+  'abonnement',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {

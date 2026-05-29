@@ -93,6 +93,7 @@ export const PLATFORM_MODULES = [
   { id: 'audit',         href: '/dashboard/audit',          label: 'Audit & Logs',     sublabel: 'Traçabilité système'    },
   { id: 'calendrier',    href: '/dashboard/calendrier',     label: 'Calendrier',       sublabel: 'Événements & planning'  },
   { id: 'taches',        href: '/dashboard/taches',         label: 'Tâches',           sublabel: 'Collaboration & suivi'  },
+  { id: 'abonnement',    href: '/dashboard/abonnement',     label: 'Abonnement',       sublabel: 'Plans & facturation'    },
   { id: 'parametres',    href: '/dashboard/parametres',     label: 'Paramètres',       sublabel: 'Configuration'          },
 ] as const
 
