@@ -84,9 +84,21 @@ END $$;
 -- =============================================================================
 
 -- factures
-CREATE INDEX IF NOT EXISTS idx_factures_tenant_date    ON factures(tenant_id, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_factures_tenant_statut  ON factures(tenant_id, statut);
-CREATE INDEX IF NOT EXISTS idx_factures_due_date       ON factures(due_date) WHERE statut NOT IN ('payee','annulee');
+CREATE INDEX IF NOT EXISTS idx_factures_tenant_date   ON factures(tenant_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_factures_tenant_statut ON factures(tenant_id, statut);
+
+-- due_date conditionnel (colonne ajoutée dans migration 010, peut être absente)
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'factures' AND column_name = 'due_date'
+  ) THEN
+    EXECUTE $idx$
+      CREATE INDEX IF NOT EXISTS idx_factures_due_date
+      ON factures(due_date) WHERE statut NOT IN ('payee','annulee')
+    $idx$;
+  END IF;
+END $$;
 
 -- transactions (ledger central)
 CREATE INDEX IF NOT EXISTS idx_transactions_tenant_date   ON transactions(tenant_id, date_operation DESC);
@@ -118,9 +130,16 @@ CREATE INDEX IF NOT EXISTS idx_products_tenant_actif  ON products(tenant_id, act
 -- profiles (clé de résolution tenant)
 CREATE INDEX IF NOT EXISTS idx_profiles_user_created  ON profiles(user_id, created_at ASC);
 
--- billing_subscriptions
-CREATE INDEX IF NOT EXISTS idx_bsub_trial_ends ON billing_subscriptions(trial_ends_at)
-  WHERE statut = 'trial' AND trial_ends_at IS NOT NULL;
+-- billing_subscriptions (conditionnel — table créée dans migration 062)
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'billing_subscriptions') THEN
+    EXECUTE $idx$
+      CREATE INDEX IF NOT EXISTS idx_bsub_trial_ends
+      ON billing_subscriptions(trial_ends_at)
+      WHERE statut = 'trial' AND trial_ends_at IS NOT NULL
+    $idx$;
+  END IF;
+END $$;
 
 
 -- =============================================================================
