@@ -303,6 +303,7 @@ export default function PaiePage() {
         .from('tenants')
         .select('nom_entreprise')
         .eq('id', tenantId)
+        .limit(1)
         .maybeSingle(),
     ])
 

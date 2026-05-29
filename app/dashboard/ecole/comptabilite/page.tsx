@@ -855,7 +855,7 @@ export default function ComptabilitePage() {
 
   useEffect(() => {
     if (!tenantId) return
-    supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).maybeSingle()
+    supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).limit(1).maybeSingle()
       .then(({ data }) => { if (data?.nom_entreprise) setNomEcole(data.nom_entreprise) })
   }, [tenantId])
 

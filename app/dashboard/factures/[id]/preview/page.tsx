@@ -101,7 +101,7 @@ export default function InvoicePreviewPage() {
     const [{ data: f }, { data: ls }, { data: cfg }] = await Promise.all([
       supabase.from('factures').select('*').eq('id', id).single(),
       supabase.from('facture_lignes').select('*').eq('invoice_id', id).order('id'),
-      supabase.from('entreprise_config').select('*').eq('tenant_id', tenantId).maybeSingle(),
+      supabase.from('entreprise_config').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: true }).limit(1).maybeSingle(),
     ])
     if (f) {
       setFacture(f as Facture)

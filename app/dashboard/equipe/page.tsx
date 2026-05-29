@@ -155,6 +155,7 @@ export default function EquipePage() {
         .from('tenants')
         .select('secteur_activite')
         .eq('id', tenantId)
+        .limit(1)
         .maybeSingle(),
       supabase
         .from('roles')

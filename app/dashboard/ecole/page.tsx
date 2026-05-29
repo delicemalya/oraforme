@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
@@ -58,7 +58,7 @@ type OverviewData = {
   recentPaie: { id: string; montant: number; methode: string; libelle: string; created_at: string }[]
 }
 
-// ── KPI Card — fond neutre, icône couleur token ───────────────────────────────
+// -- KPI Card � fond neutre, ic�ne couleur token -------------------------------
 
 function StatCard({
   icon: Icon, label, value, sub, color, href, badge, i,
@@ -96,7 +96,7 @@ function StatCard({
   )
 }
 
-// ── Revenue Card with period selector ─────────────────────────────────────────
+// -- Revenue Card with period selector -----------------------------------------
 
 function RevenueCard({
   revenuJour, revenuSemaine, revenuMois,
@@ -141,23 +141,23 @@ function RevenueCard({
           <p style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 4 }}>
             {fmt(cfg.value)} <span style={{ fontSize: 16, fontWeight: 600 }}>FCFA</span>
           </p>
-          <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{cfg.sub} · {cfg.nb} paiement{cfg.nb !== 1 ? 's' : ''}</p>
+          <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{cfg.sub} � {cfg.nb} paiement{cfg.nb !== 1 ? 's' : ''}</p>
         </div>
       </Link>
     </motion.div>
   )
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
+// -- Main Page -----------------------------------------------------------------
 
 export default function EcoleOverviewPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()
   const [data,     setData]     = useState<OverviewData | null>(null)
   const [loading,  setLoading]  = useState(true)
-  const [nomEcole, setNomEcole] = useState('École')
+  const [nomEcole, setNomEcole] = useState('�cole')
 
-  const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+  const MOIS = ['Jan', 'F�v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Ao�', 'Sep', 'Oct', 'Nov', 'D�c']
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -207,7 +207,7 @@ export default function EcoleOverviewPage() {
         .eq('date', todayStr),
       supabase.from('sessions_ecole').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('statut', 'en_cours'),
       supabase.from('planning_ecole').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).gte('date_debut', todayStr),
-      supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).maybeSingle(),
+      supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).limit(1).maybeSingle(),
     ])
 
     if (tenantRes.data?.nom_entreprise) setNomEcole(tenantRes.data.nom_entreprise)
@@ -278,12 +278,12 @@ export default function EcoleOverviewPage() {
   return (
     <div className="flex flex-col gap-6 pb-10">
 
-      {/* ── Banner — fond orange plat ────────────────────────────────────────── */}
+      {/* -- Banner � fond orange plat ------------------------------------------ */}
       <motion.div {...fade(0)} style={{ background: '#DC2626', borderRadius: 12, padding: '20px 24px' }}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{t('school.greeting')}, Admin 👋</h1>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{t('school.greeting')}, Admin ??</h1>
               <button onClick={load} style={{ color: 'rgba(255,255,255,0.5)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}
                 className="hover:opacity-80 transition-opacity">
                 <RefreshCw size={13} />
@@ -293,7 +293,7 @@ export default function EcoleOverviewPage() {
               {t('school.dashSubtitle')}
             </p>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
-              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> · {t('nav.dashboard')}
+              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> � {t('nav.dashboard')}
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
               <Link href="/dashboard/ecole/scolarite"
@@ -323,18 +323,18 @@ export default function EcoleOverviewPage() {
         </div>
       </motion.div>
 
-      {/* ── 5 KPI Cards ─────────────────────────────────────────────────────── */}
+      {/* -- 5 KPI Cards ------------------------------------------------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
         <StatCard i={1} icon={GraduationCap} label={t('school.enrolled')}
-          value={d.nbEtudiants} sub={`${d.nbActifs} ${t('common.active').toLowerCase()} · ${d.nbSuspendus} suspendus`}
+          value={d.nbEtudiants} sub={`${d.nbActifs} ${t('common.active').toLowerCase()} � ${d.nbSuspendus} suspendus`}
           color="#DC2626" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% ${t('common.active').toLowerCase()}`} />
 
         <StatCard i={2} icon={Users} label={t('school.agents')}
-          value={nbAgents} sub={`${d.nbEmployes} ${t('rh.employees').toLowerCase()} · ${d.nbStaff} staff direction`}
+          value={nbAgents} sub={`${d.nbEmployes} ${t('rh.employees').toLowerCase()} � ${d.nbStaff} staff direction`}
           color="#DC2626" href="/dashboard/ecole/rh" badge={t('rh.employees')} />
 
         <StatCard i={3} icon={BookOpen} label={t('school.trainers')}
-          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} ${t('rh.employees').toLowerCase()} · ${d.nbEnsPrestataires} prestataires`}
+          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} ${t('rh.employees').toLowerCase()} � ${d.nbEnsPrestataires} prestataires`}
           color="#7C3AED" href="/dashboard/ecole/rh" badge={t('common.active')} />
 
         <RevenueCard i={4}
@@ -347,7 +347,7 @@ export default function EcoleOverviewPage() {
           href="/dashboard/ecole/tresorerie" badge={t('finance.expenses')} />
       </div>
 
-      {/* ── Graphique + panel droit ──────────────────────────────────────────── */}
+      {/* -- Graphique + panel droit -------------------------------------------- */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
         {/* Graphique flux financiers */}
@@ -357,7 +357,7 @@ export default function EcoleOverviewPage() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{t('school.cashflowAnalysis')}</p>
-              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')} — 8 {t('school.lastMonths')}</p>
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')} � 8 {t('school.lastMonths')}</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-secondary)' }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#DC2626' }} />
@@ -394,7 +394,7 @@ export default function EcoleOverviewPage() {
                 fontSize: 11, fontWeight: 700,
                 color: recoveryRate >= 80 ? '#DC2626' : recoveryRate >= 50 ? '#DC2626' : '#DC2626',
               }}>
-                {recoveryRate >= 80 ? `✓ ${t('school.onTrack')}` : recoveryRate >= 50 ? '⚠ À surveiller' : '✗ Retard'}
+                {recoveryRate >= 80 ? `? ${t('school.onTrack')}` : recoveryRate >= 50 ? '? � surveiller' : '? Retard'}
               </span>
             </div>
             <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden', marginBottom: 12 }}>
@@ -407,8 +407,8 @@ export default function EcoleOverviewPage() {
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {d.montantImpayes > 0
-                ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
-                : <>{t('school.noUnpaid')} — <strong style={{ color: '#DC2626' }}>{t('school.excellent')}</strong></>
+                ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impay�s sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
+                : <>{t('school.noUnpaid')} � <strong style={{ color: '#DC2626' }}>{t('school.excellent')}</strong></>
               }
             </p>
           </div>
@@ -420,7 +420,7 @@ export default function EcoleOverviewPage() {
         </motion.div>
       </div>
 
-      {/* ── Raccourcis ───────────────────────────────────────────────────────── */}
+      {/* -- Raccourcis --------------------------------------------------------- */}
       <motion.div {...fade(8)}>
         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{t('school.shortcuts')}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -448,7 +448,7 @@ export default function EcoleOverviewPage() {
         </div>
       </motion.div>
 
-      {/* ── Transactions récentes ─────────────────────────────────────────────── */}
+      {/* -- Transactions r�centes ----------------------------------------------- */}
       <motion.div {...fade(9)} style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
           <div>
@@ -456,7 +456,7 @@ export default function EcoleOverviewPage() {
             <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')}</p>
           </div>
           <Link href="/dashboard/ecole/direction" style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
-            {t('common.seeAll')} →
+            {t('common.seeAll')} ?
           </Link>
         </div>
 
@@ -514,15 +514,15 @@ export default function EcoleOverviewPage() {
         )}
       </motion.div>
 
-      {/* ── Alerte impayés ───────────────────────────────────────────────────── */}
+      {/* -- Alerte impay�s ----------------------------------------------------- */}
       {d.nbImpayes > 0 && (
         <motion.div {...fade(10)} style={{ background: 'rgba(245,30,51,0.06)', border: '1px solid rgba(245,30,51,0.2)', borderRadius: 12, padding: '16px 20px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <AlertTriangle size={17} style={{ color: '#DC2626', flexShrink: 0, marginTop: 1 }} />
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{t('school.unpaid')} {t('common.pending').toLowerCase()}</p>
             <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} — {fmt(d.montantImpayes)} FCFA {t('school.recovery').toLowerCase()}.{' '}
-              <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>{t('common.validate')} →</Link>
+              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} � {fmt(d.montantImpayes)} FCFA {t('school.recovery').toLowerCase()}.{' '}
+              <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>{t('common.validate')} ?</Link>
             </p>
           </div>
         </motion.div>

@@ -325,8 +325,8 @@ export default function FacturationPage() {
     if (!tenantId) return
     setLoading(true)
     const [{ data: facs }, { data: cfg }] = await Promise.all([
-      supabase.from('factures').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
-      supabase.from('entreprise_config').select('*').eq('tenant_id', tenantId).maybeSingle(),
+      supabase.from('factures').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
+      supabase.from('entreprise_config').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: true }).limit(1).maybeSingle(),
     ])
     setFactures((facs ?? []) as Facture[])
     if (cfg) setConfig(cfg as EntrepriseConfig)

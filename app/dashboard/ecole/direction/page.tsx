@@ -662,7 +662,7 @@ export default function DirectionPage() {
     setLoading(true)
     const [{ data: etus }, { data: tenant }, { data: ens }, { data: cls }] = await Promise.all([
       supabase.from('etudiants').select('*').eq('tenant_id', tenantId).order('nom'),
-      supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).maybeSingle(),
+      supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).limit(1).maybeSingle(),
       supabase.from('enseignants').select('*').eq('tenant_id', tenantId),
       supabase.from('classes_ecole').select('*').eq('tenant_id', tenantId),
     ])

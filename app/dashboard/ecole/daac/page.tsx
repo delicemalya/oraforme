@@ -57,7 +57,7 @@ export default function DaacPage() {
       supabase.from('sessions_ecole').select('*').eq('tenant_id', tenantId).order('date_debut', { ascending: false }),
       supabase.from('diplomas').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }),
       supabase.from('defenses').select('*').eq('tenant_id', tenantId).order('date_soutenance', { ascending: false }),
-      supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).maybeSingle(),
+      supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).limit(1).maybeSingle(),
     ])
     setEtudiants((etuRes.data ?? []) as Etudiant[])
     setEnseignants((ensRes.data ?? []) as Enseignant[])

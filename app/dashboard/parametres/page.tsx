@@ -99,7 +99,7 @@ export default function ParametresPage() {
 
   const load = useCallback(async () => {
     if (!tenantId) return
-    const { data } = await supabase.from('entreprise_config').select('*').eq('tenant_id', tenantId).maybeSingle()
+    const { data } = await supabase.from('entreprise_config').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: true }).limit(1).maybeSingle()
     if (data) {
       setCfg({
         logo_url:        data.logo_url        ?? '',
@@ -163,6 +163,8 @@ export default function ParametresPage() {
       .from('entreprise_config')
       .select('id')
       .eq('tenant_id', tenantId)
+      .order('created_at', { ascending: true })
+      .limit(1)
       .maybeSingle()
 
     if (selErr) return selErr.message
