@@ -26,7 +26,7 @@ interface SubRow {
   } | null
   tenants: {
     nom_entreprise: string
-    secteur:        string | null
+    secteur_activite: string | null
   } | null
 }
 
@@ -41,7 +41,7 @@ export default async function BillingPage() {
       id, tenant_id, statut, periode, montant_actuel, montant_addons,
       trial_ends_at, next_billing_date, created_at,
       billing_plans ( code, nom, secteur_cible ),
-      tenants ( nom_entreprise, secteur )
+      tenants ( nom_entreprise, secteur_activite )
     `)
     .order('created_at', { ascending: false })
 
@@ -249,8 +249,8 @@ export default async function BillingPage() {
                       <p className="text-[13px] font-semibold text-gray-900">
                         {sub.tenants?.nom_entreprise ?? '—'}
                       </p>
-                      {sub.tenants?.secteur && (
-                        <p className="text-[11px] text-gray-400 capitalize">{sub.tenants.secteur}</p>
+                      {sub.tenants?.secteur_activite && (
+                        <p className="text-[11px] text-gray-400 capitalize">{sub.tenants.secteur_activite}</p>
                       )}
                     </td>
                     <td className="px-5 py-3.5">

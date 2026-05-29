@@ -509,7 +509,7 @@ SELECT
   s.id              AS subscription_id,
   s.tenant_id,
   t.nom_entreprise,
-  t.secteur_activite,
+  t.secteur_activite AS secteur,
   p.code            AS plan_code,
   p.nom             AS plan_nom,
   p.type            AS plan_type,
