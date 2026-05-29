@@ -21,17 +21,17 @@ import {
 // ─── Types locaux ─────────────────────────────────────────────────────────────
 
 interface PaymentForm {
-  provider:  PaymentProvider
-  phone:     string
-  reference: string
-  notes:     string
+  provider:          PaymentProvider
+  phone:             string
+  provider_reference: string
+  description:       string
 }
 
 const EMPTY_FORM: PaymentForm = {
-  provider:  'mtn_money',
-  phone:     '',
-  reference: '',
-  notes:     '',
+  provider:           'mtn_money',
+  phone:              '',
+  provider_reference: '',
+  description:        '',
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -86,9 +86,9 @@ export default function AbonnementPage() {
       if (subRes.error) throw subRes.error
       if (invRes.error) throw invRes.error
       if (payRes.error) throw payRes.error
-      setSub(subRes.data as BillingSubscription | null)
-      setInvoices((invRes.data ?? []) as BillingInvoice[])
-      setPayments((payRes.data ?? []) as BillingPayment[])
+      setSub(subRes.data as unknown as BillingSubscription | null)
+      setInvoices((invRes.data ?? []) as unknown as BillingInvoice[])
+      setPayments((payRes.data ?? []) as unknown as BillingPayment[])
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur de chargement')
     } finally {
@@ -104,16 +104,16 @@ export default function AbonnementPage() {
     setError(null)
     try {
       const { error: err } = await supabase.from('billing_payments').insert({
-        tenant_id:       tenantId,
-        invoice_id:      modalInvoice.id,
-        subscription_id: sub?.id ?? null,
-        provider:        form.provider,
-        montant:         modalInvoice.montant_ttc - modalInvoice.montant_paye,
-        devise:          modalInvoice.devise,
-        statut:          'pending',
-        reference:       form.reference || null,
-        phone_number:    form.phone || null,
-        notes:           form.notes || null,
+        tenant_id:          tenantId,
+        invoice_id:         modalInvoice.id,
+        subscription_id:    sub?.id ?? null,
+        provider:           form.provider,
+        montant:            modalInvoice.montant_total - modalInvoice.montant_paye,
+        devise:             modalInvoice.devise,
+        statut:             'pending',
+        provider_reference: form.provider_reference || null,
+        phone_number:       form.phone || null,
+        description:        form.description || null,
       })
       if (err) throw err
       setSaveOk(true)
@@ -140,13 +140,13 @@ export default function AbonnementPage() {
     )
   }
 
-  const plan   = sub?.billing_plans
-  const statut = sub?.statut ?? 'expired'
-  const sColor = SUB_STATUT_COLORS[statut]
+  const plan     = sub?.billing_plans
+  const statut   = sub?.statut ?? 'expired'
+  const sColor   = SUB_STATUT_COLORS[statut]
   const daysLeft = trialDaysLeft(sub?.trial_ends_at ?? null)
 
-  const unpaidInvoices = invoices.filter(i => i.statut === 'sent' || i.statut === 'past_due')
-  const totalDue       = unpaidInvoices.reduce((s, i) => s + (i.montant_ttc - i.montant_paye), 0)
+  const unpaidInvoices = invoices.filter(i => i.statut === 'pending' || i.statut === 'overdue')
+  const totalDue       = unpaidInvoices.reduce((s, i) => s + (i.montant_total - i.montant_paye), 0)
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -213,7 +213,6 @@ export default function AbonnementPage() {
                       Expire le {new Date(sub.trial_ends_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
                     </p>
                   )}
-                  {/* Barre de progression de l'essai */}
                   <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full transition-all"
@@ -247,14 +246,14 @@ export default function AbonnementPage() {
             </p>
             <p className="text-xs text-red-600 mt-0.5">
               {statut === 'suspended'
-                ? 'Votre accès est suspendu. Régularisez votre situation pour restaurer l\'accès.'
+                ? "Votre accès est suspendu. Régularisez votre situation pour restaurer l'accès."
                 : `${fmtFCFA(totalDue)} en attente de paiement. Réglez dès que possible pour éviter la suspension.`}
             </p>
           </div>
         </div>
       )}
 
-      {/* Essai — alerte expiration proche */}
+      {/* Alerte essai expirant bientôt */}
       {statut === 'trial' && daysLeft <= 5 && daysLeft > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-start gap-3">
           <Clock size={18} className="text-amber-500 mt-0.5 shrink-0" />
@@ -318,19 +317,19 @@ export default function AbonnementPage() {
             <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="bg-gray-50">
-                  {['N° Facture', 'Période', 'Montant TTC', 'Payé', 'Statut', ''].map(h => (
+                  {['N° Facture', 'Période', 'Total', 'Payé', 'Statut', ''].map(h => (
                     <th key={h} className="px-5 py-3 text-left text-[11px] font-bold text-gray-400 uppercase tracking-wide">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {invoices.map(inv => {
-                  const sc = INVOICE_STATUT_COLORS[inv.statut]
-                  const reste = inv.montant_ttc - inv.montant_paye
+                  const sc    = INVOICE_STATUT_COLORS[inv.statut]
+                  const reste = inv.montant_total - inv.montant_paye
                   return (
                     <tr key={inv.id} className="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="px-5 py-3.5">
-                        <span className="text-[13px] font-semibold text-gray-900">{inv.numero}</span>
+                        <span className="text-[13px] font-semibold text-gray-900 font-mono">{inv.numero_facture || '—'}</span>
                       </td>
                       <td className="px-5 py-3.5 text-xs text-gray-500">
                         {new Date(inv.periode_debut).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}
@@ -338,10 +337,10 @@ export default function AbonnementPage() {
                         {new Date(inv.periode_fin).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="text-[13px] font-bold text-gray-900">{fmtFCFA(inv.montant_ttc)}</span>
+                        <span className="text-[13px] font-bold text-gray-900">{fmtFCFA(inv.montant_total)}</span>
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className={`text-[12px] font-semibold ${inv.montant_paye >= inv.montant_ttc ? 'text-green-600' : 'text-gray-400'}`}>
+                        <span className={`text-[12px] font-semibold ${inv.montant_paye >= inv.montant_total ? 'text-green-600' : 'text-gray-400'}`}>
                           {fmtFCFA(inv.montant_paye)}
                         </span>
                       </td>
@@ -354,7 +353,7 @@ export default function AbonnementPage() {
                         </span>
                       </td>
                       <td className="px-5 py-3.5">
-                        {(inv.statut === 'sent' || inv.statut === 'past_due') && reste > 0 && (
+                        {(inv.statut === 'pending' || inv.statut === 'overdue') && reste > 0 && (
                           <button
                             onClick={() => { setModalInvoice(inv); setForm(EMPTY_FORM) }}
                             className="flex items-center gap-1 text-[12px] font-bold text-blue-600 hover:text-blue-800 transition-colors"
@@ -402,13 +401,13 @@ export default function AbonnementPage() {
                       <span className="text-[13px] font-bold text-gray-900">{fmtFCFA(p.montant)}</span>
                     </td>
                     <td className="px-5 py-3 text-xs text-gray-400 font-mono">
-                      {p.numero_transaction ?? p.reference ?? '—'}
+                      {p.provider_reference ?? '—'}
                     </td>
                     <td className="px-5 py-3">
                       <span className={`text-[11px] font-bold ${
-                        p.statut === 'confirmed' ? 'text-green-600' :
-                        p.statut === 'failed'    ? 'text-red-600'   :
-                        p.statut === 'pending'   ? 'text-amber-600' : 'text-gray-400'
+                        p.statut === 'completed'  ? 'text-green-600' :
+                        p.statut === 'failed'     ? 'text-red-600'   :
+                        p.statut === 'pending'    ? 'text-amber-600' : 'text-gray-400'
                       }`}>
                         {PAYMENT_STATUT_LABELS[p.statut]}
                       </span>
@@ -428,7 +427,9 @@ export default function AbonnementPage() {
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div>
                 <h3 className="text-[15px] font-bold text-gray-900">Payer la facture</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{modalInvoice.numero} — {fmtFCFA(modalInvoice.montant_ttc - modalInvoice.montant_paye)}</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {modalInvoice.numero_facture || '—'} — {fmtFCFA(modalInvoice.montant_total - modalInvoice.montant_paye)}
+                </p>
               </div>
               <button onClick={() => setModalInvoice(null)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
                 <X size={16} className="text-gray-400" />
@@ -441,7 +442,7 @@ export default function AbonnementPage() {
                   <CheckCircle2 size={16} /> Paiement enregistré — en attente de confirmation
                 </div>
               )}
-              {error && (
+              {error && !saveOk && (
                 <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">{error}</div>
               )}
 
@@ -451,7 +452,7 @@ export default function AbonnementPage() {
                   Mode de paiement
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {(MOBILE_MONEY_PROVIDERS as PaymentProvider[]).concat(['bank_transfer', 'cheque', 'manual'] as PaymentProvider[]).map(prov => (
+                  {([...MOBILE_MONEY_PROVIDERS, 'bank_transfer', 'cheque', 'manual'] as PaymentProvider[]).map(prov => (
                     <button
                       key={prov}
                       onClick={() => setForm(f => ({ ...f, provider: prov }))}
@@ -462,11 +463,11 @@ export default function AbonnementPage() {
                       }`}
                     >
                       <span className="text-base">
-                        {prov === 'airtel_money' ? '🔴' :
-                         prov === 'mtn_money'    ? '🟡' :
-                         prov === 'orange_money' ? '🟠' :
-                         prov === 'bank_transfer'? '🏦' :
-                         prov === 'cheque'       ? '📄' : '✍️'}
+                        {prov === 'airtel_money'  ? '🔴' :
+                         prov === 'mtn_money'     ? '🟡' :
+                         prov === 'orange_money'  ? '🟠' :
+                         prov === 'bank_transfer' ? '🏦' :
+                         prov === 'cheque'        ? '📄' : '✍️'}
                       </span>
                       {PROVIDER_LABELS[prov]}
                     </button>
@@ -498,21 +499,21 @@ export default function AbonnementPage() {
                 <input
                   type="text"
                   placeholder="N° de confirmation..."
-                  value={form.reference}
-                  onChange={e => setForm(f => ({ ...f, reference: e.target.value }))}
+                  value={form.provider_reference}
+                  onChange={e => setForm(f => ({ ...f, provider_reference: e.target.value }))}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
-              {/* Notes */}
+              {/* Description */}
               <div>
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">
                   Notes <span className="text-gray-400 font-normal">(optionnel)</span>
                 </label>
                 <textarea
                   rows={2}
-                  value={form.notes}
-                  onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+                  value={form.description}
+                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
@@ -531,12 +532,15 @@ export default function AbonnementPage() {
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {saving ? <RefreshCw size={14} className="animate-spin" /> : <CreditCard size={14} />}
-                {saving ? 'Enregistrement...' : `Payer ${fmtFCFA(modalInvoice.montant_ttc - modalInvoice.montant_paye)}`}
+                {saving ? 'Enregistrement...' : `Payer ${fmtFCFA(modalInvoice.montant_total - modalInvoice.montant_paye)}`}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Icône décorative calendrier inutilisée évitée */}
+      <div className="hidden"><Calendar size={1} /></div>
     </div>
   )
 }

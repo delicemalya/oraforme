@@ -1,6 +1,6 @@
 /**
  * lib/billing.ts — Types, constantes et utilitaires pour le moteur SaaS Billing
- * Compatible avec la migration 062_billing_saas.sql
+ * Compatible avec la migration 062_billing_saas.sql (colonnes SQL exactes)
  */
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -27,9 +27,11 @@ export type PaymentProvider =
   | 'cheque'
   | 'manual'
 
-export type InvoiceStatut = 'draft' | 'sent' | 'paid' | 'past_due' | 'cancelled'
+// Matches SQL CHECK: ('pending','paid','overdue','cancelled','refunded')
+export type InvoiceStatut = 'pending' | 'paid' | 'overdue' | 'cancelled' | 'refunded'
 
-export type PaymentStatut = 'pending' | 'processing' | 'confirmed' | 'failed' | 'refunded'
+// Matches SQL CHECK: ('pending','processing','completed','failed','refunded','cancelled')
+export type PaymentStatut = 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' | 'cancelled'
 
 export interface BillingPlan {
   id:             string
@@ -69,48 +71,50 @@ export interface BillingSubscription {
   montant_addons:        number
   stripe_subscription_id: string | null
   stripe_customer_id:    string | null
+  cancel_at_period_end:  boolean
   created_at:            string
   updated_at:            string
   billing_plans?:        BillingPlan
 }
 
+// Matches billing_invoices SQL columns exactly
 export interface BillingInvoice {
   id:              string
   tenant_id:       string
   subscription_id: string | null
-  numero:          string
+  numero_facture:  string
   statut:          InvoiceStatut
   periode_debut:   string
   periode_fin:     string
   montant_ht:      number
   tva_pct:         number
   montant_tva:     number
-  montant_ttc:     number
+  montant_total:   number
   montant_paye:    number
   devise:          string
-  date_echeance:   string | null
-  date_paiement:   string | null
+  date_echeance:   string
+  lignes:          unknown[]
   notes:           string | null
   created_at:      string
   updated_at:      string
 }
 
+// Matches billing_payments SQL columns exactly
 export interface BillingPayment {
-  id:               string
-  tenant_id:        string
-  invoice_id:       string | null
-  subscription_id:  string | null
-  provider:         PaymentProvider
-  montant:          number
-  devise:           string
-  statut:           PaymentStatut
-  reference:        string | null
-  numero_transaction: string | null
-  phone_number:     string | null
-  notes:            string | null
-  confirmed_at:     string | null
-  created_at:       string
-  updated_at:       string
+  id:                string
+  tenant_id:         string
+  invoice_id:        string | null
+  subscription_id:   string | null
+  provider:          PaymentProvider
+  montant:           number
+  devise:            string
+  statut:            PaymentStatut
+  provider_reference: string | null
+  phone_number:      string | null
+  description:       string | null
+  confirmed_at:      string | null
+  created_at:        string
+  updated_at:        string
 }
 
 // ─── Libellés ─────────────────────────────────────────────────────────────────
@@ -124,17 +128,6 @@ export const PROVIDER_LABELS: Record<PaymentProvider, string> = {
   bank_transfer: 'Virement bancaire',
   cheque:        'Chèque',
   manual:        'Paiement manuel',
-}
-
-export const PROVIDER_LOGOS: Record<PaymentProvider, string> = {
-  airtel_money:  '🔴',
-  mtn_money:     '🟡',
-  orange_money:  '🟠',
-  stripe:        '💳',
-  paypal:        '🔵',
-  bank_transfer: '🏦',
-  cheque:        '📄',
-  manual:        '✍️',
 }
 
 export const MOBILE_MONEY_PROVIDERS: PaymentProvider[] = [
@@ -162,27 +155,28 @@ export const SUB_STATUT_COLORS: Record<SubscriptionStatut, { bg: string; text: s
 }
 
 export const INVOICE_STATUT_LABELS: Record<InvoiceStatut, string> = {
-  draft:    'Brouillon',
-  sent:     'Envoyée',
+  pending:  'En attente',
   paid:     'Payée',
-  past_due: 'En retard',
+  overdue:  'En retard',
   cancelled:'Annulée',
+  refunded: 'Remboursée',
 }
 
 export const INVOICE_STATUT_COLORS: Record<InvoiceStatut, { bg: string; text: string }> = {
-  draft:    { bg: '#F9FAFB', text: '#6B7280' },
-  sent:     { bg: '#EFF6FF', text: '#2563EB' },
+  pending:  { bg: '#EFF6FF', text: '#2563EB' },
   paid:     { bg: '#F0FDF4', text: '#16A34A' },
-  past_due: { bg: '#FEF2F2', text: '#DC2626' },
+  overdue:  { bg: '#FEF2F2', text: '#DC2626' },
   cancelled:{ bg: '#F9FAFB', text: '#9CA3AF' },
+  refunded: { bg: '#F9FAFB', text: '#6B7280' },
 }
 
 export const PAYMENT_STATUT_LABELS: Record<PaymentStatut, string> = {
   pending:    'En attente',
   processing: 'En cours',
-  confirmed:  'Confirmé',
+  completed:  'Confirmé',
   failed:     'Échoué',
   refunded:   'Remboursé',
+  cancelled:  'Annulé',
 }
 
 // ─── Utilitaires ──────────────────────────────────────────────────────────────
