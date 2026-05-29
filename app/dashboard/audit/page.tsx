@@ -273,17 +273,18 @@ export default function AuditPage() {
     try {
       if (modFilter === 'all' || modFilter === 'stock') {
         let q = supabase.from('stock_movements')
-          .select('id, type, quantite, notes, created_at, product_id, products:product_id(nom)')
+          .select('id, type, quantite, created_at, products:product_id(nom)')
           .eq('tenant_id', tenantId).order('created_at', { ascending: false })
         if (dateFrom) q = q.gte('created_at', dateFrom)
         if (dateTo)   q = q.lte('created_at', dateTo + 'T23:59:59')
         const { data } = await q.limit(200)
-        ;(data ?? []).forEach((m: { id: string; type: string; quantite: number; notes?: string; created_at: string; products: { nom?: string } | null }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(data ?? []).forEach((m: any) => {
+          const prodNom: string = Array.isArray(m.products) ? (m.products[0]?.nom ?? 'produit') : (m.products?.nom ?? 'produit')
           all.push({
             id: m.id, action: 'CREATE', module: 'stock', niveau: 'info',
             entite: 'stock_movements',
-            entite_label: `Stock — ${(m.products as { nom?: string } | null)?.nom ?? 'produit'}`,
-            description: `${m.type} stock — ${(m.products as { nom?: string } | null)?.nom ?? 'produit'}`,
+            entite_label: `Stock — ${prodNom}`,
             quantite: m.quantite, created_at: m.created_at,
           })
         })
@@ -295,11 +296,11 @@ export default function AuditPage() {
         if (dateFrom) q = q.gte('created_at', dateFrom)
         if (dateTo)   q = q.lte('created_at', dateTo + 'T23:59:59')
         const { data } = await q.limit(200)
-        ;(data ?? []).forEach((tx: { id: string; type: string; montant: number; description?: string; created_at: string }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(data ?? []).forEach((tx: any) => {
           all.push({
             id: tx.id, action: 'PAYMENT', module: 'tresorerie', niveau: 'info',
             entite_label: tx.description ?? `Transaction ${tx.type}`,
-            description: tx.description ?? `Transaction ${tx.type}`,
             montant: tx.montant, created_at: tx.created_at,
           })
         })
@@ -311,12 +312,12 @@ export default function AuditPage() {
         if (dateFrom) q = q.gte('created_at', dateFrom)
         if (dateTo)   q = q.lte('created_at', dateTo + 'T23:59:59')
         const { data } = await q.limit(200)
-        ;(data ?? []).forEach((f: { id: string; total: number; statut: string; created_at: string; client_name?: string; client_nom?: string }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(data ?? []).forEach((f: any) => {
           all.push({
             id: f.id, action: 'CREATE', module: 'facturation', niveau: 'info',
             entite: 'factures',
             entite_label: `Facture — ${f.client_name ?? f.client_nom ?? 'client'}`,
-            description: `Facture — ${f.client_name ?? f.client_nom ?? 'client'}`,
             montant: f.total, created_at: f.created_at,
           })
         })

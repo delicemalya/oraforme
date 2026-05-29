@@ -426,13 +426,13 @@ BEGIN
   IF TG_OP = 'INSERT' THEN
     PERFORM fn_audit_log(
       NEW.tenant_id, 'CREATE', 'facturation', 'devis', NEW.id,
-      COALESCE(NEW.numero, NEW.id::TEXT),
+      COALESCE(NEW.devis_number, NEW.id::TEXT),
       NULL, to_jsonb(NEW), 'info', NULL
     );
   ELSIF TG_OP = 'UPDATE' THEN
     PERFORM fn_audit_log(
       NEW.tenant_id, 'UPDATE', 'facturation', 'devis', NEW.id,
-      COALESCE(NEW.numero, NEW.id::TEXT),
+      COALESCE(NEW.devis_number, NEW.id::TEXT),
       to_jsonb(OLD), to_jsonb(NEW),
       CASE WHEN OLD.statut <> NEW.statut THEN 'warning' ELSE 'info' END,
       NULL
