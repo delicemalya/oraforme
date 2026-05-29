@@ -21,7 +21,7 @@ import {
   BookMarked, Calculator, HeartHandshake, UsersRound,
   Layers, Activity, TrendingUp,
   Bell, FolderOpen, Building2,
-  ChevronDown,
+  ChevronDown, Calendar, CheckSquare,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -116,6 +116,8 @@ const ICONS: Record<string, LucideIcon> = {
   achats:        ShoppingCart,
   ged:           FolderOpen,
   bizbot:        Bot,
+  calendrier:    Calendar,
+  taches:        CheckSquare,
   profil:        Building2,
   parametres:    Settings,
   'ecole-direction':        BarChart2,
@@ -160,6 +162,7 @@ const SIDEBAR_GROUPS = [
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: UsersRound,      moduleIds: ['crm'] },
   { id: 'supply',      labelKey: 'nav.supply',      icon: Package,         moduleIds: ['stock', 'achats'] },
   { id: 'docs_ai',     labelKey: 'nav.docs_ai',     icon: FolderOpen,      moduleIds: ['ged', 'bizbot'] },
+  { id: 'collab',      labelKey: 'nav.collab',      icon: CheckSquare,     moduleIds: ['calendrier', 'taches'] },
   { id: 'params',      labelKey: 'nav.params',      icon: Settings,        moduleIds: ['profil', 'parametres'] },
 ]
 
@@ -181,6 +184,8 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   achats:       'nav.achats',
   ged:          'nav.ged',
   bizbot:       'nav.bizbot',
+  calendrier:   'nav.calendrier',
+  taches:       'nav.taches',
   profil:       'nav.profil',
   parametres:   'nav.parametres',
   ecole:        'nav.ecole',
@@ -197,6 +202,7 @@ const ALL_MODULE_IDS = [
   ...CORE_ERP_MODULES.map(m => m.id),
   ...PLATFORM_MODULES.map(m => m.id),
   'ecole', 'restaurant', 'hotel', 'transport',
+  'calendrier', 'taches',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
@@ -228,7 +234,7 @@ export default function Sidebar() {
 
   // Tous les blocs ouverts par défaut
   const [openGroups, setOpenGroups] = useState<Set<string>>(
-    new Set([...SIDEBAR_GROUPS.map(g => g.id), 'metier'])
+    new Set([...SIDEBAR_GROUPS.map(g => g.id), 'metier', 'collab'])
   )
 
   function toggleGroup(gid: string) {

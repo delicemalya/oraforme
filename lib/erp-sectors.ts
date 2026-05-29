@@ -78,6 +78,8 @@ export const PLATFORM_MODULES = [
   { id: 'profil',        href: '/dashboard/profil',         label: 'Profil Entreprise',sublabel: 'Marque & paramètres'    },
   { id: 'roles',         href: '/dashboard/roles',          label: 'Rôles & Droits',   sublabel: 'Permissions équipe'     },
   { id: 'audit',         href: '/dashboard/audit',          label: 'Audit & Logs',     sublabel: 'Traçabilité système'    },
+  { id: 'calendrier',    href: '/dashboard/calendrier',     label: 'Calendrier',       sublabel: 'Événements & planning'  },
+  { id: 'taches',        href: '/dashboard/taches',         label: 'Tâches',           sublabel: 'Collaboration & suivi'  },
   { id: 'parametres',    href: '/dashboard/parametres',     label: 'Paramètres',       sublabel: 'Configuration'          },
 ] as const
 
