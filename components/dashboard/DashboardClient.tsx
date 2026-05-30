@@ -16,6 +16,7 @@ import RevenueChart from '@/components/dashboard/RevenueChart'
 import ModuleChart from '@/components/dashboard/ModuleChart'
 import ActivityTimeline, { type ActivityItem } from '@/components/ui/ActivityTimeline'
 import { useLocale } from '@/lib/hooks/useLocale'
+import GeoDetectionBanner from '@/components/ui/GeoDetectionBanner'
 
 export interface DashboardData {
   tenant: { nom_entreprise: string; modules_actifs: string[]; plan: string }
@@ -560,6 +561,8 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
 
   return (
     <div className="space-y-6 pb-6">
+
+      <GeoDetectionBanner />
 
       {/* ── Role badge ──────────────────────────────────────────────────── */}
       {secteur === 'ecole' && ecoleRole && ecoleRole !== 'DIRECTION_GENERALE' && (() => {

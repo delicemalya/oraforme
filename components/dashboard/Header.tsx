@@ -9,6 +9,7 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import { useLocale } from '@/lib/hooks/useLocale'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
 import LanguageSelector from '@/components/ui/LanguageSelector'
+import DeviseSelector from '@/components/ui/DeviseSelector'
 
 export default function Header() {
   const { tenant } = useTenantContext()
@@ -142,6 +143,9 @@ export default function Header() {
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
+
+        {/* Sélecteur de pays / devise — géolocalisation IP + persistance localStorage */}
+        <DeviseSelector />
 
         {/* ✅ Sélecteur de langue — 8 langues via LocaleContext (sans reload) */}
         <LanguageSelector />

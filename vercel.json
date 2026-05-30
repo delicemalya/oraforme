@@ -9,6 +9,7 @@
     { "path": "/api/agents/superviseur/rapport",  "schedule": "0 7 * * *"  },
     { "path": "/api/agents/securite/backup",      "schedule": "0 1 * * *"  },
     { "path": "/api/agents/rh/bulletins",         "schedule": "0 9 25 * *" },
-    { "path": "/api/agents/ecole/impayes",        "schedule": "0 8 * * 1"  }
+    { "path": "/api/agents/ecole/impayes",        "schedule": "0 8 * * 1"  },
+    { "path": "/api/agents/restaurant/cloture",   "schedule": "59 23 * * *" }
   ]
 }
