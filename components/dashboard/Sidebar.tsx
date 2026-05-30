@@ -23,7 +23,7 @@ import {
   Bell, FolderOpen, Building2,
   ChevronDown, Calendar, CheckSquare,
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
-  CreditCard, LineChart,
+  CreditCard, LineChart, Zap, Key, Landmark,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -76,6 +76,7 @@ const COLORS: Record<string, GroupColor> = {
   metier:      { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
   docs_ai:     { header: '#64748B', active: '#F8FAFC', text: '#334155', dot: '#64748B' },
   collab:      { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
+  platform:    { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
   params:      { header: '#475569', active: '#F1F5F9', text: '#334155', dot: '#475569' },
 }
 
@@ -155,6 +156,7 @@ const ICONS: Record<string, LucideIcon> = {
   'pharmacie-meds':    Package,
   'pharmacie-ventes':  ShoppingCart,
   abonnement:          CreditCard,
+  fiscalite:           Landmark,
 }
 
 // ─── Module Registry ──────────────────────────────────────────────────────────
@@ -184,6 +186,9 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'pharmacie-meds',        label: 'Médicaments',              sublabel: 'Stock & catalogue',          href: '/dashboard/pharmacie/medicaments'      },
   { id: 'pharmacie-ventes',      label: 'Ventes / POS',             sublabel: 'Caisse & ordonnances',       href: '/dashboard/pharmacie/ventes'           },
   { id: 'abonnement',            label: 'Abonnement',               sublabel: 'Plans & facturation',        href: '/dashboard/abonnement'                 },
+  { id: 'workflows',             label: 'Workflows',                sublabel: 'Automatisations',            href: '/dashboard/workflows'                  },
+  { id: 'api-keys',              label: 'Clés API',                 sublabel: 'Intégrations externes',      href: '/dashboard/api-keys'                   },
+  { id: 'fiscalite',             label: 'Fiscalité',                sublabel: 'Déclarations & taxes',       href: '/dashboard/fiscalite'                  },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -194,12 +199,13 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 const SIDEBAR_GROUPS = [
   { id: 'bi',          labelKey: 'nav.bi',           icon: LineChart,       moduleIds: ['bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'] },
   { id: 'pilotage',    labelKey: 'nav.pilotage',    icon: LayoutDashboard, moduleIds: ['direction', 'finance', 'analytics', 'audit', 'notifications'] },
-  { id: 'finance_ops', labelKey: 'nav.finance_ops', icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses'] },
+  { id: 'finance_ops', labelKey: 'nav.finance_ops', icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   { id: 'rh_org',      labelKey: 'nav.rh_org',      icon: Users,           moduleIds: ['rh', 'roles'] },
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: UsersRound,      moduleIds: ['crm'] },
   { id: 'supply',      labelKey: 'nav.supply',      icon: Package,         moduleIds: ['stock', 'achats'] },
   { id: 'docs_ai',     labelKey: 'nav.docs_ai',     icon: FolderOpen,      moduleIds: ['ged', 'bizbot'] },
   { id: 'collab',      labelKey: 'nav.collab',      icon: CheckSquare,     moduleIds: ['calendrier', 'taches'] },
+  { id: 'platform',    labelKey: 'nav.platform',    icon: Zap,             moduleIds: ['workflows', 'api-keys'] },
   { id: 'params',      labelKey: 'nav.params',      icon: Settings,        moduleIds: ['profil', 'abonnement', 'parametres'] },
 ]
 
@@ -237,6 +243,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   transport:    'nav.transport',
   mobilemoney:  'nav.mobilemoney',
   workflows:    'nav.workflows',
+  'api-keys':   'nav.api_keys',
   sante:               'nav.sante',
   'sante-patients':    'nav.sante_patients',
   'sante-rdv':         'nav.sante_rdv',
@@ -246,9 +253,11 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'pharmacie-meds':    'nav.pharmacie_meds',
   'pharmacie-ventes':  'nav.pharmacie_ventes',
   abonnement:          'nav.abonnement',
+  fiscalite:           'nav.fiscalite',
 }
 
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
+const ADMIN_MODULE_IDS = new Set(['workflows', 'api-keys'])
 const BI_MODULE_IDS = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
 
 const ALL_MODULE_IDS = [
@@ -258,7 +267,7 @@ const ALL_MODULE_IDS = [
   'calendrier', 'taches',
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
-  'abonnement',
+  'abonnement', 'fiscalite',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
@@ -356,6 +365,7 @@ export default function Sidebar() {
 
   const canView = useCallback((id: string): boolean => {
     if (isOwner) return true
+    if (ADMIN_MODULE_IDS.has(id)) return role === 'admin'
     if (BI_MODULE_IDS.has(id)) return role === 'admin'
     if (PLATFORM_RESTRICTED.has(id)) return ecoleRole === 'DIRECTION_GENERALE'
     if (secteur === 'ecole') {
