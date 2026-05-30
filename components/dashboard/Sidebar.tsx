@@ -142,26 +142,18 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 // ─── Sidebar Group definitions ────────────────────────────────────────────────
 
 const SIDEBAR_GROUPS = [
-  // SUPERVISION — monitoring système, sécurité, alertes uniquement
+  // SUPERVISION — monitoring système, alertes, sécurité
   { id: 'pilotage',     labelKey: 'nav.pilotage',    icon: ShieldAlert,  moduleIds: ['direction', 'analytics', 'audit', 'notifications'] },
-  // BI & ANALYTICS — intelligence métier, forecasting, BI sectoriels
+  // BI & ANALYTICS — intelligence métier, filtrés par secteur pour owners
   { id: 'bi_analytics', labelKey: 'nav.bi',          icon: TrendingUp,   moduleIds: ['finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'] },
-  // FINANCE & COMPTA
+  // FINANCE & COMPTA — transactions, comptabilité, trésorerie
   { id: 'finance_ops',  labelKey: 'nav.finance_ops', icon: Calculator,   moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
-  // RH & ORGANISATION
-  { id: 'rh_org',       labelKey: 'nav.rh_org',      icon: Users,        moduleIds: ['rh', 'roles'] },
-  // COMMERCIAL
-  { id: 'commercial',   labelKey: 'nav.commercial',  icon: UsersRound,   moduleIds: ['crm'] },
-  // STOCK & ACHATS
-  { id: 'supply',       labelKey: 'nav.supply',      icon: Package,      moduleIds: ['stock', 'achats'] },
-  // DOCUMENTS & IA
-  { id: 'docs_ai',      labelKey: 'nav.docs_ai',     icon: FolderOpen,   moduleIds: ['ged', 'bizbot'] },
-  // COLLABORATION
-  { id: 'collab',       labelKey: 'nav.collab',      icon: CheckSquare,  moduleIds: ['calendrier', 'taches'] },
-  // PLATEFORME & API
-  { id: 'platform',     labelKey: 'nav.platform',    icon: Zap,          moduleIds: ['workflows', 'api-keys'] },
-  // PARAMÈTRES
-  { id: 'params',       labelKey: 'nav.params',      icon: Settings,     moduleIds: ['profil', 'abonnement', 'parametres'] },
+  // OPÉRATIONS — RH, CRM, Stock, Achats (fusion de 3 groupes)
+  { id: 'operations',   labelKey: 'nav.operations',  icon: Users,        moduleIds: ['rh', 'roles', 'crm', 'stock', 'achats'] },
+  // OUTILS & IA — GED, BizBot, Calendrier, Tâches (fusion de 2 groupes)
+  { id: 'outils',       labelKey: 'nav.outils',      icon: FolderOpen,   moduleIds: ['ged', 'bizbot', 'calendrier', 'taches'] },
+  // PARAMÈTRES — compte, abonnement, workflows, API, config
+  { id: 'params',       labelKey: 'nav.params',      icon: Settings,     moduleIds: ['profil', 'abonnement', 'workflows', 'api-keys', 'parametres'] },
 ]
 
 const MODULE_LABEL_KEYS: Record<string, string> = {
@@ -340,7 +332,14 @@ export default function Sidebar() {
     exact ? pathname === href : pathname.startsWith(href), [pathname])
 
   const canView = useCallback((id: string): boolean => {
-    if (isOwner) return true
+    // Owner voit tout SAUF les BI d'autres secteurs (un compte école ne voit pas bi-hotel/bi-restaurant)
+    if (isOwner) {
+      if (BI_MODULE_IDS.has(id) && secteur) {
+        const allowed = SECTOR_BI_MAP[secteur] ?? ['bi-dg']
+        return allowed.includes(id)
+      }
+      return true
+    }
     if (ADMIN_MODULE_IDS.has(id)) return role === 'admin'
     if (BI_MODULE_IDS.has(id)) {
       if (role !== 'admin') return false
@@ -452,45 +451,51 @@ export default function Sidebar() {
 
   // ── Group block renderer ───────────────────────────────────────────────────
 
-  function GroupBlock({ group }: { group: NavGroup }) {
+  function GroupBlock({ group, showSep }: { group: NavGroup; showSep: boolean }) {
     const isOpen    = openGroups.has(group.id)
     const GroupIcon = group.icon
 
     return (
-      <div className="mb-0.5">
-        <button
-          onClick={() => toggleGroup(group.id)}
-          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors"
-          style={{ background: 'transparent' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-        >
-          <GroupIcon size={10} style={{ color: '#94A3B8', flexShrink: 0 }} />
-          <span className="flex-1 text-left text-[10px] font-bold uppercase tracking-widest" style={{ color: '#94A3B8' }}>
-            {group.label}
-          </span>
-          <ChevronDown
-            size={9}
-            style={{
-              color: '#CBD5E1',
-              transition: 'transform 0.2s',
-              transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
-            }}
-          />
-        </button>
+      <div>
+        {/* Séparateur horizontal entre groupes — style Buildkite */}
+        {showSep && (
+          <div style={{ height: 1, background: '#F1F5F9', margin: '6px 0 8px' }} />
+        )}
+        <div className="mb-0.5">
+          <button
+            onClick={() => toggleGroup(group.id)}
+            className="w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors"
+            style={{ background: 'transparent' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          >
+            <GroupIcon size={10} style={{ color: '#94A3B8', flexShrink: 0 }} />
+            <span className="flex-1 text-left text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#94A3B8' }}>
+              {group.label}
+            </span>
+            <ChevronDown
+              size={9}
+              style={{
+                color: '#CBD5E1',
+                transition: 'transform 0.2s',
+                transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
+              }}
+            />
+          </button>
 
-        <div
-          style={{
-            maxHeight: isOpen ? `${group.items.length * 44}px` : '0px',
-            overflow: 'hidden',
-            transition: 'max-height 0.22s ease',
-            opacity: isOpen ? 1 : 0,
-          }}
-        >
-          <div className="py-0.5 space-y-0.5">
-            {group.items.map(item => (
-              <NavLink key={item.id} item={item} />
-            ))}
+          <div
+            style={{
+              maxHeight: isOpen ? `${group.items.length * 44}px` : '0px',
+              overflow: 'hidden',
+              transition: 'max-height 0.22s ease',
+              opacity: isOpen ? 1 : 0,
+            }}
+          >
+            <div className="py-0.5 space-y-0.5">
+              {group.items.map(item => (
+                <NavLink key={item.id} item={item} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -564,20 +569,21 @@ export default function Sidebar() {
         {/* Blocs */}
         {loaded && (
           <>
-            {visibleGroups.map(group => {
-              const insertMetierAfter = group.id === 'supply'
+            {visibleGroups.map((group, idx) => {
+              // Secteur métier s'insère après operations (ou en dernier fallback)
+              const insertMetierAfter = group.id === 'operations'
               return (
                 <div key={group.id}>
-                  <GroupBlock group={group} />
+                  <GroupBlock group={group} showSep={idx > 0} />
                   {insertMetierAfter && metierGroup && (
-                    <GroupBlock group={metierGroup} />
+                    <GroupBlock group={metierGroup} showSep />
                   )}
                 </div>
               )
             })}
 
-            {!visibleGroups.find(g => g.id === 'supply') && metierGroup && (
-              <GroupBlock group={metierGroup} />
+            {!visibleGroups.find(g => g.id === 'operations') && metierGroup && (
+              <GroupBlock group={metierGroup} showSep={visibleGroups.length > 0} />
             )}
 
             {isOwner && !secteur && (
