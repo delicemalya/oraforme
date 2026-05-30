@@ -17,12 +17,12 @@ export async function GET(req: NextRequest) {
     .from('banque_operations')
     .select('*, banque_membres(nom, prenom, numero_compte)', { count: 'exact' })
     .eq('tenant_id', ctx.tenantId)
-    .order('created_at', { ascending: false })
+    .order('date_operation', { ascending: false })
     .limit(200)
 
   if (membre_id) query = query.eq('membre_id', membre_id)
-  if (from)      query = query.gte('created_at', from)
-  if (to)        query = query.lte('created_at', to)
+  if (from)      query = query.gte('date_operation', from)
+  if (to)        query = query.lte('date_operation', to)
 
   const { data, error: dbErr, count } = await query
   if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 })
@@ -34,10 +34,10 @@ export async function POST(req: NextRequest) {
   if (error) return error
 
   const body = await req.json()
-  const { membre_id, type, montant, description, reference, credit_id } = body
+  const { membre_id, type_operation, montant, description, reference, credit_id } = body
 
-  if (!membre_id) return NextResponse.json({ error: 'membre_id requis' }, { status: 400 })
-  if (!type)      return NextResponse.json({ error: 'type requis' }, { status: 400 })
+  if (!membre_id)      return NextResponse.json({ error: 'membre_id requis' }, { status: 400 })
+  if (!type_operation) return NextResponse.json({ error: 'type_operation requis' }, { status: 400 })
   if (!montant || montant <= 0) return NextResponse.json({ error: 'Montant invalide' }, { status: 400 })
 
   const { data: membre } = await supabaseAdmin
@@ -49,18 +49,18 @@ export async function POST(req: NextRequest) {
 
   if (!membre) return NextResponse.json({ error: 'Membre introuvable' }, { status: 404 })
 
-  const solde_avant  = membre.solde
-  const delta        = ['depot','remboursement'].includes(type) ? montant : -montant
-  const solde_apres  = solde_avant + delta
+  const solde_avant = membre.solde
+  const delta       = ['depot','remboursement'].includes(type_operation) ? montant : -montant
+  const solde_apres = solde_avant + delta
 
-  if (['retrait','virement'].includes(type) && solde_apres < 0)
+  if (['retrait','virement'].includes(type_operation) && solde_apres < 0)
     return NextResponse.json({ error: 'Solde insuffisant' }, { status: 400 })
 
-  const [{ data: op }, ] = await Promise.all([
+  const [{ data: op }] = await Promise.all([
     supabaseAdmin.from('banque_operations').insert({
-      tenant_id:   ctx.tenantId,
+      tenant_id:      ctx.tenantId,
       membre_id,
-      type,
+      type_operation,
       montant,
       solde_avant,
       solde_apres,

@@ -32,10 +32,10 @@ export async function POST(req: NextRequest) {
   if (error) return error
 
   const body = await req.json()
-  const { membre_id, montant, taux_interet = 12, duree_mois = 12, motif, notes } = body
+  const { membre_id, montant_demande, montant_accorde, taux_interet = 12, duree_mois = 12, motif, notes } = body
 
-  if (!membre_id) return NextResponse.json({ error: 'membre_id requis' }, { status: 400 })
-  if (!montant || montant <= 0) return NextResponse.json({ error: 'Montant invalide' }, { status: 400 })
+  if (!membre_id)           return NextResponse.json({ error: 'membre_id requis' }, { status: 400 })
+  if (!montant_demande || montant_demande <= 0) return NextResponse.json({ error: 'Montant invalide' }, { status: 400 })
 
   const { data: membre } = await supabaseAdmin
     .from('banque_membres')
@@ -49,14 +49,15 @@ export async function POST(req: NextRequest) {
   const { data, error: insErr } = await supabaseAdmin
     .from('banque_credits')
     .insert({
-      tenant_id:    ctx.tenantId,
+      tenant_id:       ctx.tenantId,
       membre_id,
-      montant,
+      montant_demande,
+      montant_accorde: montant_accorde ?? montant_demande,
       taux_interet,
       duree_mois,
-      motif:        motif || null,
-      notes:        notes || null,
-      statut:       'en_attente',
+      motif:  motif  || null,
+      notes:  notes  || null,
+      statut: 'en_attente',
     })
     .select('id')
     .single()
@@ -73,12 +74,12 @@ export async function PATCH(req: NextRequest) {
   const { id, ...updates } = body
   if (!id) return NextResponse.json({ error: 'id requis' }, { status: 400 })
 
-  const allowed = ['statut','montant_rembourse','date_octroi','date_echeance','notes']
+  const allowed = ['statut','montant_accorde','montant_rembourse','date_accord','date_echeance','taux_interet','duree_mois','motif','notes']
   const payload: Record<string, unknown> = {}
   for (const k of allowed) if (k in updates) payload[k] = updates[k]
 
-  if (updates.statut === 'accorde' && !updates.date_octroi) {
-    payload.date_octroi = new Date().toISOString().split('T')[0]
+  if (updates.statut === 'accorde' && !updates.date_accord) {
+    payload.date_accord = new Date().toISOString().split('T')[0]
   }
 
   const { error: updErr } = await supabaseAdmin

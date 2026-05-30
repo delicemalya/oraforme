@@ -24,22 +24,24 @@ export async function POST(req: NextRequest) {
   if (error) return error
 
   const body = await req.json()
-  const { nom, type, stock_actuel = 0, unite = 'kg', prix_unitaire = 0, seuil_alerte = 0, fournisseur } = body
+  const { nom, type_intrant, quantite_stock = 0, unite = 'kg', prix_unitaire = 0, fournisseur, date_achat, date_expiration, notes } = body
 
-  if (!nom?.trim()) return NextResponse.json({ error: 'Nom requis' }, { status: 400 })
-  if (!type)        return NextResponse.json({ error: 'Type requis' }, { status: 400 })
+  if (!nom?.trim())  return NextResponse.json({ error: 'Nom requis' }, { status: 400 })
+  if (!type_intrant) return NextResponse.json({ error: 'Type requis' }, { status: 400 })
 
   const { data, error: insErr } = await supabaseAdmin
     .from('agriculture_intrants')
     .insert({
-      tenant_id:    ctx.tenantId,
-      nom:          nom.trim(),
-      type,
-      stock_actuel,
+      tenant_id:       ctx.tenantId,
+      nom:             nom.trim(),
+      type_intrant,
+      quantite_stock,
       unite,
       prix_unitaire,
-      seuil_alerte,
-      fournisseur: fournisseur || null,
+      fournisseur:     fournisseur     || null,
+      date_achat:      date_achat      || null,
+      date_expiration: date_expiration || null,
+      notes:           notes           || null,
     })
     .select('id')
     .single()
@@ -56,7 +58,7 @@ export async function PATCH(req: NextRequest) {
   const { id, ...updates } = body
   if (!id) return NextResponse.json({ error: 'id requis' }, { status: 400 })
 
-  const allowed = ['nom','type','stock_actuel','unite','prix_unitaire','seuil_alerte','fournisseur']
+  const allowed = ['nom','type_intrant','quantite_stock','unite','prix_unitaire','fournisseur','date_achat','date_expiration','notes']
   const payload: Record<string, unknown> = {}
   for (const k of allowed) if (k in updates) payload[k] = updates[k]
 
