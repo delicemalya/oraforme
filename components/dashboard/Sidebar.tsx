@@ -23,7 +23,7 @@ import {
   Bell, FolderOpen, Building2,
   ChevronDown, Calendar, CheckSquare,
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
-  CreditCard,
+  CreditCard, LineChart,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -67,6 +67,7 @@ type GroupColor = {
 // ─── Palette des blocs ────────────────────────────────────────────────────────
 
 const COLORS: Record<string, GroupColor> = {
+  bi:          { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
   pilotage:    { header: '#2563EB', active: '#EFF6FF', text: '#1D4ED8', dot: '#2563EB' },
   finance_ops: { header: '#16A34A', active: '#F0FDF4', text: '#15803D', dot: '#16A34A' },
   rh_org:      { header: '#7C3AED', active: '#F5F3FF', text: '#6D28D9', dot: '#7C3AED' },
@@ -103,6 +104,12 @@ function getSectorColor(secteur: string): GroupColor {
 // ─── Icon Registry ────────────────────────────────────────────────────────────
 
 const ICONS: Record<string, LucideIcon> = {
+  'bi':              LineChart,
+  'bi-dg':           BarChart2,
+  'bi-rh':           Users,
+  'bi-ecole':        GraduationCap,
+  'bi-hotel':        Hotel,
+  'bi-restaurant':   ChefHat,
   direction:     BarChart2,
   finance:       TrendingUp,
   analytics:     Activity,
@@ -155,6 +162,12 @@ const ICONS: Record<string, LucideIcon> = {
 type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 
 const MODULE_DEFS: ModuleDef[] = [
+  { id: 'bi',          label: 'Business Intelligence', sublabel: 'Tableaux de bord BI', href: '/dashboard/bi' },
+  { id: 'bi-dg',       label: 'Direction Générale',    sublabel: 'CA · Résultat · Tréso', href: '/dashboard/bi' },
+  { id: 'bi-rh',       label: 'RH & Paie',             sublabel: 'Effectif · Masse sal.', href: '/dashboard/bi/rh' },
+  { id: 'bi-ecole',    label: 'École',                  sublabel: 'Scolarité · Absences', href: '/dashboard/bi/ecole' },
+  { id: 'bi-hotel',    label: 'Hôtel',                  sublabel: 'Occupation · Revenus', href: '/dashboard/bi/hotel' },
+  { id: 'bi-restaurant', label: 'Restaurant',           sublabel: 'Ventes · Commandes',  href: '/dashboard/bi/restaurant' },
   ...(CORE_ERP_MODULES as unknown as ModuleDef[]),
   ...(PLATFORM_MODULES as unknown as ModuleDef[]),
   { id: 'ecole',                 label: 'École & Université',       sublabel: 'Gestion académique',         href: '/dashboard/ecole'                      },
@@ -179,6 +192,7 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 
 // Les labels sont des clés i18n — traduits dynamiquement dans le composant via t()
 const SIDEBAR_GROUPS = [
+  { id: 'bi',          labelKey: 'nav.bi',           icon: LineChart,       moduleIds: ['bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'] },
   { id: 'pilotage',    labelKey: 'nav.pilotage',    icon: LayoutDashboard, moduleIds: ['direction', 'finance', 'analytics', 'audit', 'notifications'] },
   { id: 'finance_ops', labelKey: 'nav.finance_ops', icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses'] },
   { id: 'rh_org',      labelKey: 'nav.rh_org',      icon: Users,           moduleIds: ['rh', 'roles'] },
@@ -191,6 +205,11 @@ const SIDEBAR_GROUPS = [
 
 // Mapping module ID → clé i18n (pour les labels des items du menu)
 const MODULE_LABEL_KEYS: Record<string, string> = {
+  'bi-dg':       'nav.bi_dg',
+  'bi-rh':       'nav.bi_rh',
+  'bi-ecole':    'nav.bi_ecole',
+  'bi-hotel':    'nav.bi_hotel',
+  'bi-restaurant': 'nav.bi_restaurant',
   direction:    'nav.direction',
   finance:      'nav.finance',
   analytics:    'nav.analytics',
@@ -230,6 +249,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
 }
 
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
+const BI_MODULE_IDS = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
 
 const ALL_MODULE_IDS = [
   ...CORE_ERP_MODULES.map(m => m.id),
@@ -336,6 +356,7 @@ export default function Sidebar() {
 
   const canView = useCallback((id: string): boolean => {
     if (isOwner) return true
+    if (BI_MODULE_IDS.has(id)) return role === 'admin'
     if (PLATFORM_RESTRICTED.has(id)) return ecoleRole === 'DIRECTION_GENERALE'
     if (secteur === 'ecole') {
       const allowed = ECOLE_CORE_ROLE_FILTER[id]

@@ -42,6 +42,12 @@ export const translations: Record<Locale, Record<string, string>> = {
   // ══════════════════════════════════════════════════════════════
   fr: {
     // Navigation — Blocs
+    'nav.bi':             'BI & Analytics',
+    'nav.bi_dg':          'Direction Générale',
+    'nav.bi_rh':          'RH & Paie',
+    'nav.bi_ecole':       'École',
+    'nav.bi_hotel':       'Hôtel',
+    'nav.bi_restaurant':  'Restaurant',
     'nav.pilotage':       'Pilotage',
     'nav.finance_ops':    'Finance & Compta',
     'nav.rh_org':         'RH & Organisation',
@@ -3099,6 +3105,12 @@ export const translations: Record<Locale, Record<string, string>> = {
   // ENGLISH
   // ══════════════════════════════════════════════════════════════
   en: {
+    'nav.bi':             'BI & Analytics',
+    'nav.bi_dg':          'General Management',
+    'nav.bi_rh':          'HR & Payroll',
+    'nav.bi_ecole':       'School',
+    'nav.bi_hotel':       'Hotel',
+    'nav.bi_restaurant':  'Restaurant',
     'nav.pilotage':       'Management',
     'nav.finance_ops':    'Finance & Accounting',
     'nav.rh_org':         'HR & Organization',
