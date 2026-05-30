@@ -42,13 +42,13 @@ export const translations: Record<Locale, Record<string, string>> = {
   // ══════════════════════════════════════════════════════════════
   fr: {
     // Navigation — Blocs
-    'nav.bi':             'BI & Analytics',
-    'nav.bi_dg':          'Direction Générale',
-    'nav.bi_rh':          'RH & Paie',
-    'nav.bi_ecole':       'École',
-    'nav.bi_hotel':       'Hôtel',
-    'nav.bi_restaurant':  'Restaurant',
-    'nav.pilotage':       'Pilotage',
+    'nav.bi':             'Analytics',
+    'nav.bi_dg':          'Analytics général',
+    'nav.bi_rh':          'Analytics RH',
+    'nav.bi_ecole':       'Analytics École',
+    'nav.bi_hotel':       'Analytics Hôtel',
+    'nav.bi_restaurant':  'Analytics Restaurant',
+    'nav.pilotage':       'Supervision',
     'nav.finance_ops':    'Finance & Compta',
     'nav.rh_org':         'RH & Organisation',
     'nav.commercial':     'Commercial',
@@ -3108,13 +3108,13 @@ export const translations: Record<Locale, Record<string, string>> = {
   // ENGLISH
   // ══════════════════════════════════════════════════════════════
   en: {
-    'nav.bi':             'BI & Analytics',
-    'nav.bi_dg':          'General Management',
-    'nav.bi_rh':          'HR & Payroll',
-    'nav.bi_ecole':       'School',
-    'nav.bi_hotel':       'Hotel',
-    'nav.bi_restaurant':  'Restaurant',
-    'nav.pilotage':       'Management',
+    'nav.bi':             'Analytics',
+    'nav.bi_dg':          'General Analytics',
+    'nav.bi_rh':          'HR Analytics',
+    'nav.bi_ecole':       'School Analytics',
+    'nav.bi_hotel':       'Hotel Analytics',
+    'nav.bi_restaurant':  'Restaurant Analytics',
+    'nav.pilotage':       'Supervision',
     'nav.finance_ops':    'Finance & Accounting',
     'nav.rh_org':         'HR & Organization',
     'nav.commercial':     'Sales',

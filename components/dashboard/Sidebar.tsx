@@ -106,7 +106,7 @@ function getSectorColor(secteur: string): GroupColor {
 
 const ICONS: Record<string, LucideIcon> = {
   'bi':              LineChart,
-  'bi-dg':           BarChart2,
+  'bi-dg':           LineChart,
   'bi-rh':           Users,
   'bi-ecole':        GraduationCap,
   'bi-hotel':        Hotel,
@@ -164,12 +164,12 @@ const ICONS: Record<string, LucideIcon> = {
 type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 
 const MODULE_DEFS: ModuleDef[] = [
-  { id: 'bi',          label: 'Business Intelligence', sublabel: 'Tableaux de bord BI', href: '/dashboard/bi' },
-  { id: 'bi-dg',       label: 'Direction Générale',    sublabel: 'CA · Résultat · Tréso', href: '/dashboard/bi' },
-  { id: 'bi-rh',       label: 'RH & Paie',             sublabel: 'Effectif · Masse sal.', href: '/dashboard/bi/rh' },
-  { id: 'bi-ecole',    label: 'École',                  sublabel: 'Scolarité · Absences', href: '/dashboard/bi/ecole' },
-  { id: 'bi-hotel',    label: 'Hôtel',                  sublabel: 'Occupation · Revenus', href: '/dashboard/bi/hotel' },
-  { id: 'bi-restaurant', label: 'Restaurant',           sublabel: 'Ventes · Commandes',  href: '/dashboard/bi/restaurant' },
+  { id: 'bi',          label: 'Analytics',              sublabel: 'Tableaux de bord BI', href: '/dashboard/bi' },
+  { id: 'bi-dg',       label: 'Analytics général',     sublabel: 'CA · Résultat · Tréso', href: '/dashboard/bi' },
+  { id: 'bi-rh',       label: 'Analytics RH',           sublabel: 'Effectif · Masse sal.', href: '/dashboard/bi/rh' },
+  { id: 'bi-ecole',    label: 'Analytics École',        sublabel: 'Inscriptions · Absences', href: '/dashboard/bi/ecole' },
+  { id: 'bi-hotel',    label: 'Analytics Hôtel',        sublabel: 'Occupation · Revenus', href: '/dashboard/bi/hotel' },
+  { id: 'bi-restaurant', label: 'Analytics Restaurant', sublabel: 'Ventes · Commandes',  href: '/dashboard/bi/restaurant' },
   ...(CORE_ERP_MODULES as unknown as ModuleDef[]),
   ...(PLATFORM_MODULES as unknown as ModuleDef[]),
   { id: 'ecole',                 label: 'École & Université',       sublabel: 'Gestion académique',         href: '/dashboard/ecole'                      },
@@ -197,8 +197,7 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 
 // Les labels sont des clés i18n — traduits dynamiquement dans le composant via t()
 const SIDEBAR_GROUPS = [
-  { id: 'bi',          labelKey: 'nav.bi',           icon: LineChart,       moduleIds: ['bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'] },
-  { id: 'pilotage',    labelKey: 'nav.pilotage',    icon: LayoutDashboard, moduleIds: ['direction', 'finance', 'analytics', 'audit', 'notifications'] },
+  { id: 'pilotage',    labelKey: 'nav.pilotage',    icon: LayoutDashboard, moduleIds: ['direction', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'finance', 'analytics', 'audit', 'notifications'] },
   { id: 'finance_ops', labelKey: 'nav.finance_ops', icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   { id: 'rh_org',      labelKey: 'nav.rh_org',      icon: Users,           moduleIds: ['rh', 'roles'] },
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: UsersRound,      moduleIds: ['crm'] },
@@ -259,6 +258,27 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
 const ADMIN_MODULE_IDS = new Set(['workflows', 'api-keys'])
 const BI_MODULE_IDS = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
+
+// BI items affichés selon le secteur — seuls les analytics pertinents sont visibles
+const SECTOR_BI_MAP: Record<string, string[]> = {
+  ecole:            ['bi-dg', 'bi-rh', 'bi-ecole'],
+  hotel:            ['bi-dg', 'bi-hotel'],
+  restaurant:       ['bi-dg', 'bi-restaurant'],
+  sante:            ['bi-dg', 'bi-rh'],
+  pharmacie:        ['bi-dg', 'bi-rh'],
+  transport:        ['bi-dg'],
+  transport_public: ['bi-dg'],
+  commerce:         ['bi-dg'],
+  supermarche:      ['bi-dg'],
+  boutique:         ['bi-dg'],
+  btp:              ['bi-dg', 'bi-rh'],
+  banque:           ['bi-dg', 'bi-rh'],
+  ong:              ['bi-dg', 'bi-rh'],
+  agriculture:      ['bi-dg'],
+  petrole:          ['bi-dg', 'bi-rh'],
+  cabinet:          ['bi-dg'],
+  boisson:          ['bi-dg'],
+}
 
 const ALL_MODULE_IDS = [
   ...CORE_ERP_MODULES.map(m => m.id),
@@ -366,7 +386,15 @@ export default function Sidebar() {
   const canView = useCallback((id: string): boolean => {
     if (isOwner) return true
     if (ADMIN_MODULE_IDS.has(id)) return role === 'admin'
-    if (BI_MODULE_IDS.has(id)) return role === 'admin'
+    if (BI_MODULE_IDS.has(id)) {
+      if (role !== 'admin') return false
+      // Seuls les analytics pertinents au secteur sont visibles
+      if (secteur) {
+        const allowed = SECTOR_BI_MAP[secteur] ?? ['bi-dg']
+        return allowed.includes(id)
+      }
+      return true // pas de secteur = entreprise générique, tout BI accessible
+    }
     if (PLATFORM_RESTRICTED.has(id)) return ecoleRole === 'DIRECTION_GENERALE'
     if (secteur === 'ecole') {
       const allowed = ECOLE_CORE_ROLE_FILTER[id]
