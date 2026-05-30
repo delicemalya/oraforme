@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Sparkles, Mic } from 'lucide-react'
+import { X, Send, Sparkles, Mic, ChevronLeft } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -141,7 +141,7 @@ function detectModule(path: string): ModuleKey {
   return 'dashboard'
 }
 
-function now() {
+function nowTime() {
   return new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
 
@@ -156,15 +156,26 @@ export default function AiAssistant() {
   const mod      = detectModule(pathname ?? '')
   const cfg      = MODULE_CONFIG[mod]
 
-  const [open,       setOpen]       = useState(false)
-  const [messages,   setMessages]   = useState<Message[]>([])
-  const [input,      setInput]      = useState('')
-  const [loading,    setLoading]    = useState(false)
-  const [entreprise, setEntreprise] = useState('')
-  const [modules,    setModules]    = useState<string[]>([])
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const [open,         setOpen]         = useState(false)
+  const [messages,     setMessages]     = useState<Message[]>([])
+  const [input,        setInput]        = useState('')
+  const [loading,      setLoading]      = useState(false)
+  const [entreprise,   setEntreprise]   = useState('')
+  const [modules,      setModules]      = useState<string[]>([])
+  const [isMobile,     setIsMobile]     = useState(false)
+  const [showSidebar,  setShowSidebar]  = useState(false)
+  const bottomRef  = useRef<HTMLDivElement>(null)
+  const inputRef   = useRef<HTMLInputElement>(null)
 
-  // Load tenant info once
+  // Detect mobile
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  // Load tenant info
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
@@ -181,7 +192,7 @@ export default function AiAssistant() {
     })
   }, [])
 
-  // Set greeting when chat opens for the first time
+  // Greeting on first open
   useEffect(() => {
     if (open && messages.length === 0) {
       const h = new Date().getHours()
@@ -189,7 +200,7 @@ export default function AiAssistant() {
       const greeting = entreprise
         ? `${salut} ! Je suis **${cfg.nom}**, ${cfg.specialite} chez **${entreprise}**. Comment puis-je vous aider ?`
         : `${salut} ! Je suis **${cfg.nom}**, ${cfg.specialite}. Comment puis-je vous aider ?`
-      setMessages([{ role: 'bot', text: greeting, time: now() }])
+      setMessages([{ role: 'bot', text: greeting, time: nowTime() }])
     }
   }, [open, entreprise, messages.length, cfg])
 
@@ -197,17 +208,23 @@ export default function AiAssistant() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  // Reset messages when module changes (new context)
+  // Reset when module changes
   useEffect(() => {
     setMessages([])
   }, [mod])
+
+  // Focus input when panel opens
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 300)
+  }, [open])
 
   async function send(text: string) {
     const msg = text.trim()
     if (!msg || loading) return
     setInput('')
+    setShowSidebar(false)
 
-    const userMsg: Message = { role: 'user', text: msg, time: now() }
+    const userMsg: Message = { role: 'user', text: msg, time: nowTime() }
     const newMsgs = [...messages, userMsg]
     setMessages(newMsgs)
     setLoading(true)
@@ -218,7 +235,6 @@ export default function AiAssistant() {
         content: m.text,
       }))
 
-      // Try /api/miaa/chat first (module-aware), fallback to /api/ai/chat
       const res = await fetch('/api/miaa/chat', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -227,27 +243,86 @@ export default function AiAssistant() {
           message:  msg,
           history:  history.slice(0, -1),
           tenantData: { tenant_id: undefined },
-          // also pass legacy fields for compatibility
           entreprise,
           modules_actifs: modules,
           user_role: 'gestionnaire',
         }),
       })
 
-      const data = await res.json()
+      const data  = await res.json()
       const reply = data.response ?? data.reply ?? "Désolé, je n'ai pas pu répondre."
-      setMessages(prev => [...prev, { role: 'bot', text: reply, time: now() }])
+      setMessages(prev => [...prev, { role: 'bot', text: reply, time: nowTime() }])
     } catch {
-      setMessages(prev => [...prev, { role: 'bot', text: '❌ Impossible de contacter MIAA+. Vérifiez votre connexion.', time: now() }])
+      setMessages(prev => [...prev, { role: 'bot', text: '❌ Impossible de contacter MIAA+. Vérifiez votre connexion.', time: nowTime() }])
     } finally {
       setLoading(false)
     }
   }
 
+  // ── Panel animation variants ───────────────────────────────────────────────
+  const panelVariants = {
+    hidden:  isMobile ? { y: '100%' as const }           : { x: 80, opacity: 0 },
+    visible: isMobile ? { y: 0 }                          : { x: 0,  opacity: 1 },
+    exit:    isMobile ? { y: '100%' as const }            : { x: 80, opacity: 0 },
+  }
+
+  // ── Sidebar (mobile: full overlay, desktop: left panel) ───────────────────
+  const SidebarContent = () => (
+    <>
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[17px] font-bold text-[#1A1A2E]">Suggestions</h2>
+          <span className="text-[11px] font-semibold text-white px-1.5 py-0.5 rounded-full" style={{ background: cfg.color }}>
+            {cfg.suggestions.length}
+          </span>
+        </div>
+      </div>
+
+      {/* Search bar */}
+      <div className="px-4 pb-3">
+        <div className="flex items-center gap-2 bg-[#F5F7FA] rounded-xl px-3 py-2">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <span className="text-[11px] text-[#94A3B8]">Rechercher…</span>
+        </div>
+      </div>
+
+      {/* Module item */}
+      <div className="px-2 pb-2 space-y-0.5 flex-1 overflow-y-auto">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-xl" style={{ background: cfg.color + '12' }}>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-base" style={{ background: cfg.color + '20' }}>
+            {cfg.avatar}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-semibold text-[#1A1A2E] truncate">{cfg.nom}</p>
+            <p className="text-[10px] text-[#94A3B8] truncate mt-0.5">En ligne</p>
+          </div>
+        </div>
+
+        {cfg.suggestions.map((s, i) => (
+          <button
+            key={i}
+            onClick={() => { send(s); if (isMobile) setShowSidebar(false) }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F5F7FA] active:bg-[#EEF2FF] transition-colors text-left"
+          >
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-white" style={{ background: cfg.color }}>
+              {String(i + 1).padStart(2, '0')}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-medium text-[#374151] leading-snug line-clamp-2">{s}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </>
+  )
+
   return (
     <>
       {/* ── Floating button ──────────────────────────────────────────────── */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-1">
+      <div className={`fixed z-50 flex flex-col items-center gap-1 ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'}`}>
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
@@ -273,91 +348,89 @@ export default function AiAssistant() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-[1px] z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-50"
             onClick={() => setOpen(false)}
           />
         )}
       </AnimatePresence>
 
-      {/* ── Chat panel (slides in from right) ────────────────────────────── */}
+      {/* ── Chat panel ───────────────────────────────────────────────────── */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 60 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-            className="fixed bottom-[84px] right-6 z-50 flex overflow-hidden"
-            style={{
-              width: 680,
-              height: 560,
-              borderRadius: 16,
-              boxShadow: '0 4px 40px rgba(0,0,0,0.14)',
-              background: '#FFFFFF',
-            }}
+            variants={panelVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
             onClick={e => e.stopPropagation()}
+            className="fixed z-50 flex overflow-hidden bg-white"
+            style={isMobile
+              ? {
+                  left: 0, right: 0, bottom: 0,
+                  height: 'calc(100svh - 64px)',
+                  borderRadius: '20px 20px 0 0',
+                  boxShadow: '0 -4px 40px rgba(0,0,0,0.18)',
+                }
+              : {
+                  width: 680, height: 560,
+                  bottom: 84, right: 24,
+                  borderRadius: 16,
+                  boxShadow: '0 4px 40px rgba(0,0,0,0.14)',
+                }
+            }
           >
-            {/* ── LEFT PANEL — Dialogs / Suggestions ──────────────────────── */}
-            <div className="flex flex-col w-[220px] shrink-0 border-r border-[#F0F0F0]" style={{ background: '#FFFFFF' }}>
-              {/* Header */}
-              <div className="px-5 pt-5 pb-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-[17px] font-bold text-[#1A1A2E]">Dialogs</h2>
-                  <span className="text-[11px] font-semibold text-white px-1.5 py-0.5 rounded-full" style={{ background: cfg.color }}>
-                    {cfg.suggestions.length}
-                  </span>
-                </div>
+            {/* ── LEFT PANEL (desktop only) ──────────────────────────── */}
+            {!isMobile && (
+              <div className="flex flex-col w-[220px] shrink-0 border-r border-[#F0F0F0] bg-white">
+                <SidebarContent />
               </div>
+            )}
 
-              {/* Search bar */}
-              <div className="px-4 pb-3">
-                <div className="flex items-center gap-2 bg-[#F5F7FA] rounded-xl px-3 py-2">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                  </svg>
-                  <span className="text-[11px] text-[#94A3B8]">Rechercher…</span>
-                </div>
-              </div>
-
-              {/* Suggestion list as dialogs */}
-              <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-0.5">
-                {/* Active module item */}
-                <div
-                  className="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer"
-                  style={{ background: cfg.color + '12' }}
+            {/* ── Mobile sidebar overlay ────────────────────────────── */}
+            <AnimatePresence>
+              {isMobile && showSidebar && (
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                  className="absolute inset-0 z-10 flex flex-col bg-white"
+                  style={{ borderRadius: '20px 20px 0 0' }}
                 >
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-base" style={{ background: cfg.color + '20' }}>
-                    {cfg.avatar}
+                  <div className="flex items-center gap-2 px-4 pt-5 pb-2 border-b border-[#F0F0F0]">
+                    <button
+                      onClick={() => setShowSidebar(false)}
+                      className="w-8 h-8 rounded-full bg-[#F5F7FA] flex items-center justify-center"
+                    >
+                      <ChevronLeft size={16} className="text-[#64748B]" />
+                    </button>
+                    <span className="text-[15px] font-bold text-[#1A1A2E]">Suggestions</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold text-[#1A1A2E] truncate">{cfg.nom}</p>
-                    <p className="text-[10px] text-[#94A3B8] truncate mt-0.5">En ligne</p>
+                  <div className="flex-1 overflow-y-auto">
+                    <SidebarContent />
                   </div>
-                </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-                {/* Suggestions as quick-access dialogs */}
-                {cfg.suggestions.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => send(s)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F5F7FA] transition-colors text-left"
-                  >
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-white shrink-0" style={{ background: cfg.color }}>
-                      {String(i + 1).padStart(2, '0')}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium text-[#374151] leading-snug line-clamp-2">{s}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* ── RIGHT PANEL — Active conversation ───────────────────────── */}
+            {/* ── RIGHT PANEL — Chat ────────────────────────────────── */}
             <div className="flex flex-col flex-1 min-w-0" style={{ background: '#FAFAFA' }}>
 
               {/* Header */}
-              <div className="flex items-center gap-3 px-5 py-4 bg-white border-b border-[#F0F0F0]">
+              <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-[#F0F0F0] shrink-0">
+                {/* Mobile: back/suggestions button */}
+                {isMobile && (
+                  <button
+                    onClick={() => setShowSidebar(true)}
+                    className="w-8 h-8 rounded-full bg-[#F5F7FA] flex items-center justify-center shrink-0"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                  </button>
+                )}
+
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0"
                   style={{ background: cfg.color + '18' }}
@@ -365,7 +438,7 @@ export default function AiAssistant() {
                   {cfg.avatar}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-bold text-[#1A1A2E]">{cfg.nom}</p>
+                  <p className="text-[13px] font-bold text-[#1A1A2E] truncate">{cfg.nom}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                     <span className="text-[10px] text-[#94A3B8]">En ligne</span>
@@ -373,28 +446,30 @@ export default function AiAssistant() {
                 </div>
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-7 h-7 rounded-full bg-[#F5F7FA] hover:bg-[#E5E7EB] flex items-center justify-center transition-colors shrink-0"
+                  className="w-8 h-8 rounded-full bg-[#F5F7FA] hover:bg-[#E5E7EB] flex items-center justify-center transition-colors shrink-0"
                 >
-                  <X size={13} className="text-[#64748B]" />
+                  <X size={14} className="text-[#64748B]" />
                 </button>
               </div>
 
-              {/* Connection notice */}
-              {messages.length === 0 && (
-                <div className="flex items-center justify-center py-3">
-                  <div className="flex items-center gap-2 text-[10px] text-[#94A3B8]">
-                    <div className="w-5 h-5 rounded-full overflow-hidden" style={{ background: cfg.color + '20' }}>
-                      <span className="flex items-center justify-center h-full text-[10px]">{cfg.avatar}</span>
-                    </div>
-                    <span className="font-medium">Opérateur</span>
-                    <span className="font-bold" style={{ color: cfg.color }}>Margaret</span>
-                    <span>connecté</span>
-                  </div>
+              {/* Mobile: suggestion chips (horizontal scroll) */}
+              {isMobile && messages.length <= 1 && (
+                <div className="flex gap-2 px-4 py-2.5 overflow-x-auto shrink-0 scrollbar-hide border-b border-[#F5F7FA]">
+                  {cfg.suggestions.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => send(s)}
+                      className="flex-none text-[11px] font-medium px-3 py-1.5 rounded-full border whitespace-nowrap transition-colors active:opacity-70"
+                      style={{ borderColor: cfg.color + '40', color: cfg.color, background: cfg.color + '08' }}
+                    >
+                      {s.length > 28 ? s.slice(0, 27) + '…' : s}
+                    </button>
+                  ))}
                 </div>
               )}
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
                 {messages.map((m, i) => (
                   <motion.div
                     key={i}
@@ -403,7 +478,6 @@ export default function AiAssistant() {
                     transition={{ duration: 0.18 }}
                     className={`flex gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                   >
-                    {/* Avatar */}
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 mt-auto"
                       style={{ background: m.role === 'bot' ? cfg.color + '18' : '#E5E7EB' }}
@@ -411,23 +485,12 @@ export default function AiAssistant() {
                       {m.role === 'bot' ? cfg.avatar : '👤'}
                     </div>
 
-                    {/* Bubble */}
-                    <div className={`flex flex-col gap-1 max-w-[72%] ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+                    <div className={`flex flex-col gap-1 max-w-[78%] ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                       <div
                         className="px-4 py-2.5 text-[12.5px] leading-relaxed"
                         style={m.role === 'user'
-                          ? {
-                              background: cfg.color,
-                              color: '#FFFFFF',
-                              borderRadius: '18px 18px 4px 18px',
-                            }
-                          : {
-                              background: '#FFFFFF',
-                              color: '#374151',
-                              border: '1px solid #E5E7EB',
-                              borderRadius: '18px 18px 18px 4px',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                            }
+                          ? { background: cfg.color, color: '#FFF', borderRadius: '18px 18px 4px 18px' }
+                          : { background: '#FFF', color: '#374151', border: '1px solid #E5E7EB', borderRadius: '18px 18px 18px 4px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }
                         }
                         dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
                       />
@@ -460,34 +523,30 @@ export default function AiAssistant() {
                 <div ref={bottomRef} />
               </div>
 
-              {/* Input */}
-              <div className="px-4 py-3 bg-white border-t border-[#F0F0F0]">
+              {/* Input bar */}
+              <div className={`px-4 bg-white border-t border-[#F0F0F0] shrink-0 ${isMobile ? 'pb-safe py-3' : 'py-3'}`}>
                 <div className="flex items-center gap-2 bg-[#F5F7FA] rounded-2xl px-4 py-2.5">
                   <input
+                    ref={inputRef}
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
-                    placeholder="Type something..."
+                    placeholder="Écrivez votre message…"
                     disabled={loading}
-                    className="flex-1 bg-transparent text-[12.5px] text-[#374151] placeholder-[#94A3B8] outline-none disabled:opacity-50"
+                    className="flex-1 bg-transparent text-[13px] text-[#374151] placeholder-[#94A3B8] outline-none disabled:opacity-50 min-w-0"
                   />
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button className="w-7 h-7 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] transition-colors">
-                      <Mic size={14} />
-                    </button>
-                    <button className="w-7 h-7 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] transition-colors">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                      </svg>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button className="w-8 h-8 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] transition-colors">
+                      <Mic size={15} />
                     </button>
                     <motion.button
                       whileTap={{ scale: 0.88 }}
                       onClick={() => send(input)}
                       disabled={loading || !input.trim()}
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white disabled:opacity-40 transition-all"
-                      style={{ background: '#1A1A2E' }}
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-white disabled:opacity-40 transition-all"
+                      style={{ background: input.trim() ? cfg.color : '#1A1A2E' }}
                     >
-                      <Send size={13} />
+                      <Send size={14} />
                     </motion.button>
                   </div>
                 </div>
