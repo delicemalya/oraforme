@@ -195,7 +195,6 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   hotel:        'nav.hotel',
   housekeeping: 'nav.housekeeping',
   transport:    'nav.transport',
-  mobilemoney:  'nav.mobilemoney',
   workflows:    'nav.workflows',
   'api-keys':   'nav.api_keys',
   sante:               'nav.sante',
@@ -210,8 +209,10 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   fiscalite:           'nav.fiscalite',
 }
 
-const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
-const ADMIN_MODULE_IDS    = new Set(['workflows', 'api-keys'])
+// roles : gestion des rôles école — réservé à DIRECTION_GENERALE uniquement
+const PLATFORM_RESTRICTED = new Set(['roles'])
+// analytics et audit : visibles aux admins de TOUS les secteurs (pas école-only)
+const ADMIN_MODULE_IDS    = new Set(['workflows', 'api-keys', 'analytics', 'audit'])
 const BI_MODULE_IDS       = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
 
 const SECTOR_BI_MAP: Record<string, string[]> = {
