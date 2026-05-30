@@ -15,12 +15,12 @@ import Link from 'next/link'
 
 interface JournalEntry {
   id: string
-  date: string
-  piece_number: string | null
-  account_debit:  string
-  account_credit: string
-  amount:         number
-  description:    string
+  date_operation: string
+  piece_number:   string | null
+  debit_account:  string
+  credit_account: string
+  montant:        number
+  libelle:        string
   source:         string | null
   fiscal_year:    number | null
   created_at:     string
@@ -98,9 +98,9 @@ export default function JournalPage() {
       .from('journal_entries')
       .select('*', { count: 'exact' })
       .eq('tenant_id', tenantId)
-      .gte('date', start)
-      .lte('date', end)
-      .order('date', { ascending: false })
+      .gte('date_operation', start)
+      .lte('date_operation', end)
+      .order('date_operation', { ascending: false })
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
 
@@ -116,13 +116,13 @@ export default function JournalPage() {
   const filtered = entries.filter(e => {
     if (!search) return true
     const q = search.toLowerCase()
-    return e.description.toLowerCase().includes(q) ||
-      e.account_debit.includes(q)  ||
-      e.account_credit.includes(q) ||
+    return e.libelle.toLowerCase().includes(q) ||
+      e.debit_account.includes(q)  ||
+      e.credit_account.includes(q) ||
       (e.piece_number || '').toLowerCase().includes(q)
   })
 
-  const totalDebit  = filtered.reduce((s, e) => s + e.amount, 0)
+  const totalDebit  = filtered.reduce((s, e) => s + e.montant, 0)
   const totalCredit = totalDebit // double-entry: always equal
 
   const prevMonth = () => {
@@ -140,8 +140,8 @@ export default function JournalPage() {
     const rows = [
       [t('common.date'), t('compta.journal.colPiece'), t('compta.journal.colDebit'), t('compta.journal.colCredit'), t('common.amount'), t('compta.journal.colLabel'), t('compta.journal.colSource')],
       ...filtered.map(e => [
-        fmtDate(e.date), e.piece_number || '', e.account_debit, e.account_credit,
-        e.amount.toString(), `"${e.description}"`, e.source || '',
+        fmtDate(e.date_operation), e.piece_number || '', e.debit_account, e.credit_account,
+        e.montant.toString(), `"${e.libelle}"`, e.source || '',
       ]),
     ]
     const csv = rows.map(r => r.join(';')).join('\n')
@@ -294,24 +294,24 @@ export default function JournalPage() {
                 <tr key={e.id}
                   className="border-t transition-colors hover:bg-gray-50"
                   style={{ borderColor: 'var(--border)', background: i % 2 === 0 ? 'var(--surface)' : 'transparent' }}>
-                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-secondary)' }}>{fmtDate(e.date)}</td>
+                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-secondary)' }}>{fmtDate(e.date_operation)}</td>
                   <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--text-secondary)' }}>
                     {e.piece_number || '—'}
                   </td>
-                  <td className="px-4 py-3 max-w-xs truncate" style={{ color: 'var(--text)' }} title={e.description}>
-                    {e.description}
+                  <td className="px-4 py-3 max-w-xs truncate" style={{ color: 'var(--text)' }} title={e.libelle}>
+                    {e.libelle}
                   </td>
                   <td className="px-4 py-3 font-mono font-semibold text-sm" style={{ color: 'var(--info)' }}>
-                    {e.account_debit}
+                    {e.debit_account}
                   </td>
                   <td className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--info)' }}>
-                    {fmtFCFA(e.amount)}
+                    {fmtFCFA(e.montant)}
                   </td>
                   <td className="px-4 py-3 font-mono font-semibold text-sm" style={{ color: 'var(--success)' }}>
-                    {e.account_credit}
+                    {e.credit_account}
                   </td>
                   <td className="px-4 py-3 text-right font-semibold" style={{ color: 'var(--success)' }}>
-                    {fmtFCFA(e.amount)}
+                    {fmtFCFA(e.montant)}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${srcCls}`}>

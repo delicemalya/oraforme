@@ -109,11 +109,11 @@ export default function Header() {
             style={{ width: 180, height: 36, objectFit: 'contain', display: 'block' }}
           />
         ) : (
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-100 shrink-0">
-            <div className="w-5 h-5 rounded-md bg-[#F59E0B] flex items-center justify-center shrink-0">
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-red-50 border border-red-100 shrink-0">
+            <div className="w-5 h-5 rounded-md bg-[#DC2626] flex items-center justify-center shrink-0">
               <span className="text-[10px] font-black text-white">{nomEntreprise.charAt(0).toUpperCase()}</span>
             </div>
-            <span className="text-xs font-semibold text-amber-700 tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
+            <span className="text-xs font-semibold text-red-700 tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
           </div>
         )
       )}
@@ -124,7 +124,7 @@ export default function Header() {
           href="/dashboard/equipe"
           className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
             pathname === '/dashboard/equipe'
-              ? 'bg-amber-50 text-amber-700'
+              ? 'bg-red-50 text-red-700'
               : 'text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
           }`}
         >
@@ -158,8 +158,8 @@ export default function Header() {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#F8FAFC] transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
-              <span className="text-amber-700 text-xs font-bold">{initials}</span>
+            <div className="w-7 h-7 rounded-full bg-red-100 border border-red-200 flex items-center justify-center shrink-0">
+              <span className="text-red-700 text-xs font-bold">{initials}</span>
             </div>
             <span className="text-sm text-[#0F172A] hidden sm:block max-w-[96px] truncate">{userName}</span>
             <ChevronDown size={12} className="text-[#94A3B8] hidden sm:block" />

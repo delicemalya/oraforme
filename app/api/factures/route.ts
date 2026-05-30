@@ -1,0 +1,131 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase-server'
+import { requireTenant } from '@/lib/tenant-guard'
+import { calculerTVACongo } from '@/lib/fiscalite-congo'
+
+export const dynamic = 'force-dynamic'
+
+// GET /api/factures — liste des factures du tenant
+export async function GET(req: NextRequest) {
+  const { ctx, error } = await requireTenant()
+  if (error) return error
+
+  const { searchParams } = new URL(req.url)
+  const statut   = searchParams.get('statut')
+  const page     = Math.max(0, parseInt(searchParams.get('page') ?? '0'))
+  const limit    = Math.min(200, parseInt(searchParams.get('limit') ?? '100'))
+
+  let query = supabaseAdmin
+    .from('factures')
+    .select('*', { count: 'exact' })
+    .eq('tenant_id', ctx.tenantId)
+    .order('created_at', { ascending: false })
+    .range(page * limit, (page + 1) * limit - 1)
+
+  if (statut) query = query.eq('statut', statut)
+
+  const { data, error: dbErr, count } = await query
+  if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 })
+
+  return NextResponse.json({ data: data ?? [], total: count ?? 0, page, limit })
+}
+
+// POST /api/factures — créer une facture + écritures OHADA automatiques
+export async function POST(req: NextRequest) {
+  const { ctx, error } = await requireTenant()
+  if (error) return error
+
+  const body = await req.json()
+  const {
+    invoice_number, client_name, client_address, client_phone, client_email,
+    date, due_date, notes, statut = 'brouillon', lignes = [], type = 'facture',
+  } = body
+
+  if (!client_name?.trim()) {
+    return NextResponse.json({ error: 'Nom du client requis' }, { status: 400 })
+  }
+  if (!lignes.length) {
+    return NextResponse.json({ error: 'Au moins une ligne requise' }, { status: 400 })
+  }
+
+  const ht = lignes.reduce(
+    (s: number, l: { price: number; quantity: number }) => s + l.price * l.quantity, 0
+  )
+  const { tva, ca, ttc } = calculerTVACongo(ht)
+
+  // Créer la facture
+  const { data: facture, error: facErr } = await supabaseAdmin
+    .from('factures')
+    .insert({
+      tenant_id:      ctx.tenantId,
+      invoice_number,
+      client_name,
+      client_nom:     client_name,
+      client_address: client_address || null,
+      client_phone:   client_phone   || null,
+      client_email:   client_email   || null,
+      date:           date ?? new Date().toISOString().split('T')[0],
+      due_date:       due_date       || null,
+      subtotal:       ht,
+      montant_ht:     ht,
+      tva,
+      ca,
+      total:          ttc,
+      notes:          notes          || null,
+      statut,
+      type,
+    })
+    .select('id')
+    .single()
+
+  if (facErr) return NextResponse.json({ error: facErr.message }, { status: 500 })
+
+  // Insérer les lignes
+  if (facture?.id && lignes.length) {
+    await supabaseAdmin.from('facture_lignes').insert(
+      lignes
+        .filter((l: { description: string }) => l.description)
+        .map((l: { description: string; price: number; quantity: number }) => ({
+          invoice_id:  facture.id,
+          description: l.description,
+          price:       l.price,
+          quantity:    l.quantity,
+          total:       l.price * l.quantity,
+        }))
+    )
+  }
+
+  // Écritures OHADA — uniquement pour les factures émises (pas les brouillons)
+  if (facture?.id && statut !== 'brouillon' && type !== 'avoir') {
+    const today    = date ?? new Date().toISOString().split('T')[0]
+    const fiscYear = new Date(today).getFullYear()
+    const pieceNum = invoice_number ?? `FAC-${facture.id.slice(0, 8).toUpperCase()}`
+
+    // Partie double : 3 lignes d'écriture
+    // 1. Vente HT : débit 411 Clients / crédit 701 Ventes
+    // 2. TVA 18% : débit 411 Clients / crédit 443 TVA facturée
+    // 3. CA 5%   : débit 411 Clients / crédit 447 Impôts et taxes
+    const entries = [
+      { credit_account: '701000', montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
+      { credit_account: '443000', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA 18%` },
+      { credit_account: '447000', montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
+    ].filter(e => e.montant > 0)
+
+    await supabaseAdmin.from('journal_entries').insert(
+      entries.map(e => ({
+        tenant_id:      ctx.tenantId,
+        date_operation: today,
+        libelle:        e.libelle,
+        debit_account:  '411000',
+        credit_account: e.credit_account,
+        montant:        e.montant,
+        source:         'facture',
+        source_id:      facture.id,
+        fiscal_year:    fiscYear,
+        piece_number:   pieceNum,
+      }))
+    )
+  }
+
+  return NextResponse.json({ id: facture.id, ht, tva, ca, ttc })
+}

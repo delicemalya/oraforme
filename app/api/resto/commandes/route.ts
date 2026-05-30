@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
       .select('id')
       .eq('tenant_id', tenantId)
       .eq('nom', it.nom)
+      .order('created_at', { ascending: true })
+      .limit(1)
       .maybeSingle()
     if (!menuItem) continue
 

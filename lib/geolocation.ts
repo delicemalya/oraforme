@@ -34,8 +34,13 @@ export const PAYS_CONFIG: Record<string, PaysGeo> = {
   NG: { code: 'NG', nom: 'Nigeria',            drapeau: '🇳🇬', devise: 'NGN',  symbole: '₦', locale: 'en-NG', zone: 'anglophone', langue_officielle: 'en' },
   KE: { code: 'KE', nom: 'Kenya',              drapeau: '🇰🇪', devise: 'KES',  symbole: 'KSh', locale: 'en-KE', zone: 'anglophone', langue_officielle: 'en' },
   GH: { code: 'GH', nom: 'Ghana',              drapeau: '🇬🇭', devise: 'GHS',  symbole: '₵', locale: 'en-GH', zone: 'anglophone', langue_officielle: 'en' },
-  FR: { code: 'FR', nom: 'France',             drapeau: '🇫🇷', devise: 'EUR',  symbole: '€', locale: 'fr-FR', zone: 'UE', smig: 1_767, langue_officielle: 'fr' },
-  US: { code: 'US', nom: 'États-Unis',         drapeau: '🇺🇸', devise: 'USD',  symbole: '$', locale: 'en-US', zone: 'autre', langue_officielle: 'en' },
+  FR: { code: 'FR', nom: 'France',               drapeau: '🇫🇷', devise: 'EUR',  symbole: '€',   locale: 'fr-FR', zone: 'UE',        smig: 1_767,    langue_officielle: 'fr' },
+  BE: { code: 'BE', nom: 'Belgique',             drapeau: '🇧🇪', devise: 'EUR',  symbole: '€',   locale: 'fr-BE', zone: 'UE',        smig: 1_956,    langue_officielle: 'fr' },
+  CH: { code: 'CH', nom: 'Suisse',               drapeau: '🇨🇭', devise: 'CHF',  symbole: 'CHF', locale: 'fr-CH', zone: 'UE',        smig: 3_500,    langue_officielle: 'fr' },
+  TD: { code: 'TD', nom: 'Tchad',                drapeau: '🇹🇩', devise: 'FCFA', symbole: '₣',   locale: 'fr-TD', zone: 'CEMAC',                     langue_officielle: 'fr' },
+  CF: { code: 'CF', nom: 'RCA',                  drapeau: '🇨🇫', devise: 'FCFA', symbole: '₣',   locale: 'fr-CF', zone: 'CEMAC',                     langue_officielle: 'fr' },
+  GQ: { code: 'GQ', nom: 'Guinée Équatoriale',   drapeau: '🇬🇶', devise: 'FCFA', symbole: '₣',   locale: 'es-GQ', zone: 'CEMAC',     smig: 129_035,  langue_officielle: 'es' },
+  US: { code: 'US', nom: 'États-Unis',           drapeau: '🇺🇸', devise: 'USD',  symbole: '$',   locale: 'en-US', zone: 'autre',                     langue_officielle: 'en' },
 }
 
 export const PAYS_GEO_LIST = Object.values(PAYS_CONFIG)
@@ -46,28 +51,32 @@ export function getPaysGeo(code: string): PaysGeo {
 
 // IP country code → app country code (some ISPs report differently)
 const COUNTRY_CODE_MAP: Record<string, string> = {
-  CD: 'CD', CG: 'CG', CM: 'CM', GA: 'GA', CF: 'CG', TD: 'CG',
+  CD: 'CD', CG: 'CG', CM: 'CM', GA: 'GA', CF: 'CF', TD: 'TD', GQ: 'GQ',
   SN: 'SN', CI: 'CI', ML: 'ML', BF: 'BF', TG: 'TG', BJ: 'BJ',
   NE: 'NE', GN: 'GN', AO: 'AO', MZ: 'MZ', MA: 'MA', DZ: 'DZ',
-  TN: 'TN', NG: 'NG', KE: 'KE', GH: 'GH', FR: 'FR', BE: 'FR',
-  CH: 'FR', US: 'US', CA: 'US', GB: 'US',
+  TN: 'TN', NG: 'NG', KE: 'KE', GH: 'GH', FR: 'FR', BE: 'BE',
+  CH: 'CH', US: 'US', CA: 'US', GB: 'US',
 }
 
 export function mapIpCountryToAppCode(ipCountry: string): string {
   return COUNTRY_CODE_MAP[ipCountry] ?? 'CG'
 }
 
+// Devises sans décimales (entiers uniquement)
+const ZERO_DECIMAL_CURRENCIES = new Set(['FCFA', 'GNF', 'CDF'])
+
 export function formaterMontant(montant: number, code: string): string {
   const pays = getPaysGeo(code)
-  if (pays.devise === 'EUR') {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(montant)
+  const { devise, locale } = pays
+
+  // Devises africaines sans centimes
+  if (ZERO_DECIMAL_CURRENCIES.has(devise)) {
+    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(montant)) + ' ' + devise
   }
-  if (pays.devise === 'USD') {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(montant)
+  // Toutes les autres devises : format Intl standard (EUR, USD, CHF, MAD, NGN, KES…)
+  try {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: devise, maximumFractionDigits: 2 }).format(montant)
+  } catch {
+    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(montant) + ' ' + devise
   }
-  if (pays.devise === 'CHF') {
-    return new Intl.NumberFormat('fr-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 2 }).format(montant)
-  }
-  // FCFA and other non-decimal currencies
-  return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(montant)) + ' ' + pays.devise
 }

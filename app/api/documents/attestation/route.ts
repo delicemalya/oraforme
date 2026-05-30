@@ -35,6 +35,8 @@ export async function GET(req: NextRequest) {
     .from('entreprise_config')
     .select('*')
     .eq('tenant_id', callerProfile.tenant_id)
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle()
 
   const { data: tenant } = await supabaseAdmin

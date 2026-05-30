@@ -78,6 +78,42 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
   transport_public: [
     { id: 'transport', href: '/dashboard/transport', label: 'Transport public', sublabel: 'Lignes & voyageurs' },
   ],
+  btp: [
+    { id: 'btp',           href: '/dashboard/btp',                label: 'Chantiers',    sublabel: 'Tableau de bord BTP'       },
+    { id: 'btp-devis',     href: '/dashboard/btp/devis',          label: 'Devis & AO',   sublabel: 'Devis & appels d\'offres'  },
+    { id: 'btp-chantiers', href: '/dashboard/btp/chantiers',      label: 'Chantiers',    sublabel: 'Projets & avancement'      },
+    { id: 'btp-materiaux', href: '/dashboard/btp/materiaux',      label: 'Matériaux',    sublabel: 'Stock & équipements'       },
+  ],
+  banque: [
+    { id: 'banque',            href: '/dashboard/banque',                label: 'Microfinance', sublabel: 'Tableau de bord'           },
+    { id: 'banque-clients',    href: '/dashboard/banque/clients',        label: 'Membres',      sublabel: 'Comptes & membres'         },
+    { id: 'banque-credits',    href: '/dashboard/banque/credits',        label: 'Crédits',      sublabel: 'Prêts & remboursements'    },
+    { id: 'banque-epargne',    href: '/dashboard/banque/epargne',        label: 'Épargne',      sublabel: 'Dépôts & retraits'         },
+    { id: 'banque-operations', href: '/dashboard/banque/operations',     label: 'Opérations',   sublabel: 'Transactions & virements'  },
+  ],
+  agriculture: [
+    { id: 'agriculture',           href: '/dashboard/agriculture',           label: 'Exploitation', sublabel: 'Tableau de bord agricole'  },
+    { id: 'agriculture-parcelles', href: '/dashboard/agriculture/parcelles', label: 'Parcelles',    sublabel: 'Cultures & superficies'    },
+    { id: 'agriculture-recoltes',  href: '/dashboard/agriculture/recoltes',  label: 'Récoltes',     sublabel: 'Production & stocks'       },
+    { id: 'agriculture-intrants',  href: '/dashboard/agriculture/intrants',  label: 'Intrants',     sublabel: 'Semences, engrais & outils'},
+  ],
+  cabinet: [
+    { id: 'cabinet',        href: '/dashboard/cabinet',         label: 'Cabinet',       sublabel: 'Tableau de bord conseil'   },
+    { id: 'cabinet-projets',href: '/dashboard/cabinet/projets', label: 'Projets',       sublabel: 'Missions & livrables'      },
+  ],
+  petrole: [
+    { id: 'petrole',       href: '/dashboard/petrole',        label: 'Exploitation',  sublabel: 'Tableau de bord pétrole'   },
+    { id: 'petrole-sites', href: '/dashboard/petrole/sites',  label: 'Sites',         sublabel: 'Puits & sites d\'extraction'},
+  ],
+  ong: [
+    { id: 'ong',          href: '/dashboard/ong',         label: 'ONG',          sublabel: 'Tableau de bord associatif' },
+    { id: 'ong-projets',  href: '/dashboard/ong/projets', label: 'Projets',      sublabel: 'Programmes & bailleurs'     },
+    { id: 'ong-dons',     href: '/dashboard/ong/dons',    label: 'Dons',         sublabel: 'Collecte & affectation'     },
+  ],
+  boisson: [
+    { id: 'boisson',         href: '/dashboard/boisson',            label: 'Distribution', sublabel: 'Tableau de bord boissons'  },
+    { id: 'boisson-tournees',href: '/dashboard/boisson/tournees',   label: 'Tournées',     sublabel: 'Livraisons & chauffeurs'   },
+  ],
 }
 
 // ── COUCHE 3 : Plateforme ─────────────────────────────────────────────────────

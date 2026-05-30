@@ -63,7 +63,7 @@ interface HeroCardProps {
   i: number
 }
 
-const ACCENT_COLORS = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6']
+const ACCENT_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6']
 
 function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: HeroCardProps) {
   const accent = ACCENT_COLORS[i % ACCENT_COLORS.length]
@@ -157,8 +157,8 @@ function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending
     <motion.div {...fadeUp(4)} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20 }}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div style={{ width: 32, height: 32, background: 'rgba(245,158,11,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Wallet size={15} style={{ color: '#F59E0B' }} />
+          <div style={{ width: 32, height: 32, background: 'rgba(220,38,38,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Wallet size={15} style={{ color: '#DC2626' }} />
           </div>
           <p style={{ fontSize: 12, fontWeight: 600, color: '#64748B' }}>{t('dash.solde')}</p>
         </div>
@@ -190,12 +190,12 @@ function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending
 function QuickLinksCard({ secteur }: { secteur: string | null; modules: string[] }) {
   const { t } = useLocale()
   const actions = secteur === 'ecole' ? [
-    { label: 'Nouvelle inscription', desc: 'Ajouter un étudiant', href: '/dashboard/ecole/scolarite', color: '#F59E0B', bg: '#FFFBEB', icon: GraduationCap },
+    { label: 'Nouvelle inscription', desc: 'Ajouter un étudiant', href: '/dashboard/ecole/scolarite', color: '#DC2626', bg: '#FFFBEB', icon: GraduationCap },
     { label: 'Valider paiements',    desc: 'Scolarité en attente',  href: '/dashboard/ecole/scolarite', color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
     { label: 'Bulletins de paie',    desc: 'Générer la paie',        href: '/dashboard/ecole/rh',        color: '#2563EB', bg: '#EFF6FF', icon: FileText },
     { label: 'Tableau de bord',      desc: 'Direction générale',     href: '/dashboard/ecole/direction', color: '#7C3AED', bg: '#F5F3FF', icon: BarChart2 },
   ] : [
-    { label: t('dash.newAction'),   desc: t('sc.d.facturation'),   href: '/dashboard/facturation',  color: '#F59E0B', bg: '#FFFBEB', icon: FileText },
+    { label: t('dash.newAction'),   desc: t('sc.d.facturation'),   href: '/dashboard/facturation',  color: '#DC2626', bg: '#FFFBEB', icon: FileText },
     { label: 'Valider factures',    desc: 'Paiements en attente',   href: '/dashboard/facturation',  color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
     { label: 'Rapports',            desc: 'Analyse des données',    href: '/dashboard/bi',           color: '#2563EB', bg: '#EFF6FF', icon: BarChart2 },
     { label: 'Paramètres',          desc: 'Configurer le système',  href: '/dashboard/parametres',   color: '#7C3AED', bg: '#F5F3FF', icon: Settings },
@@ -204,7 +204,7 @@ function QuickLinksCard({ secteur }: { secteur: string | null; modules: string[]
   return (
     <motion.div {...fadeUp(5)} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 18 }}>
       <div className="flex items-center gap-2 mb-3">
-        <Zap size={13} style={{ color: '#F59E0B' }} />
+        <Zap size={13} style={{ color: '#DC2626' }} />
         <p style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{t('dash.quickLinks')}</p>
         <span style={{ fontSize: 10, color: '#94A3B8', marginLeft: 2 }}>Actions fréquentes</span>
       </div>
@@ -236,11 +236,11 @@ function QuickLinksCard({ secteur }: { secteur: string | null; modules: string[]
 function TopModulesCard({ data }: { data: { name: string; value: number; color: string }[] }) {
   const { t } = useLocale()
   const total = data.reduce((s, d) => s + d.value, 0) || 1
-  const BAR_COLORS = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
+  const BAR_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
   return (
     <motion.div {...fadeUp(6)} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 18 }}>
       <div className="flex items-center gap-2 mb-4">
-        <BarChart2 size={13} style={{ color: '#F59E0B' }} />
+        <BarChart2 size={13} style={{ color: '#DC2626' }} />
         <p style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{t('dash.invoiceBreakdown')}</p>
       </div>
       {data.length === 0 ? (
@@ -412,13 +412,13 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
   return (
     <motion.div {...fadeUp(9)} style={{ marginBottom: 24 }}>
       <div className="flex items-center gap-2 mb-4">
-        <Zap size={14} style={{ color: '#F59E0B' }} />
+        <Zap size={14} style={{ color: '#DC2626' }} />
         <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t('dash.shortcuts')}</h3>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {cards.map((sc, i) => {
           const Icon = sc.icon
-          const SHORTCUT_COLORS = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
+          const SHORTCUT_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
           const iconColor = SHORTCUT_COLORS[i % SHORTCUT_COLORS.length]
           return (
             <motion.div
@@ -442,7 +442,7 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLAnchorElement
-                  el.style.borderColor = '#F59E0B'
+                  el.style.borderColor = '#DC2626'
                   el.style.transform = 'translateY(-1px)'
                 }}
                 onMouseLeave={e => {
@@ -483,7 +483,7 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
   const ago  = diff < 3600000 ? `${Math.floor(diff / 60000)}min`
              : diff < 86400000 ? `${Math.floor(diff / 3600000)}h`
              : `${Math.floor(diff / 86400000)}j`
-  const colors = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C', '#64748B']
+  const colors = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C', '#64748B']
   const avatarColor = colors[item.client_nom.charCodeAt(0) % colors.length]
 
   return (
@@ -582,7 +582,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
       {secteur === 'ecole' && ecoleRole && ecoleRole !== 'DIRECTION_GENERALE' && (() => {
         const ROLE_LABELS: Record<string, { labelKey: string; color: string }> = {
           DAAC:      { labelKey: 'roles.daac_full',     color: '#2563EB' },
-          SCOLARITE: { labelKey: 'roles.scolarite_full',color: '#F59E0B' },
+          SCOLARITE: { labelKey: 'roles.scolarite_full',color: '#DC2626' },
           RAF:       { labelKey: 'roles.raf_full',      color: '#16A34A' },
           RH_PAIE:   { labelKey: 'roles.rhPaie_full',   color: '#7C3AED' },
           FORMATEUR: { labelKey: 'roles.formateur_full',color: '#0891B2' },
@@ -611,13 +611,13 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
       {/* ── Welcome Banner ───────────────────────────────────────────────── */}
       <motion.div {...fadeUp(0)} style={{ background: '#0F172A', borderRadius: 16, padding: '24px 28px', position: 'relative', overflow: 'hidden' }}>
         {/* Subtle amber glow top-right */}
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(220,38,38,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
             {/* Date badge */}
             <div className="flex items-center gap-2 mb-3">
-              <span style={{ background: 'rgba(245,158,11,0.15)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.25)', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
+              <span style={{ background: 'rgba(220,38,38,0.15)', color: '#DC2626', border: '1px solid rgba(220,38,38,0.25)', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
                 {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
@@ -626,7 +626,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             </h1>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>
               <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{tenant.nom_entreprise}</span>
-              {' · '}{t('dash.plan')} <span style={{ color: '#F59E0B', fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
+              {' · '}{t('dash.plan')} <span style={{ color: '#DC2626', fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
               {' · '}{tenant.modules_actifs.length} modules actifs
             </p>
           </div>
@@ -635,7 +635,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             <Link
               href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
               className="flex items-center gap-1.5 text-xs font-bold rounded-xl transition-all hover:opacity-90"
-              style={{ background: '#F59E0B', color: '#0F172A', padding: '8px 16px' }}
+              style={{ background: '#DC2626', color: '#0F172A', padding: '8px 16px' }}
             >
               <Download size={12} /> Export
             </Link>
@@ -661,7 +661,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
               <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px' }}>
                 <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', marginBottom: 5 }}>{k.label}</p>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>{k.value}</p>
-                {k.trend && <p style={{ fontSize: 10, color: '#F59E0B', marginTop: 3 }}>{k.trend} vs hier</p>}
+                {k.trend && <p style={{ fontSize: 10, color: '#DC2626', marginTop: 3 }}>{k.trend} vs hier</p>}
               </div>
             ))}
           </div>
@@ -713,7 +713,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
               <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{t('dash.lastTransactions')}</h3>
               <p style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{recentActivity.length} {t('dash.lastFactures')}</p>
             </div>
-            <Link href="/dashboard/facturation" style={{ fontSize: 12, color: '#F59E0B', fontWeight: 600 }}>
+            <Link href="/dashboard/facturation" style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
               {t('dash.viewAll')} →
             </Link>
           </div>
@@ -745,8 +745,8 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
           textAlign: 'center',
           marginBottom: 24,
         }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-            <Star size={20} style={{ color: '#F59E0B' }} />
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(220,38,38,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+            <Star size={20} style={{ color: '#DC2626' }} />
           </div>
           <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>{t('dash.restricted')}</p>
           <p style={{ fontSize: 12, color: '#64748B' }}>{t('dash.restrictedMsg')}</p>

@@ -36,9 +36,9 @@ export async function GET(
     supabaseAdmin
       .from('entreprise_config')
       .select('*')
-      .eq('tenant_id', (
-        await supabaseAdmin.from('factures').select('tenant_id').eq('id', id).single()
-      ).data?.tenant_id ?? '')
+      .eq('tenant_id', callerProfile.tenant_id)
+      .order('created_at', { ascending: true })
+      .limit(1)
       .maybeSingle(),
   ])
 
