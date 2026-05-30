@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Bot, Send, Sparkles, TrendingUp, TrendingDown, AlertTriangle,
+  Send, TrendingUp, TrendingDown, AlertTriangle,
   Users, CreditCard, ClipboardList, BarChart2, RefreshCw, Lightbulb,
   GraduationCap, BookOpen, Calendar, ChevronRight, Loader2,
 } from 'lucide-react'
@@ -68,11 +68,11 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
       animate={{ opacity: 1, y: 0 }}
       className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}
     >
-      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
-        isUser ? 'bg-orange-500/20' : 'bg-orange-500/30'
-      }`}>
-        {isUser ? <Users size={13} className="text-orange-400" /> : <Bot size={13} className="text-orange-400" />}
-      </div>
+      {isUser
+        ? <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 bg-orange-500/20"><Users size={13} className="text-orange-400" /></div>
+        /* eslint-disable-next-line @next/next/no-img-element */
+        : <img src="/miaa-logo.png" alt="MIAA+" className="w-7 h-7 rounded-full object-cover shrink-0" />
+      }
       <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
         isUser
           ? 'bg-orange-500/20 text-[#101729] rounded-tr-sm'
@@ -264,12 +264,11 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
       {/* Header */}
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-orange-500/20">
-            <Bot size={20} className="text-orange-400" />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/miaa-logo.png" alt="MIAA+" className="w-10 h-10 rounded-full object-cover shrink-0" style={{ filter: 'drop-shadow(0 2px 6px rgba(220,38,38,0.4))' }} />
           <div>
             <h1 className="text-lg font-bold text-[#101729] flex items-center gap-2">
-              MIAA+ <Sparkles size={14} className="text-orange-400" />
+              MIAA+
             </h1>
             <p className="text-xs text-[var(--text-secondary)]">{t('ecole.miaa.subtitle')}</p>
           </div>
@@ -331,9 +330,8 @@ ${ctx.paiementsRecents.map(p => `- ${p.libelle}: ${fmt(p.montant)} (${p.statut})
             </AnimatePresence>
             {thinking && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center bg-orange-500/30">
-                  <Bot size={13} className="text-orange-400" />
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/miaa-logo.png" alt="MIAA+" className="w-7 h-7 rounded-full object-cover shrink-0" />
                 <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce [animation-delay:0ms]" />
                   <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce [animation-delay:150ms]" />

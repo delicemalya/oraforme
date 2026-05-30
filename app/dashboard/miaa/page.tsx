@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Send, Sparkles, Calculator, BarChart2, FileText,
+  Send, Calculator, BarChart2, FileText,
   Bell, Cog, Globe, Loader2, Trash2, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -15,10 +15,26 @@ interface Message { role: 'user' | 'bot'; text: string; ts?: number }
 
 // ── MIAA+ Logo ────────────────────────────────────────────────────────────────
 
-function MIAALogo({ size = 40 }: { size?: number }) {
+function MIAALogo({ size = 40, animate = false }: { size?: number; animate?: boolean }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src="/logo-icon.png" alt="MIAA+" className="shrink-0 rounded-full" style={{ width: size, height: size, objectFit: 'cover' }} />
+    <div className="relative shrink-0 flex items-center justify-center" style={{ width: size, height: size }}>
+      {animate && (
+        <div
+          className="absolute inset-[-4px] rounded-full"
+          style={{
+            background: 'conic-gradient(from 0deg, transparent 60%, #DC2626 80%, #FF4444 90%, transparent 100%)',
+            animation: 'spin 5s linear infinite',
+          }}
+        />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/miaa-logo.png"
+        alt="MIAA+"
+        className="relative z-10 rounded-full object-cover"
+        style={{ width: size, height: size, filter: animate ? 'drop-shadow(0 2px 8px rgba(220,38,38,0.5))' : undefined }}
+      />
+    </div>
   )
 }
 
@@ -304,7 +320,7 @@ export default function MIAAPage() {
         {/* Capabilities */}
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4">
           <p className="text-xs font-bold text-[var(--text)] mb-3 flex items-center gap-2">
-            <Sparkles size={13} className="text-[#DC2626]" /> {t('miaa.capabilities')}
+            <MIAALogo size={18} /> {t('miaa.capabilities')}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {CAPABILITIES.map(cap => {

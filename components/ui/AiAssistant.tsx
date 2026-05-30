@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Sparkles, Mic, ChevronLeft } from 'lucide-react'
+import { X, Send, Mic, ChevronLeft } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -324,20 +324,48 @@ export default function AiAssistant() {
       {/* ── Floating button ──────────────────────────────────────────────── */}
       <div className={`fixed z-50 flex flex-col items-center gap-1 ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'}`}>
         <motion.button
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.92 }}
+          whileHover={{ scale: 1.10 }}
+          whileTap={{ scale: 0.88 }}
           onClick={() => setOpen(o => !o)}
-          className="relative w-[54px] h-[54px] rounded-full shadow-xl flex items-center justify-center"
-          style={{ background: '#DC2626' }}
+          className="relative w-[62px] h-[62px] flex items-center justify-center"
           title="MIAA+ — Assistant IA"
         >
-          <span className="absolute inset-0 rounded-full bg-[#DC2626]/40 animate-ping" style={{ animationDuration: '2.5s' }} />
-          <Sparkles size={22} className="text-white relative z-10" />
-          <span className="absolute -top-1 -right-1 bg-[#7C3AED] text-white font-black rounded-full flex items-center justify-center z-20" style={{ fontSize: 7, width: 16, height: 16 }}>
-            IA
-          </span>
+          {/* Rotating conic glow ring */}
+          <motion.div
+            className="absolute inset-[-5px] rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+            style={{
+              background: 'conic-gradient(from 0deg, transparent 60%, #DC2626 80%, #FF4444 90%, transparent 100%)',
+              borderRadius: '50%',
+            }}
+          />
+          {/* Pulse halo */}
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ background: 'radial-gradient(circle, #DC262680 0%, transparent 70%)' }}
+          />
+          {/* Logo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/miaa-logo.png"
+            alt="MIAA+"
+            className="relative z-10 rounded-full object-cover shadow-lg"
+            style={{
+              width: 62, height: 62,
+              filter: 'drop-shadow(0 3px 10px rgba(220,38,38,0.55))',
+            }}
+          />
         </motion.button>
-        <span className="text-[10px] font-bold text-[#DC2626] tracking-wide select-none">MIAA+</span>
+        <motion.span
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="text-[10px] font-bold text-[#DC2626] tracking-wide select-none"
+        >
+          MIAA+
+        </motion.span>
       </div>
 
       {/* ── Backdrop ─────────────────────────────────────────────────────── */}
