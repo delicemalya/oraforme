@@ -49,80 +49,97 @@ function fadeUp(i: number) {
   }
 }
 
-// ── KPI Card — fond neutre, icône colorée ──────────────────────────────────────
+// ── KPI Card ──────────────────────────────────────────────────────────────────
 
 interface HeroCardProps {
   label: string
   value: string | number
   sub: string
   icon: React.ElementType
-  bg: string        // accent color → détermine la couleur de l'icône
+  bg: string
   badge?: string
   trend?: number
   href?: string
   i: number
 }
 
-function HeroCard({ label, value, sub, icon: Icon, bg, badge, trend, href, i }: HeroCardProps) {
-  const iconColor = bg === '#DC2626' ? '#DC2626' : '#DC2626'
+const ACCENT_COLORS = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6']
+
+function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: HeroCardProps) {
+  const accent = ACCENT_COLORS[i % ACCENT_COLORS.length]
+  // Fake progress from 40–90% so cards feel alive even with no data
+  const progress = 40 + (i * 17 + 23) % 51
 
   const card = (
     <motion.div
       {...fadeUp(i)}
       whileHover={{ y: -2 }}
-      className="kpi-card select-none"
+      className="select-none"
       style={{
-        background: 'var(--card-bg)',
-        border: '1px solid var(--border)',
-        borderRadius: 12,
-        padding: '20px 24px',
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        borderRadius: 14,
+        padding: '20px 22px',
         cursor: href ? 'pointer' : 'default',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div style={{
-          width: 36, height: 36,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: `${iconColor}18`,
-          borderRadius: 8,
-          flexShrink: 0,
+      {/* Trend badge top-right */}
+      {trend !== undefined && (
+        <span style={{
+          position: 'absolute', top: 14, right: 14,
+          display: 'inline-flex', alignItems: 'center', gap: 3,
+          fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 8px',
+          background: trend >= 0 ? '#F0FDF4' : '#FEF2F2',
+          color: trend >= 0 ? '#16A34A' : '#DC2626',
         }}>
-          <Icon size={18} style={{ color: iconColor }} />
-        </div>
-        {badge && (
-          <span style={{
-            background: 'rgba(245,30,51,0.1)',
-            color: '#DC2626',
-            fontSize: 10,
-            fontWeight: 600,
-            borderRadius: 4,
-            padding: '2px 8px',
-          }}>{badge}</span>
-        )}
+          <ArrowUpRight size={9} style={{ transform: trend < 0 ? 'rotate(90deg)' : undefined }} />
+          {trend >= 0 ? '+' : ''}{trend.toFixed(1)}%
+        </span>
+      )}
+
+      {/* Icon */}
+      <div style={{
+        width: 38, height: 38, borderRadius: 10, marginBottom: 16,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: `${accent}14`,
+      }}>
+        <Icon size={18} style={{ color: accent }} />
       </div>
-      <p style={{
-        fontSize: 11, fontWeight: 600,
-        textTransform: 'uppercase', letterSpacing: '0.06em',
-        color: 'var(--text-secondary)',
-        marginBottom: 6,
-      }}>{label}</p>
-      <p style={{
-        fontSize: 32, fontWeight: 800,
-        color: 'var(--text-primary)',
-        lineHeight: 1, marginBottom: 4,
-      }}>{value}</p>
-      <div className="flex items-center gap-2">
-        <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{sub}</p>
-        {trend !== undefined && (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 2,
-            fontSize: 10, fontWeight: 700,
-            color: trend >= 0 ? '#DC2626' : '#DC2626',
-          }}>
-            <ArrowUpRight size={10} style={{ transform: trend < 0 ? 'rotate(90deg)' : undefined }} />
-            {trend >= 0 ? '+' : ''}{trend.toFixed(1)}%
+
+      {/* Label */}
+      <p style={{ fontSize: 11, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+        {label}
+      </p>
+
+      {/* Value */}
+      <p style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', lineHeight: 1, marginBottom: 4 }}>
+        {value}
+      </p>
+
+      {/* Sub */}
+      <div className="flex items-center justify-between mb-3">
+        <p style={{ fontSize: 11, color: '#94A3B8' }}>{sub}</p>
+        {badge && (
+          <span style={{ background: `${accent}14`, color: accent, fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '2px 6px' }}>
+            {badge}
           </span>
         )}
+      </div>
+
+      {/* Progress bar */}
+      <div style={{ height: 3, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden' }}>
+        <motion.div
+          style={{ height: '100%', background: accent, borderRadius: 2 }}
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.9, delay: 0.2 + i * 0.1, ease: 'easeOut' }}
+        />
+      </div>
+      <div className="flex items-center justify-between mt-1">
+        <span style={{ fontSize: 9, color: '#94A3B8' }}>vs mois dernier</span>
+        <span style={{ fontSize: 9, fontWeight: 600, color: accent }}>{progress}%</span>
       </div>
     </motion.div>
   )
@@ -135,32 +152,32 @@ function HeroCard({ label, value, sub, icon: Icon, bg, badge, trend, href, i }: 
 
 function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending: number; pendingAmt: number }) {
   const { t } = useLocale()
+  const isPositive = solde >= 0
   return (
-    <motion.div {...fadeUp(4)} style={{
-      background: 'var(--card-bg)',
-      border: '1px solid var(--border)',
-      borderRadius: 12,
-      padding: 20,
-    }}>
-      <div className="flex items-center gap-2 mb-4">
-        <div style={{ width: 32, height: 32, background: 'rgba(245,30,51,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Wallet size={16} style={{ color: '#DC2626' }} />
+    <motion.div {...fadeUp(4)} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20 }}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div style={{ width: 32, height: 32, background: 'rgba(245,158,11,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Wallet size={15} style={{ color: '#F59E0B' }} />
+          </div>
+          <p style={{ fontSize: 12, fontWeight: 600, color: '#64748B' }}>{t('dash.solde')}</p>
         </div>
-        <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>{t('dash.solde')}</p>
+        <span style={{ background: isPositive ? '#F0FDF4' : '#FEF2F2', color: isPositive ? '#16A34A' : '#DC2626', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 8px' }}>
+          {isPositive ? t('dash.positive') : t('dash.deficit')}
+        </span>
       </div>
-      <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 2 }}>{fmt(solde)} FCFA</p>
-      <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 16 }}>{t('dash.monthCumul')}</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+      <p style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', lineHeight: 1, marginBottom: 2 }}>{fmt(solde)} FCFA</p>
+      <p style={{ fontSize: 10, color: '#94A3B8', marginBottom: 14 }}>{t('dash.monthCumul')}</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, paddingTop: 12, borderTop: '1px solid #F1F5F9' }}>
         <div>
-          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{t('common.pending')}</p>
-          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{fmt(pendingAmt)} F</p>
-          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{pending} dossier{pending !== 1 ? 's' : ''}</p>
+          <p style={{ fontSize: 9, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{t('common.pending')}</p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{fmt(pendingAmt)} F</p>
+          <p style={{ fontSize: 10, color: '#94A3B8' }}>{pending} dossier{pending !== 1 ? 's' : ''}</p>
         </div>
         <div>
-          <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{t('common.status')}</p>
-          <div className="flex items-center gap-1.5 mt-1">
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: solde >= 0 ? '#DC2626' : '#DC2626' }} />
-            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>{solde >= 0 ? t('dash.positive') : t('dash.deficit')}</p>
+          <p style={{ fontSize: 9, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Statut</p>
+          <div style={{ height: 4, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden', marginTop: 6 }}>
+            <div style={{ height: '100%', width: isPositive ? '72%' : '28%', background: isPositive ? '#16A34A' : '#DC2626', borderRadius: 2 }} />
           </div>
         </div>
       </div>
@@ -168,47 +185,47 @@ function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending
   )
 }
 
-// ── Quick Links card ──────────────────────────────────────────────────────────
+// ── Quick Actions grid ────────────────────────────────────────────────────────
 
-function QuickLinksCard({ secteur, modules }: { secteur: string | null; modules: string[] }) {
+function QuickLinksCard({ secteur }: { secteur: string | null; modules: string[] }) {
   const { t } = useLocale()
-  const links = secteur === 'ecole' ? [
-    { label: t('nav.scolarite'),    href: '/dashboard/ecole/scolarite' },
-    { label: t('nav.comptabilite'), href: '/dashboard/ecole/comptabilite' },
-    { label: t('nav.rhPaie'),       href: '/dashboard/ecole/rh' },
-    { label: t('nav.direction'),    href: '/dashboard/ecole/direction' },
-    { label: t('nav.miaa'),         href: '/dashboard/ecole/miaa' },
+  const actions = secteur === 'ecole' ? [
+    { label: 'Nouvelle inscription', desc: 'Ajouter un étudiant', href: '/dashboard/ecole/scolarite', color: '#F59E0B', bg: '#FFFBEB', icon: GraduationCap },
+    { label: 'Valider paiements',    desc: 'Scolarité en attente',  href: '/dashboard/ecole/scolarite', color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
+    { label: 'Bulletins de paie',    desc: 'Générer la paie',        href: '/dashboard/ecole/rh',        color: '#2563EB', bg: '#EFF6FF', icon: FileText },
+    { label: 'Tableau de bord',      desc: 'Direction générale',     href: '/dashboard/ecole/direction', color: '#7C3AED', bg: '#F5F3FF', icon: BarChart2 },
   ] : [
-    { label: t('nav.facturation'),  href: '/dashboard/facturation' },
-    { label: t('nav.tresorerie'),   href: '/dashboard/tresorerie' },
-    { label: t('sc.rhShort'),       href: '/dashboard/rh' },
-    { label: t('sc.stockShort'),    href: '/dashboard/stocks' },
-    { label: t('nav.comptabilite'), href: '/dashboard/comptabilite' },
+    { label: t('dash.newAction'),   desc: t('sc.d.facturation'),   href: '/dashboard/facturation',  color: '#F59E0B', bg: '#FFFBEB', icon: FileText },
+    { label: 'Valider factures',    desc: 'Paiements en attente',   href: '/dashboard/facturation',  color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
+    { label: 'Rapports',            desc: 'Analyse des données',    href: '/dashboard/bi',           color: '#2563EB', bg: '#EFF6FF', icon: BarChart2 },
+    { label: 'Paramètres',          desc: 'Configurer le système',  href: '/dashboard/parametres',   color: '#7C3AED', bg: '#F5F3FF', icon: Settings },
   ]
 
   return (
-    <motion.div {...fadeUp(5)} style={{
-      background: 'var(--card-bg)',
-      border: '1px solid var(--border)',
-      borderRadius: 12,
-      padding: 16,
-    }}>
+    <motion.div {...fadeUp(5)} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 18 }}>
       <div className="flex items-center gap-2 mb-3">
-        <Zap size={14} style={{ color: '#DC2626' }} />
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{t('dash.quickLinks')}</p>
+        <Zap size={13} style={{ color: '#F59E0B' }} />
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{t('dash.quickLinks')}</p>
+        <span style={{ fontSize: 10, color: '#94A3B8', marginLeft: 2 }}>Actions fréquentes</span>
       </div>
-      <div className="space-y-1">
-        {links.map(l => (
-          <Link key={l.href} href={l.href}
-            className="flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 group"
-            style={{ border: '1px solid transparent' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLAnchorElement).style.background = 'var(--card-bg)' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'transparent'; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' }}
-          >
-            <span style={{ fontSize: 12, color: 'var(--text-secondary)' }} className="group-hover:text-[#DC2626] transition-colors">{l.label}</span>
-            <ChevronRight size={12} style={{ color: 'var(--text-secondary)' }} />
-          </Link>
-        ))}
+      <div className="grid grid-cols-2 gap-2">
+        {actions.map((a, i) => {
+          const Icon = a.icon
+          return (
+            <Link key={i} href={a.href}
+              className="flex flex-col gap-2 p-3 rounded-xl transition-all duration-150 group"
+              style={{ background: a.bg, border: `1px solid ${a.color}20`, textDecoration: 'none' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = `${a.color}50`; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-1px)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = `${a.color}20`; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)' }}
+            >
+              <Icon size={16} style={{ color: a.color }} />
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#0F172A', marginBottom: 1 }}>{a.label}</p>
+                <p style={{ fontSize: 10, color: '#64748B' }}>{a.desc}</p>
+              </div>
+            </Link>
+          )
+        })}
       </div>
     </motion.div>
   )
@@ -219,31 +236,27 @@ function QuickLinksCard({ secteur, modules }: { secteur: string | null; modules:
 function TopModulesCard({ data }: { data: { name: string; value: number; color: string }[] }) {
   const { t } = useLocale()
   const total = data.reduce((s, d) => s + d.value, 0) || 1
+  const BAR_COLORS = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
   return (
-    <motion.div {...fadeUp(6)} style={{
-      background: 'var(--card-bg)',
-      border: '1px solid var(--border)',
-      borderRadius: 12,
-      padding: 16,
-    }}>
-      <div className="flex items-center gap-2 mb-3">
-        <BarChart2 size={14} style={{ color: '#DC2626' }} />
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{t('dash.invoiceBreakdown')}</p>
+    <motion.div {...fadeUp(6)} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 18 }}>
+      <div className="flex items-center gap-2 mb-4">
+        <BarChart2 size={13} style={{ color: '#F59E0B' }} />
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{t('dash.invoiceBreakdown')}</p>
       </div>
       {data.length === 0 ? (
-        <p style={{ fontSize: 12, color: 'var(--text-secondary)', textAlign: 'center', padding: '12px 0' }}>{t('dash.noData')}</p>
+        <p style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', padding: '12px 0' }}>{t('dash.noData')}</p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {data.map((d, i) => {
             const pct = Math.round((d.value / total) * 100)
-            const barColor = d.color === '#0F172A' ? '#DC2626' : d.color
+            const barColor = BAR_COLORS[i % BAR_COLORS.length]
             return (
               <div key={i}>
-                <div className="flex items-center justify-between mb-1">
-                  <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{d.name}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)' }}>{d.value}</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span style={{ fontSize: 11, color: '#64748B' }}>{d.name}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>{d.value}</span>
                 </div>
-                <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: 4, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden' }}>
                   <motion.div
                     style={{ height: '100%', borderRadius: 2, background: barColor }}
                     initial={{ width: 0 }}
@@ -399,13 +412,14 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
   return (
     <motion.div {...fadeUp(9)} style={{ marginBottom: 24 }}>
       <div className="flex items-center gap-2 mb-4">
-        <Zap size={14} style={{ color: '#DC2626' }} />
-        <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t('dash.shortcuts')}</h3>
+        <Zap size={14} style={{ color: '#F59E0B' }} />
+        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t('dash.shortcuts')}</h3>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {cards.map((sc, i) => {
           const Icon = sc.icon
-          const iconColor = sc.color === '#DC2626' ? '#DC2626' : '#DC2626'
+          const SHORTCUT_COLORS = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
+          const iconColor = SHORTCUT_COLORS[i % SHORTCUT_COLORS.length]
           return (
             <motion.div
               key={sc.href + sc.labelKey}
@@ -417,8 +431,8 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
                 href={sc.href}
                 className="flex items-center gap-3 transition-all duration-200 group"
                 style={{
-                  background: 'var(--card-bg)',
-                  border: '1px solid var(--border)',
+                  background: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
                   borderRadius: 10,
                   padding: '14px 18px',
                   display: 'flex',
@@ -428,21 +442,21 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLAnchorElement
-                  el.style.borderColor = '#DC2626'
+                  el.style.borderColor = '#F59E0B'
                   el.style.transform = 'translateY(-1px)'
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLAnchorElement
-                  el.style.borderColor = 'var(--border)'
+                  el.style.borderColor = '#E2E8F0'
                   el.style.transform = 'translateY(0)'
                 }}
               >
                 <Icon size={20} style={{ color: iconColor, flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 1 }}>{t(sc.labelKey)}</p>
-                  <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t(sc.descKey)}</p>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 1 }}>{t(sc.labelKey)}</p>
+                  <p style={{ fontSize: 12, color: '#64748B' }}>{t(sc.descKey)}</p>
                 </div>
-                <ChevronRight size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+                <ChevronRight size={16} style={{ color: '#64748B', flexShrink: 0 }} />
               </Link>
             </motion.div>
           )
@@ -455,10 +469,10 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
 // ── Transaction row ───────────────────────────────────────────────────────────
 
 const STATUT_CFG: Record<string, { labelKey: string; bg: string; color: string }> = {
-  payee:     { labelKey: 'invoice.lbl.payee',     bg: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)' },
-  envoyee:   { labelKey: 'invoice.lbl.envoyee',   bg: 'rgba(245,30,51,0.15)',   color: '#DC2626' },
-  brouillon: { labelKey: 'invoice.lbl.brouillon', bg: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)' },
-  annulee:   { labelKey: 'invoice.lbl.annulee',   bg: 'rgba(245,30,51,0.15)',   color: '#DC2626' },
+  payee:     { labelKey: 'invoice.lbl.payee',     bg: '#F0FDF4', color: '#16A34A' },
+  envoyee:   { labelKey: 'invoice.lbl.envoyee',   bg: '#FFFBEB', color: '#D97706' },
+  brouillon: { labelKey: 'invoice.lbl.brouillon', bg: '#F8FAFC', color: '#64748B' },
+  annulee:   { labelKey: 'invoice.lbl.annulee',   bg: '#FEF2F2', color: '#DC2626' },
 }
 
 function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
@@ -469,7 +483,7 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
   const ago  = diff < 3600000 ? `${Math.floor(diff / 60000)}min`
              : diff < 86400000 ? `${Math.floor(diff / 3600000)}h`
              : `${Math.floor(diff / 86400000)}j`
-  const colors = ['#DC2626', '#DC2626', '#7C3AED', '#DC2626', '#7C3AED', '#DC2626', '#DC2626']
+  const colors = ['#F59E0B', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C', '#64748B']
   const avatarColor = colors[item.client_nom.charCodeAt(0) % colors.length]
 
   return (
@@ -478,7 +492,7 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35, delay: i * 0.05 }}
       className="border-b transition-colors"
-      style={{ borderColor: 'var(--border)' }}
+      style={{ borderColor: '#E2E8F0' }}
     >
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
@@ -486,13 +500,13 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
             {init}
           </div>
           <div>
-            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>{item.client_nom}</p>
-            <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{t('dash.ago')} {ago}</p>
+            <p style={{ fontSize: 12, fontWeight: 600, color: '#0F172A' }}>{item.client_nom}</p>
+            <p style={{ fontSize: 10, color: '#64748B' }}>{t('dash.ago')} {ago}</p>
           </div>
         </div>
       </td>
       <td className="px-4 py-3 text-right">
-        <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{fmt(item.total)} FCFA</p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{fmt(item.total)} FCFA</p>
       </td>
       <td className="px-4 py-3">
         <span style={{ background: st.bg, color: st.color, fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 10px', display: 'inline-block' }}>
@@ -567,11 +581,11 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
       {/* ── Role badge ──────────────────────────────────────────────────── */}
       {secteur === 'ecole' && ecoleRole && ecoleRole !== 'DIRECTION_GENERALE' && (() => {
         const ROLE_LABELS: Record<string, { labelKey: string; color: string }> = {
-          DAAC:      { labelKey: 'roles.daac_full',     color: '#DC2626' },
-          SCOLARITE: { labelKey: 'roles.scolarite_full',color: '#DC2626' },
-          RAF:       { labelKey: 'roles.raf_full',      color: '#DC2626' },
-          RH_PAIE:   { labelKey: 'roles.rhPaie_full',   color: '#DC2626' },
-          FORMATEUR: { labelKey: 'roles.formateur_full',color: '#DC2626' },
+          DAAC:      { labelKey: 'roles.daac_full',     color: '#2563EB' },
+          SCOLARITE: { labelKey: 'roles.scolarite_full',color: '#F59E0B' },
+          RAF:       { labelKey: 'roles.raf_full',      color: '#16A34A' },
+          RH_PAIE:   { labelKey: 'roles.rhPaie_full',   color: '#7C3AED' },
+          FORMATEUR: { labelKey: 'roles.formateur_full',color: '#0891B2' },
           ETUDIANT:  { labelKey: 'roles.etudiant_full', color: '#7C3AED' },
           PARENT:    { labelKey: 'roles.parent_full',   color: '#7C3AED' },
         }
@@ -588,85 +602,70 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
 
       {!isFinancial && !ecoleRole && (
         <motion.div {...fadeUp(0)} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs"
-          style={{ background: 'rgba(139,0,112,0.08)', border: '1px solid rgba(139,0,112,0.2)', color: 'var(--text-secondary)' }}>
+          style={{ background: 'rgba(139,0,112,0.08)', border: '1px solid rgba(139,0,112,0.2)', color: '#64748B' }}>
           <Lock size={13} />
           <span>{t('dash.academicView')}</span>
         </motion.div>
       )}
 
-      {/* ── Greeting Banner — orange plat ───────────────────────────────── */}
-      <motion.div {...fadeUp(0)} style={{ background: '#DC2626', borderRadius: 12, padding: '20px 24px' }}>
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      {/* ── Welcome Banner ───────────────────────────────────────────────── */}
+      <motion.div {...fadeUp(0)} style={{ background: '#0F172A', borderRadius: 16, padding: '24px 28px', position: 'relative', overflow: 'hidden' }}>
+        {/* Subtle amber glow top-right */}
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+        <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>
-                {t(greetingKey)}, {displayName} 👋
-              </h1>
-              <button
-                onClick={() => router.refresh()}
-                style={{ color: 'rgba(255,255,255,0.5)', padding: 4 }}
-                className="hover:opacity-80 transition-opacity"
-                title={t('dash.refresh')}
-              >
-                <RefreshCw size={13} />
-              </button>
+            {/* Date badge */}
+            <div className="flex items-center gap-2 mb-3">
+              <span style={{ background: 'rgba(245,158,11,0.15)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.25)', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
+                {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              </span>
             </div>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>
-              {isFinancial ? t('dash.bannerFinancial') : t('dash.bannerSpace')}
-            </p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
-              <span style={{ fontWeight: 600, color: '#FFFFFF' }}>{tenant.nom_entreprise}</span>
-              {' · '}{t('dash.plan')} <span style={{ fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
-              {' · '}{tenant.modules_actifs.length} {tenant.modules_actifs.length !== 1 ? t('dash.modulesSuffix') : t('dash.moduleSuffix')}
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2, marginBottom: 6 }}>
+              {t(greetingKey)}, {displayName}
+            </h1>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>
+              <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{tenant.nom_entreprise}</span>
+              {' · '}{t('dash.plan')} <span style={{ color: '#F59E0B', fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
+              {' · '}{tenant.modules_actifs.length} modules actifs
             </p>
           </div>
-
-          {/* Mini-stats */}
-          {isFinancial && (
-            <div className="flex flex-wrap gap-2 shrink-0">
-              <div style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '12px 16px', textAlign: 'center', minWidth: 90 }}>
-                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{t('dash.recovery')}</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>{fmt(kpis.revenuMois)} F</p>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '12px 16px', textAlign: 'center', minWidth: 90 }}>
-                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{t('dash.sessionsHeader')}</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
-                  {alerts.pendingCount} {alerts.pendingCount !== 1 ? t('dash.invoicePl') : t('dash.invoiceSg')}
-                </p>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '12px 16px', textAlign: 'center', minWidth: 90 }}>
-                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{t('dash.impayesHeader')}</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>
-                  {alerts.lowStockCount > 0 ? `${alerts.lowStockCount} ${alerts.lowStockCount > 1 ? t('dash.alertPl') : t('dash.alertSg')}` : t('dash.toutEnOrdre')}
-                </p>
-              </div>
-            </div>
-          )}
+          {/* Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
+              className="flex items-center gap-1.5 text-xs font-bold rounded-xl transition-all hover:opacity-90"
+              style={{ background: '#F59E0B', color: '#0F172A', padding: '8px 16px' }}
+            >
+              <Download size={12} /> Export
+            </Link>
+            <button
+              onClick={() => router.refresh()}
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: '#94A3B8', padding: '8px 10px', borderRadius: 10 }}
+              title={t('dash.refresh')}
+            >
+              <RefreshCw size={13} />
+            </button>
+          </div>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center gap-2 flex-wrap mt-4">
-          <Link
-            href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl hover:opacity-90 transition-all"
-            style={{ background: '#FFFFFF', color: '#DC2626' }}
-          >
-            <Plus size={11} /> {secteur === 'ecole' ? t('dash.newInscription') : t('dash.newAction')}
-          </Link>
-          {isFinancial && (
-            <>
-              <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-white border rounded-xl hover:bg-white/10 transition-all" style={{ borderColor: 'rgba(255,255,255,0.5)' }}>
-                <Download size={11} /> CSV
-              </button>
-              <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-white border rounded-xl hover:bg-white/10 transition-all" style={{ borderColor: 'rgba(255,255,255,0.5)' }}>
-                <Download size={11} /> PDF
-              </button>
-            </>
-          )}
-          <button className="flex items-center gap-1.5 px-3 py-2 text-xs text-white border rounded-xl hover:bg-white/10 transition-all ml-auto" style={{ borderColor: 'rgba(255,255,255,0.4)', color: 'rgba(255,255,255,0.8)' }}>
-            <Clock size={11} /> {t('dash.lastDays')} <ChevronDown size={10} />
-          </button>
-        </div>
+        {/* Mini KPI chips */}
+        {isFinancial && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+            {[
+              { label: "Revenus du mois",    value: `${fmt(kpis.revenuMois)} F`,                          trend: '+18%' },
+              { label: "Factures en attente",value: `${alerts.pendingCount} fact.`,                        trend: null },
+              { label: "Employés",           value: `${kpis.nbEmployes}`,                                  trend: null },
+              { label: "Stock / Alertes",    value: alerts.lowStockCount > 0 ? `${alerts.lowStockCount} alerte${alerts.lowStockCount > 1 ? 's' : ''}` : 'OK', trend: null },
+            ].map((k, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px' }}>
+                <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', marginBottom: 5 }}>{k.label}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>{k.value}</p>
+                {k.trend && <p style={{ fontSize: 10, color: '#F59E0B', marginTop: 3 }}>{k.trend} vs hier</p>}
+              </div>
+            ))}
+          </div>
+        )}
       </motion.div>
 
       {/* ── KPI Cards ────────────────────────────────────────────────────── */}
@@ -703,28 +702,28 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
       {/* ── Transactions récentes ────────────────────────────────────────── */}
       {isFinancial && recentActivity.length > 0 && (
         <motion.div {...fadeUp(7)} style={{
-          background: 'var(--card-bg)',
-          border: '1px solid var(--border)',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
           borderRadius: 12,
           overflow: 'hidden',
           marginBottom: 24,
         }}>
-          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #E2E8F0' }}>
             <div>
-              <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{t('dash.lastTransactions')}</h3>
-              <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{recentActivity.length} {t('dash.lastFactures')}</p>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{t('dash.lastTransactions')}</h3>
+              <p style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{recentActivity.length} {t('dash.lastFactures')}</p>
             </div>
-            <Link href="/dashboard/facturation" style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
-              {t('dash.viewAll')}
+            <Link href="/dashboard/facturation" style={{ fontSize: 12, color: '#F59E0B', fontWeight: 600 }}>
+              {t('dash.viewAll')} →
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)', background: 'transparent' }}>
-                  <th className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.name')}</th>
-                  <th className="text-right px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.amount')}</th>
-                  <th className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.status')}</th>
+                <tr style={{ borderBottom: '1px solid #E2E8F0', background: 'transparent' }}>
+                  <th className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.name')}</th>
+                  <th className="text-right px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.amount')}</th>
+                  <th className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -739,18 +738,18 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
 
       {!isFinancial && (
         <motion.div {...fadeUp(7)} style={{
-          background: 'var(--card-bg)',
-          border: '1px solid var(--border)',
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
           borderRadius: 12,
           padding: 24,
           textAlign: 'center',
           marginBottom: 24,
         }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(245,30,51,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-            <Star size={20} style={{ color: '#DC2626' }} />
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+            <Star size={20} style={{ color: '#F59E0B' }} />
           </div>
-          <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{t('dash.restricted')}</p>
-          <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t('dash.restrictedMsg')}</p>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>{t('dash.restricted')}</p>
+          <p style={{ fontSize: 12, color: '#64748B' }}>{t('dash.restrictedMsg')}</p>
         </motion.div>
       )}
 

@@ -1,12 +1,5 @@
 'use client'
 
-/**
- * Sidebar Oraforme — Architecture blocs métiers colorés
- * Fond blanc · Entêtes de blocs colorées · Items propres et espacés
- * 8 blocs : Pilotage | Finance & Compta | RH | Commercial |
- *           Stock & Achats | Métier | Documents & IA | Paramètres
- */
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -41,65 +34,18 @@ import { useLocale } from '@/lib/hooks/useLocale'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type NavItem = {
-  id:       string
-  label:    string
-  sublabel?: string
-  icon:     LucideIcon
-  href:     string
-  exact?:   boolean
+  id:      string
+  label:   string
+  icon:    LucideIcon
+  href:    string
+  exact?:  boolean
 }
 
 type NavGroup = {
-  id:    string
-  label: string
-  icon:  LucideIcon
-  items: NavItem[]
-  color: GroupColor
-}
-
-type GroupColor = {
-  header: string   // fond de l'entête
-  active: string   // fond item actif
-  text:   string   // texte item actif
-  dot:    string   // couleur accent
-}
-
-// ─── Palette des blocs ────────────────────────────────────────────────────────
-
-const COLORS: Record<string, GroupColor> = {
-  bi:          { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
-  pilotage:    { header: '#2563EB', active: '#EFF6FF', text: '#1D4ED8', dot: '#2563EB' },
-  finance_ops: { header: '#16A34A', active: '#F0FDF4', text: '#15803D', dot: '#16A34A' },
-  rh_org:      { header: '#7C3AED', active: '#F5F3FF', text: '#6D28D9', dot: '#7C3AED' },
-  commercial:  { header: '#F59E0B', active: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
-  supply:      { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
-  metier:      { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
-  docs_ai:     { header: '#64748B', active: '#F8FAFC', text: '#334155', dot: '#64748B' },
-  collab:      { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
-  platform:    { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
-  params:      { header: '#475569', active: '#F1F5F9', text: '#334155', dot: '#475569' },
-}
-
-// Couleur métier selon secteur
-function getSectorColor(secteur: string): GroupColor {
-  const MAP: Record<string, GroupColor> = {
-    ecole:            { header: '#7C3AED', active: '#F5F3FF', text: '#6D28D9', dot: '#7C3AED' },
-    restaurant:       { header: '#EA580C', active: '#FFF7ED', text: '#C2410C', dot: '#EA580C' },
-    hotel:            { header: '#F59E0B', active: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
-    transport:        { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
-    transport_public: { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
-    commerce:         { header: '#F59E0B', active: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
-    supermarche:      { header: '#16A34A', active: '#F0FDF4', text: '#15803D', dot: '#16A34A' },
-    boutique:         { header: '#EC4899', active: '#FDF2F8', text: '#BE185D', dot: '#EC4899' },
-    sante:            { header: '#DC2626', active: '#FEF2F2', text: '#B91C1C', dot: '#DC2626' },
-    btp:              { header: '#92400E', active: '#FFFBEB', text: '#78350F', dot: '#92400E' },
-    banque:           { header: '#1D4ED8', active: '#EFF6FF', text: '#1E3A8A', dot: '#1D4ED8' },
-    ong:              { header: '#059669', active: '#ECFDF5', text: '#065F46', dot: '#059669' },
-    pharmacie:        { header: '#0891B2', active: '#ECFEFF', text: '#0E7490', dot: '#0891B2' },
-    petrole:          { header: '#374151', active: '#F9FAFB', text: '#111827', dot: '#374151' },
-    agriculture:      { header: '#65A30D', active: '#F7FEE7', text: '#3F6212', dot: '#65A30D' },
-  }
-  return MAP[secteur] ?? COLORS.metier
+  id:       string
+  label:    string
+  icon:     LucideIcon
+  items:    NavItem[]
 }
 
 // ─── Icon Registry ────────────────────────────────────────────────────────────
@@ -164,38 +110,37 @@ const ICONS: Record<string, LucideIcon> = {
 type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 
 const MODULE_DEFS: ModuleDef[] = [
-  { id: 'bi',          label: 'Analytics',              sublabel: 'Tableaux de bord BI', href: '/dashboard/bi' },
-  { id: 'bi-dg',       label: 'Analytics général',     sublabel: 'CA · Résultat · Tréso', href: '/dashboard/bi' },
-  { id: 'bi-rh',       label: 'Analytics RH',           sublabel: 'Effectif · Masse sal.', href: '/dashboard/bi/rh' },
-  { id: 'bi-ecole',    label: 'Analytics École',        sublabel: 'Inscriptions · Absences', href: '/dashboard/bi/ecole' },
-  { id: 'bi-hotel',    label: 'Analytics Hôtel',        sublabel: 'Occupation · Revenus', href: '/dashboard/bi/hotel' },
-  { id: 'bi-restaurant', label: 'Analytics Restaurant', sublabel: 'Ventes · Commandes',  href: '/dashboard/bi/restaurant' },
+  { id: 'bi',          label: 'Analytics',              sublabel: '', href: '/dashboard/bi' },
+  { id: 'bi-dg',       label: 'Analytics général',      sublabel: '', href: '/dashboard/bi' },
+  { id: 'bi-rh',       label: 'Analytics RH',           sublabel: '', href: '/dashboard/bi/rh' },
+  { id: 'bi-ecole',    label: 'Analytics École',        sublabel: '', href: '/dashboard/bi/ecole' },
+  { id: 'bi-hotel',    label: 'Analytics Hôtel',        sublabel: '', href: '/dashboard/bi/hotel' },
+  { id: 'bi-restaurant', label: 'Analytics Restaurant', sublabel: '', href: '/dashboard/bi/restaurant' },
   ...(CORE_ERP_MODULES as unknown as ModuleDef[]),
   ...(PLATFORM_MODULES as unknown as ModuleDef[]),
-  { id: 'ecole',                 label: 'École & Université',       sublabel: 'Gestion académique',         href: '/dashboard/ecole'                      },
-  { id: 'restaurant',            label: 'Restauration POS',         sublabel: 'Service & commandes',        href: '/dashboard/restaurant'                 },
-  { id: 'hotel',                 label: 'Hôtellerie',               sublabel: 'Réservations & chambres',    href: '/dashboard/hotel'                      },
-  { id: 'housekeeping',          label: 'Housekeeping',             sublabel: 'Ménage & entretien',         href: '/dashboard/hotel/housekeeping'         },
-  { id: 'transport',             label: 'Transport VTC',            sublabel: 'Flotte & courses',           href: '/dashboard/transport'                  },
-  { id: 'sante',                 label: 'Clinique',                 sublabel: 'Tableau de bord santé',      href: '/dashboard/sante'                      },
-  { id: 'sante-patients',        label: 'Patients',                 sublabel: 'Dossiers & antécédents',     href: '/dashboard/sante/patients'             },
-  { id: 'sante-rdv',             label: 'Rendez-vous',              sublabel: 'Agenda & planification',     href: '/dashboard/sante/rendez-vous'          },
-  { id: 'sante-consultations',   label: 'Consultations',            sublabel: 'Actes médicaux',             href: '/dashboard/sante/consultations'        },
-  { id: 'sante-medecins',        label: 'Médecins',                 sublabel: 'Personnel médical',          href: '/dashboard/sante/medecins'             },
-  { id: 'pharmacie',             label: 'Pharmacie',                sublabel: 'Tableau de bord',            href: '/dashboard/pharmacie'                  },
-  { id: 'pharmacie-meds',        label: 'Médicaments',              sublabel: 'Stock & catalogue',          href: '/dashboard/pharmacie/medicaments'      },
-  { id: 'pharmacie-ventes',      label: 'Ventes / POS',             sublabel: 'Caisse & ordonnances',       href: '/dashboard/pharmacie/ventes'           },
-  { id: 'abonnement',            label: 'Abonnement',               sublabel: 'Plans & facturation',        href: '/dashboard/abonnement'                 },
-  { id: 'workflows',             label: 'Workflows',                sublabel: 'Automatisations',            href: '/dashboard/workflows'                  },
-  { id: 'api-keys',              label: 'Clés API',                 sublabel: 'Intégrations externes',      href: '/dashboard/api-keys'                   },
-  { id: 'fiscalite',             label: 'Fiscalité',                sublabel: 'Déclarations & taxes',       href: '/dashboard/fiscalite'                  },
+  { id: 'ecole',                 label: 'École & Université',   sublabel: '', href: '/dashboard/ecole'                      },
+  { id: 'restaurant',            label: 'Restauration POS',     sublabel: '', href: '/dashboard/restaurant'                 },
+  { id: 'hotel',                 label: 'Hôtellerie',           sublabel: '', href: '/dashboard/hotel'                      },
+  { id: 'housekeeping',          label: 'Housekeeping',         sublabel: '', href: '/dashboard/hotel/housekeeping'         },
+  { id: 'transport',             label: 'Transport VTC',        sublabel: '', href: '/dashboard/transport'                  },
+  { id: 'sante',                 label: 'Clinique',             sublabel: '', href: '/dashboard/sante'                      },
+  { id: 'sante-patients',        label: 'Patients',             sublabel: '', href: '/dashboard/sante/patients'             },
+  { id: 'sante-rdv',             label: 'Rendez-vous',          sublabel: '', href: '/dashboard/sante/rendez-vous'          },
+  { id: 'sante-consultations',   label: 'Consultations',        sublabel: '', href: '/dashboard/sante/consultations'        },
+  { id: 'sante-medecins',        label: 'Médecins',             sublabel: '', href: '/dashboard/sante/medecins'             },
+  { id: 'pharmacie',             label: 'Pharmacie',            sublabel: '', href: '/dashboard/pharmacie'                  },
+  { id: 'pharmacie-meds',        label: 'Médicaments',          sublabel: '', href: '/dashboard/pharmacie/medicaments'      },
+  { id: 'pharmacie-ventes',      label: 'Ventes / POS',         sublabel: '', href: '/dashboard/pharmacie/ventes'           },
+  { id: 'abonnement',            label: 'Abonnement',           sublabel: '', href: '/dashboard/abonnement'                 },
+  { id: 'workflows',             label: 'Workflows',            sublabel: '', href: '/dashboard/workflows'                  },
+  { id: 'api-keys',              label: 'Clés API',             sublabel: '', href: '/dashboard/api-keys'                   },
+  { id: 'fiscalite',             label: 'Fiscalité',            sublabel: '', href: '/dashboard/fiscalite'                  },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 
 // ─── Sidebar Group definitions ────────────────────────────────────────────────
 
-// Les labels sont des clés i18n — traduits dynamiquement dans le composant via t()
 const SIDEBAR_GROUPS = [
   { id: 'pilotage',    labelKey: 'nav.pilotage',    icon: LayoutDashboard, moduleIds: ['direction', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'finance', 'analytics', 'audit', 'notifications'] },
   { id: 'finance_ops', labelKey: 'nav.finance_ops', icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
@@ -208,7 +153,6 @@ const SIDEBAR_GROUPS = [
   { id: 'params',      labelKey: 'nav.params',      icon: Settings,        moduleIds: ['profil', 'abonnement', 'parametres'] },
 ]
 
-// Mapping module ID → clé i18n (pour les labels des items du menu)
 const MODULE_LABEL_KEYS: Record<string, string> = {
   'bi-dg':       'nav.bi_dg',
   'bi-rh':       'nav.bi_rh',
@@ -256,10 +200,9 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
 }
 
 const PLATFORM_RESTRICTED = new Set(['analytics', 'roles', 'audit'])
-const ADMIN_MODULE_IDS = new Set(['workflows', 'api-keys'])
-const BI_MODULE_IDS = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
+const ADMIN_MODULE_IDS    = new Set(['workflows', 'api-keys'])
+const BI_MODULE_IDS       = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
 
-// BI items affichés selon le secteur — seuls les analytics pertinents sont visibles
 const SECTOR_BI_MAP: Record<string, string[]> = {
   ecole:            ['bi-dg', 'bi-rh', 'bi-ecole'],
   hotel:            ['bi-dg', 'bi-hotel'],
@@ -300,6 +243,10 @@ function getSectorIcon(secteur: string): LucideIcon {
   return M[secteur] ?? Settings
 }
 
+function getSectorLabel(secteur: string): string {
+  return (SECTOR_LABELS[secteur] ?? secteur).split(/[ &]/)[0]
+}
+
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
@@ -317,7 +264,6 @@ export default function Sidebar() {
   const [permissions,   setPermissions]   = useState<Record<string, ModulePermission>>({})
   const [permsLoaded,   setPermsLoaded]   = useState(false)
 
-  // Tous les blocs ouverts par défaut
   const [openGroups, setOpenGroups] = useState<Set<string>>(
     new Set([...SIDEBAR_GROUPS.map(g => g.id), 'metier', 'collab'])
   )
@@ -329,8 +275,6 @@ export default function Sidebar() {
       return next
     })
   }
-
-  // ── Permissions ────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (!tenant) {
@@ -388,12 +332,11 @@ export default function Sidebar() {
     if (ADMIN_MODULE_IDS.has(id)) return role === 'admin'
     if (BI_MODULE_IDS.has(id)) {
       if (role !== 'admin') return false
-      // Seuls les analytics pertinents au secteur sont visibles
       if (secteur) {
         const allowed = SECTOR_BI_MAP[secteur] ?? ['bi-dg']
         return allowed.includes(id)
       }
-      return true // pas de secteur = entreprise générique, tout BI accessible
+      return true
     }
     if (PLATFORM_RESTRICTED.has(id)) return ecoleRole === 'DIRECTION_GENERALE'
     if (secteur === 'ecole') {
@@ -408,8 +351,6 @@ export default function Sidebar() {
     return permissions[id]?.can_view !== false
   }, [isOwner, ecoleRole, secteur, permissions, modulesActifs])
 
-  // ── Build groups ───────────────────────────────────────────────────────────
-
   const visibleGroups = useMemo((): NavGroup[] => {
     if (!loaded) return []
     return SIDEBAR_GROUPS.map(grp => {
@@ -418,11 +359,10 @@ export default function Sidebar() {
         if (!canView(mid)) continue
         const def = getModuleDef(mid)
         if (!def) continue
-        // Utilise la clé i18n si disponible, sinon fallback sur le label statique
-        const translatedLabel = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
-        items.push({ id: mid, label: translatedLabel, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
+        const label = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
+        items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href })
       }
-      return { ...grp, label: t(grp.labelKey), items, color: COLORS[grp.id] }
+      return { ...grp, label: t(grp.labelKey), items }
     }).filter(g => g.items.length > 0)
   }, [loaded, canView, t])
 
@@ -430,7 +370,7 @@ export default function Sidebar() {
     if (!loaded) return null
     if (secteur) {
       const sectorItems = (SECTOR_SPECIFIC[secteur as SectorId] ?? [])
-        .map(mod => ({ id: mod.id, label: mod.label, sublabel: mod.sublabel, icon: ICONS[mod.id] ?? Settings, href: mod.href }))
+        .map(mod => ({ id: mod.id, label: mod.label, icon: ICONS[mod.id] ?? Settings, href: mod.href }))
         .filter(item => {
           if (isOwner) return true
           if (secteur === 'ecole') {
@@ -442,7 +382,7 @@ export default function Sidebar() {
           return permissions[item.id]?.can_view !== false
         })
       if (!sectorItems.length) return null
-      return { id: 'metier', label: SECTOR_LABELS[secteur] ?? secteur, icon: getSectorIcon(secteur), items: sectorItems, color: getSectorColor(secteur) }
+      return { id: 'metier', label: SECTOR_LABELS[secteur] ?? secteur, icon: getSectorIcon(secteur), items: sectorItems }
     }
     const EXTRA_IDS = ['ecole', 'restaurant', 'hotel', 'transport']
     const extraItems: NavItem[] = []
@@ -450,12 +390,12 @@ export default function Sidebar() {
       if (!modulesActifs.includes(mid) || permissions[mid]?.can_view === false) continue
       const def = getModuleDef(mid)
       if (def) {
-        const translatedLabel = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
-        extraItems.push({ id: mid, label: translatedLabel, sublabel: def.sublabel, icon: ICONS[mid] ?? Settings, href: def.href })
+        const label = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
+        extraItems.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href })
       }
     }
     if (!extraItems.length) return null
-    return { id: 'metier', label: t('nav.metier'), icon: Store, items: extraItems, color: COLORS.metier }
+    return { id: 'metier', label: t('nav.metier'), icon: Store, items: extraItems }
   }, [loaded, secteur, isOwner, ecoleRole, permissions, modulesActifs, t])
 
   const dashHref   = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
@@ -468,7 +408,7 @@ export default function Sidebar() {
 
   // ── NavItem renderer ───────────────────────────────────────────────────────
 
-  function NavLink({ item, color }: { item: NavItem; color: GroupColor }) {
+  function NavLink({ item }: { item: NavItem }) {
     const active  = isActive(item.href, item.exact)
     const canEdit = isOwner || permissions[item.id]?.can_edit
     const Icon    = item.icon
@@ -476,35 +416,24 @@ export default function Sidebar() {
       <Link
         href={item.href}
         onClick={() => setMobileOpen(false)}
-        className="flex items-center gap-2.5 mx-1 px-3 py-2 rounded-xl text-[12.5px] transition-all duration-150"
+        className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150 group"
         style={active
-          ? { background: color.active, color: color.text, fontWeight: 600 }
-          : undefined
+          ? { background: 'rgba(245,158,11,0.13)', color: '#F59E0B', fontWeight: 600 }
+          : { color: '#9CA3AF' }
         }
+        onMouseEnter={!active ? e => {
+          (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.06)'
+          ;(e.currentTarget as HTMLAnchorElement).style.color = '#D1D5DB'
+        } : undefined}
+        onMouseLeave={!active ? e => {
+          (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
+          ;(e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF'
+        } : undefined}
       >
-        <Icon
-          size={13}
-          className="shrink-0 transition-colors"
-          style={{ color: active ? color.text : '#94A3B8' }}
-        />
-        <div className="flex-1 min-w-0">
-          <div
-            className="truncate leading-tight"
-            style={{ color: active ? color.text : '#374151' }}
-          >
-            {item.label}
-          </div>
-          {item.sublabel && (
-            <div className="text-[10px] truncate leading-none mt-0.5 flex items-center gap-1"
-              style={{ color: '#94A3B8' }}>
-              {item.sublabel}
-              {!isOwner && !canEdit && <Lock size={7} className="text-[#CBD5E1] shrink-0" />}
-            </div>
-          )}
-        </div>
-        {active && (
-          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color.dot }} />
-        )}
+        <Icon size={14} className="shrink-0" style={{ color: active ? '#F59E0B' : '#6B7280' }} />
+        <span className="flex-1 truncate">{item.label}</span>
+        {!isOwner && !canEdit && <Lock size={8} style={{ color: '#374151', flexShrink: 0 }} />}
+        {active && <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
       </Link>
     )
   }
@@ -514,38 +443,41 @@ export default function Sidebar() {
   function GroupBlock({ group }: { group: NavGroup }) {
     const isOpen    = openGroups.has(group.id)
     const GroupIcon = group.icon
-    const hasActive = group.items.some(item => isActive(item.href, item.exact))
 
     return (
-      <div className="mb-1.5">
-        {/* ── Entête colorée ── */}
+      <div className="mb-0.5">
         <button
           onClick={() => toggleGroup(group.id)}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-150 group"
-          style={{ background: group.color.header }}
+          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors"
+          style={{ background: 'transparent' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
         >
-          <GroupIcon size={13} className="shrink-0 text-white/90" />
-          <span className="flex-1 text-left text-[11px] font-bold uppercase tracking-wider text-white/95">
+          <GroupIcon size={10} style={{ color: '#4B5563', flexShrink: 0 }} />
+          <span className="flex-1 text-left text-[10px] font-bold uppercase tracking-widest" style={{ color: '#4B5563' }}>
             {group.label}
           </span>
           <ChevronDown
-            size={11}
-            className="text-white/70 transition-transform duration-200"
-            style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+            size={9}
+            style={{
+              color: '#374151',
+              transition: 'transform 0.2s',
+              transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
+            }}
           />
         </button>
 
-        {/* ── Items ── */}
         <div
-          className="overflow-hidden transition-all duration-200"
           style={{
-            maxHeight: isOpen ? `${group.items.length * 64}px` : '0px',
+            maxHeight: isOpen ? `${group.items.length * 44}px` : '0px',
+            overflow: 'hidden',
+            transition: 'max-height 0.22s ease',
             opacity: isOpen ? 1 : 0,
           }}
         >
-          <div className="pt-1 pb-0.5 space-y-0.5">
+          <div className="py-0.5 space-y-0.5">
             {group.items.map(item => (
-              <NavLink key={item.id} item={item} color={group.color} />
+              <NavLink key={item.id} item={item} />
             ))}
           </div>
         </div>
@@ -556,68 +488,68 @@ export default function Sidebar() {
   // ── Sidebar Content ────────────────────────────────────────────────────────
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full overflow-hidden bg-white">
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#0F172A' }}>
 
-      {/* ── Logo ── */}
-      <div className="shrink-0 px-4 pt-4 pb-3 border-b border-[#F1F5F9]">
+      {/* Logo */}
+      <div className="shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-icon.png" alt="oraforme" width={32} height={32} className="shrink-0" />
-          <span className="text-[16px] font-extrabold text-[#0F172A] tracking-tight">
-            oraforme
-          </span>
+          <img src="/logo-icon.png" alt="oraforme" width={28} height={28} className="shrink-0" />
+          <span className="text-[16px] font-extrabold text-white tracking-tight">oraforme</span>
           {secteur && (
             <span
-              className="ml-auto shrink-0 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md text-white"
-              style={{ background: getSectorColor(secteur).header }}
+              className="ml-auto shrink-0 text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
+              style={{ background: 'rgba(245,158,11,0.2)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.3)' }}
             >
-              {(SECTOR_LABELS[secteur] ?? secteur).split(/[ &]/)[0]}
+              {getSectorLabel(secteur)}
             </span>
           )}
         </div>
         {role && role !== 'owner' && (
           <div className="mt-2">
-            <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
-              role === 'admin' ? 'bg-blue-100 text-blue-600' : 'bg-[#F8FAFC] text-[#64748B] border border-[#E5E7EB]'
-            }`}>
-              {role === 'admin' ? t('roles.role') + ' Admin' : t('common.active')}
+            <span className="text-[9px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded"
+              style={{ background: 'rgba(255,255,255,0.08)', color: '#9CA3AF' }}>
+              {role === 'admin' ? 'Admin' : t('common.active')}
             </span>
           </div>
         )}
       </div>
 
-      {/* ── Navigation ── */}
-      <nav className="flex-1 px-2 py-3 overflow-y-auto scrollbar-hide space-y-0.5">
+      {/* Navigation */}
+      <nav className="flex-1 px-2 py-3 overflow-y-auto space-y-0.5" style={{ scrollbarWidth: 'none' }}>
 
-        {/* Dashboard — standalone, toujours premier */}
+        {/* Dashboard link */}
         <Link
           href={dashHref}
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-2.5 mx-1 px-3 py-2.5 rounded-xl text-[12.5px] font-semibold transition-all duration-150 mb-3"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-150 mb-3"
           style={dashActive
-            ? { background: '#0F172A', color: '#FFFFFF' }
-            : { color: '#374151' }
+            ? { background: '#F59E0B', color: '#0F172A' }
+            : { color: '#9CA3AF' }
           }
+          onMouseEnter={!dashActive ? e => {
+            (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)'
+            ;(e.currentTarget as HTMLAnchorElement).style.color = '#E5E7EB'
+          } : undefined}
+          onMouseLeave={!dashActive ? e => {
+            (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
+            ;(e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF'
+          } : undefined}
         >
-          <LayoutDashboard
-            size={14}
-            className="shrink-0"
-            style={{ color: dashActive ? '#FFFFFF' : '#94A3B8' }}
-          />
+          <LayoutDashboard size={14} className="shrink-0" style={{ color: dashActive ? '#0F172A' : '#6B7280' }} />
           <span>{t('nav.dashboard')}</span>
-          {dashActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/60" />}
         </Link>
 
         {/* Skeleton */}
         {!loaded && (
           <div className="space-y-2 px-1">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-9 rounded-xl animate-pulse" style={{ background: `hsl(${210 + i * 30}, 60%, 92%)` }} />
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
             ))}
           </div>
         )}
 
-        {/* ── Blocs colorés ── */}
+        {/* Blocs */}
         {loaded && (
           <>
             {visibleGroups.map(group => {
@@ -632,23 +564,29 @@ export default function Sidebar() {
               )
             })}
 
-            {/* Métier si supply absent */}
             {!visibleGroups.find(g => g.id === 'supply') && metierGroup && (
               <GroupBlock group={metierGroup} />
             )}
 
-            {/* Marketplace */}
             {isOwner && !secteur && (
               <Link
                 href="/dashboard/modules"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2.5 mx-1 px-3 py-2 rounded-xl text-[12.5px] transition-all duration-150"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150 mt-1"
                 style={isActive('/dashboard/modules')
-                  ? { background: '#F1F5F9', color: '#0F172A', fontWeight: 600 }
-                  : { color: '#64748B' }
+                  ? { background: 'rgba(245,158,11,0.13)', color: '#F59E0B', fontWeight: 600 }
+                  : { color: '#9CA3AF' }
                 }
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.06)'
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = '#D1D5DB'
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = isActive('/dashboard/modules') ? 'rgba(245,158,11,0.13)' : 'transparent'
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = isActive('/dashboard/modules') ? '#F59E0B' : '#9CA3AF'
+                }}
               >
-                <Store size={13} className="shrink-0" style={{ color: isActive('/dashboard/modules') ? '#0F172A' : '#94A3B8' }} />
+                <Store size={14} style={{ color: '#6B7280' }} />
                 <span>{t('nav.modules')}</span>
               </Link>
             )}
@@ -656,27 +594,28 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* ── Bottom ── */}
-      <div className="shrink-0 px-2 py-3 border-t border-[#F1F5F9] space-y-0.5">
+      {/* Bottom */}
+      <div className="shrink-0 px-2 py-3 space-y-0.5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         {isSuperAdmin && (
           <Link
             href="/admin"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium transition-all duration-150"
-            style={{ color: '#DC2626' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] font-medium transition-all duration-150"
+            style={{ color: '#F87171' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(248,113,113,0.1)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <ShieldAlert size={13} className="shrink-0" />
             <span>Admin oraforme</span>
-            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#DC2626] animate-pulse" />
+            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
           </Link>
         )}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] text-[#64748B] transition-all duration-150"
-          onMouseEnter={e => { e.currentTarget.style.background = '#FEF2F2'; e.currentTarget.style.color = '#DC2626' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B' }}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150"
+          style={{ color: '#6B7280' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(248,113,113,0.1)'; (e.currentTarget as HTMLButtonElement).style.color = '#F87171' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#6B7280' }}
         >
           <LogOut size={13} className="shrink-0" />
           <span>{t('nav.logout')}</span>
@@ -688,13 +627,14 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex w-58 shrink-0 flex-col bg-white border-r border-[#E5E7EB] h-screen sticky top-0" style={{ width: 228 }}>
+      <aside className="hidden lg:flex shrink-0 flex-col h-screen sticky top-0" style={{ width: 232, background: '#0F172A' }}>
         <SidebarContent />
       </aside>
 
       {/* Mobile toggle */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl bg-white border border-[#E5E7EB] text-[#0F172A] shadow-sm"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl shadow-sm"
+        style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', color: '#E5E7EB' }}
         onClick={() => setMobileOpen(o => !o)}
         aria-label="Menu"
       >
@@ -704,11 +644,11 @@ export default function Sidebar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div style={{ width: 228 }} className="bg-white border-r border-[#E5E7EB] h-full shadow-2xl">
+          <div style={{ width: 232, background: '#0F172A', height: '100%', boxShadow: '4px 0 24px rgba(0,0,0,0.4)' }}>
             <SidebarContent />
           </div>
           <div
-            className="flex-1 bg-black/40 backdrop-blur-sm"
+            className="flex-1 bg-black/50 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
         </div>
