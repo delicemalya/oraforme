@@ -10,7 +10,6 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
-import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 import { captureSupabaseError } from '@/lib/monitoring'
 import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
@@ -631,7 +630,6 @@ export default function TresorerieDashboard() {
           </div>
         </div>
       )}
-      <MIAAAssistant module="tresorerie" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }

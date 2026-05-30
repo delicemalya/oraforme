@@ -16,7 +16,6 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 
 // Types kept for backward-compat
 export type EcoleRole =
@@ -529,7 +528,6 @@ export default function EcoleOverviewPage() {
         </motion.div>
       )}
 
-      <MIAAAssistant module="ecole" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }

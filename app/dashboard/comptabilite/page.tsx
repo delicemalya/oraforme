@@ -18,7 +18,6 @@ import {
   CheckCircle2, ArrowUpRight, ArrowDownRight, Activity,
 } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface JournalEntry {
@@ -575,7 +574,6 @@ export default function ComptabilitePage() {
           </div>
         </div>
       )}
-      <MIAAAssistant module="comptabilite" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }

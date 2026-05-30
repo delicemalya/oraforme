@@ -6,7 +6,6 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
 import Link from 'next/link'
-import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
 import {
   Package, AlertTriangle, TrendingDown, Loader2,
   ArrowUpCircle, ArrowDownCircle, Warehouse, Users2,
@@ -296,7 +295,6 @@ export default function StocksDashboard() {
           </div>
         </>
       )}
-      <MIAAAssistant module="stock" tenantData={{ tenant_id: tenantId ?? undefined }} />
     </div>
   )
 }
