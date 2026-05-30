@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Search, ChevronDown, LogOut, Sun, Moon, UsersRound } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Search, ChevronDown, LogOut, Sun, Moon, UsersRound, ChevronLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -15,7 +15,13 @@ export default function Header() {
   const { tenant } = useTenantContext()
   const { t } = useLocale()
   const pathname = usePathname()
-  const isOwner = tenant?.role === 'owner'
+  const router   = useRouter()
+  const isOwner  = tenant?.role === 'owner'
+
+  // Back button: compute parent path from current URL segments
+  const segments  = pathname.split('/').filter(Boolean) // e.g. ['dashboard', 'btp', 'chantiers']
+  const showBack  = segments.length > 1                 // anything deeper than /dashboard
+  const parentPath = '/' + segments.slice(0, -1).join('/')
   const canSeeTeam = isOwner || tenant?.ecoleRole === 'DIRECTION_GENERALE'
 
   const [userName,     setUserName]     = useState('')
@@ -85,7 +91,17 @@ export default function Header() {
 
   return (
     <header className="h-14 bg-white border-b border-[#E2E8F0] flex items-center px-4 lg:px-6 gap-3 shrink-0">
-      <div className="w-8 lg:hidden shrink-0" />
+      {showBack ? (
+        <button
+          onClick={() => router.push(parentPath)}
+          title="Retour"
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors shrink-0"
+        >
+          <ChevronLeft size={18} />
+        </button>
+      ) : (
+        <div className="w-8 lg:hidden shrink-0" />
+      )}
 
       <div className="flex-1 max-w-sm">
         <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-3 py-1.5">
