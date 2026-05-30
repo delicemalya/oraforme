@@ -143,7 +143,7 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 
 const SIDEBAR_GROUPS = [
   // SUPERVISION — monitoring système, alertes, sécurité
-  { id: 'pilotage',     labelKey: 'nav.pilotage',    icon: ShieldAlert,  moduleIds: ['direction', 'analytics', 'audit', 'notifications'] },
+  { id: 'pilotage',     labelKey: 'nav.pilotage',    icon: ShieldAlert,  moduleIds: ['direction', 'analytics', 'audit'] },
   // BI & ANALYTICS — intelligence métier, filtrés par secteur pour owners
   { id: 'bi_analytics', labelKey: 'nav.bi',          icon: TrendingUp,   moduleIds: ['finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'] },
   // FINANCE & COMPTA — transactions, comptabilité, trésorerie
