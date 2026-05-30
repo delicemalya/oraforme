@@ -1,9 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { Shield, AlertTriangle, CheckCircle2, Users, Lock, Eye, Clock, Globe, Key } from 'lucide-react'
+import { Shield, AlertTriangle, CheckCircle2, Users, Lock, Eye, Clock, Key } from 'lucide-react'
 
 export default async function SecuritePage() {
-  const now = new Date()
-
   // Fetch recent profiles / tenants for analysis
   const [tenantsRes, profilesRes] = await Promise.all([
     supabaseAdmin.from('tenants').select('id, nom_entreprise, status, created_at').order('created_at', { ascending: false }),

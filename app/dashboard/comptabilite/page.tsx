@@ -8,15 +8,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { resolveAccounts, accountLabel, OHADA_ACCOUNTS, type AccountCode } from '@/lib/accounting-engine'
+import { resolveAccounts, OHADA_ACCOUNTS, type AccountCode } from '@/lib/accounting-engine'
 import { fmtFCFA } from '@/lib/admin-config'
 import Link from 'next/link'
 import {
-  TrendingUp, TrendingDown, DollarSign, Scale, AlertTriangle,
+  TrendingUp, TrendingDown, Scale, AlertTriangle,
   BookOpen, BarChart2, GitMerge, Percent, Lock, Download,
   List, Users, Layers, Package, Plus, X, ChevronRight,
   CheckCircle2, ArrowUpRight, ArrowDownRight, Activity,
-  CreditCard, Building2, Smartphone,
 } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { MIAAAssistant } from '@/components/miaa/MIAAAssistant'
@@ -99,7 +98,6 @@ export default function ComptabilitePage() {
 
     const now   = new Date()
     const year  = now.getFullYear()
-    const month = now.getMonth() + 1
 
     const [jcR, deR] = await Promise.all([
       supabase.from('journal_comptable')

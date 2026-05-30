@@ -3,7 +3,7 @@ import { MODULE_PRICES, MODULE_LABELS, fmtFCFA } from '@/lib/admin-config'
 import Link from 'next/link'
 import {
   DollarSign, TrendingUp, TrendingDown, Wallet, CreditCard,
-  ArrowRight, Building2, BarChart3, RefreshCw, PieChart, CheckCircle2,
+  ArrowRight, BarChart3, RefreshCw, PieChart, CheckCircle2,
 } from 'lucide-react'
 
 export default async function FinanceDashboardPage() {

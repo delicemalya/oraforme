@@ -1,5 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { Users, Shield, Crown, UserCheck, Search } from 'lucide-react'
+import { Users, Shield, Crown, UserCheck } from 'lucide-react'
 
 export default async function UtilisateursPage() {
   const [profilesRes, tenantsRes] = await Promise.all([

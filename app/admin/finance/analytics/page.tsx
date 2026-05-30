@@ -80,8 +80,6 @@ export default async function FinanceAnalyticsPage() {
     plan,
     count: activeTenants.filter(t => t.plan === plan).length,
   }))
-  const maxPlanCount = Math.max(...planStats.map(p => p.count), 1)
-
   // ARPU
   const arpu = activeTenants.length > 0 ? Math.round(mrr / activeTenants.length) : 0
 

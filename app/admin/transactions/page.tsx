@@ -25,7 +25,6 @@ export default async function TransactionsGlobalesPage() {
 
   const volEntrees = entrees.reduce((s, t) => s + (t.montant ?? 0), 0)
   const volSorties = sorties.reduce((s, t) => s + (t.montant ?? 0), 0)
-  const solde      = volEntrees - volSorties
 
   // Per tenant volume
   const perTenant = tenants.map(t => {
@@ -115,7 +114,7 @@ export default async function TransactionsGlobalesPage() {
               </tr>
             </thead>
             <tbody>
-              {transactions.slice(0, 30).map((t, i) => (
+              {transactions.slice(0, 30).map((t) => (
                 <tr key={t.id} className="border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
                   <td className="px-5 py-3 text-[12px] text-gray-500">{fmtDate(t.date || t.created_at)}</td>
                   <td className="px-5 py-3 text-[13px] font-medium text-gray-800">{tenantMap[t.tenant_id] ?? '—'}</td>

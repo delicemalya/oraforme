@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import {
   ChevronLeft, ChevronRight, Plus, X, Loader2,
-  Calendar, Clock, MapPin, Users, Tag, Repeat,
+  Calendar, Clock, MapPin, Users,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────

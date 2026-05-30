@@ -38,13 +38,6 @@ export default async function AdminMIAAPage() {
   const mrrMIAA = nbTenantsWithMIAA * 6000
   const margeIA = mrrMIAA - monthlyCostFCFA
 
-  // Simulated daily conversations chart (last 7 days)
-  const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
-  const weekData = DAYS.map(day => ({
-    day,
-    conversations: Math.round(dailyConversations * (0.7 + Math.random() * 0.6)),
-  }))
-
   // Common question categories (estimated)
   const topCategories = [
     { label: 'Fiscal Congo (TVA, CNSS, IRPP)', pct: 38 },

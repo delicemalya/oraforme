@@ -6,15 +6,13 @@ import Link from 'next/link'
 import {
   Building2, DollarSign, Package, Users, TrendingUp, TrendingDown,
   Activity, ArrowRight, Shield, AlertTriangle, CheckCircle2,
-  Zap, Bot, CreditCard, BarChart3, Clock, Globe,
+  Zap, Bot, CreditCard, BarChart3, Globe,
 } from 'lucide-react'
 
 export default async function AdminPage() {
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-  const startOfYear  = new Date(now.getFullYear(), 0, 1).toISOString()
   const lastMonth    = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
-  const endLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).toISOString()
 
   // ── Parallel fetches ──────────────────────────────────────────────────────────
   const [tenantsRes, profilesRes, facturesRes, transactionsRes] = await Promise.all([

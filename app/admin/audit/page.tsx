@@ -1,5 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { FileSearch, Clock, Shield, Building2, Users, Package, DollarSign, AlertTriangle } from 'lucide-react'
+import { FileSearch, Clock, Shield, Building2, Users, Package, AlertTriangle } from 'lucide-react'
 
 export default async function AuditPage() {
   const now = new Date()

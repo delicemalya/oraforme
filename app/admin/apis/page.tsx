@@ -1,4 +1,4 @@
-import { Zap, CheckCircle2, AlertTriangle, Globe, Key, Code, Shield, BookOpen } from 'lucide-react'
+import { Zap, CheckCircle2, Globe, Code, Shield, BookOpen } from 'lucide-react'
 
 export default function ApisPage() {
   const endpoints = [

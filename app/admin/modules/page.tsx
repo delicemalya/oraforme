@@ -1,6 +1,6 @@
 ﻿import { supabaseAdmin } from '@/lib/supabase-server'
 import { MODULE_LABELS, MODULE_PRICES, MODULE_ICONS, fmtFCFA } from '@/lib/admin-config'
-import { Package, Users, TrendingUp } from 'lucide-react'
+import { Package } from 'lucide-react'
 
 export default async function AdminModulesPage() {
   const { data: tenants } = await supabaseAdmin

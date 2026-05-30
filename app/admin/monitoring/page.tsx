@@ -1,6 +1,6 @@
 import type React from 'react'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { ServerCrash, CheckCircle2, AlertTriangle, XCircle, Clock, Database, Zap, Globe, Shield, RefreshCw } from 'lucide-react'
+import { CheckCircle2, AlertTriangle, XCircle, Clock, Database, Zap, Globe, Shield } from 'lucide-react'
 
 function StatusDot({ status }: { status: 'ok' | 'warn' | 'error' | 'unknown' }) {
   const cls = {

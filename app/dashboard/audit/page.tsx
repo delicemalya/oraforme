@@ -7,7 +7,7 @@ import { fmtFCFA } from '@/lib/admin-config'
 import {
   Shield, Search, Download, RefreshCw, Filter,
   Package, AlertTriangle, CheckCircle2, Clock, User,
-  Calendar, Database, ChevronLeft, ChevronRight,
+  Database, ChevronLeft, ChevronRight,
   FileText, CreditCard, ShoppingCart, Wallet,
   Eye, Activity, ChevronDown, ChevronRight as ChevronRightIcon,
   FolderOpen,
@@ -262,7 +262,7 @@ export default function AuditPage() {
 
     setLoading(false)
     setRefreshing(false)
-  }, [tenantId, modFilter, nivFilter, dateFrom, dateTo, search]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tenantId, modFilter, nivFilter, dateFrom, dateTo, search])  
 
   // ── Load legacy multi-source ───────────────────────────────────────────────
   const loadLegacy = useCallback(async (currentPage = 0) => {
@@ -342,7 +342,7 @@ export default function AuditPage() {
     setEntries(filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE))
     setLoading(false)
     setRefreshing(false)
-  }, [tenantId, modFilter, dateFrom, dateTo, search]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tenantId, modFilter, dateFrom, dateTo, search])  
 
   useEffect(() => {
     setPage(0)

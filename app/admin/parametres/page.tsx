@@ -1,5 +1,5 @@
 import { SUPER_ADMIN_EMAILS, MODULE_PRICES, MODULE_LABELS } from '@/lib/admin-config'
-import { Settings, Users, Shield, Globe, Bell, Package, Zap, Key } from 'lucide-react'
+import { Shield, Globe, Bell, Package, Zap, Key } from 'lucide-react'
 
 export default function ParametresPage() {
 

@@ -156,7 +156,7 @@ export default function EncaissementsPage() {
       const cat = CATEGORIES.find(c => c.value === form.categorie)
 
       // Determine destination account based on mode
-      let creditAccount = cat?.compte ?? '758000'
+      const creditAccount = cat?.compte ?? '758000'
       let debitAccount = '521000'
       if (form.compte_destination === 'caisse')  debitAccount = '571000'
       if (form.compte_destination === 'mobile')  debitAccount = '514000'

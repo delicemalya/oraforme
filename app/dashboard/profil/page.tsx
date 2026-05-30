@@ -50,11 +50,6 @@ export default function ProfilPage() {
     logo_url: '', site_web: '', description: '',
   })
 
-  useEffect(() => {
-    if (!tenant) return
-    loadProfile()
-  }, [tenant]) // eslint-disable-line react-hooks/exhaustive-deps
-
   async function loadProfile() {
     setLoading(true)
     const { data } = await supabase
@@ -80,6 +75,11 @@ export default function ProfilPage() {
     }
     setLoading(false)
   }
+
+  useEffect(() => {
+    if (!tenant) return
+    loadProfile()
+  }, [tenant]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()

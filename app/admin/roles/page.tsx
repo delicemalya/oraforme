@@ -1,5 +1,5 @@
 import { SUPER_ADMIN_EMAILS } from '@/lib/admin-config'
-import { Key, Crown, Shield, Users, Lock, CheckCircle2, XCircle } from 'lucide-react'
+import { Crown, Shield, Users, Lock, CheckCircle2, XCircle } from 'lucide-react'
 
 export default function RolesPage() {
 

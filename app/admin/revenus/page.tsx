@@ -39,7 +39,6 @@ export default async function AdminRevenusPage() {
     const m = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1)
     const monthStr = m.toISOString().slice(0, 7)
     const newClients = tenants.filter(t => t.created_at.startsWith(monthStr)).length
-    const mrr = newClients * (totalMRR / Math.max(tenants.length, 1))
     return {
       date: monthNames[m.getMonth()],
       inscriptions: newClients,

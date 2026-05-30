@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { MODULE_PRICES, fmtFCFA } from '@/lib/admin-config'
 import { GrowthChart, ModuleRevenueChart } from '@/components/admin/AdminChartsClient'
-import { BarChart3, TrendingUp, Users, Globe, Zap } from 'lucide-react'
+import { TrendingUp, Users, Globe, Zap } from 'lucide-react'
 
 export default async function AnalyticsPage() {
   const now = new Date()

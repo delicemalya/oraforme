@@ -4,17 +4,16 @@ import Link from 'next/link'
 import { MODULE_LABELS, MODULE_PRICES, fmtFCFA } from '@/lib/admin-config'
 import {
   ArrowLeft, Building2, Users, FileText,
-  Package, Calendar, Mail,
+  Package, Mail,
 } from 'lucide-react'
 
 export default async function AdminClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const [tenantRes, profilesRes, facturesRes, employesRes] = await Promise.all([
+  const [tenantRes, profilesRes, facturesRes] = await Promise.all([
     supabaseAdmin.from('tenants').select('*').eq('id', id).maybeSingle(),
     supabaseAdmin.from('profiles').select('*').eq('tenant_id', id),
     supabaseAdmin.from('factures').select('*').eq('tenant_id', id).order('created_at', { ascending: false }).limit(20),
-    supabaseAdmin.from('employes').select('id, nom, poste, contrat, created_at').eq('tenant_id', id).limit(10),
   ])
 
   const tenant = tenantRes.data
@@ -22,7 +21,6 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
   const profiles = profilesRes.data ?? []
   const factures = facturesRes.data ?? []
-  const employes = employesRes.data ?? []
 
   const caGenere = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0)
   const mrr = (tenant.modules_actifs ?? []).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)

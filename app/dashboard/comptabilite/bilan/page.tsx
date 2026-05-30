@@ -9,9 +9,9 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
-import { getActifAccounts, getPassifAccounts, OHADA_ACCOUNTS } from '@/lib/accounting-engine'
+import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { TrendingUp, TrendingDown, Download, FileText, BarChart2 } from 'lucide-react'
+import { TrendingUp, Download, FileText, BarChart2 } from 'lucide-react'
 
 interface Movement { date_operation: string; debit_account: string; credit_account: string; montant: number }
 interface AccountBalance { number: string; name: string; solde: number }
