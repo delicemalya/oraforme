@@ -506,12 +506,11 @@ export default function AiAssistant() {
                     transition={{ duration: 0.18 }}
                     className={`flex gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                   >
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 mt-auto"
-                      style={{ background: m.role === 'bot' ? cfg.color + '18' : '#E5E7EB' }}
-                    >
-                      {m.role === 'bot' ? cfg.avatar : '👤'}
-                    </div>
+                    {m.role === 'bot'
+                      ? (/* eslint-disable-next-line @next/next/no-img-element */
+                         <img src="/miaa-logo.png" alt="MIAA+" className="w-8 h-8 rounded-full object-cover shrink-0 mt-auto" />)
+                      : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 mt-auto" style={{ background: '#E5E7EB' }}>👤</div>
+                    }
 
                     <div className={`flex flex-col gap-1 max-w-[78%] ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                       <div
@@ -530,9 +529,8 @@ export default function AiAssistant() {
                 {/* Typing indicator */}
                 {loading && (
                   <div className="flex gap-2.5">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0" style={{ background: cfg.color + '18' }}>
-                      {cfg.avatar}
-                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/miaa-logo.png" alt="MIAA+" className="w-8 h-8 rounded-full object-cover shrink-0" />
                     <div className="px-4 py-3 bg-white border border-[#E5E7EB] rounded-[18px] rounded-bl-[4px] shadow-sm">
                       <div className="flex gap-1 items-center">
                         {[0, 1, 2].map(i => (

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import {
   FileText, Wallet, Users, Package, ChefHat, GraduationCap,
-  Activity, ShoppingCart, Smartphone, Receipt, BarChart2, Bot,
+  Activity, ShoppingCart, Smartphone, Receipt, BarChart2,
   Building2, Briefcase, CheckCircle2, ArrowRight, Star,
   Shield, X, Menu, Mail, MapPin,
 } from 'lucide-react'
@@ -21,10 +21,10 @@ const MODULES = [
   { icon: GraduationCap, title: 'École',           desc: 'Inscriptions, notes, bulletins et frais scolaires' },
   { icon: Activity,      title: 'Santé',           desc: 'Consultations, ordonnances, stock médicaments' },
   { icon: ShoppingCart,  title: 'Achats',          desc: 'Commandes fournisseurs, réception, contrôle qualité' },
-  { icon: Smartphone,    title: 'Mobile Money',    desc: 'Airtel Money, MTN MoMo — collecte de paiements intégrée' },
+  { icon: Smartphone,    title: 'Mobile Money',    desc: 'Airtel Money & MTN MoMo — moyen de paiement intégré dans tous les modules' },
   { icon: Receipt,       title: 'Dépenses',        desc: 'Suivi des charges, notes de frais, justificatifs' },
   { icon: BarChart2,     title: 'Rapports',        desc: 'Tableaux de bord, KPIs, exports PDF et Excel' },
-  { icon: Bot,           title: 'MIAA+',           desc: 'Assistant IA — analyse, rapports auto, décisions assistées' },
+  { icon: null,          title: 'MIAA+',           desc: 'Assistant IA — analyse, rapports auto, décisions assistées' },
 ]
 
 const SECTORS = [
@@ -150,7 +150,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map(l => (
               <a key={l.href} href={l.href}
-                className="text-sm font-semibold text-[#64748B] hover:text-teal-500 transition-colors">
+                className="text-sm font-semibold text-[#64748B] hover:text-[#DC2626] transition-colors">
                 {l.label}
               </a>
             ))}
@@ -184,7 +184,7 @@ export default function LandingPage() {
               <div className="px-6 py-5 flex flex-col gap-4">
                 {NAV_LINKS.map(l => (
                   <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
-                    className="text-base font-semibold text-[#0F172A] hover:text-teal-500">
+                    className="text-base font-semibold text-[#0F172A] hover:text-[#DC2626]">
                     {l.label}
                   </a>
                 ))}
@@ -215,8 +215,8 @@ export default function LandingPage() {
                 transition={{ duration: 0.4 }}
                 className="inline-flex items-center gap-3 mb-8"
               >
-                <div className="w-1 h-10 bg-teal-500 rounded-full" />
-                <span className="text-sm font-bold text-teal-600 uppercase tracking-widest">
+                <div className="w-1 h-10 bg-red-500 rounded-full" />
+                <span className="text-sm font-bold text-[#DC2626] uppercase tracking-widest">
                   MIAA+ · ASSISTANT IA INTÉGRÉ
                 </span>
               </motion.div>
@@ -228,7 +228,7 @@ export default function LandingPage() {
                 className="text-5xl sm:text-6xl lg:text-[64px] font-black text-[#0F172A] leading-[1.05] tracking-tight mb-6"
               >
                 L&apos;ERP conçu<br />pour les{' '}
-                <span className="text-teal-500">entreprises<br />africaines</span>
+                <span className="text-[#DC2626]">entreprises<br />africaines</span>
               </motion.h1>
 
               <motion.p
@@ -251,7 +251,7 @@ export default function LandingPage() {
                   Démarrer gratuitement <ArrowRight size={16} />
                 </Link>
                 <a href="#modules"
-                  className="inline-flex items-center gap-2 text-[#0F172A] font-semibold text-base px-8 py-4 rounded-xl border-2 border-gray-200 hover:border-teal-300 hover:text-teal-600 transition-colors">
+                  className="inline-flex items-center gap-2 text-[#0F172A] font-semibold text-base px-8 py-4 rounded-xl border-2 border-gray-200 hover:border-[#DC2626]/40 hover:text-[#DC2626] transition-colors">
                   Voir les modules
                 </a>
               </motion.div>
@@ -282,7 +282,7 @@ export default function LandingPage() {
                   { value: '99.9%', label: 'Disponibilité' },
                 ].map(s => (
                   <div key={s.value} className="text-center">
-                    <div className="text-3xl font-black text-teal-500">{s.value}</div>
+                    <div className="text-3xl font-black text-[#DC2626]">{s.value}</div>
                     <div className="text-xs text-[#64748B] font-medium mt-1">{s.label}</div>
                   </div>
                 ))}
@@ -297,13 +297,13 @@ export default function LandingPage() {
               className="relative"
             >
               {/* Decorative bg square */}
-              <div className="absolute -right-4 -bottom-4 w-full h-full rounded-3xl bg-teal-500/10 -z-0" />
+              <div className="absolute -right-4 -bottom-4 w-full h-full rounded-3xl bg-red-500/10 -z-0" />
 
               {/* Photo */}
-              <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-teal-100">
+              <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-red-50">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/hero-vr.jpg"
+                  src="/images/hero.jpg"
                   alt="Entrepreneur africain avec technologie avancée"
                   className="w-full aspect-[4/5] object-cover"
                 />
@@ -311,8 +311,8 @@ export default function LandingPage() {
                 <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/50 to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="flex items-center gap-3 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl">
-                    <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center shrink-0">
-                      <Shield size={18} className="text-teal-600" />
+                    <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                      <Shield size={18} className="text-[#DC2626]" />
                     </div>
                     <div>
                       <div className="text-sm font-bold text-[#0F172A]">SYSCOHADA Conforme</div>
@@ -328,9 +328,8 @@ export default function LandingPage() {
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute -top-5 -left-5 z-20 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100 flex items-center gap-3"
               >
-                <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-                  <Bot size={18} className="text-orange-500" />
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/miaa-logo.png" alt="MIAA+" className="w-10 h-10 rounded-xl object-cover shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-[#0F172A]">MIAA+ a analysé</div>
                   <div className="text-[10px] text-[#94A3B8]">Rapport trésorerie ✓</div>
@@ -357,7 +356,7 @@ export default function LandingPage() {
       <section id="modules" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-teal-500 uppercase tracking-[0.14em]">12 MODULES COMPLETS</span>
+            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">12 MODULES COMPLETS</span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
               Tout ce dont votre entreprise a besoin
             </h2>
@@ -371,9 +370,13 @@ export default function LandingPage() {
               const Icon = m.icon
               return (
                 <FadeIn key={m.title} delay={Math.min(i * 0.04, 0.32)}>
-                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-50 transition-all duration-200 group cursor-pointer h-full">
-                    <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center mb-3 group-hover:bg-teal-100 transition-colors">
-                      <Icon size={18} className="text-teal-500" />
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:border-[#DC2626]/30 hover:shadow-lg hover:shadow-red-50 transition-all duration-200 group cursor-pointer h-full">
+                    <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center mb-3 group-hover:bg-red-100 transition-colors">
+                      {Icon
+                        ? <Icon size={18} className="text-[#DC2626]" />
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        : <img src="/miaa-logo.png" alt="MIAA+" className="w-7 h-7 rounded-full object-cover" />
+                      }
                     </div>
                     <h3 className="text-sm font-bold text-[#0F172A] mb-1">{m.title}</h3>
                     <p className="text-xs text-[#64748B] leading-relaxed">{m.desc}</p>
@@ -386,7 +389,7 @@ export default function LandingPage() {
       </section>
 
       {/* ══ FEATURE SPLIT — teal background (James "Do Some Awesome Stuff") ══ */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-teal-600 relative overflow-hidden">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#0F172A] relative overflow-hidden">
         <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-white/5 pointer-events-none" />
         <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-white/5 pointer-events-none" />
         <div className="max-w-7xl mx-auto">
@@ -404,7 +407,7 @@ export default function LandingPage() {
                 />
                 {/* Floating stat card */}
                 <div className="absolute z-20 -bottom-6 -right-4 bg-white rounded-2xl p-5 shadow-2xl">
-                  <div className="text-4xl font-black text-teal-600">50+</div>
+                  <div className="text-4xl font-black text-[#DC2626]">50+</div>
                   <div className="text-sm text-[#64748B] font-medium">Entreprises actives</div>
                 </div>
               </div>
@@ -412,11 +415,11 @@ export default function LandingPage() {
 
             {/* Text */}
             <FadeIn delay={0.12} className="text-white">
-              <span className="text-teal-200 text-xs font-bold uppercase tracking-[0.14em]">NOTRE PLATEFORME</span>
+              <span className="text-gray-300 text-xs font-bold uppercase tracking-[0.14em]">NOTRE PLATEFORME</span>
               <h2 className="text-4xl sm:text-5xl font-black mt-4 mb-6 leading-tight">
                 Gérez toute votre entreprise depuis un seul outil
               </h2>
-              <p className="text-teal-100 text-lg leading-relaxed mb-10">
+              <p className="text-gray-200 text-lg leading-relaxed mb-10">
                 Comptabilité SYSCOHADA, RH &amp; Paie, Trésorerie, Scolarité, Restaurant — une seule plateforme pensée pour l&apos;Afrique, accessible depuis votre téléphone.
               </p>
               <ul className="space-y-4 mb-10">
@@ -428,7 +431,7 @@ export default function LandingPage() {
                   'Accessible depuis smartphone ou ordinateur',
                 ].map(item => (
                   <li key={item} className="flex items-center gap-3">
-                    <CheckCircle2 size={18} className="text-teal-200 shrink-0" />
+                    <CheckCircle2 size={18} className="text-gray-300 shrink-0" />
                     <span className="text-white font-medium text-sm">{item}</span>
                   </li>
                 ))}
@@ -446,7 +449,7 @@ export default function LandingPage() {
       <section id="secteurs" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-teal-500 uppercase tracking-[0.14em]">SOLUTIONS PAR SECTEUR</span>
+            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">SOLUTIONS PAR SECTEUR</span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
               Adapté à chaque métier
             </h2>
@@ -460,14 +463,14 @@ export default function LandingPage() {
               const Icon = s.icon
               return (
                 <FadeIn key={s.title} delay={i * 0.08}>
-                  <div className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-teal-200 hover:shadow-xl hover:shadow-teal-50 transition-all duration-200 h-full group">
+                  <div className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#DC2626]/30 hover:shadow-xl hover:shadow-red-50 transition-all duration-200 h-full group">
                     {s.badge && (
                       <span className="absolute top-4 right-4 text-[9px] font-bold text-orange-600 bg-orange-50 border border-orange-100 rounded-full px-2 py-0.5">
                         {s.badge}
                       </span>
                     )}
-                    <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center mb-4 group-hover:bg-teal-100 transition-colors">
-                      <Icon size={22} className="text-teal-600" />
+                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors">
+                      <Icon size={22} className="text-[#DC2626]" />
                     </div>
                     <h3 className="text-base font-bold text-[#0F172A] mb-2">{s.title}</h3>
                     <p className="text-sm text-[#64748B] leading-relaxed">{s.desc}</p>
@@ -482,18 +485,18 @@ export default function LandingPage() {
             <div className="relative rounded-3xl overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/vr-futuristic.jpg"
+                src="/images/vr-tech.jpg"
                 alt="Technologie avancée pour entreprises africaines"
                 className="w-full h-72 sm:h-96 object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-900/80 via-teal-900/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/80 via-teal-900/40 to-transparent" />
               <div className="absolute inset-0 flex items-center px-10 sm:px-16">
                 <div className="max-w-lg">
-                  <span className="text-teal-300 text-xs font-bold uppercase tracking-widest">TECHNOLOGIE AVANCÉE</span>
+                  <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">TECHNOLOGIE AVANCÉE</span>
                   <h3 className="text-3xl sm:text-4xl font-black text-white mt-3 mb-4 leading-tight">
                     L&apos;avenir de la gestion d&apos;entreprise en Afrique
                   </h3>
-                  <p className="text-teal-100 text-sm leading-relaxed mb-6">
+                  <p className="text-gray-200 text-sm leading-relaxed mb-6">
                     Intelligence artificielle, Mobile Money, comptabilité automatique — Oraforme vous connecte à la technologie de demain.
                   </p>
                   <Link href="/register"
@@ -511,7 +514,7 @@ export default function LandingPage() {
       <section id="apropos" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-teal-500 uppercase tracking-[0.14em]">POURQUOI ORAFORME</span>
+            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">POURQUOI ORAFORME</span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
               Fait pour vous, fait pour l&apos;Afrique
             </h2>
@@ -527,11 +530,11 @@ export default function LandingPage() {
                 accent: 'bg-orange-500',
                 tag: 'MOBILE MONEY',
                 title: 'Mobile Money natif',
-                desc: 'Collectez vos paiements directement via Airtel Money et MTN MoMo. Vos clients paient comme ils le font naturellement, depuis leur téléphone.',
+                desc: 'Airtel Money et MTN MoMo sont intégrés comme moyen de paiement dans tous les modules — facturation, scolarité, restaurant. Vos clients paient naturellement.',
               },
               {
                 img: '/images/analytics.jpg',
-                accent: 'bg-teal-500',
+                accent: 'bg-red-500',
                 tag: 'ANALYTIQUE',
                 title: 'Rapports & Tableaux de bord',
                 desc: 'KPIs en temps réel, exports PDF et Excel, rapports SYSCOHADA — toutes vos données financières en un coup d\'œil.',
@@ -545,7 +548,7 @@ export default function LandingPage() {
               },
             ].map((item, i) => (
               <FadeIn key={item.title} delay={i * 0.1}>
-                <div className="rounded-3xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-teal-50 transition-all duration-300 group h-full flex flex-col">
+                <div className="rounded-3xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-red-50 transition-all duration-300 group h-full flex flex-col">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -584,7 +587,7 @@ export default function LandingPage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-teal-500 uppercase tracking-[0.14em]">TÉMOIGNAGES</span>
+            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">TÉMOIGNAGES</span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
               Ce que disent nos clients
             </h2>
@@ -596,9 +599,9 @@ export default function LandingPage() {
           <div className="grid sm:grid-cols-3 gap-6">
             {TESTIMONIALS.map((t, i) => (
               <FadeIn key={t.name} delay={i * 0.1}>
-                <div className="bg-white rounded-3xl p-8 border border-gray-100 hover:border-teal-200 hover:shadow-xl hover:shadow-teal-50 transition-all h-full flex flex-col">
+                <div className="bg-white rounded-3xl p-8 border border-gray-100 hover:border-[#DC2626]/30 hover:shadow-xl hover:shadow-red-50 transition-all h-full flex flex-col">
                   {/* Quote mark */}
-                  <div className="text-6xl font-black text-teal-100 leading-none mb-2 select-none">&ldquo;</div>
+                  <div className="text-6xl font-black text-gray-200 leading-none mb-2 select-none">&ldquo;</div>
                   <div className="flex gap-1 mb-4">
                     {Array.from({ length: t.stars }).map((_, j) => (
                       <Star key={j} size={14} className="text-orange-400 fill-orange-400" />
@@ -608,7 +611,7 @@ export default function LandingPage() {
                     {t.quote}
                   </p>
                   <div className="flex items-center gap-3 pt-5 border-t border-gray-100">
-                    <div className="w-11 h-11 rounded-full bg-teal-500 flex items-center justify-center font-bold text-white text-sm shrink-0">
+                    <div className="w-11 h-11 rounded-full bg-red-500 flex items-center justify-center font-bold text-white text-sm shrink-0">
                       {t.avatar}
                     </div>
                     <div>
@@ -627,7 +630,7 @@ export default function LandingPage() {
       <section id="tarifs" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-teal-500 uppercase tracking-[0.14em]">TARIFICATION</span>
+            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">TARIFICATION</span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
               Des tarifs accessibles, aucun frais caché
             </h2>
@@ -641,7 +644,7 @@ export default function LandingPage() {
               <FadeIn key={plan.name} delay={i * 0.08}>
                 <div className={`rounded-3xl p-7 border relative ${
                   plan.highlight
-                    ? 'bg-teal-600 border-teal-600 shadow-2xl shadow-teal-200'
+                    ? 'bg-[#0F172A] border-teal-600 shadow-2xl shadow-red-100'
                     : 'bg-gray-50 border-gray-100'
                 }`}>
                   {plan.highlight && (
@@ -650,15 +653,15 @@ export default function LandingPage() {
                     </div>
                   )}
                   <div className={`text-lg font-bold mb-1 ${plan.highlight ? 'text-white' : 'text-[#0F172A]'}`}>{plan.name}</div>
-                  <div className={`text-xs mb-5 ${plan.highlight ? 'text-teal-200' : 'text-[#64748B]'}`}>{plan.desc}</div>
+                  <div className={`text-xs mb-5 ${plan.highlight ? 'text-gray-300' : 'text-[#64748B]'}`}>{plan.desc}</div>
                   <div className="mb-6">
                     <span className={`text-3xl font-black ${plan.highlight ? 'text-white' : 'text-[#0F172A]'}`}>{plan.price}</span>
-                    {plan.period && <span className={`text-xs ml-1.5 ${plan.highlight ? 'text-teal-200' : 'text-[#64748B]'}`}>{plan.period}</span>}
+                    {plan.period && <span className={`text-xs ml-1.5 ${plan.highlight ? 'text-gray-300' : 'text-[#64748B]'}`}>{plan.period}</span>}
                   </div>
                   <ul className="space-y-2.5 mb-7">
                     {plan.features.map(f => (
-                      <li key={f} className={`flex items-center gap-2 text-xs font-medium ${plan.highlight ? 'text-teal-100' : 'text-[#475569]'}`}>
-                        <CheckCircle2 size={13} className={plan.highlight ? 'text-teal-200 shrink-0' : 'text-teal-500 shrink-0'} />
+                      <li key={f} className={`flex items-center gap-2 text-xs font-medium ${plan.highlight ? 'text-gray-200' : 'text-[#475569]'}`}>
+                        <CheckCircle2 size={13} className={plan.highlight ? 'text-gray-300 shrink-0' : 'text-[#DC2626] shrink-0'} />
                         {f}
                       </li>
                     ))}
@@ -666,8 +669,8 @@ export default function LandingPage() {
                   <Link href={plan.href}
                     className={`block text-center text-sm font-bold py-3 rounded-xl transition-colors ${
                       plan.highlight
-                        ? 'bg-white text-teal-700 hover:bg-teal-50'
-                        : 'bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-100'
+                        ? 'bg-white text-[#B91C1C] hover:bg-red-50'
+                        : 'bg-red-50 text-[#B91C1C] hover:bg-red-100 border border-teal-100'
                     }`}>
                     {plan.cta}
                   </Link>
@@ -698,7 +701,7 @@ export default function LandingPage() {
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-teal-900/80 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-[2px]" />
 
         {/* Decorative circles */}
         <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-white/5 pointer-events-none" />
@@ -709,7 +712,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-5 leading-tight">
               Prêt à transformer<br className="hidden sm:block" /> votre entreprise ?
             </h2>
-            <p className="text-lg text-teal-200 mb-10 leading-relaxed">
+            <p className="text-lg text-gray-300 mb-10 leading-relaxed">
               Rejoignez plus de 50 entreprises africaines qui utilisent Oraforme chaque jour.<br className="hidden sm:block" />
               Démarrez gratuitement — 30 jours d&apos;essai, sans carte bancaire.
             </p>
@@ -753,7 +756,7 @@ export default function LandingPage() {
                 <ul className="space-y-3">
                   {col.links.map(l => (
                     <li key={l}>
-                      <a href="#" className="text-sm text-gray-500 hover:text-teal-400 transition-colors">{l}</a>
+                      <a href="#" className="text-sm text-gray-500 hover:text-[#DC2626] transition-colors">{l}</a>
                     </li>
                   ))}
                 </ul>

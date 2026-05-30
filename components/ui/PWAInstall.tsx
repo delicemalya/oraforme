@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, X, Smartphone } from 'lucide-react'
+import { Download, X } from 'lucide-react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -66,24 +66,23 @@ export default function PWAInstall() {
       >
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl">
           <div className="flex items-start gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#DC2626] flex items-center justify-center shrink-0">
-              <Smartphone size={20} className="text-[#DC2626]" />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Oraforme" className="w-11 h-11 rounded-xl object-cover shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-[var(--text)]">Installer Oraforme</p>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                Accédez rapidement depuis votre écran d'accueil, même hors ligne.
+                Accédez rapidement depuis votre écran d&apos;accueil, même hors ligne.
               </p>
             </div>
-            <button onClick={dismiss} className="text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors shrink-0">
+            <button onClick={dismiss} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors shrink-0">
               <X size={16} />
             </button>
           </div>
           <div className="flex gap-2 mt-3">
-            <button onClick={dismiss} className="flex-1 py-2 text-xs text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl hover:border-[#64748B] transition-all">
+            <button onClick={dismiss} className="flex-1 py-2 text-xs font-semibold text-[var(--text-secondary)] bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl hover:border-gray-400 transition-all">
               Plus tard
             </button>
-            <button onClick={install} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-[#DC2626] bg-[#DC2626] rounded-xl hover:bg-[#E09000] transition-all">
+            <button onClick={install} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded-xl transition-all">
               <Download size={13} /> Installer
             </button>
           </div>
