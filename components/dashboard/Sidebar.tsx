@@ -221,6 +221,45 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'pharmacie-ventes':  'nav.pharmacie_ventes',
   abonnement:          'nav.abonnement',
   fiscalite:           'nav.fiscalite',
+  // Secteurs métier
+  btp:                     'nav.btp',
+  'btp-devis':             'nav.btp_devis',
+  'btp-chantiers':         'nav.btp_chantiers',
+  'btp-materiaux':         'nav.btp_materiaux',
+  banque:                  'nav.banque',
+  'banque-clients':        'nav.banque_clients',
+  'banque-credits':        'nav.banque_credits',
+  'banque-epargne':        'nav.banque_epargne',
+  'banque-operations':     'nav.banque_operations',
+  agriculture:             'nav.agriculture',
+  'agriculture-parcelles': 'nav.agri_parcelles',
+  'agriculture-recoltes':  'nav.agri_recoltes',
+  'agriculture-intrants':  'nav.agri_intrants',
+  cabinet:                 'nav.cabinet',
+  'cabinet-projets':       'nav.cabinet_projets',
+  petrole:                 'nav.petrole',
+  'petrole-sites':         'nav.petrole_sites',
+  ong:                     'nav.ong',
+  'ong-projets':           'nav.ong_projets',
+  'ong-dons':              'nav.ong_dons',
+  boisson:                 'nav.boisson',
+  'boisson-tournees':      'nav.boisson_tournees',
+}
+
+const SECTOR_LABEL_KEYS: Record<string, string> = {
+  ecole:            'nav.ecole',
+  restaurant:       'nav.restaurant',
+  hotel:            'nav.hotel',
+  sante:            'nav.sante',
+  pharmacie:        'nav.pharmacie',
+  transport:        'nav.transport',
+  btp:              'nav.btp',
+  banque:           'nav.banque',
+  agriculture:      'nav.agriculture',
+  cabinet:          'nav.cabinet',
+  petrole:          'nav.petrole',
+  ong:              'nav.ong',
+  boisson:          'nav.boisson',
 }
 
 // roles : gestion des rôles école — réservé à DIRECTION_GENERALE uniquement
@@ -403,7 +442,12 @@ export default function Sidebar() {
     if (!loaded) return null
     if (secteur) {
       const sectorItems = (SECTOR_SPECIFIC[secteur as SectorId] ?? [])
-        .map(mod => ({ id: mod.id, label: mod.label, icon: ICONS[mod.id] ?? Settings, href: mod.href }))
+        .map(mod => ({
+          id:   mod.id,
+          label: MODULE_LABEL_KEYS[mod.id] ? t(MODULE_LABEL_KEYS[mod.id]) : mod.label,
+          icon: ICONS[mod.id] ?? Settings,
+          href: mod.href,
+        }))
         .filter(item => {
           if (isOwner) return true
           if (secteur === 'ecole') {
@@ -415,7 +459,8 @@ export default function Sidebar() {
           return permissions[item.id]?.can_view !== false
         })
       if (!sectorItems.length) return null
-      return { id: 'metier', label: SECTOR_LABELS[secteur] ?? secteur, icon: getSectorIcon(secteur), items: sectorItems }
+      const sectorLabel = SECTOR_LABEL_KEYS[secteur] ? t(SECTOR_LABEL_KEYS[secteur]) : (SECTOR_LABELS[secteur] ?? secteur)
+      return { id: 'metier', label: sectorLabel, icon: getSectorIcon(secteur), items: sectorItems }
     }
     const EXTRA_IDS = ['ecole', 'restaurant', 'hotel', 'transport']
     const extraItems: NavItem[] = []
