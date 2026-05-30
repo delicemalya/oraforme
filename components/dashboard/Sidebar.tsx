@@ -142,25 +142,36 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 // ─── Sidebar Group definitions ────────────────────────────────────────────────
 
 const SIDEBAR_GROUPS = [
-  { id: 'pilotage',    labelKey: 'nav.pilotage',    icon: LayoutDashboard, moduleIds: ['direction', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'finance', 'analytics', 'audit', 'notifications'] },
-  { id: 'finance_ops', labelKey: 'nav.finance_ops', icon: Calculator,      moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
-  { id: 'rh_org',      labelKey: 'nav.rh_org',      icon: Users,           moduleIds: ['rh', 'roles'] },
-  { id: 'commercial',  labelKey: 'nav.commercial',  icon: UsersRound,      moduleIds: ['crm'] },
-  { id: 'supply',      labelKey: 'nav.supply',      icon: Package,         moduleIds: ['stock', 'achats'] },
-  { id: 'docs_ai',     labelKey: 'nav.docs_ai',     icon: FolderOpen,      moduleIds: ['ged', 'bizbot'] },
-  { id: 'collab',      labelKey: 'nav.collab',      icon: CheckSquare,     moduleIds: ['calendrier', 'taches'] },
-  { id: 'platform',    labelKey: 'nav.platform',    icon: Zap,             moduleIds: ['workflows', 'api-keys'] },
-  { id: 'params',      labelKey: 'nav.params',      icon: Settings,        moduleIds: ['profil', 'abonnement', 'parametres'] },
+  // SUPERVISION — monitoring système, sécurité, alertes uniquement
+  { id: 'pilotage',     labelKey: 'nav.pilotage',    icon: ShieldAlert,  moduleIds: ['direction', 'analytics', 'audit', 'notifications'] },
+  // BI & ANALYTICS — intelligence métier, forecasting, BI sectoriels
+  { id: 'bi_analytics', labelKey: 'nav.bi',          icon: TrendingUp,   moduleIds: ['finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'] },
+  // FINANCE & COMPTA
+  { id: 'finance_ops',  labelKey: 'nav.finance_ops', icon: Calculator,   moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
+  // RH & ORGANISATION
+  { id: 'rh_org',       labelKey: 'nav.rh_org',      icon: Users,        moduleIds: ['rh', 'roles'] },
+  // COMMERCIAL
+  { id: 'commercial',   labelKey: 'nav.commercial',  icon: UsersRound,   moduleIds: ['crm'] },
+  // STOCK & ACHATS
+  { id: 'supply',       labelKey: 'nav.supply',      icon: Package,      moduleIds: ['stock', 'achats'] },
+  // DOCUMENTS & IA
+  { id: 'docs_ai',      labelKey: 'nav.docs_ai',     icon: FolderOpen,   moduleIds: ['ged', 'bizbot'] },
+  // COLLABORATION
+  { id: 'collab',       labelKey: 'nav.collab',      icon: CheckSquare,  moduleIds: ['calendrier', 'taches'] },
+  // PLATEFORME & API
+  { id: 'platform',     labelKey: 'nav.platform',    icon: Zap,          moduleIds: ['workflows', 'api-keys'] },
+  // PARAMÈTRES
+  { id: 'params',       labelKey: 'nav.params',      icon: Settings,     moduleIds: ['profil', 'abonnement', 'parametres'] },
 ]
 
 const MODULE_LABEL_KEYS: Record<string, string> = {
-  'bi-dg':       'nav.bi_dg',
-  'bi-rh':       'nav.bi_rh',
-  'bi-ecole':    'nav.bi_ecole',
-  'bi-hotel':    'nav.bi_hotel',
+  'bi-dg':         'nav.bi_dg',
+  'bi-rh':         'nav.bi_rh',
+  'bi-ecole':      'nav.bi_ecole',
+  'bi-hotel':      'nav.bi_hotel',
   'bi-restaurant': 'nav.bi_restaurant',
-  direction:    'nav.direction',
-  finance:      'nav.finance',
+  direction:       'nav.direction',
+  finance:         'nav.finance',
   analytics:    'nav.analytics',
   audit:        'nav.audit',
   notifications:'nav.notifications',
@@ -416,24 +427,24 @@ export default function Sidebar() {
       <Link
         href={item.href}
         onClick={() => setMobileOpen(false)}
-        className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150 group"
+        className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150"
         style={active
-          ? { background: 'rgba(245,158,11,0.13)', color: '#F59E0B', fontWeight: 600 }
-          : { color: '#9CA3AF' }
+          ? { background: 'rgba(220,38,38,0.08)', color: '#DC2626', fontWeight: 600 }
+          : { color: '#64748B' }
         }
         onMouseEnter={!active ? e => {
-          (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.06)'
-          ;(e.currentTarget as HTMLAnchorElement).style.color = '#D1D5DB'
+          (e.currentTarget as HTMLAnchorElement).style.background = '#F8FAFC'
+          ;(e.currentTarget as HTMLAnchorElement).style.color = '#0F172A'
         } : undefined}
         onMouseLeave={!active ? e => {
           (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
-          ;(e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF'
+          ;(e.currentTarget as HTMLAnchorElement).style.color = '#64748B'
         } : undefined}
       >
-        <Icon size={14} className="shrink-0" style={{ color: active ? '#F59E0B' : '#6B7280' }} />
+        <Icon size={14} className="shrink-0" style={{ color: active ? '#DC2626' : '#94A3B8' }} />
         <span className="flex-1 truncate">{item.label}</span>
-        {!isOwner && !canEdit && <Lock size={8} style={{ color: '#374151', flexShrink: 0 }} />}
-        {active && <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
+        {!isOwner && !canEdit && <Lock size={8} style={{ color: '#CBD5E1', flexShrink: 0 }} />}
+        {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#DC2626' }} />}
       </Link>
     )
   }
@@ -450,17 +461,17 @@ export default function Sidebar() {
           onClick={() => toggleGroup(group.id)}
           className="w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors"
           style={{ background: 'transparent' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+          onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
         >
-          <GroupIcon size={10} style={{ color: '#4B5563', flexShrink: 0 }} />
-          <span className="flex-1 text-left text-[10px] font-bold uppercase tracking-widest" style={{ color: '#4B5563' }}>
+          <GroupIcon size={10} style={{ color: '#94A3B8', flexShrink: 0 }} />
+          <span className="flex-1 text-left text-[10px] font-bold uppercase tracking-widest" style={{ color: '#94A3B8' }}>
             {group.label}
           </span>
           <ChevronDown
             size={9}
             style={{
-              color: '#374151',
+              color: '#CBD5E1',
               transition: 'transform 0.2s',
               transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
             }}
@@ -488,18 +499,18 @@ export default function Sidebar() {
   // ── Sidebar Content ────────────────────────────────────────────────────────
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#0F172A' }}>
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#FFFFFF' }}>
 
       {/* Logo */}
-      <div className="shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid #E2E8F0' }}>
         <div className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-icon.png" alt="oraforme" width={28} height={28} className="shrink-0" />
-          <span className="text-[16px] font-extrabold text-white tracking-tight">oraforme</span>
+          <span className="text-[16px] font-extrabold tracking-tight" style={{ color: '#0F172A' }}>oraforme</span>
           {secteur && (
             <span
               className="ml-auto shrink-0 text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
-              style={{ background: 'rgba(245,158,11,0.2)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.3)' }}
+              style={{ background: 'rgba(220,38,38,0.08)', color: '#DC2626', border: '1px solid rgba(220,38,38,0.15)' }}
             >
               {getSectorLabel(secteur)}
             </span>
@@ -508,7 +519,7 @@ export default function Sidebar() {
         {role && role !== 'owner' && (
           <div className="mt-2">
             <span className="text-[9px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded"
-              style={{ background: 'rgba(255,255,255,0.08)', color: '#9CA3AF' }}>
+              style={{ background: '#F1F5F9', color: '#64748B' }}>
               {role === 'admin' ? 'Admin' : t('common.active')}
             </span>
           </div>
@@ -524,19 +535,19 @@ export default function Sidebar() {
           onClick={() => setMobileOpen(false)}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-150 mb-3"
           style={dashActive
-            ? { background: '#F59E0B', color: '#0F172A' }
-            : { color: '#9CA3AF' }
+            ? { background: '#DC2626', color: '#FFFFFF' }
+            : { color: '#64748B' }
           }
           onMouseEnter={!dashActive ? e => {
-            (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)'
-            ;(e.currentTarget as HTMLAnchorElement).style.color = '#E5E7EB'
+            (e.currentTarget as HTMLAnchorElement).style.background = '#F8FAFC'
+            ;(e.currentTarget as HTMLAnchorElement).style.color = '#0F172A'
           } : undefined}
           onMouseLeave={!dashActive ? e => {
             (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
-            ;(e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF'
+            ;(e.currentTarget as HTMLAnchorElement).style.color = '#64748B'
           } : undefined}
         >
-          <LayoutDashboard size={14} className="shrink-0" style={{ color: dashActive ? '#0F172A' : '#6B7280' }} />
+          <LayoutDashboard size={14} className="shrink-0" style={{ color: dashActive ? '#FFFFFF' : '#94A3B8' }} />
           <span>{t('nav.dashboard')}</span>
         </Link>
 
@@ -544,7 +555,7 @@ export default function Sidebar() {
         {!loaded && (
           <div className="space-y-2 px-1">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <div key={i} className="h-8 rounded-lg animate-pulse" style={{ background: '#F1F5F9' }} />
             ))}
           </div>
         )}
@@ -574,19 +585,19 @@ export default function Sidebar() {
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150 mt-1"
                 style={isActive('/dashboard/modules')
-                  ? { background: 'rgba(245,158,11,0.13)', color: '#F59E0B', fontWeight: 600 }
-                  : { color: '#9CA3AF' }
+                  ? { background: 'rgba(220,38,38,0.08)', color: '#DC2626', fontWeight: 600 }
+                  : { color: '#64748B' }
                 }
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.06)'
-                  ;(e.currentTarget as HTMLAnchorElement).style.color = '#D1D5DB'
+                  (e.currentTarget as HTMLAnchorElement).style.background = '#F8FAFC'
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = '#0F172A'
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = isActive('/dashboard/modules') ? 'rgba(245,158,11,0.13)' : 'transparent'
-                  ;(e.currentTarget as HTMLAnchorElement).style.color = isActive('/dashboard/modules') ? '#F59E0B' : '#9CA3AF'
+                  (e.currentTarget as HTMLAnchorElement).style.background = isActive('/dashboard/modules') ? 'rgba(220,38,38,0.08)' : 'transparent'
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = isActive('/dashboard/modules') ? '#DC2626' : '#64748B'
                 }}
               >
-                <Store size={14} style={{ color: '#6B7280' }} />
+                <Store size={14} style={{ color: '#94A3B8' }} />
                 <span>{t('nav.modules')}</span>
               </Link>
             )}
@@ -595,27 +606,27 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="shrink-0 px-2 py-3 space-y-0.5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="shrink-0 px-2 py-3 space-y-0.5" style={{ borderTop: '1px solid #E2E8F0' }}>
         {isSuperAdmin && (
           <Link
             href="/admin"
             onClick={() => setMobileOpen(false)}
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] font-medium transition-all duration-150"
-            style={{ color: '#F87171' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(248,113,113,0.1)')}
+            style={{ color: '#DC2626' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(220,38,38,0.06)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <ShieldAlert size={13} className="shrink-0" />
             <span>Admin oraforme</span>
-            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
           </Link>
         )}
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150"
-          style={{ color: '#6B7280' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(248,113,113,0.1)'; (e.currentTarget as HTMLButtonElement).style.color = '#F87171' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#6B7280' }}
+          style={{ color: '#94A3B8' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(220,38,38,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = '#DC2626' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#94A3B8' }}
         >
           <LogOut size={13} className="shrink-0" />
           <span>{t('nav.logout')}</span>
@@ -627,14 +638,14 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex shrink-0 flex-col h-screen sticky top-0" style={{ width: 232, background: '#0F172A' }}>
+      <aside className="hidden lg:flex shrink-0 flex-col h-screen sticky top-0" style={{ width: 232, background: '#FFFFFF', borderRight: '1px solid #E2E8F0' }}>
         <SidebarContent />
       </aside>
 
       {/* Mobile toggle */}
       <button
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl shadow-sm"
-        style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', color: '#E5E7EB' }}
+        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', color: '#0F172A' }}
         onClick={() => setMobileOpen(o => !o)}
         aria-label="Menu"
       >
@@ -644,11 +655,11 @@ export default function Sidebar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div style={{ width: 232, background: '#0F172A', height: '100%', boxShadow: '4px 0 24px rgba(0,0,0,0.4)' }}>
+          <div style={{ width: 232, background: '#FFFFFF', height: '100%', boxShadow: '4px 0 24px rgba(0,0,0,0.12)', borderRight: '1px solid #E2E8F0' }}>
             <SidebarContent />
           </div>
           <div
-            className="flex-1 bg-black/50 backdrop-blur-sm"
+            className="flex-1 bg-black/30 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
         </div>
