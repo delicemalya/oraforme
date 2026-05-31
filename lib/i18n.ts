@@ -1854,6 +1854,12 @@ export const translations: Record<Locale, Record<string, string>> = {
     'miaa.suggest.tva':             '🧮 Calculer TVA sur 500 000 FCFA',
     'miaa.suggest.net':             '👔 Net pour 400 000 FCFA brut',
     'miaa.suggest.cnss':            '📋 Règles CNSS Congo',
+    'miaa.suggestions':             'Suggestions',
+    'miaa.uploadBtn':               'Joindre un fichier',
+    'miaa.uploadHint':              'PDF, Excel, Word — max 10 Mo',
+    'miaa.uploadAnalyzing':         'Analyse du fichier en cours…',
+    'miaa.downloadTxt':             'Télécharger TXT',
+    'miaa.generateReport':          'Générer rapport',
 
     // Rapports page
     'rapports.title':               'Rapports Financiers',

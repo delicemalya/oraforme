@@ -11,11 +11,12 @@ export function useTenant() {
   const { tenant, loading } = useTenantContext()
 
   return {
-    tenantId: tenant?.tenantId ?? null,
-    role:     tenant?.role     ?? null,
-    isOwner:  tenant?.role === 'owner',
+    tenantId:      tenant?.tenantId      ?? null,
+    role:          tenant?.role          ?? null,
+    isOwner:       tenant?.role === 'owner',
     loading,
-    prenom:   tenant?.prenom   ?? null,
-    nom:      tenant?.nom      ?? null,
+    prenom:        tenant?.prenom        ?? null,
+    nom:           tenant?.nom           ?? null,
+    nomEntreprise: tenant?.nomEntreprise ?? null,
   }
 }

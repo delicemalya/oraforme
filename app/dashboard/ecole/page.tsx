@@ -152,16 +152,19 @@ function RevenueCard({
 // -- Main Page -----------------------------------------------------------------
 
 export default function EcoleOverviewPage() {
-  const { tenantId, loading: tenantLoading, prenom, nom } = useTenant()
+  const { tenantId, loading: tenantLoading, prenom, nom, nomEntreprise } = useTenant()
   const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#2977ac'
   const { t } = useLocale()
   const [data,     setData]     = useState<OverviewData | null>(null)
   const [loading,  setLoading]  = useState(true)
-  const [nomEcole, setNomEcole] = useState('�cole')
+  const [nomEcole, setNomEcole] = useState('École')
 
-  const MOIS = ['Jan', 'F�v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Ao�', 'Sep', 'Oct', 'Nov', 'D�c']
+  const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
-  const displayName = prenom ? [prenom, nom].filter(Boolean).join(' ') : 'Admin'
+  // Fallback chain: prenom → company name → 'vous'
+  const displayName = prenom
+    ? [prenom, nom].filter(Boolean).join(' ')
+    : (nomEntreprise ?? 'vous')
 
   const load = useCallback(async () => {
     if (!tenantId) return

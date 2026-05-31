@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Calculator, BarChart2, FileText,
-  Bell, Cog, Globe, Loader2, Trash2, ChevronDown, ChevronUp, Sparkles,
+  Bell, Cog, Globe, Loader2, Trash2, ChevronDown, ChevronUp,
+  Sparkles, Paperclip, Download, X,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -13,22 +14,40 @@ import { getTenantBrandColor } from '@/lib/utils'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface Message { role: 'user' | 'bot'; text: string; ts?: number }
+interface Message {
+  role: 'user' | 'bot'
+  text: string
+  ts?: number
+  peut_telecharger?: boolean
+  contenu_telechargeable?: string
+  fichier_analyse?: string
+}
+
+// ── Accepted file types per module ────────────────────────────────────────────
+
+const FICHIERS_ACCEPTES: Record<string, string> = {
+  comptabilite: '.pdf,.xlsx,.xls,.csv,.doc,.docx',
+  rh:           '.pdf,.doc,.docx,.xlsx,.xls',
+  facturation:  '.pdf,.doc,.docx,.xlsx',
+  stock:        '.xlsx,.xls,.csv,.pdf',
+  ecole:        '.pdf,.doc,.docx,.xlsx,.jpg,.png',
+  default:      '.pdf,.doc,.docx,.xlsx,.xls,.csv,.jpg,.png',
+}
 
 // ── MIAA+ Avatar ──────────────────────────────────────────────────────────────
 
 function MIAAAvatar({ size = 32, color }: { size?: number; color: string }) {
   return (
     <div
-      className="shrink-0 flex items-center justify-center rounded-full text-white font-bold"
-      style={{ width: size, height: size, background: color, fontSize: size * 0.35 }}
+      className="shrink-0 flex items-center justify-center rounded-full"
+      style={{ width: size, height: size, background: color }}
     >
       <Sparkles size={size * 0.45} color="white" />
     </div>
   )
 }
 
-// ── Text formatter ────────────────────────────────────────────────────────────
+// ── Text formatter (bold + line breaks) ───────────────────────────────────────
 
 function formatText(text: string) {
   return text
@@ -36,11 +55,33 @@ function formatText(text: string) {
     .replace(/\n/g, '<br />')
 }
 
+// ── Download helper ───────────────────────────────────────────────────────────
+
+function downloadTxt(content: string) {
+  const clean = content.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&')
+  const blob = new Blob([clean], { type: 'text/plain;charset=utf-8' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href     = url
+  a.download = `miaa-rapport-${Date.now()}.txt`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload  = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function MIAAPage() {
-  const { t } = useLocale()
-  const { tenantId, prenom, nom } = useTenant()
+  const { t }                                 = useLocale()
+  const { tenantId, prenom, nom, nomEntreprise } = useTenant()
   const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#F59E0B'
 
   const CAPABILITIES = [
@@ -97,10 +138,16 @@ export default function MIAAPage() {
   const [entreprise,    setEntreprise]    = useState('')
   const [modulesActifs, setModulesActifs] = useState<string[]>([])
   const [expandedCat,   setExpandedCat]   = useState<number | null>(0)
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef  = useRef<HTMLInputElement>(null)
+  const [fichierJoint,  setFichierJoint]  = useState<File | null>(null)
+  const [uploadLoading, setUploadLoading] = useState(false)
+  const bottomRef  = useRef<HTMLDivElement>(null)
+  const inputRef   = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const displayName = prenom ? [prenom, nom].filter(Boolean).join(' ') : null
+  // Compute user display name with fallback chain: prenom → nomEntreprise → 'vous'
+  const displayName = prenom
+    ? [prenom, nom].filter(Boolean).join(' ')
+    : (nomEntreprise ?? null)
 
   function getGreeting() {
     const h = new Date().getHours()
@@ -134,7 +181,7 @@ export default function MIAAPage() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, loading])
+  }, [messages, loading, uploadLoading])
 
   const send = useCallback(async (text: string) => {
     const msg = text.trim()
@@ -148,12 +195,8 @@ export default function MIAAPage() {
 
     try {
       const history = newMessages
-        .slice(1)
-        .slice(-10)
-        .map(m => ({
-          role:    m.role === 'user' ? 'user' as const : 'assistant' as const,
-          content: m.text,
-        }))
+        .slice(1).slice(-10)
+        .map(m => ({ role: m.role === 'user' ? 'user' as const : 'assistant' as const, content: m.text }))
 
       const res = await fetch('/api/ai/chat', {
         method:  'POST',
@@ -168,13 +211,110 @@ export default function MIAAPage() {
         }),
       })
       const { reply } = await res.json()
-      setMessages(prev => [...prev, { role: 'bot', text: reply ?? t('miaa.errorReply'), ts: Date.now() }])
+      const text = reply ?? t('miaa.errorReply')
+      setMessages(prev => [...prev, {
+        role:                  'bot',
+        text,
+        ts:                    Date.now(),
+        peut_telecharger:      text.length > 150,
+        contenu_telechargeable: text,
+      }])
     } catch {
       setMessages(prev => [...prev, { role: 'bot', text: t('miaa.errorConnection'), ts: Date.now() }])
     } finally {
       setLoading(false)
     }
   }, [loading, messages, entreprise, modulesActifs, t])
+
+  // File upload handler
+  async function handleFichier(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+
+    if (file.size > 10 * 1024 * 1024) {
+      setMessages(prev => [...prev, {
+        role: 'bot',
+        text: 'Fichier trop volumineux. Limite : 10 Mo.',
+        ts: Date.now(),
+      }])
+      return
+    }
+
+    setFichierJoint(file)
+    setUploadLoading(true)
+    setMessages(prev => [...prev, {
+      role: 'user',
+      text: `[Fichier joint : ${file.name}] Analyse ce document.`,
+      ts: Date.now(),
+    }])
+
+    try {
+      const base64 = await fileToBase64(file)
+      const res = await fetch('/api/miaa/analyze-file', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          module:   'miaa',
+          filename: file.name,
+          filetype: file.type,
+          filesize: file.size,
+          base64,
+          tenantData: { tenant_id: tenantId ?? undefined },
+        }),
+      })
+      const data = await res.json()
+      const analyse = data.analyse ?? 'Analyse terminée.'
+      setMessages(prev => [...prev, {
+        role:                  'bot',
+        text:                  analyse,
+        ts:                    Date.now(),
+        peut_telecharger:      true,
+        contenu_telechargeable: analyse,
+        fichier_analyse:        file.name,
+      }])
+    } catch {
+      setMessages(prev => [...prev, {
+        role: 'bot',
+        text: "Impossible d'analyser ce fichier. Vérifiez le format et réessayez.",
+        ts: Date.now(),
+      }])
+    } finally {
+      setFichierJoint(null)
+      setUploadLoading(false)
+    }
+  }
+
+  // Ask MIAA+ to generate a full downloadable report
+  async function demanderRapport(contexte: string) {
+    if (loading) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message:   "Sur la base de ces informations, génère un rapport professionnel complet avec titre, introduction, sections numérotées et conclusion avec recommandations.",
+          entreprise,
+          module:    'miaa',
+          modules_actifs: modulesActifs,
+          user_role: 'gestionnaire',
+          history:   [{ role: 'assistant', content: contexte }],
+        }),
+      })
+      const { reply } = await res.json()
+      const rapport = reply ?? 'Rapport généré.'
+      setMessages(prev => [...prev, {
+        role:                  'bot',
+        text:                  rapport,
+        ts:                    Date.now(),
+        peut_telecharger:      true,
+        contenu_telechargeable: rapport,
+      }])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   function clearChat() {
     const salut = getGreeting()
@@ -193,7 +333,7 @@ export default function MIAAPage() {
       {/* ── LEFT: Chat ──────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden min-h-0 shadow-sm">
 
-        {/* Chat Header — white, clean */}
+        {/* Header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-white shrink-0">
           <MIAAAvatar size={38} color={brandColor} />
           <div className="flex-1 min-w-0">
@@ -209,7 +349,9 @@ export default function MIAAPage() {
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />
               <p className="text-[10px] text-gray-400 truncate">
-                {displayName ? `${displayName} · ` : ''}{entreprise ? `${entreprise} · ` : ''}{t('miaa.subtitle')}
+                {displayName ? `${displayName} · ` : ''}
+                {entreprise ? `${entreprise} · ` : ''}
+                {t('miaa.subtitle')}
               </p>
             </div>
           </div>
@@ -231,28 +373,59 @@ export default function MIAAPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
-                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} gap-2.5 items-end`}
+                className={`flex flex-col gap-1 ${m.role === 'user' ? 'items-end' : 'items-start'}`}
               >
-                {m.role === 'bot' && (
-                  <div className="shrink-0 mb-0.5">
-                    <MIAAAvatar size={26} color={brandColor} />
+                {/* File badge */}
+                {m.fichier_analyse && (
+                  <div className="flex items-center gap-1 text-[10px] text-gray-400 mb-0.5">
+                    <FileText size={10} />
+                    <span>{m.fichier_analyse}</span>
                   </div>
                 )}
-                <div
-                  className={`max-w-[78%] text-xs px-4 py-2.5 leading-relaxed shadow-sm ${
-                    m.role === 'user'
-                      ? 'rounded-2xl rounded-br-md text-white font-medium'
-                      : 'rounded-2xl rounded-bl-md text-gray-800 bg-white border border-gray-100'
-                  }`}
-                  style={m.role === 'user' ? { background: brandColor } : undefined}
-                  dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
-                />
-                {m.role === 'user' && (
+
+                <div className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} gap-2.5 items-end w-full`}>
+                  {m.role === 'bot' && (
+                    <div className="shrink-0 mb-0.5">
+                      <MIAAAvatar size={26} color={brandColor} />
+                    </div>
+                  )}
                   <div
-                    className="shrink-0 mb-0.5 w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
-                    style={{ background: '#CBD5E1' }}
-                  >
-                    {displayName ? displayName[0].toUpperCase() : 'U'}
+                    className={`max-w-[78%] text-xs px-4 py-2.5 leading-relaxed shadow-sm ${
+                      m.role === 'user'
+                        ? 'rounded-2xl rounded-br-md text-white font-medium'
+                        : 'rounded-2xl rounded-bl-md text-gray-800 bg-white border border-gray-100'
+                    }`}
+                    style={m.role === 'user' ? { background: brandColor } : undefined}
+                    dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
+                  />
+                  {m.role === 'user' && (
+                    <div
+                      className="shrink-0 mb-0.5 w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
+                      style={{ background: '#CBD5E1' }}
+                    >
+                      {displayName ? displayName[0].toUpperCase() : 'U'}
+                    </div>
+                  )}
+                </div>
+
+                {/* Download + Report buttons on long bot messages */}
+                {m.role === 'bot' && m.peut_telecharger && m.contenu_telechargeable && (
+                  <div className="flex gap-1.5 ml-9 mt-0.5 flex-wrap">
+                    <button
+                      onClick={() => downloadTxt(m.contenu_telechargeable!)}
+                      className="flex items-center gap-1 px-2.5 py-1 text-[10px] bg-gray-50 text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all"
+                    >
+                      <Download size={10} />
+                      {t('miaa.downloadTxt')}
+                    </button>
+                    <button
+                      onClick={() => demanderRapport(m.contenu_telechargeable!)}
+                      className="flex items-center gap-1 px-2.5 py-1 text-[10px] border rounded-lg hover:opacity-80 transition-all"
+                      style={{ background: `${brandColor}12`, color: brandColor, borderColor: `${brandColor}40` }}
+                    >
+                      <FileText size={10} />
+                      {t('miaa.generateReport')}
+                    </button>
                   </div>
                 )}
               </motion.div>
@@ -260,7 +433,7 @@ export default function MIAAPage() {
           </AnimatePresence>
 
           {/* Typing indicator */}
-          {loading && (
+          {(loading || uploadLoading) && (
             <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
@@ -276,16 +449,19 @@ export default function MIAAPage() {
                     transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
                   />
                 ))}
+                {uploadLoading && (
+                  <span className="text-[10px] text-gray-400 ml-1">{t('miaa.uploadAnalyzing')}</span>
+                )}
               </div>
             </motion.div>
           )}
           <div ref={bottomRef} />
         </div>
 
-        {/* Suggestions row (visible when chat is fresh) */}
-        {messages.length <= 1 && !loading && (
-          <div className="px-4 pb-3 pt-1 flex gap-2 flex-wrap shrink-0 border-t border-gray-100 bg-white">
-            <p className="w-full text-[10px] text-gray-400 mb-1">{t('miaa.suggestions') ?? 'Suggestions :'}</p>
+        {/* Suggestions row */}
+        {messages.length <= 1 && !loading && !uploadLoading && (
+          <div className="px-4 pb-3 pt-2 flex gap-2 flex-wrap shrink-0 border-t border-gray-100 bg-white">
+            <p className="w-full text-[10px] text-gray-400">{t('miaa.suggestions')} :</p>
             {[t('miaa.suggest.tva'), t('miaa.suggest.net'), t('miaa.suggest.cnss')].map(s => (
               <button
                 key={s}
@@ -298,24 +474,54 @@ export default function MIAAPage() {
           </div>
         )}
 
+        {/* File attachment indicator */}
+        {fichierJoint && (
+          <div className="px-4 py-1.5 bg-blue-50 border-t border-blue-100 flex items-center gap-2 shrink-0">
+            <FileText size={12} className="text-blue-500 shrink-0" />
+            <span className="text-xs text-blue-600 flex-1 truncate">{fichierJoint.name}</span>
+            <button onClick={() => setFichierJoint(null)} className="text-blue-400 hover:text-blue-600">
+              <X size={12} />
+            </button>
+          </div>
+        )}
+
         {/* Input bar */}
-        <div className="flex items-center gap-2.5 px-4 py-3 border-t border-gray-100 bg-white shrink-0">
+        <div className="flex items-center gap-2 px-4 py-3 border-t border-gray-100 bg-white shrink-0">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={FICHIERS_ACCEPTES.default}
+            onChange={handleFichier}
+            className="hidden"
+          />
+
+          {/* Upload button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading || uploadLoading}
+            title={t('miaa.uploadBtn')}
+            className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all disabled:opacity-30 shrink-0"
+          >
+            <Paperclip size={16} />
+          </button>
+
           <input
             ref={inputRef}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
             placeholder={t('miaa.placeholder')}
-            disabled={loading}
+            disabled={loading || uploadLoading}
             className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 outline-none transition-colors disabled:opacity-50"
-            style={{ ['--tw-ring-color' as string]: brandColor }}
             onFocus={e => { e.currentTarget.style.borderColor = brandColor; e.currentTarget.style.boxShadow = `0 0 0 3px ${brandColor}18` }}
             onBlur={e =>  { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = '' }}
           />
+
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => send(input)}
-            disabled={loading || !input.trim()}
+            disabled={loading || uploadLoading || !input.trim()}
             className="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0 disabled:opacity-30"
             style={{ background: brandColor }}
           >
@@ -354,7 +560,7 @@ export default function MIAAPage() {
           </div>
         </div>
 
-        {/* Quick actions by category */}
+        {/* Quick actions */}
         <div className="bg-white border border-gray-200 rounded-2xl p-4 flex-1 shadow-sm">
           <p className="text-xs font-bold text-gray-900 mb-3">{t('miaa.quickQuestions')}</p>
           <div className="space-y-2">
@@ -398,7 +604,24 @@ export default function MIAAPage() {
           </div>
         </div>
 
-        {/* Config hint */}
+        {/* Upload info card */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <Paperclip size={10} />
+            {t('miaa.uploadBtn')}
+          </p>
+          <p className="text-[10px] text-gray-400 leading-relaxed">{t('miaa.uploadHint')}</p>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading || uploadLoading}
+            className="mt-2 w-full text-[11px] font-medium py-1.5 rounded-lg border transition-all disabled:opacity-30"
+            style={{ background: `${brandColor}10`, color: brandColor, borderColor: `${brandColor}30` }}
+          >
+            + {t('miaa.uploadBtn')}
+          </button>
+        </div>
+
+        {/* Config */}
         <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('miaa.configTitle')}</p>
           <div className="space-y-2.5 text-[11px]">
@@ -409,10 +632,6 @@ export default function MIAAPage() {
             <div className="flex justify-between items-center">
               <span className="text-gray-500">{t('miaa.configLang')}</span>
               <span className="font-medium text-gray-700">{t('miaa.configLangValue')}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500">{t('miaa.configContext')}</span>
-              <span className="font-medium text-gray-700">{t('miaa.configContextValue')}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500">{t('miaa.configModules')}</span>
