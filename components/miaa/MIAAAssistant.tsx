@@ -220,19 +220,24 @@ export function MIAAAssistant({ module, tenantData }: MIAAAssistantProps) {
 
   return (
     <>
-      {/* Floating button */}
+      {/* MIAA PREMIUM floating button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg text-white font-bold"
-        style={{ backgroundColor: agent.couleur }}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-xl text-white font-bold"
+        style={{ background: 'linear-gradient(135deg, #6D28D9, #DC2626, #F59E0B)', boxShadow: '0 4px 20px rgba(109,40,217,0.45)' }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <span className="text-xl">{agent.avatar}</span>
-        <span className="text-sm">{agent.nom}</span>
+        {/* Mini logo M */}
+        <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="24" fill="rgba(255,255,255,0.15)" />
+          <path d="M11 34V14l13 13L37 14v20" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+        <span className="text-sm font-black tracking-wide">MIAA PREMIUM</span>
         {!isOpen && (
           <motion.span
             className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-400"
+            style={{ boxShadow: '0 0 6px rgba(74,222,128,0.8)' }}
             animate={{ scale: [1, 1.3, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
           />
@@ -248,19 +253,23 @@ export function MIAAAssistant({ module, tenantData }: MIAAAssistantProps) {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed bottom-24 right-6 z-50 w-96 h-[600px] bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* Header */}
+            {/* Header MIAA PREMIUM */}
             <div
               className="p-4 flex items-center gap-3 flex-shrink-0 border-b border-gray-100"
-              style={{ background: agent.couleur + '10' }}
+              style={{ background: 'linear-gradient(135deg, #6D28D908, #DC262605, #F59E0B03)' }}
             >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-                style={{ backgroundColor: agent.couleur + '25' }}
-              >
-                {agent.avatar}
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, #6D28D9, #DC2626, #F59E0B)', boxShadow: '0 2px 8px rgba(109,40,217,0.35)' }}>
+                <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+                  <path d="M11 34V14l13 13L37 14v20" stroke="white" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-gray-900 text-sm">{agent.nom}</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-black text-gray-900 text-sm">MIAA PREMIUM</span>
+                  <span className="px-1.5 py-0.5 rounded text-[8px] font-black text-white tracking-widest"
+                    style={{ background: 'linear-gradient(135deg, #7C3AED, #DC2626)' }}>P</span>
+                </div>
                 <div className="text-xs flex items-center gap-1 truncate text-gray-500">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
                   {agent.specialite}

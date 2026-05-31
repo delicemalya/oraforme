@@ -1,7 +1,7 @@
 export const MIAA_AGENTS = {
 
   comptabilite: {
-    nom: "MIAA Comptable",
+    nom: "MIAA PREMIUM – Comptable",
     avatar: "📊",
     couleur: "#6366F1",
     specialite: "Expert OHADA & Fiscalité Congo",
@@ -22,7 +22,7 @@ Tu parles comme un expert-comptable bienveillant.`,
   },
 
   rh: {
-    nom: "MIAA RH",
+    nom: "MIAA PREMIUM – RH",
     avatar: "👥",
     couleur: "#7C5CBF",
     specialite: "Expert RH & Droit du Travail Congo",
@@ -44,7 +44,7 @@ Tu génères les bulletins, calcules les salaires nets, conseilles sur le recrut
   },
 
   facturation: {
-    nom: "MIAA Facturation",
+    nom: "MIAA PREMIUM – Facturation",
     avatar: "💰",
     couleur: "#F0A30A",
     specialite: "Expert Facturation OHADA & Recouvrement",
@@ -65,7 +65,7 @@ Tu crées les factures, envoies des relances, analyses les retards et optimises 
   },
 
   restaurant: {
-    nom: "MIAA Chef",
+    nom: "MIAA PREMIUM – Restaurant",
     avatar: "🍽️",
     couleur: "#FF6B35",
     specialite: "Expert Gestion Restaurant & POS",
@@ -86,7 +86,7 @@ Tu analyses les ventes, suggères des optimisations de menu, alertes sur les sto
   },
 
   ecole: {
-    nom: "MIAA Académique",
+    nom: "MIAA PREMIUM – École",
     avatar: "🎓",
     couleur: "#2EA8E0",
     specialite: "Expert Gestion Scolaire & Pédagogie",
@@ -108,7 +108,7 @@ Tu génères les bulletins, analyses les résultats, identifies les étudiants e
   },
 
   stock: {
-    nom: "MIAA Stock",
+    nom: "MIAA PREMIUM – Stock",
     avatar: "📦",
     couleur: "#2EA043",
     specialite: "Expert Gestion des Stocks & Approvisionnement",
@@ -129,7 +129,7 @@ Tu surveilles les niveaux, alertes sur les ruptures, suggères des quantités à
   },
 
   tresorerie: {
-    nom: "MIAA Trésorier",
+    nom: "MIAA PREMIUM – Trésorerie",
     avatar: "💵",
     couleur: "#388BFD",
     specialite: "Expert Trésorerie & Cash Flow",
@@ -150,7 +150,7 @@ Tu analyses le solde, prévois les besoins, alertes sur les risques et optimises
   },
 
   sante: {
-    nom: "MIAA Médical",
+    nom: "MIAA PREMIUM – Santé",
     avatar: "🏥",
     couleur: "#E8633A",
     specialite: "Expert Gestion Médicale & Clinique",
@@ -171,7 +171,7 @@ Tu gères les patients, analyses les consultations et optimises la gestion médi
   },
 
   fiscalite: {
-    nom: "MIAA Fiscal",
+    nom: "MIAA PREMIUM – Fiscal",
     avatar: "🧾",
     couleur: "#F59E0B",
     specialite: "Expert Fiscal OHADA & Déclarations multi-pays",

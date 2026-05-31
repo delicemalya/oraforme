@@ -34,7 +34,41 @@ const FICHIERS_ACCEPTES: Record<string, string> = {
   default:      '.pdf,.doc,.docx,.xlsx,.xls,.csv,.jpg,.png',
 }
 
-// ── MIAA+ Avatar ──────────────────────────────────────────────────────────────
+// ── MIAA PREMIUM Logo ─────────────────────────────────────────────────────────
+
+function MIAALogo({ size = 38 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="miaaGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#6D28D9" />
+          <stop offset="50%" stopColor="#DC2626" />
+          <stop offset="100%" stopColor="#F59E0B" />
+        </linearGradient>
+        <linearGradient id="miaaGrad2" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#7C3AED" />
+          <stop offset="100%" stopColor="#EF4444" />
+        </linearGradient>
+      </defs>
+      {/* Background circle */}
+      <circle cx="24" cy="24" r="24" fill="url(#miaaGrad)" />
+      {/* Outer glow ring */}
+      <circle cx="24" cy="24" r="21" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+      {/* Premium M letter */}
+      <path
+        d="M11 34V14l13 13L37 14v20"
+        stroke="white"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {/* Sparkle top right */}
+      <path d="M37 9 L38.2 11.8 L41 13 L38.2 14.2 L37 17 L35.8 14.2 L33 13 L35.8 11.8Z"
+        fill="rgba(255,255,255,0.9)" />
+    </svg>
+  )
+}
 
 function MIAAAvatar({ size = 32, color }: { size?: number; color: string }) {
   return (
@@ -199,20 +233,19 @@ export default function MIAAPage() {
         .slice(1).slice(-10)
         .map(m => ({ role: m.role === 'user' ? 'user' as const : 'assistant' as const, content: m.text }))
 
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetch('/api/miaa/chat', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message:        msg,
-          entreprise,
-          module:         'miaa',
-          modules_actifs: modulesActifs,
-          user_role:      'gestionnaire',
-          history:        history.slice(0, -1),
+          module:     'general',
+          message:    msg,
+          history:    history.slice(0, -1),
+          tenantData: { tenant_id: tenantId ?? undefined },
+          langue:     'fr',
         }),
       })
-      const { reply } = await res.json()
-      const text = reply ?? t('miaa.errorReply')
+      const data = await res.json()
+      const text = data.response ?? t('miaa.errorReply')
       setMessages(prev => [...prev, {
         role:                  'bot',
         text,
@@ -291,20 +324,19 @@ export default function MIAAPage() {
     if (loading) return
     setLoading(true)
     try {
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetch('/api/miaa/chat', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message:   "Sur la base de ces informations, génère un rapport professionnel complet avec titre, introduction, sections numérotées et conclusion avec recommandations.",
-          entreprise,
-          module:    'miaa',
-          modules_actifs: modulesActifs,
-          user_role: 'gestionnaire',
-          history:   [{ role: 'assistant', content: contexte }],
+          module:     'general',
+          message:    "Sur la base de ces informations, génère un rapport professionnel complet avec titre, introduction, sections numérotées et conclusion avec recommandations.",
+          history:    [{ role: 'assistant', content: contexte }],
+          tenantData: { tenant_id: tenantId ?? undefined },
+          langue:     'fr',
         }),
       })
-      const { reply } = await res.json()
-      const rapport = reply ?? 'Rapport généré.'
+      const data = await res.json()
+      const rapport = data.response ?? 'Rapport généré.'
       setMessages(prev => [...prev, {
         role:                  'bot',
         text:                  rapport,
@@ -335,17 +367,16 @@ export default function MIAAPage() {
       {/* ── LEFT: Chat ──────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden min-h-0 shadow-sm">
 
-        {/* Header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-white shrink-0">
-          <MIAAAvatar size={38} color={brandColor} />
+        {/* Header MIAA PREMIUM */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-white shrink-0"
+          style={{ background: 'linear-gradient(135deg, #6D28D908, #DC262605, #F59E0B03)' }}>
+          <MIAALogo size={42} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-gray-900">{t('miaa.title')}</h1>
-              <span
-                className="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide"
-                style={{ background: `${brandColor}18`, color: brandColor }}
-              >
-                {t('miaa.badge')}
+              <h1 className="text-sm font-bold text-gray-900">MIAA PREMIUM</h1>
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest text-white"
+                style={{ background: 'linear-gradient(135deg, #7C3AED, #DC2626, #F59E0B)' }}>
+                PREMIUM
               </span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
