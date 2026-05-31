@@ -290,15 +290,23 @@ export function MIAAAssistant({ module, tenantData }: MIAAAssistantProps) {
                     </div>
                   )}
 
-                  <div
-                    className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
-                      msg.role === 'user'
-                        ? 'text-white rounded-tr-sm'
-                        : 'bg-white text-gray-800 rounded-tl-sm border border-gray-100'
-                    }`}
-                    style={msg.role === 'user' ? { backgroundColor: agent.couleur } : {}}
-                  >
-                    {msg.content}
+                  <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    {/* Logo MIAA sur les messages bot */}
+                    {msg.role === 'assistant' && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src="/logo-miaa-premium.png" alt="MIAA" width={24} height={24}
+                        className="rounded-full shrink-0 mb-0.5 object-contain" />
+                    )}
+                    <div
+                      className={`max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
+                        msg.role === 'user'
+                          ? 'text-white rounded-tr-sm'
+                          : 'bg-white text-gray-800 rounded-tl-sm border border-gray-100'
+                      }`}
+                      style={msg.role === 'user' ? { backgroundColor: agent.couleur } : {}}
+                    >
+                      {msg.content}
+                    </div>
                   </div>
 
                   {/* Quick action chips */}

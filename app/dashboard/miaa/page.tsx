@@ -399,7 +399,9 @@ export default function MIAAPage() {
                 <div className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} gap-2.5 items-end w-full`}>
                   {m.role === 'bot' && (
                     <div className="shrink-0 mb-0.5">
-                      <MIAAAvatar size={26} color={brandColor} />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/logo-miaa-premium.png" alt="MIAA" width={28} height={28}
+                        className="rounded-full object-contain" />
                     </div>
                   )}
                   <div
