@@ -542,7 +542,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     setGreetingKey(h < 12 ? 'dash.greetingMorning' : h < 18 ? 'dash.greetingAfternoon' : 'dash.greetingEvening')
   }, [])
 
-  const displayName      = userName || tenant.nom_entreprise || 'Admin'
+  const displayName      = userName || tenant.nom_entreprise || 'vous'
   const soldeTresorerie  = kpis.revenuMois - alerts.pendingAmount * 0.3
 
   const isDaac = secteur === 'ecole' && ecoleRole === 'DAAC' && daacKpis

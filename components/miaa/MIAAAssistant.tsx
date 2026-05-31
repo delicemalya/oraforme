@@ -49,6 +49,23 @@ function downloadTxt(content: string, filename: string) {
   URL.revokeObjectURL(url)
 }
 
+function downloadHtml(content: string, filename: string) {
+  const paragraphs = content
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .map(l => `<p style="margin:0 0 8px">${l.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`)
+    .join('\n')
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport MIAA+</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.6}h1{color:#374151;border-bottom:2px solid #e5e7eb;padding-bottom:12px}</style></head><body><h1>Rapport MIAA+</h1><div>${paragraphs}</div></body></html>`
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export function MIAAAssistant({ module, tenantData }: MIAAAssistantProps) {
   const agent = MIAA_AGENTS[module]
   const [isOpen, setIsOpen]           = useState(false)
@@ -308,6 +325,12 @@ export function MIAAAssistant({ module, tenantData }: MIAAAssistantProps) {
                         className="flex items-center gap-1 px-2 py-1 text-[10px] bg-gray-50 text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all"
                       >
                         <Download size={10} /> TXT
+                      </button>
+                      <button
+                        onClick={() => downloadHtml(msg.contenu_telechargeable!, `miaa-rapport-${Date.now()}.html`)}
+                        className="flex items-center gap-1 px-2 py-1 text-[10px] bg-gray-50 text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-100 transition-all"
+                      >
+                        <Download size={10} /> HTML
                       </button>
                       <button
                         onClick={() => demanderRapport(msg.contenu_telechargeable!)}
