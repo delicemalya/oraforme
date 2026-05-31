@@ -346,7 +346,12 @@ export default function Sidebar() {
       setModulesActifs([]); setPermissions({}); setPermsLoaded(true); return
     }
     if (tenant.role === 'owner') {
-      setModulesActifs(ALL_MODULE_IDS); setPermissions({}); setPermsLoaded(true); return
+      // Use modules_actifs from DB (computed from plan+sector at onboarding).
+      // Fall back to ALL_MODULE_IDS only for legacy tenants with no modules_actifs.
+      const ownerModules = tenant.modulesActifs && tenant.modulesActifs.length > 0
+        ? tenant.modulesActifs
+        : ALL_MODULE_IDS
+      setModulesActifs(ownerModules); setPermissions({}); setPermsLoaded(true); return
     }
     let cancelled = false
     async function loadPerms() {

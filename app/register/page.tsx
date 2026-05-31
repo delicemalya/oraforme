@@ -1,28 +1,21 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import Input from '@/components/ui/Input'
-import Button from '@/components/ui/Button'
-import { MailCheck } from 'lucide-react'
+import { Eye, EyeOff, MailCheck, ArrowRight, Zap } from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [form, setForm] = useState({
-    nomEntreprise: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  // State shown when Supabase requires email confirmation
+  const [form, setForm] = useState({ email: '', password: '', confirmPassword: '' })
+  const [error,     setError]     = useState('')
+  const [loading,   setLoading]   = useState(false)
   const [emailSent, setEmailSent] = useState(false)
+  const [showPwd,   setShowPwd]   = useState(false)
 
   function set(key: string, value: string) {
-    setForm((prev) => ({ ...prev, [key]: value }))
+    setForm(prev => ({ ...prev, [key]: value }))
   }
 
   async function handleRegister(e: React.FormEvent) {
@@ -40,23 +33,13 @@ export default function RegisterPage() {
 
     setLoading(true)
 
-    // ── CRITICAL FIX 1 ────────────────────────────────────────────────────────
-    // Sign out ANY existing session before creating a new account.
-    // Without this, if a developer/tester is logged in with a different account
-    // and navigates to /register, their session cookie persists through signUp()
-    // when email confirmation is ON — causing the new user's onboarding action
-    // to authenticate as the WRONG user and redirect to the wrong tenant dashboard.
+    // Sign out any existing session before creating a new account
     await supabase.auth.signOut()
-    // ── END CRITICAL FIX 1 ───────────────────────────────────────────────────
 
     const { data, error: signUpError } = await supabase.auth.signUp({
-      email: form.email,
+      email:    form.email,
       password: form.password,
       options: {
-        data: { nom_entreprise: form.nomEntreprise },
-        // Tell Supabase where to redirect after the user clicks the confirmation link.
-        // This must also be added to "Redirect URLs" in the Supabase dashboard:
-        //   Authentication → URL Configuration → Redirect URLs
         emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
       },
     })
@@ -67,136 +50,133 @@ export default function RegisterPage() {
       return
     }
 
-    // ── CRITICAL FIX 2 ────────────────────────────────────────────────────────
-    // When Supabase email confirmation is ENABLED, signUp() returns:
-    //   { data: { user, session: null }, error: null }
-    // session is null because the user must click the confirmation link first.
-    // The previous code checked only `error`, treated null-session as success,
-    // and pushed to /onboarding — but no session was established for the new user.
-    // The middleware (or the onboarding server action) would then pick up the
-    // stale session from an already-logged-in user (the test account).
-    //
-    // Fix: If session is null → show "check your email" screen. Do NOT redirect.
+    // Email confirmation enabled — show confirmation screen
     if (!data.session) {
       setEmailSent(true)
       setLoading(false)
       return
     }
-    // ── END CRITICAL FIX 2 ───────────────────────────────────────────────────
 
-    // Session is established (email confirmation disabled in Supabase settings).
-    // The new user is now properly authenticated — proceed to onboarding.
     router.push('/onboarding')
   }
 
   // ── Email confirmation screen ─────────────────────────────────────────────
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md text-center">
-          <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-10">
-            <div className="w-14 h-14 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto mb-5">
-              <MailCheck size={28} className="text-[#DC2626]" />
-            </div>
-            <h2 className="text-lg font-bold text-[var(--text)] mb-2">Vérifiez votre email</h2>
-            <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-              Un lien de confirmation a été envoyé à{' '}
-              <span className="text-[var(--text)] font-medium">{form.email}</span>.
-              Cliquez sur ce lien pour activer votre compte et démarrer l&apos;installation.
-            </p>
-            <p className="text-xs text-[var(--text-secondary)] mb-6">
-              Pensez à vérifier votre dossier spam si vous ne trouvez pas l&apos;email.
-            </p>
-            <Link
-              href="/login"
-              className="inline-block text-sm text-[#DC2626] hover:underline"
-            >
-              Retour à la connexion
-            </Link>
+      <div className="min-h-screen flex items-center justify-center px-4 bg-[#0A0A0F]">
+        <div className="w-full max-w-sm text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#F59E0B]/10 border border-[#F59E0B]/20 flex items-center justify-center mx-auto mb-6">
+            <MailCheck size={28} className="text-[#F59E0B]" />
           </div>
+          <h2 className="text-2xl font-bold text-white mb-3">Vérifiez votre email</h2>
+          <p className="text-white/40 text-sm leading-relaxed mb-6">
+            Un lien de confirmation a été envoyé à{' '}
+            <span className="text-white font-medium">{form.email}</span>.
+            Cliquez sur ce lien pour activer votre compte.
+          </p>
+          <p className="text-white/25 text-xs mb-6">Pensez à vérifier votre dossier spam.</p>
+          <Link href="/login" className="text-[#F59E0B] text-sm hover:underline">
+            Retour à la connexion
+          </Link>
         </div>
       </div>
     )
   }
 
-  // ── Registration form ────────────────────────────────────────────────────
+  // ── Register form ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Back button */}
-        <div className="mb-4">
-          <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M9.78 12.78a.75.75 0 0 1-1.06 0L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 1.06L6.06 8l3.72 3.72a.75.75 0 0 1 0 1.06z"/></svg>
-            Se connecter
-          </Link>
-        </div>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#0A0A0F]">
+      <div className="w-full max-w-sm">
 
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8" />
-            <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
-          </div>
-          <p className="text-[var(--text-secondary)] text-sm">Créez votre espace entreprise</p>
+        <div className="text-center mb-10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-icon.png" alt="oraforme" className="w-9 h-9 mx-auto mb-3"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          <h1 className="text-2xl font-bold text-white">Créer votre compte</h1>
+          <p className="text-white/40 text-sm mt-1">Votre ERP africain en 4 minutes</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-8">
-          <h1 className="text-lg font-semibold text-[var(--text)] mb-6">Créer un compte</h1>
-
-          <form onSubmit={handleRegister} className="flex flex-col gap-4">
-            <Input
-              label="Nom de l'entreprise"
-              type="text"
-              placeholder="Ma Société SARL"
-              value={form.nomEntreprise}
-              onChange={(e) => set('nomEntreprise', e.target.value)}
-              required
-            />
-            <Input
-              label="Email professionnel"
+        <form onSubmit={handleRegister} className="space-y-4">
+          {/* Email */}
+          <div>
+            <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Email professionnel</label>
+            <input
               type="email"
-              placeholder="vous@entreprise.com"
               value={form.email}
-              onChange={(e) => set('email', e.target.value)}
+              onChange={e => set('email', e.target.value)}
+              placeholder="vous@entreprise.com"
               required
+              autoComplete="email"
+              className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
             />
-            <Input
-              label="Mot de passe"
-              type="password"
-              placeholder="Min. 8 caractères"
-              value={form.password}
-              onChange={(e) => set('password', e.target.value)}
-              required
-            />
-            <Input
-              label="Confirmer le mot de passe"
-              type="password"
-              placeholder="••••••••"
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Mot de passe</label>
+            <div className="relative">
+              <input
+                type={showPwd ? 'text' : 'password'}
+                value={form.password}
+                onChange={e => set('password', e.target.value)}
+                placeholder="8 caractères minimum"
+                required
+                autoComplete="new-password"
+                className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 pr-11 outline-none focus:border-[#F59E0B]/50 transition-colors"
+              />
+              <button type="button" onClick={() => setShowPwd(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60">
+                {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm password */}
+          <div>
+            <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Confirmer le mot de passe</label>
+            <input
+              type={showPwd ? 'text' : 'password'}
               value={form.confirmPassword}
-              onChange={(e) => set('confirmPassword', e.target.value)}
+              onChange={e => set('confirmPassword', e.target.value)}
+              placeholder="Répétez le mot de passe"
               required
+              autoComplete="new-password"
+              className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
             />
+          </div>
 
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
-                {error}
-              </div>
+          {error && (
+            <div className="px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading || !form.email || !form.password || !form.confirmPassword}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-40"
+            style={{ background: '#F59E0B', color: '#000' }}
+          >
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+            ) : (
+              <><Zap size={15} /> Créer mon compte</>
             )}
+          </button>
+        </form>
 
-            <Button type="submit" loading={loading} className="w-full mt-2">
-              Créer mon compte
-            </Button>
-          </form>
+        <p className="text-center text-white/30 text-xs mt-6">
+          Déjà un compte ?{' '}
+          <Link href="/login" className="text-[#F59E0B] hover:underline font-semibold">
+            Se connecter
+          </Link>
+        </p>
 
-          <p className="text-center text-sm text-[var(--text-secondary)] mt-6">
-            Déjà un compte ?{' '}
-            <Link href="/login" className="text-[#DC2626] hover:underline">
-              Se connecter
-            </Link>
-          </p>
-        </div>
+        <p className="text-center text-white/15 text-[11px] mt-4">
+          En créant votre compte, vous acceptez les{' '}
+          <a href="/cgv" className="underline">conditions générales</a>.
+        </p>
       </div>
     </div>
   )

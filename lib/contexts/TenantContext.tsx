@@ -38,6 +38,10 @@ export interface TenantState {
   profileId:     string
   nomEntreprise: string
   secteur:       string | null
+  plan:          string | null
+  taille:        string | null
+  pays:          string | null
+  langue:        string | null
   role:          UserRole
   ecoleRole:     string | null
   isSuperAdmin:  boolean
@@ -82,7 +86,7 @@ async function fetchTenantForUser(
   // from localStorage will override this default instead of breaking isolation.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite)')
+    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, plan, taille_entreprise, pays, langue)')
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -91,24 +95,32 @@ async function fetchTenantForUser(
   if (!profile) return null
 
   const t = profile.tenants as unknown as {
-    nom_entreprise:   string
-    modules_actifs:   string[]
-    secteur_activite: string | null
+    nom_entreprise:    string
+    modules_actifs:    string[]
+    secteur_activite:  string | null
+    plan?:             string | null
+    taille_entreprise?: string | null
+    pays?:             string | null
+    langue?:           string | null
   } | null
 
   return {
-    tenantId:      profile.tenant_id as string,
-    profileId:     profile.id as string,
-    nomEntreprise: t?.nom_entreprise ?? '',
-    secteur:       t?.secteur_activite ?? null,
-    role:          profile.role as UserRole,
-    ecoleRole:     (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null,
-    isSuperAdmin:  SUPER_ADMIN_EMAILS.includes(email),
-    modulesActifs: t?.modules_actifs ?? [],
+    tenantId:         profile.tenant_id as string,
+    profileId:        profile.id as string,
+    nomEntreprise:    t?.nom_entreprise ?? '',
+    secteur:          t?.secteur_activite ?? null,
+    plan:             t?.plan ?? null,
+    taille:           t?.taille_entreprise ?? null,
+    pays:             t?.pays ?? null,
+    langue:           t?.langue ?? null,
+    role:             profile.role as UserRole,
+    ecoleRole:        (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null,
+    isSuperAdmin:     SUPER_ADMIN_EMAILS.includes(email),
+    modulesActifs:    t?.modules_actifs ?? [],
     userId,
-    userEmail:     email,
-    prenom:        (profile as { prenom?: string | null }).prenom ?? null,
-    nom:           (profile as { nom?: string | null }).nom ?? null,
+    userEmail:        email,
+    prenom:           (profile as { prenom?: string | null }).prenom ?? null,
+    nom:              (profile as { nom?: string | null }).nom ?? null,
   }
 }
 

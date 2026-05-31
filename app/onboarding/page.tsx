@@ -1,391 +1,615 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, Plus, X } from 'lucide-react'
-import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
-import { createTenantAndProfile } from './actions'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Check, ChevronRight, ChevronLeft, Eye, EyeOff, Building2, Users, Zap } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { SECTOR_CONFIG, MODULE_META } from '@/lib/modules'
+import { createTenantAndProfile } from './actions'
+import {
+  SECTEUR_CONFIG, PLAN_CONFIG, PAYS_LIST, LANGUES_LIST,
+  type TailleEntreprise, type SecteurId,
+} from '@/lib/plans'
 
-// All purchasable modules (displayed in the module picker)
-const ALL_MODULE_KEYS = Object.keys(MODULE_META)
+// ── Step definitions ──────────────────────────────────────────────────────────
 
-const STEPS = ['Secteur', 'Entreprise', 'Modules', 'Confirmation']
+const STEPS = [
+  { id: 1, label: 'Secteur',   sub: 'Votre activité' },
+  { id: 2, label: 'Taille',    sub: 'Votre pack' },
+  { id: 3, label: 'Société',   sub: 'Vos informations' },
+  { id: 4, label: 'Compte',    sub: 'Accès administrateur' },
+]
+
+// ── Slide animation ───────────────────────────────────────────────────────────
+
+const slideVariants = {
+  enter:  (d: number) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
+  center:               ({ x: 0, opacity: 1 }),
+  exit:   (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const [step, setStep]               = useState(0)
-  const [loading, setLoading]         = useState(false)
-  const [error, setError]             = useState('')
-  const [secteurId, setSecteurId]     = useState('')
-  const [selectedMods, setSelectedMods] = useState<string[]>([])
-  const [entreprise, setEntreprise]   = useState({
-    nom: '', nif: '', pays: 'Congo (Brazzaville)', ville: '',
+  const [step, setStep]     = useState(1)
+  const [dir,  setDir]      = useState(1)
+  const [loading, setLoading]   = useState(false)
+  const [error,   setError]     = useState('')
+  const [showPwd, setShowPwd]   = useState(false)
+
+  // Step 1
+  const [secteur, setSecteur]   = useState<SecteurId | ''>('')
+  const [pays,    setPays]      = useState('CG')
+  const [langue,  setLangue]    = useState('fr')
+
+  // Step 2
+  const [taille, setTaille]     = useState<TailleEntreprise | ''>('')
+
+  // Step 3
+  const [societe, setSociete]   = useState({
+    nom: '', telephone: '', adresse: '', nif: '',
+  })
+
+  // Step 4
+  const [admin, setAdmin]       = useState({
+    prenom: '', nom: '', email: '', password: '',
   })
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) router.replace('/login')
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        // User already authed (came from /register) — pre-fill email
+        setAdmin(prev => ({ ...prev, email: session.user.email ?? '' }))
+      }
     })
-  }, [router])
+  }, [])
 
-  // Reset modules when sector changes
-  useEffect(() => {
-    if (secteurId && SECTOR_CONFIG[secteurId]) {
-      setSelectedMods(SECTOR_CONFIG[secteurId].dbModules)
-    }
-  }, [secteurId])
-
-  const secteurCfg  = secteurId ? SECTOR_CONFIG[secteurId] : null
-  const uiModules   = secteurCfg?.uiModules ?? []
-  const totalMensuel = selectedMods.reduce((s, k) => s + (MODULE_META[k]?.prix ?? 0), 0)
-
-  function toggleMod(key: string) {
-    setSelectedMods(prev =>
-      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
-    )
+  function go(next: number) {
+    setDir(next > step ? 1 : -1)
+    setStep(next)
+    setError('')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  async function handleFinish() {
+  function canAdvance(): boolean {
+    if (step === 1) return !!secteur && !!pays && !!langue
+    if (step === 2) return !!taille
+    if (step === 3) return societe.nom.trim().length >= 2
+    if (step === 4) return (
+      admin.prenom.trim().length >= 1 &&
+      admin.nom.trim().length >= 1 &&
+      admin.email.includes('@') &&
+      admin.password.length >= 8
+    )
+    return false
+  }
+
+  async function handleSubmit() {
     setLoading(true)
     setError('')
+
+    // If not yet authenticated, create auth account first
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.user) {
+      await supabase.auth.signOut()
+      const { error: signUpErr } = await supabase.auth.signUp({
+        email:    admin.email,
+        password: admin.password,
+        options: {
+          data: { nom_entreprise: societe.nom },
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        },
+      })
+      if (signUpErr) { setError(signUpErr.message); setLoading(false); return }
+    }
+
     const result = await createTenantAndProfile({
-      nomEntreprise:    entreprise.nom,
-      nif:              entreprise.nif,
-      secteurActivite:  secteurId,
-      customModules:    selectedMods,
+      nomEntreprise:   societe.nom,
+      nif:             societe.nif,
+      telephone:       societe.telephone,
+      adresse:         societe.adresse,
+      secteurActivite: secteur as SecteurId,
+      taille:          taille as TailleEntreprise,
+      pays,
+      langue,
+      prenom:          admin.prenom,
+      nom:             admin.nom,
     })
+
     if (result.error) { setError(result.error); setLoading(false); return }
     window.location.href = '/dashboard'
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-2xl">
+  const planCfg = taille ? PLAN_CONFIG[taille] : null
+  const secteurCfg = secteur ? SECTEUR_CONFIG[secteur] : null
+  const paysCfg = PAYS_LIST.find(p => p.code === pays)
+  const langueCfg = LANGUES_LIST.find(l => l.code === langue)
 
-        {/* Logo + stepper */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-5">
+  return (
+    <div className="min-h-screen flex bg-[#0A0A0F]">
+
+      {/* ── Left panel ─────────────────────────────────────────────────────── */}
+      <div className="hidden lg:flex flex-col w-[340px] xl:w-[380px] bg-gradient-to-b from-[#0F0F18] to-[#0A0A0F] border-r border-white/5 p-8 justify-between flex-shrink-0">
+
+        {/* Logo */}
+        <div>
+          <div className="flex items-center gap-2.5 mb-12">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8" />
-            <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
+            <img src="/logo-icon.png" alt="oraforme" className="w-7 h-7" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+            <span className="text-white font-bold text-lg tracking-tight">oraforme</span>
           </div>
 
-          <div className="flex items-center justify-center gap-1.5">
-            {STEPS.map((s, i) => (
-              <div key={s} className="flex items-center gap-1.5">
-                <div className={`flex items-center gap-1.5 text-xs ${
-                  i === step ? 'text-[#DC2626]' : i < step ? 'text-[var(--text-secondary)]' : 'text-[var(--text-secondary)]'
-                }`}>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold border ${
-                    i < step   ? 'bg-[#DC2626] border-[#DC2626] text-[#DC2626]' :
-                    i === step ? 'border-[#DC2626] text-[#DC2626]'              :
-                                 'border-[var(--border)] text-[var(--text-secondary)]'
+          {/* Step list */}
+          <div className="space-y-1">
+            {STEPS.map((s, i) => {
+              const done    = step > s.id
+              const current = step === s.id
+              return (
+                <div key={s.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
+                  style={{ background: current ? 'rgba(245,158,11,0.08)' : 'transparent' }}>
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all ${
+                    done    ? 'bg-[#16A34A] text-white' :
+                    current ? 'bg-[#F59E0B] text-black' :
+                              'bg-white/5 text-white/30'
                   }`}>
-                    {i < step ? '✓' : i + 1}
+                    {done ? <Check size={13} /> : s.id}
                   </div>
-                  <span className="hidden sm:inline">{s}</span>
+                  <div>
+                    <p className={`text-sm font-semibold ${current ? 'text-white' : done ? 'text-white/60' : 'text-white/25'}`}>{s.label}</p>
+                    <p className={`text-xs ${current ? 'text-white/50' : 'text-white/20'}`}>{s.sub}</p>
+                  </div>
                 </div>
-                {i < STEPS.length - 1 && (
-                  <div className={`w-5 h-px ${i < step ? 'bg-[#DC2626]' : 'bg-[#30363D]'}`} />
-                )}
-              </div>
+              )
+            })}
+          </div>
+
+          {/* Live summary */}
+          {(secteur || taille || societe.nom) && (
+            <div className="mt-8 p-4 bg-white/3 border border-white/6 rounded-2xl space-y-3">
+              <p className="text-[11px] font-bold text-white/30 uppercase tracking-widest">Récapitulatif</p>
+              {secteurCfg && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{secteurCfg.emoji}</span>
+                  <div>
+                    <p className="text-white text-[13px] font-semibold">{secteurCfg.label}</p>
+                    <p className="text-white/40 text-[11px]">{paysCfg?.flag} {paysCfg?.label} · {langueCfg?.flag} {langueCfg?.label}</p>
+                  </div>
+                </div>
+              )}
+              {planCfg && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white text-[13px] font-bold">{planCfg.label}</p>
+                    <p className="text-white/40 text-[11px]">{planCfg.subtitle}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-[14px]" style={{ color: planCfg.color }}>
+                      {new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)}
+                    </p>
+                    <p className="text-white/30 text-[10px]">FCFA/mois</p>
+                  </div>
+                </div>
+              )}
+              {societe.nom && (
+                <p className="text-white/70 text-[13px] font-medium truncate">{societe.nom}</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div>
+          <p className="text-white/15 text-[11px] text-center">
+            © 2025 Oraforme · SaaS africain · oraforms.com
+          </p>
+        </div>
+      </div>
+
+      {/* ── Right panel ────────────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+
+        {/* Mobile header */}
+        <div className="lg:hidden flex items-center justify-between px-6 pt-6 pb-4">
+          <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-icon.png" alt="oraforme" className="w-6 h-6" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+            <span className="text-white font-bold">oraforme</span>
+          </div>
+          <div className="flex gap-1">
+            {STEPS.map(s => (
+              <div key={s.id} className={`h-1.5 rounded-full transition-all ${
+                step >= s.id ? 'bg-[#F59E0B]' : 'bg-white/10'
+              }`} style={{ width: step === s.id ? 24 : 8 }} />
             ))}
           </div>
         </div>
 
-        {/* Card */}
-        <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-8">
+        {/* Form area */}
+        <div className="flex-1 flex items-center justify-center px-6 py-8">
+          <div className="w-full max-w-xl">
 
-          {/* ── ÉTAPE 0 : Secteur ─────────────────────────────── */}
-          {step === 0 && (
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--text)] mb-1">Votre secteur d&apos;activité</h2>
-              <p className="text-sm text-[var(--text-secondary)] mb-6">
-                Oraforme configure automatiquement les modules adaptés à votre métier.
-              </p>
+            <AnimatePresence mode="wait" custom={dir}>
+              <motion.div
+                key={step}
+                custom={dir}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {Object.entries(SECTOR_CONFIG).map(([id, cfg]) => (
-                  <button
-                    key={id}
-                    onClick={() => setSecteurId(id)}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all ${
-                      secteurId === id
-                        ? 'border-[#DC2626] bg-[#DC2626]/5 shadow-[0_0_0_1px_#DC262633]'
-                        : 'border-[var(--border)] bg-[var(--surface-alt)] hover:border-[#64748B]'
-                    }`}
-                  >
-                    <span className="text-2xl">{cfg.emoji}</span>
-                    <span className="text-xs font-medium text-[var(--text)] leading-tight">{cfg.label}</span>
-                    {secteurId === id && (
-                      <span className="text-xs text-[#DC2626]">{cfg.uiModules.length} modules</span>
-                    )}
-                  </button>
-                ))}
-              </div>
+                {/* ── STEP 1: Secteur + Pays + Langue ─────────────────────── */}
+                {step === 1 && (
+                  <div>
+                    <div className="mb-8">
+                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 1 sur 4</p>
+                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Votre secteur d'activité</h1>
+                      <p className="text-white/40 text-sm">Oraforme adapte automatiquement votre ERP.</p>
+                    </div>
 
-              {/* Module preview */}
-              {secteurCfg && uiModules.length > 0 && (
-                <div className="mt-4 p-3 bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-lg">
-                  <p className="text-xs text-[#DC2626] font-medium mb-2">
-                    Modules inclus par défaut pour {secteurCfg.label}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {uiModules.map((m, i) => (
-                      <span key={i} className="text-xs bg-[var(--surface-alt)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
-                        {m.emoji} {m.label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end mt-6">
-                <Button onClick={() => setStep(1)} disabled={!secteurId}>
-                  Continuer →
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* ── ÉTAPE 1 : Entreprise ──────────────────────────── */}
-          {step === 1 && (
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--text)] mb-1">Votre entreprise</h2>
-              <p className="text-sm text-[var(--text-secondary)] mb-6">Ces informations apparaîtront sur vos documents officiels.</p>
-              <div className="flex flex-col gap-4">
-                <Input
-                  label="Nom de l'entreprise *"
-                  placeholder="Ma Société SARL"
-                  value={entreprise.nom}
-                  onChange={e => setEntreprise(p => ({ ...p, nom: e.target.value }))}
-                />
-                <Input
-                  label="NIF / Numéro fiscal"
-                  placeholder="123456789"
-                  value={entreprise.nif}
-                  onChange={e => setEntreprise(p => ({ ...p, nif: e.target.value }))}
-                />
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-[var(--text-secondary)]">Pays</label>
-                  <select
-                    className="w-full px-4 py-2.5 rounded-lg bg-[var(--surface-alt)] border border-[var(--border)] text-[var(--text)] text-sm focus:outline-none focus:border-[#DC2626]"
-                    value={entreprise.pays}
-                    onChange={e => setEntreprise(p => ({ ...p, pays: e.target.value }))}
-                  >
-                    {['Congo (Brazzaville)', 'Congo (Kinshasa)', 'Gabon', 'Cameroun', "Côte d'Ivoire", 'Sénégal', 'France', 'Autre'].map(p => (
-                      <option key={p}>{p}</option>
-                    ))}
-                  </select>
-                </div>
-                <Input
-                  label="Ville"
-                  placeholder="Brazzaville"
-                  value={entreprise.ville}
-                  onChange={e => setEntreprise(p => ({ ...p, ville: e.target.value }))}
-                />
-              </div>
-              <div className="flex justify-between mt-6">
-                <Button variant="secondary" onClick={() => setStep(0)}>← Retour</Button>
-                <Button onClick={() => setStep(2)} disabled={!entreprise.nom}>Continuer →</Button>
-              </div>
-            </div>
-          )}
-
-          {/* ── ÉTAPE 2 : Modules ─────────────────────────────── */}
-          {step === 2 && (
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--text)] mb-1">Choisissez vos modules</h2>
-              <p className="text-sm text-[var(--text-secondary)] mb-5">
-                Les modules recommandés pour votre secteur sont déjà sélectionnés.
-                Ajoutez ou retirez librement selon vos besoins.
-              </p>
-
-              {/* Modules recommandés */}
-              {secteurCfg && (
-                <div className="mb-4">
-                  <p className="text-xs text-[#DC2626] font-medium uppercase tracking-wider mb-2">
-                    ✦ Recommandés pour {secteurCfg.label}
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {secteurCfg.dbModules.map(key => {
-                      const m = MODULE_META[key]
-                      if (!m) return null
-                      const selected = selectedMods.includes(key)
-                      return (
+                    {/* Sector grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6">
+                      {(Object.entries(SECTEUR_CONFIG) as [SecteurId, typeof SECTEUR_CONFIG[SecteurId]][]).map(([key, cfg]) => (
                         <button
                           key={key}
-                          onClick={() => toggleMod(key)}
-                          className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
-                            selected
-                              ? 'border-[#DC2626] bg-[#DC2626]/8'
-                              : 'border-[var(--border)] bg-[var(--surface-alt)] hover:border-[#64748B]'
+                          onClick={() => setSecteur(key)}
+                          className={`p-3.5 rounded-xl border text-left transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                            secteur === key
+                              ? 'border-[#F59E0B] bg-[#F59E0B]/10 shadow-[0_0_20px_rgba(245,158,11,0.15)]'
+                              : 'border-white/8 bg-white/3 hover:border-white/15 hover:bg-white/5'
                           }`}
                         >
-                          <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all ${
-                            selected
-                              ? 'bg-[#DC2626] border-[#DC2626]'
-                              : 'border-[#64748B]'
-                          }`}>
-                            {selected && <Check size={10} className="text-[#DC2626]" />}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-xs font-medium text-[var(--text)] truncate">
-                              {m.emoji} {m.label}
-                            </div>
-                            <div className="text-[10px] text-[var(--text-secondary)]">
-                              {m.prix.toLocaleString()} F/mois
-                            </div>
-                          </div>
+                          <span className="text-xl block mb-1">{cfg.emoji}</span>
+                          <p className={`text-xs font-semibold leading-snug ${secteur === key ? 'text-white' : 'text-white/60'}`}>
+                            {cfg.label}
+                          </p>
                         </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Modules supplémentaires */}
-              {(() => {
-                const extras = ALL_MODULE_KEYS.filter(k => !secteurCfg?.dbModules.includes(k))
-                if (extras.length === 0) return null
-                return (
-                  <div>
-                    <p className="text-xs text-[var(--text-secondary)] font-medium uppercase tracking-wider mb-2">
-                      + Modules supplémentaires disponibles
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {extras.map(key => {
-                        const m = MODULE_META[key]
-                        if (!m) return null
-                        const selected = selectedMods.includes(key)
-                        return (
-                          <button
-                            key={key}
-                            onClick={() => toggleMod(key)}
-                            className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all ${
-                              selected
-                                ? 'border-[#16A34A] bg-[#16A34A]/8'
-                                : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border)]'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all ${
-                              selected
-                                ? 'bg-[#16A34A] border-[#16A34A]'
-                                : 'border-[var(--border)]'
-                            }`}>
-                              {selected ? <Check size={10} className="text-[#DC2626]" /> : <Plus size={9} className="text-[var(--text-secondary)]" />}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="text-xs font-medium text-[var(--text-secondary)] truncate">
-                                {m.emoji} {m.label}
-                              </div>
-                              <div className="text-[10px] text-[var(--text-secondary)]">
-                                {m.prix.toLocaleString()} F/mois
-                              </div>
-                            </div>
-                          </button>
-                        )
-                      })}
+                      ))}
                     </div>
-                  </div>
-                )
-              })()}
 
-              {/* Total + modules sélectionnés */}
-              <div className="mt-4 p-3 bg-[var(--surface-alt)] rounded-xl flex items-center justify-between">
-                <div>
-                  <span className="text-xs text-[var(--text-secondary)]">
-                    {selectedMods.length} module{selectedMods.length !== 1 ? 's' : ''} sélectionné{selectedMods.length !== 1 ? 's' : ''}
-                  </span>
-                  {selectedMods.length === 0 && (
-                    <div className="flex items-center gap-1 text-[10px] text-[#DC2626] mt-0.5">
-                      <X size={9} /> Sélectionnez au moins un module
-                    </div>
-                  )}
-                </div>
-                <span className="text-base font-bold text-[#DC2626]">
-                  {totalMensuel.toLocaleString()} F<span className="text-xs font-normal text-[var(--text-secondary)]">/mois</span>
-                </span>
-              </div>
-
-              <div className="flex justify-between mt-6">
-                <Button variant="secondary" onClick={() => setStep(1)}>← Retour</Button>
-                <Button onClick={() => setStep(3)} disabled={selectedMods.length === 0}>Continuer →</Button>
-              </div>
-            </div>
-          )}
-
-          {/* ── ÉTAPE 3 : Confirmation ────────────────────────── */}
-          {step === 3 && (
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--text)] mb-1">Confirmation</h2>
-              <p className="text-sm text-[var(--text-secondary)] mb-6">Vérifiez vos informations avant de démarrer.</p>
-
-              <div className="space-y-3">
-                <div className="p-4 bg-[var(--surface-alt)] rounded-xl">
-                  <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2">Secteur</p>
-                  <p className="text-sm font-medium text-[var(--text)]">
-                    {secteurCfg?.emoji} {secteurCfg?.label}
-                  </p>
-                  {secteurCfg?.description && (
-                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">{secteurCfg.description}</p>
-                  )}
-                </div>
-
-                <div className="p-4 bg-[var(--surface-alt)] rounded-xl">
-                  <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2">Entreprise</p>
-                  <p className="text-sm font-semibold text-[var(--text)]">{entreprise.nom}</p>
-                  {entreprise.nif && (
-                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">NIF : {entreprise.nif}</p>
-                  )}
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    {entreprise.ville && `${entreprise.ville}, `}{entreprise.pays}
-                  </p>
-                </div>
-
-                <div className="p-4 bg-[var(--surface-alt)] rounded-xl">
-                  <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                    Modules activés ({selectedMods.length})
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedMods.map(key => {
-                      const m = MODULE_META[key]
-                      return m ? (
-                        <span
-                          key={key}
-                          className="inline-flex items-center gap-1 text-xs bg-[#DC2626]/10 text-[#DC2626] border border-[#DC2626]/20 rounded-full px-2.5 py-1"
+                    {/* Pays + Langue */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Pays</label>
+                        <select
+                          value={pays}
+                          onChange={e => setPays(e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-xl px-3 py-2.5 outline-none focus:border-[#F59E0B]/50 appearance-none"
                         >
-                          {m.emoji} {m.label}
-                        </span>
-                      ) : null
-                    })}
+                          {PAYS_LIST.map(p => (
+                            <option key={p.code} value={p.code} className="bg-[#1a1a2e]">
+                              {p.flag} {p.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Langue</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {LANGUES_LIST.map(l => (
+                            <button
+                              key={l.code}
+                              onClick={() => setLangue(l.code)}
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                langue === l.code
+                                  ? 'bg-[#F59E0B] text-black'
+                                  : 'bg-white/5 text-white/50 hover:bg-white/10'
+                              }`}
+                            >
+                              {l.flag} {l.code.toUpperCase()}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="p-4 bg-[var(--surface-alt)] rounded-xl flex items-center justify-between">
-                  <span className="text-sm text-[var(--text-secondary)]">Total mensuel estimé</span>
-                  <span className="text-xl font-bold text-[#DC2626]">
-                    {totalMensuel.toLocaleString()} <span className="text-sm font-normal">FCFA</span>
-                  </span>
-                </div>
+                {/* ── STEP 2: Taille entreprise ────────────────────────────── */}
+                {step === 2 && (
+                  <div>
+                    <div className="mb-8">
+                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 2 sur 4</p>
+                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Choisissez votre pack</h1>
+                      <p className="text-white/40 text-sm">Modules inclus automatiquement selon votre taille.</p>
+                    </div>
+
+                    <div className="space-y-3">
+                      {(Object.entries(PLAN_CONFIG) as [TailleEntreprise, typeof PLAN_CONFIG[TailleEntreprise]][]).map(([key, cfg]) => (
+                        <button
+                          key={key}
+                          onClick={() => setTaille(key)}
+                          className={`w-full p-5 rounded-2xl border text-left transition-all hover:scale-[1.01] active:scale-[0.99] ${
+                            taille === key
+                              ? 'shadow-[0_0_30px_rgba(0,0,0,0.3)]'
+                              : 'border-white/8 bg-white/3 hover:bg-white/5'
+                          }`}
+                          style={taille === key ? {
+                            border: `1.5px solid ${cfg.color}`,
+                            background: `${cfg.color}0d`,
+                            boxShadow: `0 0 30px ${cfg.color}20`,
+                          } : {}}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-white font-bold text-lg">{cfg.label}</span>
+                                {cfg.badge && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style={{ background: `${cfg.color}25`, color: cfg.color }}>
+                                    {cfg.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-white/40 text-xs mb-3">{cfg.subtitle}</p>
+                              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                {cfg.features.slice(0, 4).map(f => (
+                                  <span key={f} className="flex items-center gap-1 text-[11px] text-white/50">
+                                    <Check size={10} style={{ color: cfg.color }} />
+                                    {f}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="font-bold text-2xl" style={{ color: cfg.color }}>
+                                {new Intl.NumberFormat('fr-FR').format(cfg.price_fcfa)}
+                              </p>
+                              <p className="text-white/30 text-[11px]">FCFA/mois</p>
+                              <p className="text-white/20 text-[10px] mt-0.5">
+                                {cfg.max_users === -1 ? 'Utilisateurs illimités' : `${cfg.max_users} utilisateurs`}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Full features on selection */}
+                          {taille === key && (
+                            <div className="mt-4 pt-4 border-t border-white/8 grid grid-cols-2 gap-1.5">
+                              {cfg.features.map(f => (
+                                <span key={f} className="flex items-center gap-1.5 text-[11px] text-white/60">
+                                  <Check size={10} style={{ color: cfg.color }} />
+                                  {f}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── STEP 3: Informations société ─────────────────────────── */}
+                {step === 3 && (
+                  <div>
+                    <div className="mb-8">
+                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 3 sur 4</p>
+                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Votre entreprise</h1>
+                      <p className="text-white/40 text-sm">Ces informations apparaîtront sur vos documents.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">
+                          Nom de l'entreprise <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          value={societe.nom}
+                          onChange={e => setSociete(s => ({ ...s, nom: e.target.value }))}
+                          placeholder="Ex: Société Générale du Congo"
+                          className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Téléphone</label>
+                          <input
+                            value={societe.telephone}
+                            onChange={e => setSociete(s => ({ ...s, telephone: e.target.value }))}
+                            placeholder="+242 06 xxx xxxx"
+                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">NIF (optionnel)</label>
+                          <input
+                            value={societe.nif}
+                            onChange={e => setSociete(s => ({ ...s, nif: e.target.value }))}
+                            placeholder="Numéro fiscal"
+                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Adresse</label>
+                        <input
+                          value={societe.adresse}
+                          onChange={e => setSociete(s => ({ ...s, adresse: e.target.value }))}
+                          placeholder="Adresse complète"
+                          className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Sector + plan recap */}
+                    {secteurCfg && planCfg && (
+                      <div className="mt-6 p-4 bg-white/3 border border-white/6 rounded-2xl flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{secteurCfg.emoji}</span>
+                          <div>
+                            <p className="text-white text-sm font-semibold">{secteurCfg.label}</p>
+                            <p className="text-white/40 text-xs">{paysCfg?.flag} {paysCfg?.label}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold" style={{ color: planCfg.color }}>{planCfg.label}</p>
+                          <p className="text-white/30 text-xs">{new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)} FCFA/mois</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── STEP 4: Compte administrateur ────────────────────────── */}
+                {step === 4 && (
+                  <div>
+                    <div className="mb-8">
+                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 4 sur 4</p>
+                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Votre compte admin</h1>
+                      <p className="text-white/40 text-sm">Vous serez le propriétaire de cet espace.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Prénom <span className="text-red-400">*</span></label>
+                          <input
+                            value={admin.prenom}
+                            onChange={e => setAdmin(a => ({ ...a, prenom: e.target.value }))}
+                            placeholder="Jean"
+                            autoComplete="given-name"
+                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Nom <span className="text-red-400">*</span></label>
+                          <input
+                            value={admin.nom}
+                            onChange={e => setAdmin(a => ({ ...a, nom: e.target.value }))}
+                            placeholder="Mpemba"
+                            autoComplete="family-name"
+                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Email professionnel <span className="text-red-400">*</span></label>
+                        <input
+                          type="email"
+                          value={admin.email}
+                          onChange={e => setAdmin(a => ({ ...a, email: e.target.value }))}
+                          placeholder="jean@monentreprise.com"
+                          autoComplete="email"
+                          className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Mot de passe <span className="text-red-400">*</span></label>
+                        <div className="relative">
+                          <input
+                            type={showPwd ? 'text' : 'password'}
+                            value={admin.password}
+                            onChange={e => setAdmin(a => ({ ...a, password: e.target.value }))}
+                            placeholder="8 caractères minimum"
+                            autoComplete="new-password"
+                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 pr-11 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPwd(v => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+                          >
+                            {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+                          </button>
+                        </div>
+                        {admin.password.length > 0 && admin.password.length < 8 && (
+                          <p className="text-red-400/70 text-xs mt-1">8 caractères minimum</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Final recap */}
+                    <div className="mt-6 p-4 bg-white/3 border border-white/6 rounded-2xl space-y-2">
+                      <p className="text-white/30 text-[11px] uppercase tracking-wider font-bold">Résumé de votre abonnement</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {secteurCfg && <span className="text-lg">{secteurCfg.emoji}</span>}
+                          <div>
+                            <p className="text-white text-sm font-semibold">{societe.nom || 'Votre entreprise'}</p>
+                            <p className="text-white/40 text-xs">{secteurCfg?.label} · {paysCfg?.flag} {paysCfg?.label}</p>
+                          </div>
+                        </div>
+                        {planCfg && (
+                          <div className="text-right">
+                            <p className="font-bold text-lg" style={{ color: planCfg.color }}>
+                              {planCfg.label}
+                            </p>
+                            <p className="text-white/30 text-xs">
+                              {new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)} FCFA/mois
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-white/20 text-[11px] mt-4 text-center">
+                      En créant votre compte, vous acceptez les{' '}
+                      <a href="/cgv" className="underline text-white/40">conditions générales</a> d'Oraforme.
+                    </p>
+                  </div>
+                )}
+
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Error */}
+            {error && (
+              <div className="mt-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+                {error}
               </div>
+            )}
 
-              {error && (
-                <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
-                  {error}
-                </div>
+            {/* Navigation */}
+            <div className="flex items-center justify-between mt-8 gap-4">
+              {step > 1 ? (
+                <button
+                  onClick={() => go(step - 1)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-white/50 text-sm hover:bg-white/5 hover:text-white/80 transition-all"
+                >
+                  <ChevronLeft size={16} /> Retour
+                </button>
+              ) : (
+                <a href="/login" className="text-white/30 text-sm hover:text-white/60 transition-colors">
+                  Déjà un compte ?
+                </a>
               )}
 
-              <div className="flex justify-between mt-6">
-                <Button variant="secondary" onClick={() => setStep(2)}>← Retour</Button>
-                <Button onClick={handleFinish} loading={loading}>Accéder au dashboard →</Button>
-              </div>
+              {step < 4 ? (
+                <button
+                  onClick={() => go(step + 1)}
+                  disabled={!canAdvance()}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  style={{
+                    background: canAdvance() ? '#F59E0B' : '#F59E0B40',
+                    color: canAdvance() ? '#000' : '#000',
+                  }}
+                >
+                  Continuer <ChevronRight size={16} />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={!canAdvance() || loading}
+                  className="flex items-center gap-2 px-8 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  style={{ background: '#F59E0B', color: '#000' }}
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                      Création en cours…
+                    </>
+                  ) : (
+                    <>
+                      <Zap size={15} /> Lancer mon ERP
+                    </>
+                  )}
+                </button>
+              )}
             </div>
-          )}
 
+          </div>
         </div>
       </div>
     </div>
