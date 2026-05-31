@@ -164,18 +164,18 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 // ─── Sidebar Group definitions ────────────────────────────────────────────────
 
 const SIDEBAR_GROUPS = [
-  // SUPERVISION — monitoring système, alertes, sécurité
-  { id: 'pilotage',     labelKey: 'nav.pilotage',    icon: ShieldAlert,  moduleIds: ['direction', 'analytics', 'audit'] },
-  // BI & ANALYTICS — intelligence métier, filtrés par secteur pour owners
-  { id: 'bi_analytics', labelKey: 'nav.bi',          icon: TrendingUp,   moduleIds: ['finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'] },
-  // FINANCE & COMPTA — transactions, comptabilité, trésorerie
-  { id: 'finance_ops',  labelKey: 'nav.finance_ops', icon: Calculator,   moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
-  // OPÉRATIONS — RH, CRM, Stock, Achats (fusion de 3 groupes)
-  { id: 'operations',   labelKey: 'nav.operations',  icon: Users,        moduleIds: ['rh', 'roles', 'crm', 'stock', 'achats'] },
-  // OUTILS & IA — GED, MIAA+, Calendrier, Tâches (fusion de 2 groupes)
-  { id: 'outils',       labelKey: 'nav.outils',      icon: FolderOpen,   moduleIds: ['ged', 'bizbot', 'calendrier', 'taches'] },
-  // PARAMÈTRES — compte, abonnement, workflows, API, config
-  { id: 'params',       labelKey: 'nav.params',      icon: Settings,     moduleIds: ['profil', 'abonnement', 'workflows', 'api-keys', 'parametres'] },
+  // SUPERVISION — KPIs exécutifs, BI, analytics
+  { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
+  // FINANCE — gestion financière complète
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
+  // RH — personnel & paie
+  { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'roles'] },
+  // COMMERCIAL — clients, stock, achats
+  { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'stock', 'achats'] },
+  // OUTILS — IA & productivité (calendrier → navbar)
+  { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'taches'] },
+  // ADMIN — abonnement, automatisation, API
+  { id: 'params',      labelKey: 'nav.params',      icon: Settings,    moduleIds: ['abonnement', 'workflows', 'api-keys'] },
 ]
 
 const MODULE_LABEL_KEYS: Record<string, string> = {
