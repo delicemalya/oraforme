@@ -363,16 +363,16 @@ function TabCours({ tenantId, enseignant, cours, onRefresh, showToast }: {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Niveau (ex: Licence 2)" value={form.niveau} onChange={v => setForm(p => ({ ...p, niveau: v }))} />
               <div>
-                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Statut</label>
+                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">{t('common.status')}</label>
                 <select value={form.statut} onChange={e => setForm(p => ({ ...p, statut: e.target.value as 'brouillon'|'publie' }))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]">
-                  <option value="brouillon">Brouillon</option>
+                  <option value="brouillon">{t('common.draft')}</option>
                   <option value="publie">Publié</option>
                 </select>
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Description</label>
+              <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">{t('common.description')}</label>
               <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3}
                 className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7] resize-none" placeholder="Contenu, objectifs, plan…" />
             </div>
@@ -636,7 +636,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom de l'examen *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} />
               <div>
-                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">Type</label>
+                <label className="block text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">{t('common.type')}</label>
                 <select value={form.type_exam} onChange={e => setForm(p => ({ ...p, type_exam: e.target.value as Exam['type_exam'] }))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   {TYPES_EXAM.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}

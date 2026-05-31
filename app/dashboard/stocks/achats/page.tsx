@@ -368,7 +368,7 @@ export default function AchatsPage() {
                             <th className="text-left px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Produit</th>
                             <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Qté</th>
                             <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Prix unit.</th>
-                            <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Total</th>
+                            <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">{t('common.total')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -384,7 +384,7 @@ export default function AchatsPage() {
                             </tr>
                           ))}
                           <tr className="border-t border-[#E2E8F0] bg-[#F8FAFC]">
-                            <td colSpan={3} className="px-4 py-2.5 text-xs font-bold text-right text-[#374151]">Total</td>
+                            <td colSpan={3} className="px-4 py-2.5 text-xs font-bold text-right text-[#374151]">{t('common.total')}</td>
                             <td className="px-4 py-2.5 text-right text-sm font-bold text-[#0F172A]">{fmtFCFA(p.total_amount)}</td>
                           </tr>
                         </tbody>
@@ -419,13 +419,13 @@ export default function AchatsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">Référence</label>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('common.reference')}</label>
                   <input value={form.reference} onChange={e => setForm(f => ({ ...f, reference: e.target.value }))}
                     placeholder="ACH-2026-001"
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">Date</label>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('common.date')}</label>
                   <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
                 </div>
@@ -447,7 +447,7 @@ export default function AchatsPage() {
                         <th className="text-left px-3 py-2 text-[10px] font-semibold text-[#64748B]">Produit</th>
                         <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">Qté</th>
                         <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">Prix unit.</th>
-                        <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">Total</th>
+                        <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">{t('common.total')}</th>
                         <th className="w-8" />
                       </tr>
                     </thead>
@@ -486,7 +486,7 @@ export default function AchatsPage() {
                     </tbody>
                     <tfoot>
                       <tr className="border-t border-[#E2E8F0] bg-[#F8FAFC]">
-                        <td colSpan={3} className="px-3 py-2 text-xs font-bold text-right text-[#374151]">Total</td>
+                        <td colSpan={3} className="px-3 py-2 text-xs font-bold text-right text-[#374151]">{t('common.total')}</td>
                         <td className="px-3 py-2 text-right text-sm font-bold text-[#16A34A]">{fmtFCFA(totalForm)}</td>
                         <td />
                       </tr>

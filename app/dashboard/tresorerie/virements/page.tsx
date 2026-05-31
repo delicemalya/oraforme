@@ -117,6 +117,7 @@ export default function VirementsPage() {
   }
 
   const handleExecute = async (id: string) => {
+  const { t } = useLocale()
     if (!confirm(t('treso.virements.confirmValid'))) return
     const { error: err } = await supabase.from('virements')
       .update({ statut: 'execute', date_execution: new Date().toISOString() })
@@ -185,7 +186,7 @@ export default function VirementsPage() {
       {/* KPI Strip */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="rounded-2xl p-4 border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>En attente</p>
+          <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('common.pending')}</p>
           <p className="text-xl font-bold text-yellow-600">{fmtFCFA(totals.attente)}</p>
           <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
             {virements.filter(v => v.statut === 'en_attente').length} virement(s)

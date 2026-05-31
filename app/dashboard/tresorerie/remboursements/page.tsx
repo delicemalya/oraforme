@@ -412,7 +412,7 @@ export default function RemboursementsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Référence</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.reference')}</label>
                 <input value={form.reference} onChange={e => setForm(f => ({ ...f, reference: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
               </div>

@@ -494,7 +494,7 @@ export default function DocumentsRHPage() {
                           href={doc.url}
                           download
                           className="w-7 h-7 rounded-lg bg-[#F0FDF4] flex items-center justify-center hover:bg-[#DCFCE7]"
-                          title="Télécharger"
+                          title={t('common.download')}
                         >
                           <Download size={12} className="text-[#16A34A]" />
                         </a>
@@ -510,7 +510,7 @@ export default function DocumentsRHPage() {
                     <button
                       onClick={() => handleDelete(doc.id)}
                       className="w-7 h-7 rounded-lg bg-[#FEE2E2] flex items-center justify-center hover:bg-[#FECACA]"
-                      title="Supprimer"
+                      title={t('common.delete')}
                     >
                       <Trash2 size={11} className="text-[#DC2626]" />
                     </button>

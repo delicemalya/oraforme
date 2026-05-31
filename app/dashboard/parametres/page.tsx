@@ -150,6 +150,7 @@ export default function ParametresPage() {
   }
 
   function set(key: keyof Config, val: string | number) {
+  const { t } = useLocale()
     setCfg(p => ({ ...p, [key]: val }))
   }
 
@@ -186,6 +187,7 @@ export default function ParametresPage() {
   // ── Logo upload ────────────────────────────────────────────────────────────
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  const { t } = useLocale()
     const file = e.target.files?.[0]
     if (!file || !tenantId) return
     e.target.value = ''

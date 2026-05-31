@@ -351,7 +351,7 @@ export default function ImmobilisationsPage() {
             <div className="p-6 space-y-4">
               {/* Catégorie */}
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Catégorie</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('common.category')}</label>
                 <select value={form.categorie || 'materiel'}
                   onChange={e => {
                     const cat = CATEGORIES.find(c => c.id === e.target.value)
@@ -396,7 +396,7 @@ export default function ImmobilisationsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Statut</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('common.status')}</label>
                   <select value={form.statut || 'actif'}
                     onChange={e => setForm(f => ({ ...f, statut: e.target.value as Immobilisation['statut'] }))}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none">

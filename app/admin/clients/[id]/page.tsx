@@ -1,4 +1,4 @@
-﻿import { supabaseAdmin } from '@/lib/supabase-server'
+import { supabaseAdmin } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { MODULE_LABELS, MODULE_PRICES, fmtFCFA } from '@/lib/admin-config'

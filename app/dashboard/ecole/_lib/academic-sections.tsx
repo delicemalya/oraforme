@@ -1,4 +1,5 @@
-﻿'use client'
+'use client'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -38,6 +39,7 @@ function FormCard({ children }: { children?: React.ReactNode }) {
 // ── SECTION MATIÈRES ─────────────────────────────────────────────────────────
 
 export function SectionMatieres({ tenantId, enseignants }: { tenantId: string; enseignants: Enseignant[] }) {
+  const { t } = useLocale()
   const [subjects,  setSubjects]  = useState<Subject[]>([])
   const [loading,   setLoading]   = useState(true)
   const [showForm,  setShowForm]  = useState(false)
@@ -110,7 +112,7 @@ export function SectionMatieres({ tenantId, enseignants }: { tenantId: string; e
               <button onClick={save} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[var(--primary)] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </FormCard>
         )}
@@ -158,6 +160,7 @@ const SESSION_TYPES: { value: SessionEcole['type']; label: string }[] = [
 ]
 
 export function SectionSessions({ tenantId }: { tenantId: string }) {
+  const { t } = useLocale()
   const [sessions, setSessions] = useState<SessionEcole[]>([])
   const [loading,  setLoading]  = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -211,7 +214,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Nom de la session *" value={form.nom} onChange={v => setForm(p => ({ ...p, nom: v }))} placeholder="Trimestre 1 – 2024-2025" />
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.type')}</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as SessionEcole['type'] }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   {SESSION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
@@ -225,7 +228,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
               <button onClick={save} disabled={saving || !form.nom || !form.date_debut || !form.date_fin} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[var(--primary)] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Créer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </FormCard>
         )}
@@ -273,6 +276,7 @@ export function SectionSessions({ tenantId }: { tenantId: string }) {
 export function SectionExamens({ tenantId, etudiants, classes }: {
   tenantId: string; etudiants: Etudiant[]; classes: ClasseEcole[]
 }) {
+  const { t } = useLocale()
   const [sessions, setSessions] = useState<SessionEcole[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [exams,    setExams]    = useState<Exam[]>([])
@@ -409,7 +413,7 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
               <button onClick={saveExam} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#ff7000] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Créer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
@@ -591,6 +595,7 @@ function BarChart2({ size, className }: { size?: number; className?: string }) {
 export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
   tenantId: string; etudiants: Etudiant[]; nomEcole: string
 }) {
+  const { t } = useLocale()
   const [attestations, setAttestations] = useState<Attestation[]>([])
   const [loading,      setLoading]      = useState(true)
   const [showForm,     setShowForm]     = useState(false)
@@ -664,7 +669,7 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
               <button onClick={save} disabled={saving || !form.etudiant_id} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#0F172A', color: '#0F172A' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <ScrollText size={12} />} Émettre
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
@@ -677,7 +682,7 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
       ) : (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <table className="w-full">
-            <thead><tr style={{ background: '#FFFFFF' }}><Th>Étudiant</Th><Th>Type</Th><Th>Réf.</Th><Th>Année</Th><Th>Date</Th><Th></Th></tr></thead>
+            <thead><tr style={{ background: '#FFFFFF' }}><Th>Étudiant</Th><Th>{t('common.type')}</Th><Th>Réf.</Th><Th>{t('common.year')}</Th><Th>{t('common.date')}</Th><Th></Th></tr></thead>
             <tbody>
               {attestations.map(a => {
                 const e = etudiants.find(et => et.id === a.etudiant_id)
@@ -689,7 +694,7 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
                     <Td className="text-[var(--text-secondary)]">{a.annee_scolaire ?? '—'}</Td>
                     <Td className="text-[var(--text-secondary)]">{new Date(a.date_emission).toLocaleDateString('fr-FR')}</Td>
                     <Td>
-                      <button onClick={() => print(a)} className="text-[var(--text-secondary)] hover:text-[#DC2626] transition-colors" title="Imprimer">
+                      <button onClick={() => print(a)} className="text-[var(--text-secondary)] hover:text-[#DC2626] transition-colors" title={t('common.print')}>
                         <Printer size={13} />
                       </button>
                     </Td>
@@ -709,6 +714,7 @@ export function SectionAttestations({ tenantId, etudiants, nomEcole }: {
 export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
   tenantId: string; etudiants: Etudiant[]; nomEcole: string
 }) {
+  const { t } = useLocale()
   const [diplomas, setDiplomas] = useState<Diploma[]>([])
   const [loading,  setLoading]  = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -793,7 +799,7 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
               <button onClick={save} disabled={saving || !form.etudiant_id || !form.type_diplome} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#ff7000] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <GraduationCap size={12} />} Créer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
@@ -806,7 +812,7 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
       ) : (
         <div className="rounded-xl border border-[var(--border)] overflow-hidden">
           <table className="w-full">
-            <thead><tr style={{ background: '#FFFFFF' }}><Th>Étudiant</Th><Th>Diplôme</Th><Th>Mention</Th><Th>Année</Th><Th>Statut</Th><Th>Actions</Th></tr></thead>
+            <thead><tr style={{ background: '#FFFFFF' }}><Th>Étudiant</Th><Th>Diplôme</Th><Th>Mention</Th><Th>{t('common.year')}</Th><Th>{t('common.status')}</Th><Th>{t('common.actions')}</Th></tr></thead>
             <tbody>
               {diplomas.map(d => {
                 const e   = etudiants.find(et => et.id === d.etudiant_id)
@@ -822,12 +828,12 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
                     <Td>
                       <div className="flex items-center gap-2">
                         {d.statut === 'en_attente' && (
-                          <button onClick={() => updateStatut(d.id, 'valide')} className="text-[10px] px-2 py-0.5 rounded border border-[#DC2626]/30 text-[#DC2626] hover:bg-[#DC2626]/10 transition-colors">Valider</button>
+                          <button onClick={() => updateStatut(d.id, 'valide')} className="text-[10px] px-2 py-0.5 rounded border border-[#DC2626]/30 text-[#DC2626] hover:bg-[#DC2626]/10 transition-colors">{t('common.validate')}</button>
                         )}
                         {d.statut === 'valide' && (
                           <button onClick={() => updateStatut(d.id, 'delivre')} className="text-[10px] px-2 py-0.5 rounded border border-[#0F172A]/30 text-[#DC2626] hover:bg-[var(--surface)]/10 transition-colors">Délivrer</button>
                         )}
-                        {e && <button onClick={() => printDiploma(e, d, nomEcole)} className="text-[var(--text-secondary)] hover:text-[#7C3AED] transition-colors" title="Imprimer"><Printer size={12} /></button>}
+                        {e && <button onClick={() => printDiploma(e, d, nomEcole)} className="text-[var(--text-secondary)] hover:text-[#7C3AED] transition-colors" title={t('common.print')}><Printer size={12} /></button>}
                       </div>
                     </Td>
                   </tr>
@@ -844,6 +850,7 @@ export function SectionDiplomes({ tenantId, etudiants, nomEcole }: {
 // ── SECTION SOUTENANCES (Direction) ──────────────────────────────────────────
 
 export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; etudiants: Etudiant[] }) {
+  const { t } = useLocale()
   const [defenses, setDefenses] = useState<Defense[]>([])
   const [loading,  setLoading]  = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -935,7 +942,7 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
               <button onClick={save} disabled={saving || !form.etudiant_id || !form.titre_memoire || !form.date_soutenance} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-[#DC2626] text-white disabled:opacity-40">
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Swords size={12} />} Planifier
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
@@ -959,7 +966,7 @@ export function SectionSoutenances({ tenantId, etudiants }: { tenantId: string; 
               </div>
               <div className="flex gap-2">
                 <button onClick={saveNote} className="flex-1 py-2 rounded-lg bg-[#DC2626] text-white text-xs font-semibold flex items-center justify-center gap-1"><Check size={12} /> Valider</button>
-                <button onClick={() => setEditNote(null)} className="flex-1 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] text-xs">Annuler</button>
+                <button onClick={() => setEditNote(null)} className="flex-1 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] text-xs">{t('common.cancel')}</button>
               </div>
             </motion.div>
           </motion.div>

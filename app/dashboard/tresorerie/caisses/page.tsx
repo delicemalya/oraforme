@@ -438,7 +438,7 @@ export default function CaissesPage() {
             <div className="p-5 space-y-3">
               {opType === 'depense' && (
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Catégorie</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('common.category')}</label>
                   <select value={fOp.categorie} onChange={e => setFOp(f => ({ ...f, categorie: e.target.value }))}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none">
                     {CATS_DEP.map(c => <option key={c}>{c}</option>)}

@@ -502,7 +502,7 @@ export default function ComptabilitePage() {
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Date</label>
+                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">{t('common.date')}</label>
                   <input type="date" value={formDate} onChange={e => setFormDate(e.target.value)}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30" />
                 </div>

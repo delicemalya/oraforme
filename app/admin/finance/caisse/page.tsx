@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import {
   Wallet, Plus, TrendingUp, TrendingDown, RefreshCw,
@@ -50,6 +52,7 @@ function fmtDate(d: string) {
 }
 
 export default function CaissePage() {
+  const { t } = useLocale()
   const [entries, setEntries]   = useState<CaisseEntry[]>([])
   const [loading, setLoading]   = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -290,14 +293,14 @@ export default function CaissePage() {
                     <td className="px-5 py-2.5">
                       {e.statut === 'valide'
                         ? <span className="text-[11px] font-semibold text-green-700">✓ Validé</span>
-                        : <span className="text-[11px] font-semibold text-gray-400">Annulé</span>}
+                        : <span className="text-[11px] font-semibold text-gray-400">{t('common.cancelled')}</span>}
                     </td>
                     <td className="px-5 py-2.5">
                       {e.statut === 'valide' && (
                         <button
                           onClick={() => handleAnnuler(e.id)}
                           className="text-[11px] text-gray-400 hover:text-red-600 transition-colors"
-                          title="Annuler"
+                          title={t('common.cancel')}
                         >
                           <X size={13} />
                         </button>
@@ -347,7 +350,7 @@ export default function CaissePage() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Catégorie */}
                 <div>
-                  <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Catégorie</label>
+                  <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">{t('common.category')}</label>
                   <select
                     value={form.categorie}
                     onChange={e => setForm(f => ({ ...f, categorie: e.target.value as Categorie }))}

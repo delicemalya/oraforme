@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { Search, ExternalLink, PauseCircle, PlayCircle, Trash2, X, AlertTriangle, Loader2 } from 'lucide-react'
@@ -206,7 +208,7 @@ export default function AdminClientsTable({ tenants: initialTenants }: { tenants
                       <Link
                         href={`/admin/clients/${t.id}`}
                         className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--info)] hover:bg-[var(--info-light)] transition-colors"
-                        title="Voir détails"
+                        title="Voir le détail"
                       >
                         <ExternalLink size={13} />
                       </Link>

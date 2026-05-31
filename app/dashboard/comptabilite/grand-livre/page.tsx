@@ -116,6 +116,7 @@ export default function GrandLivrePage() {
 
   /* CSV export */
   function exportCSV() {
+  const { t } = useLocale()
     const rows = filtered.flatMap(a =>
       a.movements.map(m => ({
         [t('compta.grandlivre.colCompte')]: a.number,

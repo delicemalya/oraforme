@@ -387,7 +387,7 @@ export default function ValidationsPage() {
               <div className="text-xs text-[#64748B]">{selected.beneficiaire} — <strong>{fmtFCFA(selected.montant)}</strong></div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#374151] mb-1">Commentaire</label>
+              <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.comment')}</label>
               <textarea value={commentaire} onChange={e => setCommentaire(e.target.value)}
                 rows={3} placeholder="Motif de la décision (optionnel)"
                 className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2] resize-none" />
@@ -458,7 +458,7 @@ export default function ValidationsPage() {
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Date</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.date')}</label>
                 <input type="date" value={form.date_demande} onChange={e => setForm(f => ({ ...f, date_demande: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
               </div>

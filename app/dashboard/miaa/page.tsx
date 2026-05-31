@@ -80,7 +80,7 @@ function fileToBase64(file: File): Promise<string> {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function MIAAPage() {
-  const { t }                                 = useLocale()
+  const { t } = useLocale()
   const { tenantId, prenom, nom, nomEntreprise } = useTenant()
   const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#F59E0B'
 
@@ -150,6 +150,7 @@ export default function MIAAPage() {
     : (nomEntreprise ?? null)
 
   function getGreeting() {
+  const { t } = useLocale()
     const h = new Date().getHours()
     return h < 12 ? t('miaa.greetMorning') : h < 18 ? t('miaa.greetAfternoon') : t('miaa.greetEvening')
   }
@@ -317,6 +318,7 @@ export default function MIAAPage() {
   }
 
   function clearChat() {
+  const { t } = useLocale()
     const salut = getGreeting()
     setMessages([{
       role: 'bot',

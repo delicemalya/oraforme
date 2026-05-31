@@ -78,10 +78,10 @@ function fmtDate(d: string) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function InvoicePreviewPage() {
+  const { t } = useLocale()
   const { id }         = useParams<{ id: string }>()
   const router         = useRouter()
   const { tenantId }   = useTenant()
-  const { t }          = useLocale()
 
   const [facture,     setFacture]     = useState<Facture | null>(null)
   const [lignes,      setLignes]      = useState<Ligne[]>([])
@@ -340,7 +340,7 @@ export default function InvoicePreviewPage() {
                         <p style={{ fontSize: 13, fontWeight: 700, color: '#111', margin: 0 }}>{invoiceNum}</p>
                       </div>
                       <div style={{ marginBottom: facture.due_date ? 14 : 0 }}>
-                        <p style={{ fontSize: 9, fontWeight: 800, color: '#374151', textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 4px' }}>Date</p>
+                        <p style={{ fontSize: 9, fontWeight: 800, color: '#374151', textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 4px' }}>{t('common.date')}</p>
                         <p style={{ fontSize: 13, fontWeight: 700, color: '#111', margin: 0 }}>
                           {facture.date ? fmtDate(facture.date) : fmtDate(facture.created_at)}
                         </p>
@@ -362,7 +362,7 @@ export default function InvoicePreviewPage() {
                         <th style={{ width: '44%', padding: '12px 14px', color: '#fff', fontWeight: 800, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'left' }}>Item Description</th>
                         <th style={{ width: '18%', padding: '12px 14px', color: '#fff', fontWeight: 800, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'right' }}>Price</th>
                         <th style={{ width: '10%', padding: '12px 14px', color: '#fff', fontWeight: 800, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center' }}>Qty</th>
-                        <th style={{ width: '22%', padding: '12px 14px', color: '#fff', fontWeight: 800, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'right' }}>Total</th>
+                        <th style={{ width: '22%', padding: '12px 14px', color: '#fff', fontWeight: 800, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'right' }}>{t('common.total')}</th>
                       </tr>
                     </thead>
                     <tbody>

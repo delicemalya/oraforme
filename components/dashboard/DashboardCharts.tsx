@@ -1,3 +1,4 @@
+import { useLocale } from '@/lib/hooks/useLocale'
 ﻿'use client'
 
 import {
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function DashboardCharts({ donutData, barData, donutTitle }: Props) {
+  const { t } = useLocale()
   const totalDonut = donutData.reduce((s, d) => s + d.value, 0)
 
   return (
@@ -68,7 +70,7 @@ export default function DashboardCharts({ donutData, barData, donutTitle }: Prop
         ) : (
           <div className="h-[190px] flex flex-col items-center justify-center gap-2">
             <div className="w-16 h-16 rounded-full border-4 border-[var(--border)] border-dashed" />
-            <p className="text-xs text-[var(--text-secondary)]">Aucune donnée</p>
+            <p className="text-xs text-[var(--text-secondary)]">{t('common.noData')}</p>
           </div>
         )}
       </div>

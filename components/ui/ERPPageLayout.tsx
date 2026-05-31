@@ -1,3 +1,5 @@
+'use client'
+import { useLocale } from '@/lib/hooks/useLocale'
 /**
  * ERPPageLayout — Layout universel pour TOUTES les pages métier Oraforme.
  *
@@ -7,7 +9,7 @@
  *    subtitle="Gestion du personnel"
  *    icon={<Users size={18} />}
  *    color="#64748B"
- *    actions={<Button>Créer</Button>}
+ *    actions={<Button>{t('common.create')}</Button>}
  *    kpis={[...]}
  *    tabs={[...]}
  *    activeTab={...}
@@ -251,6 +253,7 @@ export default function ERPPageLayout({
   kpis, tabs, activeTab, onTabChange,
   children, className = '',
 }: ERPPageLayoutProps) {
+  const { t } = useLocale()
   return (
     <div className={`space-y-5 ${className}`}>
 

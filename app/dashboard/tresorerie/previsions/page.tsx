@@ -376,14 +376,14 @@ export default function PrevisionsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Période</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.period')}</label>
                 <select value={form.periode} onChange={e => setForm(f => ({ ...f, periode: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]">
                   {periodes.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Type</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.type')}</label>
                 <select value={form.type} onChange={e => setForm(f => ({
                   ...f, type: e.target.value as 'entree' | 'sortie',
                   categorie: e.target.value === 'entree' ? CATEGORIES_ENTREE[0] : CATEGORIES_SORTIE[0]
@@ -394,7 +394,7 @@ export default function PrevisionsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Catégorie</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.category')}</label>
                 <select value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]">
                   {(form.type === 'entree' ? CATEGORIES_ENTREE : CATEGORIES_SORTIE).map(c => <option key={c} value={c}>{c}</option>)}

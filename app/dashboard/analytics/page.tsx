@@ -139,6 +139,7 @@ export default function AnalyticsPage() {
   useEffect(() => { load() }, [load])
 
   async function runAutomation() {
+  const { t } = useLocale()
     setRunning(true)
     setRunResult(null)
     try {

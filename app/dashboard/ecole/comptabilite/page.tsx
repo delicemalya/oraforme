@@ -123,7 +123,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Date" value={form.date} onChange={v => setForm(p => ({ ...p, date: v }))} type="date" />
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.type')}</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   <option value="recette">Recette</option>
                   <option value="depense">Dépense</option>
@@ -514,7 +514,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
             className="overflow-hidden">
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
               <div className="col-span-2 md:col-span-1">
-                <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Type</label>
+                <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">{t('common.type')}</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] outline-none focus:border-[#00b9a7]">
                   <option value="entree">Entrée (recette)</option>
@@ -527,7 +527,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
                   placeholder="0" className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] outline-none focus:border-[#00b9a7]" />
               </div>
               <div>
-                <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">Date</label>
+                <label className="text-[10px] text-[var(--text-secondary)] mb-1 block">{t('common.date')}</label>
                 <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
                   className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[#101729] outline-none focus:border-[#00b9a7]" />
               </div>
@@ -581,10 +581,10 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-[var(--border)] text-[var(--text-secondary)] uppercase tracking-wider text-[10px]" style={{ background: '#F9FAFB' }}>
-                <th className="px-4 py-2.5 text-left">Date</th>
+                <th className="px-4 py-2.5 text-left">{t('common.date')}</th>
                 <th className="px-4 py-2.5 text-left">Libellé</th>
                 <th className="px-4 py-2.5 text-left">Source</th>
-                <th className="px-4 py-2.5 text-right">Montant</th>
+                <th className="px-4 py-2.5 text-right">{t('common.amount')}</th>
               </tr>
             </thead>
             <tbody>

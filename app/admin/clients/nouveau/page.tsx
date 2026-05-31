@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -22,6 +24,7 @@ const PLAN_CONFIG: Record<Plan, { label: string; desc: string; color: string }> 
 }
 
 export default function NouvelleEntreprisePage() {
+  const { t } = useLocale()
   const router = useRouter()
 
   const [step, setStep]     = useState(1) // 1 = info, 2 = admin, 3 = modules, 4 = confirmation
@@ -234,7 +237,7 @@ export default function NouvelleEntreprisePage() {
               />
             </div>
             <div>
-              <label className="text-[12px] font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Phone size={11} />Téléphone</label>
+              <label className="text-[12px] font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Phone size={11} />{t('common.phone')}</label>
               <input
                 value={company.telephone}
                 onChange={e => setCompany(c => ({ ...c, telephone: e.target.value }))}

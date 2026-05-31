@@ -520,10 +520,10 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
                         onChange={e => updateStatut(c.id, e.target.value)}
                         className="bg-transparent text-[10px] border border-[var(--border)] rounded px-1.5 py-0.5 text-[var(--text-secondary)] outline-none"
                       >
-                        <option value="nouveau">Nouveau</option>
+                        <option value="nouveau">{t('common.new')}</option>
                         <option value="entretien">Entretien</option>
                         <option value="retenu">Retenu</option>
-                        <option value="rejete">Rejeté</option>
+                        <option value="rejete">{t('common.rejected')}</option>
                       </select>
                     </td>
                     <td className="px-4 py-3">

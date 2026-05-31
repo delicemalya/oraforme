@@ -272,8 +272,8 @@ export default function FournisseursPage() {
                     <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.fournisseurs.colDelai')}</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.mouvements.title')}</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('stock.page.colValeur')}</th>
-                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Note</th>
-                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Actions</th>
+                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('common.note')}</th>
+                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -379,7 +379,7 @@ export default function FournisseursPage() {
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">Téléphone</label>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('common.phone')}</label>
                   <input value={form.telephone} onChange={e => setForm(f => ({ ...f, telephone: e.target.value }))}
                     placeholder="+243 …"
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
@@ -388,7 +388,7 @@ export default function FournisseursPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">Email</label>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('common.email')}</label>
                   <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                     placeholder="contact@fournisseur.com"
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
@@ -402,7 +402,7 @@ export default function FournisseursPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-[#374151] mb-1">Adresse</label>
+                <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('common.address')}</label>
                 <input value={form.adresse} onChange={e => setForm(f => ({ ...f, adresse: e.target.value }))}
                   placeholder="Adresse complète"
                   className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />

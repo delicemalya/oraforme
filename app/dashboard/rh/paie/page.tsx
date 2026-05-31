@@ -629,8 +629,8 @@ export default function PaiePage() {
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">IRPP</th>
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-[#16A34A]">Net</th>
                   <th className="text-right px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Patro.</th>
-                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Statut</th>
-                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Actions</th>
+                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('common.status')}</th>
+                  <th className="text-center px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>

@@ -169,6 +169,7 @@ export default function PresencesPage() {
   const retards   = dayPresences.filter(p => p.type === 'retard').length
 
   function exportCSV() {
+  const { t } = useLocale()
     const rows = [
       [t('rh.presences.colDate'), t('rh.presences.colEmployee'), t('rh.presences.colStatus'), t('rh.presences.colArrival'), t('rh.presences.colDeparture'), t('rh.presences.colReason')],
       ...presences.map(p => [

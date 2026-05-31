@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Pencil, Trash2 } from 'lucide-react'
 
@@ -12,6 +14,7 @@ const STATUT_LABELS: Record<string,string> = { active:'Active', jachere:'Jachèr
 const STATUT_COLORS: Record<string,string> = { active:'#16A34A', jachere:'#F59E0B', en_preparation:'#2563EB', archive:'#94A3B8' }
 
 export default function AgriParcellesPage() {
+  const { t } = useLocale()
   const [parcelles, setParcelles] = useState<Parcelle[]>([])
   const [loading, setLoading]     = useState(true)
   const [showForm, setShowForm]   = useState(false)
@@ -132,7 +135,7 @@ export default function AgriParcellesPage() {
               </div>
             ))}
             <div style={{ display:'flex', gap:10, marginTop:20 }}>
-              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>Annuler</button>
+              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving||!form.nom.trim()} style={{ flex:2, padding:10, border:'none', borderRadius:8, background:'#16A34A', color:'#fff', cursor:'pointer', fontWeight:600, opacity:saving||!form.nom.trim()?.6:1 }}>
                 {saving ? 'Enregistrement…' : editing ? 'Modifier' : 'Créer la parcelle'}
               </button>

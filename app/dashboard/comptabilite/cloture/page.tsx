@@ -260,7 +260,7 @@ export default function CloturePage() {
                       }}>
                         {isCloture ? t('compta.cloture.stat.cloture') : m.nb_ecritures === 0 ? t('compta.cloture.stat.ouvert') : t('compta.cloture.stat.ouvert')}
                       </div>
-                      <div className="text-[9px] text-[#94A3B8]">Statut</div>
+                      <div className="text-[9px] text-[#94A3B8]">{t('common.status')}</div>
                     </div>
                   </div>
                   {/* Action */}

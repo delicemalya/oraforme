@@ -189,7 +189,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                 <div className="flex gap-2 pt-1 mt-auto">
                   <button onClick={() => del(e.id)}
                     className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-red-400 hover:border-red-400/30 transition-all"
-                    title="Supprimer">
+                    title={t('common.delete')}>
                     <Trash2 size={12} />
                   </button>
                   <button onClick={() => setSelected(selected?.id === e.id ? null : e)}
@@ -299,7 +299,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
                   ))}
 
                   <div className="col-span-2 flex gap-3 pt-2">
-                    <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[#101729] text-sm">Annuler</button>
+                    <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-[#101729] text-sm">{t('common.cancel')}</button>
                     <button onClick={save} disabled={saving || !form.nom || !form.prenom} className="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40" style={{ background: '#DC2626', color: '#0F172A' }}>
                       {saving ? <Loader2 className="animate-spin" size={14} /> : <><Check size={14} /> Inscrire</>}
                     </button>
@@ -319,6 +319,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
 function SectionPaiements({ tenantId, etudiants, nomEcole }: {
   tenantId: string; etudiants: Etudiant[]; nomEcole: string
 }) {
+  const { t } = useLocale()
   const [frais,        setFrais]        = useState<FraisScolaire[]>([])
   const [paiements,    setPaiements]    = useState<PaiementScolaire[]>([])
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
@@ -463,7 +464,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
             {showNewFrais && (
               <div className="flex gap-2 mb-3">
                 <input className="flex-1 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729]" placeholder="Libell�" value={fraisForm.libelle} onChange={e => setFraisForm(p => ({ ...p, libelle: e.target.value }))} />
-                <input type="number" className="w-24 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] text-right" placeholder="Montant" value={fraisForm.montant} onChange={e => setFraisForm(p => ({ ...p, montant: e.target.value }))} />
+                <input type="number" className="w-24 bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-1.5 text-xs text-[#101729] text-right" placeholder={t('common.amount')} value={fraisForm.montant} onChange={e => setFraisForm(p => ({ ...p, montant: e.target.value }))} />
                 <button onClick={addFrais} disabled={saving} className="px-3 py-1.5 rounded-md bg-[#DC2626]/15 text-[#DC2626] text-xs font-semibold"><Check size={12} /></button>
               </div>
             )}
@@ -540,6 +541,7 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
 function SectionNotes({ tenantId, etudiants, nomEcole }: {
   tenantId: string; etudiants: Etudiant[]; nomEcole: string
 }) {
+  const { t } = useLocale()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [notes,      setNotes]      = useState<Note[]>([])
   const [periode,    setPeriode]    = useState<Periode>('trimestre1')
@@ -617,7 +619,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
                 <input className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.matiere} onChange={e => setForm(p => ({ ...p, matiere: e.target.value }))} placeholder="Math�matiques�" />
               </div>
               <div>
-                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">Type</label>
+                <label className="text-[10px] text-[var(--text-secondary)] block mb-1">{t('common.type')}</label>
                 <select className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-md px-2 py-2 text-xs text-[#101729]" value={form.type_note} onChange={e => setForm(p => ({ ...p, type_note: e.target.value }))}>
                   {['devoir', 'examen', 'tp', 'oral', 'projet'].map(t => <option key={t} value={t} className="bg-[var(--card-bg)]">{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                 </select>
@@ -677,6 +679,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
 function SectionClasses({ tenantId, classes, onRefresh }: {
   tenantId: string; classes: ClasseEcole[]; onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [form, setForm] = useState({ nom: '', niveau: 'lycee', annee_scolaire: '2024-2025', nb_places: '30' })
@@ -692,6 +695,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
   }
 
   async function del(id: string) {
+  const { t } = useLocale()
     await supabase.from('classes_ecole').delete().eq('id', id); onRefresh()
   }
 
@@ -721,7 +725,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
               <button onClick={save} disabled={saving || !form.nom} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#DC2626', color: '#0F172A' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}
@@ -758,6 +762,7 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
 function SectionPlanning({ tenantId, planning, onRefresh }: {
   tenantId: string; planning: PlanningEcole[]; onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [showForm,   setShowForm]   = useState(false)
   const [saving,     setSaving]     = useState(false)
   const [filterType, setFilterType] = useState<'tous' | TypeEvent>('tous')
@@ -777,6 +782,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
   }
 
   async function del(id: string) {
+  const { t } = useLocale()
     await supabase.from('planning_ecole').delete().eq('id', id); onRefresh()
   }
 
@@ -808,7 +814,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
             <div className="grid grid-cols-2 gap-3">
               <FI label="Titre *" value={form.titre} onChange={v => setForm(p => ({ ...p, titre: v }))} />
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Type</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.type')}</label>
                 <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value as TypeEvent }))} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
                   {(Object.entries(TYPE_EVENT) as [TypeEvent, { label: string }][]).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
@@ -816,7 +822,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
               <FI label="Date d�but *" value={form.date_debut} onChange={v => setForm(p => ({ ...p, date_debut: v }))} type="date" />
               <FI label="Date fin"     value={form.date_fin}   onChange={v => setForm(p => ({ ...p, date_fin: v }))}   type="date" />
               <div className="col-span-2">
-                <label className="block text-xs text-[var(--text-secondary)] mb-1">Description</label>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.description')}</label>
                 <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7] resize-none" />
               </div>
             </div>
@@ -824,7 +830,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
               <button onClick={save} disabled={saving || !form.titre || !form.date_debut} className="px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40" style={{ background: '#DC2626', color: '#0F172A' }}>
                 {saving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />} Enregistrer
               </button>
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">Annuler</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-xs text-[var(--text-secondary)] border border-[var(--border)]">{t('common.cancel')}</button>
             </div>
           </motion.div>
         )}

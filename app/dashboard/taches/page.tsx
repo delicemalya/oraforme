@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -136,6 +138,7 @@ function TaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
 // ── Inline Add Row ─────────────────────────────────────────────────────────────
 
 function InlineAdd({ statut, tenantId, onAdded }: { statut: Statut; tenantId: string; onAdded: () => void }) {
+  const { t } = useLocale()
   const [open,  setOpen]  = useState(false)
   const [title, setTitle] = useState('')
   const [saving, setSaving] = useState(false)
@@ -170,7 +173,7 @@ function InlineAdd({ statut, tenantId, onAdded }: { statut: Statut; tenantId: st
         className="w-full text-sm outline-none text-[#0F172A] placeholder-[#94A3B8]"
       />
       <div className="flex gap-1.5 mt-2 justify-end">
-        <button onClick={() => setOpen(false)} className="text-xs text-[#94A3B8] hover:text-[#0F172A] px-2 py-1">Annuler</button>
+        <button onClick={() => setOpen(false)} className="text-xs text-[#94A3B8] hover:text-[#0F172A] px-2 py-1">{t('common.cancel')}</button>
         <button onClick={save} disabled={saving || !title.trim()}
           className="text-xs bg-[#DC2626] text-white px-3 py-1 rounded-lg disabled:opacity-50 font-medium">
           {saving ? 'Ajout...' : 'Ajouter'}
@@ -191,6 +194,7 @@ function TaskDetailPanel({
   onClose: () => void
   onRefresh: () => void
 }) {
+  const { t } = useLocale()
   const [form, setForm]         = useState({ ...BLANK_TASK, ...task, tags: task.tags.join(', '), due_date: task.due_date ?? '' })
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
@@ -275,7 +279,7 @@ function TaskDetailPanel({
 
           {/* Description */}
           <div>
-            <label className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Description</label>
+            <label className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">{t('common.description')}</label>
             <textarea value={form.description ?? ''} onChange={e => set('description', e.target.value)} rows={3}
               className="w-full mt-1 border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/30 resize-none" />
           </div>
@@ -283,7 +287,7 @@ function TaskDetailPanel({
           {/* Statut + Priorité */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Statut</label>
+              <label className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">{t('common.status')}</label>
               <select value={form.statut} onChange={e => set('statut', e.target.value as Statut)}
                 className="w-full mt-1 border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#DC2626]/30 bg-white">
                 {COLUMNS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
@@ -376,6 +380,7 @@ function TaskDetailPanel({
 // ── Page principale ───────────────────────────────────────────────────────────
 
 export default function TachesPage() {
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [tasks,   setTasks]   = useState<Task[]>([])
   const [members, setMembers] = useState<Member[]>([])

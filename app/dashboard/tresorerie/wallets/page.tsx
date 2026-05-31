@@ -393,7 +393,7 @@ export default function WalletsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Référence</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('common.reference')}</label>
                   <input type="text" value={opForm.reference}
                     onChange={e => setOpForm(f => ({ ...f, reference: e.target.value }))}
                     placeholder="N° transaction"
@@ -401,7 +401,7 @@ export default function WalletsPage() {
                     style={{ borderColor: 'var(--border)', background: 'var(--bg)' }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Date</label>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>{t('common.date')}</label>
                   <input type="date" value={opForm.date_operation}
                     onChange={e => setOpForm(f => ({ ...f, date_operation: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl text-sm border outline-none"

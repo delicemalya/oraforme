@@ -143,6 +143,7 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
   onPaid: () => void
   tenantId: string
 }) {
+  const { t } = useLocale()
   const resteARegler = facture.total - (facture.montant_paye ?? 0)
   const [montant, setMontant] = useState(resteARegler)
   const [mode, setMode] = useState<string>('especes')
@@ -219,7 +220,7 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
 
             {/* Montant */}
             <div>
-              <label className="block text-xs text-[var(--text-secondary)] mb-1">Montant</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.amount')}</label>
               <input
                 type="number"
                 min={0}
@@ -238,7 +239,7 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
 
             {/* Date */}
             <div>
-              <label className="block text-xs text-[var(--text-secondary)] mb-1">Date</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.date')}</label>
               <input
                 type="date"
                 value={date}
@@ -734,7 +735,7 @@ export default function FacturationPage() {
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <ActionBtn title="Voir détail"     onClick={() => setViewId(f.id)}                                                                       icon={<Eye size={13} />} />
                           <ActionBtn title="Aperçu plein écran" onClick={() => router.push(`/dashboard/factures/${f.id}/preview`)}                                 icon={<ExternalLink size={13} />} hoverClass="hover:text-[#DC2626]" />
-                          <ActionBtn title="Modifier"        onClick={() => openEdit(f)}                                                                           icon={<Edit3 size={13} />} />
+                          <ActionBtn title={t('common.edit')}        onClick={() => openEdit(f)}                                                                           icon={<Edit3 size={13} />} />
                           {f.client_phone && <ActionBtn title="WhatsApp" onClick={() => sendWhatsApp(f)}                                                           icon={<MessageCircle size={13} />} hoverClass="hover:text-[#25D366]" />}
                           {f.client_email && <ActionBtn title="Envoyer par email" onClick={() => sendEmail(f)}                                                     icon={<Mail size={13} />} hoverClass="hover:text-[#DC2626]" />}
                           <ActionBtn
@@ -750,7 +751,7 @@ export default function FacturationPage() {
                           {f.statut === 'payee' && (f.type === 'facture' || !f.type) && (
                             <ActionBtn title="Créer un avoir" onClick={() => creerAvoir(f)} icon={<RotateCcw size={13} />} hoverClass="hover:text-[#F59E0B]" />
                           )}
-                          <ActionBtn title="Supprimer" onClick={() => del(f.id)} icon={<Trash2 size={13} />} hoverClass="hover:text-red-400" />
+                          <ActionBtn title={t('common.delete')} onClick={() => del(f.id)} icon={<Trash2 size={13} />} hoverClass="hover:text-red-400" />
                         </div>
                       </td>
                     </motion.tr>

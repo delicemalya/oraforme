@@ -216,6 +216,7 @@ export default function RapportsPage() {
   useEffect(() => { load() }, [load])
 
   async function genererAnalyse() {
+  const { t } = useLocale()
     if (!data) return
     setAiLoading(true)
     const produits = data.ventesFactures + data.prestations + data.autresProduits

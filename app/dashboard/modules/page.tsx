@@ -32,6 +32,7 @@ export default function ModulesMarketplacePage() {
   }
 
   async function toggleModule(moduleId: string, action: 'activate' | 'deactivate') {
+  const { t } = useLocale()
     setToggling(moduleId)
     setConfirm(null)
     try {

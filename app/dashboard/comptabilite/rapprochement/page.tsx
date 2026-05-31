@@ -267,7 +267,7 @@ export default function RapprochementPage() {
             <table className="w-full text-[12px]">
               <thead className="bg-[#F8FAFC]">
                 <tr>
-                  <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-[#94A3B8] uppercase">Date</th>
+                  <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-[#94A3B8] uppercase">{t('common.date')}</th>
                   <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-[#94A3B8] uppercase">Libellé</th>
                   <th className="px-3 py-2.5 text-right text-[10px] font-semibold text-[#94A3B8] uppercase">Débit</th>
                   <th className="px-3 py-2.5 text-right text-[10px] font-semibold text-[#94A3B8] uppercase">Crédit</th>

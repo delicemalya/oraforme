@@ -320,13 +320,13 @@ export default function RapprochmentsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Date</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.date')}</label>
                 <input type="date" value={addForm.date_operation}
                   onChange={e => setAddForm(f => ({ ...f, date_operation: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Référence</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.reference')}</label>
                 <input value={addForm.reference}
                   onChange={e => setAddForm(f => ({ ...f, reference: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
@@ -353,7 +353,7 @@ export default function RapprochmentsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowAdd(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowAdd(false)} className="px-4 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={addLigne} disabled={saving || !addForm.libelle || (!addForm.debit && !addForm.credit)}
                 className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-teal-600 rounded-xl hover:bg-teal-700 disabled:opacity-50">
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}

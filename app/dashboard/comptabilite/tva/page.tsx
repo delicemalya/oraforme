@@ -198,13 +198,13 @@ export default function TVAPage() {
           <table className="w-full text-[12px]">
             <thead className="bg-[#0F172A] text-white">
               <tr>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold">Mois</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold">{t('common.month')}</th>
                 <th className="px-4 py-3 text-right text-[11px] font-semibold">CA HT</th>
                 <th className="px-4 py-3 text-right text-[11px] font-semibold">TVA Collectée</th>
                 <th className="px-4 py-3 text-right text-[11px] font-semibold">TVA Déductible</th>
                 <th className="px-4 py-3 text-right text-[11px] font-semibold">Solde TVA</th>
                 <th className="px-4 py-3 text-right text-[11px] font-semibold">Contrib. Appui</th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold">Statut</th>
+                <th className="px-4 py-3 text-center text-[11px] font-semibold">{t('common.status')}</th>
                 <th className="px-4 py-3 text-center text-[11px] font-semibold">Détail</th>
               </tr>
             </thead>

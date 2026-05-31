@@ -1,4 +1,5 @@
-﻿'use client'
+'use client'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -37,6 +38,7 @@ function timeAgo(date: string): string {
 }
 
 export default function NotificationsPanel() {
+  const { t } = useLocale()
   const [open, setOpen] = useState(false)
   const [notifs, setNotifs] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
@@ -209,7 +211,7 @@ export default function NotificationsPanel() {
             {/* List */}
             <div className="max-h-[420px] overflow-y-auto">
               {loading ? (
-                <div className="px-4 py-8 text-center text-xs text-[var(--text-secondary)]">Chargement...</div>
+                <div className="px-4 py-8 text-center text-xs text-[var(--text-secondary)]">{t('common.loading')}</div>
               ) : notifs.length === 0 ? (
                 <div className="px-4 py-12 text-center">
                   <Bell size={24} className="text-[var(--text-secondary)] mx-auto mb-3" />

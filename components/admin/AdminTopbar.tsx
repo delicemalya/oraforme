@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useRouter } from 'next/navigation'
 import { Bell, Settings, LogOut, ChevronDown, ExternalLink, Shield, User, Search, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -26,6 +28,7 @@ const QUICK_LINKS = [
 ]
 
 export default function AdminTopbar({ email, timeStr, dateStr }: Props) {
+  const { t } = useLocale()
   const router = useRouter()
   const [avatarOpen, setAvatarOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -199,7 +202,7 @@ export default function AdminTopbar({ email, timeStr, dateStr }: Props) {
             </div>
             <div className="py-2 max-h-72 overflow-y-auto">
               {filtered.length === 0 && (
-                <p className="px-4 py-6 text-center text-[13px] text-gray-400">Aucun résultat</p>
+                <p className="px-4 py-6 text-center text-[13px] text-gray-400">{t('common.noResult')}</p>
               )}
               {filtered.map(l => (
                 <Link
@@ -217,7 +220,7 @@ export default function AdminTopbar({ email, timeStr, dateStr }: Props) {
               <kbd className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono">↵</kbd>
               <span className="text-[11px] text-gray-400">Sélectionner</span>
               <kbd className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono ml-2">Esc</kbd>
-              <span className="text-[11px] text-gray-400">Fermer</span>
+              <span className="text-[11px] text-gray-400">{t('common.close')}</span>
             </div>
           </div>
         </div>

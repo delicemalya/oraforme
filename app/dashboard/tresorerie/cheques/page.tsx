@@ -94,6 +94,7 @@ export default function ChequesPage() {
   }
 
   const handleCreate = async (e: React.FormEvent) => {
+  const { t } = useLocale()
     e.preventDefault()
     if (!tenantId) return
     setSaving(true)
@@ -118,6 +119,7 @@ export default function ChequesPage() {
   }
 
   const handleEncaisser = async (id: string) => {
+  const { t } = useLocale()
     if (!confirm(t('treso.cheques.confirmEncaiss'))) return
     const { error: err } = await supabase.from('cheques')
       .update({ statut: 'encaisse', date_encaissement: new Date().toISOString().slice(0, 10) })
@@ -128,6 +130,7 @@ export default function ChequesPage() {
   }
 
   const handleRejeter = async (id: string) => {
+  const { t } = useLocale()
     if (!confirm(t('treso.cheques.confirmRejet'))) return
     const { error: err } = await supabase.from('cheques')
       .update({ statut: 'rejete' }).eq('id', id).eq('tenant_id', tenantId)

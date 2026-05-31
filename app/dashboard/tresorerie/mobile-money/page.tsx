@@ -52,6 +52,7 @@ export default function MobileMoneyPage() {
   function showToast(msg: string, ok = true) { setToast({ msg, ok }); setTimeout(() => setToast(null), 3000) }
 
   const load = useCallback(async () => {
+  const { t } = useLocale()
     if (!tenantId) return
     setLoading(true)
     const { data, error } = await supabase.from('wallets').select('*').eq('tenant_id', tenantId).order('created_at').limit(200)

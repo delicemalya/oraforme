@@ -126,6 +126,7 @@ export default function DepensesPage() {
   }
 
   async function deleteDepense(id: string) {
+  const { t } = useLocale()
     if (!confirm(t('dep.deleteConfirm'))) return
     setDeleting(id)
     // fn_delete_depense() is SECURITY DEFINER → supprime depense + transaction liée

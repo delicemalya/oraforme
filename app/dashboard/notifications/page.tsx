@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -88,6 +90,7 @@ function NotifCard({
   onRead:   (id: string) => void
   onDelete: (id: string) => void
 }) {
+  const { t } = useLocale()
   const type = TYPE_CFG[notif.type] ?? TYPE_CFG.info
   const prio = PRIORITY_CFG[notif.priority ?? 'normale']
 
@@ -157,7 +160,7 @@ function NotifCard({
           </button>
         )}
         <button onClick={e => { e.preventDefault(); onDelete(notif.id) }}
-          title="Supprimer"
+          title={t('common.delete')}
           className="p-1.5 rounded-lg hover:bg-red-50 text-[#94A3B8] hover:text-[#DC2626] transition-colors">
           <Trash2 size={13} />
         </button>
@@ -178,6 +181,7 @@ function NotifCard({
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function NotificationsPage() {
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
 
   const [notifs,    setNotifs]    = useState<Notification[]>([])
@@ -332,7 +336,7 @@ export default function NotificationsPage() {
       <div className="bg-white rounded-2xl border border-[#E5E7EB] p-4 mb-4 space-y-3">
         {/* Lues / Non lues */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide w-16">Statut</span>
+          <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide w-16">{t('common.status')}</span>
           {(['all', 'unread'] as const).map(f => (
             <button key={f} onClick={() => setFilterRead(f)}
               className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${

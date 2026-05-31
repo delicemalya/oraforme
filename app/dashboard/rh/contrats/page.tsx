@@ -108,6 +108,7 @@ export default function ContratsPage() {
   }
 
   async function handleTerminate(emp: Employe) {
+  const { t } = useLocale()
     if (!confirm(`${t('rh.contrats.confirmTerminate')} ${emp.nom} ?`)) return
     await supabase.from('employes').update({
       statut: 'licencie',
@@ -141,6 +142,7 @@ export default function ContratsPage() {
   }).length
 
   function printContract(emp: Employe) {
+  const { t } = useLocale()
     const w = window.open('', '_blank')
     if (!w) return
     w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/><title>${t('rh.contrats.printTitle')} — ${emp.nom}</title>

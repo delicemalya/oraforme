@@ -94,7 +94,7 @@ export default function Header() {
       {showBack ? (
         <button
           onClick={() => router.push(parentPath)}
-          title="Retour"
+          title={t('common.back')}
           className="flex items-center justify-center w-8 h-8 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors shrink-0"
         >
           <ChevronLeft size={18} />

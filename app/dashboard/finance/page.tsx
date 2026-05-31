@@ -633,7 +633,7 @@ export default function FinancePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-[#F9FAFB] text-[10px] text-[#6B7280] uppercase tracking-wider">
-                    <th className="text-left px-5 py-3 font-medium">Mois</th>
+                    <th className="text-left px-5 py-3 font-medium">{t('common.month')}</th>
                     <th className="text-right px-4 py-3 font-medium">{t('finance.entries')}</th>
                     <th className="text-right px-4 py-3 font-medium">{t('finance.exits')}</th>
                     <th className="text-right px-4 py-3 font-medium">{t('finance.net')}</th>
@@ -899,7 +899,7 @@ export default function FinancePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-[#F9FAFB] text-[10px] text-[#6B7280] uppercase tracking-wider">
-                    <th className="text-left px-5 py-3 font-medium">Mois</th>
+                    <th className="text-left px-5 py-3 font-medium">{t('common.month')}</th>
                     <th className="text-right px-4 py-3 font-medium">CA HT</th>
                     <th className="text-right px-4 py-3 font-medium">{t('finance.vatCollected')} 18%</th>
                     <th className="text-right px-4 py-3 font-medium">Charges HT</th>

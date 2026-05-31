@@ -248,7 +248,7 @@ export default function SanctionsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">Statut</label>
+                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">{t('common.status')}</label>
                   <select
                     value={form.statut}
                     onChange={e => setForm(f => ({ ...f, statut: e.target.value }))}

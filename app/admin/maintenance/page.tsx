@@ -1,9 +1,12 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState } from 'react'
 import { Wrench, AlertTriangle, CheckCircle2, Clock, Zap, Shield, RefreshCw, Database, Globe, Power } from 'lucide-react'
 
 export default function MaintenancePage() {
+  const { t } = useLocale()
   const [maintenanceMode, setMaintenanceMode] = useState(false)
   const [confirming, setConfirming] = useState(false)
 
@@ -91,7 +94,7 @@ export default function MaintenancePage() {
                 <button
                   onClick={() => setConfirming(false)}
                   className="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-[11px] font-bold"
-                >Annuler</button>
+                >{t('common.cancel')}</button>
               </div>
             )}
             {maintenanceMode && (

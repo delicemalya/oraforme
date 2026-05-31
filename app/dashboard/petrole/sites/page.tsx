@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Pencil } from 'lucide-react'
 
@@ -14,6 +16,7 @@ const STATUT_COLORS: Record<string,string> = { actif:'#16A34A', inactif:'#94A3B8
 const fmtDate = (d: string|null) => d ? new Date(d).toLocaleDateString('fr-FR') : '—'
 
 export default function PetroleSitesPage() {
+  const { t } = useLocale()
   const [sites, setSites]       = useState<Site[]>([])
   const [loading, setLoading]   = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -141,7 +144,7 @@ export default function PetroleSitesPage() {
               </select>
             </div>
             <div style={{ display:'flex', gap:10, marginTop:20 }}>
-              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>Annuler</button>
+              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving||!form.nom.trim()} style={{ flex:2, padding:10, border:'none', borderRadius:8, background:'#2563EB', color:'#fff', cursor:'pointer', fontWeight:600, opacity:saving||!form.nom.trim()?.6:1 }}>
                 {saving ? 'Enregistrement…' : editing ? 'Modifier' : 'Créer le site'}
               </button>

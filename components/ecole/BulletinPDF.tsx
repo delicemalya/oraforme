@@ -1,4 +1,4 @@
-﻿import {
+import {
   Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
 

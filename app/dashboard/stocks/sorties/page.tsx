@@ -383,7 +383,7 @@ export default function SortiesPage() {
                             <th className="text-left px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Produit</th>
                             <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Quantité</th>
                             <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Prix unit.</th>
-                            <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">Total</th>
+                            <th className="text-right px-4 py-2.5 text-[10px] font-semibold text-[#64748B]">{t('common.total')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -483,7 +483,7 @@ export default function SortiesPage() {
                         <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">Stock dispo</th>
                         <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">Qté</th>
                         <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">Prix</th>
-                        <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">Total</th>
+                        <th className="text-right px-3 py-2 text-[10px] font-semibold text-[#64748B]">{t('common.total')}</th>
                         <th className="w-8" />
                       </tr>
                     </thead>

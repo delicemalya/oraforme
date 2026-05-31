@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -39,6 +41,7 @@ const PAIE_STATUTS = [
 function getPaie(v: string) { return PAIE_STATUTS.find(s => s.value === v) ?? PAIE_STATUTS[0] }
 
 export default function ConsultationsPage() {
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [consults, setConsults] = useState<Consultation[]>([])
   const [patients, setPatients] = useState<Patient[]>([])
@@ -263,7 +266,7 @@ export default function ConsultationsPage() {
             </div>
             <div className="flex justify-end gap-2 px-5 pb-5">
               <button onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E5E7EB] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+                className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E5E7EB] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving}
                 className="px-4 py-2 text-xs font-semibold bg-[#DC2626] text-white rounded-xl hover:bg-[#B91C1C] disabled:opacity-50">
                 {saving ? 'Enregistrement…' : 'Enregistrer'}

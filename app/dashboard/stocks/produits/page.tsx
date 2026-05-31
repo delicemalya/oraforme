@@ -245,8 +245,8 @@ export default function ProduitsPage() {
           <select value={filterStatut} onChange={e => setFilterStatut(e.target.value)}
             className="border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
             <option value="all">Tous statuts</option>
-            <option value="actif">Actif</option>
-            <option value="inactif">Inactif</option>
+            <option value="actif">{t('common.active')}</option>
+            <option value="inactif">{t('common.inactive')}</option>
             <option value="archive">Archivé</option>
           </select>
           <select value={filterStock} onChange={e => setFilterStock(e.target.value)}
@@ -343,10 +343,10 @@ export default function ProduitsPage() {
                           <button onClick={() => setSelected(p)} className="p-1.5 hover:bg-[#F1F5F9] rounded-lg" title="Voir détail">
                             <Eye size={13} className="text-[#94A3B8]" />
                           </button>
-                          <button onClick={() => openEdit(p)} className="p-1.5 hover:bg-[#F1F5F9] rounded-lg" title="Modifier">
+                          <button onClick={() => openEdit(p)} className="p-1.5 hover:bg-[#F1F5F9] rounded-lg" title={t('common.edit')}>
                             <Edit2 size={13} className="text-[#94A3B8]" />
                           </button>
-                          <button onClick={() => setConfirmDel(p)} className="p-1.5 hover:bg-red-50 rounded-lg" title="Supprimer">
+                          <button onClick={() => setConfirmDel(p)} className="p-1.5 hover:bg-red-50 rounded-lg" title={t('common.delete')}>
                             <Trash2 size={13} className="text-red-400" />
                           </button>
                         </div>
@@ -426,7 +426,7 @@ export default function ProduitsPage() {
             <p className="text-xs text-red-600">Cette action est irréversible. Tous les mouvements liés seront également supprimés.</p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDel(null)} className="flex-1 py-2 text-xs font-medium border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
-              <button onClick={() => deleteProduct(confirmDel)} className="flex-1 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700">Supprimer</button>
+              <button onClick={() => deleteProduct(confirmDel)} className="flex-1 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700">{t('common.delete')}</button>
             </div>
           </div>
         </div>
@@ -463,7 +463,7 @@ export default function ProduitsPage() {
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Catégorie</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.category')}</label>
                 <select value={form.categorie_id} onChange={e => setForm(f => ({ ...f, categorie_id: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
                   <option value="">— Sélectionner —</option>
@@ -518,16 +518,16 @@ export default function ProduitsPage() {
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Statut</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.status')}</label>
                 <select value={form.statut} onChange={e => setForm(f => ({ ...f, statut: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
-                  <option value="actif">Actif</option>
-                  <option value="inactif">Inactif</option>
+                  <option value="actif">{t('common.active')}</option>
+                  <option value="inactif">{t('common.inactive')}</option>
                   <option value="archive">Archivé</option>
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-xs font-medium text-[#374151] mb-1">Description</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.description')}</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={2} placeholder="Description du produit (optionnel)"
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A] resize-none" />

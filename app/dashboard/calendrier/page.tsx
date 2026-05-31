@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -81,6 +83,7 @@ interface EventModalProps {
 }
 
 function EventModal({ date, event, tenantId, onClose, onSaved }: EventModalProps) {
+  const { t } = useLocale()
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     title:       event?.title       ?? '',
@@ -156,7 +159,7 @@ function EventModal({ date, event, tenantId, onClose, onSaved }: EventModalProps
 
           {/* Type */}
           <div>
-            <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">Type</label>
+            <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">{t('common.type')}</label>
             <div className="mt-1 flex flex-wrap gap-1">
               {(Object.keys(EVENT_TYPES) as EventType[]).map(tp => (
                 <button key={tp} type="button" onClick={() => set('type', tp)}
@@ -207,7 +210,7 @@ function EventModal({ date, event, tenantId, onClose, onSaved }: EventModalProps
 
           {/* Description */}
           <div>
-            <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">Description</label>
+            <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">{t('common.description')}</label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)} rows={2}
               className="mt-1 w-full px-3 py-2 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none resize-none" />
           </div>
@@ -290,6 +293,7 @@ function EventDetailPanel({
 // ── CalendrierPage ────────────────────────────────────────────────────────────
 
 export default function CalendrierPage() {
+  const { t } = useLocale()
   const { tenantId } = useTenant()
 
   const today    = new Date()

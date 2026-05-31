@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -25,6 +27,7 @@ const SPECIALITES = [
 ]
 
 export default function MedecinsPage() {
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [medecins, setMedecins] = useState<Medecin[]>([])
   const [loading,  setLoading]  = useState(true)
@@ -103,9 +106,9 @@ export default function MedecinsPage() {
             {m.email && <p className="text-xs text-[#64748B] flex items-center gap-1.5 mb-1"><Mail size={11} />{m.email}</p>}
             {m.numero_ordre && <p className="text-[10px] text-[#94A3B8] mt-1">N° Ordre : {m.numero_ordre}</p>}
             <div className="flex gap-2 mt-3 pt-3 border-t border-[#F1F5F9]">
-              <button onClick={() => openEdit(m)} className="flex-1 text-xs text-[#2563EB] border border-[#BFDBFE] py-1.5 rounded-lg hover:bg-[#EFF6FF]">Modifier</button>
+              <button onClick={() => openEdit(m)} className="flex-1 text-xs text-[#2563EB] border border-[#BFDBFE] py-1.5 rounded-lg hover:bg-[#EFF6FF]">{t('common.edit')}</button>
               <button onClick={() => supabase.from('clinique_medecins').update({ actif: false }).eq('id', m.id).then(() => load())}
-                className="text-xs text-[#94A3B8] border border-[#E5E7EB] px-3 py-1.5 rounded-lg hover:bg-[#F1F5F9]">Archiver</button>
+                className="text-xs text-[#94A3B8] border border-[#E5E7EB] px-3 py-1.5 rounded-lg hover:bg-[#F1F5F9]">{t('common.archive')}</button>
             </div>
           </div>
         ))}
@@ -138,7 +141,7 @@ export default function MedecinsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2 px-5 pb-5">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E5E7EB] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E5E7EB] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving} className="px-4 py-2 text-xs font-semibold bg-[#DC2626] text-white rounded-xl hover:bg-[#B91C1C] disabled:opacity-50">
                 {saving ? 'Enregistrement…' : 'Enregistrer'}
               </button>

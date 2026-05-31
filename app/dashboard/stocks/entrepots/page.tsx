@@ -376,7 +376,7 @@ export default function EntrepotsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-[#374151] mb-1">Adresse</label>
+                <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('common.address')}</label>
                 <input value={form.adresse}
                   onChange={e => setForm(f => ({ ...f, adresse: e.target.value }))}
                   placeholder="123 Rue du Commerce"
@@ -391,7 +391,7 @@ export default function EntrepotsPage() {
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">Téléphone</label>
+                  <label className="block text-[11px] font-semibold text-[#374151] mb-1">{t('common.phone')}</label>
                   <input value={form.telephone}
                     onChange={e => setForm(f => ({ ...f, telephone: e.target.value }))}
                     placeholder="+243 …"

@@ -303,7 +303,7 @@ export default function MultiUnitesPage() {
             </div>
             <div className="flex justify-end gap-2 px-5 pb-5">
               <button onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+                className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving}
                 className="px-4 py-2 text-xs font-semibold bg-[#16A34A] text-white rounded-xl hover:bg-[#15803D] disabled:opacity-50">
                 {saving ? 'Enregistrement…' : editItem ? 'Modifier' : 'Créer'}

@@ -372,10 +372,10 @@ export default function EncaissementsPage() {
           <select value={filterStatut} onChange={e => setFilterStatut(e.target.value)}
             className="border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0891B2]">
             <option value="all">Tous statuts</option>
-            <option value="en_attente">En attente</option>
+            <option value="en_attente">{t('common.pending')}</option>
             <option value="validé">Validé</option>
-            <option value="rejeté">Rejeté</option>
-            <option value="annulé">Annulé</option>
+            <option value="rejeté">{t('common.rejected')}</option>
+            <option value="annulé">{t('common.cancelled')}</option>
           </select>
         </div>
         <div className="flex gap-2 mt-2">
@@ -541,7 +541,7 @@ export default function EncaissementsPage() {
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Catégorie</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.category')}</label>
                 <select value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]">
                   {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -576,7 +576,7 @@ export default function EncaissementsPage() {
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Référence</label>
+                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.reference')}</label>
                 <input value={form.reference} onChange={e => setForm(f => ({ ...f, reference: e.target.value }))}
                   placeholder="N° facture, chèque, etc."
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2]" />

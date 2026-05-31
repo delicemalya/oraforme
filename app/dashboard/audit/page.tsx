@@ -176,7 +176,7 @@ function ExpandableRow({ entry, fmtDate }: { entry: GlobalEntry; fmtDate: (s: st
             )}
             {entry.details && !entry.ancien_valeur && !entry.nouvelle_valeur && (
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wide mb-1">Détails</p>
+                <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wide mb-1">{t('common.details')}</p>
                 <pre className="text-[10px] text-[#374151] bg-white border border-[#E2E8F0] rounded-xl p-3 overflow-x-auto whitespace-pre-wrap max-h-40">
                   {JSON.stringify(entry.details, null, 2)}
                 </pre>
@@ -352,6 +352,7 @@ export default function AuditPage() {
 
   // ── CSV Export ─────────────────────────────────────────────────────────────
   const exportCSV = () => {
+  const { t } = useLocale()
     const rows = [[t('audit.colModule'), t('audit.colAction'), t('audit.colEntite'), t('audit.colNiveau'), t('audit.colUser'), t('audit.colDate')]]
     entries.forEach(e => {
       rows.push([

@@ -315,8 +315,8 @@ function getSectorLabel(secteur: string): string {
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
+  const { t } = useLocale()
   const pathname = usePathname()
-  const { t }    = useLocale()
   const { tenant, loading: tenantLoading } = useTenantContext()
 
   const secteur      = tenant?.secteur    ?? null

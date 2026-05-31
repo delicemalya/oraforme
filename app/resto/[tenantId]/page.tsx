@@ -1,4 +1,5 @@
-﻿'use client'
+'use client'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -16,6 +17,7 @@ function fmt(n: number) {
 }
 
 export default function PublicOrderPage() {
+  const { t } = useLocale()
   const { tenantId } = useParams<{ tenantId: string }>()
   const searchParams  = useSearchParams()
   const tableFromQR   = searchParams.get('table') ?? ''
@@ -365,7 +367,7 @@ export default function PublicOrderPage() {
 
                 {/* Total + submit */}
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-semibold text-white">Total</span>
+                  <span className="text-sm font-semibold text-white">{t('common.total')}</span>
                   <span className="text-lg font-bold text-[#DC2626]">{fmt(total)}</span>
                 </div>
 

@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -28,6 +30,7 @@ const FORMES = ['comprime','gelule','sirop','injectable','pommade','gouttes','sp
 const BLANK = { nom_commercial: '', dci: '', forme: 'comprime', dosage: '', laboratoire: '', prix_achat: '', prix_vente: '', stock_actuel: '0', stock_min: '5', date_expiration: '', ordonnance_requise: false, emplacement: '' }
 
 export default function MedicamentsPage() {
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [meds,    setMeds]    = useState<Medicament[]>([])
   const [loading, setLoading] = useState(true)
@@ -170,11 +173,11 @@ export default function MedicamentsPage() {
                       <td className="px-4 py-3">
                         {m.ordonnance_requise
                           ? <span className="text-[10px] font-semibold bg-[#FEF2F2] text-[#DC2626] px-2 py-0.5 rounded-full">Requise</span>
-                          : <span className="text-[10px] text-[#94A3B8]">Non</span>}
+                          : <span className="text-[10px] text-[#94A3B8]">{t('common.no')}</span>}
                       </td>
                       <td className="px-4 py-3">
                         <button onClick={() => openEdit(m)}
-                          className="text-xs text-[#2563EB] border border-[#BFDBFE] px-2.5 py-1 rounded-lg hover:bg-[#EFF6FF]">Modifier</button>
+                          className="text-xs text-[#2563EB] border border-[#BFDBFE] px-2.5 py-1 rounded-lg hover:bg-[#EFF6FF]">{t('common.edit')}</button>
                       </td>
                     </tr>
                   )
@@ -261,7 +264,7 @@ export default function MedicamentsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2 px-5 pb-5">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E5E7EB] rounded-xl hover:bg-[#F8FAFC]">Annuler</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-xs font-semibold text-[#64748B] border border-[#E5E7EB] rounded-xl hover:bg-[#F8FAFC]">{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving} className="px-4 py-2 text-xs font-semibold bg-[#DC2626] text-white rounded-xl hover:bg-[#B91C1C] disabled:opacity-50">
                 {saving ? 'Enregistrement…' : 'Enregistrer'}
               </button>

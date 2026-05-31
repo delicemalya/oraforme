@@ -103,6 +103,7 @@ export default function BalancePage() {
 
   /* CSV */
   function exportCSV() {
+  const { t } = useLocale()
     const rows = balanceLines.map(l => ({
       [t('compta.balance.colCompte')]: l.number,
       [t('compta.balance.colIntitule')]: l.name,

@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Search, Pencil, CreditCard } from 'lucide-react'
 
@@ -14,6 +16,7 @@ const STATUT_COLORS: Record<string,string> = { actif:'#16A34A', suspendu:'#F59E0
 const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency', currency:'XAF', maximumFractionDigits:0 }).format(v)
 
 export default function BanqueClientsPage() {
+  const { t } = useLocale()
   const [membres, setMembres]   = useState<Membre[]>([])
   const [loading, setLoading]   = useState(true)
   const [search, setSearch]     = useState('')
@@ -143,7 +146,7 @@ export default function BanqueClientsPage() {
               </select>
             </div>
             <div style={{ display:'flex', gap:10, marginTop:20 }}>
-              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>Annuler</button>
+              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving || !form.nom.trim() || !form.prenom.trim()} style={{ flex:2, padding:10, border:'none', borderRadius:8, background:'#2563EB', color:'#fff', cursor:'pointer', fontWeight:600, opacity: saving||!form.nom.trim()||!form.prenom.trim() ? .6 : 1 }}>
                 {saving ? 'Enregistrement…' : 'Créer le compte'}
               </button>

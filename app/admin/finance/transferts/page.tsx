@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import {
   RefreshCw, Plus, ArrowRight, Loader2, X, CheckCircle2, XCircle,
@@ -65,6 +67,7 @@ const QUICK_FLOWS: Array<{ label: string; source: CompteType; dest: CompteType; 
 ]
 
 export default function TransfertsPage() {
+  const { t } = useLocale()
   const [transferts, setTransferts] = useState<Transfert[]>([])
   const [loading,    setLoading]    = useState(true)
   const [showForm,   setShowForm]   = useState(false)
@@ -425,7 +428,7 @@ export default function TransfertsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Référence</label>
+                  <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">{t('common.reference')}</label>
                   <input
                     value={form.reference}
                     onChange={e => setForm(f => ({ ...f, reference: e.target.value }))}

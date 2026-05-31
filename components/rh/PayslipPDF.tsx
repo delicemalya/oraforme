@@ -1,4 +1,4 @@
-﻿import {
+import {
   Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
 
@@ -168,7 +168,7 @@ export function PayslipPDF({ data }: { data: PayslipData }) {
         <View style={s.tableHead}>
           <Text style={s.thLabel}>Désignation</Text>
           <Text style={s.thBase}>Base / Taux</Text>
-          <Text style={s.thMontant}>Montant</Text>
+          <Text style={s.thMontant}>{'Montant'}</Text>
         </View>
 
         {/* Salaire de base */}

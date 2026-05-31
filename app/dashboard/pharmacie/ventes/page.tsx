@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -48,6 +50,7 @@ const MODE_LABELS: Record<string, string> = {
 }
 
 export default function PharmacieVentesPage() {
+  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [medicaments, setMedicaments] = useState<Medicament[]>([])
   const [search, setSearch] = useState('')
@@ -326,7 +329,7 @@ export default function PharmacieVentesPage() {
 
               <div className="bg-[#F8FAFC] rounded-xl p-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-semibold text-[#64748B]">Total</span>
+                  <span className="text-sm font-semibold text-[#64748B]">{t('common.total')}</span>
                   <span className="text-xl font-bold text-[#0F172A]">{fmtFCFA(total)}</span>
                 </div>
               </div>

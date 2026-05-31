@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X } from 'lucide-react'
 
@@ -17,6 +19,7 @@ const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency'
 const fmtDate = (d: string) => new Date(d).toLocaleDateString('fr-FR')
 
 export default function BanqueOperationsPage() {
+  const { t } = useLocale()
   const [operations, setOperations] = useState<Operation[]>([])
   const [membres, setMembres]       = useState<Membre[]>([])
   const [loading, setLoading]       = useState(true)
@@ -156,7 +159,7 @@ export default function BanqueOperationsPage() {
               </div>
             ))}
             <div style={{ display:'flex', gap:10, marginTop:20 }}>
-              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>Annuler</button>
+              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving||!form.membre_id||!form.montant} style={{ flex:2, padding:10, border:'none', borderRadius:8, background:'#2563EB', color:'#fff', cursor:'pointer', fontWeight:600, opacity:saving||!form.membre_id||!form.montant?0.6:1 }}>
                 {saving ? 'Enregistrement…' : 'Enregistrer'}
               </button>

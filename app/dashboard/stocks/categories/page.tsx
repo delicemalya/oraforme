@@ -516,7 +516,7 @@ export default function CategoriesPage() {
 
               {/* Preview */}
               <div className="border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
-                <p className="text-[10px] text-[#94A3B8] mb-2">Aperçu</p>
+                <p className="text-[10px] text-[#94A3B8] mb-2">{t('common.preview')}</p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
                     style={{ background: form.couleur + '20' }}>

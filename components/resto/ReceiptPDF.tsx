@@ -1,4 +1,4 @@
-﻿import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
+import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
 
 export interface ReceiptData {
   numero_recu: string
@@ -113,7 +113,7 @@ export function ReceiptPDF({ data }: { data: ReceiptData }) {
         </View>
         {data.reference && (
           <View style={s.row}>
-            <Text style={s.gray}>Référence</Text>
+            <Text style={s.gray}>{'Référence'}</Text>
             <Text>{data.reference}</Text>
           </View>
         )}

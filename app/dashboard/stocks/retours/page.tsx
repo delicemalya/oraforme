@@ -283,14 +283,14 @@ export default function RetoursPage() {
                 <thead>
                   <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
                     <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Numéro</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Type</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('common.type')}</th>
                     <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Produit</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Qté</th>
                     <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Motif</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Valeur</th>
-                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Statut</th>
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Date</th>
-                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">Actions</th>
+                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('common.status')}</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('common.date')}</th>
+                    <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>

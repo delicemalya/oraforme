@@ -1,4 +1,5 @@
-﻿'use client'
+'use client'
+import { useLocale } from '@/lib/hooks/useLocale'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -6,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { MailCheck, ArrowLeft } from 'lucide-react'
 
 export default function ForgotPasswordPage() {
+  const { t } = useLocale()
   const [email,   setEmail]   = useState('')
   const [sent,    setSent]    = useState(false)
   const [error,   setError]   = useState('')
@@ -71,7 +73,7 @@ export default function ForgotPasswordPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-[var(--text-secondary)]">Email</label>
+              <label className="text-sm font-medium text-[var(--text-secondary)]">{t('common.email')}</label>
               <input
                 type="email"
                 placeholder="vous@entreprise.com"

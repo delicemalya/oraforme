@@ -165,6 +165,7 @@ export default function RolesPage() {
   }
 
   async function del(r: Role) {
+  const { t } = useLocale()
     if (!confirm(`${t('common.delete')} "${r.name}" ?`)) return
     await supabase.from('roles').delete().eq('id', r.id)
     if (selRole?.id === r.id) { setSelRole(null); setPerms({}) }
@@ -177,6 +178,7 @@ export default function RolesPage() {
   }
 
   async function defaults() {
+  const { t } = useLocale()
     if (!tenantId || !confirm(t('roles.createConfirm'))) return
     setSaving(true)
     await supabase.rpc('fn_create_default_roles', { p_tenant_id: tenantId })

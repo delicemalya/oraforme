@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useCallback } from 'react'
 import {
   TrendingUp, TrendingDown, Wallet, Users, FileText,
@@ -27,6 +29,7 @@ interface Props {
 }
 
 export default function BiDgClient({ initial, year: initialYear }: Props) {
+  const { t } = useLocale()
   const [data, setData]     = useState<DgInsights>(initial)
   const [tab, setTab]       = useState<Tab>('apercu')
   const [year, setYear]     = useState(initialYear)
@@ -312,7 +315,7 @@ export default function BiDgClient({ initial, year: initialYear }: Props) {
               <table className="w-full text-[12px]">
                 <thead>
                   <tr className="bg-[#F9FAFB] text-[10px] text-[#6B7280] uppercase tracking-wider border-b border-[#F3F4F6]">
-                    <th className="text-left px-5 py-3 font-medium">Mois</th>
+                    <th className="text-left px-5 py-3 font-medium">{t('common.month')}</th>
                     <th className="text-right px-4 py-3 font-medium">Entrées</th>
                     <th className="text-right px-4 py-3 font-medium">Sorties</th>
                     <th className="text-right px-5 py-3 font-medium">Résultat</th>

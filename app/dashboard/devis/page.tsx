@@ -607,7 +607,7 @@ export default function DevisPage() {
                             icon={<Eye size={13} />}
                           />
                           <ActionBtn
-                            title="Modifier"
+                            title={t('common.edit')}
                             onClick={() => openEdit(d)}
                             icon={<Edit3 size={13} />}
                           />
@@ -636,7 +636,7 @@ export default function DevisPage() {
                           )}
                           {canDelete && (
                             <ActionBtn
-                              title="Supprimer"
+                              title={t('common.delete')}
                               onClick={() => setConfirmDelete(d.id)}
                               icon={<Trash2 size={13} />}
                               hoverClass="hover:text-red-400"

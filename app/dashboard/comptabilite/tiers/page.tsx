@@ -372,7 +372,7 @@ export default function TiersPage() {
             <div className="p-6 space-y-4">
               {/* Type */}
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Type</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('common.type')}</label>
                 <div className="flex gap-2">
                   {['client','fournisseur','partenaire'].map(tp => (
                     <button key={tp}
@@ -425,7 +425,7 @@ export default function TiersPage() {
 
               {/* Adresse */}
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Adresse</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1">{t('common.address')}</label>
                 <textarea value={form.adresse || ''} rows={2}
                   onChange={e => setForm(f => ({ ...f, adresse: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 resize-none" />

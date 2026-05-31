@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Pencil, Trash2, ChevronRight } from 'lucide-react'
@@ -19,6 +21,7 @@ const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style: 'currency
 const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString('fr-FR') : '—'
 
 export default function BTPChantiersPage() {
+  const { t } = useLocale()
   const router = useRouter()
   const [chantiers, setChantiers] = useState<Chantier[]>([])
   const [loading, setLoading]     = useState(true)
@@ -175,7 +178,7 @@ export default function BTPChantiersPage() {
               </div>
             ))}
             <div style={{ display:'flex', gap:10, marginTop:20 }}>
-              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:'10px', border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer', fontSize:14 }}>Annuler</button>
+              <button onClick={() => setShowForm(false)} style={{ flex:1, padding:'10px', border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer', fontSize:14 }}>{t('common.cancel')}</button>
               <button onClick={handleSave} disabled={saving || !form.nom.trim()} style={{ flex:2, padding:'10px', border:'none', borderRadius:8, background:'#2563EB', color:'#fff', cursor:'pointer', fontWeight:600, fontSize:14, opacity: saving||!form.nom.trim() ? .6 : 1 }}>
                 {saving ? 'Enregistrement…' : editing ? 'Modifier' : 'Créer le chantier'}
               </button>

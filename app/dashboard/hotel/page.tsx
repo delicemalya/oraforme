@@ -96,6 +96,7 @@ export default function HotelPage() {
   const montantTotal = selectedChambre ? nuits * selectedChambre.prix_nuit : 0
 
   const handleSaveChambre = async () => {
+  const { t } = useLocale()
     if (!tenantId || !cForm.numero || !cForm.prix_nuit) { setError(t('hotel.errorNumAndPrice')); return }
     setSaving(true); setError('')
     try {
@@ -111,6 +112,7 @@ export default function HotelPage() {
   }
 
   const handleSaveResa = async () => {
+  const { t } = useLocale()
     if (!tenantId || !rForm.client_nom || !rForm.date_arrivee || !rForm.date_depart) {
       setError(t('hotel.errorClientAndDates')); return
     }

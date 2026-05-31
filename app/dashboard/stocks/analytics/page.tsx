@@ -315,7 +315,7 @@ export default function StocksAnalyticsPage() {
                 Top produits — entrées (valeur)
               </h3>
               {topEntrees.length === 0 ? (
-                <p className="text-xs text-[#94A3B8] text-center py-4">Aucune donnée</p>
+                <p className="text-xs text-[#94A3B8] text-center py-4">{t('common.noData')}</p>
               ) : (
                 <div className="space-y-3">
                   {topEntrees.map((p, i) => (
@@ -344,7 +344,7 @@ export default function StocksAnalyticsPage() {
                 Top produits — sorties (valeur)
               </h3>
               {topSorties.length === 0 ? (
-                <p className="text-xs text-[#94A3B8] text-center py-4">Aucune donnée</p>
+                <p className="text-xs text-[#94A3B8] text-center py-4">{t('common.noData')}</p>
               ) : (
                 <div className="space-y-3">
                   {topSorties.map((p, i) => (
@@ -376,7 +376,7 @@ export default function StocksAnalyticsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-[#F8FAFC]">
-                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">Mois</th>
+                    <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#64748B]">{t('common.month')}</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Entrées (qté)</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Entrées (valeur)</th>
                     <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#64748B]">Sorties (qté)</th>
@@ -405,7 +405,7 @@ export default function StocksAnalyticsPage() {
                 </tbody>
                 <tfoot>
                   <tr className="border-t border-[#E2E8F0] bg-[#F8FAFC] font-bold">
-                    <td className="px-4 py-3 text-xs text-[#374151]">Total</td>
+                    <td className="px-4 py-3 text-xs text-[#374151]">{t('common.total')}</td>
                     <td className="px-4 py-3 text-right text-xs text-[#16A34A]">
                       +{data.reduce((s, d) => s + d.entrees_qty, 0).toLocaleString()}
                     </td>

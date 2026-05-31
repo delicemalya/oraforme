@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
+
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -37,6 +39,7 @@ const EMPTY_FORM: PaymentForm = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AbonnementPage() {
+  const { t } = useLocale()
   const { tenantId, loading: authLoading } = useTenant()
 
   const [sub,      setSub]      = useState<BillingSubscription | null>(null)
@@ -195,7 +198,7 @@ export default function AbonnementPage() {
             </div>
             {/* Montant */}
             <div>
-              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-1">Montant</p>
+              <p className="text-[11px] text-gray-400 uppercase tracking-wide mb-1">{t('common.amount')}</p>
               <p className="text-[17px] font-bold text-gray-900">{fmtFCFA(sub.montant_actuel)}</p>
               <p className="text-xs text-gray-500 mt-0.5">
                 par {sub.periode === 'annuel' ? 'an' : 'mois'}

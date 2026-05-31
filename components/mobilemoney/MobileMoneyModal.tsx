@@ -1,3 +1,4 @@
+import { useLocale } from '@/lib/hooks/useLocale'
 ﻿'use client'
 
 import { useState } from 'react'
@@ -22,6 +23,7 @@ const OPERATORS: { id: Operator; name: string; color: string; prefix: string }[]
 ]
 
 export default function MobileMoneyModal({ open, onClose, montant, reference }: MobileMoneyModalProps) {
+  const { t } = useLocale()
   const [step, setStep] = useState<'form' | 'confirm' | 'done'>('form')
   const [operator, setOperator] = useState<Operator>('airtel')
   const [phone, setPhone] = useState('')
@@ -176,7 +178,7 @@ export default function MobileMoneyModal({ open, onClose, montant, reference }: 
                       </div>
                       <div className="h-px bg-[#30363D]" />
                       <div className="flex justify-between">
-                        <span className="text-[var(--text-secondary)] text-sm">Montant</span>
+                        <span className="text-[var(--text-secondary)] text-sm">{t('common.amount')}</span>
                         <span className="text-[#DC2626] font-bold text-lg">
                           {new Intl.NumberFormat('fr-FR').format(Number(amount))} FCFA
                         </span>

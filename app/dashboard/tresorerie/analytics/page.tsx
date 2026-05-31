@@ -294,7 +294,7 @@ export default function AnalyticsPage() {
               <h3 className="text-sm font-bold text-[#0F172A] mb-3">Top catégories — Entrées</h3>
               <div className="space-y-2">
                 {categoriesIn.length === 0 ? (
-                  <p className="text-xs text-[#94A3B8] text-center py-4">Aucune donnée</p>
+                  <p className="text-xs text-[#94A3B8] text-center py-4">{t('common.noData')}</p>
                 ) : categoriesIn.map((c, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-xs mb-0.5">
@@ -314,7 +314,7 @@ export default function AnalyticsPage() {
               <h3 className="text-sm font-bold text-[#0F172A] mb-3">Top catégories — Sorties</h3>
               <div className="space-y-2">
                 {categoriesOut.length === 0 ? (
-                  <p className="text-xs text-[#94A3B8] text-center py-4">Aucune donnée</p>
+                  <p className="text-xs text-[#94A3B8] text-center py-4">{t('common.noData')}</p>
                 ) : categoriesOut.map((c, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-xs mb-0.5">

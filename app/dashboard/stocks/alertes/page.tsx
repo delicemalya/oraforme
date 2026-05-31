@@ -150,6 +150,7 @@ export default function AlertesStocksPage() {
   }
 
   const markAllLues = () => {
+  const { t } = useLocale()
     setAlertes(als => als.map(a => ({ ...a, lue: true })))
   }
 

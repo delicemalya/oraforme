@@ -1,4 +1,4 @@
-﻿import { supabaseAdmin } from '@/lib/supabase-server'
+import { supabaseAdmin } from '@/lib/supabase-server'
 import { fmtFCFA } from '@/lib/admin-config'
 import { Activity, TrendingDown, ArrowUpRight, ArrowDownRight, AlertTriangle, CheckCircle2 } from 'lucide-react'
 

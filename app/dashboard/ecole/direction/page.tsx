@@ -291,6 +291,7 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
   }
 
   async function del(id: string) {
+  const { t } = useLocale()
     await supabase.from('planning_ecole').delete().eq('id', id); load()
   }
 

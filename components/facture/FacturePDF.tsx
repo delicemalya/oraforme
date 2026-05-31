@@ -1,4 +1,4 @@
-﻿import {
+import {
   Document, Page, View, Text, Image, StyleSheet,
 } from '@react-pdf/renderer'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
@@ -189,7 +189,7 @@ export function FacturePDF({ facture, config }: { facture: FacturePDFData; confi
           <View style={s.infoBox}>
             <Text style={s.infoLabel}>Invoice Number</Text>
             <Text style={s.infoValue}>{facture.invoice_number}</Text>
-            <Text style={s.infoLabel}>Date</Text>
+            <Text style={s.infoLabel}>{'Date'}</Text>
             <Text style={[s.infoValue, { marginBottom: facture.due_date ? 12 : 0 }]}>{fmtDate(facture.date)}</Text>
             {facture.due_date && (
               <>
@@ -206,7 +206,7 @@ export function FacturePDF({ facture, config }: { facture: FacturePDFData; confi
           <Text style={s.thDesc}>Item Description</Text>
           <Text style={s.thPrice}>Price</Text>
           <Text style={s.thQty}>Qty</Text>
-          <Text style={s.thTotal}>Total</Text>
+          <Text style={s.thTotal}>{'Total'}</Text>
         </View>
         {facture.lignes.map((l, i) => (
           <View key={i} style={i % 2 === 0 ? s.rowEven : s.rowOdd}>

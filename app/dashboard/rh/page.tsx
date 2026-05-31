@@ -241,6 +241,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   }
 
   async function handleDelete(id: string) {
+  const { t } = useLocale()
     if (!confirm(t('rh.deletePermanent'))) return
     await supabase.from('employes').delete().eq('id', id)
     setSelected(null)

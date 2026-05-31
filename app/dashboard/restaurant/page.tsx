@@ -154,6 +154,7 @@ export default function RestaurantPage() {
   const sousTotal = panier.reduce((s, x) => s + x.quantite * x.prix, 0)
 
   async function passerCommande() {
+  const { t } = useLocale()
     if (panier.length === 0) return
     setSavingCmd(true)
     try {
@@ -225,6 +226,7 @@ export default function RestaurantPage() {
   }
 
   async function saveAchat() {
+  const { t } = useLocale()
     if (!achatForm.fournisseur_nom.trim() || !achatForm.lignes.length) return
     setSavingAchat(true)
     try {
@@ -252,6 +254,7 @@ export default function RestaurantPage() {
   // ── ANNULATION COMMANDE ───────────────────────────────────────────────────────
 
   async function annulerCommande(id: string) {
+  const { t } = useLocale()
     await supabase.from('resto_commandes').update({ statut: 'annule' }).eq('id', id)
     setCommandes(c => c.map(x => x.id === id ? { ...x, statut: 'annule' as StatutCmd } : x))
     showToast(t('resto.cancelOrder'))
@@ -341,6 +344,7 @@ export default function RestaurantPage() {
   })
 
   async function cloturerCaisse() {
+  const { t } = useLocale()
     if (!tenantId) return
     const fiscal = calculerTVACongo(caDuJour)
     const esp = cmdsLivrees.filter(c => ['especes','Espèces'].includes(c.paiement??'')).reduce((s,c)=>s+c.total,0)
