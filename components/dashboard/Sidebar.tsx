@@ -172,7 +172,7 @@ const SIDEBAR_GROUPS = [
   { id: 'finance_ops',  labelKey: 'nav.finance_ops', icon: Calculator,   moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   // OPÉRATIONS — RH, CRM, Stock, Achats (fusion de 3 groupes)
   { id: 'operations',   labelKey: 'nav.operations',  icon: Users,        moduleIds: ['rh', 'roles', 'crm', 'stock', 'achats'] },
-  // OUTILS & IA — GED, BizBot, Calendrier, Tâches (fusion de 2 groupes)
+  // OUTILS & IA — GED, MIAA+, Calendrier, Tâches (fusion de 2 groupes)
   { id: 'outils',       labelKey: 'nav.outils',      icon: FolderOpen,   moduleIds: ['ged', 'bizbot', 'calendrier', 'taches'] },
   // PARAMÈTRES — compte, abonnement, workflows, API, config
   { id: 'params',       labelKey: 'nav.params',      icon: Settings,     moduleIds: ['profil', 'abonnement', 'workflows', 'api-keys', 'parametres'] },
