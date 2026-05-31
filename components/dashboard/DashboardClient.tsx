@@ -68,7 +68,8 @@ interface HeroCardProps {
 const ACCENT_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6']
 
 function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: HeroCardProps) {
-  const accent = ACCENT_COLORS[i % ACCENT_COLORS.length]
+  const { t }   = useLocale()
+  const accent  = ACCENT_COLORS[i % ACCENT_COLORS.length]
   // Fake progress from 40–90% so cards feel alive even with no data
   const progress = 40 + (i * 17 + 23) % 51
 
@@ -140,7 +141,7 @@ function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: Hero
         />
       </div>
       <div className="flex items-center justify-between mt-1">
-        <span style={{ fontSize: 9, color: '#94A3B8' }}>vs mois dernier</span>
+        <span style={{ fontSize: 9, color: '#94A3B8' }}>{t('dash.vsMoisDernier')}</span>
         <span style={{ fontSize: 9, fontWeight: 600, color: accent }}>{progress}%</span>
       </div>
     </motion.div>
@@ -174,10 +175,10 @@ function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending
         <div>
           <p style={{ fontSize: 9, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{t('common.pending')}</p>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{fmt(pendingAmt)} F</p>
-          <p style={{ fontSize: 10, color: '#94A3B8' }}>{pending} dossier{pending !== 1 ? 's' : ''}</p>
+          <p style={{ fontSize: 10, color: '#94A3B8' }}>{pending} {pending !== 1 ? t('dash.dossiers') : t('dash.dossier')}</p>
         </div>
         <div>
-          <p style={{ fontSize: 9, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>Statut</p>
+          <p style={{ fontSize: 9, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{t('dash.statut')}</p>
           <div style={{ height: 4, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden', marginTop: 6 }}>
             <div style={{ height: '100%', width: isPositive ? '72%' : '28%', background: isPositive ? '#16A34A' : '#DC2626', borderRadius: 2 }} />
           </div>
@@ -208,7 +209,7 @@ function QuickLinksCard({ secteur }: { secteur: string | null; modules: string[]
       <div className="flex items-center gap-2 mb-3">
         <Zap size={13} style={{ color: '#DC2626' }} />
         <p style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{t('dash.quickLinks')}</p>
-        <span style={{ fontSize: 10, color: '#94A3B8', marginLeft: 2 }}>Actions fréquentes</span>
+        <span style={{ fontSize: 10, color: '#94A3B8', marginLeft: 2 }}>{t('dash.actionsFrequentes')}</span>
       </div>
       <div className="grid grid-cols-2 gap-2">
         {actions.map((a, i) => {
@@ -541,7 +542,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     setGreetingKey(h < 12 ? 'dash.greetingMorning' : h < 18 ? 'dash.greetingAfternoon' : 'dash.greetingEvening')
   }, [])
 
-  const displayName      = userName || 'Admin'
+  const displayName      = userName || tenant.nom_entreprise || 'Admin'
   const soldeTresorerie  = kpis.revenuMois - alerts.pendingAmount * 0.3
 
   const isDaac = secteur === 'ecole' && ecoleRole === 'DAAC' && daacKpis

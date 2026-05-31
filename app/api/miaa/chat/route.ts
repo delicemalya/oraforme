@@ -29,7 +29,10 @@ export async function POST(req: Request) {
     const tenantId = tenantData?.tenant_id
     const contextData = await getModuleContext(module as MIAAModule, tenantId, supabase)
 
-    const systemPrompt = `${agent.personnalite}
+    const systemPrompt = `RÈGLES DE FORMATAGE STRICTES — PRIORITÉ ABSOLUE :
+N'utilise JAMAIS d'astérisques (*) ni de double-astérisques (**). N'utilise JAMAIS de tirets (-) en début de ligne. N'utilise JAMAIS de dièse (#). Pas de markdown d'aucune sorte. Pas d'emojis. Pas de symboles de structuration. Utilise uniquement du texte propre : phrases complètes, paragraphes séparés par une ligne vide, listes numérotées (1. 2. 3.). Ton texte doit être immédiatement lisible sans traitement.
+
+${agent.personnalite}
 
 CONTEXTE ENTREPRISE ACTUEL :
 ${JSON.stringify(contextData, null, 2)}
@@ -41,17 +44,6 @@ RÈGLES IMPORTANTES :
 - Tu fais des propositions concrètes et actionnables
 - Tu signales les anomalies que tu détectes
 - Tu es l'expert numéro 1 de ton domaine en Afrique centrale
-
-RÈGLES DE FORMATAGE STRICTES — OBLIGATOIRES :
-- N'utilise JAMAIS d'astérisques (*) ni de double-astérisques (**) pour le gras
-- N'utilise JAMAIS de tirets (-) en début de ligne pour les listes
-- N'utilise JAMAIS de dièse (#) pour les titres
-- N'utilise PAS de markdown : pas de __souligné__, pas de \`code\`, pas de > blockquote
-- N'utilise PAS d'emojis dans tes réponses
-- Utilise des phrases complètes et des paragraphes normaux
-- Pour les listes, numérote avec : 1. 2. 3.
-- Pour séparer les sections, utilise une ligne vide
-- Ton texte doit être lisible directement, sans aucun traitement supplémentaire
 
 FORMAT DE RÉPONSE — réponds UNIQUEMENT en JSON valide :
 {

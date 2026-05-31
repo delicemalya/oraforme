@@ -1164,6 +1164,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     'dash.newInscription':     'Nouvelle inscription',
     'dash.lastFactures':       'dernières factures',
     'dash.academicView':       'Vue académique — accès financier restreint',
+    'dash.paymentsPaid':       'Paiements reçus',
+    'dash.paymentsPending':    'Paiements en attente',
+    'dash.vsMoisDernier':      'vs mois dernier',
+    'dash.dossier':            'dossier',
+    'dash.dossiers':           'dossiers',
+    'dash.statut':             'Statut',
+    'dash.actionsFrequentes':  'Actions fréquentes',
 
     // Rôles école — labels complets
     'roles.daac_full':         'Direction des Affaires Académiques',
@@ -4351,6 +4358,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     'dash.newInscription':     'New enrollment',
     'dash.lastFactures':       'latest invoices',
     'dash.academicView':       'Academic view — financial access restricted',
+    'dash.paymentsPaid':       'Received payments',
+    'dash.paymentsPending':    'Pending payments',
+    'dash.vsMoisDernier':      'vs last month',
+    'dash.dossier':            'file',
+    'dash.dossiers':           'files',
+    'dash.statut':             'Status',
+    'dash.actionsFrequentes':  'Common actions',
 
     // Roles école (en)
     'roles.daac_full':         'Academic Affairs Division',
