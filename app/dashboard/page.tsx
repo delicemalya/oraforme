@@ -228,6 +228,7 @@ export default async function DashboardPage() {
           modules_actifs: modulesActifs,
           plan:           tenant?.plan ?? 'starter',
         },
+        tenantId: tid,
         kpis:          { revenuMois, nbEmployes, nbArticles, nbAlertes },
         alerts:        { pendingCount: nbPending, pendingAmount, lowStockCount: nbStockZero },
         recentActivity,

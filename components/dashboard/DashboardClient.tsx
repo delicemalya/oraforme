@@ -17,9 +17,11 @@ import ModuleChart from '@/components/dashboard/ModuleChart'
 import ActivityTimeline, { type ActivityItem } from '@/components/ui/ActivityTimeline'
 import { useLocale } from '@/lib/hooks/useLocale'
 import GeoDetectionBanner from '@/components/ui/GeoDetectionBanner'
+import { getTenantBrandColor } from '@/lib/utils'
 
 export interface DashboardData {
   tenant: { nom_entreprise: string; modules_actifs: string[]; plan: string }
+  tenantId: string
   kpis: { revenuMois: number; nbEmployes: number; nbArticles: number; nbAlertes: number }
   alerts: { pendingCount: number; pendingAmount: number; lowStockCount: number }
   recentActivity: ActivityItem[]
@@ -250,10 +252,11 @@ function TopModulesCard({ data }: { data: { name: string; value: number; color: 
           {data.map((d, i) => {
             const pct = Math.round((d.value / total) * 100)
             const barColor = BAR_COLORS[i % BAR_COLORS.length]
+            const displayName = d.name.includes('.') ? t(d.name) : d.name
             return (
               <div key={i}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span style={{ fontSize: 11, color: '#64748B' }}>{d.name}</span>
+                  <span style={{ fontSize: 11, color: '#64748B' }}>{displayName}</span>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#0F172A' }}>{d.value}</span>
                 </div>
                 <div style={{ height: 4, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden' }}>
@@ -522,7 +525,8 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
 export default function DashboardClient({ data, userName }: { data: DashboardData; userName?: string }) {
   const { t } = useLocale()
   const router = useRouter()
-  const { tenant, kpis, alerts, recentActivity, chartData } = data
+  const { tenant, tenantId, kpis, alerts, recentActivity, chartData } = data
+  const brandColor      = getTenantBrandColor(tenantId)
   const isFinancial     = data.isFinancial ?? true
   const secteur         = data.secteur ?? null
   const ecoleRole       = data.ecoleRole ?? null
@@ -608,26 +612,36 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
         </motion.div>
       )}
 
-      {/* ── Welcome Banner ───────────────────────────────────────────────── */}
-      <motion.div {...fadeUp(0)} style={{ background: '#0F172A', borderRadius: 16, padding: '24px 28px', position: 'relative', overflow: 'hidden' }}>
-        {/* Subtle amber glow top-right */}
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(220,38,38,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      {/* ── Welcome Banner — couleur unique par tenant ───────────────────── */}
+      <motion.div
+        {...fadeUp(0)}
+        style={{
+          background: brandColor,
+          borderRadius: 16,
+          padding: '24px 28px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Lueur blanche douce en haut à droite */}
+        <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 150, height: 150, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,0,0,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
             {/* Date badge */}
             <div className="flex items-center gap-2 mb-3">
-              <span style={{ background: 'rgba(220,38,38,0.15)', color: '#DC2626', border: '1px solid rgba(220,38,38,0.25)', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
-                {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              <span style={{ background: 'rgba(255,255,255,0.18)', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.3)', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
+                {new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
             <h1 style={{ fontSize: 24, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2, marginBottom: 6 }}>
               {t(greetingKey)}, {displayName}
             </h1>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{tenant.nom_entreprise}</span>
-              {' · '}{t('dash.plan')} <span style={{ color: '#DC2626', fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
-              {' · '}{tenant.modules_actifs.length} modules actifs
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+              <span style={{ color: '#FFFFFF', fontWeight: 600 }}>{tenant.nom_entreprise}</span>
+              {' · '}{t('dash.plan')} <span style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
+              {' · '}{tenant.modules_actifs.length} {t('dash.activeModules').toLowerCase()}
             </p>
           </div>
           {/* Buttons */}
@@ -635,13 +649,13 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             <Link
               href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
               className="flex items-center gap-1.5 text-xs font-bold rounded-xl transition-all hover:opacity-90"
-              style={{ background: '#DC2626', color: '#0F172A', padding: '8px 16px' }}
+              style={{ background: 'rgba(255,255,255,0.2)', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.35)', padding: '8px 16px' }}
             >
               <Download size={12} /> Export
             </Link>
             <button
               onClick={() => router.refresh()}
-              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: '#94A3B8', padding: '8px 10px', borderRadius: 10 }}
+              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', padding: '8px 10px', borderRadius: 10 }}
               title={t('dash.refresh')}
             >
               <RefreshCw size={13} />
@@ -653,15 +667,14 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
         {isFinancial && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
             {[
-              { label: "Revenus du mois",    value: `${fmt(kpis.revenuMois)} F`,                          trend: '+18%' },
-              { label: "Factures en attente",value: `${alerts.pendingCount} fact.`,                        trend: null },
-              { label: "Employés",           value: `${kpis.nbEmployes}`,                                  trend: null },
-              { label: "Stock / Alertes",    value: alerts.lowStockCount > 0 ? `${alerts.lowStockCount} alerte${alerts.lowStockCount > 1 ? 's' : ''}` : 'OK', trend: null },
+              { label: t('dash.revenue'),         value: `${fmt(kpis.revenuMois)} F` },
+              { label: t('dash.facturesAttente'),  value: `${alerts.pendingCount}`    },
+              { label: t('dash.employees'),        value: `${kpis.nbEmployes}`        },
+              { label: t('dash.alertesStock'),     value: alerts.lowStockCount > 0 ? `${alerts.lowStockCount}` : 'OK' },
             ].map((k, i) => (
-              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px' }}>
-                <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', marginBottom: 5 }}>{k.label}</p>
+              <div key={i} style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '12px 14px' }}>
+                <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.55)', marginBottom: 5 }}>{k.label}</p>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>{k.value}</p>
-                {k.trend && <p style={{ fontSize: 10, color: '#DC2626', marginTop: 3 }}>{k.trend} vs hier</p>}
               </div>
             ))}
           </div>

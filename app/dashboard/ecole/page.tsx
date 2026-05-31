@@ -16,6 +16,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { getTenantBrandColor } from '@/lib/utils'
 
 // Types kept for backward-compat
 export type EcoleRole =
@@ -151,13 +152,16 @@ function RevenueCard({
 // -- Main Page -----------------------------------------------------------------
 
 export default function EcoleOverviewPage() {
-  const { tenantId, loading: tenantLoading } = useTenant()
+  const { tenantId, loading: tenantLoading, prenom, nom } = useTenant()
+  const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#2977ac'
   const { t } = useLocale()
   const [data,     setData]     = useState<OverviewData | null>(null)
   const [loading,  setLoading]  = useState(true)
   const [nomEcole, setNomEcole] = useState('�cole')
 
   const MOIS = ['Jan', 'F�v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Ao�', 'Sep', 'Oct', 'Nov', 'D�c']
+
+  const displayName = prenom ? [prenom, nom].filter(Boolean).join(' ') : 'Admin'
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -279,11 +283,11 @@ export default function EcoleOverviewPage() {
     <div className="flex flex-col gap-6 pb-10">
 
       {/* -- Banner � fond orange plat ------------------------------------------ */}
-      <motion.div {...fade(0)} style={{ background: '#DC2626', borderRadius: 12, padding: '20px 24px' }}>
+      <motion.div {...fade(0)} style={{ background: brandColor, borderRadius: 12, padding: '20px 24px', position: 'relative', overflow: 'hidden' }}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{t('school.greeting')}, Admin ??</h1>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{t('school.greeting')}, {displayName}</h1>
               <button onClick={load} style={{ color: 'rgba(255,255,255,0.5)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}
                 className="hover:opacity-80 transition-opacity">
                 <RefreshCw size={13} />
@@ -297,7 +301,7 @@ export default function EcoleOverviewPage() {
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
               <Link href="/dashboard/ecole/scolarite"
-                style={{ background: '#FFFFFF', color: '#DC2626', fontWeight: 700, fontSize: 13, padding: '8px 16px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                style={{ background: '#FFFFFF', color: brandColor, fontWeight: 700, fontSize: 13, padding: '8px 16px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 <Plus size={13} /> {t('school.enrollment')}
               </Link>
               <Link href="/dashboard/ecole/direction"

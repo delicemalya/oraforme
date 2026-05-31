@@ -15,5 +15,7 @@ export function useTenant() {
     role:     tenant?.role     ?? null,
     isOwner:  tenant?.role === 'owner',
     loading,
+    prenom:   tenant?.prenom   ?? null,
+    nom:      tenant?.nom      ?? null,
   }
 }

@@ -44,6 +44,8 @@ export interface TenantState {
   modulesActifs: string[]
   userId:        string
   userEmail:     string
+  prenom:        string | null
+  nom:           string | null
 }
 
 interface TenantContextValue {
@@ -80,7 +82,7 @@ async function fetchTenantForUser(
   // from localStorage will override this default instead of breaking isolation.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, tenant_id, ecole_role_name, tenants(nom_entreprise, modules_actifs, secteur_activite)')
+    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite)')
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -104,7 +106,9 @@ async function fetchTenantForUser(
     isSuperAdmin:  SUPER_ADMIN_EMAILS.includes(email),
     modulesActifs: t?.modules_actifs ?? [],
     userId,
-    userEmail: email,
+    userEmail:     email,
+    prenom:        (profile as { prenom?: string | null }).prenom ?? null,
+    nom:           (profile as { nom?: string | null }).nom ?? null,
   }
 }
 
