@@ -735,16 +735,40 @@ export default function PaiePage() {
 
                     {/* Actions */}
                     <td className="px-3 py-3 text-center">
-                      <button
-                        onClick={() => printBulletin(row, mois, annee, entreprise)}
-                        title={t('common.print')}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium
-                                   bg-[var(--surface)] hover:bg-gray-200 text-[var(--text-secondary)] hover:text-[#101729]
-                                   border border-[var(--border)] transition-colors"
-                      >
-                        <Printer size={11} />
-                        {t('common.print')}
-                      </button>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => printBulletin(row, mois, annee, entreprise)}
+                          title={t('common.print')}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium
+                                     bg-[var(--surface)] hover:bg-gray-200 text-[var(--text-secondary)] hover:text-[#101729]
+                                     border border-[var(--border)] transition-colors"
+                        >
+                          <Printer size={11} />
+                          {t('common.print')}
+                        </button>
+                        {row.existingId && (
+                          <button
+                            onClick={async () => {
+                              const res = await fetch(`/api/rh/paie/${row.existingId}/bulletin-pdf`)
+                              if (!res.ok) return
+                              const blob = await res.blob()
+                              const url = URL.createObjectURL(blob)
+                              const a = document.createElement('a')
+                              a.href = url
+                              a.download = `bulletin-${row.nom}-${MOIS_LABELS[mois]}-${annee}.pdf`
+                              a.click()
+                              URL.revokeObjectURL(url)
+                            }}
+                            title="Télécharger PDF"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium
+                                       bg-[#DC2626]/10 hover:bg-[#DC2626]/20 text-[#DC2626]
+                                       border border-[#DC2626]/20 transition-colors"
+                          >
+                            <FileText size={11} />
+                            PDF
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </motion.tr>
                 ))}

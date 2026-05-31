@@ -367,20 +367,34 @@ export default function RapportsPage() {
                   <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5">
                     <p className="text-xs font-bold text-[var(--text)] mb-3 uppercase tracking-wide">{t('rapports.exports.title')}</p>
                     <div className="space-y-2">
-                      {[
-                        { label: t('rapports.exports.pdf'), note: t('rapports.exports.soon') },
-                        { label: t('rapports.exports.csv'), note: t('rapports.exports.soon') },
-                        { label: t('rapports.exports.tva'), note: t('rapports.exports.tvaTab') },
-                      ].map(e => (
-                        <button key={e.label} onClick={() => e.note === t('rapports.exports.tvaTab') ? setTab(4) : undefined}
-                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--border)] hover:bg-white/5 transition-all group text-left">
-                          <div className="flex items-center gap-2">
-                            <Download size={12} className="text-[var(--text-secondary)] group-hover:text-[#DC2626] transition-colors" />
-                            <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text)] transition-colors">{e.label}</span>
-                          </div>
-                          <span className="text-[10px] text-[var(--text-secondary)]">{e.note}</span>
-                        </button>
-                      ))}
+                      <button
+                        onClick={async () => {
+                          const res = await fetch(`/api/documents/rapport-excel?annee=${selectedYear}`)
+                          if (!res.ok) return
+                          const blob = await res.blob()
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = `rapport-${selectedYear}.xlsx`
+                          a.click()
+                          URL.revokeObjectURL(url)
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[var(--border)] hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5 transition-all group text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Download size={12} className="text-[var(--text-secondary)] group-hover:text-[#16A34A] transition-colors" />
+                          <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text)] transition-colors">Export Excel (5 onglets)</span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-[#16A34A] bg-[#DCFCE7] px-2 py-0.5 rounded-full">XLSX</span>
+                      </button>
+                      <button onClick={() => setTab(4)}
+                        className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--border)] hover:bg-white/5 transition-all group text-left">
+                        <div className="flex items-center gap-2">
+                          <Download size={12} className="text-[var(--text-secondary)] group-hover:text-[#DC2626] transition-colors" />
+                          <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text)] transition-colors">{t('rapports.exports.tva')}</span>
+                        </div>
+                        <span className="text-[10px] text-[var(--text-secondary)]">{t('rapports.exports.tvaTab')}</span>
+                      </button>
                     </div>
                   </div>
                 </div>
