@@ -223,20 +223,18 @@ export function MIAAAssistant({ module, tenantData }: MIAAAssistantProps) {
       {/* MIAA PREMIUM floating button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-xl text-white font-bold"
-        style={{ background: 'linear-gradient(135deg, #6D28D9, #DC2626, #F59E0B)', boxShadow: '0 4px 20px rgba(109,40,217,0.45)' }}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 pl-1 pr-4 py-1 rounded-full shadow-xl text-white font-bold bg-white border border-[#3B82F6]/20"
+        style={{ boxShadow: '0 4px 20px rgba(59,130,246,0.30)' }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        {/* Mini logo M */}
-        <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="24" fill="rgba(255,255,255,0.15)" />
-          <path d="M11 34V14l13 13L37 14v20" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        </svg>
-        <span className="text-sm font-black tracking-wide">MIAA PREMIUM</span>
+        {/* Logo image */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-miaa-premium.png" alt="MIAA PREMIUM" width={36} height={36} className="rounded-full shrink-0" />
+        <span className="text-sm font-black tracking-wide text-[#1D4ED8]">MIAA PREMIUM</span>
         {!isOpen && (
           <motion.span
-            className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-400"
+            className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400"
             style={{ boxShadow: '0 0 6px rgba(74,222,128,0.8)' }}
             animate={{ scale: [1, 1.3, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
@@ -258,12 +256,9 @@ export function MIAAAssistant({ module, tenantData }: MIAAAssistantProps) {
               className="p-4 flex items-center gap-3 flex-shrink-0 border-b border-gray-100"
               style={{ background: 'linear-gradient(135deg, #6D28D908, #DC262605, #F59E0B03)' }}
             >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #6D28D9, #DC2626, #F59E0B)', boxShadow: '0 2px 8px rgba(109,40,217,0.35)' }}>
-                <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
-                  <path d="M11 34V14l13 13L37 14v20" stroke="white" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                </svg>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-miaa-premium.png" alt="MIAA PREMIUM" width={40} height={40}
+                className="w-10 h-10 rounded-full shrink-0 object-contain" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="font-black text-gray-900 text-sm">MIAA PREMIUM</span>

@@ -38,35 +38,15 @@ const FICHIERS_ACCEPTES: Record<string, string> = {
 
 function MIAALogo({ size = 38 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="miaaGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#6D28D9" />
-          <stop offset="50%" stopColor="#DC2626" />
-          <stop offset="100%" stopColor="#F59E0B" />
-        </linearGradient>
-        <linearGradient id="miaaGrad2" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#7C3AED" />
-          <stop offset="100%" stopColor="#EF4444" />
-        </linearGradient>
-      </defs>
-      {/* Background circle */}
-      <circle cx="24" cy="24" r="24" fill="url(#miaaGrad)" />
-      {/* Outer glow ring */}
-      <circle cx="24" cy="24" r="21" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-      {/* Premium M letter */}
-      <path
-        d="M11 34V14l13 13L37 14v20"
-        stroke="white"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-      {/* Sparkle top right */}
-      <path d="M37 9 L38.2 11.8 L41 13 L38.2 14.2 L37 17 L35.8 14.2 L33 13 L35.8 11.8Z"
-        fill="rgba(255,255,255,0.9)" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logo-miaa-premium.png"
+      alt="MIAA PREMIUM"
+      width={size}
+      height={size}
+      className="shrink-0 rounded-full object-contain"
+      style={{ width: size, height: size }}
+    />
   )
 }
 
