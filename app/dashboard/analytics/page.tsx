@@ -11,6 +11,7 @@ import {
 import { BiTrendChart, BiBarChart, BiDonutChart, BiCountBarChart } from '@/components/bi/BiCharts'
 import { fmtFCFA } from '@/lib/admin-config'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useTenantContext } from '@/lib/contexts/TenantContext'
 
 // ── Types ─────────────────────────────────────────────────────────
 interface AnalyticsData {
@@ -107,6 +108,9 @@ function ChartCard({ title, icon: Icon, iconColor, children, className = '' }: {
 // ── Main ──────────────────────────────────────────────────────────
 export default function AnalyticsPage() {
   const { t } = useLocale()
+  const { tenant } = useTenantContext()
+  const secteur = tenant?.secteur ?? null
+
   const [data, setData]       = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab]         = useState('overview')
@@ -116,12 +120,12 @@ export default function AnalyticsPage() {
 
   const YEARS = [new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2]
 
-  // Tabs définis ici pour accéder à t()
+  // Tabs filtrés selon le secteur — École uniquement pour secteur 'ecole'
   const TABS = [
     { id: 'overview',  label: t('analytics.tab.overview'),  icon: BarChart2 },
     { id: 'financial', label: t('analytics.tab.financial'), icon: TrendingUp },
     { id: 'rh',        label: t('analytics.tab.rh'),        icon: Users },
-    { id: 'ecole',     label: t('analytics.tab.ecole'),     icon: GraduationCap },
+    ...(secteur === 'ecole' ? [{ id: 'ecole', label: t('analytics.tab.ecole'), icon: GraduationCap }] : []),
     { id: 'stock',     label: t('analytics.tab.stock'),     icon: Package },
     { id: 'auto',      label: t('analytics.tab.auto'),      icon: Zap },
   ]
@@ -164,7 +168,7 @@ export default function AnalyticsPage() {
       <motion.div {...fadeUp(0)} className="flex items-center justify-between flex-wrap gap-3 pt-1">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg,#4A0040,#7C3AED)' }}>
+            style={{ background: 'linear-gradient(135deg,#7C3AED,#6D28D9)' }}>
             <Activity size={18} className="text-white" />
           </div>
           <div>
@@ -218,13 +222,13 @@ export default function AnalyticsPage() {
                     value={fmtFCFA(data.financial.soldeTresorerie)}
                     sub={`+${fmtFCFA(data.financial.totalEntrees)} / -${fmtFCFA(data.financial.totalSorties)}`}
                     color={data.financial.soldeTresorerie >= 0
-                      ? 'linear-gradient(135deg,#071535,#0F172A)'
-                      : 'linear-gradient(135deg,#7A0000,#A00018)'}
+                      ? 'linear-gradient(135deg,#2563EB,#1D4ED8)'
+                      : 'linear-gradient(135deg,#DC2626,#B91C1C)'}
                     trend={data.financial.txPaiement} />
                   <KpiCard i={2} label={t('analytics.kpi.headcount')} icon={Users}
                     value={String(data.rh.nbActifs)}
                     sub={`${data.rh.nbConges} ${t('analytics.kpi.onLeave')}`}
-                    color="linear-gradient(135deg,#4A0040,#7C3AED)"
+                    color="linear-gradient(135deg,#7C3AED,#6D28D9)"
                     alert={data.rh.contratsExpirant30 > 0} />
                   <KpiCard i={3} label={t('analytics.kpi.stock')} icon={Package}
                     value={fmtFCFA(data.stock.valeurStock)}
@@ -234,7 +238,7 @@ export default function AnalyticsPage() {
                   <KpiCard i={4} label={t('analytics.kpi.absences')} icon={GraduationCap}
                     value={String(data.ecole.nbAbsences)}
                     sub={`${t('nav.ecole')} : ${fmtFCFA(data.ecole.totalScol)}`}
-                    color="linear-gradient(135deg,#4A0040,#7C3AED)" />
+                    color="linear-gradient(135deg,#7C3AED,#6D28D9)" />
                 </div>
 
                 {/* Main trend */}
@@ -358,14 +362,14 @@ export default function AnalyticsPage() {
               <div className="space-y-5">
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                   {[
-                    { label: t('analytics.kpi.encaissements'), val: data.financial.totalEntrees,    color: '#071535', icon: TrendingUp  },
-                    { label: t('analytics.kpi.decaissements'), val: data.financial.totalSorties,    color: '#7A0000', icon: TrendingDown },
-                    { label: t('analytics.kpi.tresoNet'),      val: data.financial.soldeTresorerie, color: '#4A0040', icon: Wallet       },
-                    { label: t('analytics.kpi.creances'),      val: data.financial.totalCreances,   color: '#4A0040', icon: FileText     },
+                    { label: t('analytics.kpi.encaissements'), val: data.financial.totalEntrees,    color: '#16A34A', icon: TrendingUp  },
+                    { label: t('analytics.kpi.decaissements'), val: data.financial.totalSorties,    color: '#DC2626', icon: TrendingDown },
+                    { label: t('analytics.kpi.tresoNet'),      val: data.financial.soldeTresorerie, color: '#2563EB', icon: Wallet       },
+                    { label: t('analytics.kpi.creances'),      val: data.financial.totalCreances,   color: '#F59E0B', icon: FileText     },
                   ].map((k, i) => (
                     <KpiCard key={k.label} i={i + 1} label={k.label} value={fmtFCFA(k.val)}
                       icon={k.icon}
-                      color={`linear-gradient(135deg,${k.color},${k.color}88)`} />
+                      color={`linear-gradient(135deg,${k.color},${k.color}99)`} />
                   ))}
                 </div>
 
@@ -434,13 +438,13 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                   <KpiCard i={1} label={t('analytics.kpi.employesActifs')} icon={Users}
                     value={String(data.rh.nbActifs)} sub={`/${data.rh.nbTotal} ${t('analytics.sub.total')}`}
-                    color="linear-gradient(135deg,#071535,#0F172A)" />
+                    color="linear-gradient(135deg,#2563EB,#1D4ED8)" />
                   <KpiCard i={2} label={t('analytics.kpi.onLeave')} icon={Clock}
                     value={String(data.rh.nbConges)} sub={t('analytics.lbl.collaborateurs')}
-                    color="linear-gradient(135deg,#4A0040,#7C3AED)" />
+                    color="linear-gradient(135deg,#7C3AED,#6D28D9)" />
                   <KpiCard i={3} label={t('analytics.kpi.masseSal')} icon={Wallet}
                     value={fmtFCFA(data.rh.masseSal)} sub={t('analytics.sub.exercice')}
-                    color="linear-gradient(135deg,#4A0040,#7C3AED)" />
+                    color="linear-gradient(135deg,#7C3AED,#6D28D9)" />
                   <KpiCard i={4} label={t('analytics.kpi.contratsExp')} icon={AlertTriangle}
                     value={String(data.rh.contratsExpirant30)} sub={t('analytics.sub.dans30j')}
                     color="linear-gradient(135deg,#7A3800,#C06000)"
@@ -492,13 +496,13 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
                   <KpiCard i={1} label={t('analytics.kpi.absRegistered')} icon={GraduationCap}
                     value={String(data.ecole.nbAbsences)} sub={`${t('analytics.sub.exercice')} ${year}`}
-                    color="linear-gradient(135deg,#4A0040,#7C3AED)" />
+                    color="linear-gradient(135deg,#7C3AED,#6D28D9)" />
                   <KpiCard i={2} label={t('analytics.kpi.recettesScol')} icon={Wallet}
                     value={fmtFCFA(data.ecole.totalScol)} sub={t('analytics.sub.paiementsRecus')}
-                    color="linear-gradient(135deg,#071535,#0F172A)" />
+                    color="linear-gradient(135deg,#2563EB,#1D4ED8)" />
                   <KpiCard i={3} label={t('analytics.kpi.autoNotifs')} icon={Bell}
                     value={String(data.automation.nbNotifs)} sub={`${data.automation.notifUnread} ${t('analytics.sub.nonLues')}`}
-                    color="linear-gradient(135deg,#4A0040,#7C3AED)" />
+                    color="linear-gradient(135deg,#7C3AED,#6D28D9)" />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -533,7 +537,7 @@ export default function AnalyticsPage() {
                     color="linear-gradient(135deg,#7A3800,#C06000)" />
                   <KpiCard i={2} label={t('analytics.kpi.ruptures')} icon={AlertTriangle}
                     value={String(data.stock.articlesRupture)} sub={t('analytics.sub.artEpuises')}
-                    color="linear-gradient(135deg,#7A0000,#A00018)"
+                    color="linear-gradient(135deg,#DC2626,#B91C1C)"
                     alert={data.stock.articlesRupture > 0} />
                   <KpiCard i={3} label={t('analytics.kpi.stockCritique')} icon={AlertTriangle}
                     value={String(data.stock.articlesCritiques)} sub={t('analytics.sub.sousSeuil')}
@@ -542,7 +546,7 @@ export default function AnalyticsPage() {
                   <KpiCard i={4} label={t('analytics.kpi.articlesOk')} icon={CheckCircle}
                     value={String(Math.max(0, data.stock.nbArticles - data.stock.articlesRupture - data.stock.articlesCritiques))}
                     sub={t('analytics.sub.stockSuffisant')}
-                    color="linear-gradient(135deg,#071535,#0F172A)" />
+                    color="linear-gradient(135deg,#2563EB,#1D4ED8)" />
                 </div>
 
                 {/* Top articles */}
@@ -621,18 +625,18 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                   <KpiCard i={1} label={t('analytics.kpi.tasksDone')} icon={CheckCircle}
                     value={String(data.automation.tasksDone)} sub={`${year}`}
-                    color="linear-gradient(135deg,#071535,#0F172A)" />
+                    color="linear-gradient(135deg,#2563EB,#1D4ED8)" />
                   <KpiCard i={2} label={t('analytics.kpi.enAttente')} icon={Clock}
                     value={String(data.automation.tasksPend)} sub={t('analytics.sub.aTraiter')}
                     color="linear-gradient(135deg,#7A3800,#C06000)"
                     alert={data.automation.tasksPend > 0} />
                   <KpiCard i={3} label={t('analytics.kpi.erreurs')} icon={AlertTriangle}
                     value={String(data.automation.tasksError)} sub={t('analytics.sub.tasksFailed')}
-                    color="linear-gradient(135deg,#7A0000,#A00018)"
+                    color="linear-gradient(135deg,#DC2626,#B91C1C)"
                     alert={data.automation.tasksError > 0} />
                   <KpiCard i={4} label={t('analytics.kpi.notifications')} icon={Bell}
                     value={String(data.automation.nbNotifs)} sub={`${data.automation.notifUnread} ${t('analytics.sub.nonLues')}`}
-                    color="linear-gradient(135deg,#4A0040,#7C3AED)" />
+                    color="linear-gradient(135deg,#7C3AED,#6D28D9)" />
                 </div>
 
                 {/* Run checks panel */}
