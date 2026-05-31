@@ -494,24 +494,40 @@ export default function Sidebar() {
       <Link
         href={item.href}
         onClick={() => setMobileOpen(false)}
-        className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150"
+        className="flex items-center gap-2.5 pl-3 pr-3 py-1.5 rounded-lg text-[12.5px] transition-all duration-150 relative group"
         style={active
-          ? { background: 'rgba(220,38,38,0.08)', color: '#DC2626', fontWeight: 600 }
+          ? { background: 'rgba(220,38,38,0.07)', color: '#DC2626', fontWeight: 600 }
           : { color: '#64748B' }
         }
         onMouseEnter={!active ? e => {
           (e.currentTarget as HTMLAnchorElement).style.background = '#F8FAFC'
-          ;(e.currentTarget as HTMLAnchorElement).style.color = '#0F172A'
+          ;(e.currentTarget as HTMLAnchorElement).style.color = '#111827'
         } : undefined}
         onMouseLeave={!active ? e => {
           (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
           ;(e.currentTarget as HTMLAnchorElement).style.color = '#64748B'
         } : undefined}
       >
-        <Icon size={14} className="shrink-0" style={{ color: active ? '#DC2626' : '#94A3B8' }} />
+        {/* Left accent bar (Linear style) */}
+        {active && (
+          <div style={{
+            position: 'absolute', left: 0, top: '20%', bottom: '20%',
+            width: 3, borderRadius: '0 3px 3px 0', background: '#DC2626',
+          }} />
+        )}
+
+        {/* Icon well */}
+        <div style={{
+          width: 22, height: 22, borderRadius: 5, flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: active ? 'rgba(220,38,38,0.12)' : 'transparent',
+          transition: 'background 0.15s',
+        }}>
+          <Icon size={13} style={{ color: active ? '#DC2626' : '#94A3B8' }} />
+        </div>
+
         <span className="flex-1 truncate">{item.label}</span>
-        {!isOwner && !canEdit && <Lock size={8} style={{ color: '#CBD5E1', flexShrink: 0 }} />}
-        {active && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#DC2626' }} />}
+        {!isOwner && !canEdit && <Lock size={8} style={{ color: '#D1D5DB', flexShrink: 0 }} />}
       </Link>
     )
   }
@@ -524,27 +540,24 @@ export default function Sidebar() {
 
     return (
       <div>
-        {/* Séparateur horizontal entre groupes — style Buildkite */}
-        {showSep && (
-          <div style={{ height: 1, background: '#F1F5F9', margin: '6px 0 8px' }} />
-        )}
+        {showSep && <div className="sidebar-sep" />}
         <div className="mb-0.5">
           <button
             onClick={() => toggleGroup(group.id)}
             className="w-full flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors"
             style={{ background: 'transparent' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
+            onMouseEnter={e => (e.currentTarget.style.background = '#F8FAFC')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
-            <GroupIcon size={10} style={{ color: '#94A3B8', flexShrink: 0 }} />
-            <span className="flex-1 text-left text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#94A3B8' }}>
+            <GroupIcon size={9} style={{ color: '#C4C9D4', flexShrink: 0 }} />
+            <span className="flex-1 text-left section-label" style={{ color: '#B0B8C4', fontSize: 9 }}>
               {group.label}
             </span>
             <ChevronDown
-              size={9}
+              size={8}
               style={{
-                color: '#CBD5E1',
-                transition: 'transform 0.2s',
+                color: '#C4C9D4',
+                transition: 'transform 0.2s cubic-bezier(0.4,0,0.2,1)',
                 transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
               }}
             />
@@ -552,13 +565,13 @@ export default function Sidebar() {
 
           <div
             style={{
-              maxHeight: isOpen ? `${group.items.length * 44}px` : '0px',
+              maxHeight: isOpen ? `${group.items.length * 40}px` : '0px',
               overflow: 'hidden',
-              transition: 'max-height 0.22s ease',
+              transition: 'max-height 0.22s cubic-bezier(0.4,0,0.2,1)',
               opacity: isOpen ? 1 : 0,
             }}
           >
-            <div className="py-0.5 space-y-0.5">
+            <div className="pt-0.5 pb-0.5 space-y-px">
               {group.items.map(item => (
                 <NavLink key={item.id} item={item} />
               ))}
@@ -606,21 +619,27 @@ export default function Sidebar() {
         <Link
           href={dashHref}
           onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12.5px] font-semibold transition-all duration-150 mb-3"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12.5px] font-semibold transition-all duration-150 mb-2 relative"
           style={dashActive
             ? { background: '#DC2626', color: '#FFFFFF' }
             : { color: '#64748B' }
           }
           onMouseEnter={!dashActive ? e => {
             (e.currentTarget as HTMLAnchorElement).style.background = '#F8FAFC'
-            ;(e.currentTarget as HTMLAnchorElement).style.color = '#0F172A'
+            ;(e.currentTarget as HTMLAnchorElement).style.color = '#111827'
           } : undefined}
           onMouseLeave={!dashActive ? e => {
             (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
             ;(e.currentTarget as HTMLAnchorElement).style.color = '#64748B'
           } : undefined}
         >
-          <LayoutDashboard size={14} className="shrink-0" style={{ color: dashActive ? '#FFFFFF' : '#94A3B8' }} />
+          <div style={{
+            width: 22, height: 22, borderRadius: 5, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: dashActive ? 'rgba(255,255,255,0.2)' : 'transparent',
+          }}>
+            <LayoutDashboard size={13} style={{ color: dashActive ? '#FFFFFF' : '#94A3B8' }} />
+          </div>
           <span>{t('nav.dashboard')}</span>
         </Link>
 

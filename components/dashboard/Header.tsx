@@ -103,14 +103,16 @@ export default function Header() {
         <div className="w-8 lg:hidden shrink-0" />
       )}
 
-      <div className="flex-1 max-w-sm">
-        <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-3 py-1.5">
+      <div className="flex-1 max-w-xs">
+        <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#E8ECF0] rounded-xl px-3 py-2 transition-all focus-within:border-[#CBD5E1] focus-within:bg-white focus-within:shadow-sm">
           <Search size={13} className="text-[#94A3B8] shrink-0" />
           <input
-            placeholder={`${t('common.search')}...`}
-            className="bg-transparent text-sm text-[#0F172A] placeholder-[#94A3B8] outline-none flex-1 w-0 min-w-0"
+            placeholder={`${t('common.search')}…`}
+            className="bg-transparent text-[13px] text-[#0F172A] placeholder-[#9CA3AF] outline-none flex-1 w-0 min-w-0"
           />
-          <kbd className="hidden sm:block text-[10px] text-[#94A3B8] border border-[#E2E8F0] rounded px-1 shrink-0">⌘K</kbd>
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[10px] text-[#94A3B8] border border-[#E2E8F0] rounded px-1.5 py-0.5 shrink-0 font-medium">
+            ⌘K
+          </kbd>
         </div>
       </div>
 
@@ -172,13 +174,19 @@ export default function Header() {
         <div className="relative ml-1">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-[#F8FAFC] transition-colors"
+            className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-xl hover:bg-[#F8FAFC] transition-all border border-transparent hover:border-[#E2E8F0]"
           >
-            <div className="w-7 h-7 rounded-full bg-red-100 border border-red-200 flex items-center justify-center shrink-0">
-              <span className="text-red-700 text-xs font-bold">{initials}</span>
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+              style={{
+                background: 'linear-gradient(135deg, #DC2626, #B91C1C)',
+                boxShadow: '0 1px 3px rgba(220,38,38,0.35)',
+              }}
+            >
+              <span className="text-white text-[11px] font-bold">{initials}</span>
             </div>
-            <span className="text-sm text-[#0F172A] hidden sm:block max-w-[96px] truncate">{userName}</span>
-            <ChevronDown size={12} className="text-[#94A3B8] hidden sm:block" />
+            <span className="text-[13px] text-[#0F172A] font-medium hidden sm:block max-w-[90px] truncate">{userName}</span>
+            <ChevronDown size={11} className="text-[#94A3B8] hidden sm:block" />
           </button>
 
           {dropdownOpen && (

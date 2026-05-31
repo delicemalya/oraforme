@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import {
   TrendingUp, Users, Package, AlertTriangle, Plus, Download,
   Clock, ChevronDown, GraduationCap, UserX, CalendarOff, Lock,
@@ -67,82 +67,81 @@ interface HeroCardProps {
 
 const ACCENT_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6']
 
+// Animated spring counter for numeric KPI values
+function SpringCounter({ target, accent }: { target: number; accent: string }) {
+  const mv      = useMotionValue(0)
+  const spring  = useSpring(mv, { stiffness: 50, damping: 18, restDelta: 0.5 })
+  const display = useTransform(spring, v => Math.floor(v).toLocaleString('fr-FR'))
+  useEffect(() => { mv.set(target) }, [target, mv])
+  return (
+    <motion.span className="num" style={{ color: '#0F172A' }}>
+      {display}
+    </motion.span>
+  )
+}
+
 function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: HeroCardProps) {
-  const { t }   = useLocale()
   const accent  = ACCENT_COLORS[i % ACCENT_COLORS.length]
-  // Fake progress from 40–90% so cards feel alive even with no data
-  const progress = 40 + (i * 17 + 23) % 51
+  const isNum   = typeof value === 'number'
 
   const card = (
     <motion.div
       {...fadeUp(i)}
-      whileHover={{ y: -2 }}
-      className="select-none"
+      whileHover={{ y: -3, boxShadow: '0 8px 28px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.04)' }}
+      className="select-none card-premium"
       style={{
-        background: '#FFFFFF',
-        border: '1px solid #E2E8F0',
-        borderRadius: 14,
         padding: '20px 22px',
         cursor: href ? 'pointer' : 'default',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* Trend badge top-right */}
+      {/* Top accent strip */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+        background: `linear-gradient(90deg, ${accent}CC, ${accent}30 70%, transparent)`,
+      }} />
+
+      {/* Trend badge */}
       {trend !== undefined && (
         <span style={{
-          position: 'absolute', top: 14, right: 14,
+          position: 'absolute', top: 16, right: 14,
           display: 'inline-flex', alignItems: 'center', gap: 3,
-          fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 8px',
+          fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 9px',
           background: trend >= 0 ? '#F0FDF4' : '#FEF2F2',
           color: trend >= 0 ? '#16A34A' : '#DC2626',
+          border: `1px solid ${trend >= 0 ? '#BBF7D0' : '#FECACA'}`,
         }}>
           <ArrowUpRight size={9} style={{ transform: trend < 0 ? 'rotate(90deg)' : undefined }} />
           {trend >= 0 ? '+' : ''}{trend.toFixed(1)}%
         </span>
       )}
 
-      {/* Icon */}
-      <div style={{
-        width: 38, height: 38, borderRadius: 10, marginBottom: 16,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: `${accent}14`,
-      }}>
-        <Icon size={18} style={{ color: accent }} />
+      {/* Icon well */}
+      <div className="icon-well" style={{ background: `${accent}14`, marginBottom: 14 }}>
+        <Icon size={17} style={{ color: accent }} />
       </div>
 
       {/* Label */}
-      <p style={{ fontSize: 11, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
-        {label}
-      </p>
+      <p className="section-label" style={{ marginBottom: 5 }}>{label}</p>
 
       {/* Value */}
-      <p style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', lineHeight: 1, marginBottom: 4 }}>
-        {value}
+      <p className="kpi-value" style={{ marginBottom: 6 }}>
+        {isNum ? <SpringCounter target={value as number} accent={accent} /> : value}
       </p>
 
-      {/* Sub */}
-      <div className="flex items-center justify-between mb-3">
-        <p style={{ fontSize: 11, color: '#94A3B8' }}>{sub}</p>
+      {/* Sub + badge */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <p style={{ fontSize: 11, color: '#94A3B8', flex: 1, minWidth: 0 }}>{sub}</p>
         {badge && (
-          <span style={{ background: `${accent}14`, color: accent, fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '2px 6px' }}>
+          <span style={{
+            background: `${accent}12`, color: accent,
+            fontSize: 9, fontWeight: 700, borderRadius: 5, padding: '2px 7px',
+            border: `1px solid ${accent}25`, whiteSpace: 'nowrap',
+          }}>
             {badge}
           </span>
         )}
-      </div>
-
-      {/* Progress bar */}
-      <div style={{ height: 3, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden' }}>
-        <motion.div
-          style={{ height: '100%', background: accent, borderRadius: 2 }}
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.9, delay: 0.2 + i * 0.1, ease: 'easeOut' }}
-        />
-      </div>
-      <div className="flex items-center justify-between mt-1">
-        <span style={{ fontSize: 9, color: '#94A3B8' }}>{t('dash.vsMoisDernier')}</span>
-        <span style={{ fontSize: 9, fontWeight: 600, color: accent }}>{progress}%</span>
       </div>
     </motion.div>
   )
@@ -156,31 +155,54 @@ function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: Hero
 function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending: number; pendingAmt: number }) {
   const { t } = useLocale()
   const isPositive = solde >= 0
+  const statusColor = isPositive ? '#16A34A' : '#DC2626'
   return (
-    <motion.div {...fadeUp(4)} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20 }}>
+    <motion.div {...fadeUp(4)} className="card-premium" style={{ padding: 20 }}>
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div style={{ width: 32, height: 32, background: 'rgba(220,38,38,0.12)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Wallet size={15} style={{ color: '#DC2626' }} />
+        <div className="flex items-center gap-2.5">
+          <div className="icon-well" style={{ background: 'rgba(220,38,38,0.10)', width: 32, height: 32, borderRadius: 8 }}>
+            <Wallet size={14} style={{ color: '#DC2626' }} />
           </div>
           <p style={{ fontSize: 12, fontWeight: 600, color: '#64748B' }}>{t('dash.solde')}</p>
         </div>
-        <span style={{ background: isPositive ? '#F0FDF4' : '#FEF2F2', color: isPositive ? '#16A34A' : '#DC2626', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 8px' }}>
+        <span style={{
+          background: isPositive ? '#F0FDF4' : '#FEF2F2',
+          color: statusColor,
+          border: `1px solid ${isPositive ? '#BBF7D0' : '#FECACA'}`,
+          fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 9px',
+        }}>
           {isPositive ? t('dash.positive') : t('dash.deficit')}
         </span>
       </div>
-      <p style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', lineHeight: 1, marginBottom: 2 }}>{fmt(solde)} FCFA</p>
+      <p className="num" style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', lineHeight: 1, marginBottom: 3, letterSpacing: '-0.02em' }}>
+        {fmt(solde)} FCFA
+      </p>
       <p style={{ fontSize: 10, color: '#94A3B8', marginBottom: 14 }}>{t('dash.monthCumul')}</p>
+
+      {/* Health bar */}
+      <div className="progress-track" style={{ marginBottom: 14 }}>
+        <motion.div
+          className="progress-fill"
+          style={{ color: statusColor }}
+          initial={{ width: 0 }}
+          animate={{ width: isPositive ? '72%' : '28%' }}
+          transition={{ duration: 0.9, ease: 'easeOut' }}
+        />
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, paddingTop: 12, borderTop: '1px solid #F1F5F9' }}>
         <div>
-          <p style={{ fontSize: 9, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{t('common.pending')}</p>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{fmt(pendingAmt)} F</p>
-          <p style={{ fontSize: 10, color: '#94A3B8' }}>{pending} {pending !== 1 ? t('dash.dossiers') : t('dash.dossier')}</p>
+          <p className="section-label" style={{ marginBottom: 4 }}>{t('common.pending')}</p>
+          <p className="num" style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{fmt(pendingAmt)} F</p>
+          <p style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>{pending} {pending !== 1 ? t('dash.dossiers') : t('dash.dossier')}</p>
         </div>
         <div>
-          <p style={{ fontSize: 9, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>{t('dash.statut')}</p>
-          <div style={{ height: 4, background: '#F1F5F9', borderRadius: 2, overflow: 'hidden', marginTop: 6 }}>
-            <div style={{ height: '100%', width: isPositive ? '72%' : '28%', background: isPositive ? '#16A34A' : '#DC2626', borderRadius: 2 }} />
+          <p className="section-label" style={{ marginBottom: 4 }}>{t('dash.statut')}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: statusColor }} className="pulse-dot" />
+            <span style={{ fontSize: 11, fontWeight: 600, color: statusColor }}>
+              {isPositive ? t('dash.positive') : t('dash.deficit')}
+            </span>
           </div>
         </div>
       </div>
@@ -413,54 +435,37 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
     cards = (secteur ? SECTOR_SHORTCUTS[secteur] : null) ?? SECTOR_SHORTCUTS._default
   }
 
+  const SHORTCUT_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
+
   return (
     <motion.div {...fadeUp(9)} style={{ marginBottom: 24 }}>
       <div className="flex items-center gap-2 mb-4">
-        <Zap size={14} style={{ color: '#DC2626' }} />
-        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t('dash.shortcuts')}</h3>
+        <div className="icon-well" style={{ background: 'rgba(220,38,38,0.10)', width: 28, height: 28, borderRadius: 7 }}>
+          <Zap size={13} style={{ color: '#DC2626' }} />
+        </div>
+        <h3 className="section-label">{t('dash.shortcuts')}</h3>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {cards.map((sc, i) => {
-          const Icon = sc.icon
-          const SHORTCUT_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6', '#0891B2', '#EA580C']
-          const iconColor = SHORTCUT_COLORS[i % SHORTCUT_COLORS.length]
+          const Icon       = sc.icon
+          const iconColor  = SHORTCUT_COLORS[i % SHORTCUT_COLORS.length]
           return (
             <motion.div
               key={sc.href + sc.labelKey}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.05 + i * 0.04 }}
+              transition={{ duration: 0.3, delay: 0.04 + i * 0.04 }}
             >
-              <Link
-                href={sc.href}
-                className="flex items-center gap-3 transition-all duration-200 group"
-                style={{
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: 10,
-                  padding: '14px 18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  textDecoration: 'none',
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLAnchorElement
-                  el.style.borderColor = '#DC2626'
-                  el.style.transform = 'translateY(-1px)'
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLAnchorElement
-                  el.style.borderColor = '#E2E8F0'
-                  el.style.transform = 'translateY(0)'
-                }}
-              >
-                <Icon size={20} style={{ color: iconColor, flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginBottom: 1 }}>{t(sc.labelKey)}</p>
-                  <p style={{ fontSize: 12, color: '#64748B' }}>{t(sc.descKey)}</p>
+              <Link href={sc.href} className="shortcut-card">
+                {/* Icon well */}
+                <div className="icon-well" style={{ background: `${iconColor}12`, width: 38, height: 38, borderRadius: 10, flexShrink: 0 }}>
+                  <Icon size={17} style={{ color: iconColor }} />
                 </div>
-                <ChevronRight size={16} style={{ color: '#64748B', flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', marginBottom: 1 }}>{t(sc.labelKey)}</p>
+                  <p style={{ fontSize: 11, color: '#64748B' }}>{t(sc.descKey)}</p>
+                </div>
+                <ChevronRight size={14} style={{ color: '#CBD5E1', flexShrink: 0 }} />
               </Link>
             </motion.div>
           )
@@ -668,14 +673,14 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
         {isFinancial && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
             {[
-              { label: t('dash.revenue'),         value: `${fmt(kpis.revenuMois)} F` },
-              { label: t('dash.facturesAttente'),  value: `${alerts.pendingCount}`    },
-              { label: t('dash.employees'),        value: `${kpis.nbEmployes}`        },
-              { label: t('dash.alertesStock'),     value: alerts.lowStockCount > 0 ? `${alerts.lowStockCount}` : 'OK' },
+              { label: t('dash.revenue'),        value: `${fmt(kpis.revenuMois)} F` },
+              { label: t('dash.facturesAttente'), value: `${alerts.pendingCount}`   },
+              { label: t('dash.employees'),       value: `${kpis.nbEmployes}`       },
+              { label: t('dash.alertesStock'),    value: alerts.lowStockCount > 0 ? `${alerts.lowStockCount}` : 'OK' },
             ].map((k, i) => (
-              <div key={i} style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '12px 14px' }}>
-                <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.55)', marginBottom: 5 }}>{k.label}</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>{k.value}</p>
+              <div key={i} className="banner-chip">
+                <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.09em', color: 'rgba(255,255,255,0.5)', marginBottom: 6 }}>{k.label}</p>
+                <p className="num" style={{ fontSize: 15, fontWeight: 800, color: '#FFFFFF', lineHeight: 1, letterSpacing: '-0.01em' }}>{k.value}</p>
               </div>
             ))}
           </div>
@@ -715,29 +720,31 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
 
       {/* ── Transactions récentes ────────────────────────────────────────── */}
       {isFinancial && recentActivity.length > 0 && (
-        <motion.div {...fadeUp(7)} style={{
-          background: '#FFFFFF',
-          border: '1px solid #E2E8F0',
-          borderRadius: 12,
-          overflow: 'hidden',
-          marginBottom: 24,
-        }}>
-          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #E2E8F0' }}>
-            <div>
-              <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{t('dash.lastTransactions')}</h3>
-              <p style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{recentActivity.length} {t('dash.lastFactures')}</p>
+        <motion.div {...fadeUp(7)} className="card-premium" style={{ overflow: 'hidden', marginBottom: 24 }}>
+          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #F1F5F9' }}>
+            <div className="flex items-center gap-2.5">
+              <div className="icon-well" style={{ background: 'rgba(220,38,38,0.09)', width: 30, height: 30, borderRadius: 8 }}>
+                <FileText size={13} style={{ color: '#DC2626' }} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{t('dash.lastTransactions')}</h3>
+                <p style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>{recentActivity.length} {t('dash.lastFactures')}</p>
+              </div>
             </div>
-            <Link href="/dashboard/facturation" style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
-              {t('dash.viewAll')} →
+            <Link href="/dashboard/facturation"
+              className="flex items-center gap-1"
+              style={{ fontSize: 11, color: '#DC2626', fontWeight: 600 }}
+            >
+              {t('dash.viewAll')} <ChevronRight size={12} />
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: '1px solid #E2E8F0', background: 'transparent' }}>
-                  <th className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.name')}</th>
-                  <th className="text-right px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.amount')}</th>
-                  <th className="text-left px-4 py-3" style={{ fontSize: 10, fontWeight: 600, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('common.status')}</th>
+                <tr style={{ background: '#FAFAFA', borderBottom: '1px solid #F1F5F9' }}>
+                  <th className="text-left px-5 py-2.5 section-label">{t('common.name')}</th>
+                  <th className="text-right px-5 py-2.5 section-label">{t('common.amount')}</th>
+                  <th className="text-left px-5 py-2.5 section-label">{t('common.status')}</th>
                 </tr>
               </thead>
               <tbody>
