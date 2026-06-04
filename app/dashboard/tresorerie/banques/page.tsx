@@ -121,7 +121,7 @@ export default function BanquesPage() {
     else {
       showToast(chequeType === 'emis' ? 'Chèque émis enregistré' : 'Chèque reçu enregistré')
       setModalCheque(false)
-      setFCheque({ numero: '', montant: '', beneficiaire: '', emetteur: '', banque_tiree: 'BGFI Bank', date_emission: today(), date_echeance: '', motif: '', compte_bancaire_id: '' })
+      setFCheque({ numero: '', code_micr: '', montant: '', beneficiaire: '', emetteur: '', banque_tiree: 'BGFI Bank', date_emission: today(), date_echeance: '', motif: '', compte_bancaire_id: '', signataire: '', lieu: 'Brazzaville' })
       load()
     }
     setSaving(false)
