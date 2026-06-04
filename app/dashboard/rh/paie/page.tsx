@@ -43,35 +43,45 @@ interface BulletinRow {
   existingId?: string
 }
 
-// ── Constantes Congo-Brazzaville ───────────────────────────────────────────────
+// ── Constantes Congo-Brazzaville (formules exactes ECAM) ───────────────────────
+// CNSS salarié : 4% plafonné 1 200 000 | Patronal : 8%+12.28%+3%+4.5%
+// TOL : 1 000 FCFA fixe
 
-const TAUX_CNSS_SALARIE  = 0.0504
-const TAUX_CNSS_PATRONAL = 0.1416
-const PLAFOND_CNSS       = 3_375_000
+const PLAFOND_CNSS_SALARIE = 1_200_000  // plafonné pour la part salarié 4%
 
 const MOIS_LABELS = [
   '', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
 ]
 
-// ── Fonctions de calcul ────────────────────────────────────────────────────────
+// ── Fonctions de calcul (formules exactes ECAM) ────────────────────────────────
 
-function calcIRPP(imposable: number): number {
-  if (imposable <= 50_000)  return 0
-  if (imposable <= 100_000) return (imposable - 50_000) * 0.01
-  if (imposable <= 250_000) return 500 + (imposable - 100_000) * 0.10
-  if (imposable <= 500_000) return 15_500 + (imposable - 250_000) * 0.20
-  return 65_500 + (imposable - 500_000) * 0.30
+function calcIRPP(baseIRPP: number): number {
+  // Barème IRPP Congo — tranches mensuelles ECAM 2024
+  // NP = 1 (célibataire sans enfant par défaut dans la liste de paie)
+  if (baseIRPP <= 0) return 0
+  let irpp = 0
+  if (baseIRPP > 0)          irpp += Math.min(baseIRPP, 38_667) * 0.01
+  if (baseIRPP > 38_667)     irpp += (Math.min(baseIRPP, 83_333) - 38_667) * 0.10
+  if (baseIRPP > 83_333)     irpp += (Math.min(baseIRPP, 250_000) - 83_333) * 0.25
+  if (baseIRPP > 250_000)    irpp += (baseIRPP - 250_000) * 0.40
+  return Math.round(irpp)
 }
 
 function calcBulletin(salaire_base: number, primes: number, heures_sup: number, taux_horaire: number) {
   const brut         = Math.round(salaire_base + primes + heures_sup * taux_horaire)
-  const base_cnss    = Math.min(brut, PLAFOND_CNSS)
-  const cnss_salarie = Math.round(base_cnss * TAUX_CNSS_SALARIE)
-  const cnss_patro   = Math.round(base_cnss * TAUX_CNSS_PATRONAL)
-  const irpp         = Math.round(calcIRPP((brut - cnss_salarie) * 0.9))
-  const net          = brut - cnss_salarie - irpp
-  return { brut, cnss_salarie, cnss_patronal: cnss_patro, irpp, net }
+  // CNSS salarié : 4% plafonné 1 200 000 (formule exacte ECAM)
+  const base_cnss    = Math.min(brut, PLAFOND_CNSS_SALARIE)
+  const cnss_salarie = Math.round(base_cnss * 0.04)
+  // Patronal : 8%+12.28%+3%TUS+4.5%TUS (plafonné respectivement)
+  const cnss_patro   = Math.round(Math.min(brut, 1_200_000) * 0.08
+    + Math.min(brut, 600_000) * 0.1228
+    + brut * 0.03 + brut * 0.045)
+  const tol          = 1_000
+  const base_irpp    = brut - cnss_salarie
+  const irpp         = calcIRPP(base_irpp)
+  const net          = brut - cnss_salarie - irpp - tol
+  return { brut, cnss_salarie, cnss_patronal: cnss_patro, irpp, tol, net }
 }
 
 function fmt(n: number) {
@@ -167,7 +177,7 @@ function printBulletin(row: BulletinRow, mois: number, annee: number, entreprise
     </thead>
     <tbody>
       <tr>
-        <td>CNSS (base plafonnée à ${fmt(Math.min(row.brut, PLAFOND_CNSS))} FCFA)</td>
+        <td>CNSS (base plafonnée à ${fmt(Math.min(row.brut, PLAFOND_CNSS_SALARIE))} FCFA)</td>
         <td style="text-align:right">− ${fmt(row.cnss_salarie)}<br><span style="font-size:9px;color:#888">taux 5,04 %</span></td>
         <td style="text-align:right">${fmt(row.cnss_patronal)}<br><span style="font-size:9px;color:#888">taux 14,16 %</span></td>
       </tr>

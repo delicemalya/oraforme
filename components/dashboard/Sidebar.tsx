@@ -66,8 +66,10 @@ const ICONS: Record<string, LucideIcon> = {
   tresorerie:    Wallet,
   facturation:   FileText,
   depenses:      Receipt,
-  rh:            Users,
-  roles:         ShieldCheck,
+  rh:                  Users,
+  salaires:            Receipt,
+  'declarations-cnss': BookMarked,
+  roles:               ShieldCheck,
   crm:           UsersRound,
   stock:         Package,
   achats:        ShoppingCart,
@@ -132,6 +134,9 @@ const ICONS: Record<string, LucideIcon> = {
 type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 
 const MODULE_DEFS: ModuleDef[] = [
+  // RH — sous-modules salaires et CNSS
+  { id: 'salaires',          label: 'Salaires & Paie',     sublabel: 'Bulletins ECAM', href: '/dashboard/rh/salaires' },
+  { id: 'declarations-cnss', label: 'Déclarations CNSS',   sublabel: 'Bordereau mensuel', href: '/dashboard/rh/declarations-cnss' },
   { id: 'bi',          label: 'Analytics',              sublabel: '', href: '/dashboard/bi' },
   { id: 'bi-dg',       label: 'Analytics général',      sublabel: '', href: '/dashboard/bi' },
   { id: 'bi-rh',       label: 'Analytics RH',           sublabel: '', href: '/dashboard/bi/rh' },
@@ -169,7 +174,7 @@ const SIDEBAR_GROUPS = [
   // FINANCE — gestion financière complète
   { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   // RH — personnel & paie
-  { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'roles'] },
+  { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'declarations-cnss', 'roles'] },
   // COMMERCIAL — clients, stock, achats
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'stock', 'achats'] },
   // OUTILS — IA & productivité (calendrier → navbar)
@@ -193,8 +198,10 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   tresorerie:   'nav.tresorerie',
   facturation:  'nav.facturation',
   depenses:     'nav.depenses',
-  rh:           'nav.rh',
-  roles:        'nav.roles',
+  rh:                  'nav.rh',
+  salaires:            'nav.salaires',
+  'declarations-cnss': 'nav.declarations_cnss',
+  roles:               'nav.roles',
   crm:          'nav.crm',
   stock:        'nav.stock',
   achats:       'nav.achats',
