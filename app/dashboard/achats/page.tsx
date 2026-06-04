@@ -56,14 +56,16 @@ export default function AchatsPage() {
   async function saveFournisseur() {
     if (!fForm.nom || !tenantId) return
     setSaving(true)
-    await supabase.from('fournisseurs').insert({ tenant_id: tenantId, ...fForm, solde_du: 0 })
-    setModal(null); setFForm({ nom: '', contact: '', telephone: '', email: '' }); setSaving(false); load()
+    const { error } = await supabase.from('fournisseurs').insert({ tenant_id: tenantId, ...fForm, solde_du: 0 })
+    setSaving(false)
+    if (error) { alert('Erreur: ' + error.message); console.error('[fournisseurs insert]', error); return }
+    setModal(null); setFForm({ nom: '', contact: '', telephone: '', email: '' }); load()
   }
 
   async function saveAchat() {
     if (!aForm.description || !aForm.montant || !tenantId) return
     setSaving(true)
-    await supabase.from('achats').insert({
+    const { error } = await supabase.from('achats').insert({
       tenant_id:      tenantId,
       fournisseur_id: aForm.fournisseur_id || null,
       description:    aForm.description,
@@ -72,9 +74,10 @@ export default function AchatsPage() {
       date:           aForm.date,
       cost_center_id: aForm.cost_center_id || null,
     })
+    setSaving(false)
+    if (error) { alert('Erreur: ' + error.message); console.error('[achats insert]', error); return }
     setModal(null)
     setAForm({ fournisseur_id: '', description: '', montant: '', date: new Date().toISOString().split('T')[0], cost_center_id: '' })
-    setSaving(false)
     load()
   }
 
