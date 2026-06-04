@@ -207,7 +207,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   async function handleSave() {
     if (!form.nom.trim()) return
     setSaving(true)
-    await fetch('/api/hr/employees', {
+    const resp = await fetch('/api/hr/employees', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -225,6 +225,11 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
       }),
     })
     setSaving(false)
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}))
+      alert('Erreur création employé : ' + (err?.error ?? err?.message ?? resp.statusText))
+      return
+    }
     setShowForm(false)
     resetForm()
     onRefresh()
@@ -235,7 +240,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   }
 
   async function updateStatut(id: string, statut: string) {
-    await supabase.from('employes').update({ statut }).eq('id', id)
+    const { error } = await supabase.from('employes').update({ statut }).eq('id', id)
+    if (error) { alert('Erreur mise à jour statut : ' + error.message); return }
     if (selected?.id === id) setSelected(prev => prev ? { ...prev, statut: statut as Statut } : null)
     onRefresh()
   }
@@ -243,7 +249,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   async function handleDelete(id: string) {
   const { t } = useLocale()
     if (!confirm(t('rh.deletePermanent'))) return
-    await supabase.from('employes').delete().eq('id', id)
+    const { error } = await supabase.from('employes').delete().eq('id', id)
+    if (error) { alert('Erreur suppression employé : ' + error.message); return }
     setSelected(null)
     onRefresh()
   }
@@ -681,19 +688,21 @@ function TabConges({ tenantId, employes, conges, onRefresh }: {
     const jours = nbJours(form.date_debut, form.date_fin)
     if (!form.employe_id || !form.date_debut || !form.date_fin || jours < 1) return
     setSaving(true)
-    await supabase.from('conges').insert({
+    const { error } = await supabase.from('conges').insert({
       tenant_id: tenantId, employe_id: form.employe_id,
       type_conge: form.type_conge, date_debut: form.date_debut,
       date_fin: form.date_fin, nb_jours: jours, motif: form.motif, statut: 'en_attente',
     })
     setSaving(false)
+    if (error) { alert('Erreur création congé : ' + error.message); return }
     setShowForm(false)
     setForm({ employe_id:'',type_conge:'annuel',date_debut:'',date_fin:'',motif:'' })
     onRefresh()
   }
 
   async function approuver(id: string, statut: 'approuve' | 'refuse') {
-    await supabase.from('conges').update({ statut }).eq('id', id)
+    const { error } = await supabase.from('conges').update({ statut }).eq('id', id)
+    if (error) { alert('Erreur mise à jour congé : ' + error.message); return }
     onRefresh()
   }
 

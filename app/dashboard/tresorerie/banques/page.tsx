@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -12,7 +13,7 @@ import { fmtFCFA } from '@/lib/admin-config'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   Landmark, Plus, X, Save, FileText, Send, Download,
-  CheckCircle2, AlertTriangle, Clock, Ban, ChevronDown,
+  CheckCircle2, AlertTriangle, Clock, Ban, PenLine, Building,
 } from 'lucide-react'
 
 interface CompteBancaire {
@@ -38,6 +39,7 @@ function today() { return new Date().toISOString().split('T')[0] }
 export default function BanquesPage() {
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
+  const searchParams = useSearchParams()
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-US' : locale
   const [comptes,  setComptes]  = useState<CompteBancaire[]>([])
   const [cheques,  setCheques]  = useState<Cheque[]>([])
@@ -48,13 +50,28 @@ export default function BanquesPage() {
   const [tab,      setTab]      = useState<'comptes' | 'cheques' | 'virements'>('comptes')
   const [chequeType, setChequeType] = useState<'emis' | 'recu'>('emis')
 
+  // Lire l'onglet depuis l'URL (?tab=cheques ou ?tab=virements)
+  useEffect(() => {
+    const urlTab = searchParams.get('tab')
+    if (urlTab === 'cheques' || urlTab === 'virements') setTab(urlTab)
+  }, [searchParams])
+
   const [modalCompte, setModalCompte] = useState(false)
   const [modalCheque, setModalCheque] = useState(false)
   const [modalVirement, setModalVirement] = useState(false)
 
   const [fCompte,   setFCompte]   = useState({ banque: 'BGFI Bank', intitule: '', numero_compte: '', solde: '' })
-  const [fCheque,   setFCheque]   = useState({ numero: '', montant: '', beneficiaire: '', emetteur: '', banque_tiree: 'BGFI Bank', date_emission: today(), date_echeance: '', motif: '', compte_bancaire_id: '' })
-  const [fVirement, setFVirement] = useState({ compte_source_id: '', compte_dest_label: '', montant: '', motif: '', date: today(), reference: '' })
+  const [fCheque,   setFCheque]   = useState({
+    numero: '', code_micr: '', montant: '', beneficiaire: '', emetteur: '',
+    banque_tiree: 'BGFI Bank', date_emission: today(), date_echeance: '',
+    motif: '', compte_bancaire_id: '', signataire: '', lieu: 'Brazzaville',
+  })
+  const [fVirement, setFVirement] = useState({
+    compte_source_id: '', compte_dest_id: '', compte_dest_label: '',
+    montant: '', motif: '', date: today(), reference: '',
+    signataire: '', agence: '',
+  })
+  const [destType, setDestType] = useState<'interne' | 'externe'>('externe')
 
   function showToast(msg: string, ok = true) { setToast({ msg, ok }); setTimeout(() => setToast(null), 3000) }
 
@@ -111,23 +128,31 @@ export default function BanquesPage() {
   }
 
   async function saveVirement() {
-    if (!tenantId || !fVirement.compte_dest_label || !fVirement.montant) return
+    const destLabel = destType === 'interne'
+      ? comptes.find(c => c.id === fVirement.compte_dest_id)?.intitule ?? ''
+      : fVirement.compte_dest_label
+    if (!tenantId || !destLabel || !fVirement.montant) return
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     const src = comptes.find(c => c.id === fVirement.compte_source_id)
     const { error } = await supabase.from('virements').insert({
-      tenant_id: tenantId, compte_source_id: fVirement.compte_source_id || null,
+      tenant_id: tenantId,
+      compte_source_id:    fVirement.compte_source_id || null,
       compte_source_label: src?.intitule ?? null,
-      compte_dest_label: fVirement.compte_dest_label,
-      montant: parseFloat(fVirement.montant), motif: fVirement.motif || null,
-      date: fVirement.date, reference: fVirement.reference || null,
-      statut: 'en_attente', created_by: user?.id,
+      compte_dest_label:   destLabel,
+      montant:             parseFloat(fVirement.montant),
+      motif:               fVirement.motif || null,
+      date:                fVirement.date,
+      reference:           fVirement.reference || null,
+      statut:              'en_attente',
+      created_by:          user?.id,
     })
     if (error) showToast(error.message, false)
     else {
       showToast('Virement enregistré')
       setModalVirement(false)
-      setFVirement({ compte_source_id: '', compte_dest_label: '', montant: '', motif: '', date: today(), reference: '' })
+      setFVirement({ compte_source_id: '', compte_dest_id: '', compte_dest_label: '', montant: '', motif: '', date: today(), reference: '', signataire: '', agence: '' })
+      setDestType('externe')
       load()
     }
     setSaving(false)
@@ -494,108 +519,256 @@ export default function BanquesPage() {
         </div>
       )}
 
-      {/* Modal Chèque */}
+      {/* ── Modal Chèque — formulaire complet ─────────────────────────────── */}
       {modalCheque && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-              <h2 className="text-[15px] font-extrabold text-[#7C3AED]">Saisir un chèque</h2>
-              <button onClick={() => setModalCheque(false)}><X size={16} className="text-[#94A3B8]" /></button>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] sticky top-0 bg-white z-10">
+              <div className="flex items-center gap-2">
+                <FileText size={18} className="text-[#7C3AED]" />
+                <h2 className="text-[15px] font-extrabold text-[#7C3AED]">Saisir un chèque</h2>
+              </div>
+              <button onClick={() => setModalCheque(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X size={16} className="text-[#94A3B8]" />
+              </button>
             </div>
-            <div className="p-5 space-y-3">
+            <div className="p-6 space-y-4">
+              {/* Type émis / reçu */}
               <div className="flex gap-2">
                 {(['emis', 'recu'] as const).map(item => (
                   <button key={item} onClick={() => setChequeType(item)}
-                    className={`flex-1 py-2 rounded-lg text-[12px] font-bold border ${chequeType === item ? 'bg-[#7C3AED] text-white border-[#7C3AED]' : 'bg-white border-[#E2E8F0] text-[#64748B]'}`}>
-                    {item === 'emis' ? 'Chèque émis ↗' : 'Chèque reçu ↙'}
+                    className={`flex-1 py-2.5 rounded-xl text-[12px] font-bold border-2 transition-all ${
+                      chequeType === item
+                        ? 'bg-[#7C3AED] text-white border-[#7C3AED]'
+                        : 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#7C3AED]/40'
+                    }`}>
+                    {item === 'emis' ? '↗ Chèque émis' : '↙ Chèque reçu'}
                   </button>
                 ))}
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { key: 'numero',       label: 'N° chèque *', placeholder: '00001234' },
-                  { key: 'montant',      label: 'Montant *',   placeholder: '0',      type: 'number' },
-                  ...(chequeType === 'emis'
-                    ? [{ key: 'beneficiaire', label: 'Bénéficiaire', placeholder: 'Nom bénéficiaire' }]
-                    : [{ key: 'emetteur',     label: 'Émetteur',     placeholder: 'Nom émetteur' }]),
-                  { key: 'date_emission',  label: 'Date émission', placeholder: '', type: 'date' },
-                  { key: 'date_echeance',  label: 'Date échéance', placeholder: '', type: 'date' },
-                  { key: 'motif',          label: 'Motif',         placeholder: 'Description' },
-                ].map(f => (
-                  <div key={f.key}>
-                    <label className="block text-[11px] font-bold text-[#64748B] mb-1">{f.label}</label>
-                    <input type={f.type || 'text'} value={(fCheque as Record<string, string>)[f.key]}
-                      onChange={e => setFCheque(prev => ({ ...prev, [f.key]: e.target.value }))}
-                      placeholder={f.placeholder}
-                      className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none" />
-                  </div>
-                ))}
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* N° chèque */}
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Banque tirée</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">N° Chèque *</label>
+                  <input value={fCheque.numero} onChange={e => setFCheque(f => ({ ...f, numero: e.target.value }))}
+                    placeholder="00001234"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] font-mono focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+                {/* Code MICR */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Code MICR / CMC7</label>
+                  <input value={fCheque.code_micr} onChange={e => setFCheque(f => ({ ...f, code_micr: e.target.value }))}
+                    placeholder="123456789012345"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] font-mono focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+                {/* Montant */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Montant (FCFA) *</label>
+                  <input type="number" value={fCheque.montant} onChange={e => setFCheque(f => ({ ...f, montant: e.target.value }))}
+                    placeholder="0"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+                {/* Bénéficiaire ou Émetteur */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">
+                    {chequeType === 'emis' ? 'Bénéficiaire *' : 'Émetteur *'}
+                  </label>
+                  <input
+                    value={chequeType === 'emis' ? fCheque.beneficiaire : fCheque.emetteur}
+                    onChange={e => setFCheque(f => chequeType === 'emis' ? { ...f, beneficiaire: e.target.value } : { ...f, emetteur: e.target.value })}
+                    placeholder={chequeType === 'emis' ? 'Nom du bénéficiaire' : 'Nom de l\'émetteur'}
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+                {/* Date émission */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Date émission</label>
+                  <input type="date" value={fCheque.date_emission} onChange={e => setFCheque(f => ({ ...f, date_emission: e.target.value }))}
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+                {/* Date échéance */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Date échéance</label>
+                  <input type="date" value={fCheque.date_echeance} onChange={e => setFCheque(f => ({ ...f, date_echeance: e.target.value }))}
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+                {/* Banque tirée */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Banque tirée</label>
                   <select value={fCheque.banque_tiree} onChange={e => setFCheque(f => ({ ...f, banque_tiree: e.target.value }))}
-                    className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none">
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]">
                     {BANQUES_CG.map(b => <option key={b}>{b}</option>)}
                   </select>
                 </div>
+                {/* Compte bancaire */}
                 <div>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">Compte bancaire</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Compte bancaire</label>
                   <select value={fCheque.compte_bancaire_id} onChange={e => setFCheque(f => ({ ...f, compte_bancaire_id: e.target.value }))}
-                    className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none">
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]">
                     <option value="">— Choisir —</option>
-                    {comptes.map(c => <option key={c.id} value={c.id}>{c.intitule}</option>)}
+                    {comptes.map(c => <option key={c.id} value={c.id}>{c.banque} — {c.intitule}</option>)}
                   </select>
                 </div>
+                {/* Lieu */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Lieu</label>
+                  <input value={fCheque.lieu} onChange={e => setFCheque(f => ({ ...f, lieu: e.target.value }))}
+                    placeholder="Brazzaville"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+                {/* Motif */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Motif / Objet</label>
+                  <input value={fCheque.motif} onChange={e => setFCheque(f => ({ ...f, motif: e.target.value }))}
+                    placeholder="Description du paiement"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]" />
+                </div>
+              </div>
+
+              {/* Signataire */}
+              <div className="border-t border-[#F1F5F9] pt-4">
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1.5 flex items-center gap-1">
+                  <PenLine size={11} /> Signataire autorisé
+                </label>
+                <input value={fCheque.signataire} onChange={e => setFCheque(f => ({ ...f, signataire: e.target.value }))}
+                  placeholder="Nom et qualité du signataire"
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#7C3AED]" />
               </div>
             </div>
-            <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setModalCheque(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
+            <div className="px-6 pb-6 flex justify-end gap-2 border-t border-[#F1F5F9] pt-4">
+              <button onClick={() => setModalCheque(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-xl text-[12px] font-semibold">
+                {t('common.cancel')}
+              </button>
               <button onClick={saveCheque} disabled={saving}
-                className="flex items-center gap-1.5 px-5 py-2 bg-[#7C3AED] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? '…' : t('common.save')}
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-[#7C3AED] text-white rounded-xl text-[12px] font-bold disabled:opacity-60">
+                <Save size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer le chèque'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal Virement */}
+      {/* ── Modal Virement — formulaire complet ──────────────────────────────── */}
       {modalVirement && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-              <h2 className="text-[15px] font-extrabold text-[#0F172A]">Nouveau virement bancaire</h2>
-              <button onClick={() => setModalVirement(false)}><X size={16} className="text-[#94A3B8]" /></button>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] sticky top-0 bg-white z-10">
+              <div className="flex items-center gap-2">
+                <Send size={18} className="text-[#0F172A]" />
+                <h2 className="text-[15px] font-extrabold text-[#0F172A]">Nouveau virement bancaire</h2>
+              </div>
+              <button onClick={() => setModalVirement(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X size={16} className="text-[#94A3B8]" />
+              </button>
             </div>
-            <div className="p-5 space-y-3">
+            <div className="p-6 space-y-4">
+
+              {/* Compte source */}
               <div>
-                <label className="block text-[11px] font-bold text-[#64748B] mb-1">Compte source</label>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Compte source *</label>
                 <select value={fVirement.compte_source_id} onChange={e => setFVirement(f => ({ ...f, compte_source_id: e.target.value }))}
-                  className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none">
-                  <option value="">— Sélectionner —</option>
-                  {comptes.map(c => <option key={c.id} value={c.id}>{c.intitule} ({fmtFCFA(c.solde)})</option>)}
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]">
+                  <option value="">— Sélectionner un compte —</option>
+                  {comptes.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.banque} — {c.intitule} ({fmtFCFA(c.solde)})
+                    </option>
+                  ))}
                 </select>
               </div>
-              {[
-                { key: 'compte_dest_label', label: 'Compte destinataire *', placeholder: 'BGFI Bank — ACME SARL' },
-                { key: 'montant',           label: 'Montant (FCFA) *',      placeholder: '0', type: 'number' },
-                { key: 'motif',             label: 'Motif',                  placeholder: 'Paiement fournisseur...' },
-                { key: 'date',              label: 'Date',                   placeholder: '', type: 'date' },
-                { key: 'reference',         label: 'Référence',             placeholder: 'VIR-001' },
-              ].map(f => (
-                <div key={f.key}>
-                  <label className="block text-[11px] font-bold text-[#64748B] mb-1">{f.label}</label>
-                  <input type={f.type || 'text'} value={(fVirement as Record<string, string>)[f.key]}
-                    onChange={e => setFVirement(prev => ({ ...prev, [f.key]: e.target.value }))}
-                    placeholder={f.placeholder}
-                    className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none" />
+
+              {/* Type de destination */}
+              <div>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Type de destination</label>
+                <div className="flex gap-2">
+                  {(['interne', 'externe'] as const).map(dt => (
+                    <button key={dt} onClick={() => setDestType(dt)}
+                      className={`flex-1 py-2 rounded-xl text-[12px] font-bold border-2 transition-all ${
+                        destType === dt ? 'bg-[#0F172A] text-white border-[#0F172A]' : 'bg-white border-[#E2E8F0] text-[#64748B]'
+                      }`}>
+                      {dt === 'interne' ? '🏦 Compte interne' : '🌐 Compte externe'}
+                    </button>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Compte destinataire */}
+              {destType === 'interne' ? (
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Compte destination *</label>
+                  <select value={fVirement.compte_dest_id} onChange={e => setFVirement(f => ({ ...f, compte_dest_id: e.target.value }))}
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]">
+                    <option value="">— Sélectionner —</option>
+                    {comptes.filter(c => c.id !== fVirement.compte_source_id).map(c => (
+                      <option key={c.id} value={c.id}>{c.banque} — {c.intitule}</option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Compte destinataire * <span className="font-normal text-gray-400">(banque + nom)</span></label>
+                  <input value={fVirement.compte_dest_label} onChange={e => setFVirement(f => ({ ...f, compte_dest_label: e.target.value }))}
+                    placeholder="Ex: BGFI Bank — ACME SARL"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]" />
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* Montant */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Montant (FCFA) *</label>
+                  <input type="number" value={fVirement.montant} onChange={e => setFVirement(f => ({ ...f, montant: e.target.value }))}
+                    placeholder="0"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]" />
+                </div>
+                {/* Date */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Date du virement</label>
+                  <input type="date" value={fVirement.date} onChange={e => setFVirement(f => ({ ...f, date: e.target.value }))}
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]" />
+                </div>
+                {/* Référence */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">N° d'ordre / Référence</label>
+                  <input value={fVirement.reference} onChange={e => setFVirement(f => ({ ...f, reference: e.target.value }))}
+                    placeholder="VIR-2026-001"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] font-mono focus:outline-none focus:border-[#0F172A]" />
+                </div>
+                {/* Agence */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Agence bancaire</label>
+                  <input value={fVirement.agence} onChange={e => setFVirement(f => ({ ...f, agence: e.target.value }))}
+                    placeholder="Agence Centre-ville"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]" />
+                </div>
+              </div>
+
+              {/* Motif */}
+              <div>
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1.5">Motif / Libellé *</label>
+                <input value={fVirement.motif} onChange={e => setFVirement(f => ({ ...f, motif: e.target.value }))}
+                  placeholder="Ex: Paiement fournisseur XYZ — Facture N° 2026-001"
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]" />
+              </div>
+
+              {/* Signataire */}
+              <div className="border-t border-[#F1F5F9] pt-4">
+                <label className="block text-[11px] font-bold text-[#64748B] mb-1.5 flex items-center gap-1">
+                  <PenLine size={11} /> Signataire autorisé
+                </label>
+                <input value={fVirement.signataire} onChange={e => setFVirement(f => ({ ...f, signataire: e.target.value }))}
+                  placeholder="Nom, prénom et qualité du signataire"
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-[12px] focus:outline-none focus:border-[#0F172A]" />
+                <p className="text-[10px] text-[#94A3B8] mt-1">Ce champ servira de référence pour la validation interne.</p>
+              </div>
             </div>
-            <div className="px-5 pb-5 flex justify-end gap-2">
-              <button onClick={() => setModalVirement(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-lg text-[12px] font-semibold">{t('common.cancel')}</button>
+            <div className="px-6 pb-6 flex justify-end gap-2 border-t border-[#F1F5F9] pt-4">
+              <button onClick={() => setModalVirement(false)} className="px-4 py-2 bg-[#F1F5F9] text-[#64748B] rounded-xl text-[12px] font-semibold">
+                {t('common.cancel')}
+              </button>
               <button onClick={saveVirement} disabled={saving}
-                className="flex items-center gap-1.5 px-5 py-2 bg-[#0F172A] text-white rounded-lg text-[12px] font-semibold disabled:opacity-60">
-                <Save size={13} /> {saving ? '…' : t('common.save')}
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0F172A] text-white rounded-xl text-[12px] font-bold disabled:opacity-60">
+                <Send size={13} /> {saving ? 'Enregistrement…' : 'Créer le virement'}
               </button>
             </div>
           </div>

@@ -134,9 +134,8 @@ const ICONS: Record<string, LucideIcon> = {
 type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 
 const MODULE_DEFS: ModuleDef[] = [
-  // RH — sous-modules salaires et CNSS
-  { id: 'salaires',          label: 'Salaires & Paie',     sublabel: 'Bulletins ECAM', href: '/dashboard/rh/salaires' },
-  { id: 'declarations-cnss', label: 'Déclarations CNSS',   sublabel: 'Bordereau mensuel', href: '/dashboard/rh/declarations-cnss' },
+  // RH — sous-modules paie
+  { id: 'salaires', label: 'Paie & Bulletins', sublabel: 'ECAM Congo', href: '/dashboard/rh/paie' },
   { id: 'bi',          label: 'Analytics',              sublabel: '', href: '/dashboard/bi' },
   { id: 'bi-dg',       label: 'Analytics général',      sublabel: '', href: '/dashboard/bi' },
   { id: 'bi-rh',       label: 'Analytics RH',           sublabel: '', href: '/dashboard/bi/rh' },
@@ -174,7 +173,7 @@ const SIDEBAR_GROUPS = [
   // FINANCE — gestion financière complète
   { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   // RH — personnel & paie
-  { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'declarations-cnss', 'roles'] },
+  { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
   // COMMERCIAL — clients, stock, achats
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'stock', 'achats'] },
   // OUTILS — IA & productivité (calendrier → navbar)

@@ -150,6 +150,7 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [reference, setReference] = useState('')
   const [saving, setSaving] = useState(false)
+  const [payError, setPayError] = useState('')
 
   const modes = [
     { value: 'especes',      label: 'Espèces' },
@@ -165,7 +166,8 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
   async function handlePay() {
     if (!montant || montant <= 0) return
     setSaving(true)
-    await supabase.from('paiements_factures').insert({
+    setPayError('')
+    const { error } = await supabase.from('paiements_factures').insert({
       tenant_id: tenantId,
       facture_id: facture.id,
       montant: Math.min(montant, resteARegler),
@@ -174,6 +176,7 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
       reference: reference || null,
     })
     setSaving(false)
+    if (error) { setPayError(error.message); return }
     onPaid()
     onClose()
   }
@@ -260,6 +263,9 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
               />
             </div>
 
+            {payError && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{payError}</p>
+            )}
             {/* Boutons */}
             <div className="flex gap-3 pt-2">
               <button
@@ -415,26 +421,32 @@ export default function FacturationPage() {
     const { tva: tvaFinal, ca: caFinal, ttc } = calculerTVACongo(ht)
 
     if (editId) {
-      await supabase.from('factures').update({
+      const { error: errUpd } = await supabase.from('factures').update({
         invoice_number: invoiceNum, client_name: clientNom, client_address: clientAddress,
         client_phone: clientPhone, client_email: clientEmail,
         date: dateVal, due_date: dueDate || null,
         subtotal: ht, tva: tvaFinal, ca: caFinal, total: ttc,
         notes: notes || null, statut: finalStatut,
       }).eq('id', editId)
-      await supabase.from('facture_lignes').delete().eq('invoice_id', editId)
-      await supabase.from('facture_lignes').insert(lignes.filter(l => l.description).map(l => ({ invoice_id: editId, description: l.description, price: l.price, quantity: l.quantity, total: l.total })))
+      if (errUpd) { showToast('Erreur mise à jour : ' + errUpd.message); setSaving(false); return }
+      const { error: errDel } = await supabase.from('facture_lignes').delete().eq('invoice_id', editId)
+      if (errDel) { showToast('Erreur suppression lignes : ' + errDel.message); setSaving(false); return }
+      const { error: errIns } = await supabase.from('facture_lignes').insert(lignes.filter(l => l.description).map(l => ({ invoice_id: editId, description: l.description, price: l.price, quantity: l.quantity, total: l.total })))
+      if (errIns) { showToast('Erreur insertion lignes : ' + errIns.message); setSaving(false); return }
       showToast('Facture mise à jour !')
     } else {
-      const { data: fac } = await supabase.from('factures').insert({
+      const { data: fac, error: errCreate } = await supabase.from('factures').insert({
         tenant_id: tenantId, invoice_number: invoiceNum, client_name: clientNom,
         client_nom: clientNom, client_address: clientAddress, client_phone: clientPhone,
         client_email: clientEmail, date: dateVal, due_date: dueDate || null,
         subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
         notes: notes || null, statut: finalStatut,
       }).select('id').single()
-      if (fac?.id) {
-        await supabase.from('facture_lignes').insert(lignes.filter(l => l.description).map(l => ({ invoice_id: fac.id, description: l.description, price: l.price, quantity: l.quantity, total: l.total })))
+      if (errCreate || !fac?.id) { showToast('Erreur création : ' + (errCreate?.message ?? 'ID manquant')); setSaving(false); return }
+      const lignesValides = lignes.filter(l => l.description)
+      if (lignesValides.length > 0) {
+        const { error: errLignes } = await supabase.from('facture_lignes').insert(lignesValides.map(l => ({ invoice_id: fac.id, description: l.description, price: l.price, quantity: l.quantity, total: l.total })))
+        if (errLignes) { showToast('Facture créée, erreur lignes : ' + errLignes.message); setSaving(false); setShowForm(false); resetForm(); load(); return }
       }
       showToast('Facture créée !')
     }
@@ -447,13 +459,15 @@ export default function FacturationPage() {
   // ── Delete / Statut ───────────────────────────────────────────────────────────
 
   async function del(id: string) {
-    await supabase.from('factures').delete().eq('id', id)
+    const { error } = await supabase.from('factures').delete().eq('id', id)
+    if (error) { showToast('Erreur suppression : ' + error.message); return }
     setFactures(f => f.filter(x => x.id !== id))
     showToast('Facture supprimée.')
   }
 
   async function updateStatut(id: string, s: StatutFac) {
-    await supabase.from('factures').update({ statut: s }).eq('id', id)
+    const { error } = await supabase.from('factures').update({ statut: s }).eq('id', id)
+    if (error) { showToast('Erreur statut : ' + error.message); return }
     setFactures(f => f.map(x => x.id === id ? { ...x, statut: s } : x))
   }
 
@@ -470,7 +484,7 @@ export default function FacturationPage() {
         .eq('source_id', confirmStatut.id)
       if ((count ?? 0) === 0) {
         const ttc = calculerTVACongo(fac.subtotal ?? fac.montant_ht ?? 0).ttc
-        await supabase.from('transactions').insert({
+        const { error: errTx } = await supabase.from('transactions').insert({
           tenant_id:     tenantId,
           type:          'entree',
           categorie:     'Facture payée',
@@ -481,6 +495,7 @@ export default function FacturationPage() {
           source:        'facture',
           source_id:     confirmStatut.id,
         })
+        if (errTx) captureSupabaseError('insert transaction facture', errTx, { module: 'facturation', tenant_id: tenantId })
       }
     }
     showToast(`Statut → ${STATUT_CONFIG[confirmStatut.next].label}`)

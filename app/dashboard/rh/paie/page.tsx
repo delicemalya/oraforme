@@ -407,9 +407,15 @@ export default function PaiePage() {
       statut:        r.statut,
     }))
 
-    await supabase
+    const { error: errUpsert } = await supabase
       .from('bulletins_paie')
       .upsert(toUpsert, { onConflict: 'employe_id,mois,annee' })
+
+    if (errUpsert) {
+      captureSupabaseError('upsert bulletins_paie', errUpsert, { module: 'rh/paie', tenant_id: tenantId })
+      setSaving(false)
+      return
+    }
 
     // Sync bulletins marqués "payee" vers trésorerie (déduplication par source_id)
     const payees = rows.filter(r => r.statut === 'payee')
@@ -436,7 +442,8 @@ export default function PaiePage() {
           source_id:     `bulletin_${r.employe_id}_${mois}_${annee}`,
         }))
       if (toInsert.length > 0) {
-        await supabase.from('transactions').insert(toInsert)
+        const { error: errTx } = await supabase.from('transactions').insert(toInsert)
+        if (errTx) captureSupabaseError('insert transactions from paie', errTx, { module: 'rh/paie', tenant_id: tenantId })
       }
     }
 
