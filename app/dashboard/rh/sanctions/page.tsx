@@ -148,12 +148,14 @@ export default function SanctionsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm('Supprimer cette sanction ?')) return
-    await supabase.from('sanctions').delete().eq('id', id).eq('tenant_id', tenantId)
+    const { error } = await supabase.from('sanctions').delete().eq('id', id).eq('tenant_id', tenantId)
+    if (error) { setError(error.message); return }
     setSanctions(prev => prev.filter(s => s.id !== id))
   }
 
   async function handleCloturer(id: string) {
-    await supabase.from('sanctions').update({ statut: 'cloture' }).eq('id', id).eq('tenant_id', tenantId)
+    const { error } = await supabase.from('sanctions').update({ statut: 'cloture' }).eq('id', id).eq('tenant_id', tenantId)
+    if (error) { setError(error.message); return }
     setSanctions(prev => prev.map(s => s.id === id ? { ...s, statut: 'cloture' } : s))
   }
 

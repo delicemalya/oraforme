@@ -99,21 +99,22 @@ export default function ContratsPage() {
   async function handleRenew(emp: Employe) {
     const newFin = new Date()
     newFin.setFullYear(newFin.getFullYear() + 1)
-    await supabase.from('employes').update({
+    const { error } = await supabase.from('employes').update({
       date_fin_contrat: newFin.toISOString().slice(0, 10),
       statut: 'actif',
     }).eq('id', emp.id)
+    if (error) { alert('Erreur renouvellement : ' + error.message); return }
     load()
     setSelected(null)
   }
 
   async function handleTerminate(emp: Employe) {
-  const { t } = useLocale()
     if (!confirm(`${t('rh.contrats.confirmTerminate')} ${emp.nom} ?`)) return
-    await supabase.from('employes').update({
+    const { error } = await supabase.from('employes').update({
       statut: 'licencie',
       date_fin_contrat: new Date().toISOString().slice(0, 10),
     }).eq('id', emp.id)
+    if (error) { alert('Erreur résiliation : ' + error.message); return }
     load()
     setSelected(null)
   }
@@ -142,7 +143,6 @@ export default function ContratsPage() {
   }).length
 
   function printContract(emp: Employe) {
-  const { t } = useLocale()
     const w = window.open('', '_blank')
     if (!w) return
     w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/><title>${t('rh.contrats.printTitle')} — ${emp.nom}</title>

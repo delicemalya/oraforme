@@ -137,7 +137,6 @@ export default function JournalPage() {
   }
 
   const exportCSV = () => {
-  const { t } = useLocale()
     const rows = [
       [t('common.date'), t('compta.journal.colPiece'), t('compta.journal.colDebit'), t('compta.journal.colCredit'), t('common.amount'), t('compta.journal.colLabel'), t('compta.journal.colSource')],
       ...filtered.map(e => [

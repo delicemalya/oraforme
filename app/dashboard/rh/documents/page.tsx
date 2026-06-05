@@ -167,13 +167,15 @@ export default function DocumentsRHPage() {
 
   async function handleArchive(id: string, current: string) {
     const next = current === 'actif' ? 'archive' : 'actif'
-    await supabase.from('documents_rh').update({ statut: next }).eq('id', id).eq('tenant_id', tenantId)
+    const { error } = await supabase.from('documents_rh').update({ statut: next }).eq('id', id).eq('tenant_id', tenantId)
+    if (error) { setError(error.message); return }
     setDocuments(prev => prev.map(d => d.id === id ? { ...d, statut: next } : d))
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Supprimer ce document ?')) return
-    await supabase.from('documents_rh').delete().eq('id', id).eq('tenant_id', tenantId)
+    const { error } = await supabase.from('documents_rh').delete().eq('id', id).eq('tenant_id', tenantId)
+    if (error) { setError(error.message); return }
     setDocuments(prev => prev.filter(d => d.id !== id))
   }
 

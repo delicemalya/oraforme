@@ -86,7 +86,6 @@ export default function ClientsPage() {
   function setField(k: keyof typeof form, v: string) { setForm(p => ({ ...p, [k]: v })) }
 
   async function handleSave() {
-  const { t } = useLocale()
     if (!form.nom.trim() || !tenantId) return
     setSaving(true)
     const { error } = await supabase.from('clients').insert({
@@ -102,8 +101,8 @@ export default function ClientsPage() {
   }
 
   async function handleDelete(id: string) {
-  const { t } = useLocale()
-    await supabase.from('clients').delete().eq('id', id)
+    const { error } = await supabase.from('clients').delete().eq('id', id)
+    if (error) { showToast('Erreur suppression : ' + error.message); return }
     setClients(c => c.filter(x => x.id !== id))
     showToast(t('clients.deletedMsg'))
     setDeleteId(null)

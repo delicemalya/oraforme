@@ -263,37 +263,45 @@ export default function DevisPage() {
     const ht = subtotalNet
     const { tva: tvaFinal, ca: caFinal, ttc } = calculerTVACongo(ht)
 
-    if (editId) {
-      await supabase.from('devis').update({
-        devis_number: devisNum,
-        client_name: clientNom, client_nom: clientNom,
-        client_address: clientAddress, client_phone: clientPhone, client_email: clientEmail,
-        date: dateVal, date_validite: dateValidite || null,
-        subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
-        notes: notes || null, statut: asStatut, remise_pct: remisePct,
-      }).eq('id', editId)
-      await supabase.from('devis_lignes').delete().eq('devis_id', editId)
-      await supabase.from('devis_lignes').insert(
-        lignes.filter(l => l.description).map(l => ({ devis_id: editId, description: l.description, price: l.price, quantity: l.quantity, total: l.total }))
-      )
-      showToast('Devis mis à jour !')
-    } else {
-      const { data: newDevis } = await supabase.from('devis').insert({
-        tenant_id: tenantId,
-        devis_number: devisNum,
-        client_name: clientNom, client_nom: clientNom,
-        client_address: clientAddress, client_phone: clientPhone, client_email: clientEmail,
-        date: dateVal, date_validite: dateValidite || null,
-        subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
-        notes: notes || null, statut: asStatut, remise_pct: remisePct,
-        facture_id: null,
-      }).select('id').single()
-      if (newDevis?.id) {
+    try {
+      if (editId) {
+        const { error: errUpd } = await supabase.from('devis').update({
+          devis_number: devisNum,
+          client_name: clientNom, client_nom: clientNom,
+          client_address: clientAddress, client_phone: clientPhone, client_email: clientEmail,
+          date: dateVal, date_validite: dateValidite || null,
+          subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
+          notes: notes || null, statut: asStatut, remise_pct: remisePct,
+        }).eq('id', editId)
+        if (errUpd) throw errUpd
+        await supabase.from('devis_lignes').delete().eq('devis_id', editId)
         await supabase.from('devis_lignes').insert(
-          lignes.filter(l => l.description).map(l => ({ devis_id: newDevis.id, description: l.description, price: l.price, quantity: l.quantity, total: l.total }))
+          lignes.filter(l => l.description).map(l => ({ devis_id: editId, description: l.description, price: l.price, quantity: l.quantity, total: l.total }))
         )
+        showToast('Devis mis à jour !')
+      } else {
+        const { data: newDevis, error: errIns } = await supabase.from('devis').insert({
+          tenant_id: tenantId,
+          devis_number: devisNum,
+          client_name: clientNom, client_nom: clientNom,
+          client_address: clientAddress, client_phone: clientPhone, client_email: clientEmail,
+          date: dateVal, date_validite: dateValidite || null,
+          subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
+          notes: notes || null, statut: asStatut, remise_pct: remisePct,
+          facture_id: null,
+        }).select('id').single()
+        if (errIns) throw errIns
+        if (newDevis?.id) {
+          await supabase.from('devis_lignes').insert(
+            lignes.filter(l => l.description).map(l => ({ devis_id: newDevis.id, description: l.description, price: l.price, quantity: l.quantity, total: l.total }))
+          )
+        }
+        showToast('Devis créé !')
       }
-      showToast('Devis créé !')
+    } catch (e: unknown) {
+      alert('Erreur enregistrement devis : ' + (e instanceof Error ? e.message : (e as { message?: string })?.message ?? String(e)))
+      setSaving(false)
+      return
     }
 
     setSaving(false)
@@ -305,8 +313,10 @@ export default function DevisPage() {
   // ── Delete ────────────────────────────────────────────────────────────────────
 
   async function handleDelete(id: string) {
-    await supabase.from('devis_lignes').delete().eq('devis_id', id)
-    await supabase.from('devis').delete().eq('id', id)
+    const { error: errLignes } = await supabase.from('devis_lignes').delete().eq('devis_id', id)
+    if (errLignes) { showToast('Erreur suppression lignes : ' + errLignes.message); return }
+    const { error } = await supabase.from('devis').delete().eq('id', id)
+    if (error) { showToast('Erreur suppression devis : ' + error.message); return }
     setDevis(prev => prev.filter(d => d.id !== id))
     setConfirmDelete(null)
     showToast('Devis supprimé.')
@@ -316,7 +326,8 @@ export default function DevisPage() {
 
   async function applyStatutChange() {
     if (!confirmStatut) return
-    await supabase.from('devis').update({ statut: confirmStatut.next }).eq('id', confirmStatut.id)
+    const { error } = await supabase.from('devis').update({ statut: confirmStatut.next }).eq('id', confirmStatut.id)
+    if (error) { showToast('Erreur changement statut : ' + error.message); return }
     setDevis(prev => prev.map(d => d.id === confirmStatut.id ? { ...d, statut: confirmStatut.next } : d))
     showToast(`Statut → ${STATUT_CONFIG[confirmStatut.next].label}`)
     setConfirmStatut(null)

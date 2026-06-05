@@ -135,13 +135,15 @@ export default function AvantagesPage() {
 
   async function handleDelete(id: string) {
     if (!confirm('Supprimer cet avantage ?')) return
-    await supabase.from('avantages').delete().eq('id', id).eq('tenant_id', tenantId)
+    const { error } = await supabase.from('avantages').delete().eq('id', id).eq('tenant_id', tenantId)
+    if (error) { setError(error.message); return }
     setAvantages(prev => prev.filter(a => a.id !== id))
   }
 
   async function handleToggleStatut(id: string, current: string) {
     const next = current === 'actif' ? 'inactif' : 'actif'
-    await supabase.from('avantages').update({ statut: next }).eq('id', id).eq('tenant_id', tenantId)
+    const { error } = await supabase.from('avantages').update({ statut: next }).eq('id', id).eq('tenant_id', tenantId)
+    if (error) { setError(error.message); return }
     setAvantages(prev => prev.map(a => a.id === id ? { ...a, statut: next } : a))
   }
 

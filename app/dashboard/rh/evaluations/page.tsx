@@ -102,7 +102,7 @@ export default function EvaluationsPage() {
     if (!form.employe_id) return
     setSaving(true)
     const moyenne = Math.round(((form.note_travail + form.note_ponctualite + form.note_travail_equipe + form.note_initiative) / 4) * 10) / 10
-    await supabase.from('evaluations').insert({
+    const { error } = await supabase.from('evaluations').insert({
       tenant_id: tenantId!,
       employe_id: form.employe_id,
       periode: form.periode,
@@ -116,6 +116,7 @@ export default function EvaluationsPage() {
       evaluateur: form.evaluateur || null,
     })
     setSaving(false)
+    if (error) { alert('Erreur enregistrement évaluation : ' + error.message); return }
     setShowForm(false)
     setForm({ employe_id:'', periode:'Q2-2026', note_travail:3, note_ponctualite:3, note_travail_equipe:3, note_initiative:3, commentaire:'', objectifs_prochains:'', evaluateur:'' })
     load()

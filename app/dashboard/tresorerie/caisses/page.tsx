@@ -113,13 +113,15 @@ export default function CaissesPage() {
   async function cloturerCaisse() {
     if (!selected) return
     setSaving(true)
-    await supabase.from('caisse_operations')
+    const { error: errOps } = await supabase.from('caisse_operations')
       .update({ cloture_date: clotureDate })
       .eq('caisse_id', selected.id)
       .is('cloture_date', null)
       .eq('date', clotureDate)
+    if (errOps) { showToast(errOps.message, false); setSaving(false); return }
     if (clotureSolde !== '') {
-      await supabase.from('caisses').update({ solde: parseFloat(clotureSolde) }).eq('id', selected.id)
+      const { error: errSolde } = await supabase.from('caisses').update({ solde: parseFloat(clotureSolde) }).eq('id', selected.id)
+      if (errSolde) { showToast(errSolde.message, false); setSaving(false); return }
     }
     showToast(`Caisse clôturée pour le ${new Date(clotureDate).toLocaleDateString(intlLocale)}`)
     setClotureSolde(''); load(); loadOps(selected.id)
@@ -395,7 +397,8 @@ export default function CaissesPage() {
                     <input defaultValue={selected.nom}
                       onBlur={async e => {
                         if (e.target.value !== selected.nom) {
-                          await supabase.from('caisses').update({ nom: e.target.value }).eq('id', selected.id)
+                          const { error } = await supabase.from('caisses').update({ nom: e.target.value }).eq('id', selected.id)
+                          if (error) { showToast(error.message, false); return }
                           load(); setSelected({ ...selected, nom: e.target.value })
                         }
                       }}
@@ -409,7 +412,8 @@ export default function CaissesPage() {
                   <div className="pt-2 border-t border-[#E2E8F0]">
                     <button
                       onClick={async () => {
-                        await supabase.from('caisses').update({ actif: false }).eq('id', selected.id)
+                        const { error } = await supabase.from('caisses').update({ actif: false }).eq('id', selected.id)
+                        if (error) { showToast(error.message, false); return }
                         setSelected(null); load()
                         showToast('Caisse désactivée')
                       }}
