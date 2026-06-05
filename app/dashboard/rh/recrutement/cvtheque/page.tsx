@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Upload, Users, Loader2, Trash2, X, AlertCircle, ChevronDown } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Search, Users, Loader2, Star, X, ChevronRight } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 
@@ -10,259 +10,273 @@ interface Candidat {
   nom: string | null
   prenom: string | null
   email: string | null
+  telephone: string | null
   score_global: number
-  statut: string
   competences: string[] | null
-  formation: string | null
+  diplomes: string[] | null
+  langues: string[] | null
+  certifications: string[] | null
+  annees_experience: number | null
+  niveau_etudes: string | null
+  cv_url: string | null
+  statut: string
   created_at: string
+  nb_candidatures?: number
 }
 
-interface Offre {
-  id: string
-  titre: string
-  competences_obligatoires: string[] | null
-  langues: string[] | null
-  experience_min: number
-  diplome_requis: string | null
+function scoreCls(s: number) {
+  if (s === 0) return 'bg-gray-100 text-gray-500'
+  if (s >= 80) return 'bg-green-100 text-green-700'
+  if (s >= 60) return 'bg-amber-100 text-amber-700'
+  return 'bg-red-100 text-red-700'
 }
+function scoreCat(s: number) {
+  if (s === 0) return 'Non scoré'
+  if (s >= 90) return 'Exceptionnel'
+  if (s >= 80) return 'Excellent'
+  if (s >= 70) return 'Bon'
+  if (s >= 60) return 'Moyen'
+  return 'Faible'
+}
+
+const TABS = [
+  { key: 'tous', label: 'Tous' },
+  { key: 'talents', label: 'Talents (≥70)' },
+  { key: 'potentiels', label: 'Potentiels (50-70)' },
+  { key: 'autres', label: 'Autres' },
+]
 
 export default function CVtheque() {
-  const { tenantId, loading } = useTenant()
+  const { tenantId, loading: tl } = useTenant()
   const [candidats, setCandidats] = useState<Candidat[]>([])
-  const [offres, setOffres] = useState<Offre[]>([])
-  const [selectedOffre, setSelectedOffre] = useState('all')
-  const [uploading, setUploading] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [progressText, setProgressText] = useState('')
-  const [error, setError] = useState('')
-  const [drag, setDrag] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [filtered, setFiltered] = useState<Candidat[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [tab, setTab] = useState('tous')
+  const [selected, setSelected] = useState<Candidat | null>(null)
+  const [history, setHistory] = useState<{ offre_titre: string; statut: string; created_at: string; score_ia: number }[]>([])
+  const [histLoading, setHistLoading] = useState(false)
 
   const load = useCallback(async () => {
     if (!tenantId) return
-    const [cRes, oRes] = await Promise.all([
-      supabase
-        .from('candidats')
-        .select('id,nom,prenom,email,score_global,statut,competences,formation,created_at')
-        .eq('tenant_id', tenantId)
-        .order('score_global', { ascending: false }),
-      supabase
-        .from('offres_emploi')
-        .select('id,titre,competences_obligatoires,langues,experience_min,diplome_requis')
-        .eq('tenant_id', tenantId)
-        .eq('statut', 'active'),
-    ])
-    setCandidats(cRes.data ?? [])
-    setOffres(oRes.data ?? [])
+    setLoading(true)
+    const { data } = await supabase
+      .from('candidats')
+      .select('id, nom, prenom, email, telephone, score_global, competences, diplomes, langues, certifications, annees_experience, niveau_etudes, cv_url, statut, created_at')
+      .eq('tenant_id', tenantId)
+      .order('score_global', { ascending: false })
+    setCandidats(data ?? [])
+    setLoading(false)
   }, [tenantId])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { if (tenantId) void load() }, [tenantId, load])
 
-  async function handleFile(file: File) {
-    if (!tenantId) return
-    setUploading(true); setError(''); setProgress(10); setProgressText('Extraction du texte...')
-    try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const upRes = await fetch('/api/cv/upload', { method: 'POST', body: fd })
-      const upData = await upRes.json()
-      if (!upRes.ok) throw new Error(upData.error ?? 'Erreur upload')
+  useEffect(() => {
+    let list = [...candidats]
+    if (tab === 'talents') list = list.filter(c => c.score_global >= 70)
+    else if (tab === 'potentiels') list = list.filter(c => c.score_global >= 50 && c.score_global < 70)
+    else if (tab === 'autres') list = list.filter(c => c.score_global < 50)
 
-      setProgress(45); setProgressText('Analyse IA en cours...')
-
-      const offre = offres.find(o => o.id === selectedOffre)
-      const criteres = offre ? {
-        niveaux: offre.diplome_requis ? [offre.diplome_requis] : [],
-        experience: offre.experience_min,
-        langues: offre.langues ?? [],
-        mots_cles: offre.competences_obligatoires ?? [],
-      } : undefined
-
-      const anaRes = await fetch('/api/cv/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cvText: upData.text,
-          criteres,
-          offreId: selectedOffre !== 'all' ? selectedOffre : undefined,
-          offreTitre: offre?.titre,
-          tenantId,
-        }),
-      })
-      const anaData = await anaRes.json()
-      if (!anaRes.ok) throw new Error(anaData.error ?? 'Erreur analyse IA')
-
-      setProgress(100); setProgressText('Analyse terminée !')
-      setTimeout(() => { setProgress(0); setProgressText('') }, 1500)
-      load()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur inconnue')
-      setProgress(0); setProgressText('')
-    } finally {
-      setUploading(false)
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter(c =>
+        [c.nom, c.prenom].some(v => v?.toLowerCase().includes(q)) ||
+        (c.competences ?? []).some(s => s.toLowerCase().includes(q)) ||
+        (c.diplomes ?? []).some(s => s.toLowerCase().includes(q)) ||
+        (c.langues ?? []).some(s => s.toLowerCase().includes(q))
+      )
     }
+    setFiltered(list)
+  }, [candidats, search, tab])
+
+  async function openFiche(c: Candidat) {
+    setSelected(c)
+    setHistory([])
+    setHistLoading(true)
+    const { data } = await supabase
+      .from('candidatures')
+      .select('statut, score_ia, created_at, offres_emploi(titre)')
+      .eq('candidat_id', c.id)
+      .order('created_at', { ascending: false })
+    setHistory((data ?? []).map(d => ({
+      offre_titre: (d.offres_emploi as unknown as { titre: string } | null)?.titre ?? '—',
+      statut: d.statut, created_at: d.created_at, score_ia: d.score_ia ?? 0,
+    })))
+    setHistLoading(false)
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Supprimer ce candidat ?')) return
-    const { error } = await supabase.from('candidats').delete().eq('id', id)
-    if (error) { alert('Erreur suppression : ' + error.message); return }
-    load()
+  function initiales(c: Candidat) {
+    return [(c.prenom ?? '').charAt(0), (c.nom ?? '').charAt(0)].filter(Boolean).join('').toUpperCase() || '?'
   }
 
-  if (loading) return (
-    <div className="flex justify-center py-24">
-      <Loader2 size={28} className="text-[#F59E0B] animate-spin" />
-    </div>
-  )
+  if (tl || loading) return <div className="flex justify-center py-24"><Loader2 size={28} className="animate-spin text-[#F59E0B]" /></div>
 
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-lg font-bold text-[#0F172A]">CVthèque</h1>
-        <p className="text-xs text-[#64748B]">{candidats.length} candidat{candidats.length !== 1 ? 's' : ''} analysé{candidats.length !== 1 ? 's' : ''} par l&apos;IA</p>
+        <p className="text-xs text-[#64748B]">{candidats.length} candidat{candidats.length !== 1 ? 's' : ''} connu{candidats.length !== 1 ? 's' : ''}</p>
       </div>
 
-      {/* Upload zone */}
-      <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-          <div>
-            <label className="text-xs font-semibold text-[#64748B] mb-1.5 block">Scorer contre l&apos;offre</label>
-            <div className="relative">
-              <select value={selectedOffre} onChange={e => setSelectedOffre(e.target.value)}
-                className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm text-[#0F172A] outline-none appearance-none pr-8 min-w-[200px]">
-                <option value="all">Analyse générale</option>
-                {offres.map(o => <option key={o.id} value={o.id}>{o.titre}</option>)}
-              </select>
-              <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] pointer-events-none" />
-            </div>
-          </div>
+      {/* Search + Tabs */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 shadow-sm space-y-3">
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Rechercher par nom, compétence, diplôme, langue..."
+            className="w-full pl-9 pr-4 py-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A] outline-none focus:border-[#F59E0B]/60 transition-colors" />
         </div>
-
-        <div
-          onDragOver={e => { e.preventDefault(); !uploading && setDrag(true) }}
-          onDragLeave={() => setDrag(false)}
-          onDrop={e => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f && !uploading) handleFile(f) }}
-          onClick={() => !uploading && inputRef.current?.click()}
-          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all select-none ${
-            uploading ? 'opacity-50 cursor-not-allowed border-[#E2E8F0]' :
-            drag ? 'border-[#F59E0B] bg-[#FEF3C7]/30' :
-            'border-[#E2E8F0] hover:border-[#F59E0B]/50 hover:bg-[#FEF3C7]/10'
-          }`}
-        >
-          <Upload size={28} className={`mx-auto mb-3 ${drag ? 'text-[#F59E0B]' : 'text-[#94A3B8]'}`} />
-          <p className="text-sm font-medium text-[#64748B]">
-            {uploading ? 'Analyse en cours...' : 'Glissez un CV ici ou cliquez pour parcourir'}
-          </p>
-          <p className="text-xs text-[#94A3B8] mt-1">PDF, DOCX ou TXT — analyse IA automatique</p>
-          <input ref={inputRef} type="file" accept=".pdf,.docx,.txt" className="hidden"
-            onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); if (inputRef.current) inputRef.current.value = '' }} />
-        </div>
-
-        {progress > 0 && (
-          <div>
-            <div className="flex justify-between text-xs text-[#64748B] mb-1.5">
-              <span>{progressText}</span><span className="font-semibold">{progress}%</span>
-            </div>
-            <div className="h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#F59E0B] rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <AlertCircle size={13} className="text-red-500 shrink-0" />
-            <p className="text-xs text-red-600 flex-1">{error}</p>
-            <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 transition-colors">
-              <X size={12} />
+        <div className="flex gap-1">
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${tab === t.key ? 'bg-[#F59E0B] text-white' : 'text-[#64748B] hover:bg-[#F1F5F9]'}`}>
+              {t.label}
             </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {/* LISTE */}
+        <div className="space-y-2">
+          {filtered.length === 0 ? (
+            <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 text-center shadow-sm">
+              <Users size={28} className="text-[#CBD5E1] mx-auto mb-3" />
+              <p className="text-sm text-[#64748B]">Aucun candidat trouvé</p>
+            </div>
+          ) : (
+            filtered.map(c => (
+              <button key={c.id} onClick={() => openFiche(c)}
+                className={`w-full bg-white rounded-xl border text-left p-4 shadow-sm hover:border-[#F59E0B]/50 hover:shadow-md transition-all ${selected?.id === c.id ? 'border-[#F59E0B] shadow-md' : 'border-[#E2E8F0]'}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#E09000] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {initiales(c)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-[#0F172A] truncate">{[c.prenom, c.nom].filter(Boolean).join(' ') || 'Candidat'}</p>
+                    <p className="text-[10px] text-[#64748B] truncate">{c.email ?? '—'}</p>
+                    {(c.competences ?? []).length > 0 && (
+                      <p className="text-[10px] text-[#94A3B8] truncate mt-0.5">{(c.competences ?? []).slice(0, 3).join(' · ')}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    {c.score_global > 0 && (
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${scoreCls(c.score_global)}`}>
+                        {c.score_global} · {scoreCat(c.score_global)}
+                      </span>
+                    )}
+                    {c.score_global >= 70 && <Star size={11} className="text-[#F59E0B]" />}
+                  </div>
+                  <ChevronRight size={14} className="text-[#CBD5E1] shrink-0" />
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* FICHE CANDIDAT */}
+        {selected ? (
+          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden sticky top-4 h-fit">
+            <div className="flex items-center justify-between p-4 border-b border-[#F1F5F9]">
+              <h2 className="text-sm font-bold text-[#0F172A]">Fiche candidat</h2>
+              <button onClick={() => setSelected(null)} className="p-1.5 hover:bg-[#F1F5F9] rounded-lg"><X size={14} className="text-[#64748B]" /></button>
+            </div>
+            <div className="p-4 space-y-4">
+              {/* Header */}
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#E09000] flex items-center justify-center text-white text-sm font-bold shrink-0">
+                  {initiales(selected)}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#0F172A]">{[selected.prenom, selected.nom].filter(Boolean).join(' ') || 'Candidat'}</p>
+                  <p className="text-xs text-[#64748B]">{selected.email ?? '—'}</p>
+                  {selected.telephone && <p className="text-xs text-[#94A3B8]">{selected.telephone}</p>}
+                </div>
+              </div>
+
+              {/* Score */}
+              {selected.score_global > 0 && (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]">
+                  <div className="text-center">
+                    <p className="text-2xl font-extrabold" style={{ color: selected.score_global >= 70 ? '#16A34A' : selected.score_global >= 50 ? '#F59E0B' : '#DC2626' }}>{selected.score_global}</p>
+                    <p className="text-[10px] text-[#94A3B8]">/ 100</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#0F172A]">{scoreCat(selected.score_global)}</p>
+                    {selected.annees_experience && <p className="text-[10px] text-[#64748B]">{selected.annees_experience} an{selected.annees_experience > 1 ? 's' : ''} d&apos;expérience</p>}
+                    {selected.niveau_etudes && <p className="text-[10px] text-[#64748B]">{selected.niveau_etudes}</p>}
+                  </div>
+                </div>
+              )}
+
+              {/* Compétences */}
+              {(selected.competences ?? []).length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold text-[#64748B] mb-1.5">Compétences</p>
+                  <div className="flex flex-wrap gap-1">
+                    {(selected.competences ?? []).map(s => (
+                      <span key={s} className="text-[10px] bg-[#FEF3C7] text-[#92400E] px-2 py-0.5 rounded-full border border-[#F59E0B]/20">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Diplômes + Langues */}
+              <div className="grid grid-cols-2 gap-3">
+                {(selected.diplomes ?? []).length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-bold text-[#64748B] mb-1.5">Diplômes</p>
+                    <div className="space-y-0.5">{(selected.diplomes ?? []).map(d => <p key={d} className="text-[10px] text-[#0F172A]">• {d}</p>)}</div>
+                  </div>
+                )}
+                {(selected.langues ?? []).length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-bold text-[#64748B] mb-1.5">Langues</p>
+                    <div className="space-y-0.5">{(selected.langues ?? []).map(l => <p key={l} className="text-[10px] text-[#0F172A]">• {l}</p>)}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* CV */}
+              {selected.cv_url && (
+                <a href={selected.cv_url} target="_blank" rel="noopener noreferrer"
+                  className="block text-center py-2 px-4 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-xs font-semibold text-[#0F172A] rounded-lg transition-colors">
+                  Voir le CV →
+                </a>
+              )}
+
+              {/* Historique */}
+              <div>
+                <p className="text-[10px] font-bold text-[#64748B] mb-2">Historique des candidatures</p>
+                {histLoading ? <Loader2 size={14} className="animate-spin text-[#F59E0B]" /> : history.length === 0 ? (
+                  <p className="text-[10px] text-[#94A3B8]">Aucune candidature enregistrée</p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {history.map((h, i) => (
+                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-[#F1F5F9] last:border-0">
+                        <div>
+                          <p className="text-[10px] font-semibold text-[#0F172A] truncate max-w-[150px]">{h.offre_titre}</p>
+                          <p className="text-[9px] text-[#94A3B8]">{new Date(h.created_at).toLocaleDateString('fr-FR')}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {h.score_ia > 0 && <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${scoreCls(h.score_ia)}`}>{h.score_ia}</span>}
+                          <span className="text-[9px] text-[#64748B]">{h.statut}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 text-center shadow-sm hidden lg:flex flex-col items-center justify-center">
+            <Users size={32} className="text-[#CBD5E1] mb-3" />
+            <p className="text-sm text-[#64748B]">Sélectionnez un candidat</p>
+            <p className="text-xs text-[#94A3B8] mt-1">pour voir sa fiche complète</p>
           </div>
         )}
       </div>
-
-      {/* Candidats list */}
-      {candidats.length === 0 ? (
-        <div className="text-center py-12 text-[#94A3B8]">
-          <Users size={36} className="mx-auto mb-3 opacity-40" />
-          <p className="text-sm">Aucun candidat dans la CVthèque.</p>
-          <p className="text-xs mt-1">Déposez des CVs ci-dessus pour démarrer l&apos;analyse IA.</p>
-        </div>
-      ) : (
-        <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
-                  {['Candidat', 'Score IA', 'Formation', 'Compétences clés', 'Statut', ''].map(h => (
-                    <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E2E8F0]">
-                {candidats.map(c => {
-                  const nom = [c.prenom, c.nom].filter(Boolean).join(' ') || c.email || 'Inconnu'
-                  const sc = c.score_global ?? 0
-                  const scoreColor = sc >= 70 ? '#16A34A' : sc >= 50 ? '#F59E0B' : '#DC2626'
-                  return (
-                    <tr key={c.id} className="hover:bg-[#F8FAFC] transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
-                            style={{ background: `${scoreColor}20`, color: scoreColor }}
-                          >
-                            {nom.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold text-[#0F172A]">{nom}</p>
-                            {c.email && <p className="text-[10px] text-[#94A3B8] truncate max-w-[140px]">{c.email}</p>}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-full w-fit"
-                            style={{ color: scoreColor, background: `${scoreColor}18` }}>
-                            {sc}/100
-                          </span>
-                          <div className="w-16 h-1 bg-[#F1F5F9] rounded-full overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${sc}%`, background: scoreColor }} />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-[#64748B]">{c.formation ?? '—'}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {c.competences?.slice(0, 3).map((comp, i) => (
-                            <span key={i} className="text-[10px] text-[#64748B] border border-[#E2E8F0] rounded px-1.5 py-0.5 whitespace-nowrap">{comp}</span>
-                          ))}
-                          {(c.competences?.length ?? 0) > 3 && (
-                            <span className="text-[10px] text-[#94A3B8]">+{(c.competences?.length ?? 0) - 3}</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#64748B]">
-                          {c.statut}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button onClick={() => handleDelete(c.id)} className="text-[#CBD5E1] hover:text-[#DC2626] transition-colors">
-                          <Trash2 size={13} />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
