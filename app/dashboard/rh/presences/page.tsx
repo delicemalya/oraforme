@@ -130,16 +130,18 @@ export default function PresencesPage() {
       .maybeSingle()
 
     if (dup) {
-      await supabase.from('presences').update({
+      const { error } = await supabase.from('presences').update({
         type: form.type, heure_arrivee: form.heure_arrivee || null,
         heure_depart: form.heure_depart || null, motif: form.motif || null,
       }).eq('id', dup.id)
+      if (error) { alert('Erreur mise à jour présence : ' + error.message); setSaving(false); return }
     } else {
-      await supabase.from('presences').insert({
+      const { error } = await supabase.from('presences').insert({
         tenant_id: tenantId!, employe_id: form.employe_id, date: form.date,
         type: form.type, heure_arrivee: form.heure_arrivee || null,
         heure_depart: form.heure_depart || null, motif: form.motif || null,
       })
+      if (error) { alert('Erreur enregistrement présence : ' + error.message); setSaving(false); return }
     }
     setSaving(false)
     setShowForm(false)
@@ -150,11 +152,13 @@ export default function PresencesPage() {
   async function quickToggle(empId: string, type: TypePresence) {
     const existing = presences.find(p => p.employe_id === empId && p.date === selDate)
     if (existing) {
-      await supabase.from('presences').update({ type }).eq('id', existing.id)
+      const { error } = await supabase.from('presences').update({ type }).eq('id', existing.id)
+      if (error) { alert('Erreur mise à jour présence : ' + error.message); return }
     } else {
-      await supabase.from('presences').insert({
+      const { error } = await supabase.from('presences').insert({
         tenant_id: tenantId!, employe_id: empId, date: selDate, type,
       })
+      if (error) { alert('Erreur pointage : ' + error.message); return }
     }
     load()
   }
@@ -169,7 +173,6 @@ export default function PresencesPage() {
   const retards   = dayPresences.filter(p => p.type === 'retard').length
 
   function exportCSV() {
-  const { t } = useLocale()
     const rows = [
       [t('rh.presences.colDate'), t('rh.presences.colEmployee'), t('rh.presences.colStatus'), t('rh.presences.colArrival'), t('rh.presences.colDeparture'), t('rh.presences.colReason')],
       ...presences.map(p => [

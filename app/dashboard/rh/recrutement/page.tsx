@@ -171,7 +171,7 @@ function TabOffres({ tenantId, offres, onRefresh }: {
   async function handleCreate() {
     if (!form.titre.trim()) return
     setSaving(true)
-    await supabase.from('offres_emploi').insert({
+    const { error } = await supabase.from('offres_emploi').insert({
       tenant_id: tenantId,
       titre: form.titre,
       description: form.description,
@@ -184,13 +184,15 @@ function TabOffres({ tenantId, offres, onRefresh }: {
       statut: 'active',
     })
     setSaving(false)
+    if (error) { alert('Erreur création offre : ' + error.message); return }
     setShowForm(false)
     setForm({ titre: '', description: '', niveaux: [], experience: 0, langues: [], mots_cles: [] })
     onRefresh()
   }
 
   async function handleDelete(id: string) {
-    await supabase.from('offres_emploi').delete().eq('id', id)
+    const { error } = await supabase.from('offres_emploi').delete().eq('id', id)
+    if (error) { alert('Erreur suppression offre : ' + error.message); return }
     onRefresh()
   }
 
@@ -393,12 +395,14 @@ function TabCandidats({ tenantId, offres, candidats, onRefresh }: {
   }
 
   async function updateStatut(id: string, statut: string) {
-    await supabase.from('cv_candidats').update({ statut }).eq('id', id)
+    const { error } = await supabase.from('cv_candidats').update({ statut }).eq('id', id)
+    if (error) { alert('Erreur mise à jour statut : ' + error.message); return }
     onRefresh()
   }
 
   async function handleDelete(id: string) {
-    await supabase.from('cv_candidats').delete().eq('id', id)
+    const { error } = await supabase.from('cv_candidats').delete().eq('id', id)
+    if (error) { alert('Erreur suppression candidat : ' + error.message); return }
     onRefresh()
   }
 
@@ -548,7 +552,8 @@ function TabTop({ candidats, onRefresh }: { candidats: Candidat[]; onRefresh: ()
   const top = [...candidats].sort((a, b) => b.score - a.score).slice(0, 3)
 
   async function updateStatut(id: string, statut: string) {
-    await supabase.from('cv_candidats').update({ statut }).eq('id', id)
+    const { error } = await supabase.from('cv_candidats').update({ statut }).eq('id', id)
+    if (error) { alert('Erreur mise à jour statut : ' + error.message); return }
     onRefresh()
   }
 
