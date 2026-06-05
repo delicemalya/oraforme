@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { parseCV } from '@/lib/miaa-job/cv-parser'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://oraforms.com'
 
@@ -90,15 +91,18 @@ export async function POST(req: NextRequest) {
 
     // Upload CV to Supabase Storage
     let cvUrl: string | null = null
+    let cvBuffer: Buffer | null = null
+    let cvFilename: string = 'cv.pdf'
     if (cvFile && cvFile.size > 0) {
       const ext = cvFile.name.split('.').pop()?.toLowerCase() ?? 'pdf'
       const safeName = `${nom}-${prenom}`.toLowerCase().replace(/[^a-z0-9-]/g, '-')
       const filename = `${offre.tenant_id}/${Date.now()}-${safeName}.${ext}`
-      const buffer = Buffer.from(await cvFile.arrayBuffer())
+      cvBuffer = Buffer.from(await cvFile.arrayBuffer())
+      cvFilename = cvFile.name
 
       const { data: upload, error: uploadErr } = await supabaseAdmin.storage
         .from('cvs-candidats')
-        .upload(filename, buffer, { contentType: cvFile.type || 'application/octet-stream', upsert: false })
+        .upload(filename, cvBuffer, { contentType: cvFile.type || 'application/octet-stream', upsert: false })
 
       if (!uploadErr && upload) {
         const { data: urlData } = supabaseAdmin.storage.from('cvs-candidats').getPublicUrl(upload.path)
@@ -187,6 +191,28 @@ export async function POST(req: NextRequest) {
 
     // Confirmation email (non-blocking)
     sendConfirmationEmail(email, prenom, offre.titre, entrepriseNom, candidature.id)
+
+    // Auto-trigger CV analysis (non-blocking) — parse locally then call analyser-cv
+    if (cvBuffer && cvFilename) {
+      ;(async () => {
+        try {
+          const cvText = await parseCV(cvBuffer!, cvFilename)
+          if (cvText.length >= 20) {
+            await fetch(`${APP_URL}/api/jobs/analyser-cv`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                cvText,
+                candidatId,
+                candidatureId: candidature.id,
+              }),
+            })
+          }
+        } catch {
+          // silent — analysis is best-effort
+        }
+      })()
+    }
 
     return NextResponse.json({ success: true, id: candidature.id, doublon: estDoublon })
   } catch (err) {
