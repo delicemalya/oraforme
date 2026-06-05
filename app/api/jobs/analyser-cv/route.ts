@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     // Score CV against offer
     const scoreIa = scoreCV(cvData, offreCriteres)
 
-    // Update candidat record
+    // Update candidat record with all extracted CV fields
     await supabaseAdmin
       .from('candidats')
       .update({
@@ -71,6 +71,11 @@ export async function POST(req: NextRequest) {
         email: cvData.email ?? undefined,
         telephone: cvData.telephone ?? undefined,
         competences: cvData.competences,
+        diplomes: cvData.diplomes,
+        langues: cvData.langues,
+        certifications: cvData.certifications,
+        annees_experience: cvData.annees_experience_total,
+        niveau_etudes: cvData.niveau_etudes ?? undefined,
         score_global: scoreIa,
         cv_raw_text: cvText,
         refs_pro: cvData.references ?? [],
