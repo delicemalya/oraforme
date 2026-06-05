@@ -124,11 +124,31 @@ async function fetchTenantForUser(
   }
 }
 
+// ── localStorage cache — instant render on page navigation ───────────────────
+
+const CACHE_KEY = 'oraforme_tenant_v1'
+
+function readCache(): TenantState | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    return raw ? JSON.parse(raw) as TenantState : null
+  } catch { return null }
+}
+
+function writeCache(state: TenantState | null): void {
+  try {
+    if (state) localStorage.setItem(CACHE_KEY, JSON.stringify(state))
+    else localStorage.removeItem(CACHE_KEY)
+  } catch {}
+}
+
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 export function TenantProvider({ children }: { children: ReactNode }) {
-  const [tenant,  setTenant]  = useState<TenantState | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Initialize from cache — renders immediately without spinner on page nav
+  const [tenant,  setTenant]  = useState<TenantState | null>(() => readCache())
+  const [loading, setLoading] = useState<boolean>(() => readCache() === null)
 
   // Tracks which userId we are currently loading for — prevents stale responses
   // from overwriting newer data when two fetches race.
@@ -136,11 +156,13 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
   const loadForUser = useCallback(async (userId: string, email: string) => {
     activeUserIdRef.current = userId
-    setLoading(true)
+    // Only show spinner if we have no cached data for this user
+    if (!readCache()) setLoading(true)
     const state = await fetchTenantForUser(userId, email)
     // Drop result if a newer load started while this one was in-flight
     if (activeUserIdRef.current === userId) {
       setTenant(state)
+      writeCache(state)
       setLoading(false)
     }
   }, [])
@@ -148,7 +170,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const reload = useCallback(async () => {
     activeUserIdRef.current = null // force-bypass the stale-response guard
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setTenant(null); setLoading(false); return }
+    if (!user) { writeCache(null); setTenant(null); setLoading(false); return }
     await loadForUser(user.id, user.email ?? '')
   }, [loadForUser])
 
@@ -156,7 +178,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     // ── Initial load ──────────────────────────────────────────────────────
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) loadForUser(user.id, user.email ?? '')
-      else      { setTenant(null); setLoading(false) }
+      else      { writeCache(null); setTenant(null); setLoading(false) }
     })
 
     // ── Subscribe to auth changes ─────────────────────────────────────────
@@ -169,6 +191,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
       (event, session) => {
         if (event === 'SIGNED_OUT' || !session?.user) {
           activeUserIdRef.current = null
+          writeCache(null)
           setTenant(null)
           setLoading(false)
           // Hard-navigate: clears all React state, module singletons,
