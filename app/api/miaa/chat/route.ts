@@ -4,11 +4,11 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { MIAA_AGENTS, type MIAAModule } from '@/lib/miaa-agents'
 import { chargerMemoireMIAA, mettreAJourMemoire } from '@/lib/miaa/memory'
 import { getMIAASystemPrompt } from '@/lib/miaa/system-prompt'
+import { trackUsage } from '@/lib/miaa/usage-tracker'
 
 export const runtime = 'nodejs'
 
-// ── Sélection moteur IA ───────────────────────────────────────────────────────
-// Priorité : Claude si disponible, sinon Mistral
+// ── Clients IA ────────────────────────────────────────────────────────────────
 const USE_CLAUDE  = !!process.env.ANTHROPIC_API_KEY
 const USE_MISTRAL = !USE_CLAUDE && !!process.env.MISTRAL_API_KEY
 
@@ -27,37 +27,112 @@ function getSupabaseAdmin(): SupabaseClient {
   )
 }
 
-/** Appel unifié — retourne le texte brut quelle que soit l'IA */
+// ── Sélection du modèle ────────────────────────────────────────────────────────
+// Haiku (10× moins cher) par défaut.
+// Opus uniquement si la question nécessite une analyse lourde.
+const COMPLEX_RE = /\b(rapport|bulletin|bilan|synthèse|analyse complète|plan(?:ification)?|stratégie|prévision détaillée|état financier|calcul détaillé|génère? (?:un|le|les|une)|écri(?:s|re)|rédige?)\b/i
+
+function selectModel(message: string): { model: string; maxTokens: number; isComplex: boolean } {
+  if (COMPLEX_RE.test(message)) {
+    return { model: 'claude-opus-4-5', maxTokens: 15000, isComplex: true }
+  }
+  return { model: 'claude-haiku-4-5-20251001', maxTokens: 2000, isComplex: false }
+}
+
+// ── Cache in-memory ────────────────────────────────────────────────────────────
+// Portée : instance serveur (process). Persiste entre requêtes sur le même worker.
+// En production (Vercel serverless) : cache par instance — toujours bénéfique
+// pour les sessions actives et les questions répétées.
+
+const RESPONSE_TTL = 5 * 60 * 1000   // 5 minutes
+const CONTEXT_TTL  = 5 * 60 * 1000   // 5 minutes
+
+interface RespEntry { response: string; suggestedActions: string[]; expiresAt: number }
+interface CtxEntry<T> { value: T; expiresAt: number }
+
+const responseCache = new Map<string, RespEntry>()
+const memoryCache   = new Map<string, CtxEntry<ReturnType<typeof chargerMemoireMIAA> extends Promise<infer T> ? T : never>>()
+
+function cacheKey(tenantId: string | undefined, module: string, message: string): string {
+  const norm = message.slice(0, 200).toLowerCase().replace(/\s+/g, ' ').trim()
+  return `${tenantId ?? 'anon'}:${module}:${norm}`
+}
+
+function getResp(key: string): RespEntry | null {
+  const e = responseCache.get(key)
+  if (!e || Date.now() > e.expiresAt) { responseCache.delete(key); return null }
+  return e
+}
+function setResp(key: string, entry: Omit<RespEntry, 'expiresAt'>): void {
+  // Évite la fuite mémoire : purge les entrées expirées si le cache grossit
+  if (responseCache.size > 500) {
+    const now = Date.now()
+    for (const [k, v] of responseCache) { if (v.expiresAt < now) responseCache.delete(k) }
+  }
+  responseCache.set(key, { ...entry, expiresAt: Date.now() + RESPONSE_TTL })
+}
+
+type MemoryValue = Awaited<ReturnType<typeof chargerMemoireMIAA>>
+function getMem(tenantId: string): MemoryValue | null {
+  const e = memoryCache.get(tenantId) as CtxEntry<MemoryValue> | undefined
+  if (!e || Date.now() > e.expiresAt) { memoryCache.delete(tenantId); return null }
+  return e.value
+}
+function setMem(tenantId: string, value: MemoryValue): void {
+  memoryCache.set(tenantId, { value, expiresAt: Date.now() + CONTEXT_TTL } as CtxEntry<MemoryValue>)
+}
+
+// ── Appel IA unifié ───────────────────────────────────────────────────────────
 async function callAI(
   systemPrompt: string,
-  messages:     { role: 'user' | 'assistant'; content: string }[]
-): Promise<string> {
-  // ── Claude (priorité) ─────────────────────────────────────────────────────
+  messages:     { role: 'user' | 'assistant'; content: string }[],
+  model:        string,
+  maxTokens:    number,
+): Promise<{ text: string; inputTokens: number; outputTokens: number; moteur: string }> {
   if (anthropic) {
     const res = await anthropic.messages.create({
-      model:      'claude-opus-4-5',
-      max_tokens: 2048,
+      model:      model as Parameters<typeof anthropic.messages.create>[0]['model'],
+      max_tokens: maxTokens,
       system:     systemPrompt,
       messages,
     })
-    return res.content[0].type === 'text' ? res.content[0].text : ''
+    return {
+      text:         res.content[0].type === 'text' ? res.content[0].text : '',
+      inputTokens:  res.usage.input_tokens,
+      outputTokens: res.usage.output_tokens,
+      moteur:       'claude',
+    }
   }
 
-  // ── Mistral (fallback) ────────────────────────────────────────────────────
   if (mistral) {
     const res = await mistral.chat.complete({
       model:    'mistral-large-latest',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages,
-      ],
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
     })
-    return res.choices?.[0]?.message?.content as string ?? ''
+    return {
+      text:         (res.choices?.[0]?.message?.content ?? '') as string,
+      inputTokens:  res.usage?.promptTokens    ?? 0,
+      outputTokens: res.usage?.completionTokens ?? 0,
+      moteur:       'mistral',
+    }
   }
 
   throw new Error('Aucune clé API IA configurée (ANTHROPIC_API_KEY ou MISTRAL_API_KEY)')
 }
 
+// ── Suggestions par module ────────────────────────────────────────────────────
+const SUGGESTIONS: Record<string, string[]> = {
+  facturation:  ['Voir mes factures impayées', 'Calculer TVA sur 500 000 FCFA', 'Analyser mon CA du mois', 'Envoyer des relances'],
+  rh:           ['Calculer la paie du mois', 'Voir les congés en attente', 'Analyser la masse salariale', 'Générer les bulletins'],
+  tresorerie:   ['Quel est mon solde actuel ?', 'Prévision à 30 jours', 'Analyser entrées vs sorties', 'Alertes trésorerie'],
+  stock:        ['Articles en rupture', 'Valeur totale du stock', 'Rotation des articles', 'Commander aux fournisseurs'],
+  comptabilite: ['Générer le bilan', 'Calculer la TVA à déclarer', 'Analyser mes charges', 'État des résultats'],
+  restaurant:   ['CA du jour', 'Plats les plus vendus', 'Stock cuisine critique', 'Rapport caisse'],
+  ecole:        ['Étudiants avec impayés', 'Taux de recouvrement', 'Générer les bulletins', 'Rapport académique'],
+  general:      ['Analyse globale', 'Points urgents', 'Mes performances du mois', 'Recommandations MIAA PREMIUM'],
+}
+
+// ── Handler principal ─────────────────────────────────────────────────────────
 export async function POST(req: Request) {
   try {
     const { module, message, history, tenantData, langue } = await req.json() as {
@@ -68,22 +143,49 @@ export async function POST(req: Request) {
       langue?:    string
     }
 
-    const agent    = MIAA_AGENTS[module as MIAAModule]
-    const supabase = getSupabaseAdmin()
     const tenantId = tenantData?.tenant_id
+    const agent    = MIAA_AGENTS[module as MIAAModule]
 
-    // ── 1. Charger mémoire + données temps réel ───────────────────────────────
-    const memory = tenantId
-      ? await chargerMemoireMIAA(supabase, tenantId)
-      : {
-          entreprise:        { nom: 'Entreprise', secteur: module, pays: 'Congo-Brazzaville', plan: 'PME', nb_employes: 0, devise: 'FCFA', tva_taux: 18 },
-          donnees_live:      { solde_tresorerie: 0, factures_impayees: 0, stock_alertes: 0, employes_actifs: 0, ca_mois: 0 },
-          historique_resume: '',
-          patterns:          { questions_frequentes: [], problemes_recurrents: [], preferences_utilisateur: [] },
-          nb_conversations:  0,
-        }
+    // ── 1. Vérifier le cache de réponse ──────────────────────────────────────
+    // Seulement si l'historique est vide (question isolée de départ de session)
+    const key = cacheKey(tenantId, module, message)
+    if (history.length === 0) {
+      const cached = getResp(key)
+      if (cached) {
+        return Response.json({
+          response:          cached.response,
+          suggested_actions: cached.suggestedActions,
+          alert:             null,
+          peut_telecharger:  cached.response.length > 200,
+          moteur:            'cache',
+          cached:            true,
+        })
+      }
+    }
 
-    // ── 2. System prompt omniscient ───────────────────────────────────────────
+    // ── 2. Charger mémoire (avec cache 5min) ──────────────────────────────────
+    const supabase = getSupabaseAdmin()
+    let memory: MemoryValue
+
+    if (tenantId) {
+      const cachedMem = getMem(tenantId)
+      if (cachedMem) {
+        memory = cachedMem
+      } else {
+        memory = await chargerMemoireMIAA(supabase, tenantId)
+        setMem(tenantId, memory)
+      }
+    } else {
+      memory = {
+        entreprise:        { nom: 'Entreprise', secteur: module, pays: 'Congo-Brazzaville', plan: 'PME', nb_employes: 0, devise: 'FCFA', tva_taux: 18 },
+        donnees_live:      { solde_tresorerie: 0, factures_impayees: 0, stock_alertes: 0, employes_actifs: 0, ca_mois: 0 },
+        historique_resume: '',
+        patterns:          { questions_frequentes: [], problemes_recurrents: [], preferences_utilisateur: [] },
+        nb_conversations:  0,
+      }
+    }
+
+    // ── 3. System prompt ──────────────────────────────────────────────────────
     const systemPrompt = getMIAASystemPrompt({
       memory,
       module_actuel: module || 'general',
@@ -91,19 +193,21 @@ export async function POST(req: Request) {
       agent_context: agent?.personnalite,
     })
 
-    // ── 3. Appel IA (Claude ou Mistral) ──────────────────────────────────────
-    const rawText = await callAI(
+    // ── 4. Sélection modèle (Haiku par défaut, Opus si analyse complexe) ──────
+    const { model, maxTokens } = selectModel(message)
+
+    // ── 5. Appel IA ───────────────────────────────────────────────────────────
+    const { text: rawText, inputTokens, outputTokens, moteur } = await callAI(
       systemPrompt,
       [
-        ...history.slice(-16).map(m => ({
-          role:    m.role as 'user' | 'assistant',
-          content: m.content,
-        })),
+        ...history.slice(-16).map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
         { role: 'user' as const, content: message },
-      ]
+      ],
+      model,
+      maxTokens,
     )
 
-    // ── 4. Parser la réponse ──────────────────────────────────────────────────
+    // ── 6. Parser la réponse ──────────────────────────────────────────────────
     let parsed: { response: string; suggested_actions?: string[]; alert?: string | null }
     try {
       const jsonMatch = rawText.match(/\{[\s\S]*\}/)
@@ -112,10 +216,19 @@ export async function POST(req: Request) {
       parsed = { response: rawText }
     }
 
-    const reponse = parsed.response ?? rawText
+    const reponse           = parsed.response ?? rawText
+    const suggestedActions  = parsed.suggested_actions ?? (SUGGESTIONS[module] ?? SUGGESTIONS.general)
 
-    // ── 5. Sauvegardes asynchrones ────────────────────────────────────────────
+    // ── 7. Mettre en cache si question courte (≤ 300 chars) ──────────────────
+    if (message.length <= 300) {
+      setResp(key, { response: reponse, suggestedActions })
+    }
+
+    // ── 8. Sauvegardes asynchrones ────────────────────────────────────────────
     if (tenantId) {
+      // Invalider le cache mémoire pour que la prochaine requête ait les données fraîches
+      memoryCache.delete(tenantId)
+
       mettreAJourMemoire(supabase, tenantId, message, reponse)
         .catch(() => { /* fire-and-forget */ })
 
@@ -126,27 +239,21 @@ export async function POST(req: Request) {
         message_miaa: reponse,
         created_at:   new Date().toISOString(),
       }).then(() => {}, () => {})
-    }
 
-    // ── 6. Suggestions selon module ───────────────────────────────────────────
-    const suggestionsModule: Record<string, string[]> = {
-      facturation:  ['Voir mes factures impayées', 'Calculer TVA sur 500 000 FCFA', 'Analyser mon CA du mois', 'Envoyer des relances'],
-      rh:           ['Calculer la paie du mois', 'Voir les congés en attente', 'Analyser la masse salariale', 'Générer les bulletins'],
-      tresorerie:   ['Quel est mon solde actuel ?', 'Prévision à 30 jours', 'Analyser entrées vs sorties', 'Alertes trésorerie'],
-      stock:        ['Articles en rupture', 'Valeur totale du stock', 'Rotation des articles', 'Commander aux fournisseurs'],
-      comptabilite: ['Générer le bilan', 'Calculer la TVA à déclarer', 'Analyser mes charges', 'État des résultats'],
-      restaurant:   ['CA du jour', 'Plats les plus vendus', 'Stock cuisine critique', 'Rapport caisse'],
-      ecole:        ['Étudiants avec impayés', 'Taux de recouvrement', 'Générer les bulletins', 'Rapport académique'],
-      general:      ['Analyse globale', 'Points urgents', 'Mes performances du mois', 'Recommandations MIAA PREMIUM'],
+      // Compteur d'utilisation
+      trackUsage(supabase, tenantId, module, model, inputTokens, outputTokens)
     }
 
     return Response.json({
       response:          reponse,
-      suggested_actions: parsed.suggested_actions ?? (suggestionsModule[module] ?? suggestionsModule.general),
+      suggested_actions: suggestedActions,
       alert:             parsed.alert ?? null,
       peut_telecharger:  reponse.length > 200,
-      moteur:            anthropic ? 'claude' : 'mistral',
+      moteur,
+      model_used:        model,
+      cached:            false,
     })
+
   } catch (err) {
     console.error('[MIAA PREMIUM chat]', err)
     return Response.json(
