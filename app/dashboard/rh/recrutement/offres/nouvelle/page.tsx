@@ -6,6 +6,18 @@ import { ChevronLeft, Plus, X, Loader2, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 80)
+}
+
 const TYPES_CONTRAT = ['CDI', 'CDD', 'Stage', 'Alternance', 'Freelance', 'Temps partiel', 'Consultant']
 const DIPLOMES = ['Sans diplôme requis', 'CAP/BEP', 'BAC', 'BTS/DUT', 'Licence', 'Master', 'MBA', 'Doctorat']
 
@@ -88,8 +100,17 @@ export default function NouvelleOffrePage() {
   async function handleSubmit() {
     if (!tenantId || !form.titre.trim()) return
     setSaving(true)
+
+    // Generate slug: tenantNom-titrePOste
+    const { data: tenantData } = await supabase
+      .from('tenants').select('nom').eq('id', tenantId).maybeSingle()
+    const tenantSlug = slugify(tenantData?.nom ?? 'entreprise')
+    const posteSlug  = slugify(form.titre)
+    const slug = `${tenantSlug}-${posteSlug}`
+
     const { error } = await supabase.from('offres_emploi').insert({
       tenant_id: tenantId,
+      slug,
       titre: form.titre.trim(),
       departement: form.departement.trim() || null,
       localisation: form.localisation.trim() || null,
