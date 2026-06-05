@@ -146,7 +146,7 @@ function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: Hero
     </motion.div>
   )
 
-  if (href) return <Link href={href}>{card}</Link>
+  if (href) return <Link href={href} prefetch={true}>{card}</Link>
   return card
 }
 
@@ -237,7 +237,7 @@ function QuickLinksCard({ secteur }: { secteur: string | null; modules: string[]
         {actions.map((a, i) => {
           const Icon = a.icon
           return (
-            <Link key={i} href={a.href}
+            <Link key={i} href={a.href} prefetch={true}
               className="flex flex-col gap-2 p-3 rounded-xl transition-all duration-150 group"
               style={{ background: a.bg, border: `1px solid ${a.color}20`, textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = `${a.color}50`; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-1px)' }}
@@ -456,7 +456,7 @@ function ShortcutCards({ secteur, ecoleRole }: { secteur: string | null; ecoleRo
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.04 + i * 0.04 }}
             >
-              <Link href={sc.href} className="shortcut-card">
+              <Link href={sc.href} prefetch={true} className="shortcut-card">
                 {/* Icon well */}
                 <div className="icon-well" style={{ background: `${iconColor}12`, width: 38, height: 38, borderRadius: 10, flexShrink: 0 }}>
                   <Icon size={17} style={{ color: iconColor }} />
@@ -654,6 +654,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
+              prefetch={true}
               className="flex items-center gap-1.5 text-xs font-bold rounded-xl transition-all hover:opacity-90"
               style={{ background: 'rgba(255,255,255,0.2)', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.35)', padding: '8px 16px' }}
             >
@@ -731,7 +732,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
                 <p style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>{recentActivity.length} {t('dash.lastFactures')}</p>
               </div>
             </div>
-            <Link href="/dashboard/facturation"
+            <Link href="/dashboard/facturation" prefetch={true}
               className="flex items-center gap-1"
               style={{ fontSize: 11, color: '#DC2626', fontWeight: 600 }}
             >

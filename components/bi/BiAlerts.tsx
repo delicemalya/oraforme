@@ -27,7 +27,7 @@ export function BiAlertItem({ alert }: { alert: BiAlert }) {
   )
 
   if (alert.link) {
-    return <Link href={alert.link} className="block hover:opacity-90 transition-opacity">{inner}</Link>
+    return <Link href={alert.link} prefetch={true} className="block hover:opacity-90 transition-opacity">{inner}</Link>
   }
   return inner
 }

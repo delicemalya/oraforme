@@ -45,7 +45,7 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
           <FileText size={18} className="text-[var(--text-secondary)]" />
         </div>
         <p className="text-xs text-[var(--text-secondary)]">{t('dash.recentActivity')}</p>
-        <Link href="/dashboard/facturation" className="text-xs text-[#DC2626] hover:underline mt-1">
+        <Link href="/dashboard/facturation" prefetch={true} className="text-xs text-[#DC2626] hover:underline mt-1">
           {t('invoice.new')} →
         </Link>
       </div>

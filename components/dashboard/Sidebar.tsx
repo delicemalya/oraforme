@@ -507,6 +507,7 @@ export default function Sidebar() {
     return (
       <Link
         href={item.href}
+        prefetch={true}
         onClick={() => setMobileOpen(false)}
         className="flex items-center gap-2.5 pl-3 pr-3 py-1.5 rounded-lg text-[12.5px] transition-all duration-150 relative group"
         style={active
@@ -632,6 +633,7 @@ export default function Sidebar() {
         {/* Dashboard link */}
         <Link
           href={dashHref}
+          prefetch={true}
           onClick={() => setMobileOpen(false)}
           className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12.5px] font-semibold transition-all duration-150 mb-2 relative"
           style={dashActive
@@ -689,6 +691,7 @@ export default function Sidebar() {
             {isOwner && !secteur && (
               <Link
                 href="/dashboard/modules"
+                prefetch={true}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-150 mt-1"
                 style={isActive('/dashboard/modules')
@@ -717,6 +720,7 @@ export default function Sidebar() {
         {isSuperAdmin && (
           <Link
             href="/admin"
+            prefetch={true}
             onClick={() => setMobileOpen(false)}
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-[12.5px] font-medium transition-all duration-150"
             style={{ color: '#DC2626' }}
