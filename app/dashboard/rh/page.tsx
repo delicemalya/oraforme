@@ -1189,9 +1189,6 @@ export default function RHPage() {
           <Link href="/dashboard/rh/paie" className="flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[12px] font-semibold hover:border-amber-200 hover:text-amber-600 transition-colors">
             <DollarSign size={13} /> {t('rh.payroll')}
           </Link>
-          <Link href="/dashboard/rh/recrutement" className="flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[12px] font-semibold hover:border-blue-200 hover:text-blue-600 transition-colors">
-            <Briefcase size={13} /> {t('rh.recruitment')}
-          </Link>
         </div>
       </div>
 
@@ -1231,6 +1228,25 @@ export default function RHPage() {
           {activeTab === 'rapports'  && <TabRapports employes={employes} conges={conges} />}
         </motion.div>
       </AnimatePresence>
+
+      {/* Modules liés */}
+      <div className="pt-4 border-t border-[#E2E8F0]">
+        <p className="text-[11px] text-[#94A3B8] uppercase tracking-wide mb-3">Modules liés</p>
+        <div className="flex gap-3 flex-wrap">
+          <Link
+            href="/dashboard/rh/recrutement"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E2E8F0] hover:border-blue-200 hover:text-blue-600 text-[12px] text-[#64748B] font-semibold transition-all"
+          >
+            <Briefcase size={13} /> Recrutement IA
+          </Link>
+          <Link
+            href="/dashboard/rh#conges"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E2E8F0] hover:border-amber-200 hover:text-amber-600 text-[12px] text-[#64748B] font-semibold transition-all"
+          >
+            <Calendar size={13} /> Congés &amp; Absences
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

@@ -137,7 +137,7 @@ type ModuleDef = { id: string; label: string; sublabel: string; href: string }
 
 const MODULE_DEFS: ModuleDef[] = [
   // RH — sous-modules
-  { id: 'recrutement', label: 'Recrutement IA', sublabel: 'MIAA Job', href: '/dashboard/rh/recrutement' },
+  { id: 'recrutement', label: 'Recrutement', sublabel: 'MIAA Job', href: '/dashboard/rh/recrutement' },
   { id: 'salaires', label: 'Paie & Bulletins', sublabel: 'ECAM Congo', href: '/dashboard/rh/paie' },
   { id: 'bi',          label: 'Analytics',              sublabel: '', href: '/dashboard/bi' },
   { id: 'bi-dg',       label: 'Analytics général',      sublabel: '', href: '/dashboard/bi' },
@@ -202,7 +202,6 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   facturation:  'nav.facturation',
   depenses:     'nav.depenses',
   rh:                  'nav.rh',
-  recrutement:         'nav.recrutement',
   salaires:            'nav.salaires',
   'declarations-cnss': 'nav.declarations_cnss',
   roles:               'nav.roles',
@@ -504,15 +503,16 @@ export default function Sidebar() {
   // ── NavItem renderer ───────────────────────────────────────────────────────
 
   function NavLink({ item }: { item: NavItem }) {
-    const active  = isActive(item.href, item.exact)
-    const canEdit = isOwner || permissions[item.id]?.can_edit
-    const Icon    = item.icon
+    const active    = isActive(item.href, item.exact)
+    const canEdit   = isOwner || permissions[item.id]?.can_edit
+    const Icon      = item.icon
+    const isSubItem = item.id === 'recrutement'
     return (
       <Link
         href={item.href}
         prefetch={true}
         onClick={() => setMobileOpen(false)}
-        className="flex items-center gap-2.5 pl-3 pr-3 py-1.5 rounded-lg text-[12.5px] transition-all duration-150 relative group"
+        className={`flex items-center gap-2.5 ${isSubItem ? 'pl-6' : 'pl-3'} pr-3 py-1.5 rounded-lg text-[12.5px] transition-all duration-150 relative group`}
         style={active
           ? { background: 'rgba(220,38,38,0.07)', color: '#DC2626', fontWeight: 600 }
           : { color: '#64748B' }
