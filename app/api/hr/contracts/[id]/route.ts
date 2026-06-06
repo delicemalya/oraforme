@@ -12,7 +12,7 @@ export async function GET(
 
   const { data, error } = await supabaseAdmin
     .from('contrats')
-    .select('*, employes(nom, poste, matricule, cnss, nationalite, adresse, email, telephone)')
+    .select('*, employes(nom, poste, matricule, cnss, nationalite, adresse, email, telephone, photo_url)')
     .eq('id', id).eq('tenant_id', auth.tenantId)
     .single()
 
@@ -32,6 +32,7 @@ export async function PUT(
   const allowed = [
     'type_contrat', 'date_debut', 'date_fin', 'salaire_base', 'primes',
     'periode_essai', 'lieu_travail', 'description', 'clauses', 'statut', 'signe_le',
+    'signe_employe', 'signe_employeur', 'avantages', 'notes',
   ]
   const patch: Record<string, unknown> = {}
   for (const k of allowed) {
@@ -44,6 +45,18 @@ export async function PUT(
     .select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Sync salary to employee when contract is active
+  if (patch.statut === 'actif' && patch.salaire_base !== undefined) {
+    const { data: contrat } = await supabaseAdmin
+      .from('contrats').select('employe_id').eq('id', id).single()
+    if (contrat?.employe_id) {
+      await supabaseAdmin.from('employes')
+        .update({ salaire_base: Number(patch.salaire_base) })
+        .eq('id', contrat.employe_id).eq('tenant_id', auth.tenantId)
+    }
+  }
+
   return NextResponse.json({ success: true, data })
 }
 
