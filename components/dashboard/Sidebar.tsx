@@ -174,10 +174,12 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 const SIDEBAR_GROUPS = [
   // SUPERVISION — KPIs exécutifs, BI, analytics
   { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
-  // FINANCE — gestion financière complète
-  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite', 'declarations'] },
-  // RH — personnel & paie
-  { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'recrutement', 'salaires', 'roles'] },
+  // FINANCE — gestion financière complète (declarations fusionné dans fiscalite)
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
+  // RH — personnel & paie (recrutement = rubrique indépendante)
+  { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
+  // RECRUTEMENT — module autonome
+  { id: 'recrutement_section', labelKey: 'nav.recrutement', icon: Briefcase, moduleIds: ['recrutement'] },
   // COMMERCIAL — clients, stock, achats
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'stock', 'achats'] },
   // OUTILS — IA & productivité (calendrier → navbar)
@@ -448,7 +450,8 @@ export default function Sidebar() {
         const def = getModuleDef(mid)
         if (!def) continue
         const label = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
-        items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href })
+        // rh is exact-only: only active on /dashboard/rh, not on sub-pages like /dashboard/rh/recrutement
+        items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href, exact: mid === 'rh' })
       }
       return { ...grp, label: t(grp.labelKey), items }
     }).filter(g => g.items.length > 0)

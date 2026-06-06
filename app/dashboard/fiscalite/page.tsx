@@ -1,25 +1,25 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { motion } from 'framer-motion'
 import {
-  Receipt, Users, TrendingUp, Calendar, AlertTriangle,
-  CheckCircle, Clock, ArrowRight, Loader2, RefreshCw,
-  Building2, FileText,
+  Receipt, Users, TrendingUp, AlertTriangle, CheckCircle,
+  Clock, ArrowRight, Loader2, RefreshCw, Building2,
+  CalendarDays, ChevronRight,
 } from 'lucide-react'
 import Link from 'next/link'
 import { PAYS_LIST } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-const CARD  = '#FFFFFF'
-const TEXT  = '#0F172A'
-const MUTED = '#64748B'
-const BORDER= '#E2E8F0'
-const BLUE  = '#2563EB'
-const GREEN = '#16A34A'
-const AMBER = '#F59E0B'
-const RED   = '#DC2626'
+// ── Design tokens ──────────────────────────────────────────────────────────────
+const TEXT   = '#0F172A'
+const MUTED  = '#64748B'
+const BORDER = '#E2E8F0'
+const BG     = '#F8FAFC'
+const BLUE   = '#2563EB'
+const GREEN  = '#16A34A'
+const AMBER  = '#F59E0B'
+const RED    = '#DC2626'
+const PURPLE = '#7C3AED'
 
 function fmtN(n: number, devise = 'FCFA') {
   if (devise === 'EUR' || devise === 'CHF') {
@@ -29,78 +29,86 @@ function fmtN(n: number, devise = 'FCFA') {
 }
 
 interface KpiData {
-  tva_collectee: number; tva_deductible: number; tva_a_payer: number
+  tva_a_payer: number; tva_collectee: number; tva_deductible: number
   cnss_salarie: number; cnss_patronal: number; irpp_total: number
   nb_employes: number; ca_ht: number
 }
 
+interface PatenteInfo { statut: string; patente_nette: number }
+
 interface EcheanceData {
   type: string; label: string; date_echeance: string
-  jours_restants: number; statut: string; montant_estime?: number
+  jours_restants: number; statut: 'retard' | 'urgent' | 'ok'
+  montant_estime?: number; href: string
 }
 
-export default function FiscaledashboardPage() {
-  const [pays, setPays] = useState<PaysFiscal>('CG')
-  const [annee, setAnnee] = useState(new Date().getFullYear())
-  const [kpis, setKpis] = useState<KpiData | null>(null)
+export default function FiscaliteDashboardPage() {
+  const [pays,    setPays]    = useState<PaysFiscal>('CG')
+  const [annee,   setAnnee]   = useState(new Date().getFullYear())
+  const [kpis,    setKpis]    = useState<KpiData | null>(null)
+  const [patente, setPatente] = useState<PatenteInfo | null>(null)
   const [echeances, setEcheances] = useState<EcheanceData[]>([])
   const [loading, setLoading] = useState(true)
 
   const paysConfig = PAYS_LIST.find(p => p.code === pays)
+  const devise     = paysConfig?.devise ?? 'FCFA'
+  const ANNEE      = annee
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [tvaRes, cnssRes] = await Promise.all([
+      const [tvaRes, cnssRes, patRes] = await Promise.all([
         fetch(`/api/fiscalite/tva?annee=${annee}&pays=${pays}`),
         fetch(`/api/fiscalite/cnss?annee=${annee}&pays=${pays}`),
+        fetch(`/api/declarations/patente?annee=${annee}`),
       ])
-
-      const [tvaData, cnssData] = await Promise.all([
-        tvaRes.json(),
-        cnssRes.json(),
+      const [tvaData, cnssData, patData] = await Promise.all([
+        tvaRes.json(), cnssRes.json(), patRes.json(),
       ])
 
       setKpis({
-        tva_collectee: tvaData.totaux?.tva_collectee ?? 0,
+        tva_collectee:  tvaData.totaux?.tva_collectee  ?? 0,
         tva_deductible: tvaData.totaux?.tva_deductible ?? 0,
-        tva_a_payer: tvaData.totaux?.total_a_payer ?? 0,
-        cnss_salarie: cnssData.totaux?.cnss_salarie ?? 0,
-        cnss_patronal: cnssData.totaux?.cnss_patronal ?? 0,
-        irpp_total: cnssData.totaux?.irpp_total ?? 0,
-        nb_employes: cnssData.declarations?.find((d: { mois: number }) => d.mois === new Date().getMonth() + 1)?.nb_employes ?? 0,
-        ca_ht: tvaData.totaux?.ca_ht ?? 0,
+        tva_a_payer:    tvaData.totaux?.total_a_payer  ?? 0,
+        cnss_salarie:   cnssData.totaux?.cnss_salarie  ?? 0,
+        cnss_patronal:  cnssData.totaux?.cnss_patronal ?? 0,
+        irpp_total:     cnssData.totaux?.irpp_total    ?? 0,
+        nb_employes:    cnssData.declarations?.find((d: { mois: number }) => d.mois === new Date().getMonth() + 1)?.nb_employes ?? 0,
+        ca_ht:          tvaData.totaux?.ca_ht          ?? 0,
       })
 
-      // Compute next deadlines for current year
-      const allMonths = tvaData.declarations ?? []
+      setPatente(patData.declaration ?? null)
+
+      // Upcoming deadlines
       const now = new Date()
       const currentMois = now.getMonth() + 1
-
       const upcoming: EcheanceData[] = []
+      const allMonths = tvaData.declarations ?? []
+
       for (let m = currentMois; m <= Math.min(currentMois + 2, 12); m++) {
         const tvaDecl = allMonths.find((d: { mois: number }) => d.mois === m)
         if (tvaDecl) {
-          const echeanceDate = new Date(annee, m, 20) // mois suivant le 20
+          const echeanceDate = new Date(annee, m, 20)
+          const jr = Math.ceil((echeanceDate.getTime() - now.getTime()) / 86400_000)
           upcoming.push({
-            type: 'tva',
+            type: 'tva', href: '/dashboard/fiscalite/tva',
             label: `TVA ${new Date(annee, m - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${annee}`,
             date_echeance: echeanceDate.toISOString().split('T')[0],
-            jours_restants: Math.ceil((echeanceDate.getTime() - now.getTime()) / 86400_000),
-            statut: echeanceDate < now ? 'retard' : Math.ceil((echeanceDate.getTime() - now.getTime()) / 86400_000) <= 7 ? 'urgent' : 'ok',
+            jours_restants: jr,
+            statut: echeanceDate < now ? 'retard' : jr <= 7 ? 'urgent' : 'ok',
             montant_estime: tvaDecl.total_a_payer,
           })
         }
-
         const cnssDecl = cnssData.declarations?.find((d: { mois: number }) => d.mois === m)
         if (cnssDecl) {
           const echeanceDate = new Date(annee, m, 15)
+          const jr = Math.ceil((echeanceDate.getTime() - now.getTime()) / 86400_000)
           upcoming.push({
-            type: 'cnss',
+            type: 'cnss', href: '/dashboard/fiscalite/cnss',
             label: `${cnssData.config?.acronyme ?? 'CNSS'} ${new Date(annee, m - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${annee}`,
             date_echeance: echeanceDate.toISOString().split('T')[0],
-            jours_restants: Math.ceil((echeanceDate.getTime() - now.getTime()) / 86400_000),
-            statut: echeanceDate < now ? 'retard' : Math.ceil((echeanceDate.getTime() - now.getTime()) / 86400_000) <= 7 ? 'urgent' : 'ok',
+            jours_restants: jr,
+            statut: echeanceDate < now ? 'retard' : jr <= 7 ? 'urgent' : 'ok',
             montant_estime: cnssDecl.total_cnss,
           })
         }
@@ -111,31 +119,76 @@ export default function FiscaledashboardPage() {
     }
   }, [pays, annee])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { void load() }, [load])
 
-  const devise = paysConfig?.devise ?? 'FCFA'
+  // Patente deadline
+  const echeancePatente  = new Date(ANNEE, 0, 31)
+  const joursPatente     = Math.ceil((echeancePatente.getTime() - Date.now()) / 86400_000)
+  const patenteStatut    = patente?.statut as string ?? (joursPatente < 0 ? 'en_retard' : 'a_faire')
+
+  type StatutKey = 'soumise' | 'complete' | 'brouillon' | 'a_faire' | 'en_retard'
+  const STATUT: Record<StatutKey, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
+    soumise:   { label: 'Soumise',    color: GREEN, bg: '#F0FDF4', icon: <CheckCircle size={12} /> },
+    complete:  { label: 'Complète',   color: BLUE,  bg: '#EFF6FF', icon: <CheckCircle size={12} /> },
+    brouillon: { label: 'Brouillon',  color: AMBER, bg: '#FFFBEB', icon: <Clock size={12} /> },
+    a_faire:   { label: 'À déclarer', color: AMBER, bg: '#FFFBEB', icon: <Clock size={12} /> },
+    en_retard: { label: 'En retard',  color: RED,   bg: '#FEF2F2', icon: <AlertTriangle size={12} /> },
+  }
+  const ps = STATUT[(patenteStatut as StatutKey)] ?? STATUT.a_faire
+
+  const MODULES = [
+    {
+      id: 'patente', titre: 'Contribution de la Patente', ref: 'Formulaire 721M',
+      periode: `Annuelle · Échéance 31 jan. ${ANNEE}`,
+      icon: <Building2 size={18} color={GREEN} />, iconBg: '#F0FDF4',
+      href: '/dashboard/declarations/patente', hrefLabel: 'Déclarer →',
+      stat: patente ? fmtN(patente.patente_nette, devise) : (joursPatente < 0 ? 'En retard' : 'À compléter'),
+      statColor: ps.color, statut: patenteStatut as StatutKey, borderColor: ps.color,
+    },
+    {
+      id: 'tva', titre: 'TVA & Centime additionnel', ref: 'TVA 18% + CA 5%',
+      periode: `Mensuelle · Dépôt avant le 20`,
+      icon: <Receipt size={18} color={BLUE} />, iconBg: '#EFF6FF',
+      href: '/dashboard/fiscalite/tva', hrefLabel: 'Gérer →',
+      stat: kpis ? fmtN(kpis.tva_a_payer, devise) : '—',
+      statColor: BLUE, statut: null, borderColor: BLUE,
+    },
+    {
+      id: 'irpp', titre: 'IRPP & Charges salariales', ref: 'Impôt sur le revenu',
+      periode: `Mensuelle · Retenue à la source`,
+      icon: <TrendingUp size={18} color={PURPLE} />, iconBg: '#F5F3FF',
+      href: '/dashboard/fiscalite/irpp', hrefLabel: 'Gérer →',
+      stat: kpis ? fmtN(kpis.irpp_total, devise) : '—',
+      statColor: PURPLE, statut: null, borderColor: PURPLE,
+    },
+    {
+      id: 'cnss', titre: 'Cotisations sociales CNSS', ref: 'Salarié 5.04% · Patronal 14.16%',
+      periode: `Mensuelle · Dépôt avant le 15`,
+      icon: <Users size={18} color={AMBER} />, iconBg: '#FFFBEB',
+      href: '/dashboard/fiscalite/cnss', hrefLabel: 'Gérer →',
+      stat: kpis ? fmtN((kpis.cnss_salarie + kpis.cnss_patronal), devise) : '—',
+      statColor: AMBER, statut: null, borderColor: AMBER,
+    },
+  ]
 
   return (
-    <div>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+    <div className="max-w-4xl mx-auto space-y-6">
+
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TEXT }}>
+          <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             Fiscalité & Déclarations
           </h1>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: MUTED }}>
-            Tableau de bord fiscal — Exercice {annee}
+          <p className="text-[13px] mt-1" style={{ color: MUTED }}>
+            {paysConfig?.nom ?? 'Congo-Brazzaville'} · DGI · Exercice {ANNEE}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {/* Country selector */}
+        <div className="flex items-center gap-2">
           <select
             value={pays}
             onChange={e => setPays(e.target.value as PaysFiscal)}
-            style={{
-              border: `1px solid ${BORDER}`, borderRadius: 10, padding: '8px 12px',
-              background: CARD, fontSize: 13, color: TEXT, cursor: 'pointer',
-            }}
+            className="border border-[#E2E8F0] rounded-lg px-3 py-2 text-[13px] bg-white text-[#0F172A] cursor-pointer"
           >
             {PAYS_LIST.map(p => (
               <option key={p.code} value={p.code}>{p.drapeau} {p.nom}</option>
@@ -144,152 +197,142 @@ export default function FiscaledashboardPage() {
           <select
             value={annee}
             onChange={e => setAnnee(Number(e.target.value))}
-            style={{
-              border: `1px solid ${BORDER}`, borderRadius: 10, padding: '8px 12px',
-              background: CARD, fontSize: 13, color: TEXT,
-            }}
+            className="border border-[#E2E8F0] rounded-lg px-3 py-2 text-[13px] bg-white text-[#0F172A] cursor-pointer"
           >
-            {[2024, 2025, 2026, 2027].map(y => <option key={y}>{y}</option>)}
+            {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <button
-            onClick={load}
-            style={{
-              padding: '8px 14px', borderRadius: 10, border: `1px solid ${BORDER}`,
-              background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-              fontSize: 13, color: MUTED,
-            }}
+            onClick={() => void load()}
+            className="p-2 border border-[#E2E8F0] rounded-lg bg-white hover:bg-[#F8FAFC] transition-colors"
           >
-            <RefreshCw size={14} /> Actualiser
+            <RefreshCw size={14} className={loading ? 'animate-spin text-[#94A3B8]' : 'text-[#64748B]'} />
           </button>
         </div>
       </div>
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: 80, color: MUTED }}>
-          <Loader2 size={32} style={{ animation: 'spin 1s linear infinite' }} />
+      {/* ── Alerte patente ───────────────────────────────────────────────── */}
+      {!loading && patenteStatut !== 'soumise' && patenteStatut !== 'complete' && (
+        <div className={`rounded-xl px-4 py-3 flex items-center gap-3 border ${
+          joursPatente < 0 ? 'bg-[#FEF2F2] border-[#FECACA]' : 'bg-[#FFFBEB] border-[#FDE68A]'
+        }`}>
+          <AlertTriangle size={15} color={joursPatente < 0 ? RED : AMBER} className="shrink-0" />
+          <span className="text-[13px] font-medium flex-1" style={{ color: joursPatente < 0 ? RED : '#92400E' }}>
+            {joursPatente < 0
+              ? `Patente en retard de ${Math.abs(joursPatente)} jours — pénalités de retard applicables (CGI art. 721M)`
+              : `Déclaration de patente à soumettre avant le 31 janvier ${ANNEE} · J-${joursPatente}`}
+          </span>
+          <Link href="/dashboard/declarations/patente" className="text-[12px] font-bold shrink-0" style={{ color: BLUE }}>
+            Déclarer →
+          </Link>
         </div>
+      )}
+
+      {/* ── KPIs synthèse ───────────────────────────────────────────────── */}
+      {loading ? (
+        <div className="flex justify-center py-12"><Loader2 size={24} className="animate-spin text-[#F59E0B]" /></div>
       ) : (
         <>
-          {/* KPI Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: 'CA HT annuel', value: kpis?.ca_ht ?? 0, color: TEXT, icon: <TrendingUp size={16} color={BLUE} />, suffix: '' },
-              { label: 'TVA collectée', value: kpis?.tva_collectee ?? 0, color: BLUE, icon: <Receipt size={16} color={BLUE} />, suffix: '' },
-              { label: 'TVA déductible', value: kpis?.tva_deductible ?? 0, color: GREEN, icon: <Receipt size={16} color={GREEN} />, suffix: '' },
-              { label: 'TVA à payer', value: kpis?.tva_a_payer ?? 0, color: RED, icon: <AlertTriangle size={16} color={RED} />, suffix: '' },
-              { label: 'CNSS total', value: (kpis?.cnss_salarie ?? 0) + (kpis?.cnss_patronal ?? 0), color: '#7C3AED', icon: <Users size={16} color="#7C3AED" />, suffix: '' },
-              { label: 'IRPP total', value: kpis?.irpp_total ?? 0, color: AMBER, icon: <FileText size={16} color={AMBER} />, suffix: '' },
-            ].map(k => (
-              <motion.div
-                key={k.label}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '16px 18px' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                  {k.icon}
-                  <span style={{ fontSize: 11, color: MUTED, fontWeight: 600, textTransform: 'uppercase' }}>{k.label}</span>
-                </div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: k.color }}>
-                  {fmtN(k.value, devise)}
-                </div>
-              </motion.div>
+              { label: 'TVA à payer',        value: fmtN(kpis?.tva_a_payer ?? 0, devise),    color: BLUE   },
+              { label: 'IRPP total',          value: fmtN(kpis?.irpp_total ?? 0, devise),     color: PURPLE },
+              { label: 'CNSS total',          value: fmtN((kpis?.cnss_salarie ?? 0) + (kpis?.cnss_patronal ?? 0), devise), color: AMBER },
+              { label: 'CA HT déclaré',       value: fmtN(kpis?.ca_ht ?? 0, devise),          color: GREEN  },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="bg-white rounded-xl border border-[#E2E8F0] p-4 shadow-sm">
+                <p className="text-[11px] font-semibold mb-1" style={{ color: MUTED }}>{label}</p>
+                <p className="text-[15px] font-extrabold leading-tight" style={{ color }}>{value}</p>
+              </div>
             ))}
           </div>
 
-          {/* Two columns: Quick access + Upcoming deadlines */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-
-            {/* Quick access modules */}
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BORDER}` }}>
-                <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT }}>Modules déclaratifs</h2>
-              </div>
-              <div style={{ padding: '8px 0' }}>
-                {[
-                  { href: '/dashboard/fiscalite/tva', icon: <Receipt size={18} color={BLUE} />, label: 'TVA', sub: 'Déclarations mensuelles', bg: '#EFF6FF' },
-                  { href: '/dashboard/fiscalite/cnss', icon: <Users size={18} color="#7C3AED" />, label: 'CNSS / Charges sociales', sub: 'Bordereaux de cotisation', bg: '#F5F3FF' },
-                  { href: '/dashboard/fiscalite/irpp', icon: <TrendingUp size={18} color={AMBER} />, label: 'IRPP & Impôts salariés', sub: 'Retenues à la source', bg: '#FFFBEB' },
-                  { href: '/dashboard/fiscalite/patente', icon: <Building2 size={18} color={GREEN} />, label: 'Patente & Licences', sub: 'Taxes professionnelles', bg: '#F0FDF4' },
-                  { href: '/dashboard/fiscalite/echeancier', icon: <Calendar size={18} color={RED} />, label: 'Échéancier fiscal', sub: 'Calendrier des déclarations', bg: '#FEF2F2' },
-                  { href: '/dashboard/fiscalite/controles', icon: <FileText size={18} color="#64748B" />, label: 'Contrôles fiscaux', sub: 'Audit & Conformité', bg: '#F8FAFC' },
-                ].map(item => (
-                  <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      padding: '12px 20px', cursor: 'pointer',
-                      transition: 'background 0.1s',
-                    }}
-                      onMouseEnter={e => (e.currentTarget.style.background = '#F8FAFC')}
-                      onMouseLeave={e => (e.currentTarget.style.background = '')}
-                    >
-                      <div style={{ width: 36, height: 36, borderRadius: 10, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {item.icon}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{item.label}</div>
-                        <div style={{ fontSize: 11, color: MUTED }}>{item.sub}</div>
-                      </div>
-                      <ArrowRight size={14} color={MUTED} />
+          {/* ── Déclarations (cartes) ─────────────────────────────────────── */}
+          <div>
+            <h2 className="text-[13px] font-bold text-[#0F172A] mb-3">Déclarations fiscales</h2>
+            <div className="space-y-3">
+              {MODULES.map(m => (
+                <div key={m.id} className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden"
+                  style={{ borderLeft: `3px solid ${m.borderColor}` }}>
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: m.iconBg }}>
+                      {m.icon}
                     </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Upcoming deadlines */}
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BORDER}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT }}>Prochaines échéances</h2>
-                <Link href="/dashboard/fiscalite/echeancier" style={{ fontSize: 12, color: BLUE, textDecoration: 'none', fontWeight: 600 }}>
-                  Voir tout →
-                </Link>
-              </div>
-              <div style={{ padding: '8px 0' }}>
-                {echeances.length === 0 ? (
-                  <div style={{ padding: '32px 20px', textAlign: 'center', color: MUTED, fontSize: 13 }}>
-                    <CheckCircle size={24} color={GREEN} style={{ marginBottom: 8 }} />
-                    <div>Aucune échéance imminente</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-bold text-[#0F172A]">{m.titre}</p>
+                      <p className="text-[11px] mt-0.5" style={{ color: MUTED }}>
+                        {m.ref} · {m.periode}
+                      </p>
+                    </div>
+                    {/* Montant / Statut */}
+                    <div className="text-right shrink-0 hidden sm:block">
+                      <p className="text-[14px] font-extrabold" style={{ color: m.statColor }}>{m.stat}</p>
+                      {m.statut && (
+                        <div className="flex items-center gap-1 justify-end mt-0.5">
+                          {STATUT[m.statut]?.icon}
+                          <span className="text-[10px] font-semibold" style={{ color: STATUT[m.statut]?.color }}>
+                            {STATUT[m.statut]?.label}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <Link href={m.href}
+                      className="flex items-center gap-1 text-[12px] font-bold shrink-0 px-3 py-1.5 rounded-lg transition-colors hover:bg-[#F8FAFC]"
+                      style={{ color: m.borderColor }}>
+                      {m.hrefLabel} <ChevronRight size={13} />
+                    </Link>
                   </div>
-                ) : echeances.slice(0, 6).map((e, i) => {
-                  const statusColor = e.statut === 'retard' ? RED : e.statut === 'urgent' ? AMBER : GREEN
-                  const statusBg   = e.statut === 'retard' ? '#FEF2F2' : e.statut === 'urgent' ? '#FFFBEB' : '#F0FDF4'
-                  const TypeIcon   = e.type === 'tva' ? Receipt : Users
+                </div>
+              ))}
+            </div>
+          </div>
 
+          {/* ── Échéances à venir ─────────────────────────────────────────── */}
+          {echeances.length > 0 && (
+            <div>
+              <h2 className="text-[13px] font-bold text-[#0F172A] mb-3 flex items-center gap-2">
+                <CalendarDays size={14} color={MUTED} />
+                Prochaines échéances
+              </h2>
+              <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm divide-y divide-[#F1F5F9]">
+                {echeances.map((e, i) => {
+                  const col = e.statut === 'retard' ? RED : e.statut === 'urgent' ? AMBER : GREEN
                   return (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: i < 5 ? `1px solid #F8FAFC` : 'none' }}>
-                      <div style={{ width: 34, height: 34, borderRadius: 9, background: statusBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <TypeIcon size={16} color={statusColor} />
+                    <div key={i} className="flex items-center gap-4 px-5 py-3.5">
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: col }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-[#0F172A] truncate">{e.label}</p>
+                        <p className="text-[11px]" style={{ color: MUTED }}>
+                          Échéance : <strong>{new Date(e.date_echeance).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+                          {e.statut === 'retard' ? ` · En retard de ${Math.abs(e.jours_restants)} j` : ` · J-${e.jours_restants}`}
+                        </p>
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: TEXT, marginBottom: 2 }}>{e.label}</div>
-                        <div style={{ fontSize: 11, color: MUTED }}>
-                          Échéance {new Date(e.date_echeance).toLocaleDateString('fr-FR')}
-                        </div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{
-                          fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 20,
-                          background: statusBg, color: statusColor,
-                        }}>
-                          {e.statut === 'retard' ? 'En retard' : e.jours_restants <= 0 ? 'Auj.' : `J-${e.jours_restants}`}
-                        </div>
-                        {e.montant_estime !== undefined && e.montant_estime > 0 && (
-                          <div style={{ fontSize: 10, color: MUTED, marginTop: 2 }}>
-                            {fmtN(e.montant_estime, devise)}
-                          </div>
-                        )}
-                      </div>
+                      {e.montant_estime !== undefined && e.montant_estime > 0 && (
+                        <p className="text-[13px] font-bold shrink-0" style={{ color: col }}>
+                          {fmtN(e.montant_estime, devise)}
+                        </p>
+                      )}
+                      <Link href={e.href} className="text-[11px] font-bold shrink-0" style={{ color: BLUE }}>
+                        <ArrowRight size={14} />
+                      </Link>
                     </div>
                   )
                 })}
               </div>
             </div>
+          )}
+
+          {/* ── Info légale ───────────────────────────────────────────────── */}
+          <div className="rounded-xl border border-[#E2E8F0] p-4" style={{ background: BG }}>
+            <p className="text-[11px] font-semibold text-[#0F172A] mb-2">Obligations fiscales — {paysConfig?.nom ?? 'Congo-Brazzaville'} (DGI)</p>
+            <div className="text-[11px] space-y-1" style={{ color: MUTED, lineHeight: 1.7 }}>
+              <p>• <strong>Patente 721M</strong> : déclaration annuelle avant le 31 janvier, base = CA HT exercice précédent</p>
+              <p>• <strong>TVA 18%</strong> + Centime Additionnel 5% : déclaration mensuelle avant le 20 du mois suivant</p>
+              <p>• <strong>IRPP</strong> : retenue à la source sur salaires, reversement avant le 20 du mois suivant</p>
+              <p>• <strong>CNSS</strong> : déclaration mensuelle avant le 15, taux salarié 5,04 % + patronal 14,16 %</p>
+            </div>
           </div>
         </>
       )}
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
     </div>
   )
 }
