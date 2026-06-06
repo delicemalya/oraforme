@@ -16,7 +16,7 @@ import {
   Bell, FolderOpen, Building2,
   ChevronDown, Calendar, CheckSquare,
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
-  CreditCard, LineChart, Zap, Key, Landmark, Briefcase,
+  CreditCard, LineChart, Zap, Key, Landmark, Briefcase, ClipboardList,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -105,6 +105,7 @@ const ICONS: Record<string, LucideIcon> = {
   'pharmacie-ventes':  ShoppingCart,
   abonnement:          CreditCard,
   fiscalite:           Landmark,
+  declarations:        ClipboardList,
   btp:                 Building2,
   'btp-devis':         FileText,
   'btp-chantiers':     Layers,
@@ -162,7 +163,8 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'abonnement',            label: 'Abonnement',           sublabel: '', href: '/dashboard/abonnement'                 },
   { id: 'workflows',             label: 'Workflows',            sublabel: '', href: '/dashboard/workflows'                  },
   { id: 'api-keys',              label: 'Clés API',             sublabel: '', href: '/dashboard/api-keys'                   },
-  { id: 'fiscalite',             label: 'Fiscalité',            sublabel: '', href: '/dashboard/fiscalite'                  },
+  { id: 'fiscalite',    label: 'Fiscalité',             sublabel: '', href: '/dashboard/fiscalite'    },
+  { id: 'declarations', label: 'Déclarations fiscales', sublabel: '', href: '/dashboard/declarations' },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -173,7 +175,7 @@ const SIDEBAR_GROUPS = [
   // SUPERVISION — KPIs exécutifs, BI, analytics
   { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
   // FINANCE — gestion financière complète
-  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite', 'declarations'] },
   // RH — personnel & paie
   { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'recrutement', 'salaires', 'roles'] },
   // COMMERCIAL — clients, stock, achats
@@ -231,6 +233,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   abonnement:          'nav.abonnement',
   fiscalite:           'nav.fiscalite',
   // Secteurs métier
+
   btp:                     'nav.btp',
   'btp-devis':             'nav.btp_devis',
   'btp-chantiers':         'nav.btp_chantiers',
@@ -304,7 +307,7 @@ const ALL_MODULE_IDS = [
   'calendrier', 'taches',
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
-  'abonnement', 'fiscalite',
+  'abonnement', 'fiscalite', 'declarations',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
