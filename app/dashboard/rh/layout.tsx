@@ -43,7 +43,7 @@ export default function RHLayout({ children }: { children: React.ReactNode }) {
     <div className="space-y-0">
 
       {/* RH Module Sub-Nav */}
-      <div className="bg-white border-b border-[#E2E8F0] -mx-6 -mt-6 px-6 mb-6 sticky top-0 z-20">
+      <div className="bg-white border-b border-[#E2E8F0] -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 px-4 sm:px-6 mb-4 sm:mb-6 sticky top-0 z-20">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 py-2 text-[11px] text-[#94A3B8]">
@@ -53,7 +53,7 @@ export default function RHLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Module tabs scroll */}
-        <div className="flex items-center gap-0.5 overflow-x-auto pb-0 scrollbar-hide -mb-px">
+        <div className="flex items-center gap-0.5 overflow-x-auto pb-0 scrollbar-hide -mb-px touch-pan-x">
           {RH_MODULES.map(mod => {
             const Icon   = mod.icon
             const active = mod.exact
