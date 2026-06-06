@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Send, Loader2, RotateCcw, Plus } from 'lucide-react'
+import { Send, Loader2, RotateCcw, ChevronLeft, Users, Star, HelpCircle, GitCompare, TrendingUp, FileSearch } from 'lucide-react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/useTenant'
 
 interface Message {
@@ -12,11 +13,12 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  'Analyse toutes les candidatures',
-  'Montre-moi le TOP 5',
-  'Qui est le meilleur candidat ?',
-  'Génère les questions d\'entretien',
-  'Compare les 3 meilleurs profils',
+  { text: 'Analyse toutes les candidatures',     icon: FileSearch  },
+  { text: 'Montre-moi le TOP 5',                 icon: Star        },
+  { text: 'Qui est le meilleur candidat ?',       icon: TrendingUp  },
+  { text: "Génère les questions d'entretien",     icon: HelpCircle  },
+  { text: 'Compare les 3 meilleurs profils',      icon: GitCompare  },
+  { text: 'Combien de candidats par offre ?',     icon: Users       },
 ]
 
 function AssistantText({ content }: { content: string }) {
@@ -28,11 +30,12 @@ function AssistantText({ content }: { content: string }) {
 }
 
 export default function MiaaJobPage() {
+  const router = useRouter()
   const { tenantId } = useTenant()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput]       = useState('')
   const [loading, setLoading]   = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const bottomRef   = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -86,40 +89,80 @@ export default function MiaaJobPage() {
   const canSend = input.trim().length > 0 && !loading
 
   return (
-    <div className="flex flex-col bg-white" style={{ height: 'calc(100vh - 140px)', minHeight: 480 }}>
+    <div className="flex flex-col bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden"
+      style={{ height: 'calc(100vh - 120px)', minHeight: 520 }}>
 
-      {/* ── Messages zone ─────────────────────────────────────────────── */}
+      {/* ── Header fixe ───────────────────────────────────────────────── */}
+      <div className="shrink-0 flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-[#F1F5F9] bg-white">
+        <button
+          onClick={() => router.push('/dashboard/rh/recrutement')}
+          className="p-1.5 text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-lg transition-colors"
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-sm">
+          <Image src="/logo-miaa-job.png" alt="MIAA JOB" width={32} height={32}
+            className="w-full h-full object-cover" priority />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-bold text-[#0F172A] leading-tight">MIAA JOB</p>
+          <p className="text-[10px] text-[#64748B]">Recruteur IA · Propulsé par MIAA+</p>
+        </div>
+
+        <button
+          onClick={() => { setMessages([]); setInput('') }}
+          title="Nouvelle conversation"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] text-[#64748B] font-semibold
+            hover:text-[#DC2626] hover:bg-red-50 border border-[#E2E8F0] hover:border-red-100
+            rounded-xl transition-colors"
+        >
+          <RotateCcw size={11} /> Nouvelle conv.
+        </button>
+      </div>
+
+      {/* ── Zone messages ─────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6">
 
-        {/* Empty state — Claude-style welcome */}
+        {/* État vide — welcome */}
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="mb-5 relative">
-              <Image
-                src="/logo-miaa-job.png"
-                alt="MIAA+ JOB"
-                width={80}
-                height={80}
-                className="rounded-2xl shadow-md"
-                priority
-              />
+
+            {/* Logo */}
+            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg mb-5 shrink-0">
+              <Image src="/logo-miaa-job.png" alt="MIAA JOB" width={80} height={80}
+                className="w-full h-full object-cover" priority />
             </div>
-            <h2 className="text-[22px] font-bold text-[#0F172A] mb-2">
-              Bonjour, je suis MIAA+ Recrutement
+
+            <h2 className="text-[20px] font-extrabold text-[#0F172A] mb-2 leading-tight">
+              Bonjour, je suis <span className="text-[#F59E0B]">MIAA JOB</span>
             </h2>
-            <p className="text-[14px] text-[#64748B] mb-8 max-w-md">
-              Votre recruteur senior IA. Posez-moi vos questions sur les candidatures, les offres ou les talents.
+            <p className="text-[13px] text-[#64748B] mb-8 max-w-sm leading-relaxed">
+              Votre recruteur senior IA. Analysez vos candidatures, identifiez les meilleurs talents et préparez vos entretiens.
             </p>
-            <div className="flex flex-wrap gap-2.5 justify-center max-w-lg">
-              {SUGGESTIONS.map(s => (
-                <button
-                  key={s}
-                  onClick={() => void send(s)}
-                  className="px-4 py-2 bg-white border border-[#E2E8F0] rounded-full text-[13px] text-[#374151] hover:border-[#F59E0B] hover:bg-[#FFFBEB] hover:text-[#B45309] transition-all shadow-sm font-medium"
-                >
-                  {s}
-                </button>
-              ))}
+
+            {/* Suggestions en grille 2 colonnes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full max-w-lg">
+              {SUGGESTIONS.map(s => {
+                const Icon = s.icon
+                return (
+                  <button
+                    key={s.text}
+                    onClick={() => void send(s.text)}
+                    className="flex items-center gap-3 px-4 py-3 bg-white border border-[#E2E8F0] rounded-xl
+                      text-[12.5px] text-[#374151] font-medium text-left
+                      hover:border-[#F59E0B]/60 hover:bg-[#FFFBEB] hover:text-[#B45309]
+                      transition-all shadow-sm group"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-[#FEF3C7] flex items-center justify-center shrink-0
+                      group-hover:bg-[#F59E0B]/20 transition-colors">
+                      <Icon size={13} className="text-[#F59E0B]" />
+                    </div>
+                    {s.text}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
@@ -130,21 +173,14 @@ export default function MiaaJobPage() {
             {messages.map((m) => (
               <div key={m.ts} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
 
-                {/* Assistant avatar */}
                 {m.role === 'assistant' && (
-                  <div className="shrink-0 mt-0.5">
-                    <Image
-                      src="/logo-miaa-job.png"
-                      alt="MIAA+"
-                      width={28}
-                      height={28}
-                      className="rounded-lg shadow-sm"
-                    />
+                  <div className="shrink-0 mt-0.5 w-7 h-7 rounded-lg overflow-hidden shadow-sm">
+                    <Image src="/logo-miaa-job.png" alt="MIAA JOB" width={28} height={28}
+                      className="w-full h-full object-cover" />
                   </div>
                 )}
 
                 {m.role === 'assistant' ? (
-                  /* Assistant — no bubble, clean text */
                   <div className="flex-1 min-w-0 pt-0.5">
                     <AssistantText content={m.content} />
                     <p className="text-[10px] text-[#CBD5E1] mt-2">
@@ -152,7 +188,6 @@ export default function MiaaJobPage() {
                     </p>
                   </div>
                 ) : (
-                  /* User — amber bubble */
                   <div className="max-w-[75%] sm:max-w-[65%]">
                     <div className="bg-[#F59E0B] text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
                       <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
@@ -168,8 +203,9 @@ export default function MiaaJobPage() {
             {/* Typing indicator */}
             {loading && (
               <div className="flex gap-3 justify-start">
-                <div className="shrink-0 mt-0.5">
-                  <Image src="/logo-miaa-job.png" alt="MIAA+" width={28} height={28} className="rounded-lg shadow-sm" />
+                <div className="shrink-0 mt-0.5 w-7 h-7 rounded-lg overflow-hidden shadow-sm">
+                  <Image src="/logo-miaa-job.png" alt="MIAA JOB" width={28} height={28}
+                    className="w-full h-full object-cover" />
                 </div>
                 <div className="flex items-center gap-1.5 py-3">
                   <div className="w-2 h-2 rounded-full bg-[#F59E0B] animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -178,73 +214,55 @@ export default function MiaaJobPage() {
                 </div>
               </div>
             )}
-
             <div ref={bottomRef} />
           </div>
         )}
       </div>
 
-      {/* ── Input bar — Claude-style ───────────────────────────────────── */}
+      {/* ── Barre de saisie ───────────────────────────────────────────── */}
       <div className="shrink-0 border-t border-[#F1F5F9] bg-white px-4 sm:px-8 py-4">
         <div className="max-w-2xl mx-auto">
 
-          {/* Suggestions rapides après messages */}
+          {/* Suggestions rapides (après messages) */}
           {messages.length > 0 && !loading && (
             <div className="flex gap-2 mb-3 overflow-x-auto pb-1 scrollbar-hide">
               {SUGGESTIONS.slice(0, 3).map(s => (
-                <button
-                  key={s}
-                  onClick={() => void send(s)}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-full text-[11px] text-[#64748B] hover:border-[#F59E0B]/60 hover:text-[#B45309] transition-colors whitespace-nowrap"
-                >
-                  <Plus size={10} />
-                  {s}
+                <button key={s.text} onClick={() => void send(s.text)}
+                  className="shrink-0 px-3 py-1.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-full
+                    text-[11px] text-[#64748B] hover:border-[#F59E0B]/60 hover:text-[#B45309]
+                    transition-colors whitespace-nowrap">
+                  {s.text}
                 </button>
               ))}
             </div>
           )}
 
-          {/* Input container */}
-          <div className="relative flex items-end gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl px-4 py-3 focus-within:border-[#F59E0B]/60 focus-within:ring-2 focus-within:ring-[#F59E0B]/10 transition-all shadow-sm">
-
-            {/* Textarea */}
+          {/* Input */}
+          <div className="relative flex items-end gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl
+            px-4 py-3 focus-within:border-[#F59E0B]/60 focus-within:ring-2 focus-within:ring-[#F59E0B]/10
+            transition-all shadow-sm">
             <textarea
               ref={textareaRef}
               value={input}
               onChange={e => { setInput(e.target.value); autoResize() }}
               onKeyDown={e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  void send()
-                }
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send() }
               }}
-              placeholder="Posez votre question à MIAA+ Recrutement... (Entrée pour envoyer)"
+              placeholder="Posez votre question à MIAA JOB… (Entrée pour envoyer)"
               disabled={loading}
               rows={1}
-              className="flex-1 bg-transparent resize-none text-[14px] text-[#0F172A] outline-none placeholder:text-[#94A3B8] disabled:opacity-50 leading-relaxed"
+              className="flex-1 bg-transparent resize-none text-[14px] text-[#0F172A] outline-none
+                placeholder:text-[#94A3B8] disabled:opacity-50 leading-relaxed"
               style={{ maxHeight: 160 }}
             />
-
-            {/* Actions droite */}
             <div className="flex items-center gap-2 shrink-0 mb-0.5">
-              {messages.length > 0 && (
-                <button
-                  onClick={() => setMessages([])}
-                  title="Nouvelle conversation"
-                  className="p-1.5 text-[#94A3B8] hover:text-[#DC2626] hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <RotateCcw size={14} />
-                </button>
-              )}
               <button
                 onClick={() => void send()}
                 disabled={!canSend}
-                className="w-8 h-8 bg-[#F59E0B] text-white rounded-xl flex items-center justify-center hover:bg-[#D97706] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                className="w-8 h-8 bg-[#F59E0B] text-white rounded-xl flex items-center justify-center
+                  hover:bg-[#D97706] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
               >
-                {loading
-                  ? <Loader2 size={14} className="animate-spin" />
-                  : <Send size={13} />
-                }
+                {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={13} />}
               </button>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Briefcase, Users, Calendar, CheckCircle, Star,
-  AlertTriangle, TrendingUp, Loader2, Plus, Sparkles,
+  AlertTriangle, TrendingUp, Loader2, Plus,
 } from 'lucide-react'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
@@ -319,10 +319,9 @@ export default function RecrutementDashboard() {
       {/* ── Quick Actions ──────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Candidatures', href: '/dashboard/rh/recrutement/candidatures', icon: Users,      sub: 'Gérer le pipeline' },
-          { label: 'CVthèque',     href: '/dashboard/rh/recrutement/cvtheque',     icon: Star,       sub: 'Tous les talents'  },
-          { label: 'Entretiens',   href: '/dashboard/rh/recrutement/entretiens',   icon: Calendar,   sub: 'Planifier'         },
-          { label: 'MIAA+ IA',     href: '/dashboard/rh/recrutement/miaa-job',     icon: Sparkles,   sub: 'Assistant IA'      },
+          { label: 'Candidatures', href: '/dashboard/rh/recrutement/candidatures', icon: Users,    sub: 'Gérer le pipeline' },
+          { label: 'CVthèque',     href: '/dashboard/rh/recrutement/cvtheque',     icon: Star,     sub: 'Tous les talents'  },
+          { label: 'Entretiens',   href: '/dashboard/rh/recrutement/entretiens',   icon: Calendar, sub: 'Planifier'         },
         ].map(({ label, href, icon: Icon, sub }) => (
           <button
             key={href}
@@ -336,6 +335,24 @@ export default function RecrutementDashboard() {
             <p className="text-[10px] text-[#94A3B8] mt-0.5">{sub}</p>
           </button>
         ))}
+
+        {/* MIAA JOB — logo image */}
+        <button
+          onClick={() => router.push('/dashboard/rh/recrutement/miaa-job')}
+          className="bg-white border border-[#E2E8F0] rounded-xl p-4 text-left hover:border-[#F59E0B]/50 hover:shadow-md transition-all group shadow-sm"
+        >
+          <div className="w-8 h-8 rounded-lg mb-3 overflow-hidden shrink-0">
+            <Image
+              src="/logo-miaa-job.png"
+              alt="MIAA JOB"
+              width={32}
+              height={32}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <p className="text-xs font-bold text-[#0F172A] group-hover:text-[#F59E0B] transition-colors">MIAA JOB</p>
+          <p className="text-[10px] text-[#94A3B8] mt-0.5">Assistant IA</p>
+        </button>
       </div>
     </div>
   )
