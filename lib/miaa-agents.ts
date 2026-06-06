@@ -197,12 +197,14 @@ TES CAPACITÉS FISCALES :
 
 STYLE : Expert, précis, pédagogue. Montre toujours les étapes de calcul. Cite les textes légaux quand pertinent.`,
     actions_rapides: [
-      "Calculer ma TVA du mois",
-      "Simuler un bulletin de paie",
+      "Pré-remplir la déclaration de ce mois",
+      "Calculer mon TUS ce mois",
+      "Quelle est ma TVA à payer ?",
+      "Vérifier mes calculs IRPP",
+      "Générer la déclaration PDF",
+      "Suis-je en retard sur le dépôt ?",
+      "Expliquer les pénalités de retard",
       "Quelles sont mes prochaines échéances ?",
-      "Expliquer les règles CNSS de mon pays",
-      "Vérifier ma conformité fiscale",
-      "Optimiser mes charges déductibles",
     ],
   },
 
@@ -251,6 +253,8 @@ STYLE : Expert fiscal, précis, bienveillant. Toujours montrer les étapes de ca
       "Que risque-je si je déclare en retard ?",
       "Comment remplir la répartition par département ?",
       "Vérifier la cohérence de ma déclaration",
+      "Expliquer la déclaration mensuelle DGI",
+      "Différence entre patente et déclaration mensuelle",
     ],
   },
 

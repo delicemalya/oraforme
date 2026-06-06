@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   FileText, CheckCircle, Clock, AlertTriangle,
-  ChevronRight, Building2, Receipt, Users, TrendingUp,
+  ChevronRight, Building2, Receipt, Users, TrendingUp, BarChart2,
 } from 'lucide-react'
 
 const TEXT  = '#0F172A'
@@ -107,6 +107,18 @@ export default function DeclarationsPage() {
       statut:      'a_faire' as Statut,
       montant:     undefined,
       note:        'Via module Fiscalité',
+    },
+    {
+      id:          'mensuelle',
+      titre:       'Déclaration Générale DGI',
+      reference:   'Formulaire mensuel DGI',
+      periodicite: 'Mensuelle',
+      echeance:    `20/${MOIS < 10 ? '0' : ''}${MOIS + 1 > 12 ? 1 : MOIS + 1}/${ANNEE}`,
+      icon:        <BarChart2 size={20} color="#1E3A5F" />,
+      href:        '/dashboard/declarations/mensuelle',
+      statut:      'a_faire' as Statut,
+      montant:     undefined,
+      note:        'TVA + IRPP + TUS + TOL consolidés',
     },
   ]
 
