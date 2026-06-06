@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import {
-  Building2, Save, Send, Loader2, RefreshCw, Printer,
+  Building2, Save, Send, Loader2, RefreshCw, FileDown,
   ChevronDown, ChevronUp, CheckCircle, AlertCircle, Info,
 } from 'lucide-react'
 import {
@@ -268,9 +268,59 @@ export default function PatentePage() {
     }
   }, [form, annee, calcul.ca_imposable])
 
-  // ── PDF / Impression ─────────────────────────────────────────────────────────
+  // ── PDF 721M officiel ────────────────────────────────────────────────────────
 
-  const handlePrint = useCallback(() => { window.print() }, [])
+  const [pdfLoading, setPdfLoading] = useState(false)
+
+  const handlePDF = useCallback(async () => {
+    setPdfLoading(true)
+    try {
+      const payload = {
+        annee,
+        niu: form.niu, scien: form.scien, rccm: form.rccm,
+        denomination_sociale: form.denomination,
+        adresse: form.adresse_siege,
+        telephone: form.telephone, email: form.email,
+        forme_juridique: form.forme_juridique,
+        nature_activite: form.nature_activite,
+        date_debut_activite: form.date_debut_activite,
+        nb_etablissements: form.nb_etablissements,
+        ca_annuel: form.ca_annuel,
+        ca_exonere: form.ca_exonere,
+        ca_imposable: calcul.ca_imposable,
+        taux_applicable: calcul.taux_applicable,
+        patente_brute: calcul.patente_brute,
+        patente_liquidee: calcul.patente_liquidee,
+        est_societe_petroliere: form.est_societe_petroliere,
+        montant_reduction: calcul.montant_reduction,
+        patente_apres_reduction: calcul.patente_apres_reduction,
+        centimes_additionnels: calcul.centimes_additionnels,
+        camu: calcul.camu,
+        credit_n1: form.credit_n1,
+        patente_nette: calcul.patente_nette,
+        departements: recalcDepartementPourcentages(form.repartition_departements, calcul.ca_imposable),
+        lieu_signature: form.lieu_signature,
+        date_signature: form.date_signature,
+      }
+      const res = await fetch('/api/declarations/patente/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error('Erreur génération PDF')
+      const blob = await res.blob()
+      const url  = URL.createObjectURL(blob)
+      const a    = document.createElement('a')
+      a.href     = url
+      a.download = `patente-721M-${annee}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setPdfLoading(false)
+    }
+  }, [form, annee, calcul])
 
   // ─── Render ───────────────────────────────────────────────────────────────────
 
@@ -314,9 +364,10 @@ export default function PatentePage() {
             style={{ ...INPUT_STYLE, width: 'auto', paddingTop: 7, paddingBottom: 7 }}>
             {[annee - 1, annee, annee + 1].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <button onClick={handlePrint}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px', borderRadius: 8, border: `1px solid ${BORDER}`, background: CARD, cursor: 'pointer', fontSize: 12, color: MUTED }}>
-            <Printer size={13} /> Imprimer
+          <button onClick={handlePDF} disabled={pdfLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px', borderRadius: 8, border: `1px solid ${AMBER}`, background: pdfLoading ? '#FEF9C3' : '#FFFBEB', cursor: pdfLoading ? 'wait' : 'pointer', fontSize: 12, color: AMBER, fontWeight: 600, opacity: pdfLoading ? 0.7 : 1 }}>
+            {pdfLoading ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <FileDown size={13} />}
+            {pdfLoading ? 'Génération…' : 'Télécharger PDF'}
           </button>
           <button onClick={() => load(annee)}
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px', borderRadius: 8, border: `1px solid ${BORDER}`, background: CARD, cursor: 'pointer', fontSize: 12, color: MUTED }}>

@@ -174,8 +174,8 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 const SIDEBAR_GROUPS = [
   // SUPERVISION — KPIs exécutifs, BI, analytics
   { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
-  // FINANCE — gestion financière complète (declarations fusionné dans fiscalite)
-  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
+  // FINANCE — gestion financière + déclarations DGI
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite', 'declarations'] },
   // RH — personnel & paie (recrutement = rubrique indépendante)
   { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
   // RECRUTEMENT — module autonome
