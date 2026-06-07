@@ -57,15 +57,18 @@ export default function ComptabilitePage() {
     { href: '/dashboard/comptabilite/journal',         label: t('compta.overview.journal'),         icon: BookOpen,   color: '#2563EB', desc: 'Écritures chronologiques'   },
     { href: '/dashboard/comptabilite/grand-livre',     label: 'Grand Livre',                        icon: Scale,      color: '#16A34A', desc: 'Solde par compte'            },
     { href: '/dashboard/comptabilite/balance',         label: 'Balance',                            icon: BarChart2,  color: '#8B5CF6', desc: 'Totaux débit/crédit'        },
-    { href: '/dashboard/comptabilite/bilan',           label: 'Bilan & Résultat',                   icon: TrendingUp, color: '#F59E0B', desc: 'États financiers OHADA'      },
-    { href: '/dashboard/comptabilite/plan-comptable',  label: 'Plan Comptable',                     icon: List,       color: '#0891B2', desc: 'Comptes OHADA Classes 1-9'   },
+    { href: '/dashboard/comptabilite/bilan',           label: 'Bilan & Résultat',                   icon: TrendingUp, color: '#F59E0B', desc: 'États financiers SYSCOHADA'  },
+    { href: '/dashboard/comptabilite/plan-comptable',  label: 'Plan Comptable',                     icon: List,       color: '#0891B2', desc: 'Comptes SYSCOHADA Classes 1-9' },
     { href: '/dashboard/comptabilite/tiers',           label: 'Tiers',                              icon: Users,      color: '#D97706', desc: 'Clients & fournisseurs'      },
     { href: '/dashboard/comptabilite/immobilisations', label: 'Immobilisations',                    icon: Package,    color: '#DC2626', desc: 'Amortissements auto'         },
     { href: '/dashboard/comptabilite/tva',             label: t('compta.overview.kpi.tva'),         icon: Percent,    color: '#0F172A', desc: 'Déclarations TVA Congo'       },
     { href: '/dashboard/comptabilite/rapprochement',   label: 'Rapprochement',                      icon: GitMerge,   color: '#64748B', desc: 'Banques & caisses'           },
     { href: '/dashboard/comptabilite/cloture',         label: 'Clôture',                            icon: Lock,       color: '#7C3AED', desc: 'Clôture mensuelle/annuelle'  },
-    { href: '/dashboard/comptabilite/rapports',        label: 'Rapports',                           icon: Download,   color: '#059669', desc: 'PDF · Excel · SYSCOHADA'     },
-    { href: '/dashboard/comptabilite/centres-couts',   label: 'Centres de coûts',                   icon: Layers,     color: '#EA580C', desc: 'Analytique par projet'       },
+    { href: '/dashboard/comptabilite/rapports',          label: 'Rapports',           icon: Download,     color: '#059669', desc: 'PDF · Excel · SYSCOHADA'        },
+    { href: '/dashboard/comptabilite/centres-couts',    label: 'Centres de coûts',   icon: Layers,       color: '#EA580C', desc: 'Analytique par projet'            },
+    { href: '/dashboard/comptabilite/flux-tresorerie',  label: 'Flux de trésorerie', icon: Activity,     color: '#0891B2', desc: 'Tableau ZA/ZB/ZC SYSCOHADA'      },
+    { href: '/dashboard/comptabilite/annexes',          label: 'Notes annexes',      icon: BookOpen,     color: '#7C3AED', desc: '10 notes OHADA obligatoires'     },
+    { href: '/dashboard/comptabilite/devises',          label: 'Multi-devises',      icon: ArrowUpRight, color: '#D97706', desc: 'Taux de change · XAF/EUR/USD'    },
   ]
 
   /* State */

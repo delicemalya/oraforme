@@ -3,12 +3,13 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 import { hrAuth } from '../../hr/_auth'
 
 /* ─────────────────────────────────────────────────────────────────────────────
- * OHADA helper — server-side version of writeComptaEntry (uses supabaseAdmin)
+ * SYSCOHADA helper — écritures paie conformes SYSCOHADA révisé 2017
  *
- * Écriture paie Congo-Brazzaville :
- *   - 641 Rémunérations / 421 Personnel — rémunérations dues   [brut net]
- *   - 644 Charges sociales patronales / 431 CNSS               [cnss_patronal]
- *   - 421 Personnel — rémunérations dues / 521 Banque           [paiement net]
+ * Écriture paie Congo-Brazzaville (comptes SYSCOHADA 2-5 chiffres) :
+ *   - 661 Rémunérations directes / 422 Personnel rémunérations dues  [brut]
+ *   - 664 Charges sociales CNSS patronal / 431 CNSS                  [patronal]
+ *   - 422 Personnel rémunérations dues / 521 Banque                  [net]
+ *   - 447 Impôts retenus à la source / 521 Banque                    [IRPP]
  * ─────────────────────────────────────────────────────────────────────────── */
 
 interface OhadaWriteInput {
@@ -24,7 +25,7 @@ interface OhadaWriteInput {
 
 async function writeOhadaEntryAdmin(input: OhadaWriteInput): Promise<{ ok: boolean; error?: string }> {
   const fiscalYear = new Date(input.date).getFullYear()
-  const categorie  = '641 — Rémunérations du personnel'
+  const categorie  = '661 — Rémunérations directes versées au personnel'
 
   try {
     // 1. journal_comptable
@@ -178,13 +179,13 @@ export async function POST(req: NextRequest) {
 
   function modeToAccount(mode: string): string {
     switch (mode.toLowerCase()) {
-      case 'virement':     return '521000'
-      case 'cheque':       return '521000'
-      case 'especes':      return '571000'
-      case 'airtel_money':
-      case 'mtn_momo':
-      case 'mobile_money': return '571100'
-      default:             return '521000'
+      case 'virement':     return '521'
+      case 'cheque':       return '512'
+      case 'especes':      return '571'
+      case 'airtel_money': return '541'
+      case 'mtn_momo':     return '542'
+      case 'mobile_money': return '543'
+      default:             return '521'
     }
   }
   const compteBank = modeToAccount(modePaie)
@@ -193,25 +194,25 @@ export async function POST(req: NextRequest) {
   /* ── 3 ÉCRITURES OHADA AUTOMATIQUES ─────────────────────────────────── */
 
   /**
-   * Écriture 1 — Constatation salaire brut
-   *   Débit  641000 Rémunérations du personnel   → brut
-   *   Crédit 421000 Personnel — rémunérations dûes
+   * Écriture 1 — Constatation salaire brut (SYSCOHADA)
+   *   Débit  661 Rémunérations directes versées au personnel  → brut
+   *   Crédit 422 Personnel — rémunérations dues
    */
   const e1 = await writeOhadaEntryAdmin({
     tenantId:      auth.tenantId,
     date:          dateOp,
     libelle:       `Salaire ${moisLabel} ${annee} — ${empNom}`,
     montant:       numBrut,
-    debitAccount:  '641000',
-    creditAccount: '421000',
+    debitAccount:  '661',
+    creditAccount: '422',
     source:        'paie',
     sourceId:      bulletinId,
   })
 
   /**
-   * Écriture 2 — Charges patronales CNSS
-   *   Débit  644000 Charges sociales patronales
-   *   Crédit 431000 CNSS / Sécurité sociale
+   * Écriture 2 — Charges patronales CNSS (SYSCOHADA)
+   *   Débit  664 Charges sociales — CNSS patronal
+   *   Crédit 431 CNSS — cotisations sociales
    */
   const ohadaErrors: string[] = []
   if (!e1.ok && e1.error) ohadaErrors.push(e1.error)
@@ -222,8 +223,8 @@ export async function POST(req: NextRequest) {
       date:          dateOp,
       libelle:       `CNSS patronal ${moisLabel} ${annee} — ${empNom}`,
       montant:       numCnssPatron,
-      debitAccount:  '644000',
-      creditAccount: '431000',
+      debitAccount:  '664',
+      creditAccount: '431',
       source:        'paie',
       sourceId:      bulletinId,
     })
@@ -231,16 +232,16 @@ export async function POST(req: NextRequest) {
   }
 
   /**
-   * Écriture 3 — Paiement net (décaissement)
-   *   Débit  421000 Personnel — rémunérations dûes   → net
-   *   Crédit 521000/571000 Banque ou Caisse
+   * Écriture 3 — Paiement net (décaissement) SYSCOHADA
+   *   Débit  422 Personnel — rémunérations dues   → net
+   *   Crédit 521/512/571/541/542/543 selon mode paiement
    */
   const e3 = await writeOhadaEntryAdmin({
     tenantId:      auth.tenantId,
     date:          dateOp,
     libelle:       `Paiement salaire ${moisLabel} ${annee} — ${empNom} (${modePaie})`,
     montant:       numNet,
-    debitAccount:  '421000',
+    debitAccount:  '422',
     creditAccount: compteBank,
     source:        'paie',
     sourceId:      bulletinId,
@@ -248,9 +249,9 @@ export async function POST(req: NextRequest) {
   if (!e3.ok && e3.error) ohadaErrors.push(e3.error)
 
   /**
-   * Écriture 4 — IRPP (si > 0)
-   *   Débit  447000 Impôts sur salaires
-   *   Crédit 521000 Banque (à reverser à l'État)
+   * Écriture 4 — IRPP retenu à la source (SYSCOHADA)
+   *   Débit  447 État — impôts retenus à la source
+   *   Crédit 521 Banque (à reverser à la DGI)
    */
   if (numIrpp > 0) {
     const e4 = await writeOhadaEntryAdmin({
@@ -258,8 +259,8 @@ export async function POST(req: NextRequest) {
       date:          dateOp,
       libelle:       `IRPP ${moisLabel} ${annee} — ${empNom}`,
       montant:       numIrpp,
-      debitAccount:  '447000',
-      creditAccount: '521000',
+      debitAccount:  '447',
+      creditAccount: '521',
       source:        'paie',
       sourceId:      bulletinId,
     })
@@ -273,9 +274,9 @@ export async function POST(req: NextRequest) {
       written: ohadaErrors.length === 0,
       errors:  ohadaErrors.length > 0 ? ohadaErrors : undefined,
       entries: [
-        `641/421 Salaire brut: ${numBrut} FCFA`,
-        numCnssPatron > 0 ? `644/431 CNSS patronal: ${numCnssPatron} FCFA` : null,
-        `421/${compteBank} Net payé: ${numNet} FCFA`,
+        `661/422 Salaire brut: ${numBrut} FCFA`,
+        numCnssPatron > 0 ? `664/431 CNSS patronal: ${numCnssPatron} FCFA` : null,
+        `422/${compteBank} Net payé: ${numNet} FCFA`,
         numIrpp > 0 ? `447/521 IRPP: ${numIrpp} FCFA` : null,
       ].filter(Boolean),
     },

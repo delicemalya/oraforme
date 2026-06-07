@@ -311,6 +311,125 @@ export function genererCompteResultat(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// TABLEAU DES FLUX DE TRÉSORERIE SYSCOHADA (Méthode indirecte)
+// Codes officiels : ZA (activités), ZB (investissement), ZC (financement)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface LigneFlux {
+  code:    string
+  libelle: string
+  montant: number
+}
+
+export interface SectionFlux {
+  code:    string
+  titre:   string
+  lignes:  LigneFlux[]
+  total:   number
+}
+
+export interface FluxTresorerie {
+  sections:        SectionFlux[]
+  variationNette:  number
+  tresoOuverture:  number
+  tresoClôture:    number
+  exercice:        string
+}
+
+// Somme des mouvements nets débiteurs sur les comptes dont le numéro
+// commence par l'un des préfixes donnés.
+// solde = debitTotal - creditTotal ; positif = compte débiteur net.
+function netDb(soldes: Map<string, SoldeCompte>, prefixes: string[]): number {
+  let t = 0
+  for (const [num, s] of soldes) {
+    if (prefixes.some(p => num.startsWith(p))) t += s.solde
+  }
+  return t
+}
+
+export function genererFluxTresorerie(
+  ecritures: LigneEcriture[],
+  exercice: string,
+  resultatNet: number,   // passé depuis genererCompteResultat()
+): FluxTresorerie {
+  const s = calculerSolde(ecritures)
+
+  // ── Section A — Activités ordinaires (méthode indirecte) ─────────────────
+  const dotAmort   = netDb(s, ['68'])               // débits charges amort (positif = charge)
+  const reprAmort  = -netDb(s, ['78'])              // crédits reprises (inversé : reprises sont créditées)
+  const varStocks  = -netDb(s, ['31','32','33','34','35','36','37','38'])  // ↑ stocks = (-) flux
+  const varCreances= -netDb(s, ['41'])              // ↑ créances = (-) flux
+  const varFourn   = -netDb(s, ['40'])              // ↑ dettes four = (+) flux (net débit négatif)
+  const varFiscal  = -netDb(s, ['44','448'])        // ↑ dettes fiscales = (+) flux
+  const varSocial  = -netDb(s, ['42','43'])         // ↑ dettes sociales = (+) flux
+  const varAutres  = -netDb(s, ['47','476','477'])  // charges/produits constatés d'avance
+
+  const secA: LigneFlux[] = [
+    { code: 'ZA1', libelle: 'Résultat net de l\'exercice',                   montant: resultatNet },
+    { code: 'ZA2', libelle: '+ Dotations aux amortissements et provisions',  montant: dotAmort },
+    { code: 'ZA3', libelle: '− Reprises sur amortissements et provisions',   montant: reprAmort },
+    { code: 'ZA4', libelle: '± Variation des stocks',                        montant: varStocks },
+    { code: 'ZA5', libelle: '± Variation des créances clients',              montant: varCreances },
+    { code: 'ZA6', libelle: '± Variation des dettes fournisseurs',           montant: varFourn },
+    { code: 'ZA7', libelle: '± Variation des dettes fiscales et sociales',   montant: varFiscal + varSocial },
+    { code: 'ZA8', libelle: '± Autres variations du BFR',                    montant: varAutres },
+  ]
+  const totalA = secA.reduce((t, l) => t + l.montant, 0)
+
+  // ── Section B — Investissement ───────────────────────────────────────────
+  const acqIncorp  = -netDb(s, ['21','218'])          // acquisitions immo incorporelles
+  const acqCorpBat = -netDb(s, ['22','23'])           // terrains + bâtiments
+  const acqCorpMat = -netDb(s, ['24','25'])           // matériel + avances
+  const prodCess   = -netDb(s, ['82'])                // produits de cessions (compte 82 est produit HAO, normalement crédité)
+  const vcnCess    = netDb(s, ['81'])                 // VNC cessions (charge HAO, débitée)
+  const acqFinanc  = -netDb(s, ['26','27'])           // titres + prêts accordés
+  const divRecus   = -netDb(s, ['464'])               // dividendes à recevoir
+
+  const secB: LigneFlux[] = [
+    { code: 'ZB1', libelle: '− Acquisitions d\'immobilisations incorporelles',    montant: acqIncorp },
+    { code: 'ZB2', libelle: '− Acquisitions d\'immobilisations corporelles',      montant: acqCorpBat + acqCorpMat },
+    { code: 'ZB3', libelle: '+ Produits de cessions d\'immobilisations',          montant: prodCess - vcnCess },
+    { code: 'ZB4', libelle: '± Acquisitions / cessions d\'actifs financiers',     montant: acqFinanc },
+    { code: 'ZB5', libelle: '+ Dividendes reçus',                                montant: divRecus },
+  ]
+  const totalB = secB.reduce((t, l) => t + l.montant, 0)
+
+  // ── Section C — Financement ──────────────────────────────────────────────
+  const augCap     = -netDb(s, ['101','1011','1012','1013'])  // apports capital (crédités)
+  const empNouv    = Math.max(0, -netDb(s, ['16','17']))      // nouveaux emprunts (flux credit net)
+  const rembEmpr   = Math.min(0, -netDb(s, ['16','17']))      // remboursements (flux débit net)
+  const divVerses  = -netDb(s, ['462'])                       // dividendes à payer (débit = paiement)
+
+  const secC: LigneFlux[] = [
+    { code: 'ZC1', libelle: '+ Augmentations de capital',          montant: augCap },
+    { code: 'ZC2', libelle: '+ Nouveaux emprunts et dettes LT',    montant: empNouv },
+    { code: 'ZC3', libelle: '− Remboursements d\'emprunts',        montant: rembEmpr },
+    { code: 'ZC4', libelle: '− Dividendes versés aux actionnaires', montant: divVerses },
+  ]
+  const totalC = secC.reduce((t, l) => t + l.montant, 0)
+
+  // ── Trésorerie nette ─────────────────────────────────────────────────────
+  const variationNette = totalA + totalB + totalC
+
+  // Trésorerie de clôture = solde comptes 5x (banques + caisses + mobile)
+  const tresoClôture = netDb(s, ['51','52','53','54','57'])
+  // Trésorerie d'ouverture = clôture - variation
+  const tresoOuverture = tresoClôture - variationNette
+
+  return {
+    sections: [
+      { code: 'ZA', titre: 'Flux nets de trésorerie des activités ordinaires',    lignes: secA, total: totalA },
+      { code: 'ZB', titre: 'Flux nets de trésorerie des activités d\'investissement', lignes: secB, total: totalB },
+      { code: 'ZC', titre: 'Flux nets de trésorerie des activités de financement', lignes: secC, total: totalC },
+    ],
+    variationNette,
+    tresoOuverture,
+    tresoClôture,
+    exercice,
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Formatage FCFA
 // ─────────────────────────────────────────────────────────────────────────────
 
