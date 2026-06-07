@@ -34,7 +34,6 @@ export default function Header() {
 
   const segments   = pathname.split('/').filter(Boolean)
   const showBack   = segments.length > 1
-  const parentPath = '/' + segments.slice(0, -1).join('/')
   const canSeeTeam = isOwner || tenant?.ecoleRole === 'DIRECTION_GENERALE'
 
   const [userName,     setUserName]     = useState('')
@@ -121,17 +120,22 @@ export default function Header() {
   return (
     <header className="h-14 bg-white border-b border-[#E2E8F0] flex items-center px-4 lg:px-6 gap-3 shrink-0">
 
-      {/* Back button */}
+      {/* Bouton retour — visible sur tous les appareils, toutes les sous-pages */}
       {showBack ? (
         <button
-          onClick={() => router.push(parentPath)}
-          title={t('common.back')}
-          className="flex items-center justify-center w-8 h-8 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors shrink-0"
+          onClick={() => router.back()}
+          title="Retour"
+          className="flex items-center gap-1.5 h-9 pl-2 pr-3 rounded-xl
+            text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]
+            border border-transparent hover:border-[#E2E8F0]
+            transition-all shrink-0 group"
+          aria-label="Retour à la page précédente"
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+          <span className="text-[12px] font-medium hidden sm:inline">Retour</span>
         </button>
       ) : (
-        <div className="w-8 lg:hidden shrink-0" />
+        <div className="w-2 shrink-0" />
       )}
 
       {/* Search */}
