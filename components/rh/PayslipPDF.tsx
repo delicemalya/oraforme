@@ -1,6 +1,7 @@
 import {
   Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
+import { calculerPaie, TAUX_CNSS_EMPLOYE, TAUX_CNSS_PATRONAL, TAUX_TUS, TAUX_MEDECINE } from '@/lib/paie/calcul-paie'
 
 export interface PayslipData {
   // Entreprise
@@ -92,36 +93,31 @@ function fmt(n: number): string {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 }
 
-// Congo: CNSS 5% brut plafonné à 90000 FCFA/mois (plafond 1.8M)
-function calcCNSS(brut: number): number {
-  const plafond = 1_800_000
-  return Math.round(Math.min(brut, plafond) * 0.05)
-}
-
-// IRPP Congo (barème simplifié progressif)
-function calcIRPP(revenuImposable: number): number {
-  if (revenuImposable <= 464_000) return 0
-  if (revenuImposable <= 1_000_000) return Math.round((revenuImposable - 464_000) * 0.03)
-  if (revenuImposable <= 2_000_000) return Math.round(16_080 + (revenuImposable - 1_000_000) * 0.15)
-  if (revenuImposable <= 5_000_000) return Math.round(166_080 + (revenuImposable - 2_000_000) * 0.25)
-  return Math.round(916_080 + (revenuImposable - 5_000_000) * 0.40)
-}
+// Délègue au moteur calcul-paie (formules légales Congo validées sur 3 cas test)
 
 export function PayslipPDF({ data }: { data: PayslipData }) {
-  // Calculs
-  const heuresSup = data.heures_sup ?? 0
-  const montantHeuresSup = heuresSup * (data.taux_heure_sup ?? 0)
   const primes = data.primes ?? []
   const retenues = data.retenues ?? []
-
-  const totalPrimes = primes.reduce((s, p) => s + p.montant, 0)
   const totalRetenues = retenues.reduce((s, r) => s + r.montant, 0)
-  const brut = data.salaire_base + montantHeuresSup + totalPrimes
+  const totalPrimesCustom = primes.reduce((s, p) => s + p.montant, 0)
 
-  const cnss = data.cnss_part_employe ?? calcCNSS(brut)
-  const irpp = data.irpp ?? calcIRPP(brut - cnss)
+  // Calcul via le moteur légal Congo (CNSS 5.04%, IRPP barème progressif art.76)
+  const calc = calculerPaie({
+    salaire_base: data.salaire_base,
+    heures_sup: data.heures_sup ?? 0,
+    taux_horaire: data.taux_heure_sup ?? 0,
+    autres_gains: totalPrimesCustom,
+    autres_retenues: totalRetenues,
+  })
+
+  const brut = calc.salaire_brut
+  const cnss = data.cnss_part_employe ?? calc.cnss_employe
+  const irpp = data.irpp ?? calc.irpp
+  const montantHeuresSup = calc.heures_sup_montant
   const totalDed = cnss + irpp + totalRetenues
-  const net = brut - totalDed
+  const net = data.net_a_payer ?? calc.salaire_net
+  const cnssPatronalMontant = calc.cnss_patronal
+  const tusMontant = calc.tus_patronal
 
   return (
     <Document>
@@ -179,10 +175,10 @@ export function PayslipPDF({ data }: { data: PayslipData }) {
         </View>
 
         {/* Heures sup */}
-        {heuresSup > 0 && (
+        {(data.heures_sup ?? 0) > 0 && (
           <View style={s.tdRow}>
             <Text style={s.tdLabel}>Heures supplémentaires</Text>
-            <Text style={s.tdBase}>{heuresSup}h × {fmt(data.taux_heure_sup ?? 0)}</Text>
+            <Text style={s.tdBase}>{data.heures_sup}h × {fmt(data.taux_heure_sup ?? 0)}</Text>
             <Text style={s.tdMontant}>{fmt(montantHeuresSup)}</Text>
           </View>
         )}
@@ -202,13 +198,13 @@ export function PayslipPDF({ data }: { data: PayslipData }) {
         {/* CNSS */}
         <View style={[s.tdRow, { backgroundColor: LGRAY }]}>
           <Text style={s.tdLabel}>Cotisation CNSS (part salarié)</Text>
-          <Text style={s.tdBase}>5% du brut plafonné</Text>
+          <Text style={s.tdBase}>{(TAUX_CNSS_EMPLOYE * 100).toFixed(2)}% brut plafonné</Text>
           <Text style={s.tdMontantNeg}>- {fmt(cnss)}</Text>
         </View>
 
         {/* IRPP */}
         <View style={[s.tdRow, { backgroundColor: LGRAY }]}>
-          <Text style={s.tdLabel}>IRPP (barème progressif)</Text>
+          <Text style={s.tdLabel}>IRPP (barème progressif art.76 CGI)</Text>
           <Text style={s.tdBase}>Revenu imposable</Text>
           <Text style={s.tdMontantNeg}>- {fmt(irpp)}</Text>
         </View>
