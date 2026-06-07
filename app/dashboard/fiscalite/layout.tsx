@@ -3,24 +3,35 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Receipt, Users, FileText, Calendar,
-  Building2, History, Shield, Bot, TrendingUp,
+  Receipt, Users, FileText, Building2, History,
+  TrendingUp, GraduationCap, ClipboardList, Landmark,
 } from 'lucide-react'
 
 const NAV = [
-  { href: '/dashboard/fiscalite',              label: 'Tableau fiscal',         icon: LayoutDashboard },
-  { href: '/dashboard/fiscalite/tva',          label: 'TVA',                    icon: Receipt },
-  { href: '/dashboard/fiscalite/cnss',         label: 'CNSS & Charges',         icon: Users },
-  { href: '/dashboard/fiscalite/irpp',         label: 'IRPP & Salariés',        icon: TrendingUp },
-  { href: '/dashboard/fiscalite/echeancier',   label: 'Échéancier',             icon: Calendar },
-  { href: '/dashboard/fiscalite/patente',      label: 'Patente & Licences',     icon: Building2 },
-  { href: '/dashboard/fiscalite/historique',   label: 'Historique',             icon: History },
-  { href: '/dashboard/fiscalite/controles',    label: 'Contrôles fiscaux',      icon: Shield },
-  { href: '/dashboard/fiscalite/assistant',    label: 'Assistant MIAA+',        icon: Bot },
+  { href: '/dashboard/fiscalite/tva',               label: 'TVA',                   icon: Receipt        },
+  { href: '/dashboard/fiscalite/cnss',              label: 'CNSS',                  icon: Users          },
+  { href: '/dashboard/fiscalite/das',               label: 'DAS',                   icon: FileText       },
+  { href: '/dashboard/fiscalite/patente',           label: 'Patente',               icon: Building2      },
+  { href: '/dashboard/fiscalite/is',                label: 'Impôt société',         icon: Landmark       },
+  { href: '/dashboard/fiscalite/irpp',              label: 'IRPP',                  icon: TrendingUp     },
+  { href: '/dashboard/fiscalite/taxe-apprentissage',label: 'Taxe apprentissage',    icon: GraduationCap  },
+  { href: '/dashboard/fiscalite/liasse-fiscale',    label: 'Déclarations annuelles',icon: ClipboardList  },
+  { href: '/dashboard/fiscalite/historique',        label: 'Historique',            icon: History        },
 ]
 
 export default function FiscaliteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+
+  // Main fiscalite hub page — no subnav
+  if (pathname === '/dashboard/fiscalite') {
+    return (
+      <div style={{ minHeight: '100vh', background: '#F5F7FB' }}>
+        <div style={{ padding: '24px 20px', maxWidth: 1200, margin: '0 auto' }}>
+          {children}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5F7FB' }}>
@@ -37,10 +48,7 @@ export default function FiscaliteLayout({ children }: { children: React.ReactNod
         }}>
           {NAV.map(item => {
             const Icon = item.icon
-            const isActive = item.href === '/dashboard/fiscalite'
-              ? pathname === item.href
-              : pathname.startsWith(item.href)
-
+            const isActive = pathname.startsWith(item.href)
             return (
               <Link
                 key={item.href}

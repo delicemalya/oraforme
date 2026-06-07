@@ -105,7 +105,6 @@ const ICONS: Record<string, LucideIcon> = {
   'pharmacie-ventes':  ShoppingCart,
   abonnement:          CreditCard,
   fiscalite:           Landmark,
-  declarations:        ClipboardList,
   btp:                 Building2,
   'btp-devis':         FileText,
   'btp-chantiers':     Layers,
@@ -163,8 +162,7 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'abonnement',            label: 'Abonnement',           sublabel: '', href: '/dashboard/abonnement'                 },
   { id: 'workflows',             label: 'Workflows',            sublabel: '', href: '/dashboard/workflows'                  },
   { id: 'api-keys',              label: 'Clés API',             sublabel: '', href: '/dashboard/api-keys'                   },
-  { id: 'fiscalite',    label: 'Fiscalité',             sublabel: '', href: '/dashboard/fiscalite'    },
-  { id: 'declarations', label: 'Déclarations fiscales', sublabel: '', href: '/dashboard/declarations' },
+  { id: 'fiscalite',    label: 'Fiscalité & Déclarations', sublabel: '', href: '/dashboard/fiscalite'    },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -175,7 +173,7 @@ const SIDEBAR_GROUPS = [
   // SUPERVISION — KPIs exécutifs, BI, analytics
   { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
   // FINANCE — gestion financière + déclarations DGI
-  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite', 'declarations'] },
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   // RH — personnel & paie (recrutement = rubrique indépendante)
   { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
   // RECRUTEMENT — module autonome
@@ -308,7 +306,7 @@ const ALL_MODULE_IDS = [
   'calendrier', 'taches',
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
-  'abonnement', 'fiscalite', 'declarations',
+  'abonnement', 'fiscalite',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
