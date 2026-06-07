@@ -116,14 +116,19 @@ export async function POST(req: NextRequest) {
   if (!mois || !annee) return NextResponse.json({ error: 'mois et annee requis' }, { status: 400 })
   if (!brut || Number(brut) < 0) return NextResponse.json({ error: 'brut invalide' }, { status: 400 })
 
-  // Verify employee belongs to this tenant
+  // Verify employee belongs to this tenant and is payable
   const { data: emp } = await supabaseAdmin
     .from('employes')
-    .select('id, nom, poste, matricule')
+    .select('id, nom, poste, matricule, statut')
     .eq('id', employe_id)
     .eq('tenant_id', auth.tenantId)
     .maybeSingle()
   if (!emp) return NextResponse.json({ error: 'Employé introuvable' }, { status: 404 })
+  if (emp.statut === 'licencie' || emp.statut === 'retraite') {
+    return NextResponse.json({
+      error: `Impossible de générer un bulletin pour un employé ${emp.statut} (${emp.nom})`
+    }, { status: 400 })
+  }
 
   // Check duplicate
   const { data: dup } = await supabaseAdmin

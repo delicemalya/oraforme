@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { calculerPaie } from '@/lib/paie/calcul-paie'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -94,27 +95,14 @@ const STATUT_STYLES: Record<string, { label: string; color: string; bg: string }
   retraite: { label: 'Retraité',  color: '#9CA3AF', bg: '#F9FAFB' },
 }
 
-const TAUX_CNSS_SALARIE  = 0.0504
-const TAUX_CNSS_PATRONAL = 0.1416
-const PLAFOND_CNSS       = 3_375_000
+const TAUX_CNSS_PATRONAL = 0.1436
 
 const MOIS_LABELS = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
+// Wrapper autour du moteur officiel lib/paie/calcul-paie.ts (barème CGI Congo révisé)
 function calcNet(brut: number) {
-  const base  = Math.min(brut, PLAFOND_CNSS)
-  const cnss  = Math.round(base * TAUX_CNSS_SALARIE)
-  const irpp  = Math.round(calcIRPP((brut - cnss) * 0.9))
-  const net   = brut - cnss - irpp
-  const patro = Math.round(base * TAUX_CNSS_PATRONAL)
-  return { cnss, irpp, net, patro }
-}
-
-function calcIRPP(imposable: number): number {
-  if (imposable <= 50_000)  return 0
-  if (imposable <= 100_000) return (imposable - 50_000) * 0.01
-  if (imposable <= 250_000) return 500 + (imposable - 100_000) * 0.10
-  if (imposable <= 500_000) return 15_500 + (imposable - 250_000) * 0.20
-  return 65_500 + (imposable - 500_000) * 0.30
+  const r = calculerPaie({ salaire_base: brut })
+  return { cnss: r.cnss_employe, irpp: r.irpp, net: r.salaire_net, patro: r.cnss_patronal }
 }
 
 function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) }
@@ -182,10 +170,12 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 }) {
   const { t } = useLocale()
   const [showForm,      setShowForm]      = useState(false)
+  const [showEdit,      setShowEdit]      = useState(false)
   const [saving,        setSaving]        = useState(false)
   const [selected,      setSelected]      = useState<Employe | null>(null)
   const [filterStatut,  setFilterStatut]  = useState<string>('tous')
   const [search,        setSearch]        = useState('')
+  const [editForm, setEditForm] = useState<Partial<Employe>>({})
   const [form, setForm] = useState({
     nom: '', poste: '', email: '', telephone: '',
     salaire_base: '', contrat: 'cdi' as Contrat,
@@ -247,10 +237,43 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   }
 
   async function handleDelete(id: string) {
-  const { t } = useLocale()
     if (!confirm(t('rh.deletePermanent'))) return
     const { error } = await supabase.from('employes').delete().eq('id', id)
     if (error) { alert('Erreur suppression employé : ' + error.message); return }
+    setSelected(null)
+    onRefresh()
+  }
+
+  function openEdit(emp: Employe) {
+    setEditForm({
+      nom: emp.nom, poste: emp.poste, email: emp.email,
+      telephone: emp.telephone, salaire_base: emp.salaire_base,
+      contrat: emp.contrat, cnss: emp.cnss, departement: emp.departement ?? '',
+      manager: emp.manager ?? '', notes: emp.notes,
+      date_fin_contrat: emp.date_fin_contrat ?? '',
+    })
+    setShowEdit(true)
+  }
+
+  async function handleEditSave() {
+    if (!selected) return
+    setSaving(true)
+    const { error } = await supabase.from('employes').update({
+      nom:             editForm.nom,
+      poste:           editForm.poste,
+      email:           editForm.email,
+      telephone:       editForm.telephone,
+      salaire_base:    Number(editForm.salaire_base) || selected.salaire_base,
+      contrat:         editForm.contrat,
+      cnss:            editForm.cnss,
+      departement:     editForm.departement || null,
+      manager:         editForm.manager    || null,
+      notes:           editForm.notes,
+      date_fin_contrat: editForm.date_fin_contrat || null,
+    }).eq('id', selected.id)
+    setSaving(false)
+    if (error) { alert('Erreur mise à jour : ' + error.message); return }
+    setShowEdit(false)
     setSelected(null)
     onRefresh()
   }
@@ -265,7 +288,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
           { label: t('rh.activeSalary'),    val: employes.filter(e=>e.statut==='actif').length,                   color: '#10B981', icon: Users },
           { label: t('rh.onLeaveOrSick'),   val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, color: '#F59E0B', icon: Calendar },
           { label: t('rh.payrollMass'),     val: fmtFCFA(masseBrute),                                             color: '#3B82F6', icon: TrendingUp },
-          { label: t('rh.employerCharge'),  val: fmtFCFA(masseBrute * TAUX_CNSS_PATRONAL),                        color: '#8B5CF6', icon: AlertTriangle },
+          { label: t('rh.employerCharge'),  val: fmtFCFA(employes.filter(e=>e.statut==='actif').reduce((s,e)=>s+calculerPaie({salaire_base:e.salaire_base}).cnss_patronal, 0)), color: '#8B5CF6', icon: AlertTriangle },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -375,10 +398,13 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                       <td className="px-4 py-3 text-[12px] font-bold text-[#10B981]">{fmt(calc.net)} F</td>
                       <td className="px-4 py-3 text-right" onClick={ev => ev.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1">
-                          <Link href="/dashboard/rh/paie" className="p-1.5 rounded-lg hover:bg-amber-50 text-[#94A3B8] hover:text-[#F59E0B] transition-colors">
+                          <Link href="/dashboard/rh/paie" className="p-1.5 rounded-lg hover:bg-amber-50 text-[#94A3B8] hover:text-[#F59E0B] transition-colors" title="Paie">
                             <FileText size={13} />
                           </Link>
-                          <button onClick={() => handleDelete(e.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-[#94A3B8] hover:text-red-500 transition-colors">
+                          <button onClick={() => { setSelected(e); openEdit(e) }} className="p-1.5 rounded-lg hover:bg-blue-50 text-[#94A3B8] hover:text-blue-500 transition-colors" title="Modifier">
+                            <Edit3 size={13} />
+                          </button>
+                          <button onClick={() => handleDelete(e.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-[#94A3B8] hover:text-red-500 transition-colors" title="Supprimer">
                             <Trash2 size={13} />
                           </button>
                         </div>
@@ -508,10 +534,10 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-[12px] font-semibold hover:bg-amber-100 transition-colors">
                     <FileText size={13} /> {t('rh.generateSlip')}
                   </Link>
-                  <Link href="/dashboard/rh/presences"
+                  <button onClick={() => openEdit(selected)}
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl text-[12px] font-semibold hover:bg-blue-100 transition-colors">
-                    <Clock size={13} /> {t('rh.presences')}
-                  </Link>
+                    <Edit3 size={13} /> Modifier
+                  </button>
                   <Link href="/dashboard/rh/evaluations"
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] rounded-xl text-[12px] font-semibold hover:bg-[#F1F5F9] transition-colors">
                     <Star size={13} /> {t('rh.evaluation')}
@@ -519,6 +545,107 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                   <button onClick={() => handleDelete(selected.id)}
                     className="flex items-center justify-center gap-1.5 py-2.5 bg-red-50 border border-red-200 text-red-600 rounded-xl text-[12px] font-semibold hover:bg-red-100 transition-colors">
                     <Trash2 size={13} /> {t('common.delete')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Employee Modal */}
+      <AnimatePresence>
+        {showEdit && selected && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50" onClick={() => setShowEdit(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <h2 className="text-[16px] font-bold text-[#0F172A]">Modifier — {selected.nom}</h2>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">{selected.matricule ?? selected.agent_code}</p>
+                  </div>
+                  <button onClick={() => setShowEdit(false)}><X size={18} className="text-[#64748B]" /></button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: 'Nom complet',    key: 'nom',       placeholder: 'Jean-Pierre Moussounga' },
+                    { label: 'Email',           key: 'email',     placeholder: 'email@entreprise.com' },
+                    { label: 'Téléphone',       key: 'telephone', placeholder: '+242 06 xxx xxx' },
+                    { label: 'N° CNSS',         key: 'cnss',      placeholder: '1234567' },
+                    { label: 'Département',     key: 'departement',placeholder: 'Finance, RH, IT…' },
+                    { label: 'Manager direct',  key: 'manager',   placeholder: 'Nom du manager' },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <label className={lCls}>{f.label}</label>
+                      <input
+                        value={String((editForm as Record<string, unknown>)[f.key] ?? '')}
+                        onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
+                        placeholder={f.placeholder}
+                        className={iCls}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className={lCls}>Poste / Fonction</label>
+                    <input value={editForm.poste ?? ''} onChange={e => setEditForm(p => ({...p, poste: e.target.value}))}
+                      placeholder="Directeur Général, Comptable…" className={iCls} />
+                  </div>
+                  <div>
+                    <label className={lCls}>Type de contrat</label>
+                    <select value={editForm.contrat ?? 'cdi'} onChange={e => setEditForm(p => ({...p, contrat: e.target.value as Contrat}))} className={iCls}>
+                      {Object.entries(CONTRAT_STYLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={lCls}>Salaire de base (FCFA)</label>
+                    <input type="number" value={editForm.salaire_base ?? ''}
+                      onChange={e => setEditForm(p => ({...p, salaire_base: Number(e.target.value)}))}
+                      className={iCls} />
+                  </div>
+                  <div>
+                    <label className={lCls}>Date fin contrat</label>
+                    <input type="date" value={editForm.date_fin_contrat ?? ''}
+                      onChange={e => setEditForm(p => ({...p, date_fin_contrat: e.target.value}))} className={iCls} />
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <label className={lCls}>Notes internes</label>
+                  <textarea value={editForm.notes ?? ''} onChange={e => setEditForm(p => ({...p, notes: e.target.value}))}
+                    rows={2} className={`${iCls} resize-none`} />
+                </div>
+
+                {/* Preview nouveau net */}
+                {Number(editForm.salaire_base) > 0 && (() => {
+                  const { cnss, irpp, net } = calcNet(Number(editForm.salaire_base))
+                  return (
+                    <div className="mt-3 bg-amber-50 border border-amber-100 rounded-xl p-3 text-[12px] space-y-1">
+                      <p className="font-bold text-amber-800 mb-1">Simulation nouveau salaire</p>
+                      <div className="flex justify-between"><span className="text-[#64748B]">CNSS (5,04%)</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
+                      <div className="flex justify-between"><span className="text-[#64748B]">IRPP</span><span className="text-red-500">−{fmt(irpp)} F</span></div>
+                      <div className="flex justify-between font-bold border-t border-amber-200 pt-1"><span>Net à payer</span><span className="text-[#10B981]">{fmt(net)} F</span></div>
+                    </div>
+                  )
+                })()}
+
+                <div className="flex gap-3 mt-5">
+                  <button onClick={() => setShowEdit(false)}
+                    className="flex-1 py-2.5 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[13px] font-semibold hover:bg-[#F8FAFC]">
+                    Annuler
+                  </button>
+                  <button onClick={handleEditSave} disabled={saving}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#2563EB] text-white rounded-xl text-[13px] font-bold disabled:opacity-50 hover:bg-blue-700 transition-colors">
+                    {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                    {saving ? 'Enregistrement…' : 'Enregistrer les modifications'}
                   </button>
                 </div>
               </div>
@@ -907,8 +1034,8 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
   const { t } = useLocale()
   const actifs      = employes.filter(e => e.statut === 'actif')
   const masseBrute  = actifs.reduce((s, e) => s + e.salaire_base, 0)
-  const massePatro  = actifs.reduce((s, e) => s + Math.min(e.salaire_base, PLAFOND_CNSS) * TAUX_CNSS_PATRONAL, 0)
-  const masseNette  = actifs.reduce((s, e) => s + calcNet(e.salaire_base).net, 0)
+  const massePatro  = actifs.reduce((s, e) => s + calculerPaie({ salaire_base: e.salaire_base }).cnss_patronal, 0)
+  const masseNette  = actifs.reduce((s, e) => s + calculerPaie({ salaire_base: e.salaire_base }).salaire_net, 0)
   const congesApp   = conges.filter(c => c.statut === 'approuve')
   const totalJours  = congesApp.reduce((s, c) => s + c.nb_jours, 0)
 
