@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 export async function GET(req: NextRequest) {
-  const { ctx, error } = await requireTenant(req)
+  const { ctx, error } = await requireTenant()
   if (error) return error
 
-  const { searchParams } = new URL(req.url)
-  const annee = Number(searchParams.get('annee') ?? new Date().getFullYear())
+  const annee = Number(new URL(req.url).searchParams.get('annee') ?? new Date().getFullYear())
 
   const [{ data: revenue }, { data: clients }] = await Promise.all([
     supabaseAdmin
@@ -18,17 +17,16 @@ export async function GET(req: NextRequest) {
       .order('mois', { ascending: true }),
     supabaseAdmin
       .from('cabinet_clients')
-      .select('id, nom_entreprise, statut, frais_oraforme')
+      .select('id, nom_entreprise, statut, frais_oraforme, devise_locale')
       .eq('cabinet_tenant_id', ctx.tenantId)
       .eq('statut', 'actif'),
   ])
 
   const rows = revenue ?? []
-  const total_annee   = rows.reduce((s, r) => s + (r.montant ?? 5000), 0)
+  const total_annee    = rows.reduce((s, r) => s + (r.montant ?? 5000), 0)
   const total_encaisse = rows.filter(r => r.statut === 'paye').reduce((s, r) => s + (r.montant ?? 5000), 0)
   const clients_actifs = clients?.length ?? 0
 
-  // Tableau mensuel
   const par_mois = Array.from({ length: 12 }, (_, i) => {
     const mois = i + 1
     const lignes = rows.filter(r => r.mois === mois)
@@ -48,7 +46,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { ctx, error } = await requireTenant(req)
+  const { ctx, error } = await requireTenant()
   if (error) return error
 
   const body = await req.json()

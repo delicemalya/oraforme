@@ -1,23 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
-export async function GET(req: NextRequest) {
-  const { ctx, error } = await requireTenant(req)
+export async function GET(_req: NextRequest) {
+  const { ctx, error } = await requireTenant()
   if (error) return error
 
-  const { searchParams } = new URL(req.url)
-  const statut  = searchParams.get('statut')
-  const search  = searchParams.get('search')
-  const secteur = searchParams.get('secteur')
+  const url = new URL(_req.url)
+  const statut  = url.searchParams.get('statut')
+  const search  = url.searchParams.get('search')
+  const secteur = url.searchParams.get('secteur')
+  const type_compte = url.searchParams.get('type_compte')
 
   let q = supabaseAdmin
     .from('cabinet_clients')
     .select(`
-      id, nom_entreprise, forme_juridique, secteur_activite, pays, ville,
+      id, nom_entreprise, forme_juridique, secteur_activite, pays, ville, devise_locale,
       telephone, email, contact_nom, contact_prenom, contact_email, contact_poste,
       types_mission, honoraires_mensuel, frais_oraforme, periodicite,
-      acces_actif, statut, date_debut_mission, created_at,
+      acces_actif, statut, type_compte, date_debut_mission, client_tenant_id, created_at,
       cabinet_taches(id, statut),
       cabinet_documents(id, statut),
       cabinet_messages(id, lu, expediteur)
@@ -25,28 +26,31 @@ export async function GET(req: NextRequest) {
     .eq('cabinet_tenant_id', ctx.tenantId)
     .order('nom_entreprise', { ascending: true })
 
-  if (statut)  q = q.eq('statut', statut)
-  if (secteur) q = q.eq('secteur_activite', secteur)
-  if (search)  q = q.ilike('nom_entreprise', `%${search}%`)
+  if (statut)      q = q.eq('statut', statut)
+  if (secteur)     q = q.eq('secteur_activite', secteur)
+  if (type_compte) q = q.eq('type_compte', type_compte)
+  if (search)      q = q.ilike('nom_entreprise', `%${search}%`)
 
   const { data, error: dbErr } = await q
   if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 })
 
-  // KPIs
   const clients = data ?? []
   const kpis = {
-    total:         clients.length,
-    actifs:        clients.filter(c => c.statut === 'actif').length,
-    prospects:     clients.filter(c => c.statut === 'prospect').length,
-    revenue_mois:  clients.filter(c => c.statut === 'actif').reduce((s, c) => s + (c.frais_oraforme ?? 5000), 0),
-    honoraires_mois: clients.filter(c => c.statut === 'actif' && c.periodicite === 'mensuel').reduce((s, c) => s + (c.honoraires_mensuel ?? 0), 0),
+    total:               clients.length,
+    actifs:              clients.filter(c => c.statut === 'actif').length,
+    prospects:           clients.filter(c => c.statut === 'prospect').length,
+    suspendus:           clients.filter(c => c.statut === 'suspendu').length,
+    revenue_mois:        clients.filter(c => c.statut === 'actif').reduce((s, c) => s + (c.frais_oraforme ?? 5000), 0),
+    honoraires_mois:     clients.filter(c => c.statut === 'actif' && c.periodicite === 'mensuel').reduce((s, c) => s + (c.honoraires_mensuel ?? 0), 0),
+    msgs_non_lus:        clients.reduce((s, c) => s + (c.cabinet_messages as {lu:boolean,expediteur:string}[]).filter(m => !m.lu && m.expediteur === 'client').length, 0),
+    taches_urgentes:     clients.reduce((s, c) => s + (c.cabinet_taches as {statut:string}[]).filter(t => t.statut !== 'termine' && t.statut !== 'annule').length, 0),
   }
 
   return NextResponse.json({ clients, kpis })
 }
 
 export async function POST(req: NextRequest) {
-  const { ctx, error } = await requireTenant(req)
+  const { ctx, error } = await requireTenant()
   if (error) return error
 
   const body = await req.json()
@@ -55,7 +59,7 @@ export async function POST(req: NextRequest) {
     telephone, email, site_web, niu, rccm, sciet, scien, date_creation_entreprise,
     contact_nom, contact_prenom, contact_telephone, contact_email, contact_poste,
     types_mission, date_debut_mission, honoraires_mensuel, periodicite,
-    frais_oraforme, notes, acces_actif, statut,
+    frais_oraforme, notes, acces_actif, statut, type_compte, devise_locale,
   } = body
 
   if (!nom_entreprise?.trim()) {
@@ -81,16 +85,16 @@ export async function POST(req: NextRequest) {
       honoraires_mensuel: honoraires_mensuel ?? 0,
       periodicite: periodicite ?? 'mensuel',
       frais_oraforme: frais_oraforme ?? 5000,
-      notes: notes ?? null,
-      acces_actif: acces_actif ?? true,
+      notes: notes ?? null, acces_actif: acces_actif ?? true,
       statut: statut ?? 'actif',
+      type_compte: type_compte ?? 'comptable',
+      devise_locale: devise_locale ?? 'XAF',
     })
     .select('id')
     .single()
 
   if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 })
 
-  // Générer le premier revenue oraforme si client actif
   if ((statut ?? 'actif') === 'actif') {
     const now = new Date()
     await supabaseAdmin.rpc('generer_revenue_mensuel', {

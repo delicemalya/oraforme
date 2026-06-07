@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 type Ctx = { params: Promise<{ id: string }> }
 
-export async function GET(req: NextRequest, { params }: Ctx) {
-  const { ctx, error } = await requireTenant(req)
+export async function GET(_req: NextRequest, { params }: Ctx) {
+  const { ctx, error } = await requireTenant()
   if (error) return error
   const { id: clientId } = await params
 
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest, { params }: Ctx) {
 }
 
 export async function POST(req: NextRequest, { params }: Ctx) {
-  const { ctx, error } = await requireTenant(req)
+  const { ctx, error } = await requireTenant()
   if (error) return error
   const { id: clientId } = await params
   const body = await req.json()
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
 }
 
 export async function PATCH(req: NextRequest, { params }: Ctx) {
-  const { ctx, error } = await requireTenant(req)
+  const { ctx, error } = await requireTenant()
   if (error) return error
   const { id: clientId } = await params
   const { docId, statut, commentaire_cabinet } = await req.json()
