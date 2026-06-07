@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Grand Livre OHADA — Soldes par compte avec détail des mouvements
+ * Grand Livre SYSCOHADA — Soldes par compte avec détail des mouvements
  */
 
 import { useEffect, useState, useMemo } from 'react'
@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
-import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
+import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { Scale, Search, Download, ChevronDown, ChevronRight } from 'lucide-react'
 
 interface Movement { id: string; date_operation: string; libelle: string; debit_account: string; credit_account: string; montant: number; source: string }
@@ -63,11 +63,11 @@ export default function GrandLivrePage() {
       /* Debit side */
       if (mv.debit_account) {
         if (!map.has(mv.debit_account)) {
-          const ohada = OHADA_ACCOUNTS.find(a => String(a.number) === mv.debit_account)
+          const sc = COMPTES_PLATS.find(c => c.numero === mv.debit_account)
           map.set(mv.debit_account, {
-            number: mv.debit_account, name: ohada?.name || mv.debit_account,
-            classe: Math.floor(Number(mv.debit_account) / 100000),
-            type: ohada?.type || '—', total_debit: 0, total_credit: 0, solde: 0, movements: [],
+            number: mv.debit_account, name: sc?.nom || mv.debit_account,
+            classe: parseInt(mv.debit_account[0]) || 0,
+            type: sc?.type || '—', total_debit: 0, total_credit: 0, solde: 0, movements: [],
           })
         }
         const acc = map.get(mv.debit_account)!
@@ -77,11 +77,11 @@ export default function GrandLivrePage() {
       /* Credit side */
       if (mv.credit_account) {
         if (!map.has(mv.credit_account)) {
-          const ohada = OHADA_ACCOUNTS.find(a => String(a.number) === mv.credit_account)
+          const sc = COMPTES_PLATS.find(c => c.numero === mv.credit_account)
           map.set(mv.credit_account, {
-            number: mv.credit_account, name: ohada?.name || mv.credit_account,
-            classe: Math.floor(Number(mv.credit_account) / 100000),
-            type: ohada?.type || '—', total_debit: 0, total_credit: 0, solde: 0, movements: [],
+            number: mv.credit_account, name: sc?.nom || mv.credit_account,
+            classe: parseInt(mv.credit_account[0]) || 0,
+            type: sc?.type || '—', total_debit: 0, total_credit: 0, solde: 0, movements: [],
           })
         }
         const acc = map.get(mv.credit_account)!
@@ -116,7 +116,6 @@ export default function GrandLivrePage() {
 
   /* CSV export */
   function exportCSV() {
-  const { t } = useLocale()
     const rows = filtered.flatMap(a =>
       a.movements.map(m => ({
         [t('compta.grandlivre.colCompte')]: a.number,

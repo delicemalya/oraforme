@@ -10,7 +10,7 @@ interface Message { role: 'user' | 'bot'; text: string; time: string }
 
 // ── Module config ─────────────────────────────────────────────────────────────
 
-type ModuleKey = 'comptabilite' | 'rh' | 'facturation' | 'restaurant' | 'ecole' | 'stock' | 'tresorerie' | 'sante' | 'dashboard'
+type ModuleKey = 'comptabilite' | 'rh' | 'facturation' | 'restaurant' | 'ecole' | 'stock' | 'tresorerie' | 'sante' | 'fiscalite' | 'dashboard'
 
 const MODULE_CONFIG: Record<ModuleKey, {
   nom: string
@@ -115,6 +115,18 @@ const MODULE_CONFIG: Record<ModuleKey, {
       'Gérer les fiches patients',
     ],
   },
+  fiscalite: {
+    nom: 'MIAA Fiscal',
+    specialite: 'TVA, IS, CNSS, IRPP & DAS Congo',
+    avatar: '🏛️',
+    color: '#7C3AED',
+    suggestions: [
+      'Calculer TVA 18% + CA 5% sur une vente',
+      'Quand payer les acomptes IS Congo ?',
+      'Comment remplir la DAS annuelle ?',
+      'Seuils et taux CNSS Congo 2025',
+    ],
+  },
   dashboard: {
     nom: 'MIAA+',
     specialite: 'Assistant général Oraforme',
@@ -131,6 +143,7 @@ const MODULE_CONFIG: Record<ModuleKey, {
 
 function detectModule(path: string): ModuleKey {
   if (path.includes('/comptabilite')) return 'comptabilite'
+  if (path.includes('/fiscalite'))    return 'fiscalite'
   if (path.includes('/rh'))            return 'rh'
   if (path.includes('/facturation') || path.includes('/factures')) return 'facturation'
   if (path.includes('/restaurant'))    return 'restaurant'

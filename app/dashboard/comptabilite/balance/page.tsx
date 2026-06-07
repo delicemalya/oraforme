@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { fmtFCFA } from '@/lib/admin-config'
-import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
+import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { BarChart2, Download, CheckCircle2, AlertTriangle } from 'lucide-react'
 
 interface Movement { id: string; date_operation: string; libelle: string; debit_account: string; credit_account: string; montant: number }
@@ -67,11 +67,11 @@ export default function BalancePage() {
       for (const [acct, side] of [[mv.debit_account, 'debit'], [mv.credit_account, 'credit']] as [string, string][]) {
         if (!acct) continue
         if (!map.has(acct)) {
-          const ohada = OHADA_ACCOUNTS.find(a => String(a.number) === acct)
+          const sc = COMPTES_PLATS.find(c => c.numero === acct)
           map.set(acct, {
-            number: acct, name: ohada?.name || acct,
-            classe: Math.floor(Number(acct) / 100000),
-            type: ohada?.type || '—',
+            number: acct, name: sc?.nom || acct,
+            classe: parseInt(acct[0]) || 0,
+            type: sc?.type || '—',
             total_debit: 0, total_credit: 0,
             solde_debiteur: 0, solde_crediteur: 0,
           })
@@ -103,7 +103,6 @@ export default function BalancePage() {
 
   /* CSV */
   function exportCSV() {
-  const { t } = useLocale()
     const rows = balanceLines.map(l => ({
       [t('compta.balance.colCompte')]: l.number,
       [t('compta.balance.colIntitule')]: l.name,

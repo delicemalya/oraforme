@@ -10,6 +10,7 @@ import {
   SECTEUR_CONFIG, PLAN_CONFIG, PAYS_LIST, LANGUES_LIST,
   type TailleEntreprise, type SecteurId,
 } from '@/lib/plans'
+import { PAYS_CONFIGS } from '@/lib/fiscalite/pays'
 
 // ── Step definitions ──────────────────────────────────────────────────────────
 
@@ -304,6 +305,26 @@ export default function OnboardingPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Fiscal config preview */}
+                    {pays && PAYS_CONFIGS[pays] && (() => {
+                      const cfg = PAYS_CONFIGS[pays]
+                      return (
+                        <div className="mt-4 p-3.5 bg-white/3 border border-[#F59E0B]/20 rounded-2xl">
+                          <p className="text-[10px] font-bold text-[#F59E0B]/70 uppercase tracking-widest mb-2">
+                            Config fiscale automatique — {cfg.nom}
+                          </p>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-white/50">
+                            <span>TVA normale : <strong className="text-white/70">{(cfg.tva.taux_normal * 100).toFixed(0)}%</strong></span>
+                            <span>Système : <strong className="text-white/70">{cfg.systeme_comptable}</strong></span>
+                            <span>CNSS salarié : <strong className="text-white/70">{(cfg.cnss.taux_salarie * 100).toFixed(2)}%</strong></span>
+                            <span>CNSS patronal : <strong className="text-white/70">{(cfg.cnss.taux_patronal * 100).toFixed(2)}%</strong></span>
+                            <span>Devise : <strong className="text-white/70">{cfg.devise}</strong></span>
+                            <span>Zone : <strong className="text-white/70">{cfg.zone}</strong></span>
+                          </div>
+                        </div>
+                      )
+                    })()}
                   </div>
                 )}
 

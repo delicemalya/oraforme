@@ -213,11 +213,14 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="inline-flex items-center gap-3 mb-8"
+                className="flex flex-wrap items-center gap-3 mb-8"
               >
                 <div className="w-1 h-10 bg-red-500 rounded-full" />
                 <span className="text-sm font-bold text-[#DC2626] uppercase tracking-widest">
                   MIAA+ · ASSISTANT IA INTÉGRÉ
+                </span>
+                <span className="text-[11px] font-bold text-white bg-[#7C3AED] rounded-full px-3 py-1">
+                  Moteur SYSCOHADA Révisé 2017
                 </span>
               </motion.div>
 

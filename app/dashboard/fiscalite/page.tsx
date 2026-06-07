@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   Receipt, Users, TrendingUp, AlertTriangle, CheckCircle,
   Clock, ArrowRight, Loader2, RefreshCw, Building2,
-  CalendarDays, ChevronRight, FileText, Landmark,
+  CalendarDays, ChevronRight, FileText, Landmark, GraduationCap,
 } from 'lucide-react'
 import Link from 'next/link'
 import { PAYS_LIST } from '@/lib/fiscalite/pays'
@@ -183,6 +183,20 @@ export default function FiscaliteDashboardPage() {
       icon: <FileText size={18} color={RED} />, iconBg: '#FEF2F2',
       href: '/dashboard/fiscalite/das', hrefLabel: 'Gérer →',
       stat: '—', statColor: RED, statut: null, borderColor: RED,
+    },
+    {
+      id: 'taxe-apprentissage', titre: 'Taxe d\'Apprentissage & FPC', ref: 'TA 1.2% + FPC 1.2% masse salariale',
+      periode: `Annuelle · Versement avant le 30 avril N+1`,
+      icon: <GraduationCap size={18} color={'#0891B2'} />, iconBg: '#ECFEFF',
+      href: '/dashboard/fiscalite/taxe-apprentissage', hrefLabel: 'Calculer →',
+      stat: '—', statColor: '#0891B2', statut: null, borderColor: '#0891B2',
+    },
+    {
+      id: 'liasse-fiscale', titre: 'Liasse Fiscale DGI', ref: 'Bilan · Compte de résultat · État fiscal',
+      periode: `Annuelle · Exercice ${ANNEE}`,
+      icon: <FileText size={18} color={'#2563EB'} />, iconBg: '#EFF6FF',
+      href: '/dashboard/fiscalite/liasse-fiscale', hrefLabel: 'Voir →',
+      stat: 'Déclarations consolidées', statColor: BLUE, statut: null, borderColor: BLUE,
     },
   ]
 
