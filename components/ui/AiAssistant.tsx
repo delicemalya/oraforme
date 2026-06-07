@@ -21,14 +21,14 @@ const MODULE_CONFIG: Record<ModuleKey, {
 }> = {
   comptabilite: {
     nom: 'MIAA Comptable',
-    specialite: 'Expert OHADA & Fiscalité Congo',
+    specialite: 'Expert SYSCOHADA Révisé 2017 & Fiscalité Congo',
     avatar: '📊',
     color: '#6366F1',
     suggestions: [
-      'Calculer TVA sur 750 000 FCFA',
+      'Calculer TVA 18% + CA 5% sur 750 000 FCFA',
       'Comment gérer les factures impayées ?',
       'Rédige une relance client professionnelle',
-      'Explique le plan comptable OHADA',
+      'Explique le plan comptable SYSCOHADA classes 1-9',
     ],
   },
   rh: {

@@ -121,7 +121,7 @@ export default function NouvelleOffrePage() {
   if (loading) return <div className="flex justify-center py-24"><Loader2 size={28} className="text-[#F59E0B] animate-spin" /></div>
 
   return (
-    <div className="flex gap-6 items-start">
+    <div className="flex gap-6 items-start flex-col lg:flex-row">
       {/* FORMULAIRE */}
       <div className="flex-1 min-w-0 space-y-5">
         <div className="flex items-center gap-3">
@@ -191,9 +191,9 @@ export default function NouvelleOffrePage() {
         </div>
       </div>
 
-      {/* PREVIEW PANEL */}
+      {/* PREVIEW PANEL — masqué sur mobile, visible desktop */}
       {showPreview && (
-        <div className="w-72 shrink-0 space-y-4 sticky top-4">
+        <div className="hidden lg:block w-72 shrink-0 space-y-4 sticky top-4">
           {/* Offer preview card */}
           <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-sm space-y-3">
             <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">Aperçu de l&apos;offre</p>
