@@ -99,11 +99,27 @@ ALTER TABLE oraforme_revenue
   ADD COLUMN IF NOT EXISTS taux_change NUMERIC(10,4) DEFAULT 1.0;
 
 -- ── 5. Vue globale déclarations urgentes ─────────────────────────────────────
+-- Note: on liste les colonnes de d explicitement pour éviter le doublon cabinet_tenant_id
+-- (d.* + c.cabinet_tenant_id provoquerait "column specified more than once")
 CREATE OR REPLACE VIEW cabinet_declarations_urgentes AS
 SELECT
-  d.*,
+  d.id,
+  d.cabinet_tenant_id,
+  d.client_id,
+  d.type_declaration,
+  d.periode_mois,
+  d.periode_annee,
+  d.date_limite,
+  d.date_soumise,
+  d.montant_declare,
+  d.montant_paye,
+  d.statut,
+  d.reference_externe,
+  d.notes,
+  d.alerte_j_avant,
+  d.created_at,
+  d.updated_at,
   c.nom_entreprise,
-  c.cabinet_tenant_id,
   CURRENT_DATE - d.date_limite AS jours_retard,
   CASE
     WHEN d.date_limite < CURRENT_DATE THEN 'retard'
