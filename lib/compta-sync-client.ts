@@ -34,31 +34,31 @@ export interface ComptaEntryInput {
  */
 export const OHADA_DEFAULTS: Record<string, Record<string, [string, string]>> = {
   depense: {
-    'Salaires':                  ['641000', '521000'],
-    'Paiement prestataire':      ['621000', '521000'],
-    'Charges de personnel':      ['641000', '421000'],
-    'CNSS':                      ['644000', '431000'],
-    'Loyer':                     ['651000', '521000'],
-    'Achats / Fournisseur':      ['601000', '401000'],
-    'Carburant / Transport':     ['601000', '571000'],
-    'Impôts / Taxes':            ['447000', '521000'],
-    'Charges diverses':          ['651000', '571000'],
-    'Frais bancaires':           ['631000', '521000'],
-    'Remboursement client':      ['419000', '521000'],
-    'Autre dépense':             ['651000', '571000'],
+    'Salaires':                  ['661', '521'],
+    'Paiement prestataire':      ['621', '521'],
+    'Charges de personnel':      ['661', '422'],
+    'CNSS':                      ['664', '431'],
+    'Loyer':                     ['622', '521'],
+    'Achats / Fournisseur':      ['601', '401'],
+    'Carburant / Transport':     ['605', '571'],
+    'Impôts / Taxes':            ['641', '521'],
+    'Charges diverses':          ['658', '571'],
+    'Frais bancaires':           ['631', '521'],
+    'Remboursement client':      ['419', '521'],
+    'Autre dépense':             ['658', '571'],
   },
   recette: {
-    "Vente / Chiffre d'affaires": ['521000', '707000'],
-    'Vente':                      ['521000', '707000'],
-    'Frais de scolarité':         ['571000', '706000'],
-    'Facture payée':              ['521000', '411000'],
-    'Prestation de services':     ['571000', '706000'],
-    'Prestation':                 ['571000', '706000'],
-    'Avance client':              ['571000', '411000'],
-    'Virement reçu':              ['521000', '709000'],
-    'Remboursement':              ['571000', '409000'],
-    'Subvention / Don':           ['521000', '773000'],
-    'Autre recette':              ['571000', '709000'],
+    "Vente / Chiffre d'affaires": ['521', '701'],
+    'Vente':                      ['521', '701'],
+    'Frais de scolarité':         ['571', '705'],
+    'Facture payée':              ['521', '411'],
+    'Prestation de services':     ['521', '705'],
+    'Prestation':                 ['521', '705'],
+    'Avance client':              ['521', '419'],
+    'Virement reçu':              ['521', '471'],
+    'Remboursement':              ['521', '409'],
+    'Subvention / Don':           ['521', '711'],
+    'Autre recette':              ['521', '758'],
   },
 }
 
@@ -67,7 +67,7 @@ export function resolveOhadaAccounts(
   categorie: string,
 ): [string, string] {
   const map = OHADA_DEFAULTS[type] ?? {}
-  return map[categorie] ?? (type === 'depense' ? ['651000', '571000'] : ['571000', '709000'])
+  return map[categorie] ?? (type === 'depense' ? ['658', '571'] : ['521', '705'])
 }
 
 /**
@@ -113,13 +113,13 @@ function toOhadaCategorie(cat: string): string {
  */
 export function modeToAccount(mode: string): string {
   switch (mode.toLowerCase()) {
-    case 'virement':    return '521000' // Banque
-    case 'cheque':      return '521000' // Banque
-    case 'especes':     return '571000' // Caisse
-    case 'airtel_money':
-    case 'mtn_momo':
-    case 'mobile_money':return '571100' // Caisse mobile
-    default:            return '521000'
+    case 'virement':    return '521'  // Banques locales
+    case 'cheque':      return '512'  // Chèques à encaisser
+    case 'especes':     return '571'  // Caisse
+    case 'airtel_money':return '541'  // Airtel Money
+    case 'mtn_momo':    return '542'  // MTN MoMo
+    case 'mobile_money':return '54'   // Instruments de monnaie électronique
+    default:            return '521'
   }
 }
 

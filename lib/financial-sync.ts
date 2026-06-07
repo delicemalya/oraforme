@@ -28,40 +28,40 @@ export interface FinancialOperationInput {
   createdBy?:   string
 }
 
-// ── Mapping comptes OHADA (miroir de accounting-engine.ts côté serveur) ───────
+// ── Mapping comptes SYSCOHADA Révisé 2017 (codes 2-5 chiffres) ───────────────
 
 const ACCOUNT_MAP: Record<OperationType, Record<string, [string, string]>> = {
   entree: {
-    'Vente':            ['571000', '707000'],
-    'Facture payée':    ['521000', '411000'],
-    'Avance client':    ['571000', '411000'],
-    'Prestation':       ['571000', '706000'],
-    'Scolarité':        ['571000', '706000'],
-    'Virement reçu':    ['521000', '709000'],
-    'Remboursement':    ['571000', '409000'],
-    'Mobile Money':     ['571100', '707000'],
-    '__default':        ['571000', '709000'],
+    'Vente':            ['571', '701'],
+    'Facture payée':    ['521', '411'],
+    'Avance client':    ['521', '419'],
+    'Prestation':       ['521', '705'],
+    'Scolarité':        ['521', '705'],
+    'Virement reçu':    ['521', '471'],
+    'Remboursement':    ['521', '409'],
+    'Mobile Money':     ['542', '701'],
+    '__default':        ['521', '705'],
   },
   sortie: {
-    'Salaires':         ['641000', '421000'],
-    'Salaires & CNSS':  ['641000', '421000'],
-    'CNSS':             ['644000', '431000'],
-    'Loyer':            ['651000', '521000'],
-    'Achats':           ['601000', '401000'],
-    'Carburant':        ['601000', '571000'],
-    'Taxes':            ['447000', '521000'],
-    'Charges':          ['651000', '571000'],
-    'Fournitures':      ['604000', '571000'],
-    '__default':        ['651000', '571000'],
+    'Salaires':         ['661', '422'],
+    'Salaires & CNSS':  ['661', '422'],
+    'CNSS':             ['664', '431'],
+    'Loyer':            ['622', '521'],
+    'Achats':           ['601', '401'],
+    'Carburant':        ['605', '571'],
+    'Taxes':            ['641', '521'],
+    'Charges':          ['658', '571'],
+    'Fournitures':      ['604', '571'],
+    '__default':        ['658', '571'],
   },
   transfert: {
-    '__default':        ['521000', '571000'],
+    '__default':        ['521', '571'],
   },
 }
 
 function resolveAccounts(type: OperationType, categorie: string): [string, string] {
   const map = ACCOUNT_MAP[type] ?? {}
-  return map[categorie] ?? map['__default'] ?? ['571000', '709000']
+  return map[categorie] ?? map['__default'] ?? ['521', '705']
 }
 
 // ── Fonction principale ───────────────────────────────────────────────────────

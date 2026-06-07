@@ -41,7 +41,7 @@ export default function CaissesPage() {
   const [opType,       setOpType]       = useState<'depense' | 'approvisionnement'>('depense')
 
   const [fOp, setFOp] = useState({ montant: '', motif: '', beneficiaire: '', categorie: CATS_DEP[0], reference_piece: '', date: today() })
-  const [fCaisse, setFCaisse] = useState({ nom: '', numero_compte: '571000' })
+  const [fCaisse, setFCaisse] = useState({ nom: '', numero_compte: '571' })
   const [clotureSolde, setClotureSolde] = useState('')
   const [clotureDate,  setClotureDate]  = useState(today())
 
@@ -71,7 +71,7 @@ export default function CaissesPage() {
       tenant_id: tenantId, nom: fCaisse.nom, numero_compte: fCaisse.numero_compte,
     }).select('*').single()
     if (error) showToast(error.message, false)
-    else { showToast('Caisse créée'); setShowNewCaisse(false); setFCaisse({ nom: '', numero_compte: '571000' }); await load(); if (data) setSelected(data as Caisse) }
+    else { showToast('Caisse créée'); setShowNewCaisse(false); setFCaisse({ nom: '', numero_compte: '571' }); await load(); if (data) setSelected(data as Caisse) }
     setSaving(false)
   }
 
@@ -86,8 +86,8 @@ export default function CaissesPage() {
     const { error } = await supabase.from('caisse_operations').insert({
       caisse_id: selected.id, tenant_id: tenantId, type: opType, montant,
       motif: fOp.motif || fOp.categorie || null, beneficiaire: fOp.beneficiaire || null,
-      compte_charge: isDepense ? '612000' : '521000',
-      compte_source: isDepense ? '571000' : '521000',
+      compte_charge: isDepense ? '658' : '521',
+      compte_source: isDepense ? '571' : '521',
       reference_piece: fOp.reference_piece || null,
       date: fOp.date, created_by: user?.id,
     })
@@ -98,8 +98,8 @@ export default function CaissesPage() {
         libelle: `${isDepense ? 'Dépense caisse' : 'Appro caisse'} — ${fOp.motif || fOp.categorie}`,
         type: isDepense ? 'depense' : 'recette', montant,
         categorie: fOp.categorie || 'caisse',
-        debitAccount: isDepense ? '612000' : '571000',
-        creditAccount: isDepense ? '571000' : '521000',
+        debitAccount: isDepense ? '658' : '571',
+        creditAccount: isDepense ? '571' : '521',
         source: 'caisse',
       })
       showToast(isDepense ? `Dépense de ${fmtFCFA(montant)} enregistrée` : `Approvisionnement de ${fmtFCFA(montant)} enregistré`)
@@ -502,9 +502,9 @@ export default function CaissesPage() {
                 <label className="block text-[11px] font-bold text-[#64748B] mb-1">N° compte OHADA</label>
                 <select value={fCaisse.numero_compte} onChange={e => setFCaisse(f => ({ ...f, numero_compte: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none">
-                  <option value="571000">571000 — Caisse (FCFA)</option>
-                  <option value="571100">571100 — Caisse secondaire</option>
-                  <option value="571200">571200 — Caisse devises</option>
+                  <option value="571">571 — Caisse siège social (FCFA)</option>
+                  <option value="572">572 — Caisses succursales</option>
+                  <option value="58">58 — Régies d'avances</option>
                 </select>
               </div>
             </div>

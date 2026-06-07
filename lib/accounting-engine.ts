@@ -1,3 +1,5 @@
+import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
+
 export type AccountCode = string
 
 export type OhadaAccount = {
@@ -169,62 +171,62 @@ export const OHADA_ACCOUNTS: OhadaAccount[] = [
   { number: '781000', name: 'Reprises sur amortissements',             type: 'produit',        classe: 7, sens: 'credit' },
 ]
 
-// ── Mapping comptes par {type opération, catégorie} → [débit, crédit] ─────────
+// ── Mapping comptes SYSCOHADA Révisé 2017 — codes 2-5 chiffres ───────────────
 const ACCOUNT_MAP: Record<string, Record<string, [AccountCode, AccountCode]>> = {
   entree: {
-    'Vente':                ['571000', '707000'],
-    'Ventes marchandises':  ['571000', '707000'],
-    'Prestation services':  ['571000', '706000'],
-    'Prestation':           ['571000', '706000'],
-    'Facture payée':        ['521000', '411000'],
-    'Règlement client':     ['521000', '411000'],
-    'Avance client':        ['419000', '411000'],
-    'Scolarité':            ['571000', '706000'],
-    'Frais scolarité':      ['571000', '706000'],
-    'Virement reçu':        ['521000', '709000'],
-    'Mobile Money':         ['521100', '707000'],
-    'Remboursement':        ['571000', '409000'],
-    'Subvention reçue':     ['521000', '721000'],
-    'Produit financier':    ['521000', '741000'],
-    'Revenu locatif':       ['521000', '752000'],
-    '__default':            ['571000', '709000'],
+    'Vente':                ['571', '701'],
+    'Ventes marchandises':  ['571', '701'],
+    'Prestation services':  ['521', '705'],
+    'Prestation':           ['521', '705'],
+    'Facture payée':        ['521', '411'],
+    'Règlement client':     ['521', '411'],
+    'Avance client':        ['521', '419'],
+    'Scolarité':            ['521', '705'],
+    'Frais scolarité':      ['521', '705'],
+    'Virement reçu':        ['521', '471'],
+    'Mobile Money':         ['542', '701'],
+    'Remboursement':        ['521', '409'],
+    'Subvention reçue':     ['521', '711'],
+    'Produit financier':    ['521', '778'],
+    'Revenu locatif':       ['521', '708'],
+    '__default':            ['521', '705'],
   },
   sortie: {
-    'Salaires':             ['641000', '421000'],
-    'Salaires & CNSS':      ['641000', '421000'],
-    'Rémunérations':        ['641000', '421000'],
-    'CNSS':                 ['644000', '431000'],
-    'Charges sociales':     ['644000', '431000'],
-    'Loyer':                ['613000', '521000'],
-    'Location bureaux':     ['613000', '521000'],
-    'Achats':               ['601000', '401000'],
-    'Achats marchandises':  ['601000', '401000'],
-    'Matières premières':   ['602000', '401000'],
-    'Fournitures':          ['604000', '571000'],
-    'Carburant':            ['606000', '571000'],
-    'Transport':            ['624000', '571000'],
-    'Publicité':            ['623000', '521000'],
-    'Téléphone/Internet':   ['626000', '521000'],
-    'Assurances':           ['616000', '521000'],
-    'Entretien':            ['615000', '571000'],
-    'Frais bancaires':      ['627000', '521000'],
-    'Taxes':                ['635000', '521000'],
-    'Impôts':               ['635000', '521000'],
-    'TVA décaissée':        ['447000', '521000'],
-    'IS — Impôt sociétés':  ['691000', '521000'],
-    'Amortissement':        ['681000', '284000'],
-    'Dividendes':           ['664000', '521000'],
-    'Intérêts emprunt':     ['661000', '521000'],
-    'Pertes créances':      ['654000', '491000'],
-    'Charges diverses':     ['628000', '571000'],
-    '__default':            ['628000', '571000'],
+    'Salaires':             ['661', '422'],
+    'Salaires & CNSS':      ['661', '422'],
+    'Rémunérations':        ['661', '422'],
+    'CNSS':                 ['664', '431'],
+    'Charges sociales':     ['664', '431'],
+    'Loyer':                ['622', '521'],
+    'Location bureaux':     ['622', '521'],
+    'Achats':               ['601', '401'],
+    'Achats marchandises':  ['601', '401'],
+    'Matières premières':   ['602', '401'],
+    'Fournitures':          ['604', '571'],
+    'Carburant':            ['605', '571'],
+    'Transport':            ['618', '521'],
+    'Publicité':            ['627', '521'],
+    'Téléphone/Internet':   ['628', '521'],
+    'Assurances':           ['625', '521'],
+    'Entretien':            ['624', '571'],
+    'Frais bancaires':      ['631', '521'],
+    'Taxes':                ['641', '521'],
+    'Impôts':               ['641', '521'],
+    'TVA décaissée':        ['4441', '521'],
+    'IS — Impôt sociétés':  ['695', '521'],
+    'Amortissement':        ['683', '284'],
+    'Dividendes':           ['462', '521'],
+    'Intérêts emprunt':     ['671', '521'],
+    'Pertes créances':      ['651', '416'],
+    'Charges diverses':     ['658', '571'],
+    '__default':            ['638', '521'],
   },
   transfert: {
-    'Caisse → Banque':      ['521000', '571000'],
-    'Banque → Caisse':      ['571000', '521000'],
-    'Mobile → Banque':      ['521000', '521100'],
-    'Banque → Mobile':      ['521100', '521000'],
-    '__default':            ['576000', '576000'],
+    'Caisse → Banque':      ['521', '571'],
+    'Banque → Caisse':      ['571', '521'],
+    'Mobile → Banque':      ['521', '541'],
+    'Banque → Mobile':      ['541', '521'],
+    '__default':            ['514', '514'],
   },
 }
 
@@ -233,10 +235,14 @@ export function resolveAccounts(
   categorie: string,
 ): [AccountCode, AccountCode] {
   const map = ACCOUNT_MAP[type] ?? {}
-  return map[categorie] ?? map['__default'] ?? ['571000', '709000']
+  return map[categorie] ?? map['__default'] ?? ['521', '705']
 }
 
 export function accountLabel(number: AccountCode): string {
+  // Priorité COMPTES_PLATS (codes SYSCOHADA 2-5 chiffres)
+  const cp = COMPTES_PLATS.find(c => c.numero === number)
+  if (cp) return `${cp.numero} — ${cp.nom}`
+  // Fallback sur OHADA_ACCOUNTS (rétrocompatibilité codes 6 chiffres existants)
   const found = OHADA_ACCOUNTS.find(a => a.number === number)
   return found ? `${found.number} — ${found.name}` : number
 }

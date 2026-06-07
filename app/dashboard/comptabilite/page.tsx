@@ -8,7 +8,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { resolveAccounts, OHADA_ACCOUNTS, type AccountCode } from '@/lib/accounting-engine'
+import { resolveAccounts, type AccountCode } from '@/lib/accounting-engine'
+import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { fmtFCFA } from '@/lib/admin-config'
 import Link from 'next/link'
 import {
@@ -542,8 +543,8 @@ export default function ComptabilitePage() {
                   <select value={formDebit} onChange={e => setFormDebit(e.target.value as AccountCode)}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30">
                     <option value="">— Auto —</option>
-                    {OHADA_ACCOUNTS.map(a => (
-                      <option key={a.number} value={String(a.number)}>{a.number} — {a.name}</option>
+                    {COMPTES_PLATS.map(c => (
+                      <option key={c.numero} value={c.numero}>{c.numero} — {c.nom}</option>
                     ))}
                   </select>
                 </div>
@@ -552,8 +553,8 @@ export default function ComptabilitePage() {
                   <select value={formCredit} onChange={e => setFormCredit(e.target.value as AccountCode)}
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30">
                     <option value="">— Auto —</option>
-                    {OHADA_ACCOUNTS.map(a => (
-                      <option key={a.number} value={String(a.number)}>{a.number} — {a.name}</option>
+                    {COMPTES_PLATS.map(c => (
+                      <option key={c.numero} value={c.numero}>{c.numero} — {c.nom}</option>
                     ))}
                   </select>
                 </div>

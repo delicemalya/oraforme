@@ -217,8 +217,8 @@ export default function AchatsPage() {
           type: 'depense',
           montant: p.total_amount,
           categorie: 'achats',
-          debitAccount: '401000',
-          creditAccount: '521000',
+          debitAccount: '401',
+          creditAccount: '521',
           source: 'achats',
           sourceId: p.id,
         })

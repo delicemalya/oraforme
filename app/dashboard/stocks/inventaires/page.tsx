@@ -250,8 +250,8 @@ export default function InventairesPage() {
               type: ligne.ecart > 0 ? 'recette' : 'depense',
               montant: valeur,
               categorie: 'ajustement_stock',
-              debitAccount: ligne.ecart > 0 ? '310000' : '603000',
-              creditAccount: ligne.ecart > 0 ? '603000' : '310000',
+              debitAccount: ligne.ecart > 0 ? '311' : '601',
+              creditAccount: ligne.ecart > 0 ? '601' : '311',
               source: 'inventaire',
               sourceId: inv.id,
             })

@@ -221,8 +221,8 @@ export default function ReceptionsPage() {
           type: 'depense',
           montant: totalAmt,
           categorie: 'achats',
-          debitAccount: '310000',
-          creditAccount: '401000',
+          debitAccount: '311',
+          creditAccount: '401',
           source: 'reception',
           sourceId: rec.id,
         })

@@ -47,10 +47,10 @@ const TYPE_ICONS: Record<CompteType, React.ElementType> = {
 }
 
 const TYPE_OHADA: Record<CompteType, string> = {
-  banque: '521000',
-  caisse: '571000',
-  mobile: '514000',
-  wallet: '514000',
+  banque: '521',
+  caisse: '571',
+  mobile: '54',
+  wallet: '54',
 }
 
 const STATUT_COLORS: Record<string, string> = {
@@ -193,7 +193,7 @@ export default function TransfertsPage() {
           type: 'depense',
           montant: frais,
           categorie: 'frais_bancaires',
-          debitAccount: '627000',
+          debitAccount: '631',
           creditAccount: srcOhada,
           source: 'transfert',
           sourceId: tr?.id,

@@ -47,20 +47,20 @@ export default function DepensesPage() {
   const [showModal,    setShowModal]    = useState(false)
   const [saving,       setSaving]       = useState(false)
   const [periode,      setPeriode]      = useState(30)
-  // OHADA account mapping per depense category
+  // Mapping comptes SYSCOHADA Révisé 2017 par catégorie dépense
   const CAT_ACCOUNTS: Record<string, [string, string]> = {
-    carburant:    ['601000', '571000'],
-    loyer:        ['651000', '571000'],
-    electricite:  ['651000', '571000'],
-    telephone:    ['651000', '571000'],
-    salaires:     ['641000', '571000'],
-    fournitures:  ['601000', '571000'],
-    sante:        ['651000', '571000'],
-    taxes:        ['441000', '521000'],
-    maintenance:  ['651000', '571000'],
-    marketing:    ['651000', '571000'],
-    voyages:      ['601000', '571000'],
-    autre:        ['651000', '571000'],
+    carburant:    ['605', '571'],
+    loyer:        ['622', '521'],
+    electricite:  ['638', '521'],
+    telephone:    ['628', '521'],
+    salaires:     ['661', '521'],
+    fournitures:  ['604', '571'],
+    sante:        ['658', '571'],
+    taxes:        ['641', '521'],
+    maintenance:  ['624', '571'],
+    marketing:    ['627', '521'],
+    voyages:      ['618', '571'],
+    autre:        ['658', '571'],
   }
 
   const [form, setForm] = useState({
@@ -71,8 +71,8 @@ export default function DepensesPage() {
     mode_paiement: 'Espèces',
     reference_piece: '',
     cost_center_id: '',
-    debit_account: '601000',
-    credit_account: '571000',
+    debit_account: '605',
+    credit_account: '571',
   })
 
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -119,7 +119,7 @@ export default function DepensesPage() {
     setForm({
       categorie: 'carburant', description: '', montant: '',
       date: new Date().toISOString().split('T')[0], mode_paiement: 'Espèces',
-      reference_piece: '', cost_center_id: '', debit_account: '601000', credit_account: '571000',
+      reference_piece: '', cost_center_id: '', debit_account: '605', credit_account: '571',
     })
     setSaving(false)
     load()
@@ -319,7 +319,7 @@ export default function DepensesPage() {
                   <label className="text-xs text-[var(--text-secondary)] mb-1 block">{t('dep.modal.category')}</label>
                   <select value={form.categorie} onChange={e => {
                     const cat = e.target.value
-                    const [d, c] = CAT_ACCOUNTS[cat] ?? ['651000', '571000']
+                    const [d, c] = CAT_ACCOUNTS[cat] ?? ['658', '571']
                     setForm(f => ({ ...f, categorie: cat, debit_account: d, credit_account: c }))
                   }}
                     className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text)] outline-none">

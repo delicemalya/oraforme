@@ -28,7 +28,7 @@ interface RapprochementState {
   lignes_non_rappro: number
 }
 
-const BANK_ACCOUNTS = ['521000', '521100', '521200', '514000']  // Banque + CCP
+const BANK_ACCOUNTS = ['521', '512', '531', '54']  // Banques + Chèques + CCP + Mobile Money
 const YEARS  = [2024, 2025, 2026, 2027]
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
@@ -40,7 +40,7 @@ export default function RapprochementPage() {
   const [loading, setLoading]       = useState(true)
   const [year, setYear]             = useState(new Date().getFullYear())
   const [mois, setMois]             = useState(new Date().getMonth() + 1)
-  const [compte, setCompte]         = useState('521000')
+  const [compte, setCompte]         = useState('521')
   const [soldeBanque, setSoldeBanque] = useState<number>(0)
   const [modalAdd, setModalAdd]     = useState(false)
   const [newLigne, setNewLigne]     = useState<Partial<LigneReleve>>({})

@@ -27,15 +27,16 @@ interface Amortissement {
   dotation: number; cumul_amort: number; valeur_nette: number
 }
 
+// Codes SYSCOHADA Révisé 2017 — classe 2
 const CATEGORIES = [
-  { id: 'terrain',        label: 'Terrains',              compte: '221000', compte_amort: '' },
-  { id: 'construction',   label: 'Constructions',         compte: '231000', compte_amort: '281300' },
-  { id: 'materiel',       label: 'Matériel industriel',   compte: '241000', compte_amort: '284100' },
-  { id: 'transport',      label: 'Matériel de transport', compte: '243000', compte_amort: '284300' },
-  { id: 'informatique',   label: 'Matériel informatique', compte: '244000', compte_amort: '284400' },
-  { id: 'mobilier',       label: 'Mobilier de bureau',    compte: '245000', compte_amort: '284500' },
-  { id: 'logiciel',       label: 'Logiciels',             compte: '212000', compte_amort: '282100' },
-  { id: 'autre',          label: 'Autres immobilisations', compte: '249000', compte_amort: '284900' },
+  { id: 'terrain',        label: 'Terrains',              compte: '222',  compte_amort: '' },
+  { id: 'construction',   label: 'Constructions',         compte: '231',  compte_amort: '286' },
+  { id: 'materiel',       label: 'Matériel industriel',   compte: '241',  compte_amort: '288' },
+  { id: 'transport',      label: 'Matériel de transport', compte: '245',  compte_amort: '288' },
+  { id: 'informatique',   label: 'Matériel informatique', compte: '247',  compte_amort: '288' },
+  { id: 'mobilier',       label: 'Mobilier de bureau',    compte: '244',  compte_amort: '288' },
+  { id: 'logiciel',       label: 'Logiciels',             compte: '212',  compte_amort: '284' },
+  { id: 'autre',          label: 'Autres immobilisations', compte: '248', compte_amort: '288' },
 ]
 
 const EMPTY_FORM: Partial<Immobilisation> = {
@@ -371,8 +372,8 @@ export default function ImmobilisationsPage() {
                   { key: 'valeur_acquisition', label: 'Valeur acquisition (FCFA)', type: 'number', placeholder: '0' },
                   { key: 'valeur_residuelle',  label: 'Valeur résiduelle (FCFA)',  type: 'number', placeholder: '0' },
                   { key: 'duree_amort',   label: 'Durée amortissement (ans)', type: 'number', placeholder: '5' },
-                  { key: 'compte_ohada',  label: 'Compte immobilisation',    type: 'text',   placeholder: '241000' },
-                  { key: 'compte_amort',  label: "Compte amortissement",     type: 'text',   placeholder: '284100' },
+                  { key: 'compte_ohada',  label: 'Compte immobilisation',    type: 'text',   placeholder: '241' },
+                  { key: 'compte_amort',  label: "Compte amortissement",     type: 'text',   placeholder: '288' },
                 ].map(f => (
                   <div key={f.key}>
                     <label className="block text-[11px] font-bold text-[#64748B] mb-1">{f.label}</label>

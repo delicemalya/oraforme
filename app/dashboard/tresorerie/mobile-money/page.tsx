@@ -102,8 +102,8 @@ export default function MobileMoneyPage() {
         libelle: `${type === 'entree' ? 'Dépôt' : 'Retrait'} ${selected.operateur} — ${fOp.libelle || 'MM'}`,
         type: type === 'entree' ? 'recette' : 'depense', montant,
         categorie: 'mobile_money',
-        debitAccount: type === 'entree' ? '514000' : '521000',
-        creditAccount: type === 'entree' ? '521000' : '514000',
+        debitAccount: type === 'entree' ? '54' : '521',
+        creditAccount: type === 'entree' ? '521' : '54',
         source: 'mobile_money',
       })
       showToast(`${type === 'entree' ? 'Dépôt' : 'Retrait'} de ${fmtFCFA(montant)} enregistré`)

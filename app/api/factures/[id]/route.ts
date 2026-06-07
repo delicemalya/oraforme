@@ -95,15 +95,15 @@ export async function PATCH(
       .eq('tenant_id', ctx.tenantId)
       .eq('source', 'facture')
       .eq('source_id', id)
-      .eq('debit_account', '521000')
+      .eq('debit_account', '521')
 
     if ((count ?? 0) === 0) {
       await supabaseAdmin.from('journal_entries').insert({
         tenant_id:      ctx.tenantId,
         date_operation: today,
         libelle:        `Règlement facture ${pieceNum} — ${clientName}`,
-        debit_account:  '521000',
-        credit_account: '411000',
+        debit_account:  '521',
+        credit_account: '411',
         montant:        ttc || existing.total || 0,
         source:         'facture',
         source_id:      id,

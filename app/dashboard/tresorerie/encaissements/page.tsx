@@ -37,15 +37,15 @@ interface Caisse          { id: string; nom: string; solde: number }
 interface Wallet          { id: string; operateur: string; intitule: string; numero: string }
 
 const CATEGORIES = [
-  { value: 'vente',           label: 'Vente de marchandises',    compte: '701000' },
-  { value: 'service',         label: 'Prestation de services',   compte: '706000' },
-  { value: 'client',          label: 'Règlement client',         compte: '411000' },
-  { value: 'subvention',      label: 'Subvention',               compte: '741000' },
-  { value: 'loyer',           label: 'Loyer perçu',              compte: '752000' },
-  { value: 'interet',         label: 'Intérêts reçus',           compte: '762000' },
-  { value: 'remboursement',   label: 'Remboursement reçu',       compte: '478000' },
-  { value: 'avance_client',   label: 'Avance client',            compte: '419000' },
-  { value: 'autre',           label: 'Autre encaissement',       compte: '758000' },
+  { value: 'vente',           label: 'Vente de marchandises',    compte: '701' },
+  { value: 'service',         label: 'Prestation de services',   compte: '705' },
+  { value: 'client',          label: 'Règlement client',         compte: '411' },
+  { value: 'subvention',      label: 'Subvention',               compte: '711' },
+  { value: 'loyer',           label: 'Loyer perçu',              compte: '708' },
+  { value: 'interet',         label: 'Intérêts reçus',           compte: '778' },
+  { value: 'remboursement',   label: 'Remboursement reçu',       compte: '409' },
+  { value: 'avance_client',   label: 'Avance client',            compte: '419' },
+  { value: 'autre',           label: 'Autre encaissement',       compte: '758' },
 ]
 
 const MODES_PAIEMENT = [
@@ -156,11 +156,11 @@ export default function EncaissementsPage() {
       const cat = CATEGORIES.find(c => c.value === form.categorie)
 
       // Determine destination account based on mode
-      const creditAccount = cat?.compte ?? '758000'
-      let debitAccount = '521000'
-      if (form.compte_destination === 'caisse')  debitAccount = '571000'
-      if (form.compte_destination === 'mobile')  debitAccount = '514000'
-      if (form.compte_destination === 'wallet')  debitAccount = '514000'
+      const creditAccount = cat?.compte ?? '758'
+      let debitAccount = '521'
+      if (form.compte_destination === 'caisse')  debitAccount = '571'
+      if (form.compte_destination === 'mobile')  debitAccount = '54'
+      if (form.compte_destination === 'wallet')  debitAccount = '54'
 
       const { data: enc, error } = await supabase.from('encaissements').insert({
         tenant_id: tenantId,

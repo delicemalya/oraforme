@@ -173,7 +173,7 @@ export default function BanquesPage() {
         libelle: `Encaissement chèque n°${ch.numero}`,
         type: 'recette', montant: ch.montant,
         categorie: 'cheque',
-        debitAccount: '521000', creditAccount: '412000',
+        debitAccount: '521', creditAccount: '412',
         source: 'banque',
       })
     }
@@ -194,7 +194,7 @@ export default function BanquesPage() {
       libelle: `Virement vers ${v.compte_dest_label}`,
       type: 'depense', montant: v.montant,
       categorie: 'virement',
-      debitAccount: '521000', creditAccount: '521000',
+      debitAccount: '514', creditAccount: '521',
       source: 'banque',
     })
     showToast('Virement exécuté'); load()

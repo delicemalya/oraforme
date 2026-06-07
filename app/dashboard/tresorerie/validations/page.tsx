@@ -161,7 +161,7 @@ export default function ValidationsPage() {
 
         // If now fully approved (exécuté), write OHADA entry
         if (nextStatut === 'exécuté') {
-          const creditMap: Record<string, string> = { banque: '521000', caisse: '571000', mobile: '514000' }
+          const creditMap: Record<string, string> = { banque: '521', caisse: '571', mobile: '54' }
           await writeComptaEntry({
             tenantId,
             date: new Date().toISOString().slice(0, 10),
@@ -169,8 +169,8 @@ export default function ValidationsPage() {
             type: 'depense',
             montant: dp.montant,
             categorie: dp.categorie,
-            debitAccount: '401000',
-            creditAccount: creditMap[dp.compte_source] ?? '521000',
+            debitAccount: '401',
+            creditAccount: creditMap[dp.compte_source] ?? '521',
             source: 'validation',
             sourceId: dp.id,
           })

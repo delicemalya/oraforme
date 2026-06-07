@@ -7,8 +7,9 @@ import type { PaysFiscal } from '@/lib/fiscalite/types'
 
 export const dynamic = 'force-dynamic'
 
-const TVA_COLLECTEE_ACCOUNTS  = ['445700', '445710', '445720', '443000']
-const TVA_DEDUCTIBLE_ACCOUNTS = ['445600', '445610', '445620', '442000']
+// SYSCOHADA Révisé 2017 — TVA collectée 4441 · TVA récupérable 4446
+const TVA_COLLECTEE_ACCOUNTS  = ['4441', '4442']
+const TVA_DEDUCTIBLE_ACCOUNTS = ['4445', '4446']
 
 // GET /api/fiscalite/tva?annee=2026&mois=5&pays=CG
 export async function GET(req: NextRequest) {

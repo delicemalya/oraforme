@@ -227,8 +227,8 @@ export default function SortiesPage() {
             type: 'recette',
             montant: totalValeur,
             categorie: 'ventes',
-            debitAccount: '411000',
-            creditAccount: '700000',
+            debitAccount: '411',
+            creditAccount: '701',
             source: 'sorties',
             sourceId: sortie.id,
           })
@@ -240,8 +240,8 @@ export default function SortiesPage() {
             type: 'depense',
             montant: totalValeur,
             categorie: 'ajustement_stock',
-            debitAccount: '651000',
-            creditAccount: '310000',
+            debitAccount: '658',
+            creditAccount: '311',
             source: 'sorties',
             sourceId: sortie.id,
           })

@@ -180,8 +180,8 @@ export default function RetoursPage() {
               type: 'depense',
               montant: ret.valeur,
               categorie: 'retours',
-              debitAccount: '700000',
-              creditAccount: '411000',
+              debitAccount: '701',
+              creditAccount: '411',
               source: 'retours',
               sourceId: ret.id,
             })
@@ -193,8 +193,8 @@ export default function RetoursPage() {
               type: 'recette',
               montant: ret.valeur,
               categorie: 'retours',
-              debitAccount: '401000',
-              creditAccount: '310000',
+              debitAccount: '401',
+              creditAccount: '311',
               source: 'retours',
               sourceId: ret.id,
             })

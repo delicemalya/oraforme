@@ -37,26 +37,26 @@ interface Caisse          { id: string; nom: string; solde: number }
 interface Wallet          { id: string; operateur: string; intitule: string; numero: string; solde: number }
 
 const CATEGORIES_DEPENSE = [
-  { value: 'fournisseur',    label: 'Règlement fournisseur', debit: '401000', credit: '' },
-  { value: 'salaire',        label: 'Salaires et charges',   debit: '661000', credit: '' },
-  { value: 'loyer',          label: 'Loyer et charges',      debit: '622000', credit: '' },
-  { value: 'fourniture',     label: 'Fournitures / matériel',debit: '612000', credit: '' },
-  { value: 'impot',          label: 'Impôts et taxes',       debit: '631000', credit: '' },
-  { value: 'assurance',      label: 'Assurance',             debit: '616000', credit: '' },
-  { value: 'transport',      label: 'Transport / logistique',debit: '624000', credit: '' },
-  { value: 'sous_traitance', label: 'Sous-traitance',        debit: '611000', credit: '' },
-  { value: 'publicite',      label: 'Publicité / marketing', debit: '623000', credit: '' },
-  { value: 'frais_bancaires',label: 'Frais bancaires',       debit: '627000', credit: '' },
-  { value: 'investissement', label: 'Investissement / immo', debit: '221000', credit: '' },
-  { value: 'remboursement',  label: 'Remboursement prêt',    debit: '162000', credit: '' },
-  { value: 'autre',          label: 'Autre décaissement',    debit: '658000', credit: '' },
+  { value: 'fournisseur',    label: 'Règlement fournisseur', debit: '401', credit: '' },
+  { value: 'salaire',        label: 'Salaires et charges',   debit: '661', credit: '' },
+  { value: 'loyer',          label: 'Loyer et charges',      debit: '622', credit: '' },
+  { value: 'fourniture',     label: 'Fournitures / matériel',debit: '604', credit: '' },
+  { value: 'impot',          label: 'Impôts et taxes',       debit: '641', credit: '' },
+  { value: 'assurance',      label: 'Assurance',             debit: '625', credit: '' },
+  { value: 'transport',      label: 'Transport / logistique',debit: '618', credit: '' },
+  { value: 'sous_traitance', label: 'Sous-traitance',        debit: '621', credit: '' },
+  { value: 'publicite',      label: 'Publicité / marketing', debit: '627', credit: '' },
+  { value: 'frais_bancaires',label: 'Frais bancaires',       debit: '631', credit: '' },
+  { value: 'investissement', label: 'Investissement / immo', debit: '24',  credit: '' },
+  { value: 'remboursement',  label: 'Remboursement prêt',    debit: '162', credit: '' },
+  { value: 'autre',          label: 'Autre décaissement',    debit: '658', credit: '' },
 ]
 
 const CREDIT_ACCOUNT: Record<string, string> = {
-  banque: '521000',
-  caisse: '571000',
-  mobile: '514000',
-  wallet: '514000',
+  banque: '521',
+  caisse: '571',
+  mobile: '54',
+  wallet: '54',
 }
 
 const MODES_PAIEMENT = [
@@ -146,8 +146,8 @@ export default function DecaissementsPage() {
     try {
       const montant = parseInt(form.montant)
       const cat = CATEGORIES_DEPENSE.find(c => c.value === form.categorie)
-      const debitAccount = cat?.debit ?? '658000'
-      const creditAccount = CREDIT_ACCOUNT[form.compte_source] ?? '521000'
+      const debitAccount = cat?.debit ?? '658'
+      const creditAccount = CREDIT_ACCOUNT[form.compte_source] ?? '521'
 
       // Check sufficient balance
       if (form.compte_source === 'banque' && form.compte_source_id) {

@@ -30,9 +30,10 @@ const CA_RATE    = 0.05   // Contribution d'Appui = 5% sur TVA collectée
 const YEARS      = [2024, 2025, 2026, 2027]
 
 /* OHADA accounts for TVA */
-const TVA_COLLECTEE_ACCTS  = ['445700', '445710', '445720']   // 4457xx — TVA collectée
-const TVA_DEDUCTIBLE_ACCTS = ['445600', '445610', '445620']   // 4456xx — TVA déductible
-const CA_ACCT              = ['447000', '447100']              // 447 — Contribution d'Appui
+// SYSCOHADA Révisé 2017 — 4441 TVA facturée · 4446 TVA récupérable sur achats
+const TVA_COLLECTEE_ACCTS  = ['4441', '4442']   // TVA facturée (crédit)
+const TVA_DEDUCTIBLE_ACCTS = ['4445', '4446']   // TVA récupérable (débit)
+const CA_ACCT              = ['442']             // État, autres impôts (Contribution d'Appui 5%)
 
 export default function TVAPage() {
   const { tenantId } = useTenant()

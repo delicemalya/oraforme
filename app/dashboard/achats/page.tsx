@@ -98,8 +98,8 @@ export default function AchatsPage() {
         mode_paiement:  'especes',
         source:         'achat',
         source_id:      id,
-        debit_account:  '401000',
-        credit_account: '571000',
+        debit_account:  '401',
+        credit_account: '571',
         created_by:     user?.id,
       })
     }

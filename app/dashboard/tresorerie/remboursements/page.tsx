@@ -49,10 +49,10 @@ const STATUT_ICONS: Record<string, React.ElementType> = {
 }
 
 const TYPES_REMB = [
-  { value: 'client',      label: 'Remboursement client',      debit: '411000', credit: '521000' },
-  { value: 'fournisseur', label: 'Avoir fournisseur',          debit: '521000', credit: '401000' },
-  { value: 'salarie',     label: 'Remboursement salarié',      debit: '421000', credit: '521000' },
-  { value: 'autre',       label: 'Autre remboursement',        debit: '478000', credit: '521000' },
+  { value: 'client',      label: 'Remboursement client',      debit: '411', credit: '521' },
+  { value: 'fournisseur', label: 'Avoir fournisseur',          debit: '521', credit: '401' },
+  { value: 'salarie',     label: 'Remboursement salarié',      debit: '421', credit: '521' },
+  { value: 'autre',       label: 'Autre remboursement',        debit: '472', credit: '521' },
 ]
 
 const EMPTY_FORM = {
@@ -152,8 +152,8 @@ export default function RemboursementsPage() {
         type: 'depense',
         montant: montantEffectif,
         categorie: r.type,
-        debitAccount: typeConfig?.debit ?? '478000',
-        creditAccount: typeConfig?.credit ?? '521000',
+        debitAccount: typeConfig?.debit ?? '472',
+        creditAccount: typeConfig?.credit ?? '521',
         source: 'remboursement',
         sourceId: r.id,
       })

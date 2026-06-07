@@ -9,7 +9,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
-import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
+import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { FileText, Download, BarChart2, TrendingUp, Scale, Receipt, BookOpen, Printer } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -21,7 +21,7 @@ interface Movement {
 const YEARS   = [2024, 2025, 2026, 2027]
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
-/* ─── Utility: compute solde from movements for given accounts ─── */
+/* ─── Utility: compute solde from movements by SYSCOHADA prefix ─── */
 function computeSolde(movements: Movement[], accounts: string[]): number {
   let total = 0
   for (const m of movements) {
@@ -31,11 +31,19 @@ function computeSolde(movements: Movement[], accounts: string[]): number {
   return total
 }
 
-function computeSoldeRange(movements: Movement[], from: number, to: number): number {
-  const accts = OHADA_ACCOUNTS
-    .filter(a => Number(a.number) >= from && Number(a.number) <= to)
-    .map(a => String(a.number))
-  return computeSolde(movements, accts)
+// Filtre par préfixe(s) SYSCOHADA (codes 2-5 chiffres)
+function computeSoldeByPrefix(movements: Movement[], ...prefixes: string[]): number {
+  let total = 0
+  for (const m of movements) {
+    if (prefixes.some(p => m.debit_account?.startsWith(p)))  total += m.montant
+    if (prefixes.some(p => m.credit_account?.startsWith(p))) total -= m.montant
+  }
+  return total
+}
+
+function accountNom(numero: string): string {
+  const cp = COMPTES_PLATS.find(c => c.numero === numero)
+  return cp?.nom || numero
 }
 
 export default function RapportsPage() {
@@ -69,14 +77,20 @@ export default function RapportsPage() {
 
   /* ─── Bilan data ─── */
   const bilanData = useMemo(() => {
-    const actif_immo    = computeSoldeRange(filtered, 200000, 299999)
-    const actif_circ    = computeSoldeRange(filtered, 300000, 399999) + computeSoldeRange(filtered, 400000, 419999)
-    const actif_tres    = computeSoldeRange(filtered, 500000, 599999)
+    // Classe 2 = actif immobilisé (net des amortissements 28)
+    const actif_immo    = computeSoldeByPrefix(filtered, '20', '21', '22', '23', '24', '25', '26', '27')
+    // Classe 3 (stocks) + actif circulant de classe 4 (clients, débiteurs)
+    const actif_circ    = computeSoldeByPrefix(filtered, '3', '409', '411', '412', '413', '414', '416', '418', '421', '471', '476', '485')
+    // Classe 5 (trésorerie)
+    const actif_tres    = computeSoldeByPrefix(filtered, '50', '51', '52', '53', '54', '57')
     const total_actif   = actif_immo + actif_circ + actif_tres
 
-    const capitaux      = Math.abs(computeSoldeRange(filtered, 100000, 159999))
-    const dettes_fin    = Math.abs(computeSoldeRange(filtered, 160000, 199999))
-    const dettes_exp    = Math.abs(computeSoldeRange(filtered, 420000, 469999))
+    // Capitaux propres = classes 10 à 15
+    const capitaux      = Math.abs(computeSoldeByPrefix(filtered, '10', '11', '12', '13', '14', '15'))
+    // Dettes financières = classes 16-19
+    const dettes_fin    = Math.abs(computeSoldeByPrefix(filtered, '16', '17', '18', '19'))
+    // Dettes exploitation = passif de classe 4 (fournisseurs, personnel, État)
+    const dettes_exp    = Math.abs(computeSoldeByPrefix(filtered, '40', '419', '422', '423', '424', '43', '44', '46', '47', '48'))
     const total_passif  = capitaux + dettes_fin + dettes_exp
 
     return { actif_immo, actif_circ, actif_tres, total_actif, capitaux, dettes_fin, dettes_exp, total_passif }
@@ -84,14 +98,20 @@ export default function RapportsPage() {
 
   /* ─── CR data ─── */
   const crData = useMemo(() => {
-    const produits      = Math.abs(computeSoldeRange(filtered, 700000, 799999))
-    const charges       = computeSoldeRange(filtered, 600000, 699999)
+    // Classe 7 = produits
+    const produits      = Math.abs(computeSoldeByPrefix(filtered, '7'))
+    // Classe 6 = charges
+    const charges       = computeSoldeByPrefix(filtered, '6')
     const resultat_net  = produits - charges
-    const ventes        = Math.abs(computeSoldeRange(filtered, 700000, 709999))
-    const achats        = computeSoldeRange(filtered, 601000, 609999)
+    // 70x = ventes
+    const ventes        = Math.abs(computeSoldeByPrefix(filtered, '70'))
+    // 60x = achats
+    const achats        = computeSoldeByPrefix(filtered, '60')
     const marge         = ventes - achats
-    const charges_perso = computeSoldeRange(filtered, 641000, 649999)
-    const dotations     = computeSoldeRange(filtered, 681000, 689999)
+    // 66x = charges de personnel (SYSCOHADA: 661 rémunérations, 664 CNSS patronal)
+    const charges_perso = computeSoldeByPrefix(filtered, '66')
+    // 68x = dotations aux amortissements
+    const dotations     = computeSoldeByPrefix(filtered, '68')
     const ebe           = marge - charges_perso - dotations
     return { produits, charges, resultat_net, ventes, achats, marge, charges_perso, dotations, ebe }
   }, [filtered])
@@ -110,16 +130,16 @@ export default function RapportsPage() {
       }
     }
     const lines = Array.from(map.entries()).map(([acct, v]) => {
-      const ohada = OHADA_ACCOUNTS.find(a => String(a.number) === acct)
-      return { acct, name: ohada?.name || acct, td: v.td, tc: v.tc, solde: v.td - v.tc }
-    }).sort((a, b) => a.acct.localeCompare(b.acct))
+      return { acct, name: accountNom(acct), td: v.td, tc: v.tc, solde: v.td - v.tc }
+    }).sort((a, b) => a.acct.localeCompare(b.acct, undefined, { numeric: true }))
     return lines
   }, [filtered])
 
   /* ─── TVA data ─── */
   const tvaData = useMemo(() => {
-    const tva_collectee  = filtered.filter(m => m.credit_account?.startsWith('4457')).reduce((s, m) => s + m.montant, 0)
-    const tva_deductible = filtered.filter(m => m.debit_account?.startsWith('4456')).reduce((s, m) => s + m.montant, 0)
+    // 4441 = TVA facturée (crédit = collectée) · 4446 = TVA récupérable sur achats (débit = déductible)
+    const tva_collectee  = filtered.filter(m => m.credit_account?.startsWith('4441')).reduce((s, m) => s + m.montant, 0)
+    const tva_deductible = filtered.filter(m => m.debit_account?.startsWith('4446')).reduce((s, m) => s + m.montant, 0)
     return { tva_collectee, tva_deductible, solde: tva_collectee - tva_deductible, contrib_appui: tva_collectee * 0.05 }
   }, [filtered])
 

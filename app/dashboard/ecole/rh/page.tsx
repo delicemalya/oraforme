@@ -1466,14 +1466,14 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
           description: libelleCompta, montant: net,
           date: today, mode_paiement: mode,
           source: 'paie', source_id: paie.id,
-          debit_account: '641000', credit_account: creditAccount,
+          debit_account: '661', credit_account: creditAccount,
         }),
 
         // Comptabilit� � journal_comptable + journal_entries (via utility)
         writeComptaEntry({
           tenantId, date: today, libelle: libelleCompta,
           type: 'depense', montant: net, categorie: 'Salaires',
-          debitAccount: '641000',   // Charges de personnel
+          debitAccount: '661',   // Rémunérations directes (SYSCOHADA)
           creditAccount: creditAccount,
           source: 'paie', sourceId: paie.id,
         }),
@@ -1484,8 +1484,8 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
           libelle: `CNSS patronale ${MOIS[form.mois]} ${form.annee} � ${nomC}`,
           type: 'depense', montant: Math.round(brut * 0.08),
           categorie: 'CNSS',
-          debitAccount: '644000',   // Charges sociales
-          creditAccount: '431000',  // Organismes sociaux
+          debitAccount: '664',   // Charges sociales CNSS patronal (SYSCOHADA)
+          creditAccount: '431',  // CNSS (SYSCOHADA)
           source: 'paie', sourceId: paie.id,
         }),
 
@@ -1499,7 +1499,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
             link: '/dashboard/ecole/rh', lu: false },
           { tenant_id: tenantId, role: 'COMPTABILITE',
             title: `�criture paie � ${nomC}`,
-            body: `D:641000 / C:${creditAccount} � ${fmt(net)} FCFA`,
+            body: `D:661 / C:${creditAccount}� ${fmt(net)} FCFA`,
             link: '/dashboard/comptabilite', lu: false },
         ]),
       ])

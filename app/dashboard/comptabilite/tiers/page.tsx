@@ -39,11 +39,11 @@ const TYPES = [
 const EMPTY_FORM: Partial<Tier> = {
   type: 'client', code: '', nom: '', prenom: '', raison_sociale: '',
   nif: '', rccm: '', email: '', telephone: '', adresse: '',
-  compte_ohada: '411000', compte_auxiliaire: '', plafond_credit: 0, delai_paiement: 30, actif: true,
+  compte_ohada: '411', compte_auxiliaire: '', plafond_credit: 0, delai_paiement: 30, actif: true,
 }
 
 const TYPE_DEFAULT_ACCOUNT: Record<string, string> = {
-  client: '411000', fournisseur: '401000', partenaire: '467000',
+  client: '411', fournisseur: '401', partenaire: '472',
 }
 
 export default function TiersPage() {
@@ -402,7 +402,7 @@ export default function TiersPage() {
                   { key: 'rccm',          label: 'RCCM',          type: 'text', placeholder: 'BZV-A-2024' },
                   { key: 'email',         label: 'Email',         type: 'email', placeholder: 'contact@...' },
                   { key: 'telephone',     label: 'Téléphone',     type: 'tel', placeholder: '+242...' },
-                  { key: 'compte_ohada',  label: 'Compte OHADA',  type: 'text', placeholder: '411000' },
+                  { key: 'compte_ohada',  label: 'Compte SYSCOHADA',  type: 'text', placeholder: '411' },
                   { key: 'compte_auxiliaire', label: 'Compte auxiliaire', type: 'text', placeholder: '411CLI001' },
                   { key: 'plafond_credit', label: 'Plafond crédit (FCFA)', type: 'number', placeholder: '0' },
                   { key: 'delai_paiement', label: 'Délai paiement (j)',    type: 'number', placeholder: '30' },
