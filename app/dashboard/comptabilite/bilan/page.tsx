@@ -1,22 +1,21 @@
 'use client'
 
-/**
- * Bilan & Compte de Résultat OHADA — États financiers automatiques
- * Bilan (Actif/Passif) + Compte de Résultat + SIG
- */
-
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { fmtFCFA } from '@/lib/admin-config'
-import { OHADA_ACCOUNTS } from '@/lib/accounting-engine'
+import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { TrendingUp, Download, FileText, BarChart2 } from 'lucide-react'
 
 interface Movement { date_operation: string; debit_account: string; credit_account: string; montant: number }
-interface AccountBalance { number: string; name: string; solde: number }
 
 const YEARS = [2024, 2025, 2026, 2027]
+
+/* Libellé SYSCOHADA pour un numéro de compte */
+function libelle(num: string): string {
+  return COMPTES_PLATS.find(c => c.numero === num)?.nom ?? num
+}
 
 export default function BilanPage() {
   const { tenantId } = useTenant()
@@ -40,87 +39,120 @@ export default function BilanPage() {
     })()
   }, [tenantId, year])
 
-  /* Compute solde per account */
+  /* Solde par compte (avec matching préfixe) */
   const soldes = useMemo(() => {
     const map = new Map<string, number>()
     for (const mv of movements) {
-      map.set(mv.debit_account,  (map.get(mv.debit_account)  || 0) + mv.montant)
-      map.set(mv.credit_account, (map.get(mv.credit_account) || 0) - mv.montant)
+      map.set(mv.debit_account,  (map.get(mv.debit_account)  ?? 0) + mv.montant)
+      map.set(mv.credit_account, (map.get(mv.credit_account) ?? 0) - mv.montant)
     }
     return map
   }, [movements])
 
-  function getAccountBalance(number: string): number {
-    return soldes.get(number) || 0
+  /* Retourne le solde net d'un compte ou de tous ses sous-comptes */
+  function getSolde(numero: string): number {
+    let total = 0
+    for (const [key, val] of soldes) {
+      if (key === numero || key.startsWith(numero)) total += val
+    }
+    return total
   }
 
-  /* ── BILAN — Actif ────────────────────────────────────────── */
-  const ACTIF_GROUPS = [
-    {
-      label: 'ACTIF IMMOBILISÉ',
-      accounts: ['211000','213000','214000','215000','216000','218000','221000','222000','231000','232000','241000','242000','251000','261000','271000'],
-    },
-    {
-      label: 'ACTIF CIRCULANT',
-      accounts: ['301000','311000','321000','331000','361000','401000','411000','418000','421000','440000','450000','470000','481000'],
-    },
-    {
-      label: 'TRÉSORERIE ACTIF',
-      accounts: ['512000','514000','521000','531000','571000','571100'],
-    },
-  ]
-
-  const PASSIF_GROUPS = [
-    {
-      label: 'CAPITAUX PROPRES',
-      accounts: ['101000','104000','105000','106000','111000','121000','130000','131000','141000'],
-    },
-    {
-      label: 'DETTES FINANCIÈRES',
-      accounts: ['161000','162000','163000','164000','165000','166000','168000'],
-    },
-    {
-      label: 'DETTES D\'EXPLOITATION',
-      accounts: ['401000','404000','408000','419000','421000','422000','431000','432000','441000','444000','447000','448000','481000'],
-    },
-    {
-      label: 'TRÉSORERIE PASSIF',
-      accounts: ['519000','551000','561000'],
-    },
-  ]
-
-  /* Build bilan lines */
   function buildGroupLines(accounts: string[]) {
     return accounts
-      .map(num => {
-        const ohada = OHADA_ACCOUNTS.find(a => String(a.number) === num)
-        const solde = getAccountBalance(num)
-        return { number: num, name: ohada?.name || num, solde: Math.abs(solde) }
-      })
+      .map(num => ({ number: num, name: libelle(num), solde: Math.abs(getSolde(num)) }))
       .filter(l => l.solde > 0)
   }
 
+  /* ── BILAN ACTIF ─────────────────────────────────────────── */
+  const ACTIF_GROUPS = [
+    {
+      label: 'ACTIF IMMOBILISÉ',
+      accounts: ['211','212','213','214','215','216','218','221','222','231','232','241','242','243','251','261','271','272','273','274','275','276','277'],
+    },
+    {
+      label: 'ACTIF CIRCULANT (STOCKS)',
+      accounts: ['31','32','33','34','35','36','37','38'],
+    },
+    {
+      label: 'ACTIF CIRCULANT (CRÉANCES)',
+      accounts: ['401','411','412','413','414','418','421','441','444','445','446','448','481','488'],
+    },
+    {
+      label: 'TRÉSORERIE ACTIF',
+      accounts: ['511','512','514','521','522','531','541','542','543','544','548','571'],
+    },
+  ]
+
+  /* ── BILAN PASSIF ────────────────────────────────────────── */
+  const PASSIF_GROUPS = [
+    {
+      label: 'CAPITAUX PROPRES',
+      accounts: ['101','102','103','104','105','106','111','112','113','118','119','121','129','130','131','141','142','143','151','152','153','154','155','158'],
+    },
+    {
+      label: 'DETTES FINANCIÈRES (LONG TERME)',
+      accounts: ['161','162','163','164','165','166','168','169'],
+    },
+    {
+      label: 'DETTES D\'EXPLOITATION',
+      accounts: ['401','404','408','419','422','423','424','425','426','427','428','431','432','433','441','443','444','447','448','481','482','488'],
+    },
+    {
+      label: 'TRÉSORERIE PASSIF',
+      accounts: ['519','521','551','552','553','561','562','563','564','565','566','567','568'],
+    },
+  ]
+
   const actifGroups  = ACTIF_GROUPS.map(g  => ({ ...g, lines: buildGroupLines(g.accounts), total: 0 }))
   const passifGroups = PASSIF_GROUPS.map(g => ({ ...g, lines: buildGroupLines(g.accounts), total: 0 }))
-  actifGroups.forEach(g  => { g.total  = g.lines.reduce((s, l) => s + l.solde, 0) })
+  actifGroups.forEach(g  => { g.total = g.lines.reduce((s, l) => s + l.solde, 0) })
   passifGroups.forEach(g => { g.total = g.lines.reduce((s, l) => s + l.solde, 0) })
 
   const totalActif  = actifGroups.reduce((s, g) => s + g.total, 0)
   const totalPassif = passifGroups.reduce((s, g) => s + g.total, 0)
 
-  /* ── COMPTE DE RÉSULTAT ────────────────────────────────────── */
-  /* Produits (classe 7) */
+  /* ── COMPTE DE RÉSULTAT ──────────────────────────────────── */
   const PRODUITS_GROUPS = [
-    { label: "Chiffre d'affaires", accounts: ['701000','702000','703000','704000','705000','706000','707000','708000'] },
-    { label: 'Autres produits',    accounts: ['751000','752000','753000','761000','771000','773000','778000','791000','798000'] },
+    {
+      label: "Chiffre d'affaires (Classe 7)",
+      accounts: ['701','702','703','704','705','706','707','708'],
+    },
+    {
+      label: 'Autres produits',
+      accounts: ['71','72','73','75','751','752','753','754','755','761','762','763','764','771','772','773','774','775','776','778','781','791','796','798'],
+    },
   ]
-  /* Charges (classe 6) */
+
   const CHARGES_GROUPS = [
-    { label: 'Achats & stocks',     accounts: ['601000','602000','603000','604000','605000','608000','609000'] },
-    { label: 'Services extérieurs', accounts: ['611000','612000','613000','614000','615000','616000','617000','618000','621000','622000','623000','624000','625000','626000','627000','628000'] },
-    { label: 'Impôts & taxes',      accounts: ['631000','632000','633000'] },
-    { label: 'Charges de personnel',accounts: ['641000','642000','643000','644000','645000','648000'] },
-    { label: 'Autres charges',      accounts: ['651000','652000','653000','661000','671000','681000','691000'] },
+    {
+      label: 'Achats & stocks (60)',
+      accounts: ['601','602','603','604','605','608','609'],
+    },
+    {
+      label: 'Transports (61)',
+      accounts: ['611','612','613','614','615','616','617','618'],
+    },
+    {
+      label: 'Services extérieurs A (62)',
+      accounts: ['621','622','623','624','625','626','627','628'],
+    },
+    {
+      label: 'Services extérieurs B (63)',
+      accounts: ['631','632','633','634','635','636','637','638'],
+    },
+    {
+      label: 'Impôts & taxes (64)',
+      accounts: ['641','642','643','644','645','646','648'],
+    },
+    {
+      label: 'Charges de personnel (66)',
+      accounts: ['661','662','663','664','665','666','667','668'],
+    },
+    {
+      label: 'Charges financières & autres (67-69)',
+      accounts: ['671','672','673','674','675','676','677','678','681','691'],
+    },
   ]
 
   const produitsGrps = PRODUITS_GROUPS.map(g => ({ ...g, lines: buildGroupLines(g.accounts), total: 0 }))
@@ -132,21 +164,25 @@ export default function BilanPage() {
   const totalCharges  = chargesGrps.reduce((s, g) => s + g.total, 0)
   const resultatNet   = totalProduits - totalCharges
 
-  /* ── SIG ───────────────────────────────────────────────────── */
-  const ca            = produitsGrps[0]?.total || 0
-  const achatsRevente = chargesGrps[0]?.total  || 0
-  const margeCommerciale = ca - achatsRevente
-  const chargesPersonnel = chargesGrps.find(g => g.label.includes('personnel'))?.total || 0
-  const ebe              = margeCommerciale - chargesPersonnel
-  const amortissements   = 0 // would come from immobilisations
-  const resultatExp      = ebe - amortissements
-  const produitsFin      = (produitsGrps[1]?.total || 0) * 0.1
-  const chargesFin       = (chargesGrps[4]?.total  || 0) * 0.1
+  /* ── SIG ─────────────────────────────────────────────────── */
+  const caTotal          = getSolde('70')                                              // Ventes
+  const achatsNets       = getSolde('601') + getSolde('602') + getSolde('603')        // Achats - retours
+  const margeCommerciale = caTotal - achatsNets
+  const valeurAjoutee    = margeCommerciale - (getSolde('621') + getSolde('622') + getSolde('623') + getSolde('624') + getSolde('625') + getSolde('626') + getSolde('627') + getSolde('628') + getSolde('61'))
+  const chargesPersonnel = getSolde('66')
+  const ebe              = Math.abs(valeurAjoutee) - Math.abs(chargesPersonnel)
+  const dotAmort         = getSolde('681')
+  const resultatExp      = ebe - Math.abs(dotAmort)
+  const gainChange       = Math.abs(getSolde('776'))
+  const perteChange      = Math.abs(getSolde('676'))
+  const chargesFin       = Math.abs(getSolde('671')) + Math.abs(getSolde('672')) + perteChange
+  const produitsFin      = Math.abs(getSolde('771')) + gainChange
+  const resultatFin      = produitsFin - chargesFin
 
-  /* ── Export CSV ─────────────────────────────────────────────── */
+  /* ── Export CSV ──────────────────────────────────────────── */
   function exportCSV() {
-    const rows = [
-      ['BILAN', '', ''],
+    const rows: (string | number)[][] = [
+      ['BILAN SYSCOHADA', year, ''],
       ['ACTIF', '', ''],
       ...actifGroups.flatMap(g => [
         [g.label, '', ''],
@@ -166,7 +202,7 @@ export default function BilanPage() {
     const csv = '﻿' + rows.map(r => r.join(';')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob)
-    a.download = `bilan-${year}.csv`; a.click()
+    a.download = `bilan-syscohada-${year}.csv`; a.click()
   }
 
   if (loading) return (
@@ -186,7 +222,9 @@ export default function BilanPage() {
             <TrendingUp size={22} className="text-[#2563EB]" />
             {t('compta.bilan.title')}
           </h1>
-          <p className="text-[13px] text-[#64748B] mt-0.5">{t('compta.bilan.subtitle')} · {year}</p>
+          <p className="text-[13px] text-[#64748B] mt-0.5">
+            {t('compta.bilan.subtitle')} · SYSCOHADA Révisé 2017 · {year}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
@@ -237,14 +275,14 @@ export default function BilanPage() {
                 ) : (
                   g.lines.map(l => (
                     <div key={l.number} className="flex items-center justify-between px-4 py-1.5 border-b border-[#F8FAFC] hover:bg-[#F8FAFC]">
-                      <span className="text-[11px] text-[#64748B] font-mono w-16 shrink-0">{l.number}</span>
+                      <span className="text-[11px] text-[#64748B] font-mono w-10 shrink-0">{l.number}</span>
                       <span className="text-[12px] text-[#0F172A] flex-1 mx-2 truncate">{l.name}</span>
                       <span className="text-[12px] font-bold text-[#0F172A]">{fmtFCFA(l.solde)}</span>
                     </div>
                   ))
                 )}
                 <div className="flex justify-between px-4 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                  <span className="text-[11px] font-semibold text-[#64748B]">Sous-total {g.label}</span>
+                  <span className="text-[11px] font-semibold text-[#64748B]">Sous-total</span>
                   <span className="text-[12px] font-extrabold text-[#2563EB]">{fmtFCFA(g.total)}</span>
                 </div>
               </div>
@@ -271,14 +309,14 @@ export default function BilanPage() {
                 ) : (
                   g.lines.map(l => (
                     <div key={l.number} className="flex items-center justify-between px-4 py-1.5 border-b border-[#F8FAFC] hover:bg-[#F8FAFC]">
-                      <span className="text-[11px] text-[#64748B] font-mono w-16 shrink-0">{l.number}</span>
+                      <span className="text-[11px] text-[#64748B] font-mono w-10 shrink-0">{l.number}</span>
                       <span className="text-[12px] text-[#0F172A] flex-1 mx-2 truncate">{l.name}</span>
                       <span className="text-[12px] font-bold text-[#0F172A]">{fmtFCFA(l.solde)}</span>
                     </div>
                   ))
                 )}
                 <div className="flex justify-between px-4 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                  <span className="text-[11px] font-semibold text-[#64748B]">Sous-total {g.label}</span>
+                  <span className="text-[11px] font-semibold text-[#64748B]">Sous-total</span>
                   <span className="text-[12px] font-extrabold text-[#16A34A]">{fmtFCFA(g.total)}</span>
                 </div>
               </div>
@@ -297,7 +335,7 @@ export default function BilanPage() {
                 : 'bg-[#FEF2F2] border-[#FECACA] text-[#DC2626]'
             }`}>
               {Math.abs(totalActif - totalPassif) < 1
-                ? '✓ Bilan équilibré — Actif = Passif'
+                ? '✓ Bilan équilibré — Actif = Passif (SYSCOHADA révisé 2017)'
                 : `⚠ Bilan déséquilibré — Écart: ${fmtFCFA(Math.abs(totalActif - totalPassif))} (normal en cours d'exercice)`}
             </div>
           )}
@@ -311,7 +349,7 @@ export default function BilanPage() {
           {/* Produits */}
           <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
             <div className="bg-[#16A34A] text-white px-4 py-3 flex justify-between items-center">
-              <p className="text-[13px] font-extrabold">PRODUITS (Classe 7)</p>
+              <p className="text-[13px] font-extrabold">PRODUITS — Classe 7</p>
               <p className="text-[18px] font-extrabold">{fmtFCFA(totalProduits)}</p>
             </div>
             {produitsGrps.map(g => (
@@ -321,7 +359,7 @@ export default function BilanPage() {
                 </div>
                 {g.lines.map(l => (
                   <div key={l.number} className="flex justify-between items-center px-4 py-1.5 border-b border-[#F8FAFC] hover:bg-[#F8FAFC]">
-                    <span className="text-[11px] text-[#64748B] font-mono w-16">{l.number}</span>
+                    <span className="text-[11px] text-[#64748B] font-mono w-10">{l.number}</span>
                     <span className="text-[12px] text-[#0F172A] flex-1 mx-2 truncate">{l.name}</span>
                     <span className="text-[12px] font-bold text-[#16A34A]">{fmtFCFA(l.solde)}</span>
                   </div>
@@ -334,7 +372,7 @@ export default function BilanPage() {
           {/* Charges */}
           <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
             <div className="bg-[#DC2626] text-white px-4 py-3 flex justify-between items-center">
-              <p className="text-[13px] font-extrabold">CHARGES (Classe 6)</p>
+              <p className="text-[13px] font-extrabold">CHARGES — Classes 6</p>
               <p className="text-[18px] font-extrabold">{fmtFCFA(totalCharges)}</p>
             </div>
             {chargesGrps.map(g => (
@@ -344,7 +382,7 @@ export default function BilanPage() {
                 </div>
                 {g.lines.map(l => (
                   <div key={l.number} className="flex justify-between items-center px-4 py-1.5 border-b border-[#F8FAFC] hover:bg-[#F8FAFC]">
-                    <span className="text-[11px] text-[#64748B] font-mono w-16">{l.number}</span>
+                    <span className="text-[11px] text-[#64748B] font-mono w-10">{l.number}</span>
                     <span className="text-[12px] text-[#0F172A] flex-1 mx-2 truncate">{l.name}</span>
                     <span className="text-[12px] font-bold text-[#DC2626]">{fmtFCFA(l.solde)}</span>
                   </div>
@@ -354,7 +392,7 @@ export default function BilanPage() {
             ))}
           </div>
 
-          {/* Résultat */}
+          {/* Résultat net */}
           <div className={`lg:col-span-2 px-6 py-4 rounded-xl border-2 flex items-center justify-between ${
             resultatNet >= 0
               ? 'bg-[#F0FDF4] border-[#86EFAC]'
@@ -362,7 +400,7 @@ export default function BilanPage() {
           }`}>
             <div>
               <p className="text-[14px] font-extrabold text-[#0F172A]">
-                {resultatNet >= 0 ? '✓ Résultat net — Bénéfice' : '⚠ Résultat net — Déficit'}
+                {resultatNet >= 0 ? '✓ Résultat net — Bénéfice' : '⚠ Résultat net — Déficit'} (XI SYSCOHADA)
               </p>
               <p className="text-[12px] text-[#64748B] mt-0.5">
                 Produits ({fmtFCFA(totalProduits)}) — Charges ({fmtFCFA(totalCharges)})
@@ -383,17 +421,19 @@ export default function BilanPage() {
       {/* ── SIG ───────────────────────────────────────────────── */}
       {tab === 'sig' && (
         <div className="space-y-3">
-          <p className="text-[13px] text-[#64748B]">Soldes Intermédiaires de Gestion (SYSCOHADA)</p>
+          <p className="text-[13px] text-[#64748B]">Soldes Intermédiaires de Gestion — SYSCOHADA Révisé 2017</p>
           {[
-            { label: "Chiffre d'affaires (CA)",          value: ca,                                          color: '#16A34A' },
-            { label: 'Marge commerciale brute',           value: margeCommerciale,                            color: '#2563EB' },
-            { label: 'Charges de personnel',              value: chargesPersonnel,                            color: '#DC2626', sign: '-' },
-            { label: 'Excédent Brut d\'Exploitation (EBE)', value: ebe,                                       color: ebe >= 0 ? '#16A34A' : '#DC2626' },
-            { label: 'Dotations aux amortissements',      value: amortissements,                              color: '#DC2626', sign: '-' },
-            { label: 'Résultat d\'Exploitation',          value: resultatExp,                                 color: resultatExp >= 0 ? '#2563EB' : '#DC2626' },
-            { label: 'Produits financiers',               value: produitsFin,                                 color: '#16A34A' },
-            { label: 'Charges financières',               value: chargesFin,                                  color: '#DC2626', sign: '-' },
-            { label: 'RÉSULTAT NET',                      value: resultatNet,                                 color: resultatNet >= 0 ? '#16A34A' : '#DC2626', bold: true },
+            { label: "Chiffre d'affaires net (XB)",        value: caTotal,        color: '#16A34A' },
+            { label: 'Marge brute sur marchandises (XA)',  value: margeCommerciale, color: '#2563EB' },
+            { label: 'Valeur ajoutée produite (XC)',       value: valeurAjoutee,  color: '#2563EB' },
+            { label: 'Charges de personnel — 66 (sign -)', value: chargesPersonnel, color: '#DC2626', sign: '-' },
+            { label: 'Excédent Brut d\'Exploitation (XD)', value: ebe,            color: ebe >= 0 ? '#16A34A' : '#DC2626' },
+            { label: 'Dotations amortissements — 681 (-)', value: dotAmort,       color: '#DC2626', sign: '-' },
+            { label: 'Résultat d\'Exploitation (XF)',      value: resultatExp,    color: resultatExp >= 0 ? '#2563EB' : '#DC2626' },
+            { label: 'Produits financiers nets — 77',      value: produitsFin,    color: '#16A34A' },
+            { label: 'Charges financières — 671-676 (-)',  value: chargesFin,     color: '#DC2626', sign: '-' },
+            { label: 'Résultat financier (XH)',            value: resultatFin,    color: resultatFin >= 0 ? '#16A34A' : '#DC2626' },
+            { label: 'RÉSULTAT NET DE L\'EXERCICE (XI)',   value: resultatNet,    color: resultatNet >= 0 ? '#16A34A' : '#DC2626', bold: true },
           ].map((sig, i) => (
             <div key={sig.label} className={`flex items-center justify-between px-5 py-3 rounded-xl border ${
               sig.bold ? 'border-2 border-[#E2E8F0] bg-[#0F172A]' : 'border-[#E2E8F0] bg-white'

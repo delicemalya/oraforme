@@ -101,14 +101,14 @@ export async function POST(req: NextRequest) {
     const fiscYear = new Date(today).getFullYear()
     const pieceNum = invoice_number ?? `FAC-${facture.id.slice(0, 8).toUpperCase()}`
 
-    // Partie double : 3 lignes d'écriture
-    // 1. Vente HT : débit 411 Clients / crédit 701 Ventes
-    // 2. TVA 18% : débit 411 Clients / crédit 443 TVA facturée
-    // 3. CA 5%   : débit 411 Clients / crédit 447 Impôts et taxes
+    // SYSCOHADA — 3 écritures automatiques (révisé 2017, comptes 2-3 chiffres)
+    // 1. Vente HT  : débit 411 Clients / crédit 701 Ventes de marchandises
+    // 2. TVA 18%   : débit 411 Clients / crédit 443 TVA facturée
+    // 3. CA 5%     : débit 411 Clients / crédit 447 État — impôts retenus à la source
     const entries = [
-      { credit_account: '701000', montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
-      { credit_account: '443000', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA 18%` },
-      { credit_account: '447000', montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
+      { credit_account: '701', montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
+      { credit_account: '443', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA 18%` },
+      { credit_account: '447', montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
     ].filter(e => e.montant > 0)
 
     await supabaseAdmin.from('journal_entries').insert(
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
         tenant_id:      ctx.tenantId,
         date_operation: today,
         libelle:        e.libelle,
-        debit_account:  '411000',
+        debit_account:  '411',
         credit_account: e.credit_account,
         montant:        e.montant,
         source:         'facture',

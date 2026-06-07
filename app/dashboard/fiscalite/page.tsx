@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   Receipt, Users, TrendingUp, AlertTriangle, CheckCircle,
   Clock, ArrowRight, Loader2, RefreshCw, Building2,
-  CalendarDays, ChevronRight,
+  CalendarDays, ChevronRight, FileText, Landmark,
 } from 'lucide-react'
 import Link from 'next/link'
 import { PAYS_LIST } from '@/lib/fiscalite/pays'
@@ -168,6 +168,21 @@ export default function FiscaliteDashboardPage() {
       href: '/dashboard/fiscalite/cnss', hrefLabel: 'Gérer →',
       stat: kpis ? fmtN((kpis.cnss_salarie + kpis.cnss_patronal), devise) : '—',
       statColor: AMBER, statut: null, borderColor: AMBER,
+    },
+    {
+      id: 'is', titre: 'Impôt sur les Sociétés (IS)', ref: 'Taux 30% · Minimum 1% CA HT',
+      periode: `Annuel · Acomptes avr/jul/oct · Solde 30 avr.`,
+      icon: <Landmark size={18} color={PURPLE} />, iconBg: '#F5F3FF',
+      href: '/dashboard/fiscalite/is', hrefLabel: 'Calculer →',
+      stat: 'Voir détail →',
+      statColor: PURPLE, statut: null, borderColor: PURPLE,
+    },
+    {
+      id: 'das', titre: 'Déclaration Sommes Tiers (DAS)', ref: 'Honoraires · Commissions · Loyers',
+      periode: `Annuelle · Dépôt avant le 31 mars N+1`,
+      icon: <FileText size={18} color={RED} />, iconBg: '#FEF2F2',
+      href: '/dashboard/fiscalite/das', hrefLabel: 'Gérer →',
+      stat: '—', statColor: RED, statut: null, borderColor: RED,
     },
   ]
 
