@@ -71,6 +71,7 @@ const ICONS: Record<string, LucideIcon> = {
   'declarations-cnss': BookMarked,
   roles:               ShieldCheck,
   crm:           UsersRound,
+  recouvrement:  ClipboardList,
   stock:         Package,
   achats:        ShoppingCart,
   ged:           FolderOpen,
@@ -162,7 +163,8 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'abonnement',            label: 'Abonnement',           sublabel: '', href: '/dashboard/abonnement'                 },
   { id: 'workflows',             label: 'Workflows',            sublabel: '', href: '/dashboard/workflows'                  },
   { id: 'api-keys',              label: 'Clés API',             sublabel: '', href: '/dashboard/api-keys'                   },
-  { id: 'fiscalite',    label: 'Fiscalité & Déclarations', sublabel: '', href: '/dashboard/fiscalite'    },
+  { id: 'fiscalite',     label: 'Fiscalité & Déclarations', sublabel: '', href: '/dashboard/fiscalite'     },
+  { id: 'recouvrement', label: 'Recouvrement',             sublabel: '', href: '/dashboard/recouvrement' },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -178,8 +180,8 @@ const SIDEBAR_GROUPS = [
   { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
   // RECRUTEMENT — module autonome
   { id: 'recrutement_section', labelKey: 'nav.recrutement', icon: Briefcase, moduleIds: ['recrutement'] },
-  // COMMERCIAL — clients, stock, achats
-  { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'stock', 'achats'] },
+  // COMMERCIAL — clients, ventes, recouvrement, stock, achats
+  { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'facturation', 'recouvrement', 'stock', 'achats'] },
   // OUTILS — IA & productivité (calendrier → navbar)
   { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'taches'] },
   // ADMIN — abonnement, automatisation, API

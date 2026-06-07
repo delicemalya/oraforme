@@ -23,9 +23,10 @@ export const CORE_ERP_MODULES = [
   { id: 'tresorerie',   href: '/dashboard/tresorerie',   label: 'Trésorerie',          sublabel: 'Caisse, banque, wallets'  },
   { id: 'stock',        href: '/dashboard/stocks',       label: 'Stock & Inventaire',  sublabel: 'Gestion des stocks'       },
   { id: 'achats',       href: '/dashboard/achats',       label: 'Achats',              sublabel: 'Commandes & fournisseurs' },
-  { id: 'crm',          href: '/dashboard/crm',          label: 'CRM Clients',         sublabel: 'Relations & prospects'    },
-  { id: 'facturation',  href: '/dashboard/facturation',  label: 'Facturation',         sublabel: 'Devis & factures'         },
-  { id: 'depenses',     href: '/dashboard/depenses',     label: 'Dépenses',            sublabel: 'Charges & remboursements' },
+  { id: 'crm',           href: '/dashboard/crm',           label: 'CRM Clients',         sublabel: 'Relations, pipeline, activités' },
+  { id: 'facturation',  href: '/dashboard/facturation',  label: 'Facturation',         sublabel: 'Devis & factures'               },
+  { id: 'recouvrement', href: '/dashboard/recouvrement', label: 'Recouvrement',        sublabel: 'Relances & scoring risque'      },
+  { id: 'depenses',     href: '/dashboard/depenses',     label: 'Dépenses',            sublabel: 'Charges & remboursements'       },
 ] as const
 
 export type CoreModuleId = typeof CORE_ERP_MODULES[number]['id']
@@ -165,9 +166,10 @@ export const ECOLE_CORE_ROLE_FILTER: Record<string, string[]> = {
   tresorerie:   ['DIRECTION_GENERALE', 'RAF'],
   stock:        ['DIRECTION_GENERALE'],
   achats:       ['DIRECTION_GENERALE', 'RAF'],
-  crm:          ['DIRECTION_GENERALE'],
-  facturation:  ['DIRECTION_GENERALE', 'RAF', 'SCOLARITE'],
-  depenses:     ['DIRECTION_GENERALE', 'RAF'],
+  crm:           ['DIRECTION_GENERALE'],
+  facturation:   ['DIRECTION_GENERALE', 'RAF', 'SCOLARITE'],
+  recouvrement:  ['DIRECTION_GENERALE', 'RAF'],
+  depenses:      ['DIRECTION_GENERALE', 'RAF'],
 }
 
 // ── Set d'IDs core pour le check rapide ───────────────────────────────────────
