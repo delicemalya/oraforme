@@ -684,212 +684,324 @@ export default function ContratsPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MODAL — NOUVEAU CONTRAT
+          MODAL — NOUVEAU CONTRAT  (modal centré 2 colonnes)
       ═══════════════════════════════════════════════════════════════════════ */}
       {showNew && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowNew(false)} />
-          <div className="fixed inset-y-0 right-0 w-full max-w-2xl bg-white z-50 overflow-y-auto shadow-2xl flex flex-col">
+          {/* Overlay */}
+          <div className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm" onClick={() => setShowNew(false)} />
 
-            {/* Header */}
-            <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-[#F1F5F9] bg-white sticky top-0 z-10">
-              <div className="flex items-center gap-3">
-                <button onClick={() => setShowNew(false)} className="p-1.5 hover:bg-[#F1F5F9] rounded-lg">
-                  <ChevronLeft size={16} className="text-[#64748B]" />
-                </button>
-                <div>
-                  <h2 className="text-[16px] font-bold text-[#0F172A]">Nouveau contrat</h2>
-                  <p className="text-[11px] text-[#64748B]">Créer un contrat de travail</p>
-                </div>
-              </div>
-              <button onClick={() => setShowNew(false)}><X size={16} className="text-[#64748B]" /></button>
-            </div>
+          {/* Dialog centré */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full flex overflow-hidden"
+              style={{ maxWidth: 960, maxHeight: '92vh' }}>
 
-            <form onSubmit={handleCreate} className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+              {/* ── COLONNE GAUCHE : Formulaire ── */}
+              <form id="nouveau-contrat-form" onSubmit={handleCreate}
+                className="flex-1 flex flex-col overflow-hidden">
 
-              {/* SECTION 1 — Employé */}
-              <SectionTitle icon={User} title="Section 1 — Employé" />
-              <div>
-                <label className="field-label">Sélectionner un employé *</label>
-                <select value={form.employe_id} onChange={e => setField('employe_id', e.target.value)}
-                  className="field-input" required>
-                  <option value="">— Choisir un employé —</option>
-                  {employes.map(e => (
-                    <option key={e.id} value={e.id}>{e.nom}{e.poste ? ` · ${e.poste}` : ''}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* SECTION 2 — Type & Durée */}
-              <SectionTitle icon={Calendar} title="Section 2 — Type & Durée" />
-
-              <div>
-                <label className="field-label">Type de contrat *</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(Object.entries(TYPE_CFG) as [TypeContrat, typeof TYPE_CFG[TypeContrat]][]).map(([k, v]) => (
-                    <button type="button" key={k}
-                      onClick={() => setField('type_contrat', k)}
-                      className={`py-2.5 px-3 rounded-xl text-[12px] font-semibold border transition-all ${
-                        form.type_contrat === k
-                          ? 'border-[#F59E0B] bg-[#FFFBEB] text-[#92400E]'
-                          : 'border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]'
-                      }`}>
-                      {v.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="field-label">Date de début *</label>
-                  <input type="date" value={form.date_debut} onChange={e => setField('date_debut', e.target.value)}
-                    className="field-input" required />
-                </div>
-                {TYPES_AVEC_FIN.includes(form.type_contrat) && (
+                {/* Header formulaire */}
+                <div className="shrink-0 flex items-center justify-between px-7 py-5 border-b border-[#F1F5F9]">
                   <div>
-                    <label className="field-label">Date de fin *</label>
-                    <input type="date" value={form.date_fin} onChange={e => setField('date_fin', e.target.value)}
-                      className="field-input" required />
+                    <h2 className="text-[17px] font-bold text-[#0F172A]">Nouveau contrat</h2>
+                    <p className="text-[11px] text-[#94A3B8] mt-0.5">Créer un contrat de travail</p>
                   </div>
-                )}
-                <div>
-                  <label className="field-label">Période d&apos;essai (mois)</label>
-                  <input type="number" min={0} max={6} value={form.periode_essai}
-                    onChange={e => setField('periode_essai', e.target.value)} className="field-input" />
+                  <button type="button" onClick={() => setShowNew(false)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors">
+                    <X size={15} className="text-[#94A3B8]" />
+                  </button>
                 </div>
-              </div>
 
-              {/* SECTION 3 — Poste & Rémunération */}
-              <SectionTitle icon={DollarSign} title="Section 3 — Poste & Rémunération" />
+                {/* Corps du formulaire (scrollable) */}
+                <div className="flex-1 overflow-y-auto px-7 py-6 space-y-6">
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="field-label">Lieu de travail</label>
-                  <input type="text" value={form.lieu_travail} placeholder="Brazzaville, siège social..."
-                    onChange={e => setField('lieu_travail', e.target.value)} className="field-input" />
-                </div>
-              </div>
+                  {/* S1 — Employé */}
+                  <SectionTitle icon={User} title="Employé" />
+                  <div>
+                    <label className="field-label">Sélectionner un employé *</label>
+                    <select value={form.employe_id} onChange={e => setField('employe_id', e.target.value)}
+                      className="field-input" required>
+                      <option value="">— Choisir un employé —</option>
+                      {employes.map(e => (
+                        <option key={e.id} value={e.id}>{e.nom}{e.poste ? ` · ${e.poste}` : ''}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div>
-                <label className="field-label">Salaire brut mensuel (FCFA) *</label>
-                <input type="number" min={0} value={form.salaire_base} placeholder="ex: 500000"
-                  onChange={e => setField('salaire_base', e.target.value)} className="field-input-lg" required />
-              </div>
+                  {/* S2 — Type & Durée */}
+                  <SectionTitle icon={Calendar} title="Type & Durée" />
+                  <div>
+                    <label className="field-label">Type de contrat *</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(Object.entries(TYPE_CFG) as [TypeContrat, typeof TYPE_CFG[TypeContrat]][]).map(([k, v]) => (
+                        <button type="button" key={k} onClick={() => setField('type_contrat', k)}
+                          className={`py-2.5 px-3 rounded-xl text-[12px] font-semibold border transition-all ${
+                            form.type_contrat === k
+                              ? 'border-[#F59E0B] bg-[#FFFBEB] text-[#92400E]'
+                              : 'border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1]'
+                          }`}>
+                          {v.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-              <div>
-                <label className="field-label">Primes mensuelles (FCFA)</label>
-                <input type="number" min={0} value={form.primes} placeholder="0"
-                  onChange={e => setField('primes', e.target.value)} className="field-input" />
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="field-label">Date de début *</label>
+                      <input type="date" value={form.date_debut}
+                        onChange={e => setField('date_debut', e.target.value)} className="field-input" required />
+                    </div>
+                    {TYPES_AVEC_FIN.includes(form.type_contrat) && (
+                      <div>
+                        <label className="field-label">Date de fin *</label>
+                        <input type="date" value={form.date_fin}
+                          onChange={e => setField('date_fin', e.target.value)} className="field-input" required />
+                      </div>
+                    )}
+                    <div>
+                      <label className="field-label">Période d&apos;essai (mois)</label>
+                      <input type="number" min={0} max={6} value={form.periode_essai}
+                        onChange={e => setField('periode_essai', e.target.value)} className="field-input" />
+                    </div>
+                    <div>
+                      <label className="field-label">Lieu de travail</label>
+                      <input type="text" value={form.lieu_travail} placeholder="Brazzaville..."
+                        onChange={e => setField('lieu_travail', e.target.value)} className="field-input" />
+                    </div>
+                  </div>
 
-              {/* Avantages */}
-              <div>
-                <label className="field-label">Avantages</label>
-                <div className="space-y-2">
-                  {([
-                    { key: 'logement',     label: 'Logement',     hasAmount: true },
-                    { key: 'transport',    label: 'Transport',    hasAmount: true },
-                    { key: 'restauration', label: 'Restauration', hasAmount: true },
-                    { key: 'telephone',    label: 'Téléphone',    hasAmount: true },
-                  ] as const).map(av => (
-                    <div key={av.key} className="flex items-center gap-3">
-                      <label className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none min-w-[120px]">
-                        <input type="checkbox"
-                          checked={form.avantages[av.key] !== ''}
-                          onChange={e => setForm(prev => ({ ...prev, avantages: { ...prev.avantages, [av.key]: e.target.checked ? '0' : '' } }))}
-                          className="rounded" />
-                        {av.label}
+                  {/* S3 — Rémunération */}
+                  <SectionTitle icon={DollarSign} title="Rémunération" />
+                  <div>
+                    <label className="field-label">Salaire brut mensuel (FCFA) *</label>
+                    <input type="number" min={0} value={form.salaire_base} placeholder="ex: 500 000"
+                      onChange={e => setField('salaire_base', e.target.value)} className="field-input-lg" required />
+                  </div>
+                  <div>
+                    <label className="field-label">Primes mensuelles (FCFA)</label>
+                    <input type="number" min={0} value={form.primes} placeholder="0"
+                      onChange={e => setField('primes', e.target.value)} className="field-input" />
+                  </div>
+
+                  {/* Avantages */}
+                  <div>
+                    <label className="field-label">Avantages</label>
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                      {([
+                        { key: 'logement',     label: 'Logement' },
+                        { key: 'transport',    label: 'Transport' },
+                        { key: 'restauration', label: 'Restauration' },
+                        { key: 'telephone',    label: 'Téléphone' },
+                      ] as const).map(av => (
+                        <div key={av.key}>
+                          <label className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none mb-1">
+                            <input type="checkbox"
+                              checked={form.avantages[av.key] !== ''}
+                              onChange={e => setForm(p => ({ ...p, avantages: { ...p.avantages, [av.key]: e.target.checked ? '0' : '' } }))}
+                              className="rounded accent-amber-500" />
+                            {av.label}
+                          </label>
+                          {form.avantages[av.key] !== '' && (
+                            <input type="number" min={0} placeholder="FCFA/mois"
+                              value={form.avantages[av.key]}
+                              onChange={e => setForm(p => ({ ...p, avantages: { ...p.avantages, [av.key]: e.target.value } }))}
+                              className="field-input" />
+                          )}
+                        </div>
+                      ))}
+                      {([
+                        { key: 'assurance', label: 'Assurance maladie' },
+                        { key: 'treizieme', label: '13ème mois' },
+                        { key: 'prime_rend', label: 'Prime de rendement' },
+                      ] as const).map(av => (
+                        <label key={av.key} className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none">
+                          <input type="checkbox" checked={form.avantages[av.key] as boolean}
+                            onChange={e => setForm(p => ({ ...p, avantages: { ...p.avantages, [av.key]: e.target.checked } }))}
+                            className="rounded accent-amber-500" />
+                          {av.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* S4 — Signatures */}
+                  <SectionTitle icon={Edit2} title="Signatures" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="field-label">Date de signature</label>
+                      <input type="date" value={form.signe_le}
+                        onChange={e => setField('signe_le', e.target.value)} className="field-input" />
+                    </div>
+                    <div className="flex flex-col justify-end gap-2 pb-0.5">
+                      <label className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none">
+                        <input type="checkbox" checked={form.signe_employe}
+                          onChange={e => setField('signe_employe', e.target.checked)} className="rounded accent-amber-500" />
+                        Signé par l&apos;employé
                       </label>
-                      {form.avantages[av.key] !== '' && (
-                        <input type="number" min={0} placeholder="Montant FCFA/mois"
-                          value={form.avantages[av.key]}
-                          onChange={e => setForm(prev => ({ ...prev, avantages: { ...prev.avantages, [av.key]: e.target.value } }))}
-                          className="field-input flex-1" />
+                      <label className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none">
+                        <input type="checkbox" checked={form.signe_employeur}
+                          onChange={e => setField('signe_employeur', e.target.checked)} className="rounded accent-amber-500" />
+                        Signé par l&apos;employeur
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="field-label">Clauses particulières</label>
+                    <textarea value={form.description} rows={3}
+                      onChange={e => setField('description', e.target.value)}
+                      placeholder="Clauses spécifiques, conditions particulières..."
+                      className="field-input resize-none" />
+                  </div>
+                  <div className="pb-2">
+                    <label className="field-label">Notes internes</label>
+                    <textarea value={form.notes} rows={2}
+                      onChange={e => setField('notes', e.target.value)}
+                      placeholder="Notes confidentielles..." className="field-input resize-none" />
+                  </div>
+                </div>
+
+                {/* Footer bouton Annuler */}
+                <div className="shrink-0 px-7 py-4 border-t border-[#F1F5F9]">
+                  <button type="button" onClick={() => setShowNew(false)}
+                    className="w-full py-3 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[13px] font-semibold hover:bg-[#F8FAFC] transition-colors">
+                    Annuler
+                  </button>
+                </div>
+              </form>
+
+              {/* ── COLONNE DROITE : Récapitulatif live ── */}
+              <div className="w-72 shrink-0 bg-[#F8FAFC] border-l border-[#E2E8F0] flex flex-col">
+
+                {/* En-tête recap */}
+                <div className="px-6 py-5 border-b border-[#E2E8F0]">
+                  <p className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest">Résumé du contrat</p>
+                </div>
+
+                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+                  {/* Employé sélectionné */}
+                  <div>
+                    <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Employé</p>
+                    {form.employe_id ? (() => {
+                      const emp = employes.find(e => e.id === form.employe_id)
+                      return emp ? (
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-[12px] font-bold shrink-0"
+                            style={{ backgroundColor: avatarColor(emp.nom) }}>
+                            {initiales(emp.nom)}
+                          </div>
+                          <div>
+                            <p className="text-[13px] font-bold text-[#0F172A]">{emp.nom}</p>
+                            <p className="text-[10px] text-[#94A3B8]">{emp.poste ?? '—'}</p>
+                          </div>
+                        </div>
+                      ) : null
+                    })() : (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#E2E8F0] flex items-center justify-center shrink-0">
+                          <User size={16} className="text-[#94A3B8]" />
+                        </div>
+                        <p className="text-[12px] text-[#CBD5E1] italic">Non sélectionné</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Type contrat */}
+                  <div>
+                    <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Type</p>
+                    <span className="text-[12px] font-bold px-3 py-1.5 rounded-full"
+                      style={{ color: TYPE_CFG[form.type_contrat].color, backgroundColor: TYPE_CFG[form.type_contrat].bg }}>
+                      {TYPE_CFG[form.type_contrat].label}
+                    </span>
+                  </div>
+
+                  {/* Période */}
+                  <div>
+                    <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Période</p>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[12px]">
+                        <span className="text-[#64748B]">Début</span>
+                        <span className="font-semibold text-[#0F172A]">{fmtDate(form.date_debut)}</span>
+                      </div>
+                      <div className="flex justify-between text-[12px]">
+                        <span className="text-[#64748B]">Fin</span>
+                        <span className="font-semibold text-[#0F172A]">
+                          {TYPES_AVEC_FIN.includes(form.type_contrat) && form.date_fin ? fmtDate(form.date_fin) : 'Indéterminée'}
+                        </span>
+                      </div>
+                      {Number(form.periode_essai) > 0 && (
+                        <div className="flex justify-between text-[12px]">
+                          <span className="text-[#64748B]">Essai</span>
+                          <span className="font-semibold text-[#F59E0B]">{form.periode_essai} mois</span>
+                        </div>
                       )}
                     </div>
-                  ))}
-                  {([
-                    { key: 'assurance', label: 'Assurance maladie' },
-                    { key: 'treizieme', label: '13ème mois' },
-                    { key: 'prime_rend', label: 'Prime de rendement' },
-                  ] as const).map(av => (
-                    <label key={av.key} className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none">
-                      <input type="checkbox" checked={form.avantages[av.key] as boolean}
-                        onChange={e => setForm(prev => ({ ...prev, avantages: { ...prev.avantages, [av.key]: e.target.checked } }))}
-                        className="rounded" />
-                      {av.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* SECTION 4 — Signatures */}
-              <SectionTitle icon={Edit2} title="Section 4 — Signatures & Documents" />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="field-label">Date de signature</label>
-                  <input type="date" value={form.signe_le} onChange={e => setField('signe_le', e.target.value)} className="field-input" />
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none">
-                  <input type="checkbox" checked={form.signe_employe}
-                    onChange={e => setField('signe_employe', e.target.checked)} className="rounded" />
-                  Signé par l&apos;employé
-                </label>
-                <label className="flex items-center gap-2 text-[12px] text-[#374151] cursor-pointer select-none">
-                  <input type="checkbox" checked={form.signe_employeur}
-                    onChange={e => setField('signe_employeur', e.target.checked)} className="rounded" />
-                  Signé par l&apos;employeur
-                </label>
-              </div>
-
-              <div>
-                <label className="field-label">Description / Clauses particulières</label>
-                <textarea value={form.description} onChange={e => setField('description', e.target.value)}
-                  rows={3} placeholder="Clauses spécifiques, conditions particulières..."
-                  className="field-input resize-none" />
-              </div>
-              <div>
-                <label className="field-label">Notes internes</label>
-                <textarea value={form.notes} onChange={e => setField('notes', e.target.value)}
-                  rows={2} placeholder="Notes confidentielles..."
-                  className="field-input resize-none" />
-              </div>
-
-              {/* Récapitulatif temps réel */}
-              {brut > 0 && (
-                <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-xl px-4 py-4">
-                  <p className="text-[10px] font-bold text-[#92400E] uppercase tracking-wider mb-3">Récapitulatif financier</p>
-                  {[
-                    ['Salaire brut',          `${fmt(brut)} FCFA`],
-                    ['CNSS salarié (5,04%)',  `- ${fmt(cnssEmp)} FCFA`],
-                    ['Net estimé',            `${fmt(netEst)} FCFA`],
-                    ['Coût total employeur',  `${fmt(coutPat)} FCFA`],
-                  ].map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-[11px] py-1 border-b border-[#FDE68A] last:border-0">
-                      <span className="text-[#92400E]">{k}</span>
-                      <span className="font-bold text-[#0F172A]">{v}</span>
+                  {/* Récap financier */}
+                  <div>
+                    <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Financier</p>
+                    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+                      {[
+                        { label: 'Salaire brut',        val: brut > 0 ? `${fmt(brut)} FCFA` : '—',         bold: false },
+                        { label: 'CNSS salarié (5,04%)',val: brut > 0 ? `- ${fmt(cnssEmp)} FCFA` : '—',   bold: false },
+                        { label: 'Net estimé',          val: brut > 0 ? `${fmt(netEst)} FCFA` : '—',      bold: true  },
+                        { label: 'Coût employeur',      val: brut > 0 ? `${fmt(coutPat)} FCFA` : '—',     bold: false },
+                      ].map(({ label, val, bold }, i) => (
+                        <div key={label}
+                          className={`flex justify-between items-center px-3 py-2.5 text-[11px] ${
+                            i < 3 ? 'border-b border-[#F1F5F9]' : ''
+                          } ${bold ? 'bg-[#FFFBEB]' : ''}`}>
+                          <span className="text-[#64748B]">{label}</span>
+                          <span className={`${bold ? 'font-extrabold text-[#F59E0B] text-[12px]' : 'font-semibold text-[#0F172A]'}`}>{val}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
 
-              {/* Boutons */}
-              <div className="flex gap-3 pt-2 pb-4">
-                <button type="button" onClick={() => setShowNew(false)}
-                  className="flex-1 py-3 border border-[#E2E8F0] text-[#64748B] rounded-xl text-[13px] font-semibold hover:bg-[#F8FAFC] transition-colors">
-                  Annuler
-                </button>
-                <button type="submit" disabled={saving}
-                  className="flex-1 py-3 bg-[#F59E0B] text-white rounded-xl text-[13px] font-bold hover:bg-[#D97706] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                  Créer le contrat
-                </button>
+                  {/* Signatures */}
+                  <div>
+                    <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Signatures</p>
+                    <div className="space-y-2">
+                      <div className={`flex items-center gap-2 text-[12px] font-medium ${form.signe_employe ? 'text-green-700' : 'text-[#CBD5E1]'}`}>
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center ${form.signe_employe ? 'bg-green-100' : 'bg-[#F1F5F9]'}`}>
+                          <CheckCircle size={11} className={form.signe_employe ? 'text-green-600' : 'text-[#CBD5E1]'} />
+                        </div>
+                        Employé
+                      </div>
+                      <div className={`flex items-center gap-2 text-[12px] font-medium ${form.signe_employeur ? 'text-green-700' : 'text-[#CBD5E1]'}`}>
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center ${form.signe_employeur ? 'bg-green-100' : 'bg-[#F1F5F9]'}`}>
+                          <CheckCircle size={11} className={form.signe_employeur ? 'text-green-600' : 'text-[#CBD5E1]'} />
+                        </div>
+                        Employeur
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA Créer */}
+                <div className="shrink-0 px-6 py-5 border-t border-[#E2E8F0] space-y-3">
+                  {brut > 0 && (
+                    <div className="text-center">
+                      <p className="text-[10px] text-[#94A3B8]">Vous allez payer</p>
+                      <p className="text-[22px] font-extrabold text-[#0F172A]">{fmt(brut)} <span className="text-[13px] font-bold text-[#64748B]">FCFA/mois</span></p>
+                    </div>
+                  )}
+                  <button
+                    form="nouveau-contrat-form"
+                    type="submit"
+                    disabled={saving}
+                    className="w-full py-3.5 bg-[#F59E0B] text-white rounded-xl text-[14px] font-extrabold
+                      hover:bg-[#D97706] disabled:opacity-50 transition-all shadow-lg shadow-amber-200
+                      flex items-center justify-center gap-2">
+                    {saving ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
+                    Créer le contrat
+                  </button>
+                </div>
               </div>
-            </form>
+
+            </div>
           </div>
         </>
       )}
