@@ -462,8 +462,7 @@ export default function Sidebar() {
         const def = getModuleDef(mid)
         if (!def) continue
         const label = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
-        // rh is exact-only: only active on /dashboard/rh, not on sub-pages like /dashboard/rh/recrutement
-        items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href, exact: mid === 'rh' })
+        items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href })
       }
       return { ...grp, label: t(grp.labelKey), items }
     }).filter(g => g.items.length > 0)

@@ -77,7 +77,7 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'transport', href: '/dashboard/transport', label: 'Flotte VTC', sublabel: 'Véhicules & courses' },
   ],
   transport_public: [
-    { id: 'transport', href: '/dashboard/transport', label: 'Transport public', sublabel: 'Lignes & voyageurs' },
+    { id: 'transport_public', href: '/dashboard/transport', label: 'Transport public', sublabel: 'Lignes & voyageurs' },
   ],
   btp: [
     { id: 'btp',           href: '/dashboard/btp',                label: 'Chantiers',    sublabel: 'Tableau de bord BTP'       },
@@ -99,12 +99,11 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'agriculture-intrants',  href: '/dashboard/agriculture/intrants',  label: 'Intrants',     sublabel: 'Semences, engrais & outils'},
   ],
   cabinet: [
-    { id: 'cabinet',           href: '/dashboard/cabinet',              label: 'Cabinet',     sublabel: 'Tableau de bord cabinet'    },
-    { id: 'cabinet-clients',   href: '/dashboard/cabinet/clients',      label: 'Clients',     sublabel: 'Sociétés gérées'            },
-    { id: 'cabinet-documents', href: '/dashboard/cabinet/clients',      label: 'Documents',   sublabel: 'GED partagée'               },
-    { id: 'cabinet-taches',    href: '/dashboard/cabinet/clients',      label: 'Tâches',      sublabel: 'Missions & déclarations'    },
-    { id: 'cabinet-revenue',   href: '/dashboard/cabinet',              label: 'Revenue',     sublabel: '5 000 FCFA/client/mois'     },
-    { id: 'cabinet-projets',   href: '/dashboard/cabinet/projets',      label: 'Projets',     sublabel: 'Missions & livrables'       },
+    { id: 'cabinet',           href: '/dashboard/cabinet',         label: 'Cabinet',      sublabel: 'Tableau de bord cabinet'  },
+    { id: 'cabinet-clients',   href: '/dashboard/cabinet/clients', label: 'Clients',      sublabel: 'Sociétés gérées'          },
+    { id: 'cabinet-documents', href: '/dashboard/ged',             label: 'Documents',    sublabel: 'GED & dossiers clients'   },
+    { id: 'cabinet-taches',    href: '/dashboard/taches',          label: 'Tâches',       sublabel: 'Missions & déclarations'  },
+    { id: 'cabinet-projets',   href: '/dashboard/cabinet/projets', label: 'Projets',      sublabel: 'Missions & livrables'     },
   ],
   petrole: [
     { id: 'petrole',       href: '/dashboard/petrole',        label: 'Exploitation',  sublabel: 'Tableau de bord pétrole'   },
