@@ -19,6 +19,7 @@ import {
   INVOICE_STATUT_COLORS, PROVIDER_LABELS, MOBILE_MONEY_PROVIDERS,
   PAYMENT_STATUT_LABELS, trialDaysLeft, fmtFCFA,
 } from '@/lib/billing'
+import { TRIAL_DAYS } from '@/lib/plans'
 
 // ─── Types locaux ─────────────────────────────────────────────────────────────
 
@@ -219,7 +220,7 @@ export default function AbonnementPage() {
                   <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full transition-all"
-                      style={{ width: `${Math.max(5, 100 - (daysLeft / (plan?.trial_days ?? 14)) * 100)}%` }}
+                      style={{ width: `${Math.max(5, 100 - (daysLeft / TRIAL_DAYS) * 100)}%` }}
                     />
                   </div>
                 </>
@@ -256,16 +257,127 @@ export default function AbonnementPage() {
         </div>
       )}
 
-      {/* Alerte essai expirant bientôt */}
-      {statut === 'trial' && daysLeft <= 5 && daysLeft > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-start gap-3">
-          <Clock size={18} className="text-amber-500 mt-0.5 shrink-0" />
+      {/* ── Notifications d'essai ─────────────────────────────────────────── */}
+
+      {/* J-7 : rappel informatif */}
+      {statut === 'trial' && daysLeft <= 7 && daysLeft > 3 && (
+        <div className="rounded-2xl px-5 py-4 flex items-start gap-3"
+          style={{ background: '#EFF6FF', border: '1px solid #BFDBFE' }}>
+          <Clock size={18} className="text-blue-500 mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm font-bold text-amber-700">Essai bientôt terminé</p>
-            <p className="text-xs text-amber-600 mt-0.5">
-              Votre essai expire dans {daysLeft} jour{daysLeft > 1 ? 's' : ''}.
-              Contactez votre administrateur pour activer un abonnement payant.
+            <p className="text-sm font-bold text-blue-800">
+              Plus que {daysLeft} jours d&apos;essai gratuit
             </p>
+            <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
+              Votre essai Oraforme expire dans <strong>{daysLeft} jours</strong>.
+              Activez votre abonnement maintenant pour continuer à utiliser tous les modules sans interruption.
+            </p>
+            <a
+              href="mailto:contact@oraforme.com?subject=Activation abonnement"
+              className="inline-flex items-center gap-1 mt-2 text-[12px] font-bold text-blue-700 underline underline-offset-2"
+            >
+              Contacter l&apos;équipe Oraforme →
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* J-3 : avertissement urgent */}
+      {statut === 'trial' && daysLeft <= 3 && daysLeft > 1 && (
+        <div className="rounded-2xl px-5 py-4 flex items-start gap-3"
+          style={{ background: '#FFFBEB', border: '2px solid #FCD34D' }}>
+          <AlertTriangle size={18} className="text-amber-500 mt-0.5 shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-bold text-amber-800">
+              ⚡ Attention — {daysLeft} jours avant expiration
+            </p>
+            <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
+              Votre essai gratuit se termine dans <strong>{daysLeft} jours</strong>.
+              Après cette date, l&apos;accès à vos données et modules sera suspendu.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <a
+                href="mailto:contact@oraforme.com?subject=Activation urgente abonnement Oraforme"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold text-white"
+                style={{ background: '#F59E0B' }}
+              >
+                <Zap size={12} /> Activer mon abonnement
+              </a>
+              <a
+                href="tel:+242060000000"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold text-amber-700 bg-amber-100"
+              >
+                <Phone size={12} /> Appeler le support
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* J-1 : alerte critique */}
+      {statut === 'trial' && daysLeft === 1 && (
+        <div className="rounded-2xl px-5 py-4 flex items-start gap-3"
+          style={{ background: '#FEF2F2', border: '2px solid #F87171' }}>
+          <AlertTriangle size={18} className="text-red-500 mt-0.5 shrink-0 animate-pulse" />
+          <div className="flex-1">
+            <p className="text-sm font-bold text-red-800">
+              🚨 Votre essai expire DEMAIN
+            </p>
+            <p className="text-xs text-red-700 mt-0.5 leading-relaxed">
+              Après demain, toutes vos données seront préservées mais l&apos;accès sera bloqué.
+              Activez votre abonnement <strong>aujourd&apos;hui</strong> pour éviter toute interruption.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <a
+                href="mailto:contact@oraforme.com?subject=URGENT - Activation abonnement Oraforme J-1"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-bold text-white"
+                style={{ background: '#DC2626' }}
+              >
+                <CreditCard size={13} /> Activer maintenant
+              </a>
+              <a
+                href="tel:+242060000000"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold text-red-700 bg-red-100"
+              >
+                <Phone size={12} /> Appeler d&apos;urgence
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Essai expiré : activation obligatoire */}
+      {statut === 'expired' && (
+        <div className="rounded-2xl overflow-hidden border-2 border-red-300">
+          <div className="px-5 py-4 flex items-start gap-3" style={{ background: '#FEF2F2' }}>
+            <AlertTriangle size={20} className="text-red-600 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="text-base font-extrabold text-red-800">
+                Votre essai gratuit a expiré
+              </p>
+              <p className="text-sm text-red-700 mt-1 leading-relaxed">
+                L&apos;accès complet à Oraforme nécessite un abonnement actif.
+                Vos données sont conservées en sécurité. Contactez-nous pour réactiver votre compte.
+              </p>
+            </div>
+          </div>
+          <div className="px-5 py-3 flex flex-wrap gap-3 items-center" style={{ background: '#FFF5F5' }}>
+            <a
+              href="mailto:contact@oraforme.com?subject=Réactivation compte Oraforme"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white transition-all"
+              style={{ background: '#DC2626' }}
+            >
+              <CreditCard size={14} /> Activer mon abonnement
+            </a>
+            <a
+              href="tel:+242060000000"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold text-red-700 bg-white border border-red-200"
+            >
+              <Phone size={14} /> Appeler Oraforme
+            </a>
+            <span className="text-[11px] text-red-400 ml-auto">
+              Données sécurisées — aucune perte
+            </span>
           </div>
         </div>
       )}
