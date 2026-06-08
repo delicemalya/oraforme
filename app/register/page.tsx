@@ -12,23 +12,23 @@ import {
 // ── Sector list for Business ──────────────────────────────────────────────────
 
 const SECTORS = [
-  { id: 'cabinet',     label: 'Cabinet',          emoji: '📊' },
-  { id: 'ecole',       label: 'École',            emoji: '🎓' },
-  { id: 'universite',  label: 'Université',       emoji: '🏛️' },
-  { id: 'hotel',       label: 'Hôtel',            emoji: '🏨' },
-  { id: 'restaurant',  label: 'Restaurant',       emoji: '🍽️' },
-  { id: 'pharmacie',   label: 'Pharmacie',        emoji: '💊' },
-  { id: 'sante',       label: 'Clinique / Hôpital', emoji: '🏥' },
-  { id: 'supermarche', label: 'Supermarché',      emoji: '🛒' },
-  { id: 'boutique',    label: 'Magasin',          emoji: '🏪' },
-  { id: 'btp',         label: 'Industrie',        emoji: '🏗️' },
-  { id: 'transport',   label: 'Transport',        emoji: '🚛' },
-  { id: 'transport',   label: 'Logistique',       emoji: '📦' },
-  { id: 'petrole',     label: 'Station-service',  emoji: '⛽' },
-  { id: 'banque',      label: 'Banque',           emoji: '🏦' },
-  { id: 'banque',      label: 'Microfinance',     emoji: '💰' },
-  { id: 'commerce',    label: 'E-commerce',       emoji: '🌐' },
-  { id: 'autre',       label: 'Autre',            emoji: '🏢' },
+  { id: 'cabinet',      label: 'Cabinet',           emoji: '📊' },
+  { id: 'ecole',        label: 'École',             emoji: '🎓' },
+  { id: 'universite',   label: 'Université',        emoji: '🏛️' },
+  { id: 'hotel',        label: 'Hôtel',             emoji: '🏨' },
+  { id: 'restaurant',   label: 'Restaurant',        emoji: '🍽️' },
+  { id: 'pharmacie',    label: 'Pharmacie',         emoji: '💊' },
+  { id: 'sante',        label: 'Clinique / Hôpital', emoji: '🏥' },
+  { id: 'supermarche',  label: 'Supermarché',       emoji: '🛒' },
+  { id: 'boutique',     label: 'Magasin',           emoji: '🏪' },
+  { id: 'btp',          label: 'Industrie',         emoji: '🏗️' },
+  { id: 'transport',    label: 'Transport',         emoji: '🚛' },
+  { id: 'logistique',   label: 'Logistique',        emoji: '📦' },
+  { id: 'petrole',      label: 'Station-service',   emoji: '⛽' },
+  { id: 'banque',       label: 'Banque',            emoji: '🏦' },
+  { id: 'microfinance', label: 'Microfinance',      emoji: '💰' },
+  { id: 'commerce',     label: 'E-commerce',        emoji: '🌐' },
+  { id: 'autre',        label: 'Autre',             emoji: '🏢' },
 ]
 
 // Special pricing note
@@ -165,7 +165,9 @@ export default function RegisterPage() {
       {/* ── LEFT PANEL (green) ──────────────────────────────────────────────── */}
       <div
         className="lg:w-[42%] shrink-0 flex flex-col justify-between px-8 py-10 lg:px-12 lg:py-14"
-        style={{ background: 'linear-gradient(145deg,#15803D 0%,#16A34A 60%,#22C55E 100%)' }}
+        style={{ background: step === 0
+          ? 'linear-gradient(145deg,#15803D 0%,#16A34A 60%,#22C55E 100%)'
+          : 'linear-gradient(145deg,#92400E 0%,#D97706 55%,#F59E0B 100%)' }}
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
@@ -376,7 +378,7 @@ export default function RegisterPage() {
                       type="text" required value={form.prenom}
                       onChange={e => upd('prenom', e.target.value)}
                       placeholder="Jean"
-                      className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-400/20 transition-all"
+                      className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                     />
                   </div>
                 </div>
@@ -388,7 +390,7 @@ export default function RegisterPage() {
                       type="text" required value={form.nom}
                       onChange={e => upd('nom', e.target.value)}
                       placeholder="Dupont"
-                      className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-400/20 transition-all"
+                      className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                     />
                   </div>
                 </div>
@@ -403,7 +405,7 @@ export default function RegisterPage() {
                     onChange={e => upd('email', e.target.value)}
                     placeholder="vous@entreprise.com"
                     autoComplete="email"
-                    className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-400/20 transition-all"
+                    className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                   />
                 </div>
               </div>
@@ -416,7 +418,7 @@ export default function RegisterPage() {
                     type="tel" value={form.telephone}
                     onChange={e => upd('telephone', e.target.value)}
                     placeholder="+242 06 XXX XX XX"
-                    className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-400/20 transition-all"
+                    className="w-full pl-8 pr-3 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                   />
                 </div>
               </div>
@@ -430,7 +432,7 @@ export default function RegisterPage() {
                     onChange={e => upd('password', e.target.value)}
                     placeholder="8 caractères minimum"
                     autoComplete="new-password"
-                    className="w-full pl-8 pr-10 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-green-400 focus:ring-2 focus:ring-green-400/20 transition-all"
+                    className="w-full pl-8 pr-10 py-2.5 text-[13px] border border-gray-200 rounded-xl text-[#0F172A] placeholder-gray-300 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                   />
                   <button type="button" onClick={() => setShowPwd(v => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B]">
@@ -456,13 +458,13 @@ export default function RegisterPage() {
                           onClick={() => setSector(uniqueKey)}
                           className="flex flex-col items-center gap-1 p-2 rounded-xl border text-center transition-all"
                           style={{
-                            borderColor: sector === uniqueKey ? '#16A34A' : '#E2E8F0',
-                            background: sector === uniqueKey ? '#F0FDF4' : '#FAFAFA',
+                            borderColor: sector === uniqueKey ? '#D97706' : '#E2E8F0',
+                            background: sector === uniqueKey ? '#FFFBEB' : '#FAFAFA',
                           }}
                         >
                           <span className="text-lg leading-none">{s.emoji}</span>
                           <span className="text-[9px] font-semibold leading-tight"
-                            style={{ color: sector === uniqueKey ? '#15803D' : '#64748B' }}>
+                            style={{ color: sector === uniqueKey ? '#92400E' : '#64748B' }}>
                             {s.label}
                           </span>
                         </button>
@@ -496,7 +498,7 @@ export default function RegisterPage() {
                 type="submit"
                 disabled={loading || !canStep1}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-[14px] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: '#16A34A', color: 'white' }}
+                style={{ background: '#D97706', color: 'white' }}
               >
                 {loading
                   ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
