@@ -120,7 +120,7 @@ export default function Header() {
   return (
     <header className="h-14 bg-white border-b border-[#E2E8F0] flex items-center px-4 lg:px-6 gap-3 shrink-0">
 
-      {/* Bouton retour — visible sur tous les appareils, toutes les sous-pages */}
+      {/* Bouton retour — visible sur tous les appareils */}
       {showBack ? (
         <button
           onClick={() => router.back()}
@@ -132,7 +132,7 @@ export default function Header() {
           aria-label="Retour à la page précédente"
         >
           <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-          <span className="text-[12px] font-medium hidden sm:inline">Retour</span>
+          <span className="text-[12px] font-medium">Retour</span>
         </button>
       ) : (
         <div className="w-2 shrink-0" />

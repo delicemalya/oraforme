@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { redirect } from 'next/navigation'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
+import BackButtonBar from '@/components/dashboard/BackButtonBar'
 import AiAssistant from '@/components/ui/AiAssistant'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 
@@ -22,6 +23,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Header />
           <main className="flex-1 overflow-y-auto">
             <div className="p-4 lg:p-6 page-transition">
+              <BackButtonBar />
               <Suspense fallback={null}>
                 {children}
               </Suspense>
