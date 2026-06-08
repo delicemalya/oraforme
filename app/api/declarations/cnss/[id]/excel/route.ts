@@ -51,15 +51,17 @@ export async function GET(
     .single()
 
   const entreprise = (tenant?.nom as string | undefined) ?? 'Entreprise'
-  const buffer  = type === 'cnss-tus'
+  const raw      = type === 'cnss-tus'
     ? exporterExcelCNSSTUS(declFull, entreprise)
     : exporterExcelCNSS(declFull, entreprise)
+  const bytes    = new Uint8Array(raw)
   const filename = nomFichierCNSS(declFull, type)
 
-  return new Response(buffer, {
+  return new Response(bytes, {
     headers: {
       'Content-Type':        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length':      String(bytes.length),
     },
   })
 }

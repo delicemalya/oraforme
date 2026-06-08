@@ -128,7 +128,7 @@ export function ListeNominativeCNSS({ decl, entreprise, numero_cnss_employeur }:
             return (
               <View key={e.employe_id ?? i} style={Row}>
                 <Text style={[s.tdL, { flex: W.n }]}>{e.numero_ordre}</Text>
-                <Text style={[s.tdL, { flex: W.nom }]} numberOfLines={1}>{nomComplet}</Text>
+                <Text style={[s.tdL, { flex: W.nom }]}>{nomComplet}</Text>
                 <Text style={[s.td, { flex: W.cnss }]}>{e.numero_cnss}</Text>
                 <Text style={[s.td, { flex: W.brut, fontFamily: 'Helvetica-Bold' }]}>{fmtN(e.salaire_brut)}</Text>
                 <Text style={[s.td, { flex: W.bvie }]}>{fmtN(e.base_vieillesse)}</Text>

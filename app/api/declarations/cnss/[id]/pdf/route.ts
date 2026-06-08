@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { calculerCNSSEmploye, calculerDeclarationGlobale, MOIS_LABELS } from '@/lib/declarations/cnss-congo'
+import { calculerCNSSEmploye, calculerDeclarationGlobale } from '@/lib/declarations/cnss-congo'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createElement } from 'react'
+import type { DocumentProps } from '@react-pdf/renderer'
 import { DeclarationGlobaleCNSS } from '@/components/declarations/pdf/DeclarationGlobaleCNSS'
 import { ListeNominativeCNSS } from '@/components/declarations/pdf/ListeNominativeCNSS'
 
@@ -55,22 +56,28 @@ export async function GET(
   const declFull = { ...decl, employes, recap }
   const entreprise = (tenant?.nom as string | undefined) ?? 'Entreprise'
 
-  let buffer: Buffer
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  type PdfEl = React.ReactElement<DocumentProps, any>
+
+  let pdfEl: PdfEl
   let filename: string
 
   if (type === 'nominative') {
-    buffer   = Buffer.from(await renderToBuffer(createElement(ListeNominativeCNSS, { decl: declFull, entreprise })))
+    pdfEl    = createElement(ListeNominativeCNSS, { decl: declFull, entreprise }) as PdfEl
     filename = `CNSS_Liste_Nominative_${decl.annee}_${String(decl.mois).padStart(2, '0')}.pdf`
   } else {
-    buffer   = Buffer.from(await renderToBuffer(createElement(DeclarationGlobaleCNSS, { decl: declFull, entreprise })))
+    pdfEl    = createElement(DeclarationGlobaleCNSS, { decl: declFull, entreprise }) as PdfEl
     filename = `CNSS_Declaration_Globale_${decl.annee}_${String(decl.mois).padStart(2, '0')}.pdf`
   }
 
-  return new Response(buffer, {
+  const pdfBuffer = await renderToBuffer(pdfEl)
+  const bytes = new Uint8Array(pdfBuffer)
+
+  return new Response(bytes, {
     headers: {
       'Content-Type':        'application/pdf',
       'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Length':      String(buffer.length),
+      'Content-Length':      String(bytes.length),
     },
   })
 }
