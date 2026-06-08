@@ -99,11 +99,12 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'agriculture-intrants',  href: '/dashboard/agriculture/intrants',  label: 'Intrants',     sublabel: 'Semences, engrais & outils'},
   ],
   cabinet: [
-    { id: 'cabinet',           href: '/dashboard/cabinet',         label: 'Cabinet',      sublabel: 'Tableau de bord cabinet'  },
-    { id: 'cabinet-clients',   href: '/dashboard/cabinet/clients', label: 'Clients',      sublabel: 'Sociétés gérées'          },
-    { id: 'cabinet-documents', href: '/dashboard/ged',             label: 'Documents',    sublabel: 'GED & dossiers clients'   },
-    { id: 'cabinet-taches',    href: '/dashboard/taches',          label: 'Tâches',       sublabel: 'Missions & déclarations'  },
-    { id: 'cabinet-projets',   href: '/dashboard/cabinet/projets', label: 'Projets',      sublabel: 'Missions & livrables'     },
+    { id: 'cabinet',              href: '/dashboard/cabinet',              label: 'Cabinet',       sublabel: 'Tableau de bord cabinet'    },
+    { id: 'cabinet-clients',      href: '/dashboard/cabinet/clients',      label: 'Clients',       sublabel: 'Sociétés gérées'            },
+    { id: 'cabinet-declarations', href: '/dashboard/cabinet/declarations', label: 'Déclarations',  sublabel: 'Agenda fiscal & social'     },
+    { id: 'cabinet-documents',    href: '/dashboard/ged',                  label: 'Documents',     sublabel: 'GED & dossiers clients'     },
+    { id: 'cabinet-taches',       href: '/dashboard/taches',               label: 'Tâches',        sublabel: 'Missions & suivi'           },
+    { id: 'cabinet-projets',      href: '/dashboard/cabinet/projets',      label: 'Projets',       sublabel: 'Missions & livrables'       },
   ],
   petrole: [
     { id: 'petrole',       href: '/dashboard/petrole',        label: 'Exploitation',  sublabel: 'Tableau de bord pétrole'   },
