@@ -107,6 +107,7 @@ const ICONS: Record<string, LucideIcon> = {
   'pharmacie-ventes':  ShoppingCart,
   abonnement:          CreditCard,
   fiscalite:           Landmark,
+  'cnss-congo':        BookMarked,
   btp:                 Building2,
   'btp-devis':         FileText,
   'btp-chantiers':     Layers,
@@ -169,6 +170,7 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'workflows',             label: 'Workflows',            sublabel: '', href: '/dashboard/workflows'                  },
   { id: 'api-keys',              label: 'Clés API',             sublabel: '', href: '/dashboard/api-keys'                   },
   { id: 'fiscalite',     label: 'Fiscalité & Déclarations', sublabel: '', href: '/dashboard/fiscalite'     },
+  { id: 'cnss-congo',   label: 'CNSS Congo',               sublabel: 'Télédéclaration', href: '/dashboard/declarations/cnss' },
   { id: 'recouvrement', label: 'Recouvrement',             sublabel: '', href: '/dashboard/recouvrement' },
 ]
 
@@ -179,8 +181,8 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 const SIDEBAR_GROUPS = [
   // SUPERVISION — KPIs exécutifs, BI, analytics
   { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
-  // FINANCE — gestion financière + déclarations DGI
-  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
+  // FINANCE — gestion financière + déclarations DGI + CNSS
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite', 'cnss-congo'] },
   // RH — personnel & paie (recrutement = rubrique indépendante)
   { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
   // RECRUTEMENT — module autonome
@@ -238,6 +240,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'pharmacie-ventes':  'nav.pharmacie_ventes',
   abonnement:          'nav.abonnement',
   fiscalite:           'nav.fiscalite',
+  'cnss-congo':        'nav.cnss_congo',
   // Secteurs métier
 
   btp:                     'nav.btp',
@@ -317,7 +320,7 @@ const ALL_MODULE_IDS = [
   'calendrier', 'taches',
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
-  'abonnement', 'fiscalite',
+  'abonnement', 'fiscalite', 'cnss-congo',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
