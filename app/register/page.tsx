@@ -170,9 +170,8 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8"
+          <img src="/logo-white.png" alt="Oraforme" className="h-9 w-auto"
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-          <span className="text-white font-black text-xl tracking-tight">oraforme</span>
         </div>
 
         {/* Content */}

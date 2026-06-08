@@ -741,7 +741,7 @@ export default function LandingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
             <div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="Oraforme" className="h-10 w-auto mb-5" style={{ filter: 'brightness(0) invert(1)' }} />
+              <img src="/logo-white.png" alt="Oraforme" className="h-10 w-auto mb-5" />
               <p className="text-sm text-gray-500 leading-relaxed mb-5 max-w-xs">
                 L&apos;ERP intelligent conçu pour les PME africaines. SYSCOHADA, RH, Trésorerie, Scolarité — tout en un.
               </p>

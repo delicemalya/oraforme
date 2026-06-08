@@ -60,8 +60,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8 mx-auto mb-2" />
-          <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
+          <img src="/logo.png" alt="Oraforme" className="h-10 w-auto mx-auto mb-2" />
         </div>
 
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-8">

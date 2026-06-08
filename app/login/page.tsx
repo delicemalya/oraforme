@@ -115,10 +115,9 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-2">
+          <div className="inline-flex items-center justify-center mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8" />
-            <span className="text-xl font-bold text-[var(--text)]">oraforme</span>
+            <img src="/logo.png" alt="Oraforme" className="h-10 w-auto" />
           </div>
           <p className="text-[var(--text-secondary)] text-sm">Connectez-vous à votre espace</p>
         </div>

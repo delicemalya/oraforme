@@ -624,8 +624,7 @@ export default function Sidebar() {
       <div className="shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid #E2E8F0' }}>
         <div className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-icon.png" alt="oraforme" width={28} height={28} className="shrink-0" />
-          <span className="text-[16px] font-extrabold tracking-tight" style={{ color: '#0F172A' }}>oraforme</span>
+          <img src="/logo.png" alt="Oraforme" className="h-7 w-auto shrink-0" />
           {secteur && (
             <span
               className="ml-auto shrink-0 text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"

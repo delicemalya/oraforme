@@ -104,11 +104,8 @@ export default function AdminSidebar() {
       <div className="px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-icon.png" alt="oraforme" className="w-8 h-8 shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-          <div>
-            <p className="text-[15px] font-bold text-gray-900 leading-none">oraforme</p>
-            <p className="text-[10px] text-gray-400 mt-0.5">Platform HQ</p>
-          </div>
+          <img src="/logo.png" alt="Oraforme" className="h-7 w-auto shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          <p className="text-[10px] text-gray-400 font-semibold">Platform HQ</p>
         </div>
         <div className="mt-3 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200">
           <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />

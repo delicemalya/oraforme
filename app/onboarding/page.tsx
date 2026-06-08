@@ -170,8 +170,7 @@ export default function OnboardingPage() {
         <div>
           <div className="flex items-center gap-2.5 mb-12">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="oraforme" className="w-7 h-7" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-            <span className="text-white font-bold text-lg tracking-tight">oraforme</span>
+            <img src="/logo-white.png" alt="Oraforme" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
           </div>
 
           {/* Step list */}
@@ -247,8 +246,7 @@ export default function OnboardingPage() {
         <div className="lg:hidden flex items-center justify-between px-6 pt-6 pb-4">
           <div className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-icon.png" alt="oraforme" className="w-6 h-6" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-            <span className="text-white font-bold">oraforme</span>
+            <img src="/logo-white.png" alt="Oraforme" className="h-7 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
           </div>
           <div className="flex gap-1">
             {STEPS.map(s => (
