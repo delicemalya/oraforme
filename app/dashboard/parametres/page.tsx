@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import {
   Building2, Save, Check, Loader2, FileText,
-  Hash, Upload, X, Plus, Trash2, Layers,
+  Hash, Upload, X, Plus, Trash2, Layers, Shield, ChevronRight,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -265,6 +266,22 @@ export default function ParametresPage() {
 
   return (
     <div className="space-y-4 max-w-3xl">
+
+      {/* Conformité shortcut */}
+      <Link href="/dashboard/parametres/conformite"
+        className="flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:shadow-sm group"
+        style={{ background: '#FFFBEB', borderColor: '#FDE68A' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#F59E0B]/15 flex items-center justify-center">
+            <Shield size={15} className="text-[#F59E0B]" />
+          </div>
+          <div>
+            <p className="text-[13px] font-bold text-[#0F172A]">Centre de Conformité</p>
+            <p className="text-[11px] text-[#92400E]">NIU, RCCM, logo, photo dirigeant, documents légaux</p>
+          </div>
+        </div>
+        <ChevronRight size={16} className="text-[#F59E0B] group-hover:translate-x-0.5 transition-transform" />
+      </Link>
 
       {/* Header */}
       <div className="flex items-center justify-between">

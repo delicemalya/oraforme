@@ -68,6 +68,19 @@ export function computeModules(taille: TailleEntreprise, secteur: SecteurId): st
   return [...new Set([...planMods, ...sectorMods])]
 }
 
+// ── Durée d'essai gratuit ─────────────────────────────────────────────────────
+export const TRIAL_DAYS = 30
+
+// ── Tarification spéciale par secteur ─────────────────────────────────────────
+export const SPECIAL_SECTOR_PRICING: Record<string, {
+  price_fcfa: number
+  note?: string
+}> = {
+  cabinet:    { price_fcfa: 20_000, note: '+ 5 000 FCFA / client actif' },
+  ecole:      { price_fcfa: 35_000 },
+  universite: { price_fcfa: 56_000 },
+}
+
 // ── Config packs ──────────────────────────────────────────────────────────────
 
 export const PLAN_CONFIG: Record<TailleEntreprise, {
@@ -78,58 +91,61 @@ export const PLAN_CONFIG: Record<TailleEntreprise, {
   color: string
   badge: string | null
   features: string[]
+  miaa: string
 }> = {
   tpe: {
-    label:      'TPE',
-    subtitle:   'Très Petite Entreprise',
+    label:      'Entrepreneur',
+    subtitle:   'Pour indépendants, TPE & petites structures',
     price_fcfa: 15_000,
     max_users:  5,
-    color:      '#2563EB',
+    color:      '#16A34A',
     badge:      null,
+    miaa:       'MIAA+ Standard',
     features: [
-      'Facturation & Devis',
-      'CRM Clients',
-      'Trésorerie & Caisse',
-      'RH & Paie simple',
-      'Rapports & Exports',
+      'Tous les modules Oraforme',
+      'Facturation & Devis illimités',
+      'CRM, Trésorerie & Caisse',
+      'RH & Paie complète',
+      'Comptabilité SYSCOHADA',
+      'MIAA+ Standard (IA intégrée)',
       'Dépenses & Notes de frais',
-      'Calendrier & Tâches',
       '5 utilisateurs inclus',
     ],
   },
   pme: {
-    label:      'PME',
-    subtitle:   'Petite & Moyenne Entreprise',
-    price_fcfa: 36_000,
+    label:      'Business',
+    subtitle:   'Pour PME, cabinets & secteurs spécialisés',
+    price_fcfa: 25_000,
     max_users:  25,
     color:      '#F59E0B',
     badge:      'Populaire',
+    miaa:       'MIAA+ Premium',
     features: [
-      'Tout TPE inclus',
-      'Comptabilité OHADA complète',
-      'Déclarations fiscales (TVA, CNSS, IRPP)',
-      'Gestion des stocks',
-      'Achats & Fournisseurs',
-      'MIAA+ Intelligence Artificielle',
-      'Workflows & Automatisation',
+      'Tout Entrepreneur inclus',
+      'Modules premium activés',
+      'Analytics & Business Intelligence',
+      'Automatisations avancées',
+      'MIAA+ Premium (IA avancée)',
+      'Workflows & Intégrations',
       'GED & Documents',
       '25 utilisateurs inclus',
     ],
   },
   grande: {
-    label:      'Grande Entreprise',
+    label:      'Entreprise+',
     subtitle:   'Structure complexe & multi-sites',
     price_fcfa: 56_000,
     max_users:  -1,
     color:      '#7C3AED',
     badge:      'Premium',
+    miaa:       'MIAA+ Illimité',
     features: [
-      'Tout PME inclus',
+      'Tout Business inclus',
       'Business Intelligence avancée',
       'Audit & Conformité',
       'API Publique & Intégrations',
       'Multi-branches & multi-sites',
-      'Automatisation IA avancée',
+      'MIAA+ Illimité',
       'Reporting exécutif',
       'Utilisateurs illimités',
       'Support dédié prioritaire',

@@ -60,45 +60,44 @@ const TESTIMONIALS = [
 
 const PLANS = [
   {
-    name: 'Gratuit',
-    price: '0',
-    period: 'pour toujours',
-    desc: 'Pour découvrir et démarrer',
-    features: ['1 utilisateur', '10 factures / mois', 'Trésorerie basique', 'Support communauté'],
+    name: 'Entrepreneur',
+    price: '15 000',
+    period: 'FCFA / mois',
+    desc: 'Pour indépendants, TPE & petites structures',
+    features: ['Tous les modules Oraforme', 'Facturation & Devis illimités', 'RH & Paie complète', 'Comptabilité SYSCOHADA', 'MIAA+ Standard', '5 utilisateurs inclus'],
     cta: 'Commencer gratuitement',
     href: '/register',
     highlight: false,
-  },
-  {
-    name: 'Starter',
-    price: '15 000',
-    period: 'FCFA / mois',
-    desc: 'TPE et auto-entrepreneurs',
-    features: ['3 utilisateurs', 'Facturation illimitée', 'Stock & Inventaire', 'RH — 5 employés', 'Support email'],
-    cta: 'Choisir Starter',
-    href: '/register?plan=starter',
-    highlight: false,
+    trial: '30 jours gratuits',
   },
   {
     name: 'Business',
-    price: '35 000',
+    price: '25 000',
     period: 'FCFA / mois',
-    desc: 'PME en croissance',
-    features: ['10 utilisateurs', 'Tous les modules', 'SYSCOHADA complet', 'MIAA+ IA intégrée', 'Rapports avancés', 'Support prioritaire'],
-    cta: 'Choisir Business',
-    href: '/register?plan=business',
+    desc: 'Pour PME, cabinets & secteurs spécialisés',
+    features: ['Tout Entrepreneur inclus', 'Modules premium activés', 'Analytics & BI avancés', 'Automatisations avancées', 'MIAA+ Premium', '25 utilisateurs inclus'],
+    cta: 'Commencer gratuitement',
+    href: '/register',
     highlight: true,
+    trial: '30 jours gratuits',
   },
   {
-    name: 'Enterprise',
+    name: 'Entreprise+',
     price: 'Sur devis',
     period: '',
-    desc: 'Groupes et multi-sites',
-    features: ['Utilisateurs illimités', 'Multi-sites', 'API & intégrations', 'MIAA+ illimité', 'Manager dédié', 'SLA 99.9%'],
+    desc: 'Groupes, multi-sites & universités',
+    features: ['Tout Business inclus', 'Utilisateurs illimités', 'Multi-branches & multi-sites', 'MIAA+ Illimité', 'API & intégrations', 'Manager dédié · SLA 99.9%'],
     cta: 'Nous contacter',
     href: 'mailto:contact@oraforme.com',
     highlight: false,
+    trial: null,
   },
+]
+
+const SPECIAL_PLANS = [
+  { name: 'Cabinet comptable',         price: '20 000', note: '+ 5 000 FCFA / client actif' },
+  { name: 'École (primaire/collège/lycée)', price: '35 000', note: null },
+  { name: 'Université',                price: '56 000', note: null },
 ]
 
 const NAV_LINKS = [
@@ -162,8 +161,8 @@ export default function LandingPage() {
               Se connecter
             </Link>
             <Link href="/register"
-              className="text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2 shadow-lg shadow-orange-100">
-              Démarrer gratuitement <ArrowRight size={14} />
+              className="text-sm font-bold text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2 shadow-lg shadow-green-100">
+              COMMENCER GRATUITEMENT <ArrowRight size={14} />
             </Link>
           </div>
 
@@ -192,8 +191,8 @@ export default function LandingPage() {
                   <Link href="/login" className="text-center text-sm font-semibold text-[#64748B] border border-gray-200 rounded-xl py-3">
                     Se connecter
                   </Link>
-                  <Link href="/register" className="text-center text-sm font-bold text-white bg-orange-500 rounded-xl py-3">
-                    Démarrer gratuitement
+                  <Link href="/register" className="text-center text-sm font-bold text-white bg-green-600 rounded-xl py-3">
+                    COMMENCER GRATUITEMENT
                   </Link>
                 </div>
               </div>
@@ -250,9 +249,12 @@ export default function LandingPage() {
                 className="flex flex-wrap gap-4 mb-10"
               >
                 <Link href="/register"
-                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-xl shadow-orange-100">
-                  Démarrer gratuitement <ArrowRight size={16} />
+                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-xl shadow-green-100">
+                  COMMENCER GRATUITEMENT <ArrowRight size={16} />
                 </Link>
+                <p className="text-[13px] text-[#94A3B8] mt-1 w-full text-center sm:text-left">
+                  30 jours d&apos;essai gratuit · Aucune carte bancaire requise
+                </p>
                 <a href="#modules"
                   className="inline-flex items-center gap-2 text-[#0F172A] font-semibold text-base px-8 py-4 rounded-xl border-2 border-gray-200 hover:border-[#DC2626]/40 hover:text-[#DC2626] transition-colors">
                   Voir les modules

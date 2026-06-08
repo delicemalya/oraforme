@@ -59,10 +59,43 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        // User already authed (came from /register) — pre-fill email
-        setAdmin(prev => ({ ...prev, email: session.user.email ?? '' }))
-      }
+      if (!session?.user) return
+      setAdmin(prev => ({ ...prev, email: session.user.email ?? '' }))
+
+      // Read pre-registration context saved by /register page
+      try {
+        const raw = localStorage.getItem('oraforme_reg')
+        if (!raw) return
+        const reg = JSON.parse(raw) as {
+          offer?: string; taille?: string; sector?: string
+          prenom?: string; nom?: string; telephone?: string
+        }
+
+        const tailleMap: Record<string, TailleEntreprise> = { entrepreneur: 'tpe', business: 'pme', tpe: 'tpe', pme: 'pme', grande: 'grande' }
+        const mappedTaille = reg.taille ? tailleMap[reg.taille] ?? null : null
+        if (mappedTaille) setTaille(mappedTaille)
+
+        // Map register sector string to SecteurId
+        const sectorIdMap: Record<string, SecteurId> = {
+          cabinet: 'cabinet', ecole: 'ecole', universite: 'ecole',
+          hotel: 'hotel', restaurant: 'restaurant', pharmacie: 'pharmacie',
+          sante: 'sante', supermarche: 'supermarche', boutique: 'boutique',
+          btp: 'btp', transport: 'transport', petrole: 'petrole',
+          banque: 'banque', commerce: 'commerce', autre: 'autre',
+        }
+        const sectorId = reg.sector?.split('-')[0]
+        if (sectorId && sectorIdMap[sectorId]) setSecteur(sectorIdMap[sectorId])
+
+        if (reg.prenom) setAdmin(p => ({ ...p, prenom: reg.prenom! }))
+        if (reg.nom)    setAdmin(p => ({ ...p, nom: reg.nom! }))
+        if (reg.telephone) setSociete(p => ({ ...p, telephone: reg.telephone! }))
+
+        // Skip steps 1 & 2 when offer + sector were already chosen
+        if (mappedTaille && sectorId) {
+          setDir(1)
+          setStep(3)
+        }
+      } catch { /* ignore parse errors */ }
     })
   }, [])
 
