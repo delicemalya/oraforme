@@ -180,7 +180,7 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 
 const SIDEBAR_GROUPS = [
   // SUPERVISION — KPIs exécutifs, BI, analytics
-  { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
+  { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
   // FINANCE — gestion financière + déclarations DGI + CNSS
   { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   // RH — personnel & paie (recrutement = rubrique indépendante)
@@ -674,7 +674,7 @@ export default function Sidebar() {
           }}>
             <LayoutDashboard size={13} style={{ color: dashActive ? '#FFFFFF' : '#94A3B8' }} />
           </div>
-          <span>{t('nav.dashboard')}</span>
+          <span>Direction Générale</span>
         </Link>
 
         {/* Skeleton */}

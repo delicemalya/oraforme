@@ -16,7 +16,7 @@ export type SectorId =
 // Ces 10 modules apparaissent dans TOUTES les sidebars, tous secteurs confondus.
 
 export const CORE_ERP_MODULES = [
-  { id: 'direction',    href: '/dashboard/direction',    label: 'Direction Générale',  sublabel: 'Pilotage & KPIs'          },
+  { id: 'direction',    href: '/dashboard',              label: 'Direction Générale',  sublabel: 'Pilotage & KPIs'          },
   { id: 'rh',           href: '/dashboard/rh',           label: 'RH & Paie',           sublabel: 'Personnel & salaires'     },
   { id: 'finance',      href: '/dashboard/finance',      label: 'Finance',             sublabel: 'KPIs & résultats'         },
   { id: 'comptabilite', href: '/dashboard/comptabilite', label: 'Comptabilité',        sublabel: 'Journal OHADA'            },

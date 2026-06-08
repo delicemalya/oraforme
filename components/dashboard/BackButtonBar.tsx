@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 
 const SEGMENT_LABELS: Record<string, string> = {
-  dashboard:       'Tableau de bord',
+  dashboard:       'Direction Générale',
   fiscalite:       'Fiscalité & Déclarations',
   comptabilite:    'Comptabilité',
   tresorerie:      'Trésorerie',
