@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { redirect } from 'next/navigation'
-import DGClient from '@/components/dashboard/DGClient'
+import DashboardClient from '@/components/dashboard/DashboardClient'
 
 // Values are i18n keys — resolved client-side in ModuleChart
 const MODULE_LABELS: Record<string, string> = {
@@ -82,10 +82,9 @@ export default async function DashboardPage() {
       ? tmRows.map((r: { module_key: string }) => r.module_key)
       : (tenant?.modules_actifs ?? [])
 
-  const now            = new Date()
-  const startOfMonth   = new Date(now.getFullYear(), now.getMonth(), 1)
-  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-  const sevenDaysAgo   = new Date(now)
+  const now          = new Date()
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const sevenDaysAgo = new Date(now)
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
   sevenDaysAgo.setHours(0, 0, 0, 0)
 
@@ -96,15 +95,10 @@ export default async function DashboardPage() {
   let recentActivity: { id: string; client_nom: string; total: number; statut: string; created_at: string }[] = []
   let daily: { day: string; montant: number; count: number }[]  = []
   let moduleBreakdown: { name: string; value: number; color: string }[] = []
-  let nbAlertes    = 0
-  let totalDeps    = 0
-  let revenuPrevMois = 0
-  let tresorerie   = 0
-  let marge        = 0
-  let revenuGrowth = 0
+  let nbAlertes = 0
 
   if (isFinancial) {
-    const [pendingRes, revenuRes, recentRes, activityRes, statusRes, depsRes, prevRevRes, banqueRes, caisseRes] = await Promise.all([
+    const [pendingRes, revenuRes, recentRes, activityRes, statusRes] = await Promise.all([
       supabase.from('factures').select('id, total', { count: 'exact' })
         .eq('tenant_id', tid).in('statut', ['brouillon', 'envoyee']),
       supabase.from('factures').select('total').eq('tenant_id', tid).eq('statut', 'payee')
@@ -114,25 +108,11 @@ export default async function DashboardPage() {
       supabase.from('factures').select('created_at, total').eq('tenant_id', tid)
         .gte('created_at', sevenDaysAgo.toISOString()).limit(200),
       supabase.from('factures').select('statut').eq('tenant_id', tid).limit(200),
-      // DG extra — dépenses + CA mois précédent + trésorerie
-      supabase.from('depenses').select('montant').eq('tenant_id', tid)
-        .gte('created_at', startOfMonth.toISOString()).limit(200),
-      supabase.from('factures').select('total').eq('tenant_id', tid).eq('statut', 'payee')
-        .gte('created_at', prevMonthStart.toISOString())
-        .lt('created_at', startOfMonth.toISOString()).limit(200),
-      supabase.from('comptes_bancaires').select('solde').eq('tenant_id', tid),
-      supabase.from('caisses').select('solde').eq('tenant_id', tid),
     ])
 
     nbPending     = pendingRes.count ?? 0
     pendingAmount = pendingRes.data?.reduce((s, f) => s + (f.total ?? 0), 0) ?? 0
     revenuMois    = revenuRes.data?.reduce((s, f) => s + (f.total ?? 0), 0) ?? 0
-    totalDeps     = depsRes.data?.reduce((s, d) => s + Number(d.montant ?? 0), 0) ?? 0
-    revenuPrevMois = prevRevRes.data?.reduce((s, f) => s + Number(f.total ?? 0), 0) ?? 0
-    tresorerie    = (banqueRes.data?.reduce((s, c) => s + Number(c.solde ?? 0), 0) ?? 0)
-      + (caisseRes.data?.reduce((s, c) => s + Number(c.solde ?? 0), 0) ?? 0)
-    marge        = revenuMois > 0 ? Math.round(((revenuMois - totalDeps) / revenuMois) * 100) : 0
-    revenuGrowth = revenuPrevMois > 0 ? Math.round(((revenuMois - revenuPrevMois) / revenuPrevMois) * 100) : 0
     recentActivity = (recentRes.data ?? []).map(f => ({
       id: f.id, client_nom: f.client_nom ?? 'Client',
       total: f.total ?? 0, statut: f.statut, created_at: f.created_at,
@@ -240,7 +220,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <DGClient
+    <DashboardClient
       userName={userName ?? undefined}
       data={{
         tenant: {
@@ -253,6 +233,7 @@ export default async function DashboardPage() {
         alerts:        { pendingCount: nbPending, pendingAmount, lowStockCount: nbStockZero },
         recentActivity,
         chartData:     { daily, moduleBreakdown },
+        // Extensions pour le RBAC
         isFinancial,
         secteur,
         ecoleRole,
@@ -260,12 +241,6 @@ export default async function DashboardPage() {
         daacKpis,
         rhKpis,
         ecoleFinancials,
-        // DG extra
-        totalDeps,
-        tresorerie,
-        marge,
-        revenuGrowth,
-        revenuPrevMois,
       }}
     />
   )
