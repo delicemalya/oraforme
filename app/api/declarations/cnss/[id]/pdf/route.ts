@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { calculerCNSSEmploye, calculerDeclarationGlobale } from '@/lib/declarations/cnss-congo'
@@ -8,20 +8,20 @@ import type { DocumentProps } from '@react-pdf/renderer'
 import { DeclarationGlobaleCNSS } from '@/components/declarations/pdf/DeclarationGlobaleCNSS'
 import { ListeNominativeCNSS } from '@/components/declarations/pdf/ListeNominativeCNSS'
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+type Ctx = { params: Promise<{ id: string }> }
+
+export async function GET(request: NextRequest, { params }: Ctx) {
   const { ctx, error } = await requireTenant()
   if (error) return NextResponse.json({ error }, { status: 401 })
 
+  const { id } = await params
   const { searchParams } = new URL(request.url)
   const type = searchParams.get('type') ?? 'globale'
 
   const { data: decl } = await supabaseAdmin
     .from('declarations_cnss')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('tenant_id', ctx.tenantId)
     .single()
 
@@ -48,12 +48,9 @@ export async function GET(
   const recap = calculerDeclarationGlobale(employes)
 
   const { data: tenant } = await supabaseAdmin
-    .from('tenants')
-    .select('nom')
-    .eq('id', ctx.tenantId)
-    .single()
+    .from('tenants').select('nom').eq('id', ctx.tenantId).single()
 
-  const declFull = { ...decl, employes, recap }
+  const declFull   = { ...decl, employes, recap }
   const entreprise = (tenant?.nom as string | undefined) ?? 'Entreprise'
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,7 +68,7 @@ export async function GET(
   }
 
   const pdfBuffer = await renderToBuffer(pdfEl)
-  const bytes = new Uint8Array(pdfBuffer)
+  const bytes     = new Uint8Array(pdfBuffer)
 
   return new Response(bytes, {
     headers: {

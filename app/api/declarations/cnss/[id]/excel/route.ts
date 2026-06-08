@@ -1,23 +1,23 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { calculerCNSSEmploye, calculerDeclarationGlobale } from '@/lib/declarations/cnss-congo'
 import { exporterExcelCNSS, exporterExcelCNSSTUS, nomFichierCNSS } from '@/lib/declarations/export-cnss'
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+type Ctx = { params: Promise<{ id: string }> }
+
+export async function GET(request: NextRequest, { params }: Ctx) {
   const { ctx, error } = await requireTenant()
   if (error) return NextResponse.json({ error }, { status: 401 })
 
+  const { id } = await params
   const { searchParams } = new URL(request.url)
   const type = (searchParams.get('type') ?? 'cnss') as 'cnss' | 'cnss-tus'
 
   const { data: decl } = await supabaseAdmin
     .from('declarations_cnss')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('tenant_id', ctx.tenantId)
     .single()
 
@@ -45,17 +45,14 @@ export async function GET(
   const declFull = { ...decl, employes, recap }
 
   const { data: tenant } = await supabaseAdmin
-    .from('tenants')
-    .select('nom')
-    .eq('id', ctx.tenantId)
-    .single()
+    .from('tenants').select('nom').eq('id', ctx.tenantId).single()
 
   const entreprise = (tenant?.nom as string | undefined) ?? 'Entreprise'
-  const raw      = type === 'cnss-tus'
+  const raw        = type === 'cnss-tus'
     ? exporterExcelCNSSTUS(declFull, entreprise)
     : exporterExcelCNSS(declFull, entreprise)
-  const bytes    = new Uint8Array(raw)
-  const filename = nomFichierCNSS(declFull, type)
+  const bytes      = new Uint8Array(raw)
+  const filename   = nomFichierCNSS(declFull, type)
 
   return new Response(bytes, {
     headers: {
