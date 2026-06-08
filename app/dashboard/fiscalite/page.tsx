@@ -27,7 +27,7 @@ interface EcheanceData {
 
 const MODULES = [
   { id: 'tva',              titre: 'TVA',                  desc: 'TVA 18% + CA 5%',             periode: 'Avant le 20',           icon: Receipt,       gradient: 'from-blue-500 to-blue-600',   ring: '#3B82F6', href: '/dashboard/fiscalite/tva'              },
-  { id: 'cnss',             titre: 'CNSS',                 desc: 'Salarié 5,04% · Patronal 14,16%', periode: 'Avant le 15',        icon: Users,         gradient: 'from-amber-500 to-orange-500', ring: '#F59E0B', href: '/dashboard/fiscalite/cnss'             },
+  { id: 'cnss',             titre: 'CNSS',                 desc: 'Salarié 4% VID · Patronal 23,28%', periode: 'Avant le 15',       icon: Users,         gradient: 'from-amber-500 to-orange-500', ring: '#F59E0B', href: '/dashboard/fiscalite/cnss'             },
   { id: 'das',              titre: 'DAS',                  desc: 'Sommes versées à des tiers',   periode: 'Avant 31 mars N+1',     icon: FileText,      gradient: 'from-red-500 to-rose-600',     ring: '#EF4444', href: '/dashboard/fiscalite/das'              },
   { id: 'patente',          titre: 'Patente 721M',         desc: 'Contribution de la Patente',   periode: 'Avant 31 janvier',      icon: Building2,     gradient: 'from-green-500 to-emerald-600',ring: '#10B981', href: '/dashboard/fiscalite/patente'          },
   { id: 'is',               titre: 'Impôt Société',        desc: 'IS 30% · Minimum 1% CA HT',   periode: 'Solde 30 avril N+1',    icon: Landmark,      gradient: 'from-violet-500 to-purple-600',ring: '#7C3AED', href: '/dashboard/fiscalite/is'               },
@@ -40,12 +40,12 @@ const MODULES = [
 const LEGAL_ITEMS = [
   { label: 'Patente 721M', detail: 'avant 31 jan · base CA HT N-1 · min 50 000 FCFA', color: '#10B981' },
   { label: 'TVA 18% + CA 5%', detail: 'avant le 20 du mois suivant',              color: '#3B82F6' },
-  { label: 'CNSS', detail: 'salarié 5,04% + patronal 14,16% · avant le 15',       color: '#F59E0B' },
+  { label: 'CNSS', detail: 'salarié 4% VID + patronal 23,28% · avant le 15',       color: '#F59E0B' },
   { label: 'IRPP', detail: 'retenue source · reversement avant le 20',             color: '#6366F1' },
   { label: 'IS 30%', detail: 'min 1% CA HT (plancher 500 000 F) · 30 avril N+1',  color: '#7C3AED' },
   { label: 'DAS', detail: '>100 000 FCFA versés à tiers · avant 31 mars N+1',      color: '#EF4444' },
   { label: 'TA/FPC', detail: '1,2% + 1,2% masse salariale · avant 30 avril N+1', color: '#14B8A6' },
-  { label: 'SMIG 90 000 FCFA/mois', detail: 'Plafond CNSS : 3 375 000 FCFA/mois', color: '#64748B' },
+  { label: 'SMIG 90 000 FCFA/mois', detail: 'Plafond CNSS : 1 200 000 FCFA/mois (VID)', color: '#64748B' },
 ]
 
 export default function FiscalitePage() {
