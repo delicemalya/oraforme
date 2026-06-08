@@ -70,8 +70,11 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'pharmacie-ventes',   href: '/dashboard/pharmacie/ventes',     label: 'Ventes / POS',    sublabel: 'Caisse & ordonnances'      },
   ],
   hotel: [
-    { id: 'hotel',         href: '/dashboard/hotel',               label: 'Hébergement',    sublabel: 'Réservations & chambres' },
-    { id: 'housekeeping',  href: '/dashboard/hotel/housekeeping',  label: 'Housekeeping',   sublabel: 'Ménage & entretien'      },
+    { id: 'hotel',               href: '/dashboard/hotel',               label: 'Hébergement',    sublabel: 'Tableau de bord hôtel'   },
+    { id: 'hotel-reservations',  href: '/dashboard/hotel/reservations',  label: 'Réservations',   sublabel: 'Check-in & check-out'    },
+    { id: 'housekeeping',        href: '/dashboard/hotel/housekeeping',  label: 'Housekeeping',   sublabel: 'Ménage & entretien'      },
+    { id: 'hotel-maintenance',   href: '/dashboard/hotel/maintenance',   label: 'Maintenance',    sublabel: 'Pannes & interventions'  },
+    { id: 'hotel-miaa',          href: '/dashboard/hotel/miaa',          label: 'MIAA+ Hôtel',    sublabel: 'IA assistant hôtelier'   },
   ],
   transport: [
     { id: 'transport', href: '/dashboard/transport', label: 'Flotte VTC', sublabel: 'Véhicules & courses' },
