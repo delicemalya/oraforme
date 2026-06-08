@@ -54,8 +54,14 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'ecole-miaa',             href: '/dashboard/ecole/miaa',                   label: 'MIAA+ École',            sublabel: 'IA assistant école',       roleFilter: ['DIRECTION_GENERALE', 'DAAC', 'FORMATEUR'] },
   ],
   restaurant: [
-    { id: 'restaurant', href: '/dashboard/restaurant',         label: 'Caisse POS',     sublabel: 'Commandes & service'     },
-    { id: 'cuisine',    href: '/dashboard/restaurant/cuisine', label: 'Cuisine',        sublabel: 'Cuisine & préparation'   },
+    { id: 'resto-direction',    href: '/dashboard/restaurant/direction',    label: 'Direction',       sublabel: 'KPIs & rentabilité'      },
+    { id: 'restaurant',         href: '/dashboard/restaurant',              label: 'Caisse POS',      sublabel: 'Commandes & service'     },
+    { id: 'cuisine',            href: '/dashboard/restaurant/cuisine',      label: 'Cuisine',         sublabel: 'Préparation & suivi'     },
+    { id: 'resto-reservations', href: '/dashboard/restaurant/reservations', label: 'Réservations',    sublabel: 'Tables & planning'       },
+    { id: 'resto-livraisons',   href: '/dashboard/restaurant/livraisons',   label: 'Livraisons',      sublabel: 'Suivi livraisons'        },
+    { id: 'resto-formules',     href: '/dashboard/restaurant/formules',     label: 'Formules',        sublabel: 'Menus & formules du jour' },
+    { id: 'resto-inventaire',   href: '/dashboard/restaurant/inventaire',   label: 'Inventaire',      sublabel: 'Ingrédients & stocks'    },
+    { id: 'resto-miaa',         href: '/dashboard/restaurant/miaa',         label: 'MIAA+ Restaurant', sublabel: 'IA & prévisions'        },
   ],
   sante: [
     { id: 'sante',               href: '/dashboard/sante',                label: 'Clinique',        sublabel: 'Tableau de bord santé'     },
