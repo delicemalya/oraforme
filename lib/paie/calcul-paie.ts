@@ -2,19 +2,31 @@
 // Sources : CGI Congo, CNSS Congo, Code du Travail loi 45-75 et décrets CNSS
 // Validé sur 3 cas test (voir README)
 
-// ── Constantes légales Congo ───────────────────────────────────────────────────
+// ── Constantes légales Congo — CNSS (source : ECAM Pointe-Noire 2024) ─────────
 
-export const PLAFOND_CNSS_EMPLOYE = 3_375_000  // plafond mensuel CNSS salarié
-export const TAUX_CNSS_EMPLOYE    = 0.0504      // 5.04% part salariale
-export const TAUX_CNSS_PATRONAL   = 0.1436      // 14.36% part patronale
-export const TAUX_TUS             = 0.045       // Taxe Unique sur les Salaires — charge patronale
-export const TAUX_MEDECINE        = 0.005       // Médecine du travail — charge patronale
-export const SMIG_MENSUEL         = 90_000      // SMIG Congo (arrêté 2020)
+// Vieillesse-Décès (VID) — plafond 1 200 000 FCFA/mois
+export const PLAFOND_CNSS_EMPLOYE  = 1_200_000  // plafond VID salarié
+export const PLAFOND_VID           = 1_200_000  // plafond VID (idem)
+export const TAUX_CNSS_EMPLOYE     = 0.04       // 4% VID part salariale
+export const TAUX_VID_PATRONAL     = 0.08       // 8% VID part patronale
+
+// Allocations Familiales + Accidents du Travail — plafond 600 000 FCFA/mois
+export const PLAFOND_AT_AF         = 600_000    // plafond AF / AT
+export const TAUX_AF               = 0.1003     // 10.03% Allocations Familiales
+export const TAUX_AT               = 0.0225     // 2.25%  Accidents du Travail
+
+// TUS + Médecine du travail — déplafonnés
+export const TAUX_TUS              = 0.03       // 3%    Taxe Unique sur les Salaires
+export const TAUX_MEDECINE         = 0.005      // 0.5%  Médecine du travail
+
+// Taux patronal global (VID+AF+AT = 20.28%) — utilisé uniquement comme fallback
+export const TAUX_CNSS_PATRONAL    = 0.2028
+export const SMIG_MENSUEL          = 90_000     // SMIG Congo (arrêté 2020)
 
 // ── Barème IRPP mensuel Congo-Brazzaville ─────────────────────────────────────
 // Sources : art. 76 CGI Congo, appliqué mensuellement
-// Cas test 1 : brut=900 000 → base=854 640 → IRPP=3 906 FCFA ✓
-// Cas test 3 : brut=3 000 000 → base=2 848 800 → IRPP=190 240 FCFA ✓
+// Cas test 1 : brut=900 000 → base IRPP=864 000 → IRPP=4 000 FCFA ✓
+// Cas test 3 : brut=3 000 000 → base IRPP=2 952 000 → IRPP=200 560 FCFA ✓
 export const TRANCHES_IRPP = [
   { min: 0,          max: 464_000,   taux: 0,    label: '0 — 464 000'        },
   { min: 464_000,    max: 1_000_000, taux: 0.01, label: '464 000 — 1 000 000' },
@@ -128,8 +140,17 @@ export function calculerPaie(el: ElementsPaie): ResultatPaie {
   const total_retenues = cnss_employe + irpp + mutuelle + acompte + opposition + autres_retenues
   const salaire_net    = salaire_brut - total_retenues
 
-  const taux_patro     = el.taux_cnss_patronal || TAUX_CNSS_PATRONAL
-  const cnss_patronal  = Math.round(salaire_brut * taux_patro)
+  let cnss_patronal: number
+  if (el.taux_cnss_patronal) {
+    // override manuel : taux unique appliqué sur le brut (sans plafond)
+    cnss_patronal = Math.round(salaire_brut * el.taux_cnss_patronal)
+  } else {
+    // calcul légal multi-plafond CNSS Congo
+    const vid_patro = Math.round(Math.min(salaire_brut, PLAFOND_VID) * TAUX_VID_PATRONAL)
+    const af_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AT_AF) * TAUX_AF)
+    const at_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AT_AF) * TAUX_AT)
+    cnss_patronal = vid_patro + af_patro + at_patro
+  }
   const tus_patronal   = Math.round(salaire_brut * TAUX_TUS)
   const medecine_travail = Math.round(salaire_brut * TAUX_MEDECINE)
   const cout_total_employeur = salaire_brut + cnss_patronal + tus_patronal + medecine_travail
@@ -179,25 +200,25 @@ export function fmtFCFA(n: number): string {
   return fmtNum(n) + ' FCFA'
 }
 
-// ── Auto-tests (exécutés au build via tsc) ────────────────────────────────────
-// CAS 1 : 900 000 FCFA → net 850 734
-// CAS 2 : 300 000 FCFA → net 284 880
-// CAS 3 : 3 000 000 FCFA → net 2 658 560
+// ── Auto-tests (taux officiels CNSS Congo — ECAM Pointe-Noire 2024) ──────────
+// CAS 1 : brut=900 000 → VID=36 000, base IRPP=864 000, IRPP=4 000, net=860 000
+// CAS 2 : brut=300 000 → VID=12 000, base IRPP=288 000, IRPP=0,     net=288 000
+// CAS 3 : brut=3 000 000 → VID=48 000 (plaf. 1 200 000), IRPP=200 560, net=2 751 440
 export function _selfTest(): boolean {
   const cas1 = calculerPaie({ salaire_base: 900_000 })
-  if (cas1.cnss_employe !== 45_360)  throw new Error(`CAS1 CNSS: ${cas1.cnss_employe}`)
-  if (cas1.irpp         !== 3_906)   throw new Error(`CAS1 IRPP: ${cas1.irpp}`)
-  if (cas1.salaire_net  !== 850_734) throw new Error(`CAS1 NET: ${cas1.salaire_net}`)
+  if (cas1.cnss_employe !== 36_000)  throw new Error(`CAS1 CNSS: ${cas1.cnss_employe}`)
+  if (cas1.irpp         !== 4_000)   throw new Error(`CAS1 IRPP: ${cas1.irpp}`)
+  if (cas1.salaire_net  !== 860_000) throw new Error(`CAS1 NET: ${cas1.salaire_net}`)
 
   const cas2 = calculerPaie({ salaire_base: 300_000 })
-  if (cas2.cnss_employe !== 15_120)  throw new Error(`CAS2 CNSS: ${cas2.cnss_employe}`)
+  if (cas2.cnss_employe !== 12_000)  throw new Error(`CAS2 CNSS: ${cas2.cnss_employe}`)
   if (cas2.irpp         !== 0)       throw new Error(`CAS2 IRPP: ${cas2.irpp}`)
-  if (cas2.salaire_net  !== 284_880) throw new Error(`CAS2 NET: ${cas2.salaire_net}`)
+  if (cas2.salaire_net  !== 288_000) throw new Error(`CAS2 NET: ${cas2.salaire_net}`)
 
   const cas3 = calculerPaie({ salaire_base: 3_000_000 })
-  if (cas3.cnss_employe !== 151_200) throw new Error(`CAS3 CNSS: ${cas3.cnss_employe}`)
-  if (cas3.irpp         !== 190_240) throw new Error(`CAS3 IRPP: ${cas3.irpp}`)
-  if (cas3.salaire_net  !== 2_658_560) throw new Error(`CAS3 NET: ${cas3.salaire_net}`)
+  if (cas3.cnss_employe !== 48_000)    throw new Error(`CAS3 CNSS: ${cas3.cnss_employe}`)
+  if (cas3.irpp         !== 200_560)   throw new Error(`CAS3 IRPP: ${cas3.irpp}`)
+  if (cas3.salaire_net  !== 2_751_440) throw new Error(`CAS3 NET: ${cas3.salaire_net}`)
 
   return true
 }

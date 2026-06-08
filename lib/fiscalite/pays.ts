@@ -25,11 +25,11 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
     cnss: {
       nom: 'Caisse Nationale de Sécurité Sociale',
       acronyme: 'CNSS',
-      taux_salarie: 0.0504,    // 5.04%
-      taux_patronal: 0.1416,   // 14.16%
-      plafond_mensuel: 3_375_000,
+      taux_salarie: 0.04,     // VID 4% salarié (plafonné 1 200 000 FCFA/mois)
+      taux_patronal: 0.2328,  // VID 8% + AF 10.03% + AT 2.25% + TUS 3% = 23.28%
+      plafond_mensuel: 1_200_000,  // plafond vieillesse-décès (VID)
       plafond_annuel: null,
-      branches: ['Vieillesse-Décès', 'Accident du Travail', 'Prestations Familiales'],
+      branches: ['Vieillesse-Décès (VID)', 'Allocations Familiales (AF)', 'Accidents du Travail (AT)', 'Taxe Unique sur les Salaires (TUS)'],
       echeance_jour: 15,
       echeance_mois_suivant: true,
     },
@@ -53,7 +53,7 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
       'TVA 18% + Centime Additionnel 5% sur TVA = total 19.8% sur HT',
       'SMIG : 90 000 FCFA/mois (arrêté 2020)',
       'Déclaration TVA obligatoire avant le 20 du mois suivant',
-      'CNSS : plafond 3 375 000 FCFA/mois',
+      'CNSS Congo : salarié 4% VID (plaf. 1 200 000) · patronal 8% VID (plaf. 1 200 000) + 10.03% AF + 2.25% AT (plaf. 600 000) + 3% TUS (déplafonné)',
     ],
   },
 

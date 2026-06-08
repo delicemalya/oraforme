@@ -112,9 +112,9 @@ export default function CNSSDeclarationPage() {
     setLoading(true)
     const res = await fetch(`/api/declarations/cnss?mois=${mois}&annee=${annee}`)
     if (res.ok) {
-      const d: DeclarationCNSS = await res.json()
+      const d: DeclarationCNSS | null = await res.json()
       setDecl(d)
-      setLignes((d.employes ?? []).map((e, i) => ({
+      setLignes((d?.employes ?? []).map((e, i) => ({
         key:        `${i}`,
         employe_id: e.employe_id,
         nom:        e.nom,

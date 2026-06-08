@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Users, Download, Loader2, RefreshCw, Info, FileText, CheckCircle } from 'lucide-react'
+import { Users, Download, Loader2, RefreshCw, Info, FileText, CheckCircle, ExternalLink } from 'lucide-react'
 import { PAYS_LIST, getPaysConfig } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 
@@ -124,16 +125,40 @@ export default function CNSSPage() {
       </div>
 
       {/* Info banner */}
-      <div style={{ background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 10 }}>
+      <div style={{ background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 12, padding: '12px 16px', marginBottom: pays === 'CG' ? 10 : 20, display: 'flex', gap: 10 }}>
         <Info size={15} color={PURPLE} style={{ flexShrink: 0, marginTop: 1 }} />
         <div style={{ fontSize: 12, color: '#5B21B6', lineHeight: 1.6 }}>
           <strong>{String(config?.nom ?? cfg.cnss.nom)}</strong> ·
-          Salarié <strong>{(cfg.cnss.taux_salarie * 100).toFixed(2)}%</strong> ·
-          Patronal <strong>{(cfg.cnss.taux_patronal * 100).toFixed(2)}%</strong>
-          {cfg.cnss.plafond_mensuel ? ` · Plafond ${cfg.cnss.plafond_mensuel.toLocaleString('fr-FR')} ${devise}/mois` : ' · Sans plafond'} ·
-          Dépôt avant le <strong>{cfg.cnss.echeance_jour}</strong>{cfg.cnss.echeance_mois_suivant ? ' du mois suivant' : ' du même mois'}
+          {pays === 'CG' ? (
+            <span>
+              {' '}Salarié <strong>4% VID</strong> (plaf. 1 200 000) ·
+              Patronal <strong>8% VID</strong> (plaf. 1 200 000) + <strong>10.03% AF</strong> + <strong>2.25% AT</strong> (plaf. 600 000) + <strong>3% TUS</strong> (déplafonné) ·
+              Total patronal <strong>23.28%</strong> ·
+            </span>
+          ) : (
+            <span>
+              {' '}Salarié <strong>{(cfg.cnss.taux_salarie * 100).toFixed(2)}%</strong> ·
+              Patronal <strong>{(cfg.cnss.taux_patronal * 100).toFixed(2)}%</strong>
+              {cfg.cnss.plafond_mensuel ? ` · Plafond ${cfg.cnss.plafond_mensuel.toLocaleString('fr-FR')} ${devise}/mois` : ' · Sans plafond'} ·
+            </span>
+          )}
+          {' '}Dépôt avant le <strong>{cfg.cnss.echeance_jour}</strong>{cfg.cnss.echeance_mois_suivant ? ' du mois suivant' : ' du même mois'}
         </div>
       </div>
+
+      {/* Congo — bannière télédéclaration officielle */}
+      {pays === 'CG' && (
+        <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 12, color: '#92400E', lineHeight: 1.6 }}>
+            <strong>🇨🇬 CNSS Congo</strong> — Ce tableau affiche un récapitulatif annuel.
+            Pour la télédéclaration officielle (formulaires conformes CNSS, PDF + Excel), utilisez le module dédié.
+          </div>
+          <Link href="/dashboard/declarations/cnss"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, background: '#F59E0B', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <ExternalLink size={13} /> Télédéclaration officielle
+          </Link>
+        </div>
+      )}
 
       {/* KPIs */}
       {totaux && (

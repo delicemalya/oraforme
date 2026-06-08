@@ -182,7 +182,7 @@ const SIDEBAR_GROUPS = [
   // SUPERVISION — KPIs exécutifs, BI, analytics
   { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['direction', 'finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
   // FINANCE — gestion financière + déclarations DGI + CNSS
-  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite', 'cnss-congo'] },
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
   // RH — personnel & paie (recrutement = rubrique indépendante)
   { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
   // RECRUTEMENT — module autonome
