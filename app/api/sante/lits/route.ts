@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireTenant } from '@/lib/auth'
+import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
 export async function GET(req: NextRequest) {
@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
     .eq('tenant_id', ctx.tenantId)
     .eq('statut', 'en_cours')
 
-  const sejourByLit: Record<string, (typeof sejours)[0]> = {}
+  type SejourRow = NonNullable<typeof sejours>[number]
+  const sejourByLit: Record<string, SejourRow> = {}
   for (const s of sejours ?? []) {
     if (s.lit_id) sejourByLit[s.lit_id] = s
   }

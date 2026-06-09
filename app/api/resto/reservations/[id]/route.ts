@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
+type Ctx = { params: Promise<{ id: string }> }
+
 // PATCH /api/resto/reservations/[id]
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: Ctx) {
   const { ctx, error } = await requireTenant()
   if (error) return error
 
+  const { id } = await params
   const body = await req.json()
   const allowed = ['statut', 'table_id', 'heure_resa', 'nb_personnes', 'notes', 'livreur_nom']
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
@@ -15,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const { data, error: err } = await supabaseAdmin
     .from('resto_reservations')
     .update(updates)
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('tenant_id', ctx.tenantId)
     .select('*')
     .single()
@@ -25,14 +28,15 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // DELETE /api/resto/reservations/[id]
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const { ctx, error } = await requireTenant()
   if (error) return error
 
+  const { id } = await params
   const { error: err } = await supabaseAdmin
     .from('resto_reservations')
     .delete()
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('tenant_id', ctx.tenantId)
 
   if (err) return NextResponse.json({ error: err.message }, { status: 500 })

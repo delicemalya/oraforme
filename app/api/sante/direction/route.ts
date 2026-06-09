@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireTenant } from '@/lib/auth'
+import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
 export async function getHisKPIs(tenantId: string) {

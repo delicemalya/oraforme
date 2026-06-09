@@ -15,10 +15,10 @@ interface KPIs {
 const fmtNum = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
 
 const QUICK_PROMPTS = [
-  'Quel est le taux d'occupation des lits aujourd'hui ?',
-  'Analyse les revenus du mois et donne des recommandations',
-  'Quelles alertes médicales dois-je traiter en priorité ?',
-  'Prévisions d'admissions pour la semaine prochaine',
+  "Quel est le taux d'occupation des lits aujourd'hui ?",
+  "Analyse les revenus du mois et donne des recommandations",
+  "Quelles alertes médicales dois-je traiter en priorité ?",
+  "Prévisions d'admissions pour la semaine prochaine",
 ]
 
 export default function MIAASantePage() {
