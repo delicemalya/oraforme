@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import {
-  Eye, EyeOff, MailCheck, ArrowRight, CheckCircle2,
+  Eye, EyeOff, MailCheck, ArrowRight, ArrowLeft, CheckCircle2,
   Building2, User, Phone, Mail, Lock, ChevronLeft,
 } from 'lucide-react'
 
@@ -169,11 +169,15 @@ export default function RegisterPage() {
           ? 'linear-gradient(145deg,#15803D 0%,#16A34A 60%,#22C55E 100%)'
           : 'linear-gradient(145deg,#92400E 0%,#D97706 55%,#F59E0B 100%)' }}
       >
-        {/* Logo */}
-        <div className="flex items-center gap-3">
+        {/* Logo + retour */}
+        <div className="flex items-center justify-between">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-white.png" alt="Oraforme" className="h-9 w-auto"
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          <Link href="/"
+            className="flex items-center gap-1.5 text-white/70 hover:text-white text-[12px] font-semibold transition-colors">
+            <ArrowLeft size={13} /> Accueil
+          </Link>
         </div>
 
         {/* Content */}

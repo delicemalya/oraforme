@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { Eye, EyeOff, CheckCircle2, ArrowRight, Mail, Phone as PhoneIcon, Lock } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle2, ArrowRight, ArrowLeft, Mail, Phone as PhoneIcon, Lock } from 'lucide-react'
 
 type AuthMode  = 'email' | 'phone'
 type PhoneStep = 'enter' | 'otp'
@@ -127,11 +127,15 @@ export default function LoginPage() {
         className="lg:w-[42%] shrink-0 flex flex-col justify-between px-8 py-10 lg:px-12 lg:py-14"
         style={{ background: 'linear-gradient(145deg,#7F1D1D 0%,#DC2626 60%,#EF4444 100%)' }}
       >
-        {/* Logo */}
-        <div>
+        {/* Logo + retour */}
+        <div className="flex items-center justify-between">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-white.png" alt="Oraforme" className="h-9 w-auto"
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          <Link href="/"
+            className="flex items-center gap-1.5 text-white/70 hover:text-white text-[12px] font-semibold transition-colors">
+            <ArrowLeft size={13} /> Accueil
+          </Link>
         </div>
 
         {/* Main content */}
