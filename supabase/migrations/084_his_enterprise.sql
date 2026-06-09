@@ -339,11 +339,15 @@ CREATE INDEX idx_his_pers_tenant    ON his_personnel(tenant_id, actif);
 CREATE INDEX idx_his_gardes_date    ON his_gardes(tenant_id, date_garde);
 
 -- ==================== SEED ROLES ====================
-INSERT INTO sector_roles (sector_id, role_key, label, permissions, color) VALUES
-  ('sante', 'directeur_med',   'Directeur Médical',   '["patients","consultations","medecins","rdv","urgences","hospitalisation","labo","imagerie","bloc","facturation","assurances","rh","miaa","rapports"]', '#7C3AED'),
-  ('sante', 'medecin_senior',  'Médecin Senior',      '["patients","consultations","medecins","rdv","urgences","hospitalisation","labo","imagerie","bloc"]', '#2563EB'),
-  ('sante', 'infirmier_chef',  'Infirmier Chef',      '["patients","rdv","urgences","hospitalisation","labo"]', '#16A34A'),
-  ('sante', 'laborantin',      'Laborantin',          '["patients","labo"]', '#7C3AED'),
-  ('sante', 'radiologue',      'Radiologue',          '["patients","imagerie"]', '#0891B2'),
-  ('sante', 'caissier_sante',  'Caissier Santé',      '["facturation","assurances"]', '#F59E0B')
-ON CONFLICT (sector_id, role_key) DO NOTHING;
+INSERT INTO sector_roles (sector_id, role_key, role_label, role_label_fr, couleur, permissions) VALUES
+  ('sante', 'directeur_med',  'Medical Director',   'Directeur Médical', '#7C3AED', '{"patients":true,"consultations":true,"medecins":true,"rdv":true,"urgences":true,"hospitalisation":true,"labo":true,"imagerie":true,"bloc":true,"facturation":true,"assurances":true,"rh":true,"miaa":true,"rapports":true}'),
+  ('sante', 'medecin_senior', 'Senior Doctor',      'Médecin Senior',    '#2563EB', '{"patients":true,"consultations":true,"medecins":true,"rdv":true,"urgences":true,"hospitalisation":true,"labo":true,"imagerie":true,"bloc":true,"facturation":false,"assurances":false,"rh":false,"miaa":false,"rapports":false}'),
+  ('sante', 'infirmier_chef', 'Head Nurse',         'Infirmier Chef',    '#16A34A', '{"patients":true,"consultations":false,"medecins":false,"rdv":true,"urgences":true,"hospitalisation":true,"labo":true,"imagerie":false,"bloc":false,"facturation":false,"assurances":false,"rh":false,"miaa":false,"rapports":false}'),
+  ('sante', 'laborantin',     'Lab Technician',     'Laborantin',        '#7C3AED', '{"patients":true,"consultations":false,"medecins":false,"rdv":false,"urgences":false,"hospitalisation":false,"labo":true,"imagerie":false,"bloc":false,"facturation":false,"assurances":false,"rh":false,"miaa":false,"rapports":false}'),
+  ('sante', 'radiologue',     'Radiologist',        'Radiologue',        '#0891B2', '{"patients":true,"consultations":false,"medecins":false,"rdv":false,"urgences":false,"hospitalisation":false,"labo":false,"imagerie":true,"bloc":false,"facturation":false,"assurances":false,"rh":false,"miaa":false,"rapports":false}'),
+  ('sante', 'caissier_sante', 'Healthcare Cashier', 'Caissier Santé',    '#F59E0B', '{"patients":false,"consultations":false,"medecins":false,"rdv":false,"urgences":false,"hospitalisation":false,"labo":false,"imagerie":false,"bloc":false,"facturation":true,"assurances":true,"rh":false,"miaa":false,"rapports":false}')
+ON CONFLICT (sector_id, role_key) DO UPDATE SET
+  role_label    = EXCLUDED.role_label,
+  role_label_fr = EXCLUDED.role_label_fr,
+  couleur       = EXCLUDED.couleur,
+  permissions   = EXCLUDED.permissions;
