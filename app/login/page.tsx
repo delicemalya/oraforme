@@ -1,9 +1,9 @@
 'use client'
-
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { Eye, EyeOff, CheckCircle2, ArrowRight, ArrowLeft, Mail, Phone as PhoneIcon, Lock } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle2, ArrowRight, ArrowLeft, Mail, Phone as PhoneIcon, Lock, Info } from 'lucide-react'
 
 type AuthMode  = 'email' | 'phone'
 type PhoneStep = 'enter' | 'otp'
@@ -57,9 +57,13 @@ const inputBase = "w-full pl-9 pr-3 py-2.5 text-[13px] border border-[#E2E8F0] r
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function LoginPage() {
+function LoginPageInner() {
+  const searchParams = useSearchParams()
+  const noticeParam  = searchParams.get('notice')
+  const emailParam   = searchParams.get('email') ?? ''
+
   const [mode,      setMode]      = useState<AuthMode>('email')
-  const [email,     setEmail]     = useState('')
+  const [email,     setEmail]     = useState(emailParam)
   const [password,  setPassword]  = useState('')
   const [showPwd,   setShowPwd]   = useState(false)
   const [phone,     setPhone]     = useState('')
@@ -67,6 +71,10 @@ export default function LoginPage() {
   const [phoneStep, setPhoneStep] = useState<PhoneStep>('enter')
   const [error,     setError]     = useState('')
   const [loading,   setLoading]   = useState(false)
+
+  useEffect(() => {
+    if (emailParam) setEmail(emailParam)
+  }, [emailParam])
 
   async function handleGoogleLogin() {
     setError(''); setLoading(true)
@@ -172,6 +180,17 @@ export default function LoginPage() {
       {/* ── RIGHT PANEL (blanc) ────────────────────────────────────────────── */}
       <div className="flex-1 flex items-center justify-center px-6 py-10 lg:px-16 bg-white">
         <div className="w-full max-w-md">
+
+          {/* Notice: email already exists */}
+          {noticeParam === 'use_email' && (
+            <div className="mb-6 flex items-start gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-2xl">
+              <Info size={16} className="text-blue-600 mt-0.5 shrink-0" />
+              <p className="text-[13px] text-blue-800">
+                Un compte Oraforme existe déjà pour <strong>{emailParam}</strong>.<br />
+                Connectez-vous avec votre email et mot de passe.
+              </p>
+            </div>
+          )}
 
           {/* Header */}
           <div className="mb-8">
@@ -310,5 +329,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
   )
 }

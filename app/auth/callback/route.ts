@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 /**
  * Auth Callback Handler
@@ -84,6 +85,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/dashboard`)
   }
 
-  // New user (just confirmed email or Google OAuth) — complete onboarding
+  // For OAuth users (Google): check if another account already exists with this email
+  const identities = user.identities ?? []
+  const isOAuth = identities.some(i => i.provider !== 'email')
+  if (isOAuth && user.email) {
+    const { data: emailExists } = await supabaseAdmin
+      .rpc('fn_profile_exists_for_email', { p_email: user.email })
+    if (emailExists) {
+      // Sign out the new OAuth user and tell them to log in with email/password
+      await supabase.auth.signOut()
+      return NextResponse.redirect(
+        `${origin}/login?notice=use_email&email=${encodeURIComponent(user.email)}`
+      )
+    }
+  }
+
+  // New user — complete onboarding
   return NextResponse.redirect(`${origin}${next}`)
 }
