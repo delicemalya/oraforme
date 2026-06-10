@@ -38,6 +38,7 @@ export default function OnboardingPage() {
   const [loading, setLoading]   = useState(false)
   const [error,   setError]     = useState('')
   const [showPwd, setShowPwd]   = useState(false)
+  const [isOAuthUser, setIsOAuthUser] = useState(false)
 
   // Step 1
   const [secteur, setSecteur]   = useState<SecteurId | ''>('')
@@ -58,8 +59,27 @@ export default function OnboardingPage() {
   })
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session?.user) return
+
+      // Detect Google/OAuth user — no password needed
+      const identities = session.user.identities ?? []
+      const hasOAuth = identities.some(i => i.provider !== 'email')
+      setIsOAuthUser(hasOAuth)
+
+      // If user already has a profile, skip onboarding entirely
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle()
+      if (profile?.tenant_id) {
+        window.location.href = '/dashboard'
+        return
+      }
+
       setAdmin(prev => ({ ...prev, email: session.user.email ?? '' }))
 
       // Read pre-registration context saved by /register page
@@ -114,7 +134,7 @@ export default function OnboardingPage() {
       admin.prenom.trim().length >= 1 &&
       admin.nom.trim().length >= 1 &&
       admin.email.includes('@') &&
-      admin.password.length >= 8
+      (isOAuthUser || admin.password.length >= 8)
     )
     return false
   }
@@ -547,29 +567,38 @@ export default function OnboardingPage() {
                           className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
                         />
                       </div>
-                      <div>
-                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Mot de passe <span className="text-red-400">*</span></label>
-                        <div className="relative">
-                          <input
-                            type={showPwd ? 'text' : 'password'}
-                            value={admin.password}
-                            onChange={e => setAdmin(a => ({ ...a, password: e.target.value }))}
-                            placeholder="8 caractères minimum"
-                            autoComplete="new-password"
-                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 pr-11 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPwd(v => !v)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
-                          >
-                            {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
-                          </button>
+                      {isOAuthUser ? (
+                        <div className="flex items-center gap-3 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-xl">
+                          <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                            <Check size={11} className="text-green-400" />
+                          </div>
+                          <p className="text-green-400/90 text-[13px]">Connecté via Google — aucun mot de passe requis</p>
                         </div>
-                        {admin.password.length > 0 && admin.password.length < 8 && (
-                          <p className="text-red-400/70 text-xs mt-1">8 caractères minimum</p>
-                        )}
-                      </div>
+                      ) : (
+                        <div>
+                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Mot de passe <span className="text-red-400">*</span></label>
+                          <div className="relative">
+                            <input
+                              type={showPwd ? 'text' : 'password'}
+                              value={admin.password}
+                              onChange={e => setAdmin(a => ({ ...a, password: e.target.value }))}
+                              placeholder="8 caractères minimum"
+                              autoComplete="new-password"
+                              className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 pr-11 outline-none focus:border-[#F59E0B]/50 transition-colors"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPwd(v => !v)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+                            >
+                              {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+                            </button>
+                          </div>
+                          {admin.password.length > 0 && admin.password.length < 8 && (
+                            <p className="text-red-400/70 text-xs mt-1">8 caractères minimum</p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Final recap */}
