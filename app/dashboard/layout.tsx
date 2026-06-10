@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Sidebar from '@/components/dashboard/Sidebar'
 import Header from '@/components/dashboard/Header'
 import BackButtonBar from '@/components/dashboard/BackButtonBar'
-import AiAssistant from '@/components/ui/AiAssistant'
+import MIAAWidget from '@/components/miaa/MIAAWidget'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -30,8 +30,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
           </main>
         </div>
-        {/* MIAA+ floating assistant — available on all dashboard pages */}
-        <AiAssistant />
+        {/* MIAA+ Super Agent — floating widget with 5 tabs */}
+        <MIAAWidget />
       </div>
     </DashboardShell>
   )
