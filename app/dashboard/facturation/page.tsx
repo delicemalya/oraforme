@@ -13,8 +13,9 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { calculerTVACongo, formaterMontant, genererNumeroFacture } from '@/lib/fiscalite-congo'
+import { genererNumeroFacture } from '@/lib/fiscalite-congo'
 import { captureSupabaseError } from '@/lib/monitoring'
+import { usePays } from '@/lib/contexts/PaysContext'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -64,7 +65,6 @@ const STATUT_CONFIG: Record<StatutFac, { label: string; color: string; bg: strin
   annulee:            { label: 'Annulée',   color: '#64748B', bg: '#48495818', icon: XCircle },
 }
 
-const fmt = formaterMontant
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
@@ -149,6 +149,7 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
   tenantId: string
 }) {
   const { t } = useLocale()
+  const { formaterMontant: fmt } = usePays()
   const resteARegler = facture.total - (facture.montant_paye ?? 0)
   const [montant, setMontant] = useState(resteARegler)
   const [mode, setMode] = useState<string>('especes')
@@ -300,6 +301,7 @@ function PaymentModal({ facture, onClose, onPaid, tenantId }: {
 export default function FacturationPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()
+  const { calculerTVA, formaterMontant: fmt, paysFiscal, paysGeo } = usePays()
   const router = useRouter()
 
   const [factures,       setFactures]       = useState<Facture[]>([])
@@ -405,7 +407,8 @@ export default function FacturationPage() {
   // ── Computed totals ───────────────────────────────────────────────────────────
 
   const subtotalLive = lignes.reduce((s, l) => s + l.price * l.quantity, 0)
-  const { tva: tvaLive, ca: caLive, ttc: ttcLive } = calculerTVACongo(subtotalLive)
+  const { tva: tvaLive, ttc: ttcLive } = calculerTVA(subtotalLive)
+  const caLive = 0
 
   function updateLigne(i: number, key: keyof FactureLigne, val: string | number) {
     setLignes(prev => prev.map((l, idx) => {
@@ -423,7 +426,8 @@ export default function FacturationPage() {
     setSaving(true)
     const finalStatut = asStatut ?? statut
     const ht = subtotalLive
-    const { tva: tvaFinal, ca: caFinal, ttc } = calculerTVACongo(ht)
+    const { tva: tvaFinal, ttc } = calculerTVA(ht)
+    const caFinal = 0
 
     if (editId) {
       const { error: errUpd } = await supabase.from('factures').update({
@@ -488,7 +492,7 @@ export default function FacturationPage() {
         .eq('source', 'facture')
         .eq('source_id', confirmStatut.id)
       if ((count ?? 0) === 0) {
-        const ttc = calculerTVACongo(fac.subtotal ?? fac.montant_ht ?? 0).ttc
+        const ttc = calculerTVA(fac.subtotal ?? fac.montant_ht ?? 0).ttc
         const { error: errTx } = await supabase.from('transactions').insert({
           tenant_id:     tenantId,
           type:          'entree',
@@ -561,14 +565,14 @@ export default function FacturationPage() {
   function sendWhatsApp(f: Facture) {
     const phone = f.client_phone?.replace(/\D/g, '') ?? ''
     const num = f.invoice_number ?? f.id.slice(0, 8)
-    const ttc = calculerTVACongo(f.subtotal ?? f.montant_ht ?? 0).ttc
+    const ttc = calculerTVA(f.subtotal ?? f.montant_ht ?? 0).ttc
     const msg = encodeURIComponent(`Bonjour,\n\nVeuillez trouver ci-joint la facture ${num} d'un montant de ${fmt(ttc)}.\n\nCordialement,\n${config.nom ?? 'oraforme'}`)
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank')
   }
 
   function sendEmail(f: Facture) {
     const num = f.invoice_number ?? f.id.slice(0, 8)
-    const ttc = calculerTVACongo(f.subtotal ?? f.montant_ht ?? 0).ttc
+    const ttc = calculerTVA(f.subtotal ?? f.montant_ht ?? 0).ttc
     const subject = encodeURIComponent(`Facture ${num} — ${config.nom ?? 'oraforme'}`)
     const body = encodeURIComponent(`Bonjour,\n\nVeuillez trouver ci-joint la facture ${num} d'un montant de ${fmt(ttc)}.\n\nCordialement,\n${config.nom ?? 'oraforme'}`)
     window.open(`mailto:${f.client_email ?? ''}?subject=${subject}&body=${body}`, '_blank')
@@ -621,7 +625,9 @@ export default function FacturationPage() {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
           <h1 className="text-xl font-bold text-[#101729]">{t('invoice.title')}</h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">TVA 18 % + CA 5 % · Congo-Brazzaville</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+            {paysGeo.drapeau} TVA {(paysFiscal.tva.taux_normal * 100).toFixed(1)}%{paysFiscal.tva.taxes_additionnelles?.length ? ` + ${paysFiscal.tva.taxes_additionnelles[0].code}` : ''} · {paysGeo.nom}
+          </p>
         </div>
         <div className="flex gap-2">
           <Link href="/dashboard/devis" className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] hover:border-[#DC2626]/40 text-xs font-medium transition-colors">
@@ -706,7 +712,7 @@ export default function FacturationPage() {
               <tbody>
                 {displayed.map((f, i) => {
                   const ht = f.subtotal ?? f.montant_ht ?? 0
-                  const { tva, ca, ttc } = calculerTVACongo(ht)
+                  const { tva, ttc } = calculerTVA(ht); const ca = 0
                   return (
                     <motion.tr
                       key={f.id}
@@ -1015,7 +1021,7 @@ export default function FacturationPage() {
                   {/* Totals */}
                   {(() => {
                     const ht = viewedFac.subtotal ?? viewedFac.montant_ht ?? 0
-                    const { tva, ca, ttc } = calculerTVACongo(ht)
+                    const { tva, ttc } = calculerTVA(ht); const ca = 0
                     return (
                       <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 space-y-2">
                         <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.subtotal')}</span><span className="text-[#101729]">{fmt(ht)}</span></div>

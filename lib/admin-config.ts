@@ -1,3 +1,5 @@
+import { formaterMontant as _fmt } from '@/lib/geolocation'
+
 export const SUPER_ADMIN_EMAILS = ['adjidongui@gmail.com', 'adjigordon@gmail.com']
 export const SUPER_ADMIN_EMAIL = SUPER_ADMIN_EMAILS[0]
 
@@ -70,5 +72,6 @@ export const MODULE_DESCS: Record<string, string> = {
 }
 
 export function fmtFCFA(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
+  const pays = typeof window !== 'undefined' ? (localStorage.getItem('oraforme-pays') ?? 'CG') : 'CG'
+  return _fmt(n, pays)
 }

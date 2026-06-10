@@ -5,11 +5,13 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
   Building2, Save, Check, Loader2, FileText,
-  Hash, Upload, X, Plus, Trash2, Layers, Shield, ChevronRight,
+  Hash, Upload, X, Plus, Trash2, Layers, Shield, ChevronRight, Calendar,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { usePays } from '@/lib/contexts/PaysContext'
+import { PAYS_LIST } from '@/lib/fiscalite/pays'
 
 interface Config {
   logo_url:        string
@@ -78,6 +80,7 @@ function Field({ label, value, onChange, placeholder, type = 'text', full = fals
 export default function ParametresPage() {
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()
+  const { setPays } = usePays()
   const [cfg,           setCfg]           = useState<Config>(EMPTY)
   const [loading,       setLoading]       = useState(true)
   const [saving,        setSaving]        = useState(false)
@@ -151,7 +154,6 @@ export default function ParametresPage() {
   }
 
   function set(key: keyof Config, val: string | number) {
-  const { t } = useLocale()
     setCfg(p => ({ ...p, [key]: val }))
   }
 
@@ -188,7 +190,6 @@ export default function ParametresPage() {
   // ── Logo upload ────────────────────────────────────────────────────────────
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
-  const { t } = useLocale()
     const file = e.target.files?.[0]
     if (!file || !tenantId) return
     e.target.value = ''
@@ -246,6 +247,9 @@ export default function ParametresPage() {
       return
     }
     setSaved(true)
+    // Sync country context so all pages adapt immediately
+    const paysEntry = PAYS_LIST.find(p => p.nom === cfg.pays || p.code === cfg.pays)
+    if (paysEntry) setPays(paysEntry.code)
     window.dispatchEvent(new CustomEvent('oraforme:config-saved', { detail: { logo_url: cfg.logo_url } }))
     setTimeout(() => setSaved(false), 2500)
   }
@@ -267,7 +271,9 @@ export default function ParametresPage() {
   return (
     <div className="space-y-4 max-w-3xl">
 
-      {/* Conformité shortcut */}
+      {/* Shortcuts */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
       <Link href="/dashboard/parametres/conformite"
         className="flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:shadow-sm group"
         style={{ background: '#FFFBEB', borderColor: '#FDE68A' }}>
@@ -282,6 +288,23 @@ export default function ParametresPage() {
         </div>
         <ChevronRight size={16} className="text-[#F59E0B] group-hover:translate-x-0.5 transition-transform" />
       </Link>
+
+      <Link href="/dashboard/parametres/declarations"
+        className="flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:shadow-sm group"
+        style={{ background: '#EFF6FF', borderColor: '#BFDBFE' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#2563EB20' }}>
+            <Calendar size={15} className="text-[#2563EB]" />
+          </div>
+          <div>
+            <p className="text-[13px] font-bold text-[#0F172A]">Calendrier Fiscal</p>
+            <p className="text-[11px] text-[#1E40AF]">TVA, CNSS, IRPP, IS — échéances par pays</p>
+          </div>
+        </div>
+        <ChevronRight size={16} className="text-[#2563EB] group-hover:translate-x-0.5 transition-transform" />
+      </Link>
+
+      </div>{/* end shortcuts grid */}
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -362,7 +385,22 @@ export default function ParametresPage() {
         <Field label={t('params.companyName')}  value={cfg.nom}       onChange={v => set('nom', v)}       placeholder="SARL Congo Services" />
         <Field label={t('params.address')}      value={cfg.adresse}   onChange={v => set('adresse', v)}   placeholder="123 Avenue de l'Indépendance" full />
         <Field label={t('params.city')}         value={cfg.ville}     onChange={v => set('ville', v)}     placeholder="Pointe-Noire" />
-        <Field label={t('params.country')}      value={cfg.pays}      onChange={v => set('pays', v)}      placeholder="Congo-Brazzaville" />
+        <div>
+          <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('params.country')}</label>
+          <select
+            value={PAYS_LIST.find(p => p.nom === cfg.pays)?.code ?? PAYS_LIST.find(p => p.code === cfg.pays)?.code ?? ''}
+            onChange={e => {
+              const p = PAYS_LIST.find(x => x.code === e.target.value)
+              if (p) { set('pays', p.nom); set('devise', p.devise) }
+            }}
+            className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]"
+          >
+            <option value="">— {t('params.country')} —</option>
+            {PAYS_LIST.map(p => (
+              <option key={p.code} value={p.code}>{p.drapeau} {p.nom} ({p.devise})</option>
+            ))}
+          </select>
+        </div>
         <Field label={t('params.phone')}        value={cfg.telephone} onChange={v => set('telephone', v)} placeholder="+242 06 000 0000" />
         <Field label={t('params.email')}        value={cfg.email}     onChange={v => set('email', v)}     placeholder="contact@entreprise.cg" type="email" />
       </Section>
