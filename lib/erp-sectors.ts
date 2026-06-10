@@ -51,7 +51,7 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'espace-etudiant',        href: '/dashboard/ecole/espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              roleFilter: ['ETUDIANT'] },
     { id: 'espace-parent',          href: '/dashboard/ecole/espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi scolarité',          roleFilter: ['PARENT'] },
     { id: 'parametres-academiques', href: '/dashboard/ecole/parametres-academiques', label: 'Paramètres académiques', sublabel: 'LMD & mentions',           roleFilter: ['DIRECTION_GENERALE', 'DAAC'] },
-    { id: 'ecole-miaa',             href: '/dashboard/ecole/miaa',                   label: 'MIAA+ École',            sublabel: 'IA assistant école',       roleFilter: ['DIRECTION_GENERALE', 'DAAC', 'FORMATEUR'] },
+    { id: 'ecole-miaa',             href: '/dashboard/miaa?context=ecole',           label: 'MIAA+',                  sublabel: 'IA assistant école',       roleFilter: ['DIRECTION_GENERALE', 'DAAC', 'FORMATEUR'] },
   ],
   restaurant: [
     { id: 'resto-direction',    href: '/dashboard/restaurant/direction',    label: 'Direction',       sublabel: 'KPIs & rentabilité'      },
@@ -61,7 +61,7 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'resto-livraisons',   href: '/dashboard/restaurant/livraisons',   label: 'Livraisons',      sublabel: 'Suivi livraisons'        },
     { id: 'resto-formules',     href: '/dashboard/restaurant/formules',     label: 'Formules',        sublabel: 'Menus & formules du jour' },
     { id: 'resto-inventaire',   href: '/dashboard/restaurant/inventaire',   label: 'Inventaire',      sublabel: 'Ingrédients & stocks'    },
-    { id: 'resto-miaa',         href: '/dashboard/restaurant/miaa',         label: 'MIAA+ Restaurant', sublabel: 'IA & prévisions'        },
+    { id: 'resto-miaa',         href: '/dashboard/miaa?context=restaurant', label: 'MIAA+',            sublabel: 'IA & prévisions'        },
   ],
   sante: [
     { id: 'sante-direction',       href: '/dashboard/sante/direction',       label: 'Direction Médicale',  sublabel: 'KPIs & tableau de bord HIS'      },
@@ -78,7 +78,7 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'sante-assurances',      href: '/dashboard/sante/assurances',      label: 'Assurances',          sublabel: 'Dossiers & prises en charge'     },
     { id: 'sante-medecins',        href: '/dashboard/sante/medecins',        label: 'Médecins',            sublabel: 'Personnel médical'               },
     { id: 'sante-rh',              href: '/dashboard/sante/rh',              label: 'RH Médical',          sublabel: 'Personnel paramédical & gardes'  },
-    { id: 'sante-miaa',            href: '/dashboard/sante/miaa',            label: 'MIAA+ Santé',         sublabel: 'IA assistant médical'            },
+    { id: 'sante-miaa',            href: '/dashboard/miaa?context=sante',    label: 'MIAA+',               sublabel: 'IA assistant médical'            },
   ],
   pharmacie: [
     { id: 'pharmacie',           href: '/dashboard/pharmacie',            label: 'Pharmacie',       sublabel: 'Tableau de bord'           },
@@ -90,7 +90,7 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'hotel-reservations',  href: '/dashboard/hotel/reservations',  label: 'Réservations',   sublabel: 'Check-in & check-out'    },
     { id: 'housekeeping',        href: '/dashboard/hotel/housekeeping',  label: 'Housekeeping',   sublabel: 'Ménage & entretien'      },
     { id: 'hotel-maintenance',   href: '/dashboard/hotel/maintenance',   label: 'Maintenance',    sublabel: 'Pannes & interventions'  },
-    { id: 'hotel-miaa',          href: '/dashboard/hotel/miaa',          label: 'MIAA+ Hôtel',    sublabel: 'IA assistant hôtelier'   },
+    { id: 'hotel-miaa',          href: '/dashboard/miaa?context=hotel',  label: 'MIAA+',          sublabel: 'IA assistant hôtelier'   },
   ],
   transport: [
     { id: 'transport', href: '/dashboard/transport', label: 'Flotte VTC', sublabel: 'Véhicules & courses' },

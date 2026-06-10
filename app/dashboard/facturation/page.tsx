@@ -72,14 +72,19 @@ function emptyLigne(): FactureLigne { return { description: '', price: 0, quanti
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
+function sKey(s: StatutFac | string) {
+  return s === 'partiellement_payee' ? 'fact.status.partiel' : `fact.status.${s}`
+}
+
 function StatutBadge({ statut, size = 'sm' }: { statut: StatutFac; size?: 'sm' | 'xs' }) {
   const cfg = STATUT_CONFIG[statut] ?? STATUT_CONFIG.brouillon
+  const { t } = useLocale()
   const Icon = cfg.icon
   const px = size === 'xs' ? 'px-1.5 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
   return (
     <span className={`inline-flex items-center gap-1 rounded-full font-semibold ${px}`} style={{ color: cfg.color, background: cfg.bg }}>
       <Icon size={size === 'xs' ? 9 : 11} />
-      {cfg.label}
+      {t(sKey(statut))}
     </span>
   )
 }
@@ -498,7 +503,7 @@ export default function FacturationPage() {
         if (errTx) captureSupabaseError('insert transaction facture', errTx, { module: 'facturation', tenant_id: tenantId })
       }
     }
-    showToast(`Statut → ${STATUT_CONFIG[confirmStatut.next].label}`)
+    showToast(`Statut → ${t(sKey(confirmStatut.next))}`)
     setConfirmStatut(null)
   }
 
@@ -741,8 +746,8 @@ export default function FacturationPage() {
                           className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer rounded-full px-2 py-1 border-0"
                           style={{ color: STATUT_CONFIG[f.statut]?.color, background: STATUT_CONFIG[f.statut]?.bg }}
                         >
-                          {Object.entries(STATUT_CONFIG).map(([k, v]) => (
-                            <option key={k} value={k} className="bg-[var(--card-bg)] text-[#101729]">{v.label}</option>
+                          {Object.entries(STATUT_CONFIG).map(([k]) => (
+                            <option key={k} value={k} className="bg-[var(--card-bg)] text-[#101729]">{t(sKey(k))}</option>
                           ))}
                         </select>
                       </td>
@@ -819,7 +824,7 @@ export default function FacturationPage() {
                       <div>
                         <label className="block text-xs text-[var(--text-secondary)] mb-1">{t('common.status')}</label>
                         <select value={statut} onChange={e => setStatut(e.target.value as StatutFac)} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
-                          {Object.entries(STATUT_CONFIG).map(([k, v]) => <option key={k} value={k} className="bg-[var(--card-bg)]">{v.label}</option>)}
+                          {Object.entries(STATUT_CONFIG).map(([k]) => <option key={k} value={k} className="bg-[var(--card-bg)]">{t(sKey(k))}</option>)}
                         </select>
                       </div>
                     </div>
@@ -1043,7 +1048,7 @@ export default function FacturationPage() {
                                 : { color: '#64748B', background: 'transparent', borderColor: '#E5E7EB', cursor: 'pointer' }
                             }
                           >
-                            <Icon size={10} /> {v.label}
+                            <Icon size={10} /> {t(sKey(k))}
                           </button>
                         )
                       })}
@@ -1148,11 +1153,11 @@ export default function FacturationPage() {
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
                   {t('invoice.changeStatus')}{' '}
                   <span className="font-semibold" style={{ color: STATUT_CONFIG[confirmStatut.current].color }}>
-                    {STATUT_CONFIG[confirmStatut.current].label}
+                    {t(sKey(confirmStatut.current))}
                   </span>
                   {' '}→{' '}
                   <span className="font-semibold" style={{ color: STATUT_CONFIG[confirmStatut.next].color }}>
-                    {STATUT_CONFIG[confirmStatut.next].label}
+                    {t(sKey(confirmStatut.next))}
                   </span>
                 </p>
                 <div className="flex gap-3">

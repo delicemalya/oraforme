@@ -1,16 +1,34 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Calculator, BarChart2, FileText,
   Bell, Cog, Globe, Loader2, Trash2, ChevronDown, ChevronUp,
-  Sparkles, Paperclip, Download, X,
+  Sparkles, Paperclip, Download, X, Brain,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { getTenantBrandColor } from '@/lib/utils'
+
+// Agent display names — shown as subtle badge on responses
+const AGENT_LABELS: Record<string, { label: string; color: string; emoji: string }> = {
+  comptabilite: { label: 'Finance',     color: '#6366F1', emoji: '📊' },
+  rh:           { label: 'RH',          color: '#7C5CBF', emoji: '👥' },
+  facturation:  { label: 'Commercial',  color: '#F59E0B', emoji: '💰' },
+  fiscalite:    { label: 'Fiscalité',   color: '#F59E0B', emoji: '🧾' },
+  patente:      { label: 'Patente',     color: '#DC2626', emoji: '📋' },
+  tresorerie:   { label: 'Trésorerie',  color: '#2563EB', emoji: '💵' },
+  stock:        { label: 'Stock',       color: '#16A34A', emoji: '📦' },
+  crm:          { label: 'Commercial',  color: '#F59E0B', emoji: '🤝' },
+  restaurant:   { label: 'Restaurant',  color: '#FF6B35', emoji: '🍽️' },
+  ecole:        { label: 'École',       color: '#2EA8E0', emoji: '🎓' },
+  sante:        { label: 'Santé',       color: '#E8633A', emoji: '🏥' },
+  hotel:        { label: 'Hôtel',       color: '#0891B2', emoji: '🏨' },
+  cabinet:      { label: 'Cabinet',     color: '#7C3AED', emoji: '🏛️' },
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -21,6 +39,7 @@ interface Message {
   peut_telecharger?: boolean
   contenu_telechargeable?: string
   fichier_analyse?: string
+  agent_detected?: string
 }
 
 // ── Accepted file types per module ────────────────────────────────────────────
@@ -97,6 +116,10 @@ export default function MIAAPage() {
   const { t } = useLocale()
   const { tenantId, prenom, nom, nomEntreprise } = useTenant()
   const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#F59E0B'
+  const searchParams = useSearchParams()
+  // context = secteur hint passed via URL (e.g. ?context=ecole)
+  const contextSecteur = searchParams.get('context') ?? undefined
+  const [agentActif, setAgentActif] = useState<string>('comptabilite')
 
   const CAPABILITIES = [
     { icon: Calculator, label: t('miaa.cap.fiscal'),   desc: t('miaa.cap.fiscalDesc'),   color: brandColor },
@@ -164,7 +187,6 @@ export default function MIAAPage() {
     : (nomEntreprise ?? null)
 
   function getGreeting() {
-  const { t } = useLocale()
     const h = new Date().getHours()
     return h < 12 ? t('miaa.greetMorning') : h < 18 ? t('miaa.greetAfternoon') : t('miaa.greetEvening')
   }
@@ -217,21 +239,23 @@ export default function MIAAPage() {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          module:     'general',
+          module:     'auto',
           message:    msg,
           history:    history.slice(0, -1),
-          tenantData: { tenant_id: tenantId ?? undefined },
+          tenantData: { tenant_id: tenantId ?? undefined, secteur: contextSecteur },
           langue:     'fr',
         }),
       })
       const data = await res.json()
       const text = data.response ?? t('miaa.errorReply')
+      if (data.agent_detected) setAgentActif(data.agent_detected)
       setMessages(prev => [...prev, {
         role:                  'bot',
         text,
         ts:                    Date.now(),
         peut_telecharger:      text.length > 150,
         contenu_telechargeable: text,
+        agent_detected:        data.agent_detected,
       }])
     } catch {
       setMessages(prev => [...prev, { role: 'bot', text: t('miaa.errorConnection'), ts: Date.now() }])
@@ -308,10 +332,10 @@ export default function MIAAPage() {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          module:     'general',
+          module:     agentActif,
           message:    "Sur la base de ces informations, génère un rapport professionnel complet avec titre, introduction, sections numérotées et conclusion avec recommandations.",
           history:    [{ role: 'assistant', content: contexte }],
-          tenantData: { tenant_id: tenantId ?? undefined },
+          tenantData: { tenant_id: tenantId ?? undefined, secteur: contextSecteur },
           langue:     'fr',
         }),
       })
@@ -330,7 +354,6 @@ export default function MIAAPage() {
   }
 
   function clearChat() {
-  const { t } = useLocale()
     const salut = getGreeting()
     setMessages([{
       role: 'bot',
@@ -353,11 +376,19 @@ export default function MIAAPage() {
           <MIAALogo size={42} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-gray-900">MIAA PREMIUM</h1>
+              <h1 className="text-sm font-bold text-gray-900">MIAA+</h1>
               <span className="px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest text-white"
                 style={{ background: 'linear-gradient(135deg, #7C3AED, #DC2626, #F59E0B)' }}>
                 PREMIUM
               </span>
+              {/* Active agent badge — invisible jusqu'au premier message */}
+              {agentActif && AGENT_LABELS[agentActif] && (
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                  style={{ background: AGENT_LABELS[agentActif].color + '18', color: AGENT_LABELS[agentActif].color }}>
+                  <Brain size={8} />
+                  Agent {AGENT_LABELS[agentActif].label}
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />
@@ -422,6 +453,16 @@ export default function MIAAPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Agent used micro-label */}
+                {m.role === 'bot' && m.agent_detected && AGENT_LABELS[m.agent_detected] && (
+                  <div className="ml-9 mt-0.5">
+                    <span className="inline-flex items-center gap-1 text-[9px] font-medium opacity-60"
+                      style={{ color: AGENT_LABELS[m.agent_detected].color }}>
+                      {AGENT_LABELS[m.agent_detected].emoji} {AGENT_LABELS[m.agent_detected].label}
+                    </span>
+                  </div>
+                )}
 
                 {/* Download + Report buttons on long bot messages */}
                 {m.role === 'bot' && m.peut_telecharger && m.contenu_telechargeable && (

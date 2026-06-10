@@ -23,6 +23,10 @@ const MOIS_LABELS = [
   '', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
 ]
+const MONTH_KEYS = [
+  '', 'month.jan', 'month.feb', 'month.mar', 'month.apr', 'month.may', 'month.jun',
+  'month.jul', 'month.aug', 'month.sep', 'month.oct', 'month.nov', 'month.dec',
+]
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -217,6 +221,7 @@ function ModalDetailBulletin({
   row: BulletinRow; mois: number; annee: number
   onClose: () => void; onSave: (updates: Partial<BulletinRow>) => void
 }) {
+  const { t } = useLocale()
   const [el, setEl] = useState({
     heures_sup: row.heures_sup,
     taux_horaire: row.taux_horaire,
@@ -264,7 +269,7 @@ function ModalDetailBulletin({
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
           <div>
             <h2 className="text-base font-bold text-[#101729]">Détail bulletin — {row.nom}</h2>
-            <p className="text-xs text-[var(--text-secondary)]">{row.poste} · {MOIS_LABELS[mois]} {annee} · N° CNSS {row.cnss_num || '—'}</p>
+            <p className="text-xs text-[var(--text-secondary)]">{row.poste} · {t(MONTH_KEYS[mois])} {annee} · N° CNSS {row.cnss_num || '—'}</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-[var(--text-secondary)]">
             <X size={16} />
@@ -400,6 +405,7 @@ function ModalLancerPaie({
   rows: BulletinRow[]; mois: number; annee: number; saving: boolean
   onClose: () => void; onConfirm: () => void
 }) {
+  const { t } = useLocale()
   const totalBrut = rows.reduce((s, r) => s + r.salaire_brut, 0)
   const totalNet  = rows.reduce((s, r) => s + r.salaire_net, 0)
   const totalPatro = rows.reduce((s, r) => s + r.cnss_patronal + r.tus_patronal + r.medecine_travail, 0)
@@ -414,7 +420,7 @@ function ModalLancerPaie({
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
           <div>
-            <h2 className="text-base font-bold text-[#101729]">Lancer la paie — {MOIS_LABELS[mois]} {annee}</h2>
+            <h2 className="text-base font-bold text-[#101729]">Lancer la paie — {t(MONTH_KEYS[mois])} {annee}</h2>
             <p className="text-xs text-[var(--text-secondary)]">{rows.length} bulletin{rows.length > 1 ? 's' : ''} à générer</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
@@ -809,7 +815,7 @@ export default function PaiePage() {
             <Calendar size={13} className="text-[#DC2626]" />
             <select value={mois} onChange={e => setMois(Number(e.target.value))}
               className="bg-transparent text-[#101729] text-sm font-medium focus:outline-none cursor-pointer">
-              {MOIS_LABELS.slice(1).map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
+              {MONTH_KEYS.slice(1).map((k, i) => <option key={i+1} value={i+1}>{t(k)}</option>)}
             </select>
             <select value={annee} onChange={e => setAnnee(Number(e.target.value))}
               className="bg-transparent text-[#101729] text-sm font-medium focus:outline-none cursor-pointer">
@@ -832,7 +838,7 @@ export default function PaiePage() {
             <div className="flex items-center gap-3 bg-[#D97706]/10 border border-[#D97706]/30 rounded-xl px-4 py-3">
               <AlertTriangle size={15} className="text-[#D97706] shrink-0" />
               <p className="text-sm text-[#D97706]">
-                La paie de <strong>{MOIS_LABELS[mois]} {annee}</strong> n&apos;a pas encore été générée.
+                La paie de <strong>{t(MONTH_KEYS[mois])} {annee}</strong> n&apos;a pas encore été générée.
                 Vérifiez les éléments variables puis cliquez sur <strong>Lancer la paie</strong>.
               </p>
             </div>
@@ -871,7 +877,7 @@ export default function PaiePage() {
             style={{ background: '#DC2626', boxShadow: '0 0 20px #DC262640' }}
           >
             <Play size={14} />
-            Lancer la paie — {MOIS_LABELS[mois]} {annee}
+            Lancer la paie — {t(MONTH_KEYS[mois])} {annee}
           </motion.button>
         </div>
       </div>
@@ -956,7 +962,7 @@ export default function PaiePage() {
                             const blob = await res.blob()
                             const url = URL.createObjectURL(blob)
                             const a = document.createElement('a')
-                            a.href = url; a.download = `bulletin-${row.nom}-${MOIS_LABELS[mois]}-${annee}.pdf`; a.click()
+                            a.href = url; a.download = `bulletin-${row.nom}-${t(MONTH_KEYS[mois])}-${annee}.pdf`; a.click()
                             URL.revokeObjectURL(url)
                           }}
                             className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[#DC2626]/10 hover:bg-[#DC2626]/20 text-[#DC2626] border border-[#DC2626]/20 transition-colors">
@@ -1029,7 +1035,7 @@ export default function PaiePage() {
 
           {/* Synthèse rapide */}
           <div className="rounded-xl border border-[var(--border)] p-4 flex flex-col gap-3">
-            <p className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Synthèse — {MOIS_LABELS[mois]} {annee}</p>
+            <p className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Synthèse — {t(MONTH_KEYS[mois])} {annee}</p>
             {[
               { label: 'Brut total', value: fmt(totalBrut), color: '#101729' },
               { label: 'Net total à verser', value: fmt(totalNet), color: '#16A34A' },
@@ -1050,7 +1056,7 @@ export default function PaiePage() {
       <div className="rounded-xl border border-[var(--border)] overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-[var(--border)]">
           <p className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
-            Acomptes sur salaires — {MOIS_LABELS[mois]} {annee}
+            Acomptes sur salaires — {t(MONTH_KEYS[mois])} {annee}
           </p>
           <button onClick={() => setShowAcompteForm(v => !v)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white"

@@ -2004,12 +2004,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'miaa.quick.facturation':       '📄 Facturation',
     'miaa.quick.rh':                '👔 RH & Paie',
     'miaa.quick.scolaire':          '🏫 Scolaire',
-    'miaa.suggest.tva':             '🧮 Calculer TVA sur 500 000 FCFA',
-    'miaa.suggest.net':             '👔 Net pour 400 000 FCFA brut',
-    'miaa.suggest.cnss':            '📋 Règles CNSS Congo',
-    'miaa.suggestions':             'Suggestions',
-    'miaa.uploadBtn':               'Joindre un fichier',
-    'miaa.uploadHint':              'PDF, Excel, Word — max 10 Mo',
     'miaa.uploadAnalyzing':         'Analyse du fichier en cours…',
     'miaa.downloadTxt':             'Télécharger TXT',
     'miaa.generateReport':          'Générer rapport',
@@ -3727,6 +3721,38 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'Aucun article en stock',
     'empty.commandes':          'Aucune commande enregistrée',
     'empty.etudiants':          'Aucun étudiant inscrit',
+    // Mois — utilisés dans les bulletins et rapports
+    'month.jan': 'Janvier', 'month.feb': 'Février', 'month.mar': 'Mars',
+    'month.apr': 'Avril',   'month.may': 'Mai',      'month.jun': 'Juin',
+    'month.jul': 'Juillet', 'month.aug': 'Août',     'month.sep': 'Septembre',
+    'month.oct': 'Octobre', 'month.nov': 'Novembre', 'month.dec': 'Décembre',
+    // Statuts factures
+    'fact.status.brouillon': 'Brouillon', 'fact.status.envoyee': 'Envoyée',
+    'fact.status.payee': 'Payée', 'fact.status.partiel': 'Partiel',
+    'fact.status.retard': 'En retard', 'fact.status.annulee': 'Annulée',
+    // Statuts bulletins paie
+    'rh.status.brouillon': 'Brouillon', 'rh.status.generee': 'Générée',
+    'rh.status.validee': 'Validée', 'rh.status.payee': 'Payée',
+    // Statuts clients CRM
+    'crm.status.actif': 'Client actif', 'crm.status.prospect': 'Prospect',
+    'crm.status.inactif': 'Inactif', 'crm.status.bloque': 'Bloqué',
+    // Labels tabs CRM
+    'crm.tab.clients': 'Clients & Prospects', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Activités',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Finance', 'miaa.agent.rh': 'RH',
+    'miaa.agent.fiscalite': 'Fiscalité', 'miaa.agent.commercial': 'Commercial',
+    'miaa.agent.stock': 'Stock', 'miaa.agent.tresorerie': 'Trésorerie',
+    'miaa.agent.restaurant': 'Restaurant', 'miaa.agent.ecole': 'École',
+    'miaa.agent.sante': 'Santé', 'miaa.agent.hotel': 'Hôtel',
+    'miaa.agent.cabinet': 'Cabinet',
+    'miaa.agentActif': 'Agent actif',
+    'miaa.uploadBtn': 'Joindre un fichier',
+    'miaa.uploadHint': 'PDF, Excel, Word, images — max 10 Mo. MIAA+ analysera automatiquement le document.',
+    'miaa.suggestions': 'Suggestions',
+    'miaa.suggest.tva': 'Calculer TVA + CA sur 1 000 000 FCFA',
+    'miaa.suggest.net': 'Net pour un brut de 500 000 FCFA',
+    'miaa.suggest.cnss': 'Charges CNSS de ce mois',
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -5361,10 +5387,6 @@ export const translations: Record<Locale, Record<string, string>> = {
     'miaa.quick.facturation':       '📄 Invoicing',
     'miaa.quick.rh':                '👔 HR & Payroll',
     'miaa.quick.scolaire':          '🏫 School',
-    'miaa.suggest.tva':             '🧮 Calculate VAT on 500,000 FCFA',
-    'miaa.suggest.net':             '👔 Net for 400,000 FCFA gross',
-    'miaa.suggest.cnss':            '📋 CNSS rules Congo',
-
     // Rapports page (en)
     'rapports.title':               'Financial Reports',
     'rapports.subtitle':            'ERP · {entreprise} · {mois}',
@@ -6920,6 +6942,38 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'No items in stock',
     'empty.commandes':          'No orders recorded',
     'empty.etudiants':          'No students enrolled',
+    // Months
+    'month.jan': 'January',  'month.feb': 'February', 'month.mar': 'March',
+    'month.apr': 'April',    'month.may': 'May',       'month.jun': 'June',
+    'month.jul': 'July',     'month.aug': 'August',    'month.sep': 'September',
+    'month.oct': 'October',  'month.nov': 'November',  'month.dec': 'December',
+    // Invoice statuses
+    'fact.status.brouillon': 'Draft',   'fact.status.envoyee': 'Sent',
+    'fact.status.payee': 'Paid',        'fact.status.partiel': 'Partial',
+    'fact.status.retard': 'Overdue',    'fact.status.annulee': 'Cancelled',
+    // Payroll statuses
+    'rh.status.brouillon': 'Draft',     'rh.status.generee': 'Generated',
+    'rh.status.validee': 'Validated',   'rh.status.payee': 'Paid',
+    // CRM statuses
+    'crm.status.actif': 'Active client', 'crm.status.prospect': 'Prospect',
+    'crm.status.inactif': 'Inactive',    'crm.status.bloque': 'Blocked',
+    // CRM tabs
+    'crm.tab.clients': 'Clients & Prospects', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Activities',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Finance',     'miaa.agent.rh': 'HR',
+    'miaa.agent.fiscalite': 'Tax',       'miaa.agent.commercial': 'Sales',
+    'miaa.agent.stock': 'Inventory',     'miaa.agent.tresorerie': 'Treasury',
+    'miaa.agent.restaurant': 'Restaurant', 'miaa.agent.ecole': 'School',
+    'miaa.agent.sante': 'Healthcare',   'miaa.agent.hotel': 'Hotel',
+    'miaa.agent.cabinet': 'Accounting firm',
+    'miaa.agentActif': 'Active agent',
+    'miaa.uploadBtn': 'Attach a file',
+    'miaa.uploadHint': 'PDF, Excel, Word, images — max 10 MB. MIAA+ will analyze the document automatically.',
+    'miaa.suggestions': 'Suggestions',
+    'miaa.suggest.tva': 'Calculate VAT + CA on 1,000,000 FCFA',
+    'miaa.suggest.net': 'Net salary for 500,000 FCFA gross',
+    'miaa.suggest.cnss': 'CNSS charges for this month',
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -7302,6 +7356,38 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'Nenhum artigo em stock',
     'empty.commandes':          'Nenhuma encomenda registada',
     'empty.etudiants':          'Nenhum estudante inscrito',
+    // Months
+    'month.jan': 'Janeiro',   'month.feb': 'Fevereiro', 'month.mar': 'Março',
+    'month.apr': 'Abril',     'month.may': 'Maio',      'month.jun': 'Junho',
+    'month.jul': 'Julho',     'month.aug': 'Agosto',    'month.sep': 'Setembro',
+    'month.oct': 'Outubro',   'month.nov': 'Novembro',  'month.dec': 'Dezembro',
+    // Invoice statuses
+    'fact.status.brouillon': 'Rascunho',  'fact.status.envoyee': 'Enviada',
+    'fact.status.payee': 'Paga',          'fact.status.partiel': 'Parcial',
+    'fact.status.retard': 'Atrasada',     'fact.status.annulee': 'Cancelada',
+    // Payroll statuses
+    'rh.status.brouillon': 'Rascunho',    'rh.status.generee': 'Gerada',
+    'rh.status.validee': 'Validada',      'rh.status.payee': 'Paga',
+    // CRM statuses
+    'crm.status.actif': 'Cliente ativo',  'crm.status.prospect': 'Prospecto',
+    'crm.status.inactif': 'Inativo',      'crm.status.bloque': 'Bloqueado',
+    // CRM tabs
+    'crm.tab.clients': 'Clientes & Prospectos', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Atividades',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Finanças',    'miaa.agent.rh': 'RH',
+    'miaa.agent.fiscalite': 'Fiscal',    'miaa.agent.commercial': 'Comercial',
+    'miaa.agent.stock': 'Estoque',       'miaa.agent.tresorerie': 'Tesouraria',
+    'miaa.agent.restaurant': 'Restaurante', 'miaa.agent.ecole': 'Escola',
+    'miaa.agent.sante': 'Saúde',         'miaa.agent.hotel': 'Hotel',
+    'miaa.agent.cabinet': 'Escritório contábil',
+    'miaa.agentActif': 'Agente ativo',
+    'miaa.uploadBtn': 'Anexar ficheiro',
+    'miaa.uploadHint': 'PDF, Excel, Word, imagens — máx 10 MB. O MIAA+ analisará automaticamente.',
+    'miaa.suggestions': 'Sugestões',
+    'miaa.suggest.tva': 'Calcular IVA + CA sobre 1.000.000 FCFA',
+    'miaa.suggest.net': 'Salário líquido para bruto de 500.000 FCFA',
+    'miaa.suggest.cnss': 'Encargos CNSS deste mês',
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -7861,6 +7947,38 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'Sin artículos en stock',
     'empty.commandes':          'Sin pedidos registrados',
     'empty.etudiants':          'Sin estudiantes inscritos',
+    // Months
+    'month.jan': 'Enero',     'month.feb': 'Febrero',  'month.mar': 'Marzo',
+    'month.apr': 'Abril',     'month.may': 'Mayo',     'month.jun': 'Junio',
+    'month.jul': 'Julio',     'month.aug': 'Agosto',   'month.sep': 'Septiembre',
+    'month.oct': 'Octubre',   'month.nov': 'Noviembre','month.dec': 'Diciembre',
+    // Invoice statuses
+    'fact.status.brouillon': 'Borrador',  'fact.status.envoyee': 'Enviada',
+    'fact.status.payee': 'Pagada',        'fact.status.partiel': 'Parcial',
+    'fact.status.retard': 'Atrasada',     'fact.status.annulee': 'Cancelada',
+    // Payroll statuses
+    'rh.status.brouillon': 'Borrador',    'rh.status.generee': 'Generada',
+    'rh.status.validee': 'Validada',      'rh.status.payee': 'Pagada',
+    // CRM statuses
+    'crm.status.actif': 'Cliente activo', 'crm.status.prospect': 'Prospecto',
+    'crm.status.inactif': 'Inactivo',     'crm.status.bloque': 'Bloqueado',
+    // CRM tabs
+    'crm.tab.clients': 'Clientes & Prospectos', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Actividades',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Finanzas',    'miaa.agent.rh': 'RRHH',
+    'miaa.agent.fiscalite': 'Fiscal',    'miaa.agent.commercial': 'Comercial',
+    'miaa.agent.stock': 'Inventario',    'miaa.agent.tresorerie': 'Tesorería',
+    'miaa.agent.restaurant': 'Restaurante', 'miaa.agent.ecole': 'Escuela',
+    'miaa.agent.sante': 'Salud',          'miaa.agent.hotel': 'Hotel',
+    'miaa.agent.cabinet': 'Despacho contable',
+    'miaa.agentActif': 'Agente activo',
+    'miaa.uploadBtn': 'Adjuntar archivo',
+    'miaa.uploadHint': 'PDF, Excel, Word, imágenes — máx 10 MB. MIAA+ analizará automáticamente.',
+    'miaa.suggestions': 'Sugerencias',
+    'miaa.suggest.tva': 'Calcular IVA + CA sobre 1.000.000 FCFA',
+    'miaa.suggest.net': 'Salario neto para bruto de 500.000 FCFA',
+    'miaa.suggest.cnss': 'Cargas CNSS de este mes',
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -8240,6 +8358,40 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'Biloko te',
     'empty.commandes':          'Commande te',
     'empty.etudiants':          'Moteyi te',
+    // Months (Lingala)
+    'month.jan': 'Sánzá ya ntɔ́kɔ',    'month.feb': 'Sánzá ya míbalé',
+    'month.mar': 'Sánzá ya mísáto',    'month.apr': 'Sánzá ya míyé',
+    'month.may': 'Sánzá ya mítáno',    'month.jun': 'Sánzá ya motóba',
+    'month.jul': 'Sánzá ya nsambo',    'month.aug': 'Sánzá ya mwámbe',
+    'month.sep': 'Sánzá ya libwa',     'month.oct': 'Sánzá ya zómi',
+    'month.nov': 'Sánzá ya zómi na mɔ̌kɔ́', 'month.dec': 'Sánzá ya zómi na míbalé',
+    // Invoice statuses
+    'fact.status.brouillon': 'Brouillon',  'fact.status.envoyee': 'Kotindama',
+    'fact.status.payee': 'Lilembi',        'fact.status.partiel': 'Ndambu',
+    'fact.status.retard': 'Eleki ntango',  'fact.status.annulee': 'Esililama',
+    // Payroll statuses
+    'rh.status.brouillon': 'Brouillon',    'rh.status.generee': 'Esalema',
+    'rh.status.validee': 'Ekangamaki',     'rh.status.payee': 'Lilembi',
+    // CRM statuses
+    'crm.status.actif': 'Kliyenti ya bosembo', 'crm.status.prospect': 'Kliyenti ya bakiwa',
+    'crm.status.inactif': 'Azali te',          'crm.status.bloque': 'Ebandami',
+    // CRM tabs
+    'crm.tab.clients': 'Bakliyenti & Bapotensiyeli', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Misala',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Mbongo',      'miaa.agent.rh': 'Basali',
+    'miaa.agent.fiscalite': 'Mpako',     'miaa.agent.commercial': 'Misato',
+    'miaa.agent.stock': 'Biloko',        'miaa.agent.tresorerie': 'Caisse',
+    'miaa.agent.restaurant': 'Resto',    'miaa.agent.ecole': 'Koteya',
+    'miaa.agent.sante': 'Bokolongono',   'miaa.agent.hotel': 'Hôtel',
+    'miaa.agent.cabinet': 'Cabinet',
+    'miaa.agentActif': 'Agent ya kosala',
+    'miaa.uploadBtn': 'Tia fichier',
+    'miaa.uploadHint': 'PDF, Excel, Word, foto — max 10 Mo. MIAA+ akotala yango.',
+    'miaa.suggestions': 'Makanisi',
+    'miaa.suggest.tva': 'Leka TVA + CA na 1.000.000 FCFA',
+    'miaa.suggest.net': 'Lifuta ya net mpo na brut 500.000 FCFA',
+    'miaa.suggest.cnss': 'Ndelo ya CNSS ya sanza oyo',
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -8624,6 +8776,38 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'Hakuna bidhaa ghalani',
     'empty.commandes':          'Hakuna agizo lililorekodiwa',
     'empty.etudiants':          'Hakuna mwanafunzi aliyesajiliwa',
+    // Months (Kiswahili)
+    'month.jan': 'Januari',   'month.feb': 'Februari',  'month.mar': 'Machi',
+    'month.apr': 'Aprili',    'month.may': 'Mei',        'month.jun': 'Juni',
+    'month.jul': 'Julai',     'month.aug': 'Agosti',     'month.sep': 'Septemba',
+    'month.oct': 'Oktoba',    'month.nov': 'Novemba',    'month.dec': 'Desemba',
+    // Invoice statuses
+    'fact.status.brouillon': 'Rasimu',    'fact.status.envoyee': 'Imetumwa',
+    'fact.status.payee': 'Imelipwa',      'fact.status.partiel': 'Sehemu',
+    'fact.status.retard': 'Imechelewa',   'fact.status.annulee': 'Imefutwa',
+    // Payroll statuses
+    'rh.status.brouillon': 'Rasimu',      'rh.status.generee': 'Imetayarishwa',
+    'rh.status.validee': 'Imeidhinishwa', 'rh.status.payee': 'Imelipwa',
+    // CRM statuses
+    'crm.status.actif': 'Mteja anayefanya kazi', 'crm.status.prospect': 'Mteja anayetarajiwa',
+    'crm.status.inactif': 'Haifanyi kazi',        'crm.status.bloque': 'Imezuiwa',
+    // CRM tabs
+    'crm.tab.clients': 'Wateja & Watarajiwa', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Shughuli',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Fedha',        'miaa.agent.rh': 'HR',
+    'miaa.agent.fiscalite': 'Kodi',       'miaa.agent.commercial': 'Biashara',
+    'miaa.agent.stock': 'Ghala',          'miaa.agent.tresorerie': 'Hazina',
+    'miaa.agent.restaurant': 'Mkahawa',   'miaa.agent.ecole': 'Shule',
+    'miaa.agent.sante': 'Afya',           'miaa.agent.hotel': 'Hoteli',
+    'miaa.agent.cabinet': 'Ofisi ya uhasibu',
+    'miaa.agentActif': 'Wakala anayefanya kazi',
+    'miaa.uploadBtn': 'Ambatanisha faili',
+    'miaa.uploadHint': 'PDF, Excel, Word, picha — max MB 10. MIAA+ itachambua moja kwa moja.',
+    'miaa.suggestions': 'Mapendekezo',
+    'miaa.suggest.tva': 'Hesabu VAT + mapato kwenye FCFA 1,000,000',
+    'miaa.suggest.net': 'Mshahara wa wazi kwa jumla ya FCFA 500,000',
+    'miaa.suggest.cnss': 'Ada za CNSS za mwezi huu',
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -9186,6 +9370,38 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'Keine Artikel im Lager',
     'empty.commandes':          'Keine Bestellungen erfasst',
     'empty.etudiants':          'Keine Studenten eingeschrieben',
+    // Months (Deutsch)
+    'month.jan': 'Januar',    'month.feb': 'Februar',  'month.mar': 'März',
+    'month.apr': 'April',     'month.may': 'Mai',      'month.jun': 'Juni',
+    'month.jul': 'Juli',      'month.aug': 'August',   'month.sep': 'September',
+    'month.oct': 'Oktober',   'month.nov': 'November', 'month.dec': 'Dezember',
+    // Invoice statuses
+    'fact.status.brouillon': 'Entwurf',   'fact.status.envoyee': 'Versendet',
+    'fact.status.payee': 'Bezahlt',       'fact.status.partiel': 'Teilzahlung',
+    'fact.status.retard': 'Überfällig',   'fact.status.annulee': 'Storniert',
+    // Payroll statuses
+    'rh.status.brouillon': 'Entwurf',     'rh.status.generee': 'Erstellt',
+    'rh.status.validee': 'Bestätigt',     'rh.status.payee': 'Bezahlt',
+    // CRM statuses
+    'crm.status.actif': 'Aktiver Kunde',  'crm.status.prospect': 'Interessent',
+    'crm.status.inactif': 'Inaktiv',      'crm.status.bloque': 'Gesperrt',
+    // CRM tabs
+    'crm.tab.clients': 'Kunden & Interessenten', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Aktivitäten',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Finanzen',     'miaa.agent.rh': 'Personal',
+    'miaa.agent.fiscalite': 'Steuern',    'miaa.agent.commercial': 'Vertrieb',
+    'miaa.agent.stock': 'Lager',          'miaa.agent.tresorerie': 'Kasse',
+    'miaa.agent.restaurant': 'Restaurant','miaa.agent.ecole': 'Schule',
+    'miaa.agent.sante': 'Gesundheit',     'miaa.agent.hotel': 'Hotel',
+    'miaa.agent.cabinet': 'Steuerkanzlei',
+    'miaa.agentActif': 'Aktiver Agent',
+    'miaa.uploadBtn': 'Datei anhängen',
+    'miaa.uploadHint': 'PDF, Excel, Word, Bilder — max. 10 MB. MIAA+ analysiert automatisch.',
+    'miaa.suggestions': 'Vorschläge',
+    'miaa.suggest.tva': 'MwSt. + CA auf 1.000.000 FCFA berechnen',
+    'miaa.suggest.net': 'Nettolohn für 500.000 FCFA brutto',
+    'miaa.suggest.cnss': 'CNSS-Beiträge diesen Monat',
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -9486,6 +9702,40 @@ export const translations: Record<Locale, Record<string, string>> = {
     'empty.articles':           'Biloko te',
     'empty.commandes':          'Commande te',
     'empty.etudiants':          'Moteyi te',
+    // Months (Kituba)
+    'month.jan': 'Sanza ntete',   'month.feb': 'Sanza yibale',
+    'month.mar': 'Sanza yisatu',  'month.apr': 'Sanza yinya',
+    'month.may': 'Sanza yitanu',  'month.jun': 'Sanza yisambanu',
+    'month.jul': 'Sanza yisambwadi', 'month.aug': 'Sanza yinana',
+    'month.sep': 'Sanza ifyenda', 'month.oct': 'Sanza kumi',
+    'month.nov': 'Sanza kumi ye mosi', 'month.dec': 'Sanza kumi ye yibale',
+    // Invoice statuses
+    'fact.status.brouillon': 'Brouillon',  'fact.status.envoyee': 'Tindama',
+    'fact.status.payee': 'Lemba',          'fact.status.partiel': 'Ndambu',
+    'fact.status.retard': 'Eleki ntango',  'fact.status.annulee': 'Silisa',
+    // Payroll statuses
+    'rh.status.brouillon': 'Brouillon',    'rh.status.generee': 'Salema',
+    'rh.status.validee': 'Kangama',        'rh.status.payee': 'Lemba',
+    // CRM statuses
+    'crm.status.actif': 'Kliyenti ya vivo', 'crm.status.prospect': 'Kliyenti ya bakiwa',
+    'crm.status.inactif': 'Ko vivo te',     'crm.status.bloque': 'Banda',
+    // CRM tabs
+    'crm.tab.clients': 'Bakliyenti & Bapotensiyeli', 'crm.tab.pipeline': 'Pipeline',
+    'crm.tab.activites': 'Misalu',
+    // MIAA+ agents
+    'miaa.agent.finance': 'Mbongo',      'miaa.agent.rh': 'Basali',
+    'miaa.agent.fiscalite': 'Mpako',     'miaa.agent.commercial': 'Misato',
+    'miaa.agent.stock': 'Biloko',        'miaa.agent.tresorerie': 'Caisse',
+    'miaa.agent.restaurant': 'Resto',    'miaa.agent.ecole': 'Koteya',
+    'miaa.agent.sante': 'Nzola',         'miaa.agent.hotel': 'Hôtel',
+    'miaa.agent.cabinet': 'Cabinet',
+    'miaa.agentActif': 'Agent ya kosala',
+    'miaa.uploadBtn': 'Tia fichier',
+    'miaa.uploadHint': 'PDF, Excel, Word, foto — max 10 Mo. MIAA+ atala yango.',
+    'miaa.suggestions': 'Makanisi',
+    'miaa.suggest.tva': 'Leka TVA + CA na 1.000.000 FCFA',
+    'miaa.suggest.net': 'Lifuta ya net mpo na brut 500.000 FCFA',
+    'miaa.suggest.cnss': 'Ndelo ya CNSS ya sanza oyo',
   },
 }
 

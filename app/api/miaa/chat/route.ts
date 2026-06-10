@@ -39,6 +39,41 @@ function selectModel(message: string): { model: string; maxTokens: number; isCom
   return { model: 'claude-haiku-4-5-20251001', maxTokens: 2000, isComplex: false }
 }
 
+// ── Cerveau Central — détection automatique de l'agent ────────────────────────
+// Quand module === 'auto', on choisit le meilleur agent selon le contexte secteur
+// et les mots-clés du message. L'utilisateur voit toujours "MIAA+" mais le moteur
+// envoie la personnalité du bon expert.
+const SECTOR_TO_AGENT: Record<string, string> = {
+  restaurant: 'restaurant', ecole: 'ecole', hotel: 'hotel',
+  sante: 'sante', pharmacie: 'sante', cabinet: 'cabinet',
+}
+
+function detectAgent(message: string, secteur?: string): string {
+  // 1. Le secteur de l'entreprise prime — chaque secteur a son expert dédié
+  if (secteur && SECTOR_TO_AGENT[secteur]) return SECTOR_TO_AGENT[secteur]
+
+  // 2. Routage par mots-clés — du plus spécifique au plus général
+  const msg = message.toLowerCase()
+
+  if (/bulletin.*paie|net.*pay|salaire.*brut|cnss|irpp|licencie|préavis|contrat.*travail|employ[eé]|congé|arrêt.*maladie|recrut|offre.*emploi/.test(msg))
+    return 'rh'
+  if (/patente|tva.*déclar|déclaration.*dgi|dgid|impôt.*société|is\b|fiscalit|taxe unique|cts\b|acompte.*fiscal/.test(msg))
+    return 'fiscalite'
+  if (/facture|devis|impayé|recouvr|dso\b|relance.*client|encaissement|créance|avoir\b/.test(msg))
+    return 'facturation'
+  if (/bilan|syscohada|ohada|journal.*compt|écriture.*compt|amortissement|compte \d{3}|classe [1-9]\b|passif|actif immob/.test(msg))
+    return 'comptabilite'
+  if (/trésorerie|cash.*flow|flux.*tréso|solde.*banque|airtel.*money|mtn.*momo|orange.*money|virement|découvert/.test(msg))
+    return 'tresorerie'
+  if (/\bstock\b|inventaire|rupture.*stock|article.*stock|fournisseur.*commande|réapprovisionnement/.test(msg))
+    return 'stock'
+  if (/prospect|pipeline.*crm|opportunité.*crm|scoring.*client|fidélisation/.test(msg))
+    return 'crm'
+
+  // 3. Défaut : comptabilité — l'agent le plus polyvalent
+  return 'comptabilite'
+}
+
 // ── Cache in-memory ────────────────────────────────────────────────────────────
 // Portée : instance serveur (process). Persiste entre requêtes sur le même worker.
 // En production (Vercel serverless) : cache par instance — toujours bénéfique
@@ -139,16 +174,21 @@ export async function POST(req: Request) {
       module:     string
       message:    string
       history:    { role: 'user' | 'assistant'; content: string }[]
-      tenantData?: { tenant_id?: string }
+      tenantData?: { tenant_id?: string; secteur?: string }
       langue?:    string
     }
 
     const tenantId = tenantData?.tenant_id
-    const agent    = MIAA_AGENTS[module as MIAAModule]
+
+    // Cerveau Central : quand module='auto' on détecte le meilleur agent
+    const effectiveModule = (module === 'auto' || module === 'general')
+      ? detectAgent(message, tenantData?.secteur)
+      : module
+    const agent = MIAA_AGENTS[effectiveModule as MIAAModule]
 
     // ── 1. Vérifier le cache de réponse ──────────────────────────────────────
     // Seulement si l'historique est vide (question isolée de départ de session)
-    const key = cacheKey(tenantId, module, message)
+    const key = cacheKey(tenantId, effectiveModule, message)
     if (history.length === 0) {
       const cached = getResp(key)
       if (cached) {
@@ -188,7 +228,7 @@ export async function POST(req: Request) {
     // ── 3. System prompt ──────────────────────────────────────────────────────
     const systemPrompt = getMIAASystemPrompt({
       memory,
-      module_actuel: module || 'general',
+      module_actuel: effectiveModule || 'general',
       langue:        langue || 'fr',
       agent_context: agent?.personnalite,
     })
@@ -217,7 +257,7 @@ export async function POST(req: Request) {
     }
 
     const reponse           = parsed.response ?? rawText
-    const suggestedActions  = parsed.suggested_actions ?? (SUGGESTIONS[module] ?? SUGGESTIONS.general)
+    const suggestedActions  = parsed.suggested_actions ?? (SUGGESTIONS[effectiveModule] ?? SUGGESTIONS.general)
 
     // ── 7. Mettre en cache si question courte (≤ 300 chars) ──────────────────
     if (message.length <= 300) {
@@ -234,14 +274,14 @@ export async function POST(req: Request) {
 
       supabase.from('miaa_conversations').insert({
         tenant_id:    tenantId,
-        module,
+        module:       effectiveModule,
         message_user: message,
         message_miaa: reponse,
         created_at:   new Date().toISOString(),
       }).then(() => {}, () => {})
 
       // Compteur d'utilisation
-      trackUsage(supabase, tenantId, module, model, inputTokens, outputTokens)
+      trackUsage(supabase, tenantId, effectiveModule, model, inputTokens, outputTokens)
     }
 
     return Response.json({
@@ -251,6 +291,8 @@ export async function POST(req: Request) {
       peut_telecharger:  reponse.length > 200,
       moteur,
       model_used:        model,
+      agent_detected:    effectiveModule,
+      agent_nom:         agent?.nom ?? 'MIAA+',
       cached:            false,
     })
 
