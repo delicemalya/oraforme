@@ -462,7 +462,7 @@ export default function RolesPage() {
       {/* ── MODAL: Créer rôle ── */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-[#F1F5F9] flex items-center justify-between">
               <h2 className="text-[14px] font-bold text-[#0F172A]">{t('roles.newRole')}</h2>
               <button onClick={() => setModal(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} className="text-[#64748B]" /></button>

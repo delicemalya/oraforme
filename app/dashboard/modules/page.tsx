@@ -32,7 +32,6 @@ export default function ModulesMarketplacePage() {
   }
 
   async function toggleModule(moduleId: string, action: 'activate' | 'deactivate') {
-  const { t } = useLocale()
     setToggling(moduleId)
     setConfirm(null)
     try {
@@ -154,7 +153,7 @@ export default function ModulesMarketplacePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
+              className="relative bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <button
                 onClick={() => setConfirm(null)}

@@ -700,7 +700,7 @@ export default function RestaurantPage() {
           {showMenuForm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowMenuForm(false)} />
-              <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+              <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
                 <button onClick={() => setShowMenuForm(false)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
                 <h3 className="text-base font-bold text-[var(--text)] mb-4">{t('resto.addDishTitle')}</h3>
                 <div className="space-y-3">
@@ -1212,7 +1212,7 @@ export default function RestaurantPage() {
       {receipt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70" onClick={() => setReceipt(null)} />
-          <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+          <div className="relative bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onClick={() => setReceipt(null)} className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-secondary)]"><X size={16} /></button>
             <div className="text-center mb-5">
               <CheckCircle size={40} className="text-[#DC2626] mx-auto mb-3" />

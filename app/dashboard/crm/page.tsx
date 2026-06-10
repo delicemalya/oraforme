@@ -787,7 +787,7 @@ export default function CRMPage() {
       {/* ── Modal: Nouvelle opportunité ── */}
       {showNewOpp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[16px] font-bold text-[#0F172A]">Nouvelle opportunité</h2>
               <button onClick={() => setShowNewOpp(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
@@ -851,7 +851,7 @@ export default function CRMPage() {
       {/* ── Modal: Nouvelle activité ── */}
       {showNewAct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[16px] font-bold text-[#0F172A]">{editingActivite ? 'Modifier l\'activité' : 'Nouvelle activité'}</h2>
               <button onClick={() => { setShowNewAct(false); setEditingActivite(null); setActForm({ titre: '', type: 'note', client_id: '', description: '', date_activite: new Date().toISOString().split('T')[0] }) }} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>

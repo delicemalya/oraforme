@@ -348,7 +348,7 @@ export default function EquipePage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md"
+              className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
             >
               <h2 className="text-base font-bold text-[#101729]mb-4 flex items-center gap-2">
                 <Send size={16} className="text-[#DC2626]" />

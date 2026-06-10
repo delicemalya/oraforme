@@ -632,6 +632,15 @@ export default function Sidebar() {
               {getSectorLabel(secteur)}
             </span>
           )}
+          {/* Close button inside sidebar on mobile — replaces the floating X */}
+          <button
+            className="lg:hidden ml-auto p-1.5 rounded-lg shrink-0"
+            style={{ color: '#64748B' }}
+            onClick={() => setMobileOpen(false)}
+            aria-label="Fermer"
+          >
+            <X size={18} />
+          </button>
         </div>
         {role && role !== 'owner' && (
           <div className="mt-2">
@@ -769,19 +778,21 @@ export default function Sidebar() {
         <SidebarContent />
       </aside>
 
-      {/* Mobile toggle */}
-      <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl shadow-sm"
-        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', color: '#0F172A' }}
-        onClick={() => setMobileOpen(o => !o)}
-        aria-label="Menu"
-      >
-        {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-      </button>
+      {/* Mobile toggle — only shown when sidebar is CLOSED */}
+      {!mobileOpen && (
+        <button
+          className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl shadow-sm"
+          style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', color: '#0F172A' }}
+          onClick={() => setMobileOpen(true)}
+          aria-label="Menu"
+        >
+          <Menu size={18} />
+        </button>
+      )}
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 flex">
+        <div className="lg:hidden fixed inset-0 z-50 flex">
           <div style={{ width: 232, background: '#FFFFFF', height: '100%', boxShadow: '4px 0 24px rgba(0,0,0,0.12)', borderRight: '1px solid #E2E8F0' }}>
             <SidebarContent />
           </div>

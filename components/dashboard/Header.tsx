@@ -118,7 +118,13 @@ export default function Header() {
   }
 
   return (
-    <header className="h-14 bg-white border-b border-[#E2E8F0] flex items-center px-4 lg:px-6 gap-3 shrink-0">
+    <header className="h-14 bg-white border-b border-[#E2E8F0] flex items-center pl-14 pr-3 lg:px-6 gap-3 shrink-0">
+
+      {/* Logo Oraforme — visible uniquement sur mobile quand pas de retour */}
+      {!showBack && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src="/logo.png" alt="Oraforme" className="lg:hidden h-6 w-auto shrink-0" />
+      )}
 
       {/* Bouton retour — visible sur tous les appareils */}
       {showBack ? (
@@ -135,7 +141,7 @@ export default function Header() {
           <span className="text-[12px] font-medium">Retour</span>
         </button>
       ) : (
-        <div className="w-2 shrink-0" />
+        <div className="hidden lg:block w-2 shrink-0" />
       )}
 
       {/* Search */}
