@@ -169,6 +169,7 @@ export default function EcoleOverviewPage() {
   const load = useCallback(async () => {
     if (!tenantId) return
     setLoading(true)
+    try {
 
     const now        = new Date()
     const todayStr   = now.toISOString().slice(0, 10)
@@ -263,7 +264,21 @@ export default function EcoleOverviewPage() {
       monthly,
       recentPaie: (recentPaieRes.data ?? []) as OverviewData['recentPaie'],
     })
-    setLoading(false)
+    } catch (err) {
+      console.error('[ecole dashboard] load error:', err)
+      // Provide safe empty state instead of crashing
+      setData({
+        nbEtudiants: 0, nbActifs: 0, nbSuspendus: 0, nbDiplomes: 0,
+        nbEnseignants: 0, nbEnsEmployes: 0, nbEnsPrestataires: 0,
+        nbEmployes: 0, nbStaff: 0,
+        revenuJour: 0, revenuSemaine: 0, revenuMois: 0, revenuAnnee: 0,
+        nbPaiementsJour: 0, nbPaiementsSemaine: 0, nbPaiementsMois: 0,
+        montantImpayes: 0, nbImpayes: 0, depensesJour: 0,
+        sessionsEnCours: 0, nbEvenements: 0, monthly: [], recentPaie: [],
+      })
+    } finally {
+      setLoading(false)
+    }
   }, [tenantId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { if (tenantId) load() }, [tenantId, load])

@@ -2,72 +2,113 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Check, ChevronRight, ChevronLeft, Eye, EyeOff, Building2, Users, Zap } from 'lucide-react'
+import { Check, ChevronRight, ChevronLeft, Eye, EyeOff, Zap } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { createTenantAndProfile } from './actions'
-import {
-  SECTEUR_CONFIG, PLAN_CONFIG, PAYS_LIST, LANGUES_LIST,
-  type TailleEntreprise, type SecteurId,
-} from '@/lib/plans'
-import { PAYS_CONFIGS } from '@/lib/fiscalite/pays'
+import { PAYS_LIST, LANGUES_LIST, PLAN_CONFIG, type TailleEntreprise, type SecteurId } from '@/lib/plans'
 
-// ── Step definitions ──────────────────────────────────────────────────────────
+// ── Sector sub-types (with auto-plan) ─────────────────────────────────────────
 
-const STEPS = [
-  { id: 1, label: 'Secteur',   sub: 'Votre activité' },
-  { id: 2, label: 'Taille',    sub: 'Votre pack' },
-  { id: 3, label: 'Société',   sub: 'Vos informations' },
-  { id: 4, label: 'Compte',    sub: 'Accès administrateur' },
+const SECTOR_SUBTYPES: Record<string, Array<{ id: string; label: string; emoji: string; plan: TailleEntreprise }>> = {
+  ecole: [
+    { id: 'garderie',   label: 'Garderie / Crèche',     emoji: '🧒', plan: 'tpe' },
+    { id: 'primaire',   label: 'École Primaire',         emoji: '📚', plan: 'tpe' },
+    { id: 'college',    label: 'Collège',                emoji: '🏫', plan: 'tpe' },
+    { id: 'lycee',      label: 'Lycée',                  emoji: '🎓', plan: 'pme' },
+    { id: 'universite', label: 'Université / Institut',  emoji: '🏛️', plan: 'grande' },
+  ],
+  sante: [
+    { id: 'cabinet_med', label: 'Cabinet Médical',         emoji: '💊', plan: 'tpe' },
+    { id: 'clinique',    label: 'Clinique / Centre Santé', emoji: '🏥', plan: 'pme' },
+    { id: 'hopital',     label: 'Hôpital / CHU',           emoji: '🏨', plan: 'grande' },
+  ],
+  banque: [
+    { id: 'microfinance', label: 'Microfinance / COOPEC',  emoji: '💰', plan: 'pme' },
+    { id: 'banque_comm',  label: 'Banque Commerciale',     emoji: '🏦', plan: 'grande' },
+  ],
+  hotel: [
+    { id: 'hotel_bud', label: 'Auberge / Guesthouse',     emoji: '🏠', plan: 'tpe' },
+    { id: 'hotel_std', label: 'Hôtel Standard',           emoji: '🏨', plan: 'pme' },
+    { id: 'hotel_lux', label: 'Hôtel & Resort Luxe',      emoji: '⭐', plan: 'grande' },
+  ],
+  transport: [
+    { id: 'taxi',      label: 'Taxi / VTC',               emoji: '🚖', plan: 'tpe' },
+    { id: 'bus',       label: 'Transport Urbain',          emoji: '🚌', plan: 'pme' },
+    { id: 'freight',   label: 'Transport National / Fret', emoji: '🚛', plan: 'grande' },
+  ],
+}
+
+// Default plan when no sub-type
+const SECTOR_DEFAULT_PLAN: Record<string, TailleEntreprise> = {
+  commerce: 'tpe', boutique: 'tpe', supermarche: 'tpe', petrole: 'tpe',
+  restaurant: 'pme', pharmacie: 'pme', btp: 'pme', agriculture: 'pme',
+  ong: 'pme', cabinet: 'pme', boisson: 'pme', autre: 'pme',
+  ecole: 'pme', sante: 'pme', hotel: 'pme', transport: 'pme', banque: 'grande',
+}
+
+const SECTORS = [
+  { id: 'commerce',    label: 'Commerce & Distribution', emoji: '🛒' },
+  { id: 'restaurant',  label: 'Restaurant & Hôtellerie', emoji: '🍽️' },
+  { id: 'ecole',       label: 'École & Université',      emoji: '🎓' },
+  { id: 'sante',       label: 'Santé & Clinique',        emoji: '🏥' },
+  { id: 'btp',         label: 'BTP & Construction',      emoji: '🏗️' },
+  { id: 'transport',   label: 'Transport & Logistique',  emoji: '🚛' },
+  { id: 'hotel',       label: 'Hôtel & Tourisme',        emoji: '🏨' },
+  { id: 'agriculture', label: 'Agriculture & Élevage',   emoji: '🌾' },
+  { id: 'pharmacie',   label: 'Pharmacie',               emoji: '💊' },
+  { id: 'banque',      label: 'Banque & Finance',        emoji: '🏦' },
+  { id: 'ong',         label: 'ONG & Associations',      emoji: '🤝' },
+  { id: 'cabinet',     label: 'Cabinet Comptable',       emoji: '📊' },
+  { id: 'boisson',     label: 'Boisson & Distribution',  emoji: '🍺' },
+  { id: 'petrole',     label: 'Pétrole & Énergie',       emoji: '⛽' },
+  { id: 'supermarche', label: 'Supermarché & GMS',       emoji: '🏪' },
+  { id: 'boutique',    label: 'Boutique & Magasin',      emoji: '👗' },
+  { id: 'autre',       label: 'Autre activité',          emoji: '⚡' },
 ]
 
-// ── Slide animation ───────────────────────────────────────────────────────────
-
-const slideVariants = {
-  enter:  (d: number) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
-  center:               ({ x: 0, opacity: 1 }),
-  exit:   (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
-}
+const STEPS = [
+  { id: 1, label: 'Activité',   sub: 'Votre secteur' },
+  { id: 2, label: 'Entreprise', sub: 'Vos informations' },
+  { id: 3, label: 'Compte',     sub: 'Administrateur' },
+]
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const [step, setStep]     = useState(1)
-  const [dir,  setDir]      = useState(1)
-  const [loading, setLoading]   = useState(false)
-  const [error,   setError]     = useState('')
-  const [showPwd, setShowPwd]   = useState(false)
+  const [step,        setStep]        = useState(1)
+  const [loading,     setLoading]     = useState(false)
+  const [error,       setError]       = useState('')
+  const [showPwd,     setShowPwd]     = useState(false)
   const [isOAuthUser, setIsOAuthUser] = useState(false)
 
   // Step 1
-  const [secteur, setSecteur]   = useState<SecteurId | ''>('')
-  const [pays,    setPays]      = useState('CG')
-  const [langue,  setLangue]    = useState('fr')
+  const [secteur,  setSecteur]  = useState<SecteurId | ''>('')
+  const [sousType, setSousType] = useState('')
+  const [pays,     setPays]     = useState('CG')
+  const [langue,   setLangue]   = useState('fr')
 
   // Step 2
-  const [taille, setTaille]     = useState<TailleEntreprise | ''>('')
+  const [societe, setSociete] = useState({ nom: '', telephone: '', adresse: '', nif: '' })
 
   // Step 3
-  const [societe, setSociete]   = useState({
-    nom: '', telephone: '', adresse: '', nif: '',
-  })
+  const [admin, setAdmin] = useState({ prenom: '', nom: '', email: '', password: '' })
 
-  // Step 4
-  const [admin, setAdmin]       = useState({
-    prenom: '', nom: '', email: '', password: '',
-  })
+  // Auto-computed plan
+  const subtypes        = secteur ? (SECTOR_SUBTYPES[secteur] ?? null) : null
+  const selectedSubtype = subtypes?.find(s => s.id === sousType)
+  const taille: TailleEntreprise =
+    selectedSubtype?.plan ?? (secteur ? (SECTOR_DEFAULT_PLAN[secteur] ?? 'pme') : 'pme')
+  const planCfg = PLAN_CONFIG[taille]
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session?.user) return
 
-      // Detect Google/OAuth user — no password needed
       const identities = session.user.identities ?? []
-      const hasOAuth = identities.some(i => i.provider !== 'email')
-      setIsOAuthUser(hasOAuth)
+      setIsOAuthUser(identities.some(i => i.provider !== 'email'))
 
-      // If user already has a profile, skip onboarding entirely
+      // Already has profile → skip onboarding
       const { data: profile } = await supabase
         .from('profiles')
         .select('tenant_id')
@@ -75,62 +116,35 @@ export default function OnboardingPage() {
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle()
-      if (profile?.tenant_id) {
-        window.location.href = '/dashboard'
-        return
-      }
+      if (profile?.tenant_id) { window.location.href = '/dashboard'; return }
 
       setAdmin(prev => ({ ...prev, email: session.user.email ?? '' }))
 
-      // Read pre-registration context saved by /register page
+      // Pre-fill from register flow
       try {
         const raw = localStorage.getItem('oraforme_reg')
         if (!raw) return
-        const reg = JSON.parse(raw) as {
-          offer?: string; taille?: string; sector?: string
-          prenom?: string; nom?: string; telephone?: string
-        }
-
-        const tailleMap: Record<string, TailleEntreprise> = { entrepreneur: 'tpe', business: 'pme', tpe: 'tpe', pme: 'pme', grande: 'grande' }
-        const mappedTaille = reg.taille ? tailleMap[reg.taille] ?? null : null
-        if (mappedTaille) setTaille(mappedTaille)
-
-        // Map register sector string to SecteurId
-        const sectorIdMap: Record<string, SecteurId> = {
-          cabinet: 'cabinet', ecole: 'ecole', universite: 'ecole',
-          hotel: 'hotel', restaurant: 'restaurant', pharmacie: 'pharmacie',
-          sante: 'sante', supermarche: 'supermarche', boutique: 'boutique',
-          btp: 'btp', transport: 'transport', petrole: 'petrole',
-          banque: 'banque', commerce: 'commerce', autre: 'autre',
-        }
-        const sectorId = reg.sector?.split('-')[0]
-        if (sectorId && sectorIdMap[sectorId]) setSecteur(sectorIdMap[sectorId])
-
+        const reg = JSON.parse(raw) as { sector?: string; prenom?: string; nom?: string; telephone?: string }
         if (reg.prenom) setAdmin(p => ({ ...p, prenom: reg.prenom! }))
         if (reg.nom)    setAdmin(p => ({ ...p, nom: reg.nom! }))
         if (reg.telephone) setSociete(p => ({ ...p, telephone: reg.telephone! }))
-
-        // Skip steps 1 & 2 when offer + sector were already chosen
-        if (mappedTaille && sectorId) {
-          setDir(1)
-          setStep(3)
+        const sectorMap: Record<string, SecteurId> = {
+          cabinet: 'cabinet', ecole: 'ecole', universite: 'ecole', hotel: 'hotel',
+          restaurant: 'restaurant', pharmacie: 'pharmacie', sante: 'sante',
+          supermarche: 'supermarche', boutique: 'boutique', btp: 'btp',
+          transport: 'transport', petrole: 'petrole', banque: 'banque',
+          commerce: 'commerce', ong: 'ong', agriculture: 'agriculture', autre: 'autre',
         }
-      } catch { /* ignore parse errors */ }
+        const sId = reg.sector?.split('-')[0]
+        if (sId && sectorMap[sId]) { setSecteur(sectorMap[sId]); setStep(2) }
+      } catch { /* ignore */ }
     })
   }, [])
 
-  function go(next: number) {
-    setDir(next > step ? 1 : -1)
-    setStep(next)
-    setError('')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
   function canAdvance(): boolean {
-    if (step === 1) return !!secteur && !!pays && !!langue
-    if (step === 2) return !!taille
-    if (step === 3) return societe.nom.trim().length >= 2
-    if (step === 4) return (
+    if (step === 1) return !!secteur && (!subtypes || !!sousType) && !!pays && !!langue
+    if (step === 2) return societe.nom.trim().length >= 2
+    if (step === 3) return (
       admin.prenom.trim().length >= 1 &&
       admin.nom.trim().length >= 1 &&
       admin.email.includes('@') &&
@@ -140,555 +154,448 @@ export default function OnboardingPage() {
   }
 
   async function handleSubmit() {
-    setLoading(true)
-    setError('')
-
-    // If not yet authenticated, create auth account first
+    setLoading(true); setError('')
     const { data: { session } } = await supabase.auth.getSession()
     if (!session?.user) {
-      await supabase.auth.signOut()
-      const { error: signUpErr } = await supabase.auth.signUp({
-        email:    admin.email,
+      const { error: err } = await supabase.auth.signUp({
+        email: admin.email,
         password: admin.password,
         options: {
           data: { nom_entreprise: societe.nom },
           emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       })
-      if (signUpErr) { setError(signUpErr.message); setLoading(false); return }
+      if (err) { setError(err.message); setLoading(false); return }
     }
-
     const result = await createTenantAndProfile({
       nomEntreprise:   societe.nom,
       nif:             societe.nif,
       telephone:       societe.telephone,
       adresse:         societe.adresse,
       secteurActivite: secteur as SecteurId,
-      taille:          taille as TailleEntreprise,
+      taille,
       pays,
       langue,
       prenom:          admin.prenom,
       nom:             admin.nom,
     })
-
     if (result.error) { setError(result.error); setLoading(false); return }
+    localStorage.removeItem('oraforme_reg')
     window.location.href = '/dashboard'
   }
 
-  const planCfg = taille ? PLAN_CONFIG[taille] : null
-  const secteurCfg = secteur ? SECTEUR_CONFIG[secteur] : null
-  const paysCfg = PAYS_LIST.find(p => p.code === pays)
-  const langueCfg = LANGUES_LIST.find(l => l.code === langue)
+  const selectedSector = SECTORS.find(s => s.id === secteur)
 
   return (
-    <div className="min-h-screen flex bg-[#0A0A0F]">
+    <div className="min-h-screen flex bg-[#F8FAFC]">
 
-      {/* ── Left panel ─────────────────────────────────────────────────────── */}
-      <div className="hidden lg:flex flex-col w-[340px] xl:w-[380px] bg-gradient-to-b from-[#0F0F18] to-[#0A0A0F] border-r border-white/5 p-8 justify-between flex-shrink-0">
-
-        {/* Logo */}
+      {/* ── LEFT SIDEBAR ────────────────────────────────────────────────────── */}
+      <div className="hidden lg:flex flex-col w-[300px] xl:w-[320px] shrink-0 bg-white border-r border-[#E2E8F0] px-8 py-10 justify-between">
         <div>
-          <div className="flex items-center gap-2.5 mb-12">
+          {/* Logo */}
+          <div className="flex items-center gap-2 mb-12">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-white.png" alt="Oraforme" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+            <img src="/logo.png" alt="Oraforme" className="h-8 w-auto"
+              onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
           </div>
 
-          {/* Step list */}
-          <div className="space-y-1">
+          {/* Steps */}
+          <div className="space-y-2">
             {STEPS.map((s, i) => {
               const done    = step > s.id
               const current = step === s.id
               return (
-                <div key={s.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
-                  style={{ background: current ? 'rgba(245,158,11,0.08)' : 'transparent' }}>
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all ${
+                <div key={s.id} className="flex items-center gap-3 p-3 rounded-2xl transition-all"
+                  style={{ background: current ? '#FEF3C7' : 'transparent' }}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-black shrink-0 transition-all ${
                     done    ? 'bg-[#16A34A] text-white' :
-                    current ? 'bg-[#F59E0B] text-black' :
-                              'bg-white/5 text-white/30'
+                    current ? 'bg-[#F59E0B] text-white' :
+                              'bg-[#F1F5F9] text-[#94A3B8]'
                   }`}>
                     {done ? <Check size={13} /> : s.id}
                   </div>
                   <div>
-                    <p className={`text-sm font-semibold ${current ? 'text-white' : done ? 'text-white/60' : 'text-white/25'}`}>{s.label}</p>
-                    <p className={`text-xs ${current ? 'text-white/50' : 'text-white/20'}`}>{s.sub}</p>
+                    <p className={`text-[13px] font-bold ${current ? 'text-[#0F172A]' : done ? 'text-[#16A34A]' : 'text-[#94A3B8]'}`}>
+                      {s.label}
+                    </p>
+                    <p className="text-[11px] text-[#CBD5E1]">{s.sub}</p>
                   </div>
                 </div>
               )
             })}
           </div>
 
-          {/* Live summary */}
-          {(secteur || taille || societe.nom) && (
-            <div className="mt-8 p-4 bg-white/3 border border-white/6 rounded-2xl space-y-3">
-              <p className="text-[11px] font-bold text-white/30 uppercase tracking-widest">Récapitulatif</p>
-              {secteurCfg && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{secteurCfg.emoji}</span>
-                  <div>
-                    <p className="text-white text-[13px] font-semibold">{secteurCfg.label}</p>
-                    <p className="text-white/40 text-[11px]">{paysCfg?.flag} {paysCfg?.label} · {langueCfg?.flag} {langueCfg?.label}</p>
-                  </div>
+          {/* Summary card */}
+          {secteur && (
+            <div className="mt-8 p-4 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] space-y-3">
+              <p className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">Récapitulatif</p>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{selectedSector?.emoji}</span>
+                <div>
+                  <p className="text-[13px] font-bold text-[#0F172A]">{selectedSector?.label}</p>
+                  {selectedSubtype && (
+                    <p className="text-[11px] text-[#64748B]">{selectedSubtype.emoji} {selectedSubtype.label}</p>
+                  )}
                 </div>
-              )}
-              {planCfg && (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white text-[13px] font-bold">{planCfg.label}</p>
-                    <p className="text-white/40 text-[11px]">{planCfg.subtitle}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-[14px]" style={{ color: planCfg.color }}>
-                      {new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)}
-                    </p>
-                    <p className="text-white/30 text-[10px]">FCFA/mois</p>
-                  </div>
+              </div>
+              <div className="flex items-center justify-between pt-1 border-t border-[#E2E8F0]">
+                <div>
+                  <p className="text-[12px] font-bold text-[#0F172A]">{planCfg.label}</p>
+                  <p className="text-[10px] text-[#94A3B8]">{planCfg.subtitle}</p>
                 </div>
-              )}
+                <p className="text-[13px] font-black" style={{ color: planCfg.color }}>
+                  {new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)}
+                  <span className="text-[10px] font-normal text-[#94A3B8]"> FCFA</span>
+                </p>
+              </div>
               {societe.nom && (
-                <p className="text-white/70 text-[13px] font-medium truncate">{societe.nom}</p>
+                <p className="text-[12px] text-[#475569] font-medium truncate border-t border-[#E2E8F0] pt-1">{societe.nom}</p>
               )}
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div>
-          <p className="text-white/15 text-[11px] text-center">
-            © 2025 Oraforme · SaaS africain · oraforms.com
-          </p>
-        </div>
+        <p className="text-[11px] text-[#CBD5E1] text-center">© 2025 Oraforme · oraforms.com</p>
       </div>
 
-      {/* ── Right panel ────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      {/* ── MAIN CONTENT ────────────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-h-screen">
 
-        {/* Mobile header */}
-        <div className="lg:hidden flex items-center justify-between px-6 pt-6 pb-4">
-          <div className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-white.png" alt="Oraforme" className="h-7 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-          </div>
-          <div className="flex gap-1">
+        {/* Mobile top bar */}
+        <div className="lg:hidden flex items-center justify-between px-6 pt-6 pb-2">
+          <div className="flex gap-1.5">
             {STEPS.map(s => (
-              <div key={s.id} className={`h-1.5 rounded-full transition-all ${
-                step >= s.id ? 'bg-[#F59E0B]' : 'bg-white/10'
-              }`} style={{ width: step === s.id ? 24 : 8 }} />
+              <div key={s.id} className={`h-1.5 w-8 rounded-full transition-all ${
+                step >= s.id ? 'bg-[#F59E0B]' : 'bg-[#E2E8F0]'
+              }`} />
             ))}
           </div>
+          <span className="text-[12px] font-bold text-[#94A3B8]">Étape {step} / {STEPS.length}</span>
         </div>
 
-        {/* Form area */}
-        <div className="flex-1 flex items-center justify-center px-6 py-8">
-          <div className="w-full max-w-xl">
+        <div className="flex-1 flex items-start justify-center px-6 py-8 lg:py-12">
+          <div className="w-full max-w-2xl">
 
-            <AnimatePresence mode="wait" custom={dir}>
-              <motion.div
-                key={step}
-                custom={dir}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
-              >
+            {/* ── STEP 1: Secteur ─────────────────────────────────────────── */}
+            {step === 1 && (
+              <div>
+                <div className="mb-6">
+                  <p className="text-[12px] font-bold text-[#F59E0B] uppercase tracking-widest mb-1">Étape 1 sur 3</p>
+                  <h1 className="text-[26px] font-black text-[#0F172A]">Votre secteur d&apos;activité</h1>
+                  <p className="text-[14px] text-[#64748B] mt-1">Oraforme adapte automatiquement votre ERP.</p>
+                </div>
 
-                {/* ── STEP 1: Secteur + Pays + Langue ─────────────────────── */}
-                {step === 1 && (
-                  <div>
-                    <div className="mb-8">
-                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 1 sur 4</p>
-                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Votre secteur d'activité</h1>
-                      <p className="text-white/40 text-sm">Oraforme adapte automatiquement votre ERP.</p>
-                    </div>
+                {/* Sector grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                  {SECTORS.map(s => (
+                    <button key={s.id} type="button"
+                      onClick={() => { setSecteur(s.id as SecteurId); setSousType('') }}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all text-center ${
+                        secteur === s.id
+                          ? 'border-[#F59E0B] bg-[#FEF3C7]'
+                          : 'border-[#E2E8F0] bg-white hover:border-[#F59E0B]/40 hover:bg-[#FFFBEB]'
+                      }`}>
+                      <span className="text-2xl">{s.emoji}</span>
+                      <span className={`text-[12px] font-bold leading-tight ${secteur === s.id ? 'text-[#92400E]' : 'text-[#374151]'}`}>
+                        {s.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
 
-                    {/* Sector grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6">
-                      {(Object.entries(SECTEUR_CONFIG) as [SecteurId, typeof SECTEUR_CONFIG[SecteurId]][]).map(([key, cfg]) => (
-                        <button
-                          key={key}
-                          onClick={() => setSecteur(key)}
-                          className={`p-3.5 rounded-xl border text-left transition-all hover:scale-[1.02] active:scale-[0.98] ${
-                            secteur === key
-                              ? 'border-[#F59E0B] bg-[#F59E0B]/10 shadow-[0_0_20px_rgba(245,158,11,0.15)]'
-                              : 'border-white/8 bg-white/3 hover:border-white/15 hover:bg-white/5'
-                          }`}
-                        >
-                          <span className="text-xl block mb-1">{cfg.emoji}</span>
-                          <p className={`text-xs font-semibold leading-snug ${secteur === key ? 'text-white' : 'text-white/60'}`}>
-                            {cfg.label}
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Pays + Langue */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Pays</label>
-                        <select
-                          value={pays}
-                          onChange={e => setPays(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-xl px-3 py-2.5 outline-none focus:border-[#F59E0B]/50 appearance-none"
-                        >
-                          {PAYS_LIST.map(p => (
-                            <option key={p.code} value={p.code} className="bg-[#1a1a2e]">
-                              {p.flag} {p.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Langue</label>
-                        <div className="flex flex-wrap gap-1.5">
-                          {LANGUES_LIST.map(l => (
-                            <button
-                              key={l.code}
-                              onClick={() => setLangue(l.code)}
-                              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                langue === l.code
-                                  ? 'bg-[#F59E0B] text-black'
-                                  : 'bg-white/5 text-white/50 hover:bg-white/10'
-                              }`}
-                            >
-                              {l.flag} {l.code.toUpperCase()}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Fiscal config preview */}
-                    {pays && PAYS_CONFIGS[pays] && (() => {
-                      const cfg = PAYS_CONFIGS[pays]
-                      return (
-                        <div className="mt-4 p-3.5 bg-white/3 border border-[#F59E0B]/20 rounded-2xl">
-                          <p className="text-[10px] font-bold text-[#F59E0B]/70 uppercase tracking-widest mb-2">
-                            Config fiscale automatique — {cfg.nom}
-                          </p>
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-white/50">
-                            <span>TVA normale : <strong className="text-white/70">{(cfg.tva.taux_normal * 100).toFixed(0)}%</strong></span>
-                            <span>Système : <strong className="text-white/70">{cfg.systeme_comptable}</strong></span>
-                            <span>CNSS salarié : <strong className="text-white/70">{(cfg.cnss.taux_salarie * 100).toFixed(2)}%</strong></span>
-                            <span>CNSS patronal : <strong className="text-white/70">{(cfg.cnss.taux_patronal * 100).toFixed(2)}%</strong></span>
-                            <span>Devise : <strong className="text-white/70">{cfg.devise}</strong></span>
-                            <span>Zone : <strong className="text-white/70">{cfg.zone}</strong></span>
+                {/* Sub-types (appears when sector with subtypes is selected) */}
+                {secteur && SECTOR_SUBTYPES[secteur] && (
+                  <div className="mb-6 p-4 bg-white rounded-2xl border border-[#E2E8F0]">
+                    <p className="text-[12px] font-black text-[#64748B] uppercase tracking-widest mb-3">
+                      Quel type de {selectedSector?.label.split(' ')[0].toLowerCase()} ?
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {SECTOR_SUBTYPES[secteur].map(st => (
+                        <button key={st.id} type="button"
+                          onClick={() => setSousType(st.id)}
+                          className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 transition-all text-left ${
+                            sousType === st.id
+                              ? 'border-[#F59E0B] bg-[#FEF3C7]'
+                              : 'border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#F59E0B]/40'
+                          }`}>
+                          <span className="text-lg shrink-0">{st.emoji}</span>
+                          <div className="min-w-0">
+                            <p className={`text-[12px] font-bold truncate ${sousType === st.id ? 'text-[#92400E]' : 'text-[#374151]'}`}>
+                              {st.label}
+                            </p>
+                            <p className="text-[10px]" style={{ color: PLAN_CONFIG[st.plan].color }}>
+                              {PLAN_CONFIG[st.plan].label}
+                            </p>
                           </div>
-                        </div>
-                      )
-                    })()}
-                  </div>
-                )}
-
-                {/* ── STEP 2: Taille entreprise ────────────────────────────── */}
-                {step === 2 && (
-                  <div>
-                    <div className="mb-8">
-                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 2 sur 4</p>
-                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Choisissez votre pack</h1>
-                      <p className="text-white/40 text-sm">Modules inclus automatiquement selon votre taille.</p>
-                    </div>
-
-                    <div className="space-y-3">
-                      {(Object.entries(PLAN_CONFIG) as [TailleEntreprise, typeof PLAN_CONFIG[TailleEntreprise]][]).map(([key, cfg]) => (
-                        <button
-                          key={key}
-                          onClick={() => setTaille(key)}
-                          className={`w-full p-5 rounded-2xl border text-left transition-all hover:scale-[1.01] active:scale-[0.99] ${
-                            taille === key
-                              ? 'shadow-[0_0_30px_rgba(0,0,0,0.3)]'
-                              : 'border-white/8 bg-white/3 hover:bg-white/5'
-                          }`}
-                          style={taille === key ? {
-                            border: `1.5px solid ${cfg.color}`,
-                            background: `${cfg.color}0d`,
-                            boxShadow: `0 0 30px ${cfg.color}20`,
-                          } : {}}
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-white font-bold text-lg">{cfg.label}</span>
-                                {cfg.badge && (
-                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style={{ background: `${cfg.color}25`, color: cfg.color }}>
-                                    {cfg.badge}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-white/40 text-xs mb-3">{cfg.subtitle}</p>
-                              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                {cfg.features.slice(0, 4).map(f => (
-                                  <span key={f} className="flex items-center gap-1 text-[11px] text-white/50">
-                                    <Check size={10} style={{ color: cfg.color }} />
-                                    {f}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                              <p className="font-bold text-2xl" style={{ color: cfg.color }}>
-                                {new Intl.NumberFormat('fr-FR').format(cfg.price_fcfa)}
-                              </p>
-                              <p className="text-white/30 text-[11px]">FCFA/mois</p>
-                              <p className="text-white/20 text-[10px] mt-0.5">
-                                {cfg.max_users === -1 ? 'Utilisateurs illimités' : `${cfg.max_users} utilisateurs`}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Full features on selection */}
-                          {taille === key && (
-                            <div className="mt-4 pt-4 border-t border-white/8 grid grid-cols-2 gap-1.5">
-                              {cfg.features.map(f => (
-                                <span key={f} className="flex items-center gap-1.5 text-[11px] text-white/60">
-                                  <Check size={10} style={{ color: cfg.color }} />
-                                  {f}
-                                </span>
-                              ))}
-                            </div>
-                          )}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* ── STEP 3: Informations société ─────────────────────────── */}
-                {step === 3 && (
+                {/* Pays + Langue */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <div className="mb-8">
-                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 3 sur 4</p>
-                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Votre entreprise</h1>
-                      <p className="text-white/40 text-sm">Ces informations apparaîtront sur vos documents.</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">
-                          Nom de l'entreprise <span className="text-red-400">*</span>
-                        </label>
-                        <input
-                          value={societe.nom}
-                          onChange={e => setSociete(s => ({ ...s, nom: e.target.value }))}
-                          placeholder="Ex: Société Générale du Congo"
-                          className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Téléphone</label>
-                          <input
-                            value={societe.telephone}
-                            onChange={e => setSociete(s => ({ ...s, telephone: e.target.value }))}
-                            placeholder="+242 06 xxx xxxx"
-                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">NIF (optionnel)</label>
-                          <input
-                            value={societe.nif}
-                            onChange={e => setSociete(s => ({ ...s, nif: e.target.value }))}
-                            placeholder="Numéro fiscal"
-                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Adresse</label>
-                        <input
-                          value={societe.adresse}
-                          onChange={e => setSociete(s => ({ ...s, adresse: e.target.value }))}
-                          placeholder="Adresse complète"
-                          className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Sector + plan recap */}
-                    {secteurCfg && planCfg && (
-                      <div className="mt-6 p-4 bg-white/3 border border-white/6 rounded-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{secteurCfg.emoji}</span>
-                          <div>
-                            <p className="text-white text-sm font-semibold">{secteurCfg.label}</p>
-                            <p className="text-white/40 text-xs">{paysCfg?.flag} {paysCfg?.label}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold" style={{ color: planCfg.color }}>{planCfg.label}</p>
-                          <p className="text-white/30 text-xs">{new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)} FCFA/mois</p>
-                        </div>
-                      </div>
-                    )}
+                    <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">Pays</label>
+                    <select value={pays} onChange={e => setPays(e.target.value)}
+                      className="w-full px-3 py-2.5 text-[13px] border border-[#E2E8F0] rounded-xl bg-white text-[#0F172A] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15">
+                      {PAYS_LIST.map(p => (
+                        <option key={p.code} value={p.code}>{p.flag} {p.label}</option>
+                      ))}
+                    </select>
                   </div>
-                )}
-
-                {/* ── STEP 4: Compte administrateur ────────────────────────── */}
-                {step === 4 && (
                   <div>
-                    <div className="mb-8">
-                      <p className="text-[#F59E0B] text-sm font-semibold mb-1">Étape 4 sur 4</p>
-                      <h1 className="text-white text-3xl font-bold leading-tight mb-2">Votre compte admin</h1>
-                      <p className="text-white/40 text-sm">Vous serez le propriétaire de cet espace.</p>
+                    <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">Langue</label>
+                    <div className="flex flex-wrap gap-2">
+                      {LANGUES_LIST.map(l => (
+                        <button key={l.code} type="button"
+                          onClick={() => setLangue(l.code)}
+                          className={`px-3 py-1.5 rounded-xl text-[12px] font-bold border-2 transition-all ${
+                            langue === l.code
+                              ? 'border-[#F59E0B] bg-[#FEF3C7] text-[#92400E]'
+                              : 'border-[#E2E8F0] text-[#64748B] hover:border-[#F59E0B]/40'
+                          }`}>
+                          {l.flag} {l.code.toUpperCase()}
+                        </button>
+                      ))}
                     </div>
+                  </div>
+                </div>
 
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Prénom <span className="text-red-400">*</span></label>
-                          <input
-                            value={admin.prenom}
-                            onChange={e => setAdmin(a => ({ ...a, prenom: e.target.value }))}
-                            placeholder="Jean"
-                            autoComplete="given-name"
-                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Nom <span className="text-red-400">*</span></label>
-                          <input
-                            value={admin.nom}
-                            onChange={e => setAdmin(a => ({ ...a, nom: e.target.value }))}
-                            placeholder="Mpemba"
-                            autoComplete="family-name"
-                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                          />
-                        </div>
+                {/* Plan preview */}
+                {secteur && (
+                  <div className="mb-6 flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-[#E2E8F0]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: planCfg.color + '20' }}>
+                        <Zap size={14} style={{ color: planCfg.color }} />
                       </div>
                       <div>
-                        <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Email professionnel <span className="text-red-400">*</span></label>
-                        <input
-                          type="email"
-                          value={admin.email}
-                          onChange={e => setAdmin(a => ({ ...a, email: e.target.value }))}
-                          placeholder="jean@monentreprise.com"
-                          autoComplete="email"
-                          className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                        />
-                      </div>
-                      {isOAuthUser ? (
-                        <div className="flex items-center gap-3 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-xl">
-                          <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
-                            <Check size={11} className="text-green-400" />
-                          </div>
-                          <p className="text-green-400/90 text-[13px]">Connecté via Google — aucun mot de passe requis</p>
-                        </div>
-                      ) : (
-                        <div>
-                          <label className="block text-white/50 text-xs font-semibold mb-2 uppercase tracking-wider">Mot de passe <span className="text-red-400">*</span></label>
-                          <div className="relative">
-                            <input
-                              type={showPwd ? 'text' : 'password'}
-                              value={admin.password}
-                              onChange={e => setAdmin(a => ({ ...a, password: e.target.value }))}
-                              placeholder="8 caractères minimum"
-                              autoComplete="new-password"
-                              className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm rounded-xl px-4 py-3 pr-11 outline-none focus:border-[#F59E0B]/50 transition-colors"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPwd(v => !v)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
-                            >
-                              {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
-                            </button>
-                          </div>
-                          {admin.password.length > 0 && admin.password.length < 8 && (
-                            <p className="text-red-400/70 text-xs mt-1">8 caractères minimum</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Final recap */}
-                    <div className="mt-6 p-4 bg-white/3 border border-white/6 rounded-2xl space-y-2">
-                      <p className="text-white/30 text-[11px] uppercase tracking-wider font-bold">Résumé de votre abonnement</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {secteurCfg && <span className="text-lg">{secteurCfg.emoji}</span>}
-                          <div>
-                            <p className="text-white text-sm font-semibold">{societe.nom || 'Votre entreprise'}</p>
-                            <p className="text-white/40 text-xs">{secteurCfg?.label} · {paysCfg?.flag} {paysCfg?.label}</p>
-                          </div>
-                        </div>
-                        {planCfg && (
-                          <div className="text-right">
-                            <p className="font-bold text-lg" style={{ color: planCfg.color }}>
-                              {planCfg.label}
-                            </p>
-                            <p className="text-white/30 text-xs">
-                              {new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)} FCFA/mois
-                            </p>
-                          </div>
-                        )}
+                        <p className="text-[13px] font-bold text-[#0F172A]">Plan {planCfg.label} inclus</p>
+                        <p className="text-[11px] text-[#94A3B8]">{planCfg.subtitle}</p>
                       </div>
                     </div>
-
-                    <p className="text-white/20 text-[11px] mt-4 text-center">
-                      En créant votre compte, vous acceptez les{' '}
-                      <a href="/cgv" className="underline text-white/40">conditions générales</a> d'Oraforme.
+                    <p className="text-[16px] font-black shrink-0" style={{ color: planCfg.color }}>
+                      {new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)}
+                      <span className="text-[10px] font-normal text-[#94A3B8] ml-1">FCFA/mois</span>
                     </p>
                   </div>
                 )}
 
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Error */}
-            {error && (
-              <div className="mt-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
-                {error}
+                <button
+                  onClick={() => { if (canAdvance()) setStep(2) }}
+                  disabled={!canAdvance()}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[14px] font-black transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: canAdvance() ? '#F59E0B' : '#E2E8F0', color: canAdvance() ? 'white' : '#94A3B8' }}>
+                  Continuer <ChevronRight size={16} />
+                </button>
               </div>
             )}
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between mt-8 gap-4">
-              {step > 1 ? (
-                <button
-                  onClick={() => go(step - 1)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-white/50 text-sm hover:bg-white/5 hover:text-white/80 transition-all"
-                >
-                  <ChevronLeft size={16} /> Retour
-                </button>
-              ) : (
-                <a href="/login" className="text-white/30 text-sm hover:text-white/60 transition-colors">
-                  Déjà un compte ?
-                </a>
-              )}
+            {/* ── STEP 2: Entreprise ──────────────────────────────────────── */}
+            {step === 2 && (
+              <div>
+                <div className="mb-6">
+                  <p className="text-[12px] font-bold text-[#F59E0B] uppercase tracking-widest mb-1">Étape 2 sur 3</p>
+                  <h1 className="text-[26px] font-black text-[#0F172A]">Votre entreprise</h1>
+                  <p className="text-[14px] text-[#64748B] mt-1">Ces informations apparaîtront sur vos documents.</p>
+                </div>
 
-              {step < 4 ? (
-                <button
-                  onClick={() => go(step + 1)}
-                  disabled={!canAdvance()}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  style={{
-                    background: canAdvance() ? '#F59E0B' : '#F59E0B40',
-                    color: canAdvance() ? '#000' : '#000',
-                  }}
-                >
-                  Continuer <ChevronRight size={16} />
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={!canAdvance() || loading}
-                  className="flex items-center gap-2 px-8 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  style={{ background: '#F59E0B', color: '#000' }}
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                      Création en cours…
-                    </>
+                <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 space-y-4 mb-6">
+                  <div>
+                    <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">
+                      Nom de l&apos;entreprise <span className="text-[#DC2626]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={societe.nom}
+                      onChange={e => setSociete(p => ({ ...p, nom: e.target.value }))}
+                      placeholder="Ex: École Saint-Joseph de Brazzaville"
+                      className="w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">Téléphone</label>
+                      <input
+                        type="tel"
+                        value={societe.telephone}
+                        onChange={e => setSociete(p => ({ ...p, telephone: e.target.value }))}
+                        placeholder="+242 06 xxx xxxx"
+                        className="w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">NIF (optionnel)</label>
+                      <input
+                        type="text"
+                        value={societe.nif}
+                        onChange={e => setSociete(p => ({ ...p, nif: e.target.value }))}
+                        placeholder="Numéro fiscal"
+                        className="w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">Adresse</label>
+                    <input
+                      type="text"
+                      value={societe.adresse}
+                      onChange={e => setSociete(p => ({ ...p, adresse: e.target.value }))}
+                      placeholder="Adresse complète"
+                      className="w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button onClick={() => setStep(1)}
+                    className="flex items-center gap-1.5 px-5 py-3 rounded-2xl border-2 border-[#E2E8F0] text-[13px] font-bold text-[#64748B] hover:bg-[#F8FAFC] transition-all">
+                    <ChevronLeft size={15} /> Retour
+                  </button>
+                  <button
+                    onClick={() => { if (canAdvance()) setStep(3) }}
+                    disabled={!canAdvance()}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-[14px] font-black transition-all disabled:opacity-40"
+                    style={{ background: canAdvance() ? '#F59E0B' : '#E2E8F0', color: canAdvance() ? 'white' : '#94A3B8' }}>
+                    Continuer <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── STEP 3: Compte ──────────────────────────────────────────── */}
+            {step === 3 && (
+              <div>
+                <div className="mb-6">
+                  <p className="text-[12px] font-bold text-[#F59E0B] uppercase tracking-widest mb-1">Étape 3 sur 3</p>
+                  <h1 className="text-[26px] font-black text-[#0F172A]">Votre compte admin</h1>
+                  <p className="text-[14px] text-[#64748B] mt-1">Vous serez le propriétaire de cet espace.</p>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 space-y-4 mb-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">
+                        Prénom <span className="text-[#DC2626]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={admin.prenom}
+                        onChange={e => setAdmin(p => ({ ...p, prenom: e.target.value }))}
+                        placeholder="Jean"
+                        className="w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">
+                        Nom <span className="text-[#DC2626]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={admin.nom}
+                        onChange={e => setAdmin(p => ({ ...p, nom: e.target.value }))}
+                        placeholder="Dupont"
+                        className="w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">
+                      Email professionnel <span className="text-[#DC2626]">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={admin.email}
+                      onChange={e => setAdmin(p => ({ ...p, email: e.target.value }))}
+                      placeholder="jean@monentreprise.com"
+                      readOnly={isOAuthUser}
+                      className={`w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15 ${isOAuthUser ? 'bg-[#F8FAFC] cursor-not-allowed' : ''}`}
+                    />
+                  </div>
+
+                  {isOAuthUser ? (
+                    <div className="flex items-center gap-3 px-4 py-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl">
+                      <div className="w-5 h-5 rounded-full bg-[#16A34A] flex items-center justify-center shrink-0">
+                        <Check size={11} className="text-white" />
+                      </div>
+                      <p className="text-[13px] text-[#15803D] font-medium">Connecté via Google — aucun mot de passe requis</p>
+                    </div>
                   ) : (
-                    <>
-                      <Zap size={15} /> Lancer mon ERP
-                    </>
+                    <div>
+                      <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">
+                        Mot de passe <span className="text-[#DC2626]">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPwd ? 'text' : 'password'}
+                          value={admin.password}
+                          onChange={e => setAdmin(p => ({ ...p, password: e.target.value }))}
+                          placeholder="8 caractères minimum"
+                          autoComplete="new-password"
+                          className="w-full px-4 py-3 pr-11 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
+                        />
+                        <button type="button" onClick={() => setShowPwd(v => !v)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B]">
+                          {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+                        </button>
+                      </div>
+                      {admin.password.length > 0 && admin.password.length < 8 && (
+                        <p className="text-[#DC2626] text-[11px] mt-1">8 caractères minimum</p>
+                      )}
+                    </div>
                   )}
-                </button>
-              )}
-            </div>
+                </div>
+
+                {/* Final recap */}
+                <div className="mb-6 p-4 bg-white rounded-2xl border border-[#E2E8F0] flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{selectedSector?.emoji}</span>
+                    <div>
+                      <p className="text-[13px] font-bold text-[#0F172A]">{societe.nom || 'Votre entreprise'}</p>
+                      <p className="text-[11px] text-[#64748B]">
+                        {selectedSector?.label}
+                        {selectedSubtype ? ` · ${selectedSubtype.label}` : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-[13px] font-black" style={{ color: planCfg.color }}>{planCfg.label}</p>
+                    <p className="text-[10px] text-[#94A3B8]">
+                      {new Intl.NumberFormat('fr-FR').format(planCfg.price_fcfa)} FCFA/mois
+                    </p>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="mb-4 px-4 py-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[13px] text-[#DC2626]">
+                    {error}
+                  </div>
+                )}
+
+                <p className="text-[11px] text-[#94A3B8] text-center mb-4">
+                  En créant votre compte, vous acceptez les{' '}
+                  <a href="/cgu" className="underline hover:text-[#F59E0B]">conditions générales</a> d&apos;Oraforme.
+                </p>
+
+                <div className="flex gap-3">
+                  <button onClick={() => setStep(2)}
+                    className="flex items-center gap-1.5 px-5 py-3 rounded-2xl border-2 border-[#E2E8F0] text-[13px] font-bold text-[#64748B] hover:bg-[#F8FAFC] transition-all">
+                    <ChevronLeft size={15} /> Retour
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!canAdvance() || loading}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-[14px] font-black transition-all disabled:opacity-40"
+                    style={{ background: canAdvance() && !loading ? '#F59E0B' : '#E2E8F0', color: canAdvance() && !loading ? 'white' : '#94A3B8' }}>
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <><Zap size={16} /> Lancer mon ERP</>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
