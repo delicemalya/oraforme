@@ -77,10 +77,12 @@ const STEPS = [
 export default function OnboardingPage() {
   const router = useRouter()
   const [step,        setStep]        = useState(1)
-  const [loading,     setLoading]     = useState(false)
-  const [error,       setError]       = useState('')
-  const [showPwd,     setShowPwd]     = useState(false)
-  const [isOAuthUser, setIsOAuthUser] = useState(false)
+  const [loading,      setLoading]      = useState(false)
+  const [error,        setError]        = useState('')
+  const [showPwd,      setShowPwd]      = useState(false)
+  const [isOAuthUser,  setIsOAuthUser]  = useState(false)
+  const [emailPending, setEmailPending] = useState(false)
+  const [pendingEmail, setPendingEmail] = useState('')
 
   // Step 1
   const [secteur,  setSecteur]  = useState<SecteurId | ''>('')
@@ -136,7 +138,15 @@ export default function OnboardingPage() {
           commerce: 'commerce', ong: 'ong', agriculture: 'agriculture', autre: 'autre',
         }
         const sId = reg.sector?.split('-')[0]
-        if (sId && sectorMap[sId]) { setSecteur(sectorMap[sId]); setStep(2) }
+        if (sId && sectorMap[sId]) {
+          const mappedSector = sectorMap[sId]
+          setSecteur(mappedSector)
+          // Only jump to step 2 if no sub-types needed for this sector
+          // Otherwise stay on step 1 so user can pick sub-type
+          if (!SECTOR_SUBTYPES[mappedSector]) {
+            setStep(2)
+          }
+        }
       } catch { /* ignore */ }
     })
   }, [])
@@ -157,7 +167,7 @@ export default function OnboardingPage() {
     setLoading(true); setError('')
     const { data: { session } } = await supabase.auth.getSession()
     if (!session?.user) {
-      const { error: err } = await supabase.auth.signUp({
+      const { data: signUpData, error: err } = await supabase.auth.signUp({
         email: admin.email,
         password: admin.password,
         options: {
@@ -166,6 +176,13 @@ export default function OnboardingPage() {
         },
       })
       if (err) { setError(err.message); setLoading(false); return }
+      // Email confirmation required — show "check email" screen
+      if (!signUpData.session) {
+        setPendingEmail(admin.email)
+        setEmailPending(true)
+        setLoading(false)
+        return
+      }
     }
     const result = await createTenantAndProfile({
       nomEntreprise:   societe.nom,
@@ -185,6 +202,30 @@ export default function OnboardingPage() {
   }
 
   const selectedSector = SECTORS.find(s => s.id === secteur)
+
+  // ── Email confirmation pending screen ──────────────────────────────────────
+  if (emailPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] px-6">
+        <div className="w-full max-w-sm bg-white rounded-3xl p-8 border border-[#E2E8F0] text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#F0FDF4] border border-[#BBF7D0] flex items-center justify-center mx-auto mb-5">
+            <Check size={28} className="text-[#16A34A]" />
+          </div>
+          <h2 className="text-2xl font-black text-[#0F172A] mb-3">Vérifiez votre email</h2>
+          <p className="text-[#64748B] text-[14px] leading-relaxed mb-2">
+            Un lien d&apos;activation a été envoyé à
+          </p>
+          <p className="text-[#0F172A] font-bold text-[14px] mb-6">{pendingEmail}</p>
+          <p className="text-[#94A3B8] text-[12px] mb-6">
+            Cliquez sur le lien dans l&apos;email pour activer votre compte. Pensez à vérifier les spams.
+          </p>
+          <a href="/login" className="text-[#F59E0B] text-[13px] font-bold hover:underline">
+            ← Retour à la connexion
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex bg-[#F8FAFC]">
