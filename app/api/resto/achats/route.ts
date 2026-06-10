@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
       .from('stock_articles')
       .update({ quantite: Number(article.quantite) + ligne.quantite })
       .eq('id', ligne.article_id)
+      .eq('tenant_id', auth.tenantId)
   }
 
   // Créer une écriture en trésorerie (sortie = dépense)

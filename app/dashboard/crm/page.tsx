@@ -152,6 +152,8 @@ export default function CRMPage() {
   const [showNewAct, setShowNewAct] = useState(false)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [clientFactures, setClientFactures] = useState<{id:string;invoice_number:string;total:number;statut:string;date:string}[]>([])
+  const [editingClient, setEditingClient] = useState<Client | null>(null)
+  const [editingActivite, setEditingActivite] = useState<Activite | null>(null)
 
   // Forms
   const [clientForm, setClientForm] = useState({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif' as ClientStatut, nif: '', notes: '' })
@@ -164,15 +166,20 @@ export default function CRMPage() {
   const load = useCallback(async () => {
     if (!tid) return
     setLoading(true)
-    const [{ data: c }, { data: o }, { data: a }] = await Promise.all([
-      supabase.from('clients').select('*').eq('tenant_id', tid).order('created_at', { ascending: false }),
-      supabase.from('crm_opportunites').select('*, clients(nom, entreprise)').eq('tenant_id', tid).order('created_at', { ascending: false }),
-      supabase.from('crm_activites').select('*, clients(nom)').eq('tenant_id', tid).order('date_activite', { ascending: false }).limit(50),
-    ])
-    setClients((c ?? []) as Client[])
-    setOpps((o ?? []) as unknown as Opportunite[])
-    setActivites((a ?? []) as unknown as Activite[])
-    setLoading(false)
+    try {
+      const [{ data: c }, { data: o }, { data: a }] = await Promise.all([
+        supabase.from('clients').select('*').eq('tenant_id', tid).order('created_at', { ascending: false }),
+        supabase.from('crm_opportunites').select('*, clients(nom, entreprise)').eq('tenant_id', tid).order('created_at', { ascending: false }),
+        supabase.from('crm_activites').select('*, clients(nom)').eq('tenant_id', tid).order('date_activite', { ascending: false }).limit(50),
+      ])
+      setClients((c ?? []) as Client[])
+      setOpps((o ?? []) as unknown as Opportunite[])
+      setActivites((a ?? []) as unknown as Activite[])
+    } catch (err) {
+      console.error('[CRM] load error:', err)
+    } finally {
+      setLoading(false)
+    }
   }, [tid])
 
   useEffect(() => { load() }, [load])
@@ -183,22 +190,6 @@ export default function CRMPage() {
     const { data } = await supabase.from('factures').select('id,invoice_number,total,statut,date')
       .eq('tenant_id', tid).eq('client_id', c.id).order('date', { ascending: false }).limit(10)
     setClientFactures((data ?? []) as typeof clientFactures)
-  }
-
-  async function createClient(e: React.FormEvent) {
-    e.preventDefault()
-    if (!clientForm.nom.trim() || !tid) return
-    setSaving(true)
-    const { error } = await supabase.from('clients').insert({
-      tenant_id: tid, nom: clientForm.nom.trim(),
-      email: clientForm.email || null, telephone: clientForm.telephone || null,
-      entreprise: clientForm.entreprise || null, secteur: clientForm.secteur || null,
-      ville: clientForm.ville || null, nif: clientForm.nif || null,
-      notes: clientForm.notes || null, statut: clientForm.statut,
-      type: clientForm.statut === 'prospect' ? 'prospect' : 'client',
-    })
-    setSaving(false)
-    if (!error) { setShowNewClient(false); setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', nif: '', notes: '' }); load() }
   }
 
   async function createOpp(e: React.FormEvent) {
@@ -220,22 +211,6 @@ export default function CRMPage() {
     load()
   }
 
-  async function createActivite(e: React.FormEvent) {
-    e.preventDefault()
-    if (!actForm.titre.trim() || !tid) return
-    setSaving(true)
-    await supabase.from('crm_activites').insert({
-      tenant_id: tid, titre: actForm.titre.trim(),
-      type: actForm.type, client_id: actForm.client_id || null,
-      description: actForm.description || null,
-      date_activite: actForm.date_activite,
-    })
-    setSaving(false)
-    setShowNewAct(false)
-    setActForm({ titre: '', type: 'note', client_id: '', description: '', date_activite: new Date().toISOString().split('T')[0] })
-    load()
-  }
-
   async function moveOpp(id: string, etape: OppEtape) {
     if (!tid) return
     await supabase.from('crm_opportunites').update({ etape }).eq('id', id).eq('tenant_id', tid)
@@ -247,6 +222,87 @@ export default function CRMPage() {
     await supabase.from('clients').delete().eq('id', id).eq('tenant_id', tid)
     setSelectedClient(null)
     load()
+  }
+
+  function startEditClient(c: Client) {
+    setEditingClient(c)
+    setClientForm({ nom: c.nom, email: c.email ?? '', telephone: c.telephone ?? '', entreprise: c.entreprise ?? '', secteur: c.secteur ?? '', ville: c.ville ?? '', statut: c.statut, nif: c.nif ?? '', notes: c.notes ?? '' })
+    setSelectedClient(null)
+    setShowNewClient(true)
+  }
+
+  async function saveClient(e: React.FormEvent) {
+    e.preventDefault()
+    if (!clientForm.nom.trim() || !tid) return
+    setSaving(true)
+    if (editingClient) {
+      await supabase.from('clients').update({
+        nom: clientForm.nom.trim(), email: clientForm.email || null,
+        telephone: clientForm.telephone || null, entreprise: clientForm.entreprise || null,
+        secteur: clientForm.secteur || null, ville: clientForm.ville || null,
+        nif: clientForm.nif || null, notes: clientForm.notes || null,
+        statut: clientForm.statut,
+        type: clientForm.statut === 'prospect' ? 'prospect' : 'client',
+      }).eq('id', editingClient.id).eq('tenant_id', tid)
+    } else {
+      await supabase.from('clients').insert({
+        tenant_id: tid, nom: clientForm.nom.trim(),
+        email: clientForm.email || null, telephone: clientForm.telephone || null,
+        entreprise: clientForm.entreprise || null, secteur: clientForm.secteur || null,
+        ville: clientForm.ville || null, nif: clientForm.nif || null,
+        notes: clientForm.notes || null, statut: clientForm.statut,
+        type: clientForm.statut === 'prospect' ? 'prospect' : 'client',
+      })
+    }
+    setSaving(false)
+    setShowNewClient(false)
+    setEditingClient(null)
+    setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', nif: '', notes: '' })
+    load()
+  }
+
+  async function deleteOpp(id: string) {
+    if (!tid || !confirm('Supprimer cette opportunité ?')) return
+    await supabase.from('crm_opportunites').delete().eq('id', id).eq('tenant_id', tid)
+    setOpps(prev => prev.filter(o => o.id !== id))
+  }
+
+  function startEditActivite(a: Activite) {
+    setEditingActivite(a)
+    setActForm({ titre: a.titre, type: a.type, client_id: a.client_id ?? '', description: a.description ?? '', date_activite: a.date_activite.split('T')[0] })
+    setShowNewAct(true)
+  }
+
+  async function saveActivite(e: React.FormEvent) {
+    e.preventDefault()
+    if (!actForm.titre.trim() || !tid) return
+    setSaving(true)
+    if (editingActivite) {
+      await supabase.from('crm_activites').update({
+        titre: actForm.titre.trim(), type: actForm.type,
+        client_id: actForm.client_id || null,
+        description: actForm.description || null,
+        date_activite: actForm.date_activite,
+      }).eq('id', editingActivite.id).eq('tenant_id', tid)
+    } else {
+      await supabase.from('crm_activites').insert({
+        tenant_id: tid, titre: actForm.titre.trim(),
+        type: actForm.type, client_id: actForm.client_id || null,
+        description: actForm.description || null,
+        date_activite: actForm.date_activite,
+      })
+    }
+    setSaving(false)
+    setShowNewAct(false)
+    setEditingActivite(null)
+    setActForm({ titre: '', type: 'note', client_id: '', description: '', date_activite: new Date().toISOString().split('T')[0] })
+    load()
+  }
+
+  async function deleteActivite(id: string) {
+    if (!tid || !confirm('Supprimer cette activité ?')) return
+    await supabase.from('crm_activites').delete().eq('id', id).eq('tenant_id', tid)
+    setActivites(prev => prev.filter(a => a.id !== id))
   }
 
   // ── Computed ──────────────────────────────────────────────────────────────
@@ -463,7 +519,7 @@ export default function CRMPage() {
                               <Clock size={9} /> {fmtDate(opp.date_cloture_prevue)}
                             </p>
                           )}
-                          {/* Move buttons */}
+                          {/* Move + delete buttons */}
                           <div className="flex gap-1 mt-2">
                             {ETAPES.filter(e => e.id !== etape.id).slice(0, 2).map(target => (
                               <button key={target.id} onClick={() => moveOpp(opp.id, target.id)}
@@ -473,6 +529,11 @@ export default function CRMPage() {
                                 → {target.label.slice(0, 5)}
                               </button>
                             ))}
+                            <button onClick={() => deleteOpp(opp.id)}
+                              className="px-1.5 py-1 rounded text-[9px] font-bold transition-colors bg-red-50 text-red-500 hover:bg-red-100"
+                              title="Supprimer">
+                              <Trash2 size={10} />
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -520,7 +581,17 @@ export default function CRMPage() {
                           {a.clients && <p className="text-[11px] text-[#64748B]">{(a.clients as {nom:string}).nom}</p>}
                           {a.description && <p className="text-[12px] text-[#475569] mt-0.5 line-clamp-1">{a.description}</p>}
                         </div>
-                        <p className="text-[11px] text-[#94A3B8] shrink-0">{fmtDate(a.date_activite)}</p>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <p className="text-[11px] text-[#94A3B8]">{fmtDate(a.date_activite)}</p>
+                          <button onClick={() => startEditActivite(a)}
+                            className="p-1.5 rounded-lg hover:bg-amber-50 text-[#94A3B8] hover:text-amber-600 transition-colors">
+                            <Edit3 size={12} />
+                          </button>
+                          <button onClick={() => deleteActivite(a.id)}
+                            className="p-1.5 rounded-lg hover:bg-red-50 text-[#94A3B8] hover:text-red-600 transition-colors">
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
                       </div>
                     )
                   })}
@@ -608,6 +679,10 @@ export default function CRMPage() {
 
               {/* Actions */}
               <div className="flex gap-2 pt-2">
+                <button onClick={() => startEditClient(selectedClient)}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 border border-amber-200 rounded-xl text-[13px] font-semibold text-amber-700 hover:bg-amber-50">
+                  <Edit3 size={13} /> Modifier
+                </button>
                 <button onClick={() => { setActForm(p => ({...p, client_id: selectedClient.id})); setShowNewAct(true) }}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-[#E2E8F0] rounded-xl text-[13px] font-semibold text-[#0F172A] hover:bg-[#F8FAFC]">
                   <Activity size={13} /> Activité
@@ -631,10 +706,10 @@ export default function CRMPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[16px] font-bold text-[#0F172A]">Nouveau client / prospect</h2>
-              <button onClick={() => setShowNewClient(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
+              <h2 className="text-[16px] font-bold text-[#0F172A]">{editingClient ? 'Modifier le client' : 'Nouveau client / prospect'}</h2>
+              <button onClick={() => { setShowNewClient(false); setEditingClient(null); setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', nif: '', notes: '' }) }} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
             </div>
-            <form onSubmit={createClient} className="space-y-3">
+            <form onSubmit={saveClient} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
                   <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">Nom complet *</label>
@@ -695,13 +770,13 @@ export default function CRMPage() {
                 </div>
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => setShowNewClient(false)}
+                <button type="button" onClick={() => { setShowNewClient(false); setEditingClient(null); setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', nif: '', notes: '' }) }}
                   className="flex-1 py-2.5 border border-[#E2E8F0] rounded-xl text-[13px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
                   Annuler
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 bg-[#F59E0B] text-white rounded-xl text-[13px] font-semibold hover:bg-amber-600 disabled:opacity-50">
-                  {saving ? 'Enregistrement...' : 'Créer'}
+                  {saving ? 'Enregistrement...' : editingClient ? 'Enregistrer' : 'Créer'}
                 </button>
               </div>
             </form>
@@ -778,10 +853,10 @@ export default function CRMPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[16px] font-bold text-[#0F172A]">Nouvelle activité</h2>
-              <button onClick={() => setShowNewAct(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
+              <h2 className="text-[16px] font-bold text-[#0F172A]">{editingActivite ? 'Modifier l\'activité' : 'Nouvelle activité'}</h2>
+              <button onClick={() => { setShowNewAct(false); setEditingActivite(null); setActForm({ titre: '', type: 'note', client_id: '', description: '', date_activite: new Date().toISOString().split('T')[0] }) }} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
             </div>
-            <form onSubmit={createActivite} className="space-y-3">
+            <form onSubmit={saveActivite} className="space-y-3">
               <div>
                 <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">Type</label>
                 <select value={actForm.type} onChange={e => setActForm(p=>({...p,type:e.target.value as ActiviteType}))}
@@ -817,7 +892,7 @@ export default function CRMPage() {
                   placeholder="Détails de l'activité..." />
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => setShowNewAct(false)}
+                <button type="button" onClick={() => { setShowNewAct(false); setEditingActivite(null); setActForm({ titre: '', type: 'note', client_id: '', description: '', date_activite: new Date().toISOString().split('T')[0] }) }}
                   className="flex-1 py-2.5 border border-[#E2E8F0] rounded-xl text-[13px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
                   Annuler
                 </button>
