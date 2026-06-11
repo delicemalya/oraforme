@@ -61,6 +61,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.api_keys':       'Clés API',
     'nav.operations':     'Opérations',
     'nav.outils':         'Outils & IA',
+    'nav.miaa_agent':    'MIAA+ Agent IA',
+    'nav.miaa_chat':     'MIAA+ Chat',
+    'nav.miaa_rapports': 'Rapports IA',
 
     // Navigation��� Items
     'nav.dashboard':      'Tableau de bord',
@@ -3778,6 +3781,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.api_keys':       'API Keys',
     'nav.operations':     'Operations',
     'nav.outils':         'Tools & AI',
+    'nav.miaa_agent':    'MIAA+ AI Agent',
+    'nav.miaa_chat':     'MIAA+ Chat',
+    'nav.miaa_rapports': 'AI Reports',
     'nav.dashboard':      'Dashboard',
     'nav.direction':      'General Management',
     'nav.directionSub':   'Global view & management',

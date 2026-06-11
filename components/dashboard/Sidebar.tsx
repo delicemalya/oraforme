@@ -144,6 +144,10 @@ const ICONS: Record<string, LucideIcon> = {
   'ong-dons':          Heart,
   boisson:             Package,
   'boisson-tournees':  Truck,
+  // MIAA+ Agent
+  'miaa':          Bot,
+  'miaa-agent':    Zap,
+  'miaa-rapports': FileText,
 }
 
 // ─── Module Registry ──────────────────────────────────────────────────────────
@@ -190,6 +194,10 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'audit-ohada',      label: 'Conformité OHADA',          sublabel: '', href: '/dashboard/audit/ohada'          },
   { id: 'audit-plans',      label: "Plans d'Actions",           sublabel: '', href: '/dashboard/audit/plans-actions'  },
   { id: 'audit-rapports',   label: 'Rapports d\'Audit',         sublabel: '', href: '/dashboard/audit/rapports'       },
+  // MIAA+
+  { id: 'miaa',          label: 'MIAA+ Chat',              sublabel: 'Agent IA',       href: '/dashboard/miaa'          },
+  { id: 'miaa-agent',    label: 'Centre de Commandement',  sublabel: 'Agent Autonome', href: '/dashboard/miaa/agent'    },
+  { id: 'miaa-rapports', label: 'Rapports MIAA+',          sublabel: 'Générés par IA', href: '/dashboard/miaa/rapports' },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -211,6 +219,8 @@ const SIDEBAR_GROUPS = [
   { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'taches'] },
   // AUDIT & CONFORMITÉ OHADA
   { id: 'audit_group', labelKey: 'nav.audit',       icon: ShieldAlert, moduleIds: ['audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci', 'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'] },
+  // MIAA+ — Agent Exécutif IA
+  { id: 'miaa_group',  labelKey: 'nav.miaa_agent',  icon: Sparkles,    moduleIds: ['miaa', 'miaa-agent', 'miaa-rapports'] },
   // ADMIN — abonnement, automatisation, API
   { id: 'params',      labelKey: 'nav.params',      icon: Settings,    moduleIds: ['abonnement', 'workflows', 'api-keys'] },
 ]
@@ -289,6 +299,10 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'ong-dons':              'nav.ong_dons',
   boisson:                 'nav.boisson',
   'boisson-tournees':      'nav.boisson_tournees',
+  // MIAA+
+  'miaa':          'nav.miaa_chat',
+  'miaa-agent':    'nav.miaa_agent',
+  'miaa-rapports': 'nav.miaa_rapports',
 }
 
 const SECTOR_LABEL_KEYS: Record<string, string> = {
@@ -343,6 +357,7 @@ const ALL_MODULE_IDS = [
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
   'abonnement', 'fiscalite', 'cnss-congo',
+  'miaa', 'miaa-agent', 'miaa-rapports',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
