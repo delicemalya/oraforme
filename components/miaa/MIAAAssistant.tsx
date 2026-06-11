@@ -372,7 +372,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                 animate={{ rotate: 360 }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
                 style={{
-                  background: 'conic-gradient(from 0deg, transparent 55%, #F59E0B 75%, #FCD34D 88%, transparent 100%)',
+                  background: 'conic-gradient(from 0deg, transparent 55%, #DC2626 75%, #FF4444 88%, transparent 100%)',
                   borderRadius: '50%',
                 }}
               />
@@ -381,7 +381,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                 className="absolute inset-[-2px] rounded-full"
                 animate={{ scale: [1, 1.30, 1], opacity: [0.45, 0, 0.45] }}
                 transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ background: 'radial-gradient(circle, #F59E0B70 0%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, #DC262660 0%, transparent 70%)' }}
               />
               {/* Logo */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -389,7 +389,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                 src="/miaa-logo.png"
                 alt="MIAA+"
                 className="relative z-10 rounded-full object-cover shadow-xl"
-                style={{ width: 64, height: 64, filter: 'drop-shadow(0 4px 12px rgba(245,158,11,0.60))' }}
+                style={{ width: 64, height: 64, filter: 'drop-shadow(0 4px 14px rgba(220,38,38,0.65))' }}
               />
               {/* Badge non-lus */}
               {unreadCount > 0 && (
@@ -407,7 +407,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
               className="text-[10px] font-bold tracking-wide select-none"
-              style={{ color: '#F59E0B', textShadow: '0 1px 4px rgba(245,158,11,0.4)' }}
+              style={{ color: '#DC2626', textShadow: '0 1px 4px rgba(220,38,38,0.4)' }}
             >
               MIAA+
             </motion.span>
