@@ -145,8 +145,9 @@ const ICONS: Record<string, LucideIcon> = {
   boisson:             Package,
   'boisson-tournees':  Truck,
   // MIAA+ Agent sous-modules
-  'miaa-agent':    Zap,
-  'miaa-rapports': FileText,
+  'miaa-agent':     Zap,
+  'miaa-rapports':  FileText,
+  'miaa-expertise': Sparkles,
 }
 
 // ─── Module Registry ──────────────────────────────────────────────────────────
@@ -194,8 +195,9 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'audit-plans',      label: "Plans d'Actions",           sublabel: '', href: '/dashboard/audit/plans-actions'  },
   { id: 'audit-rapports',   label: 'Rapports d\'Audit',         sublabel: '', href: '/dashboard/audit/rapports'       },
   // MIAA+ sous-modules (bizbot = entrée principale → /dashboard/miaa)
-  { id: 'miaa-agent',    label: 'Agent Autonome',  sublabel: 'Centre de Commandement', href: '/dashboard/miaa/agent'    },
-  { id: 'miaa-rapports', label: 'Rapports IA',      sublabel: 'Générés par MIAA+',      href: '/dashboard/miaa/rapports' },
+  { id: 'miaa-agent',     label: 'Agent Autonome',        sublabel: 'Centre de Commandement',  href: '/dashboard/miaa/agent'     },
+  { id: 'miaa-rapports',  label: 'Rapports IA',            sublabel: 'Générés par MIAA+',       href: '/dashboard/miaa/rapports'  },
+  { id: 'miaa-expertise', label: 'Expertise & Documents',  sublabel: 'Marketplace 82 modèles', href: '/dashboard/miaa/expertise' },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -213,8 +215,8 @@ const SIDEBAR_GROUPS = [
   { id: 'recrutement_section', labelKey: 'nav.recrutement', icon: Briefcase, moduleIds: ['recrutement'] },
   // COMMERCIAL — clients, ventes, recouvrement, stock, achats
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'facturation', 'recouvrement', 'stock', 'achats'] },
-  // OUTILS — IA & productivité (miaa-agent + miaa-rapports vivent ici, sous bizbot)
-  { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'miaa-agent', 'miaa-rapports', 'taches'] },
+  // OUTILS — IA & productivité
+  { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'miaa-agent', 'miaa-rapports', 'miaa-expertise', 'taches'] },
   // AUDIT & CONFORMITÉ OHADA
   { id: 'audit_group', labelKey: 'nav.audit',       icon: ShieldAlert, moduleIds: ['audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci', 'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'] },
   // ADMIN — abonnement, automatisation, API
@@ -296,8 +298,9 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   boisson:                 'nav.boisson',
   'boisson-tournees':      'nav.boisson_tournees',
   // MIAA+ sous-modules
-  'miaa-agent':    'nav.miaa_agent',
-  'miaa-rapports': 'nav.miaa_rapports',
+  'miaa-agent':     'nav.miaa_agent',
+  'miaa-rapports':  'nav.miaa_rapports',
+  'miaa-expertise': 'nav.miaa_expertise',
 }
 
 const SECTOR_LABEL_KEYS: Record<string, string> = {
@@ -352,7 +355,7 @@ const ALL_MODULE_IDS = [
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
   'abonnement', 'fiscalite', 'cnss-congo',
-  'miaa-agent', 'miaa-rapports',
+  'miaa-agent', 'miaa-rapports', 'miaa-expertise',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
