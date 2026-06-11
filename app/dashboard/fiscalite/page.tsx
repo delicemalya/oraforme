@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { PAYS_LIST } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
+import MIAAContextButton from '@/components/miaa/MIAAContextButton'
 
 function fmtN(n: number, devise = 'FCFA') {
   if (n === 0) return `0 ${devise}`
@@ -115,7 +116,7 @@ export default function FiscalitePage() {
   ]
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 w-full max-w-6xl mx-auto">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -141,6 +142,7 @@ export default function FiscalitePage() {
             <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
             <span className="hidden sm:inline">Actualiser</span>
           </button>
+          <MIAAContextButton module="fiscalite" />
         </div>
       </div>
 

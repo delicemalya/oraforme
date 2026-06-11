@@ -133,6 +133,44 @@ Seuil d'alerte minimum = Charges fixes mensuelles × 1,5`,
   },
 ]
 
+// ── Suggestions par module ─────────────────────────────────────────────────────
+
+const MODULE_SUGGESTIONS: Record<string, string[]> = {
+  comptabilite: ['Passer une écriture OHADA', 'Vérifier ma balance comptable', 'Calculer la TVA sur 500 000 FCFA'],
+  rh:           ['Calculer le salaire net de 450 000 FCFA', 'Obligations CNSS employeur', 'Rédiger un contrat CDI'],
+  recrutement:  ['Analyser les candidatures en cours', 'Générer une fiche d\'entretien', 'Meilleurs profils pour ce poste'],
+  tresorerie:   ['Quel est mon solde de trésorerie ?', 'Analyser mes flux du mois', 'Prévision à 30 jours'],
+  facturation:  ['Créer une facture OHADA conforme', 'Relancer un client impayé', 'Calculer les pénalités de retard'],
+  stock:        ['Articles en rupture de stock', 'Valoriser mon inventaire OHADA', 'Optimiser mes commandes'],
+  crm:          ['Analyser mes clients actifs', 'Pipeline commercial du mois', 'Stratégie de fidélisation'],
+  fiscalite:    ['Calculer la TVA trimestrielle', 'Déclaration DGI Congo', 'Optimiser mon IS 30%'],
+  audit:        ['Lancer un audit OHADA complet', 'Analyser les risques détectés', 'Plan d\'action correctif'],
+  ecole:        ['Calculer les moyennes des élèves', 'Gestion des frais de scolarité', 'Rapport de résultats'],
+  restaurant:   ['Analyser le food cost', 'Calculer la marge d\'un plat', 'Rapport de vente du jour'],
+  hotel:        ['Taux d\'occupation du mois', 'Revenu par chambre (RevPAR)', 'Rapport housekeeping'],
+  sante:        ['Patients du jour', 'Relance consultations impayées', 'Rapport médecin mensuel'],
+  depenses:     ['Mes dépenses du mois', 'Quelles charges déduire ?', 'Budget prévisionnel'],
+  auto:         ['Calculer la TVA sur 500 000 FCFA', 'Quel est mon solde de trésorerie ?', 'Comment calculer le salaire net ?'],
+}
+
+const MODULE_EXPERT_LABELS: Record<string, string> = {
+  comptabilite: 'Expert Comptabilité · OHADA',
+  rh:           'Expert RH · Droit social',
+  recrutement:  'Expert Recrutement',
+  tresorerie:   'Expert Trésorerie',
+  facturation:  'Expert Facturation',
+  stock:        'Expert Inventaire',
+  crm:          'Expert Commercial',
+  fiscalite:    'Expert Fiscalité',
+  audit:        'Expert Audit · OHADA',
+  ecole:        'Expert Éducation',
+  restaurant:   'Expert Restauration',
+  hotel:        'Expert Hôtellerie',
+  sante:        'Expert Clinique',
+  depenses:     'Expert Dépenses',
+  auto:         'Expert IA · Oraforme ERP',
+}
+
 // ── Types de documents générables ─────────────────────────────────────────────
 
 const DOC_TYPES = [
@@ -334,8 +372,10 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
 
   // ── Dimensions ─────────────────────────────────────────────────────────────
 
-  const panelW  = maximized ? 'w-[700px]' : 'w-[400px]'
-  const panelH  = maximized ? 'h-[85vh]'  : 'h-[600px]'
+  const panelW  = maximized
+    ? 'w-[calc(100vw-16px)] max-w-[700px]'
+    : 'w-[calc(100vw-16px)] max-w-[400px]'
+  const panelH  = maximized ? 'h-[90dvh] sm:h-[85vh]' : 'h-[90dvh] sm:h-[600px]'
 
   const TABS: { id: Tab; label: string; Icon: React.ElementType; badge?: number }[] = [
     { id: 'chat',      label: 'Chat',       Icon: MessageCircle },
@@ -357,7 +397,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 340, damping: 26 }}
-            className="fixed bottom-6 right-6 z-[9999] flex flex-col items-center gap-1"
+            className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-center gap-1"
           >
             <motion.button
               whileHover={{ scale: 1.10 }}
@@ -417,8 +457,8 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
 
       {/* Panel principal */}
       {open && (
-        <div className={`fixed bottom-6 right-6 z-[9999] flex flex-col rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden transition-all duration-200 ${panelW} ${panelH}`}
-          style={{ background: 'var(--background)' }}>
+        <div className={`fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-[9999] flex flex-col rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden transition-all duration-200 ${panelW} ${panelH}`}
+          style={{ background: '#FFFFFF', boxShadow: '0 24px 60px rgba(0,0,0,0.18)' }}>
 
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 shrink-0"
@@ -434,7 +474,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                 <p className="text-white font-bold text-sm leading-none">MIAA+</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse" />
-                  <p className="text-white/75 text-[10px]">Expert IA · Oraforme ERP</p>
+                  <p className="text-white/75 text-[10px]">{MODULE_EXPERT_LABELS[module ?? 'auto'] ?? 'Expert IA · Oraforme ERP'}</p>
                 </div>
               </div>
             </div>
@@ -490,7 +530,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                         Expert IA en comptabilité OHADA, fiscalité africaine, RH, facturation et gestion d&apos;entreprise.
                       </p>
                       <div className="mt-4 space-y-1.5">
-                        {['Calculer la TVA sur 500 000 FCFA', 'Quel est mon solde de trésorerie ?', 'Comment calculer le salaire net ?'].map(q => (
+                        {(MODULE_SUGGESTIONS[module ?? 'auto'] ?? MODULE_SUGGESTIONS.auto).map(q => (
                           <button key={q}
                             onClick={() => { setInput(q) }}
                             className="w-full text-left text-xs px-3 py-2 rounded-lg border border-[var(--border)] hover:border-[#F59E0B] hover:bg-[#FFFBEB] transition-all text-[var(--text-secondary)]">

@@ -54,14 +54,14 @@ const FICHIERS_ACCEPTES: Record<string, string> = {
   default:      '.pdf,.doc,.docx,.xlsx,.xls,.csv,.jpg,.png',
 }
 
-// ── MIAA PREMIUM Logo ─────────────────────────────────────────────────────────
+// ── MIAA+ Logo ────────────────────────────────────────────────────────────────
 
 function MIAALogo({ size = 38 }: { size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/logo-miaa-premium.png"
-      alt="MIAA PREMIUM"
+      src="/miaa-logo.png"
+      alt="MIAA+"
       width={size}
       height={size}
       className="shrink-0 rounded-full object-contain"
@@ -441,7 +441,7 @@ export default function MIAAPage() {
                   {m.role === 'bot' && (
                     <div className="shrink-0 mb-0.5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/logo-miaa-premium.png" alt="MIAA" width={28} height={28}
+                      <img src="/miaa-logo.png" alt="MIAA+" width={28} height={28}
                         className="rounded-full object-contain" />
                     </div>
                   )}

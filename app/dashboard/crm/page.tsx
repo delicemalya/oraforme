@@ -10,6 +10,7 @@ import {
   ArrowRight, Star, MessageSquare, PhoneCall, Calendar,
   FileText, Briefcase, ShieldAlert, Loader2, RefreshCw,
 } from 'lucide-react'
+import MIAAContextButton from '@/components/miaa/MIAAContextButton'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -343,7 +344,8 @@ export default function CRMPage() {
               <p className="text-[12px] text-[#64748B]">Relations commerciales, pipeline, activités</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <MIAAContextButton module="crm" />
             <button onClick={() => setShowNewAct(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E2E8F0] text-[13px] font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors">
               <Activity size={14} /> Activité
             </button>

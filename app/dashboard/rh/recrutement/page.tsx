@@ -338,7 +338,7 @@ export default function RecrutementDashboard() {
 
         {/* MIAA JOB — logo image */}
         <button
-          onClick={() => router.push('/dashboard/rh/recrutement/miaa-job')}
+          onClick={() => router.push('/dashboard/miaa?context=recrutement')}
           className="bg-white border border-[#E2E8F0] rounded-xl p-4 text-left hover:border-[#F59E0B]/50 hover:shadow-md transition-all group shadow-sm"
         >
           <div className="w-8 h-8 rounded-lg mb-3 overflow-hidden shrink-0">

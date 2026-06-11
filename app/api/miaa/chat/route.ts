@@ -167,7 +167,7 @@ const SUGGESTIONS: Record<string, string[]> = {
   comptabilite: ['Générer le bilan', 'Calculer la TVA à déclarer', 'Analyser mes charges', 'État des résultats'],
   restaurant:   ['CA du jour', 'Plats les plus vendus', 'Stock cuisine critique', 'Rapport caisse'],
   ecole:        ['Étudiants avec impayés', 'Taux de recouvrement', 'Générer les bulletins', 'Rapport académique'],
-  general:      ['Analyse globale', 'Points urgents', 'Mes performances du mois', 'Recommandations MIAA PREMIUM'],
+  general:      ['Analyse globale', 'Points urgents', 'Mes performances du mois', 'Recommandations MIAA+'],
 }
 
 // ── Handler principal ─────────────────────────────────────────────────────────
@@ -300,7 +300,7 @@ export async function POST(req: Request) {
     })
 
   } catch (err) {
-    console.error('[MIAA PREMIUM chat]', err)
+    console.error('[MIAA+ chat]', err)
     return Response.json(
       { response: 'Une erreur est survenue. Veuillez réessayer.', suggested_actions: [] },
       { status: 500 }

@@ -12,6 +12,7 @@ import {
   ShoppingCart, BarChart3, RefreshCw, Eye,
   DollarSign, ClipboardList, Boxes, Truck,
 } from 'lucide-react'
+import MIAAContextButton from '@/components/miaa/MIAAContextButton'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -130,9 +131,12 @@ export default function StocksDashboard() {
             </p>
           </div>
         </div>
-        <button onClick={load} disabled={loading} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC] disabled:opacity-50">
-          <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
-        </button>
+        <div className="flex items-center gap-2">
+          <MIAAContextButton module="stock" />
+          <button onClick={load} disabled={loading} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#64748B] border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC] disabled:opacity-50">
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> {t('common.refresh')}
+          </button>
+        </div>
       </div>
 
       {loading ? (

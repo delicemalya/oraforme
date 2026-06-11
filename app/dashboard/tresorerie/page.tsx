@@ -19,6 +19,7 @@ import {
   RefreshCw, Landmark, Archive, Smartphone, AlertTriangle,
   CheckCircle2, Clock, Plus, X, Save, ChevronRight, Zap,
 } from 'lucide-react'
+import MIAAContextButton from '@/components/miaa/MIAAContextButton'
 
 interface Transaction {
   id: string; type: 'entree' | 'sortie'; categorie: string
@@ -213,7 +214,8 @@ export default function TresorerieDashboard() {
             {t('treso.subtitle')}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <MIAAContextButton module="tresorerie" />
           <button onClick={load} className="p-2 bg-white border border-[#E2E8F0] rounded-lg text-[#64748B] hover:bg-[#F8FAFC]">
             <RefreshCw size={13} />
           </button>

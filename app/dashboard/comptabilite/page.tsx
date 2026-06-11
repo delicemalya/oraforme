@@ -19,6 +19,7 @@ import {
   CheckCircle2, ArrowUpRight, ArrowDownRight, Activity,
 } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
+import MIAAContextButton from '@/components/miaa/MIAAContextButton'
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface JournalEntry {
@@ -236,7 +237,7 @@ export default function ComptabilitePage() {
     <div className="space-y-6">
 
       {/* ── Header ──────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <Scale size={22} className="text-[#2563EB]" />
@@ -246,13 +247,16 @@ export default function ComptabilitePage() {
             {t('compta.overview.subtitle')}
           </p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg shadow-sm"
-        >
-          <Plus size={14} />
-          {t('compta.overview.newEntry')}
-        </button>
+        <div className="flex items-center gap-2">
+          <MIAAContextButton module="comptabilite" />
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[12px] font-bold rounded-lg shadow-sm"
+          >
+            <Plus size={14} />
+            {t('compta.overview.newEntry')}
+          </button>
+        </div>
       </div>
 
       {/* ── KPIs ─────────────────────────────────────────────── */}
