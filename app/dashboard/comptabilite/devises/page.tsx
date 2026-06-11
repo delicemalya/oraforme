@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   DEVISES, TAUX_REFERENCE, PARITE_EUR_XAF, formatDevise,
   type TauxChange,
@@ -14,6 +14,7 @@ import Link from 'next/link'
 const DEVISES_LIST = Object.values(DEVISES).filter(d => d.code !== 'XAF')
 
 export default function DevisesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const [taux, setTaux]       = useState<TauxChange[]>([])
   const [loading, setLoading] = useState(true)

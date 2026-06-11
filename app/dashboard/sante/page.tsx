@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Heart, Users, Calendar, Stethoscope,
   TrendingUp, Clock, AlertTriangle, CheckCircle2,
@@ -55,6 +55,7 @@ function fmtHeure(iso: string): string {
 }
 
 export default function SantePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [stats, setStats]     = useState<Stats | null>(null)
   const [rdvs,  setRdvs]      = useState<RdvToday[]>([])

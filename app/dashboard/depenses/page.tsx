@@ -7,7 +7,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Receipt, Plus, X, Loader2, TrendingDown, TrendingUp, BookOpen, Trash2 } from 'lucide-react'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { resolveAccounts, accountLabel } from '@/lib/accounting-engine'
 
 type Depense = {
@@ -39,6 +39,7 @@ const CATEGORIES = [
 const MODES = ['Espèces', 'Airtel Money', 'MTN MoMo', 'Virement', 'Carte']
 
 export default function DepensesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tLoading } = useTenant()
   const { t } = useLocale()
   const [depenses,     setDepenses]     = useState<Depense[]>([])

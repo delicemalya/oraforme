@@ -8,7 +8,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Landmark, Plus, Upload, Download, CheckCircle2, AlertTriangle, X, Save } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -33,6 +33,7 @@ const YEARS  = [2024, 2025, 2026, 2027]
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
 export default function RapprochementPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [movements, setMovements]   = useState<Movement[]>([])

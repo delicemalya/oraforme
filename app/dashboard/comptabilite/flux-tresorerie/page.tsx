@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   genererFluxTresorerie, genererCompteResultat,
   type LigneEcriture, type FluxTresorerie,
@@ -26,6 +26,7 @@ function FluxIcon({ val }: { val: number }) {
 }
 
 export default function FluxTresoreriePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const [ecritures, setEcritures] = useState<LigneEcriture[]>([])
   const [loading, setLoading]     = useState(true)

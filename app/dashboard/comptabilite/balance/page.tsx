@@ -9,7 +9,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { BarChart2, Download, CheckCircle2, AlertTriangle } from 'lucide-react'
 
@@ -24,6 +24,7 @@ interface BalanceLine {
 const YEARS = [2024, 2025, 2026, 2027]
 
 export default function BalancePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])

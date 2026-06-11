@@ -9,7 +9,7 @@ import {
   FileText, Users, CheckCircle, Scale, Wallet, Activity,
   Receipt, List,
 } from 'lucide-react'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -90,6 +90,7 @@ function Section({ title, rows, total, totalLabel, totalColor = '#DC2626' }: {
   totalLabel: string
   totalColor?: string
 }) {
+  const { fmt: fmtFCFA } = useFmt()
   return (
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl overflow-hidden">
       <div className="px-5 py-3 border-b border-[var(--border)] bg-[var(--surface)]/50">
@@ -115,6 +116,7 @@ function Section({ title, rows, total, totalLabel, totalColor = '#DC2626' }: {
 
 // ─── Main ─────────────────────────────────────────────────────
 export default function RapportsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
 
   const TABS = [

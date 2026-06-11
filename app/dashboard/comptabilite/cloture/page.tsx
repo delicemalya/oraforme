@@ -8,7 +8,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Lock, CheckCircle2, AlertTriangle, Clock, ChevronRight, RefreshCw } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -44,6 +44,7 @@ const STEPS_CLOTURE = [
 ]
 
 export default function CloturePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [movements, setMovements]   = useState<Movement[]>([])

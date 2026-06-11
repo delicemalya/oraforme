@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   FileText, Plus, X, Save, Search, ChevronDown, ChevronRight,
   Building2, Calendar, CheckCircle2, AlertTriangle,
@@ -54,6 +54,7 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string; 
 const TVA_RATES = [0, 5, 10, 16, 18, 20]
 
 export default function CommandesPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()

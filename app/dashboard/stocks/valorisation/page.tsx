@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   DollarSign, Package, TrendingUp, TrendingDown,
   BarChart3, RefreshCw, Search, Filter,
@@ -41,6 +41,7 @@ interface CategoryValuation {
 const METHODE_OPTIONS = ['CMP', 'FIFO', 'LIFO', 'PMP']
 
 export default function ValorisationPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t } = useLocale()

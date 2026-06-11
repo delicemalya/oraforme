@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Pencil } from 'lucide-react'
@@ -15,10 +16,10 @@ interface Credit {
 
 const STATUTS: Record<string,string> = { en_attente:'En attente', accorde:'Accordé', en_cours:'En cours', solde:'Soldé', refuse:'Refusé' }
 const STATUT_COLORS: Record<string,string> = { en_attente:'#F59E0B', accorde:'#2563EB', en_cours:'#16A34A', solde:'#64748B', refuse:'#DC2626' }
-const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency', currency:'XAF', maximumFractionDigits:0 }).format(v)
 const fmtDate = (d: string|null) => d ? new Date(d).toLocaleDateString('fr-FR') : '—'
 
 export default function BanqueCreditsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [credits, setCredits]   = useState<Credit[]>([])
   const [membres, setMembres]   = useState<Membre[]>([])

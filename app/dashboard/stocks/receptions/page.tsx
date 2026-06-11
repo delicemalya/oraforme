@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   Truck, Plus, X, Save, Search, CheckCircle2,
@@ -55,6 +55,7 @@ const CONFORMITE_CONFIG: Record<string, { label: string; color: string; bg: stri
 }
 
 export default function ReceptionsPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()

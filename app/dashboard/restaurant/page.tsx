@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
 import Link from 'next/link'
@@ -41,10 +42,10 @@ const TABLE_COLORS: Record<string, string> = {
   prete:   '#0F172A',
 }
 
-function fmtFCFA(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA' }
 function qrUrl(data: string) { return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}` }
 
 export default function RestaurantPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()
   const [tab, setTab]               = useState<TabKey>('caisse')

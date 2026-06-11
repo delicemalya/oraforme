@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { calculerSolde, type LigneEcriture, type SoldeCompte } from '@/lib/syscohada/etats-financiers'
 import { FileText, ChevronLeft, Download, ChevronDown, ChevronUp } from 'lucide-react'
 import Link from 'next/link'
@@ -40,6 +40,7 @@ function Section({ titre, badge, children }: { titre: string; badge?: string; ch
 }
 
 function TableSolde({ lignes, color = '#2563EB' }: { lignes: { num: string; nom: string; solde: number }[]; color?: string }) {
+  const { fmt: fmtFCFA } = useFmt()
   if (!lignes.length) return <p className="text-[12px] text-[#94A3B8] italic">— Aucun solde significatif —</p>
   return (
     <table className="w-full text-[12px]">
@@ -66,6 +67,7 @@ function TableSolde({ lignes, color = '#2563EB' }: { lignes: { num: string; nom:
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AnnexesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const [ecritures, setEcritures] = useState<LigneEcriture[]>([])
   const [entreprise, setEntreprise] = useState<Entreprise | null>(null)

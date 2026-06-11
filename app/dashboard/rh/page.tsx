@@ -18,6 +18,7 @@ import {
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { calculerPaie } from '@/lib/paie/calcul-paie'
 
@@ -106,7 +107,6 @@ function calcNet(brut: number) {
 }
 
 function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) }
-function fmtFCFA(n: number) { return fmt(n) + ' FCFA' }
 
 function daysBetween(d1: string, d2: Date = new Date()) {
   return Math.floor((d2.getTime() - new Date(d1).getTime()) / 86400000)
@@ -168,6 +168,7 @@ const QUICK_MODULES = [
 function TabEquipe({ tenantId, employes, onRefresh }: {
   tenantId: string; employes: Employe[]; onRefresh: () => void
 }) {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [showForm,      setShowForm]      = useState(false)
   const [showEdit,      setShowEdit]      = useState(false)
@@ -1031,6 +1032,7 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
 // ── Onglet : Rapports ──────────────────────────────────────────────────────────
 
 function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[] }) {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const actifs      = employes.filter(e => e.statut === 'actif')
   const masseBrute  = actifs.reduce((s, e) => s + e.salaire_base, 0)
@@ -1112,6 +1114,7 @@ const MAIN_TABS_DEF = [
 ]
 
 export default function RHPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()
   const [activeTab,  setActiveTab]  = useState('dashboard')

@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { Gift, Plus, X, Trash2, Users, DollarSign } from 'lucide-react'
 
@@ -49,9 +50,6 @@ const PERIODICITES = [
   { value: 'ponctuel',   label: 'Ponctuel'   },
 ]
 
-function fmtFCFA(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -70,6 +68,7 @@ const EMPTY_FORM = {
 
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function AvantagesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()
   const [avantages, setAvantages] = useState<Avantage[]>([])

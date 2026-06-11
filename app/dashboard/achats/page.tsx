@@ -6,7 +6,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Plus, X, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 type Fournisseur = { id: string; nom: string; contact: string; telephone: string; email: string; solde_du: number; created_at: string }
 type Achat = { id: string; fournisseur_id: string; description: string; montant: number; statut: string; date: string }
@@ -19,6 +19,7 @@ const STATUT_COLORS: Record<string, string> = {
 }
 
 export default function AchatsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [tab, setTab] = useState(0)
   const [fournisseurs,  setFournisseurs]  = useState<Fournisseur[]>([])

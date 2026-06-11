@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   AlertTriangle, Bell, CheckCircle2, Package,
   TrendingDown, RefreshCw, Settings, X,
@@ -49,6 +49,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: any }> = {
 }
 
 export default function AlertesStocksPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t } = useLocale()

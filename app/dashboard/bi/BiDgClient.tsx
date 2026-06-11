@@ -12,7 +12,8 @@ import { BiKpiCard } from '@/components/bi/BiKpiCard'
 import { BiChartCard, BiSectionLabel, BiEmpty } from '@/components/bi/BiChartCard'
 import { BiAlerts } from '@/components/bi/BiAlerts'
 import { BiTrendChart, BiComposedChart, BiDonutChart } from '@/components/bi/BiCharts'
-import { fmtShortFCFA, fmtFCFA, fmtPct, growthPct } from '@/lib/analytics/formatters'
+import { fmtPct, growthPct } from '@/lib/analytics/formatters'
+import { useFmt } from '@/lib/hooks/useFmt'
 import type { DgInsights } from '@/lib/analytics/types'
 
 type Tab = 'apercu' | 'cashflow' | 'alertes'
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export default function BiDgClient({ initial, year: initialYear }: Props) {
+  const { fmt: fmtFCFA, fmtShort: fmtShortFCFA } = useFmt()
   const { t } = useLocale()
   const [data, setData]     = useState<DgInsights>(initial)
   const [tab, setTab]       = useState<Tab>('apercu')

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   ShoppingCart, Plus, X, Save, Search, Filter,
@@ -50,6 +50,7 @@ const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string; 
 }
 
 export default function AchatsPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t } = useLocale()

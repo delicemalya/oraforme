@@ -8,7 +8,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Users, Plus, Search, Download, ChevronDown, ChevronRight, X, Save, TrendingUp, TrendingDown } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -47,6 +47,7 @@ const TYPE_DEFAULT_ACCOUNT: Record<string, string> = {
 }
 
 export default function TiersPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [tiers, setTiers]         = useState<Tier[]>([])

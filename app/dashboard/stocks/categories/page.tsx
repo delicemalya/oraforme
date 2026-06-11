@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Grid3X3, Plus, Edit2, Trash2, X, Save, Search,
   Package, TrendingUp, AlertTriangle, ChevronRight,
@@ -50,6 +50,7 @@ const EMPTY_FORM = {
 }
 
 export default function CategoriesPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t } = useLocale()

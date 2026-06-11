@@ -8,7 +8,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Building2, Plus, Download, ChevronDown, ChevronRight, X, Save, AlertTriangle } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -45,6 +45,7 @@ const EMPTY_FORM: Partial<Immobilisation> = {
 }
 
 export default function ImmobilisationsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [immobs, setImmobs]     = useState<Immobilisation[]>([])

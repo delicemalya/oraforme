@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
@@ -78,6 +78,7 @@ const EMPTY_FORM = {
 }
 
 export default function EncaissementsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-US' : locale

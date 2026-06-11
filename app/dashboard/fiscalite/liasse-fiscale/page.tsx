@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { FileText, Download, ChevronDown, ChevronRight } from 'lucide-react'
 
 // Liasse fiscale DGI Congo — tableaux normalisés
@@ -83,6 +83,7 @@ const TABLEAUX = [
 ]
 
 export default function LiasseFiscalePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const [year, setYear] = useState(new Date().getFullYear())
   const [loading, setLoading] = useState(true)

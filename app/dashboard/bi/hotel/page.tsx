@@ -5,10 +5,12 @@ import { Building2, Wallet, Bed, RefreshCw, Loader2, TrendingUp } from 'lucide-r
 import { BiKpiCard } from '@/components/bi/BiKpiCard'
 import { BiChartCard, BiSectionLabel } from '@/components/bi/BiChartCard'
 import { BiAlerts } from '@/components/bi/BiAlerts'
-import { fmtShortFCFA, fmtPct } from '@/lib/analytics/formatters'
+import { fmtPct } from '@/lib/analytics/formatters'
+import { useFmt } from '@/lib/hooks/useFmt'
 import type { HotelInsights } from '@/lib/analytics/types'
 
 export default function BiHotelPage() {
+  const { fmt: fmtFCFA, fmtShort: fmtShortFCFA } = useFmt()
   const [data, setData]       = useState<HotelInsights | null>(null)
   const [loading, setLoading] = useState(true)
   const [year, setYear]       = useState(new Date().getFullYear())

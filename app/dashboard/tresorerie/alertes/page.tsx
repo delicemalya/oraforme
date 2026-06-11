@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Bell, Plus, Check, X, Loader2, Eye,
   AlertTriangle, AlertCircle, Info, CheckCircle2,
@@ -57,6 +57,7 @@ const SEVERITY_CONFIG: Record<string, { color: string; bg: string; Icon: React.E
 }
 
 export default function AlertesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [configs, setConfigs]       = useState<AlertConfig[]>([])

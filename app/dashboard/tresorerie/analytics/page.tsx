@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   BarChart3, TrendingUp, TrendingDown, ArrowUpCircle, ArrowDownCircle,
   GitMerge, Download, Calendar, RefreshCw, Building2, Archive,
@@ -48,6 +48,7 @@ function getLast12Months(): string[] {
 }
 
 export default function AnalyticsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [loading, setLoading]       = useState(true)

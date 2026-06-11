@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Package, Plus, Search, Download, Check, X, Loader2, Eye,
   Edit2, Trash2, AlertTriangle, QrCode, Filter, Tag,
@@ -56,6 +56,7 @@ const EMPTY_FORM = {
 }
 
 export default function ProduitsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [products, setProducts]     = useState<Product[]>([])

@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Pencil } from 'lucide-react'
@@ -13,10 +14,10 @@ interface Tournee {
 
 const STATUTS: Record<string,string> = { planifiee:'Planifiée', en_cours:'En cours', terminee:'Terminée', annulee:'Annulée' }
 const STATUT_COLORS: Record<string,string> = { planifiee:'#64748B', en_cours:'#2563EB', terminee:'#16A34A', annulee:'#DC2626' }
-const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency', currency:'XAF', maximumFractionDigits:0 }).format(v)
 const fmtDate = (d: string) => new Date(d).toLocaleDateString('fr-FR')
 
 export default function BoissonTourneesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [tournees, setTournees] = useState<Tournee[]>([])
   const [loading, setLoading]   = useState(true)

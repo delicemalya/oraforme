@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   TrendingUp, Download, Info, CheckCircle2, Clock, AlertTriangle, Plus, X,
 } from 'lucide-react'
@@ -50,6 +50,7 @@ const MOIS_ACOMPTE: Record<number, string> = {
 }
 
 export default function ISPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const [annee,     setAnnee]     = useState(new Date().getFullYear())
   const [isData,    setIsData]    = useState<ISData>({ ca_ht: 0, resultat_brut: 0, deductions: 0, charges_non_ded: 0 })

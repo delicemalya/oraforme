@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
 import {
   Package, AlertTriangle, TrendingDown, Loader2,
@@ -39,6 +39,7 @@ interface KpiData {
 }
 
 export default function StocksDashboard() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [kpis, setKpis]             = useState<KpiData>({ totalProduits: 0, produitsFaibles: 0, ruptures: 0, valeurStock: 0, mouvementsMois: 0, fournisseursActifs: 0, achatsMois: 0, entrepots: 0 })

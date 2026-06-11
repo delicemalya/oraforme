@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import {
   BookOpen, Loader2, Search,
@@ -49,6 +50,7 @@ const SOURCE_CSS: Record<string, string> = {
 function CompteAutocomplete({
   value, onChange, placeholder,
 }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const { fmt: fmtFCFA } = useFmt()
   const [query, setQuery]       = useState(value)
   const [results, setResults]   = useState<CompteFlat[]>([])
   const [open, setOpen]         = useState(false)
@@ -116,6 +118,7 @@ function ModalSaisie({
   onClose,
   onSaved,
 }: { tenantId: string; onClose: () => void; onSaved: () => void }) {
+  const { fmt: fmtFCFA } = useFmt()
   const [form, setForm]     = useState(EMPTY_SAISIE)
   const [saving, setSaving] = useState(false)
   const [saveOk, setSaveOk] = useState(false)
@@ -265,6 +268,7 @@ function ModalSaisie({
 // ── Page principale ───────────────────────────────────────────────────────────
 
 export default function JournalPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t, locale } = useLocale()
 

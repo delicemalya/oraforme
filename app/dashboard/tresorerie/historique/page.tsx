@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   History, Search, Download, Loader2, ArrowUpCircle, ArrowDownCircle,
   GitMerge, Filter, Calendar, Eye, X, ChevronLeft, ChevronRight,
@@ -39,6 +39,7 @@ const TYPE_CONFIG: Record<string, { label: string; color: string; sign: string; 
 const PAGE_SIZE = 50
 
 export default function HistoriquePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'

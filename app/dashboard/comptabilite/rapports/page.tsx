@@ -8,7 +8,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { FileText, Download, BarChart2, TrendingUp, Scale, Receipt, BookOpen, Printer } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -47,6 +47,7 @@ function accountNom(numero: string): string {
 }
 
 export default function RapportsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])

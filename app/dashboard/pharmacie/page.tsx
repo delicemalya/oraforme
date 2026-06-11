@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Pill, ShoppingCart, AlertTriangle, TrendingUp,
   Plus, Search, X, Loader2, ChevronRight, Package, Clock,
@@ -42,6 +42,7 @@ function daysUntilExpiry(date: string | null): number | null {
 }
 
 export default function PharmaciePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [stats, setStats]   = useState<Stats | null>(null)
   const [meds,  setMeds]    = useState<Medicament[]>([])

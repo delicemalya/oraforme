@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { GraduationCap, CheckCircle2, AlertTriangle, Download } from 'lucide-react'
 
 // Congo Brazzaville — Taxe d'apprentissage
@@ -36,6 +36,7 @@ interface TaxeRecord {
 const YEARS = [2024, 2025, 2026, 2027]
 
 export default function TaxeApprentissagePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const [year, setYear] = useState(new Date().getFullYear())
   const [loading, setLoading] = useState(true)

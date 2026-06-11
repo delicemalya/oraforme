@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Shuffle, Plus, X, RefreshCw, Search,
   Warehouse, AlertTriangle, ChevronRight, ArrowLeftRight
@@ -34,6 +34,7 @@ const emptyForm = {
 }
 
 export default function TransfertsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [transferts, setTransferts] = useState<Transfert[]>([])

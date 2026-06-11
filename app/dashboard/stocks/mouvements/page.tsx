@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   ArrowLeftRight, ArrowUpCircle, ArrowDownCircle, RotateCcw,
   Search, Filter, Download, RefreshCw, Package, Warehouse,
@@ -40,6 +40,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: any; color: string; bg:
 const PAGE_SIZE = 30
 
 export default function MouvementsPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t } = useLocale()

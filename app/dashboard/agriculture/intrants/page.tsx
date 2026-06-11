@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Pencil } from 'lucide-react'
@@ -13,10 +14,10 @@ interface Intrant {
 
 const TYPE_LABELS: Record<string,string> = { semence:'Semence', engrais:'Engrais', pesticide:'Pesticide', herbicide:'Herbicide', equipement:'Équipement', carburant:'Carburant', autre:'Autre' }
 const TYPE_COLORS: Record<string,string> = { semence:'#16A34A', engrais:'#F59E0B', pesticide:'#DC2626', herbicide:'#7C3AED', equipement:'#2563EB', carburant:'#EA580C', autre:'#64748B' }
-const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency', currency:'XAF', maximumFractionDigits:0 }).format(v)
 const fmtDate = (d: string|null) => d ? new Date(d).toLocaleDateString('fr-FR') : '—'
 
 export default function AgricultureIntrantsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [intrants, setIntrants] = useState<Intrant[]>([])
   const [loading, setLoading]   = useState(true)

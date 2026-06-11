@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import {
   User, FileText, Calendar, Clock, DollarSign,
@@ -66,9 +67,6 @@ interface Presence {
 /* ─── Helpers ────────────────────────────────────────────── */
 const MONTHS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
-function fmtFCFA(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
 
 function fmtDate(d: string, intlLocale: string) {
   return new Date(d).toLocaleDateString(intlLocale, { day: '2-digit', month: 'short', year: 'numeric' })
@@ -101,6 +99,7 @@ const PRESENCE_TYPES: Record<string, { label: string; color: string }> = {
 
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function PortailPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t, locale } = useLocale()
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale

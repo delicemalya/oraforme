@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import { Smartphone, Plus, X, Save, TrendingUp, TrendingDown, Download, AlertTriangle } from 'lucide-react'
 
@@ -34,6 +34,7 @@ function getColor(op: string) { return OPERATEURS.find(o => o.id === op)?.color 
 function getBg(op: string)    { return OPERATEURS.find(o => o.id === op)?.bg    || '#F8FAFC' }
 
 export default function MobileMoneyPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : 'fr-FR'

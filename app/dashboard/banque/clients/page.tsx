@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Search, Pencil, CreditCard } from 'lucide-react'
@@ -13,9 +14,9 @@ interface Membre {
 
 const TYPE_LABELS: Record<string,string> = { epargne:'Épargne', courant:'Courant', depot_terme:'Dépôt à terme' }
 const STATUT_COLORS: Record<string,string> = { actif:'#16A34A', suspendu:'#F59E0B', cloture:'#DC2626' }
-const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency', currency:'XAF', maximumFractionDigits:0 }).format(v)
 
 export default function BanqueClientsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [membres, setMembres]   = useState<Membre[]>([])
   const [loading, setLoading]   = useState(true)

@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X, Pencil } from 'lucide-react'
@@ -12,10 +13,10 @@ interface Programme {
 
 const STATUTS: Record<string,string> = { proposition:'Proposition', en_cours:'En cours', cloture:'Clôturé', suspendu:'Suspendu' }
 const STATUT_COLORS: Record<string,string> = { proposition:'#64748B', en_cours:'#2563EB', cloture:'#16A34A', suspendu:'#F59E0B' }
-const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency', currency:'XAF', maximumFractionDigits:0 }).format(v)
 const fmtDate = (d: string|null) => d ? new Date(d).toLocaleDateString('fr-FR') : '—'
 
 export default function OngProjetsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [programmes, setProgrammes] = useState<Programme[]>([])
   const [loading, setLoading]   = useState(true)

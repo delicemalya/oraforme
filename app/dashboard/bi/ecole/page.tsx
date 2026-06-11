@@ -9,10 +9,12 @@ import { BiKpiCard } from '@/components/bi/BiKpiCard'
 import { BiChartCard, BiSectionLabel, BiEmpty, BiProgressRow } from '@/components/bi/BiChartCard'
 import { BiAlerts } from '@/components/bi/BiAlerts'
 import { BiBarChart, BiCountBarChart, BiDonutChart } from '@/components/bi/BiCharts'
-import { fmtShortFCFA, fmtFCFA, fmtPct } from '@/lib/analytics/formatters'
+import { fmtPct } from '@/lib/analytics/formatters'
+import { useFmt } from '@/lib/hooks/useFmt'
 import type { EcoleInsights } from '@/lib/analytics/types'
 
 export default function BiEcolePage() {
+  const { fmt: fmtFCFA, fmtShort: fmtShortFCFA } = useFmt()
   const [data, setData]       = useState<EcoleInsights | null>(null)
   const [loading, setLoading] = useState(true)
   const [year, setYear]       = useState(new Date().getFullYear())

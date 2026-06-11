@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   FileText, Download, Plus, X, CheckCircle2, Info, Trash2, Search,
 } from 'lucide-react'
@@ -64,6 +64,7 @@ interface BeneficiaireDAS {
 const ANNEES = [2023, 2024, 2025, 2026]
 
 export default function DASPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const [annee,        setAnnee]       = useState(new Date().getFullYear())
   const [beneficiaires,setBenef]       = useState<BeneficiaireDAS[]>([])

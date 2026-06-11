@@ -5,7 +5,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Pill, Plus, X, AlertTriangle, Loader2, ChevronLeft, Search, Package } from 'lucide-react'
 import Link from 'next/link'
 
@@ -30,6 +30,7 @@ const FORMES = ['comprime','gelule','sirop','injectable','pommade','gouttes','sp
 const BLANK = { nom_commercial: '', dci: '', forme: 'comprime', dosage: '', laboratoire: '', prix_achat: '', prix_vente: '', stock_actuel: '0', stock_min: '5', date_expiration: '', ordonnance_requise: false, emplacement: '' }
 
 export default function MedicamentsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [meds,    setMeds]    = useState<Medicament[]>([])

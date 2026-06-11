@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { MODULE_LABELS, MODULE_PRICES, MODULE_ICONS, MODULE_DESCS, fmtFCFA } from '@/lib/admin-config'
+import { MODULE_LABELS, MODULE_PRICES, MODULE_ICONS, MODULE_DESCS } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Store, CheckCircle, Lock, Loader2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
@@ -17,6 +18,7 @@ type ModuleInfo = {
 }
 
 export default function ModulesMarketplacePage() {
+  const { fmt: fmtFCFA } = useFmt()
   // Use TenantContext as the single source of truth.
   // After each toggle we call tenant.reload() so the Sidebar re-renders immediately.
   const { tenant, loading, reload } = useTenantContext()
@@ -231,6 +233,7 @@ function ModuleCard({
   onAction: () => void
   t: (key: string) => string
 }) {
+  const { fmt: fmtFCFA } = useFmt()
   return (
     <div className={`bg-[var(--surface)] border rounded-xl p-5 transition-all ${
       m.active

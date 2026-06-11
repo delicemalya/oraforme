@@ -10,7 +10,7 @@ import {
   Clock, CheckCircle, AlertCircle, TrendingUp, Wallet,
   Phone, Navigation,
 } from 'lucide-react'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 type Chauffeur = {
   id: string
@@ -48,6 +48,7 @@ function fadeUp(i: number) {
 }
 
 export default function TransportPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tLoading } = useTenant()
   const { t } = useLocale()
   const [tab, setTab]           = useState(0)

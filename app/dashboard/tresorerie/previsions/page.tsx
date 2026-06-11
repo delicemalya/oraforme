@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   TrendingUp, Plus, Download, Check, X, Loader2, Eye,
   ArrowUpCircle, ArrowDownCircle, Calendar, BarChart3,
@@ -62,6 +62,7 @@ const EMPTY_FORM = {
 }
 
 export default function PrevisionsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [rows, setRows]           = useState<Prevision[]>([])

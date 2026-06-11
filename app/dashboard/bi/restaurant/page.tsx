@@ -5,10 +5,11 @@ import { ShoppingCart, Wallet, Clock, TrendingUp, RefreshCw, Loader2 } from 'luc
 import { BiKpiCard } from '@/components/bi/BiKpiCard'
 import { BiChartCard, BiSectionLabel } from '@/components/bi/BiChartCard'
 import { BiAlerts } from '@/components/bi/BiAlerts'
-import { fmtShortFCFA, fmtFCFA } from '@/lib/analytics/formatters'
+import { useFmt } from '@/lib/hooks/useFmt'
 import type { RestoInsights } from '@/lib/analytics/types'
 
 export default function BiRestoPage() {
+  const { fmt: fmtFCFA, fmtShort: fmtShortFCFA } = useFmt()
   const [data, setData]       = useState<RestoInsights | null>(null)
   const [loading, setLoading] = useState(true)
   const [year, setYear]       = useState(new Date().getFullYear())

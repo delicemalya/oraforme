@@ -5,7 +5,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Stethoscope, Plus, X, AlertTriangle, Loader2, ChevronLeft, FileText } from 'lucide-react'
 import Link from 'next/link'
 
@@ -41,6 +41,7 @@ const PAIE_STATUTS = [
 function getPaie(v: string) { return PAIE_STATUTS.find(s => s.value === v) ?? PAIE_STATUTS[0] }
 
 export default function ConsultationsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [consults, setConsults] = useState<Consultation[]>([])

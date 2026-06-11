@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, X } from 'lucide-react'
@@ -13,10 +14,10 @@ interface Recolte {
 }
 
 const DEST_LABELS: Record<string,string> = { vente:'Vente', stockage:'Stockage', autoconsommation:'Autoconsommation' }
-const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style:'currency', currency:'XAF', maximumFractionDigits:0 }).format(v)
 const fmtDate = (d: string) => new Date(d).toLocaleDateString('fr-FR')
 
 export default function AgriRecoltesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const [recoltes, setRecoltes]   = useState<Recolte[]>([])
   const [parcelles, setParcelles] = useState<Parcelle[]>([])

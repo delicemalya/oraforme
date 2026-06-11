@@ -8,7 +8,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { Layers, Plus, Download, ChevronDown, ChevronRight, X, Save } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -38,6 +38,7 @@ const EMPTY_FORM: Partial<CentreCout> = {
 const YEARS = [2024, 2025, 2026, 2027]
 
 export default function CentresCoutsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [centres, setCentres]   = useState<CentreCout[]>([])

@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import {
   BarChart2, TrendingUp, TrendingDown, Users,
@@ -61,9 +62,6 @@ interface Evaluation {
 /* ─── Helpers ────────────────────────────────────────────── */
 const MONTHS_SHORT = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
-function fmtFCFA(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
 
 function pct(a: number, b: number) {
   if (!b) return 0
@@ -165,6 +163,7 @@ function ProgressBar({ value, max, color, label, sublabel }: {
 
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function AnalyticsRHPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t, locale } = useLocale()
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale

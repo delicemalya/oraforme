@@ -9,7 +9,7 @@ import {
   FileText, Activity, Wallet,
 } from 'lucide-react'
 import { BiTrendChart, BiBarChart, BiDonutChart, BiCountBarChart } from '@/components/bi/BiCharts'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 
@@ -107,6 +107,7 @@ function ChartCard({ title, icon: Icon, iconColor, children, className = '' }: {
 
 // ── Main ──────────────────────────────────────────────────────────
 export default function AnalyticsPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const { tenant } = useTenantContext()
   const secteur = tenant?.secteur ?? null

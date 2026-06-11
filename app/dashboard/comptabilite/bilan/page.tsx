@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { TrendingUp, Download, FileText, BarChart2 } from 'lucide-react'
@@ -18,6 +18,7 @@ function libelle(num: string): string {
 }
 
 export default function BilanPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])

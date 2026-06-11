@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Shield, Search, RefreshCw, Download,
   ArrowUpCircle, ArrowDownCircle, AlertTriangle, Clock, Warehouse
@@ -30,6 +30,7 @@ const TYPE_CONFIG: Record<string, { color: string; bg: string; label: string; ic
 const PER_PAGE = 50
 
 export default function AuditPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [logs, setLogs] = useState<AuditLog[]>([])

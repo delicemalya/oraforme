@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Users2, Plus, Edit2, Trash2, X, Save, Search,
   Phone, Mail, MapPin, Globe, Star, Package,
@@ -53,6 +53,7 @@ const EMPTY_FORM = {
 const CONDITIONS = ['Comptant', '7 jours', '15 jours', '30 jours', '45 jours', '60 jours', '90 jours', 'Sur commande']
 
 export default function FournisseursPage() {
+  const { fmt: fmtFCFA } = useFmt()
 
   const { tenantId } = useTenant()
   const { t } = useLocale()

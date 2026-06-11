@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { resolveAccounts, type AccountCode } from '@/lib/accounting-engine'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
 import {
   TrendingUp, TrendingDown, Scale, AlertTriangle,
@@ -47,6 +47,7 @@ const CATS_DEPENSE = ['Salaires', 'CNSS', 'Achats / Fournisseur', 'Loyer', 'Imp�
 
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function ComptabilitePage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
 

@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { captureSupabaseError } from '@/lib/monitoring'
 import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
@@ -50,6 +50,7 @@ const MODES = [
 function today() { return new Date().toISOString().split('T')[0] }
 
 export default function TresorerieDashboard() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tLoading } = useTenant()
   const { t } = useLocale()
   const [transactions, setTransactions] = useState<Transaction[]>([])

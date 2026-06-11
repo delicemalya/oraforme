@@ -9,7 +9,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { Receipt, Download, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react'
 
@@ -36,6 +36,7 @@ const TVA_DEDUCTIBLE_ACCTS = ['4445', '4446']   // TVA récupérable (débit)
 const CA_ACCT              = ['442']             // État, autres impôts (Contribution d'Appui 5%)
 
 export default function TVAPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])

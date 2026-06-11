@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -17,7 +18,7 @@ import type {
 import {
   SUB_STATUT_LABELS, SUB_STATUT_COLORS, INVOICE_STATUT_LABELS,
   INVOICE_STATUT_COLORS, PROVIDER_LABELS, MOBILE_MONEY_PROVIDERS,
-  PAYMENT_STATUT_LABELS, trialDaysLeft, fmtFCFA,
+  PAYMENT_STATUT_LABELS, trialDaysLeft,
 } from '@/lib/billing'
 import { TRIAL_DAYS } from '@/lib/plans'
 
@@ -40,6 +41,7 @@ const EMPTY_FORM: PaymentForm = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AbonnementPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const { tenantId, loading: authLoading } = useTenant()
 

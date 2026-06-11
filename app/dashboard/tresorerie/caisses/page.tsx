@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { fmtFCFA } from '@/lib/admin-config'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   Archive, Plus, X, Save, ChevronDown, ChevronRight,
@@ -26,6 +26,7 @@ const CATS_DEP = ['Fournitures','Carburant','Repas','Transport','Petit matériel
 function today() { return new Date().toISOString().split('T')[0] }
 
 export default function CaissesPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t, locale } = useLocale()
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-US' : locale

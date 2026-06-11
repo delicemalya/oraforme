@@ -1,4 +1,5 @@
 'use client'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -11,6 +12,7 @@ interface KPI {
 }
 
 export default function BTPDashboardPage() {
+  const { fmt: fmtFCFA } = useFmt()
   const router = useRouter()
   const [kpi, setKpi] = useState<KPI>({ chantiers_actifs: 0, chantiers_termines: 0, ca_mois: 0, devis_en_attente: 0 })
   const [loading, setLoading] = useState(true)
@@ -26,8 +28,6 @@ export default function BTPDashboardPage() {
     }
     load()
   }, [])
-
-  const fmtFCFA = (v: number) => new Intl.NumberFormat('fr-CG', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(v)
 
   const stats = [
     { label: 'Chantiers actifs',   value: kpi.chantiers_actifs.toString(),  color: '#2563EB' },
