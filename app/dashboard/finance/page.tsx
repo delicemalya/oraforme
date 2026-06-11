@@ -10,6 +10,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   AreaChart, Area, BarChart, Bar,
   LineChart, Line, ComposedChart,
@@ -71,10 +72,7 @@ type TabId = 'apercu' | 'cashflow' | 'sources' | 'previsions' | 'tva'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat('fr-CG', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' FCFA'
-
-const fmtShort = (n: number): string => {
+const fmtShortNum = (n: number): string => {
   const abs = Math.abs(n)
   const sign = n < 0 ? '−' : ''
   if (abs >= 1_000_000_000) return sign + (abs / 1_000_000_000).toFixed(1) + 'Md'
@@ -181,6 +179,7 @@ function SectionCard({ title, sub, children, action }: {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function FinancePage() {
+  const { fmt, fmtShort } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [tab,       setTab]       = useState<TabId>('apercu')
@@ -359,49 +358,49 @@ export default function FinancePage() {
           {/* KPI row 1 — P&L */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <KpiCard label={t('finance.revenue')} icon={<TrendingUp size={16} />} accent="#10B981" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.ca_annee ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.ca_annee ?? 0)}
               sub={`${fmtShort(kpi?.ca_mois ?? 0)} ce mois`} evol={caEvol} />
             <KpiCard label="Dépenses totales" icon={<TrendingDown size={16} />} accent="#EF4444" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.dep_annee ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.dep_annee ?? 0)}
               sub={`${fmtShort(kpi?.dep_mois ?? 0)} ce mois`} evol={depEvol} />
             <KpiCard label="Résultat net" icon={<DollarSign size={16} />}
               accent={(kpi?.resultat_net ?? 0) >= 0 ? '#10B981' : '#EF4444'} loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.resultat_net ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.resultat_net ?? 0)}
               sub="Produits − Charges" evol={netEvol}
               badge={kpi ? `${kpi.marge_nette_pct}%` : undefined} />
             <KpiCard label={t('finance.cashflow') + ' du mois'} icon={<BarChart2 size={16} />}
               accent={(kpi?.cashflow_mois ?? 0) >= 0 ? '#3B82F6' : '#F97316'} loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.cashflow_mois ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.cashflow_mois ?? 0)}
               sub={`${t('finance.entries')} − ${t('finance.exits')}`} />
           </div>
 
           {/* KPI row 2 — Trésorerie */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <KpiCard label={t('finance.bank')} icon={<Building2 size={16} />} accent="#3B82F6" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.solde_banque ?? 0) + ' FCFA'} />
+              value={loading ? '—' : fmtShort(kpi?.solde_banque ?? 0)} />
             <KpiCard label={t('finance.cash')} icon={<Wallet size={16} />} accent="#10B981" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.solde_caisse ?? 0) + ' FCFA'} />
+              value={loading ? '—' : fmtShort(kpi?.solde_caisse ?? 0)} />
             <KpiCard label={t('finance.mobile')} icon={<Smartphone size={16} />} accent="#F59E0B" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.solde_mobile ?? 0) + ' FCFA'} />
+              value={loading ? '—' : fmtShort(kpi?.solde_mobile ?? 0)} />
             <KpiCard label={t('finance.treso') + ' totale'} icon={<Target size={16} />} accent="#8B5CF6" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.treso_totale ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.treso_totale ?? 0)}
               sub={`${t('finance.bank')} + ${t('finance.cash')} + ${t('finance.mobile')}`} />
           </div>
 
           {/* KPI row 3 — Tiers & Fiscalité */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <KpiCard label={t('finance.receivables')} icon={<AlertCircle size={16} />} accent="#F59E0B" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.creances_clients ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.creances_clients ?? 0)}
               sub={kpi ? `${kpi.nb_factures_ouvertes} facture(s)` : '—'}
               badge={kpi && kpi.nb_factures_retard > 0 ? `${kpi.nb_factures_retard} retard` : undefined} />
             <KpiCard label={t('finance.payables')} icon={<Clock size={16} />} accent="#EF4444" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.dettes_fournisseurs ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.dettes_fournisseurs ?? 0)}
               sub="Achats non réglés" />
             <KpiCard label={t('finance.vatNet')} icon={<FileText size={16} />} accent="#2563EB" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.tva_nette ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.tva_nette ?? 0)}
               sub="À déclarer à la DGI" />
             <KpiCard label="Charges salariales" icon={<Users size={16} />} accent="#7C3AED" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.salaires_annee ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.salaires_annee ?? 0)}
               sub="Exercice en cours"
               badge={kpi ? `${kpi.ratio_salaires_pct}% du CA` : undefined} />
           </div>
@@ -432,7 +431,7 @@ export default function FinancePage() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
                     <XAxis dataKey="mois_label" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                    <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShortNum} />
                     <Tooltip formatter={(v) => fmt(Number(v))}
                       contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }} />
                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
@@ -473,7 +472,7 @@ export default function FinancePage() {
                   })}
                   <div className="pt-2 border-t border-[#F3F4F6] flex justify-between text-[12px] font-bold text-[#374151]">
                     <span>{t('common.total')} liquidités</span>
-                    <span>{fmtShort(treso.reduce((s, tr) => s + tr.solde, 0))} FCFA</span>
+                    <span>{fmtShort(treso.reduce((s, tr) => s + tr.solde, 0))}</span>
                   </div>
                 </div>
               )}
@@ -593,14 +592,14 @@ export default function FinancePage() {
           {/* KPI cashflow */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <KpiCard label={`${t('finance.entries')} YTD`}  icon={<ArrowUpRight size={16} />}  accent="#10B981" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.ca_annee ?? 0) + ' FCFA'} />
+              value={loading ? '—' : fmtShort(kpi?.ca_annee ?? 0)} />
             <KpiCard label={`${t('finance.exits')} YTD`}  icon={<ArrowDownRight size={16} />} accent="#EF4444" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.dep_annee ?? 0) + ' FCFA'} />
+              value={loading ? '—' : fmtShort(kpi?.dep_annee ?? 0)} />
             <KpiCard label={`${t('finance.net')} YTD`}      icon={<Activity size={16} />}
               accent={(kpi?.resultat_net ?? 0) >= 0 ? '#3B82F6' : '#F97316'} loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.resultat_net ?? 0) + ' FCFA'} />
+              value={loading ? '—' : fmtShort(kpi?.resultat_net ?? 0)} />
             <KpiCard label={`${t('finance.cumul')} actuel`} icon={<BarChart2 size={16} />} accent="#8B5CF6" loading={loading}
-              value={loading ? '—' : fmtShort(monthly[currentMonth]?.cumul ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(monthly[currentMonth]?.cumul ?? 0)}
               sub="Position cumulée" />
           </div>
 
@@ -613,7 +612,7 @@ export default function FinancePage() {
                 <ComposedChart data={monthly} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
                   <XAxis dataKey="mois_label" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                  <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShortNum} />
                   <Tooltip formatter={(v) => fmt(Number(v))}
                     contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }} />
                   <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
@@ -762,7 +761,7 @@ export default function FinancePage() {
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
                   <XAxis dataKey="module" tick={{ fontSize: 10, fill: '#9CA3AF' }} angle={-30} textAnchor="end" axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                  <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={fmtShortNum} />
                   <Tooltip formatter={(v) => fmt(Number(v))}
                     contentStyle={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, fontSize: 12 }} />
                   <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
@@ -819,12 +818,12 @@ export default function FinancePage() {
           {kpi && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <KpiCard label={`${t('finance.entries')} prévues (90j)`} icon={<ArrowUpRight size={16} />} accent="#10B981" loading={loading}
-                value={fmtShort(kpi.previsions_entrees) + ' FCFA'} sub="Probabilité pondérée" />
+                value={fmtShort(kpi.previsions_entrees)} sub="Probabilité pondérée" />
               <KpiCard label={`${t('finance.exits')} prévues (90j)`} icon={<ArrowDownRight size={16} />} accent="#EF4444" loading={loading}
-                value={fmtShort(kpi.previsions_sorties) + ' FCFA'} sub="Probabilité pondérée" />
+                value={fmtShort(kpi.previsions_sorties)} sub="Probabilité pondérée" />
               <KpiCard label={`${t('finance.net')} prévisionnel (90j)`} icon={<Target size={16} />}
                 accent={kpi.previsions_net >= 0 ? '#3B82F6' : '#F97316'} loading={loading}
-                value={fmtShort(kpi.previsions_net) + ' FCFA'} sub={`${t('finance.entries')} − ${t('finance.exits')} prévues`} />
+                value={fmtShort(kpi.previsions_net)} sub={`${t('finance.entries')} − ${t('finance.exits')} prévues`} />
             </div>
           )}
 
@@ -883,13 +882,13 @@ export default function FinancePage() {
         <div className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <KpiCard label={t('finance.vatCollected')} icon={<ArrowUpRight size={16} />} accent="#EF4444" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.tva_collectee ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.tva_collectee ?? 0)}
               sub={kpi?.tva_collectee === (kpi?.ca_annee ?? 0) * 0.18 ? 'Estimation (CA × 18%)' : 'Depuis déclarations'} />
             <KpiCard label={t('finance.vatDeductible')} icon={<ArrowDownRight size={16} />} accent="#10B981" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.tva_deductible ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.tva_deductible ?? 0)}
               sub="Sur achats et charges" />
             <KpiCard label={t('finance.vatNet')} icon={<DollarSign size={16} />} accent="#2563EB" loading={loading}
-              value={loading ? '—' : fmtShort(kpi?.tva_nette ?? 0) + ' FCFA'}
+              value={loading ? '—' : fmtShort(kpi?.tva_nette ?? 0)}
               sub={`+ CA Congo 5% = ${fmtShort(kpi?.ca_taxe ?? 0)} FCFA`} />
           </div>
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
 import { ArrowLeft, RefreshCw, Loader2, TrendingUp, BedDouble, AlertTriangle, Users, Activity, FlaskConical, ScanLine, Scissors, Receipt, Shield, Bot } from 'lucide-react'
 
@@ -30,6 +31,7 @@ const MODULES = [
 ]
 
 export default function DirectionSantePage() {
+  const { fmt: fmtCurrency, devise } = useFmt()
   const [kpis,       setKpis]       = useState<KPIs | null>(null)
   const [historique, setHistorique] = useState<HistoriquePoint[]>([])
   const [loading,    setLoading]    = useState(true)
@@ -74,7 +76,7 @@ export default function DirectionSantePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
               { label: 'Patients actifs',    val: String(kpis.patients_actifs),    color: '#2563EB', icon: Users },
-              { label: 'CA consultations',   val: fmtNum(kpis.ca_consultations_mois) + ' FCFA', color: '#16A34A', icon: TrendingUp },
+              { label: 'CA consultations',   val: fmtCurrency(kpis.ca_consultations_mois), color: '#16A34A', icon: TrendingUp },
               { label: 'Occupation lits',    val: kpis.taux_occupation + '%',       color: kpis.taux_occupation >= 80 ? '#DC2626' : '#F59E0B', icon: BedDouble },
               { label: 'Urgences actives',   val: String(kpis.urgences_actives),   color: '#DC2626', icon: AlertTriangle },
             ].map(s => {
@@ -114,8 +116,8 @@ export default function DirectionSantePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4">
               <p className="text-[11px] font-black text-[#94A3B8] uppercase tracking-wide mb-3">Factures impayées</p>
-              <p className="text-[28px] font-black text-[#DC2626]">{fmtNum(kpis.factures_impayees)}</p>
-              <p className="text-[11px] text-[#64748B]">FCFA en attente de règlement</p>
+              <p className="text-[28px] font-black text-[#DC2626]">{fmtCurrency(kpis.factures_impayees)}</p>
+              <p className="text-[11px] text-[#64748B]">{devise} en attente de règlement</p>
               <Link href="/dashboard/sante/facturation?statut=en_attente"
                 className="mt-3 block text-center py-1.5 bg-red-50 text-red-600 text-[11px] font-bold rounded-xl hover:bg-red-100">
                 Voir les factures →

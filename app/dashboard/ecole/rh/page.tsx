@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry, modeToAccount } from '@/lib/compta-sync-client'
 import { type Enseignant, type StatutEnseignant, STATUT_ENS, fmt, Avatar, FI, KpiCard } from '../_lib/shared'
 import { CreateEmployeeWizard } from './_components/CreateEmployeeWizard'
@@ -1337,6 +1338,7 @@ type PaieRecord = {
 }
 
 function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: string }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [agents,     setAgents]     = useState<AgentPaie[]>([])
   const [paies, setPaies] = useState<PaieRecord[]>([])
@@ -1546,7 +1548,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       {/* KPIs + logo */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex gap-3 flex-wrap">
-          <KpiCard label="Total salaires pay�s" value={fmt(totalNet) + ' FCFA'} color="#0F172A" />
+          <KpiCard label="Total salaires pay�s" value={fmtCurrency(totalNet)} color="#0F172A" />
           <KpiCard label="Bulletins �mis" value={paies.length} color="#DC2626" />
         </div>
         <button onClick={() => setShowLogo(!showLogo)}

@@ -16,6 +16,7 @@ import {
 } from '../_lib/shared'
 import { SectionDiplomes, SectionSoutenances } from '../_lib/academic-sections'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 type SubTab = 'vue' | 'finances' | 'evenements' | 'bourses' | 'partenaires' | 'communication'
            | 'diplomes' | 'soutenances'
@@ -25,6 +26,7 @@ type SubTab = 'vue' | 'finances' | 'evenements' | 'bourses' | 'partenaires' | 'c
 function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
   tenantId: string; etudiants: Etudiant[]; enseignants: Enseignant[]; classes: ClasseEcole[]; onRefresh: () => void
 }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [revenuMois,   setRevenuMois]   = useState(0)
   const [revenuAnnee,  setRevenuAnnee]  = useState(0)
@@ -80,8 +82,8 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
   }
 
   const kpis = [
-    { label: t('ecole.direction.kpi.revenuMois'),  value: statsLoading ? '…' : fmt(revenuMois) + ' FCFA',   color: '#0F172A' },
-    { label: t('ecole.direction.kpi.revenuAnnee'), value: statsLoading ? '…' : fmt(revenuAnnee) + ' FCFA', color: '#DC2626' },
+    { label: t('ecole.direction.kpi.revenuMois'),  value: statsLoading ? '…' : fmtCurrency(revenuMois),   color: '#0F172A' },
+    { label: t('ecole.direction.kpi.revenuAnnee'), value: statsLoading ? '…' : fmtCurrency(revenuAnnee), color: '#DC2626' },
     { label: t('ecole.direction.kpi.etudiants'),   value: etudiants.filter(e => e.statut === 'actif').length, color: '#DC2626' },
     { label: t('ecole.direction.kpi.impayes'),     value: statsLoading ? '…' : impayeCount,                  color: '#DC2626' },
   ]
@@ -158,7 +160,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
                     <td className="px-4 py-2.5 text-[#101729]">{etu ? `${etu.prenom} ${etu.nom}` : '—'}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmtCurrency(p.montant)}</td>
                   </tr>
                 )
               })}
@@ -174,6 +176,7 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
 // ── Finances ──────────────────────────────────────────────────────────────────
 
 function SectionFinances({ tenantId }: { tenantId: string }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [paiements, setPaiements] = useState<PaiementScolaire[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -210,9 +213,9 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label={t('ecole.direction.fin.totalEncaisse')}   value={loading ? '…' : fmt(totalPaye) + ' FCFA'} color="#0F172A" />
+        <KpiCard label={t('ecole.direction.fin.totalEncaisse')}   value={loading ? '…' : fmtCurrency(totalPaye)} color="#0F172A" />
         <KpiCard label={t('ecole.direction.fin.nbPaiements')}     value={loading ? '…' : paiements.length}         color="#DC2626" />
-        <KpiCard label={t('ecole.direction.fin.moyenne')}         value={loading || !paiements.length ? '…' : fmt(totalPaye / paiements.length) + ' FCFA'} color="#DC2626" />
+        <KpiCard label={t('ecole.direction.fin.moyenne')}         value={loading || !paiements.length ? '…' : fmtCurrency(totalPaye / paiements.length)} color="#DC2626" />
       </div>
 
       {Object.keys(byMethod).length > 0 && (
@@ -225,7 +228,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
                 <div key={method}>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-[#101729] capitalize">{method.replace('_', ' ')}</span>
-                    <span className="text-[var(--text-secondary)]">{fmt(amount)} FCFA ({pct.toFixed(0)}%)</span>
+                    <span className="text-[var(--text-secondary)]">{fmtCurrency(amount)} ({pct.toFixed(0)}%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-[var(--border)]">
                     <div className="h-2 rounded-full bg-[#DC2626]" style={{ width: `${pct}%` }} />
@@ -251,7 +254,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
                     <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-2.5 text-[#101729]">{p.libelle}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] capitalize">{p.methode.replace('_', ' ')}</td>
-                    <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmt(p.montant)} FCFA</td>
+                    <td className="px-4 py-2.5 font-semibold text-[#DC2626]">{fmtCurrency(p.montant)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -377,6 +380,7 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
 // ── Bourses ───────────────────────────────────────────────────────────────────
 
 function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: Etudiant[] }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [bourses, setBourses] = useState<{ id: string; etudiant_id: string; montant: number; libelle: string; created_at: string }[]>([])
   const [showForm, setShowForm] = useState(false)
@@ -401,7 +405,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <KpiCard label={t('ecole.direction.kpi.totalBourses')} value={fmt(total) + ' FCFA'} color="#7C3AED" />
+        <KpiCard label={t('ecole.direction.kpi.totalBourses')} value={fmtCurrency(total)} color="#7C3AED" />
         <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: '#7C3AED', color: '#fff' }}>
           <Plus size={13} /> {t('ecole.direction.newBourse')}
         </button>
@@ -454,7 +458,7 @@ function SectionBourses({ tenantId, etudiants }: { tenantId: string; etudiants: 
                         ) : <span className="text-[var(--text-secondary)]">—</span>}
                       </td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)]">{b.libelle}</td>
-                      <td className="px-4 py-2.5 font-semibold text-[#7C3AED]">{fmt(b.montant)} FCFA</td>
+                      <td className="px-4 py-2.5 font-semibold text-[#7C3AED]">{fmtCurrency(b.montant)}</td>
                       <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(b.created_at).toLocaleDateString('fr-FR')}</td>
                     </tr>
                   )
@@ -636,6 +640,7 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DirectionPage() {
+  const { fmt: fmtCurrency } = useFmt()
   useRoleGuard(['DIRECTION_GENERALE'])
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()

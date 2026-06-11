@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -54,7 +55,6 @@ interface Message {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA' }
 function fmtDate(s: string | null) { if (!s) return '—'; return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) }
 
 const TYPES_MISSION_OPT = [
@@ -105,6 +105,7 @@ const KANBAN_COLORS: Record<string, string> = {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ClientDetailPage() {
+  const { fmt } = useFmt()
   const { tenant } = useTenantContext()
   const params = useParams()
   const clientId = params.id as string

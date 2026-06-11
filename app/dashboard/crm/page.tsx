@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   Users, Plus, Search, Phone, Mail, Building2, TrendingUp,
@@ -86,10 +87,6 @@ const ACT_COLORS: Record<ActiviteType, string> = {
   devis_envoye: '#16A34A', relance: '#DC2626', visite: '#0EA5E9',
 }
 
-function fmt(n?: number | null) {
-  if (!n) return '0 FCFA'
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
 function fmtDate(s?: string | null) {
   if (!s) return '—'
   return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -138,6 +135,8 @@ function StatutBadge({ statut }: { statut: ClientStatut }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function CRMPage() {
+  const { fmt: _fmt } = useFmt()
+  const fmt = (n?: number | null) => _fmt(n ?? 0)
   const { tenant } = useTenantContext()
   const [tab, setTab] = useState<'clients' | 'pipeline' | 'activites'>('clients')
   const [clients, setClients] = useState<Client[]>([])

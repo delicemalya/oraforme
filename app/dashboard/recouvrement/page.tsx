@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   AlertTriangle, CheckCircle, Clock, Send, X,
@@ -46,10 +47,6 @@ interface Relance {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function fmt(n?: number | null) {
-  if (!n) return '0 FCFA'
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
 function fmtDate(s?: string | null) {
   if (!s) return '—'
   return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -92,6 +89,8 @@ function RetardBadge({ jours }: { jours: number }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function RecouvrementPage() {
+  const { fmt: _fmt } = useFmt()
+  const fmt = (n?: number | null) => _fmt(n ?? 0)
   const { tenant } = useTenantContext()
   const [factures, setFactures] = useState<FactureImpayee[]>([])
   const [relances, setRelances] = useState<Relance[]>([])

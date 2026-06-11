@@ -226,7 +226,7 @@ export default function RapprochementPage() {
             </span>
           </div>
           <div className={`text-[22px] font-extrabold ${isBalanced ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
-            {isBalanced ? '0 FCFA' : fmtFCFA(Math.abs(ecart))}
+            {isBalanced ? fmtFCFA(0) : fmtFCFA(Math.abs(ecart))}
           </div>
           <div className="text-[10px] mt-1" style={{ color: isBalanced ? '#16A34A' : '#DC2626' }}>
             {isBalanced ? 'Soldes identiques' : ecart > 0 ? 'Banque > Comptabilité' : 'Comptabilité > Banque'}

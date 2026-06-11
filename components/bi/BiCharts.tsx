@@ -5,6 +5,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   LineChart, Line, ComposedChart, ReferenceLine,
 } from 'recharts'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 // ── Theme presets ─────────────────────────────────────────────────
 type ChartTheme = 'dark' | 'light'
@@ -55,7 +56,8 @@ export function BiTrendChart({
   formatter?: (v: number) => string
 }) {
   const th = getTheme(theme)
-  const fmt = formatter ?? ((v: number) => new Intl.NumberFormat('fr-FR').format(v) + ' FCFA')
+  const { fmt: fmtHook } = useFmt()
+  const fmt = formatter ?? fmtHook
   return (
     <ResponsiveContainer width="100%" height={height}>
       <AreaChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -116,7 +118,8 @@ export function BiBarChart({
   formatter?: (v: number) => string
 }) {
   const th = getTheme(theme)
-  const fmt = formatter ?? ((v: number) => new Intl.NumberFormat('fr-FR').format(v) + ' FCFA')
+  const { fmt: fmtHook } = useFmt()
+  const fmt = formatter ?? fmtHook
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }} barCategoryGap="35%">
@@ -194,7 +197,8 @@ export function BiComposedChart({
   formatter?: (v: number) => string
 }) {
   const th = getTheme(theme)
-  const fmt = formatter ?? ((v: number) => new Intl.NumberFormat('fr-FR').format(v) + ' FCFA')
+  const { fmt: fmtHook } = useFmt()
+  const fmt = formatter ?? fmtHook
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>

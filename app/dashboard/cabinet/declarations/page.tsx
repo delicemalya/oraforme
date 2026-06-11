@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useFmt } from '@/lib/hooks/useFmt'
 import {
   ArrowLeft, Calendar, AlertTriangle, CheckCircle2, Clock,
   Plus, RefreshCw, Loader2, X, Sparkles, Filter,
@@ -88,14 +89,12 @@ function fmtDate(s: string | null) {
   return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-function fmt(n: number | null) {
-  if (n == null) return '—'
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function DeclarationsPage() {
+  const { fmt: _fmtRaw } = useFmt()
+  const fmt = (n: number | null) => n == null ? '—' : _fmtRaw(n)
   const [declarations, setDeclarations] = useState<Declaration[]>([])
   const [stats,        setStats]        = useState<Stats | null>(null)
   const [loading,      setLoading]      = useState(true)

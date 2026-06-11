@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
 import { ArrowLeft, TrendingUp, ShoppingBag, Users, AlertTriangle, RefreshCw, Loader2, ChevronRight } from 'lucide-react'
 
@@ -20,6 +21,7 @@ function fmtNum(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.r
 function fmtMonth(m: number) { return ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'][m - 1] }
 
 export default function DirectionRestaurantPage() {
+  const { fmt: fmtCurrency, devise } = useFmt()
   const [kpis,      setKpis]      = useState<KPIs | null>(null)
   const [renta,     setRenta]     = useState<Rentabilite[]>([])
   const [critiques, setCritiques] = useState<StockCritique[]>([])
@@ -68,10 +70,10 @@ export default function DirectionRestaurantPage() {
           {/* KPI Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: "CA Aujourd'hui", val: fmtNum(kpis.ca_aujourd) + ' FCFA', color: '#F59E0B', icon: TrendingUp },
-              { label: 'CA Semaine',     val: fmtNum(kpis.ca_semaine) + ' FCFA', color: '#2563EB', icon: TrendingUp },
-              { label: 'CA Mois',        val: fmtNum(kpis.ca_mois) + ' FCFA',    color: '#16A34A', icon: TrendingUp },
-              { label: 'Résultat Mois',  val: fmtNum(kpis.resultat_mois) + ' FCFA', color: kpis.resultat_mois >= 0 ? '#16A34A' : '#DC2626', icon: TrendingUp },
+              { label: "CA Aujourd'hui", val: fmtCurrency(kpis.ca_aujourd), color: '#F59E0B', icon: TrendingUp },
+              { label: 'CA Semaine',     val: fmtCurrency(kpis.ca_semaine), color: '#2563EB', icon: TrendingUp },
+              { label: 'CA Mois',        val: fmtCurrency(kpis.ca_mois),    color: '#16A34A', icon: TrendingUp },
+              { label: 'Résultat Mois',  val: fmtCurrency(kpis.resultat_mois), color: kpis.resultat_mois >= 0 ? '#16A34A' : '#DC2626', icon: TrendingUp },
             ].map(k => (
               <div key={k.label} className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-sm">
                 <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide mb-1">{k.label}</p>
@@ -82,7 +84,7 @@ export default function DirectionRestaurantPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: 'Ticket moyen',     val: fmtNum(kpis.ticket_moyen) + ' FCFA', color: '#7C3AED' },
+              { label: 'Ticket moyen',     val: fmtCurrency(kpis.ticket_moyen), color: '#7C3AED' },
               { label: 'Commandes / mois', val: String(kpis.nb_commandes_mois),       color: '#0F172A' },
               { label: 'Réservations ce soir', val: String(kpis.reservations_confirmees), color: '#2563EB' },
               { label: 'Stocks critiques',  val: String(kpis.stocks_critiques),        color: kpis.stocks_critiques > 0 ? '#DC2626' : '#16A34A' },
@@ -129,7 +131,7 @@ export default function DirectionRestaurantPage() {
                       <div key={label as string}>
                         <div className="flex justify-between text-[12px] mb-0.5">
                           <span className="text-[#475569]">{label}</span>
-                          <span className="font-bold text-[#0F172A]">{fmtNum(val as number)}</span>
+                          <span className="font-bold text-[#0F172A]">{fmtCurrency(val as number)}</span>
                         </div>
                         <div className="h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${((val as number) / total) * 100}%`, background: color as string }} />
@@ -175,7 +177,7 @@ export default function DirectionRestaurantPage() {
                 <table className="w-full text-[12px]">
                   <thead>
                     <tr className="border-b border-[#E2E8F0]">
-                      {['Plat', 'Catégorie', 'Prix vente', 'Coût prod.', 'Marge FCFA', 'Marge %'].map(h => (
+                      {['Plat', 'Catégorie', 'Prix vente', 'Coût prod.', `Marge ${devise}`, 'Marge %'].map(h => (
                         <th key={h} className="text-left pb-2 pr-4 text-[#94A3B8] font-semibold">{h}</th>
                       ))}
                     </tr>
@@ -185,9 +187,9 @@ export default function DirectionRestaurantPage() {
                       <tr key={r.nom} className="border-b border-[#F1F5F9] hover:bg-[#F8FAFC]">
                         <td className="py-2 pr-4 font-semibold text-[#0F172A]">{r.nom}</td>
                         <td className="py-2 pr-4 text-[#64748B]">{r.categorie}</td>
-                        <td className="py-2 pr-4 text-[#0F172A]">{fmtNum(r.prix)}</td>
-                        <td className="py-2 pr-4 text-[#DC2626]">{fmtNum(r.cout)}</td>
-                        <td className="py-2 pr-4 font-bold text-[#16A34A]">{fmtNum(r.marge)}</td>
+                        <td className="py-2 pr-4 text-[#0F172A]">{fmtCurrency(r.prix)}</td>
+                        <td className="py-2 pr-4 text-[#DC2626]">{fmtCurrency(r.cout)}</td>
+                        <td className="py-2 pr-4 font-bold text-[#16A34A]">{fmtCurrency(r.marge)}</td>
                         <td className="py-2">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${r.marge_pct >= 50 ? 'bg-green-100 text-green-700' : r.marge_pct >= 30 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
                             {r.marge_pct}%

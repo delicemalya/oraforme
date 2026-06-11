@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import {
@@ -37,7 +38,6 @@ interface CabinetClient {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA' }
 function fmtDate(s: string) { return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) }
 function statutCfg(s: string) {
   const m: Record<string, { label: string; bg: string; text: string }> = {
@@ -67,6 +67,7 @@ const TYPES_MISSION_LABELS: Record<string, string> = {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function CabinetClientsPage() {
+  const { fmt } = useFmt()
   const { tenant } = useTenantContext()
   const [clients, setClients] = useState<CabinetClient[]>([])
   const [loading, setLoading] = useState(true)

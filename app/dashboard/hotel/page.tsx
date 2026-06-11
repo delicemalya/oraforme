@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
 import {
   Hotel, BedDouble, TrendingUp, DollarSign, Users,
@@ -34,7 +35,6 @@ interface MaintReq { id: string; statut: string; titre: string; priorite: string
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA' }
 function fmtDate(s: string) { return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) }
 
 const ROOM_STATUT: Record<string, { label: string; color: string; bg: string }> = {
@@ -48,6 +48,7 @@ const ROOM_STATUT: Record<string, { label: string; color: string; bg: string }> 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function HotelDashboard() {
+  const { fmt } = useFmt()
   const { tenant } = useTenantContext()
   const tid = tenant?.tenantId
 

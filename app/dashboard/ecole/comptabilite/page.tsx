@@ -8,6 +8,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { fmt, KpiCard, FI } from '../_lib/shared'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 type SubTab = 'journal' | 'grandlivre' | 'bilan' | 'tresorerie' | 'previsions'
 
@@ -51,6 +52,7 @@ const COMPTES_OHADA = [
 // ── Journal ───────────────────────────────────────────────────────────────────
 
 function SectionJournal({ tenantId }: { tenantId: string }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [entries,  setEntries]  = useState<JournalEntry[]>([])
   const [loading,  setLoading]  = useState(true)
@@ -97,9 +99,9 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label={t('ecole.compta.kpi.produits')} value={fmt(totalRecettes) + ' FCFA'} color="#0F172A" />
-        <KpiCard label={t('ecole.compta.kpi.charges')} value={fmt(totalDepenses) + ' FCFA'} color="#DC2626" />
-        <KpiCard label={t('ecole.compta.kpi.solde')} value={fmt(Math.abs(solde)) + ' FCFA'} sub={solde >= 0 ? 'Excédent' : 'Déficit'} color={solde >= 0 ? '#0F172A' : '#DC2626'} />
+        <KpiCard label={t('ecole.compta.kpi.produits')} value={fmtCurrency(totalRecettes)} color="#0F172A" />
+        <KpiCard label={t('ecole.compta.kpi.charges')} value={fmtCurrency(totalDepenses)} color="#DC2626" />
+        <KpiCard label={t('ecole.compta.kpi.solde')} value={fmtCurrency(Math.abs(solde))} sub={solde >= 0 ? 'Excédent' : 'Déficit'} color={solde >= 0 ? '#0F172A' : '#DC2626'} />
       </div>
 
       <div className="flex items-center gap-2 justify-between flex-wrap">
@@ -139,7 +141,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
                 </select>
               </div>
               <FI label="TVA (%)" value={form.tva} onChange={v => setForm(p => ({ ...p, tva: v }))} type="number" placeholder="0" />
-              <FI label="Montant HT (FCFA) *" value={form.montant_ht} onChange={v => setForm(p => ({ ...p, montant_ht: v }))} type="number" />
+              <FI label="Montant HT *" value={form.montant_ht} onChange={v => setForm(p => ({ ...p, montant_ht: v }))} type="number" />
               <div className="flex items-end pb-1">
                 <p className="text-sm font-bold text-[#00b9a7]">
                   TTC : {fmt((Number(form.montant_ht) || 0) * (1 + (Number(form.tva) || 0) / 100))} FCFA
@@ -183,10 +185,10 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
                       {entry.type === 'recette' ? 'Recette' : 'Dépense'}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-[var(--text-secondary)]">{fmt(entry.montant_ht)}</td>
+                  <td className="px-4 py-2.5 text-[var(--text-secondary)]">{fmtCurrency(entry.montant_ht)}</td>
                   <td className="px-4 py-2.5 text-[var(--text-secondary)]">{entry.tva}%</td>
                   <td className="px-4 py-2.5 font-semibold" style={{ color: entry.type === 'recette' ? '#0F172A' : '#DC2626' }}>
-                    {fmt(entry.montant_ttc)} FCFA
+                    {fmtCurrency(entry.montant_ttc)}
                   </td>
                 </tr>
               ))}
@@ -201,6 +203,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
 // ── Grand Livre ───────────────────────────────────────────────────────────────
 
 function SectionGrandLivre({ tenantId }: { tenantId: string }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [entries,  setEntries]  = useState<JournalEntry[]>([])
   const [loading,  setLoading]  = useState(true)
@@ -264,9 +267,9 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
                   <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{account.entries.length} écriture(s)</p>
                 </div>
                 <div className="flex gap-3">
-                  <KpiCard label="Débit"    value={fmt(account.totalDepenses) + ' FCFA'} color="#DC2626" />
-                  <KpiCard label="Crédit"   value={fmt(account.totalRecettes) + ' FCFA'} color="#0F172A" />
-                  <KpiCard label="Solde"    value={fmt(Math.abs(account.solde)) + ' FCFA'} color={account.solde >= 0 ? '#0F172A' : '#DC2626'} />
+                  <KpiCard label="Débit"    value={fmtCurrency(account.totalDepenses)} color="#DC2626" />
+                  <KpiCard label="Crédit"   value={fmtCurrency(account.totalRecettes)} color="#0F172A" />
+                  <KpiCard label="Solde"    value={fmtCurrency(Math.abs(account.solde))} color={account.solde >= 0 ? '#0F172A' : '#DC2626'} />
                 </div>
               </div>
               <div className="rounded-xl border border-[var(--border)] overflow-hidden">
@@ -277,8 +280,8 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
                       <tr key={entry.id} className="border-t border-[var(--border)]">
                         <td className="px-4 py-2.5 text-[var(--text-secondary)]">{new Date(entry.date + 'T00:00:00').toLocaleDateString('fr-FR')}</td>
                         <td className="px-4 py-2.5 text-[#101729]">{entry.libelle}</td>
-                        <td className="px-4 py-2.5">{entry.type === 'depense' ? <span className="text-[#DC2626] font-semibold">{fmt(entry.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
-                        <td className="px-4 py-2.5">{entry.type === 'recette' ? <span className="text-[#DC2626] font-semibold">{fmt(entry.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
+                        <td className="px-4 py-2.5">{entry.type === 'depense' ? <span className="text-[#DC2626] font-semibold">{fmtCurrency(entry.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
+                        <td className="px-4 py-2.5">{entry.type === 'recette' ? <span className="text-[#DC2626] font-semibold">{fmtCurrency(entry.montant_ttc)}</span> : <span className="text-[var(--text-secondary)]">—</span>}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -299,6 +302,7 @@ function SectionGrandLivre({ tenantId }: { tenantId: string }) {
 // ── Bilan ─────────────────────────────────────────────────────────────────────
 
 function SectionBilan({ tenantId }: { tenantId: string }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [entries,  setEntries]  = useState<JournalEntry[]>([])
   const [loading,  setLoading]  = useState(true)
@@ -344,9 +348,9 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <KpiCard label={t('ecole.compta.kpi.produits')}  value={fmt(recettes) + ' FCFA'}         color="#0F172A" />
-        <KpiCard label={t('ecole.compta.kpi.charges')}   value={fmt(depenses) + ' FCFA'}         color="#DC2626" />
-        <KpiCard label={t('ecole.compta.kpi.solde')}     value={fmt(Math.abs(resultat)) + ' FCFA'} sub={resultat >= 0 ? 'Bénéfice' : 'Perte'} color={resultat >= 0 ? '#0F172A' : '#DC2626'} />
+        <KpiCard label={t('ecole.compta.kpi.produits')}  value={fmtCurrency(recettes)}         color="#0F172A" />
+        <KpiCard label={t('ecole.compta.kpi.charges')}   value={fmtCurrency(depenses)}         color="#DC2626" />
+        <KpiCard label={t('ecole.compta.kpi.solde')}     value={fmtCurrency(Math.abs(resultat))} sub={resultat >= 0 ? 'Bénéfice' : 'Perte'} color={resultat >= 0 ? '#0F172A' : '#DC2626'} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -362,13 +366,13 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
                   <tr key={code} className="border-b border-[var(--border)]">
                     <td className="px-4 py-2.5 font-mono text-[#00b9a7]">{code}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] text-[10px]">{label}</td>
-                    <td className="px-4 py-2.5 text-right font-semibold text-[#DC2626]">{fmt(amount)} FCFA</td>
+                    <td className="px-4 py-2.5 text-right font-semibold text-[#DC2626]">{fmtCurrency(amount)}</td>
                   </tr>
                 )
               })}
               <tr className="border-t-2 border-[#0F172A]/30">
                 <td colSpan={2} className="px-4 py-2.5 text-xs font-bold text-[#DC2626]">TOTAL PRODUITS</td>
-                <td className="px-4 py-2.5 text-right font-bold text-[#DC2626]">{fmt(recettes)} FCFA</td>
+                <td className="px-4 py-2.5 text-right font-bold text-[#DC2626]">{fmtCurrency(recettes)}</td>
               </tr>
             </tbody>
           </table>
@@ -386,13 +390,13 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
                   <tr key={code} className="border-b border-[var(--border)]">
                     <td className="px-4 py-2.5 font-mono text-[#00b9a7]">{code}</td>
                     <td className="px-4 py-2.5 text-[var(--text-secondary)] text-[10px]">{label}</td>
-                    <td className="px-4 py-2.5 text-right font-semibold text-[#DC2626]">{fmt(amount)} FCFA</td>
+                    <td className="px-4 py-2.5 text-right font-semibold text-[#DC2626]">{fmtCurrency(amount)}</td>
                   </tr>
                 )
               })}
               <tr className="border-t-2 border-[#DC2626]/30">
                 <td colSpan={2} className="px-4 py-2.5 text-xs font-bold text-[#DC2626]">TOTAL CHARGES</td>
-                <td className="px-4 py-2.5 text-right font-bold text-[#DC2626]">{fmt(depenses)} FCFA</td>
+                <td className="px-4 py-2.5 text-right font-bold text-[#DC2626]">{fmtCurrency(depenses)}</td>
               </tr>
             </tbody>
           </table>
@@ -405,7 +409,7 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
           <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{resultat >= 0 ? 'Bénéfice — à affecter aux réserves' : 'Perte — à couvrir'}</p>
         </div>
         <p className="text-2xl font-bold" style={{ color: resultat >= 0 ? '#0F172A' : '#DC2626' }}>
-          {resultat >= 0 ? '+' : '-'}{fmt(Math.abs(resultat))} FCFA
+          {resultat >= 0 ? '+' : '-'}{fmtCurrency(Math.abs(resultat))}
         </p>
       </div>
     </div>
@@ -421,6 +425,7 @@ interface Transaction {
 }
 
 function SectionTresorerie({ tenantId }: { tenantId: string }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading,      setLoading]      = useState(true)
@@ -479,7 +484,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
             </div>
             <div>
               <p className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wide">{k.label}</p>
-              <p className="text-lg font-bold" style={{ color: k.color }}>{fmt(k.val)} FCFA</p>
+              <p className="text-lg font-bold" style={{ color: k.color }}>{fmtCurrency(k.val)}</p>
             </div>
           </div>
         ))}
@@ -839,6 +844,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function ComptabilitePage() {
+  const { fmt: fmtCurrency } = useFmt()
   useRoleGuard(['DIRECTION_GENERALE', 'RAF'])
   const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()

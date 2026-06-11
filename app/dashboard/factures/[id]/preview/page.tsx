@@ -10,6 +10,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -78,6 +79,7 @@ function fmtDate(d: string) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function InvoicePreviewPage() {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const { id }         = useParams<{ id: string }>()
   const router         = useRouter()
@@ -419,9 +421,9 @@ export default function InvoicePreviewPage() {
                     {/* Right: Totals */}
                     <div style={{ width: 260, flexShrink: 0 }}>
                       {[
-                        { label: 'Sub Total',    value: fmt(subtotal) + ' FCFA' },
-                        { label: 'TVA (18 %)',   value: fmt(tva)      + ' FCFA' },
-                        { label: 'CA (5% TVA)',  value: fmt(ca)       + ' FCFA' },
+                        { label: 'Sub Total',    value: fmtCurrency(subtotal) },
+                        { label: 'TVA (18 %)',   value: fmtCurrency(tva) },
+                        { label: 'CA (5% TVA)',  value: fmtCurrency(ca) },
                       ].map(row => (
                         <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid #F3F4F6' }}>
                           <span style={{ fontSize: 11, color: '#374151', fontWeight: 500 }}>{row.label}</span>

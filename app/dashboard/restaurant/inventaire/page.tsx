@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useFmt } from '@/lib/hooks/useFmt'
 import { ArrowLeft, RefreshCw, AlertTriangle, Package, Loader2, Check, X } from 'lucide-react'
 
 interface Article {
@@ -20,6 +21,7 @@ function statusColor(qty: number, seuil: number) {
 }
 
 export default function InventairePage() {
+  const { fmt: fmtCurrency } = useFmt()
   const [articles,  setArticles]  = useState<Article[]>([])
   const [recettes,  setRecettes]  = useState<RecetteLink[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -87,7 +89,7 @@ export default function InventairePage() {
             { label: 'Total articles',  val: String(articles.length),  color: '#0F172A' },
             { label: 'Critiques',        val: String(critiques.length), color: '#DC2626' },
             { label: 'Ruptures',         val: String(ruptures.length),  color: '#DC2626' },
-            { label: 'Valeur stock',     val: new Intl.NumberFormat('fr-FR').format(articles.reduce((s, a) => s + a.quantite * a.prix_unitaire, 0)) + ' FCFA', color: '#16A34A' },
+            { label: 'Valeur stock',     val: fmtCurrency(articles.reduce((s, a) => s + a.quantite * a.prix_unitaire, 0)), color: '#16A34A' },
           ].map(s => (
             <div key={s.label} className="bg-white rounded-2xl p-3 border border-[#E2E8F0] shadow-sm text-center">
               <p className="text-[18px] font-black" style={{ color: s.color }}>{s.val}</p>
