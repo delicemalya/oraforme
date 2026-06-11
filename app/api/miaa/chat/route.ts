@@ -46,6 +46,7 @@ function selectModel(message: string): { model: string; maxTokens: number; isCom
 const SECTOR_TO_AGENT: Record<string, string> = {
   restaurant: 'restaurant', ecole: 'ecole', hotel: 'hotel',
   sante: 'sante', pharmacie: 'sante', cabinet: 'cabinet',
+  audit: 'audit',
 }
 
 function detectAgent(message: string, secteur?: string): string {
@@ -69,6 +70,8 @@ function detectAgent(message: string, secteur?: string): string {
     return 'stock'
   if (/prospect|pipeline.*crm|opportunité.*crm|scoring.*client|fidélisation/.test(msg))
     return 'crm'
+  if (/audit|conformit|anomali|score.*audit|contrôle.*intern|risque.*entreprise|ohada.*conform|plan.*action.*audit|non-conformit|redressement.*fiscal/.test(msg))
+    return 'audit'
 
   // 3. Défaut : comptabilité — l'agent le plus polyvalent
   return 'comptabilite'

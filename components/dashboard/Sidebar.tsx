@@ -289,15 +289,6 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'ong-dons':              'nav.ong_dons',
   boisson:                 'nav.boisson',
   'boisson-tournees':      'nav.boisson_tournees',
-  'audit-comptable':       'nav.audit_comptable',
-  'audit-financier':       'nav.audit_financier',
-  'audit-fiscal':          'nav.audit_fiscal',
-  'audit-rh':              'nav.audit_rh',
-  'audit-ci':              'nav.audit_ci',
-  'audit-risques':         'nav.audit_risques',
-  'audit-ohada':           'nav.audit_ohada',
-  'audit-plans':           'nav.audit_plans',
-  'audit-rapports':        'nav.audit_rapports',
 }
 
 const SECTOR_LABEL_KEYS: Record<string, string> = {

@@ -28,6 +28,7 @@ const AGENT_LABELS: Record<string, { label: string; color: string; emoji: string
   sante:        { label: 'Santé',       color: '#E8633A', emoji: '🏥' },
   hotel:        { label: 'Hôtel',       color: '#0891B2', emoji: '🏨' },
   cabinet:      { label: 'Cabinet',     color: '#7C3AED', emoji: '🏛️' },
+  audit:        { label: 'Audit IA',    color: '#DC2626', emoji: '🛡️' },
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -165,6 +166,15 @@ export default function MIAAPage() {
         'Quelles sont les règles de redoublement ?',
         'Génère un modèle de relevé de notes',
         "Comment gérer les frais d'inscription ?",
+      ],
+    },
+    {
+      label: 'Audit & Conformité',
+      actions: [
+        'Explique mon score de conformité OHADA',
+        'Comment corriger une anomalie fiscale critique ?',
+        "Quels sont les risques d'un audit DGI avec TVA non déclarée ?",
+        'Génère un plan d\'action pour améliorer mon score d\'audit',
       ],
     },
   ]
@@ -379,7 +389,7 @@ export default function MIAAPage() {
               <h1 className="text-sm font-bold text-gray-900">MIAA+</h1>
               <span className="px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest text-white"
                 style={{ background: 'linear-gradient(135deg, #7C3AED, #DC2626, #F59E0B)' }}>
-                PREMIUM
+                MIAA EXPERT
               </span>
               {/* Active agent badge — invisible jusqu'au premier message */}
               {agentActif && AGENT_LABELS[agentActif] && (

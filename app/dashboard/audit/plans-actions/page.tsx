@@ -83,7 +83,7 @@ export default function PlansActionsPage() {
   const completed = actions.filter(a => done.has(a.id))
 
   return (
-    <div className="space-y-5 max-w-3xl">
+    <div className="space-y-5 w-full">
       <Link href="/dashboard/audit" className="inline-flex items-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
         <ChevronLeft size={15} /> Audit & Conformité
       </Link>

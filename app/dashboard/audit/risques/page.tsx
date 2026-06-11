@@ -73,7 +73,7 @@ export default function RisquesPage() {
   }))
 
   return (
-    <div className="space-y-5 max-w-4xl">
+    <div className="space-y-5 w-full">
       <Link href="/dashboard/audit" className="inline-flex items-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
         <ChevronLeft size={15} /> Audit & Conformité
       </Link>
