@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Bot, X, MessageCircle, Bell, FileText, BarChart2, GraduationCap,
-  Send, Upload, Download, RefreshCw, Loader2, AlertTriangle,
-  CheckCircle2, Clock, ChevronRight, Sparkles, Minimize2, Maximize2,
-  FileUp, Trash2, ExternalLink,
+  X, MessageCircle, Bell, FileText, BarChart2, GraduationCap,
+  Send, Upload, Download, RefreshCw, Loader2,
+  CheckCircle2, ChevronRight, Sparkles, Minimize2, Maximize2,
+  FileUp, Trash2, ExternalLink, Bot,
 } from 'lucide-react'
 import Link from 'next/link'
 import type { MIAANotification } from '@/lib/miaa/notifications'
@@ -348,22 +349,71 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
 
   return (
     <>
-      {/* Bouton flottant */}
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full shadow-2xl text-white font-semibold text-sm transition-all hover:scale-105 active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' }}
-        >
-          <Bot size={18} />
-          <span>MIAA+</span>
-          {unreadCount > 0 && (
-            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-bold -mr-1">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-        </button>
-      )}
+      {/* Bouton flottant — Logo MIAA+ animé */}
+      <AnimatePresence>
+        {!open && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 26 }}
+            className="fixed bottom-6 right-6 z-[9999] flex flex-col items-center gap-1"
+          >
+            <motion.button
+              whileHover={{ scale: 1.10 }}
+              whileTap={{ scale: 0.88 }}
+              onClick={() => setOpen(true)}
+              className="relative w-[64px] h-[64px] flex items-center justify-center"
+              title="MIAA+ — Expert IA Oraforme"
+            >
+              {/* Anneau conic rotatif */}
+              <motion.div
+                className="absolute inset-[-6px] rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+                style={{
+                  background: 'conic-gradient(from 0deg, transparent 55%, #F59E0B 75%, #FCD34D 88%, transparent 100%)',
+                  borderRadius: '50%',
+                }}
+              />
+              {/* Halo pulsé */}
+              <motion.div
+                className="absolute inset-[-2px] rounded-full"
+                animate={{ scale: [1, 1.30, 1], opacity: [0.45, 0, 0.45] }}
+                transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ background: 'radial-gradient(circle, #F59E0B70 0%, transparent 70%)' }}
+              />
+              {/* Logo */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/miaa-logo.png"
+                alt="MIAA+"
+                className="relative z-10 rounded-full object-cover shadow-xl"
+                style={{ width: 64, height: 64, filter: 'drop-shadow(0 4px 12px rgba(245,158,11,0.60))' }}
+              />
+              {/* Badge non-lus */}
+              {unreadCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 z-20 flex items-center justify-center w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-md"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </motion.span>
+              )}
+            </motion.button>
+            {/* Label pulsé */}
+            <motion.span
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              className="text-[10px] font-bold tracking-wide select-none"
+              style={{ color: '#F59E0B', textShadow: '0 1px 4px rgba(245,158,11,0.4)' }}
+            >
+              MIAA+
+            </motion.span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Panel principal */}
       {open && (
@@ -374,12 +424,18 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
           <div className="flex items-center justify-between px-4 py-3 shrink-0"
             style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' }}>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                <Bot size={16} className="text-white" />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/miaa-logo.png"
+                alt="MIAA+"
+                className="w-9 h-9 rounded-full object-cover shadow-md ring-2 ring-white/30"
+              />
               <div>
                 <p className="text-white font-bold text-sm leading-none">MIAA+</p>
-                <p className="text-white/70 text-[10px] mt-0.5">Expert IA · Oraforme ERP</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse" />
+                  <p className="text-white/75 text-[10px]">Expert IA · Oraforme ERP</p>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -424,9 +480,10 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                 <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
                   {messages.length === 0 && (
                     <div className="text-center py-6">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3"
-                        style={{ background: '#FEF3C7' }}>
-                        <Sparkles size={20} style={{ color: '#F59E0B' }} />
+                      <div className="mx-auto mb-3 w-14 h-14 relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/miaa-logo.png" alt="MIAA+" className="w-14 h-14 rounded-full object-cover shadow-lg" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-400 border-2 border-white" />
                       </div>
                       <p className="text-sm font-semibold text-[var(--text)]">Bonjour, je suis MIAA+</p>
                       <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-[260px] mx-auto">
@@ -460,10 +517,18 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                     </div>
                   ))}
                   {sending && (
-                    <div className="flex justify-start">
+                    <div className="flex justify-start items-end gap-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/miaa-logo.png" alt="MIAA+" className="w-6 h-6 rounded-full object-cover shrink-0" />
                       <div className="flex items-center gap-1.5 px-3 py-2 rounded-2xl rounded-bl-sm border border-[var(--border)] bg-[var(--surface)]">
-                        <Loader2 size={12} className="animate-spin text-[#F59E0B]" />
-                        <span className="text-xs text-[var(--text-secondary)]">MIAA+ analyse…</span>
+                        {[0,1,2].map(i => (
+                          <motion.span key={i}
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: '#F59E0B' }}
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.22 }}
+                          />
+                        ))}
                       </div>
                     </div>
                   )}
@@ -646,7 +711,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                       <button onClick={analyzeFile} disabled={uploadLoading}
                         className="w-full mt-2 flex items-center justify-center gap-1.5 py-2 rounded-lg text-white text-xs font-medium transition-all disabled:opacity-50"
                         style={{ background: '#F59E0B' }}>
-                        {uploadLoading ? <Loader2 size={12} className="animate-spin" /> : <Bot size={12} />}
+                        {uploadLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
                         {uploadLoading ? 'Analyse en cours…' : 'Analyser avec MIAA+'}
                       </button>
                     </>
