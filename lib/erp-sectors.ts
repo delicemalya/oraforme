@@ -150,7 +150,7 @@ export const PLATFORM_MODULES = [
   { id: 'notifications', href: '/dashboard/notifications',  label: 'Notifications',    sublabel: 'Alertes & messages'     },
   { id: 'profil',        href: '/dashboard/profil',         label: 'Profil Entreprise',sublabel: 'Marque & paramètres'    },
   { id: 'roles',         href: '/dashboard/roles',          label: 'Rôles & Droits',   sublabel: 'Permissions équipe'     },
-  { id: 'audit',         href: '/dashboard/audit',          label: 'Audit & Logs',     sublabel: 'Traçabilité système'    },
+  { id: 'audit',         href: '/dashboard/audit',          label: 'Audit & Conformité OHADA', sublabel: 'Scores · Anomalies · Plans' },
   { id: 'calendrier',    href: '/dashboard/calendrier',     label: 'Calendrier',       sublabel: 'Événements & planning'  },
   { id: 'taches',        href: '/dashboard/taches',         label: 'Tâches',           sublabel: 'Collaboration & suivi'  },
   { id: 'abonnement',    href: '/dashboard/abonnement',     label: 'Abonnement',       sublabel: 'Plans & facturation'    },

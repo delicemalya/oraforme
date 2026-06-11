@@ -61,7 +61,16 @@ const ICONS: Record<string, LucideIcon> = {
   direction:     BarChart2,
   finance:       TrendingUp,
   analytics:     Activity,
-  audit:         ShieldAlert,
+  audit:              ShieldAlert,
+  'audit-comptable':  Calculator,
+  'audit-financier':  TrendingUp,
+  'audit-fiscal':     Landmark,
+  'audit-rh':         Users,
+  'audit-ci':         Lock,
+  'audit-risques':    BarChart2,
+  'audit-ohada':      ShieldCheck,
+  'audit-plans':      CheckSquare,
+  'audit-rapports':   FileText,
   notifications: Bell,
   comptabilite:  Calculator,
   tresorerie:    Wallet,
@@ -171,7 +180,16 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'api-keys',              label: 'Clés API',             sublabel: '', href: '/dashboard/api-keys'                   },
   { id: 'fiscalite',     label: 'Fiscalité & Déclarations', sublabel: '', href: '/dashboard/fiscalite'     },
   { id: 'cnss-congo',   label: 'CNSS Congo',               sublabel: 'Télédéclaration', href: '/dashboard/declarations/cnss' },
-  { id: 'recouvrement', label: 'Recouvrement',             sublabel: '', href: '/dashboard/recouvrement' },
+  { id: 'recouvrement',     label: 'Recouvrement',              sublabel: '', href: '/dashboard/recouvrement'           },
+  { id: 'audit-comptable',  label: 'Audit Comptable',           sublabel: '', href: '/dashboard/audit/comptable'       },
+  { id: 'audit-financier',  label: 'Audit Financier',           sublabel: '', href: '/dashboard/audit/financier'       },
+  { id: 'audit-fiscal',     label: 'Audit Fiscal',              sublabel: '', href: '/dashboard/audit/fiscal'          },
+  { id: 'audit-rh',         label: 'Audit RH & Social',         sublabel: '', href: '/dashboard/audit/rh'             },
+  { id: 'audit-ci',         label: 'Contrôle Interne',          sublabel: '', href: '/dashboard/audit/controle-interne' },
+  { id: 'audit-risques',    label: 'Gestion des Risques',       sublabel: '', href: '/dashboard/audit/risques'        },
+  { id: 'audit-ohada',      label: 'Conformité OHADA',          sublabel: '', href: '/dashboard/audit/ohada'          },
+  { id: 'audit-plans',      label: "Plans d'Actions",           sublabel: '', href: '/dashboard/audit/plans-actions'  },
+  { id: 'audit-rapports',   label: 'Rapports d\'Audit',         sublabel: '', href: '/dashboard/audit/rapports'       },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -191,6 +209,8 @@ const SIDEBAR_GROUPS = [
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'facturation', 'recouvrement', 'stock', 'achats'] },
   // OUTILS — IA & productivité (calendrier → navbar)
   { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'taches'] },
+  // AUDIT & CONFORMITÉ OHADA
+  { id: 'audit_group', labelKey: 'nav.audit',       icon: ShieldAlert, moduleIds: ['audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci', 'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'] },
   // ADMIN — abonnement, automatisation, API
   { id: 'params',      labelKey: 'nav.params',      icon: Settings,    moduleIds: ['abonnement', 'workflows', 'api-keys'] },
 ]
@@ -269,6 +289,15 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'ong-dons':              'nav.ong_dons',
   boisson:                 'nav.boisson',
   'boisson-tournees':      'nav.boisson_tournees',
+  'audit-comptable':       'nav.audit_comptable',
+  'audit-financier':       'nav.audit_financier',
+  'audit-fiscal':          'nav.audit_fiscal',
+  'audit-rh':              'nav.audit_rh',
+  'audit-ci':              'nav.audit_ci',
+  'audit-risques':         'nav.audit_risques',
+  'audit-ohada':           'nav.audit_ohada',
+  'audit-plans':           'nav.audit_plans',
+  'audit-rapports':        'nav.audit_rapports',
 }
 
 const SECTOR_LABEL_KEYS: Record<string, string> = {
@@ -289,8 +318,10 @@ const SECTOR_LABEL_KEYS: Record<string, string> = {
 
 // roles : gestion des rôles école — réservé à DIRECTION_GENERALE uniquement
 const PLATFORM_RESTRICTED = new Set(['roles'])
-// analytics et audit : visibles aux admins de TOUS les secteurs (pas école-only)
-const ADMIN_MODULE_IDS    = new Set(['workflows', 'api-keys', 'analytics', 'audit'])
+// analytics, audit et sous-modules audit : visibles aux admins de TOUS les secteurs
+const ADMIN_MODULE_IDS    = new Set(['workflows', 'api-keys', 'analytics', 'audit',
+  'audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci',
+  'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'])
 const BI_MODULE_IDS       = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
 
 const SECTOR_BI_MAP: Record<string, string[]> = {
