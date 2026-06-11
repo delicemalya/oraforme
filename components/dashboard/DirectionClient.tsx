@@ -12,10 +12,7 @@ import ERPPageLayout, {
 import { BarChart2, TrendingUp, Users, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale } from '@/lib/hooks/useLocale'
-
-function fmtFCFA(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
+import { useFmt } from '@/lib/hooks/useFmt'
 
 export interface DirectionData {
   ca:         number
@@ -32,6 +29,7 @@ export interface DirectionData {
 }
 
 export default function DirectionClient({ data }: { data: DirectionData }) {
+  const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
 
   const {

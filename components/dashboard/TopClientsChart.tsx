@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 export interface ClientRevenue {
   nom: string
@@ -8,9 +9,6 @@ export interface ClientRevenue {
   count: number
 }
 
-function fmtFull(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
 function fmtShort(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k`
@@ -21,6 +19,7 @@ const GOLD = '#DC2626'
 const GOLDS = ['#DC2626', '#E09000', '#C07800', '#A06000', '#805000']
 
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const { fmt: fmtFull } = useFmt()
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-3 shadow-2xl text-xs">
@@ -34,6 +33,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function TopClientsChart({ data }: { data: ClientRevenue[] }) {
+  const { fmt: fmtFull } = useFmt()
   const hasData = data.some(d => d.montant > 0)
 
   return (

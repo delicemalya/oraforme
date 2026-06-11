@@ -16,6 +16,7 @@ import RevenueChart from '@/components/dashboard/RevenueChart'
 import ModuleChart from '@/components/dashboard/ModuleChart'
 import ActivityTimeline, { type ActivityItem } from '@/components/ui/ActivityTimeline'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 import GeoDetectionBanner from '@/components/ui/GeoDetectionBanner'
 import { getTenantBrandColor } from '@/lib/utils'
 
@@ -153,6 +154,7 @@ function HeroCard({ label, value, sub, icon: Icon, badge, trend, href, i }: Hero
 // ── Solde Trésorerie card ─────────────────────────────────────────────────────
 
 function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending: number; pendingAmt: number }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const isPositive = solde >= 0
   const statusColor = isPositive ? '#16A34A' : '#DC2626'
@@ -175,7 +177,7 @@ function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending
         </span>
       </div>
       <p className="num" style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', lineHeight: 1, marginBottom: 3, letterSpacing: '-0.02em' }}>
-        {fmt(solde)} FCFA
+        {fmtCurrency(solde)}
       </p>
       <p style={{ fontSize: 10, color: '#94A3B8', marginBottom: 14 }}>{t('dash.monthCumul')}</p>
 
@@ -193,7 +195,7 @@ function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, paddingTop: 12, borderTop: '1px solid #F1F5F9' }}>
         <div>
           <p className="section-label" style={{ marginBottom: 4 }}>{t('common.pending')}</p>
-          <p className="num" style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{fmt(pendingAmt)} F</p>
+          <p className="num" style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>{fmtCurrency(pendingAmt)}</p>
           <p style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>{pending} {pending !== 1 ? t('dash.dossiers') : t('dash.dossier')}</p>
         </div>
         <div>
@@ -485,6 +487,7 @@ const STATUT_CFG: Record<string, { labelKey: string; bg: string; color: string }
 }
 
 function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const st   = STATUT_CFG[item.statut] ?? STATUT_CFG.brouillon
   const init = (item.client_nom ?? 'C').split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
@@ -515,7 +518,7 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
         </div>
       </td>
       <td className="px-4 py-3 text-right">
-        <p style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{fmt(item.total)} FCFA</p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>{fmtCurrency(item.total)}</p>
       </td>
       <td className="px-4 py-3">
         <span style={{ background: st.bg, color: st.color, fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 10px', display: 'inline-block' }}>
@@ -529,6 +532,7 @@ function TransactionRow({ item, i }: { item: ActivityItem; i: number }) {
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({ data, userName }: { data: DashboardData; userName?: string }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const router = useRouter()
   const { tenant, tenantId, kpis, alerts, recentActivity, chartData } = data
@@ -564,8 +568,8 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     { label: t('dash.totalPersonnel'),    value: kpis.nbEmployes,   sub: t('dash.tousStatuts'),      icon: HeartHandshake, bg: '#7C3AED', badge: t('rh.employees'),      href: '/dashboard/ecole/rh', i: 2 },
   ] : isFinancial && secteur === 'ecole' && ecoleKpis ? [
     { label: t('dash.enrolled'),         value: ecoleKpis.nbEtudiants,                            sub: `${ecoleKpis.nbActifs} ${t('dash.actifs')} · ${ecoleKpis.nbSuspendus} ${t('dash.suspendus')}`, icon: GraduationCap, bg: '#DC2626', badge: t('sc.inscriptions'), href: '/dashboard/ecole/scolarite', i: 0 },
-    { label: t('dash.revenusScolaires'), value: `${fmt(ecoleFinancials?.revenusMois ?? 0)} FCFA`, sub: `${ecoleFinancials?.nbPaiementsMois ?? 0} ${t('dash.paiementsMois')}`,                          icon: TrendingUp,    bg: '#DC2626', badge: t('dash.ceMoisCi'),   href: '/dashboard/ecole/scolarite', i: 1 },
-    { label: t('dash.impayesScolarite'), value: ecoleFinancials?.nbImpayesDossiers ?? 0,          sub: `${fmt(ecoleFinancials?.montantImpayeTotal ?? 0)} ${t('dash.enAttentePmt')}`,                    icon: AlertTriangle, bg: '#DC2626',                                href: '/dashboard/ecole/scolarite', i: 2 },
+    { label: t('dash.revenusScolaires'), value: fmtCurrency(ecoleFinancials?.revenusMois ?? 0), sub: `${ecoleFinancials?.nbPaiementsMois ?? 0} ${t('dash.paiementsMois')}`,                          icon: TrendingUp,    bg: '#DC2626', badge: t('dash.ceMoisCi'),   href: '/dashboard/ecole/scolarite', i: 1 },
+    { label: t('dash.impayesScolarite'), value: ecoleFinancials?.nbImpayesDossiers ?? 0,          sub: `${fmtCurrency(ecoleFinancials?.montantImpayeTotal ?? 0)} ${t('dash.enAttentePmt')}`,                    icon: AlertTriangle, bg: '#DC2626',                                href: '/dashboard/ecole/scolarite', i: 2 },
     { label: t('dash.totalAbsences'),    value: ecoleKpis.nbAbsences,                             sub: t('school.absences'),                                                                              icon: CalendarOff,   bg: '#7C3AED',                                                                    i: 3 },
   ] : secteur === 'ecole' && ecoleKpis ? [
     { label: t('dash.enrolled'),     value: ecoleKpis.nbEtudiants, sub: `${ecoleKpis.nbActifs} ${t('dash.actifs')}`, icon: GraduationCap, bg: '#DC2626', badge: t('sc.inscriptions'), href: '/dashboard/ecole/scolarite', i: 0 },
@@ -573,9 +577,9 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     { label: t('dash.suspended'),    value: ecoleKpis.nbSuspendus, sub: t('dash.paymentsPending'),                   icon: UserX,         bg: '#DC2626',                                                                   i: 2 },
     { label: t('dash.totalAbsences'),value: ecoleKpis.nbAbsences,  sub: t('school.absences'),                        icon: CalendarOff,   bg: '#7C3AED',                                                                   i: 3 },
   ] : isFinancial ? [
-    { label: t('dash.revenue'),          value: `${fmt(kpis.revenuMois)} FCFA`,                                                        sub: t('dash.billedInvoices'),                                                                                                                               icon: TrendingUp,    bg: '#DC2626', badge: t('dash.ceMoisCi'), trend: 12.5, href: '/dashboard/facturation', i: 0 },
+    { label: t('dash.revenue'),          value: fmtCurrency(kpis.revenuMois),                                                        sub: t('dash.billedInvoices'),                                                                                                                               icon: TrendingUp,    bg: '#DC2626', badge: t('dash.ceMoisCi'), trend: 12.5, href: '/dashboard/facturation', i: 0 },
     { label: t('dash.facturesPayees'),   value: chartData.moduleBreakdown.find(m => m.statut === 'payee')?.value ?? 0,                   sub: t('dash.ceMoisCi'),                                                                                                                                     icon: CheckCircle,   bg: '#DC2626',                               href: '/dashboard/facturation', i: 1 },
-    { label: t('dash.facturesAttente'),  value: alerts.pendingCount,                                                                    sub: `${fmt(alerts.pendingAmount)} FCFA ${t('common.pending').toLowerCase()}`,                                                                              icon: Clock,         bg: '#DC2626', badge: t('dash.pending'),  href: '/dashboard/facturation', i: 2 },
+    { label: t('dash.facturesAttente'),  value: alerts.pendingCount,                                                                    sub: `${fmtCurrency(alerts.pendingAmount)} ${t('common.pending').toLowerCase()}`,                                                                              icon: Clock,         bg: '#DC2626', badge: t('dash.pending'),  href: '/dashboard/facturation', i: 2 },
     { label: alerts.lowStockCount > 0 ? t('dash.rupturesStock') : t('dash.alertesStock'), value: kpis.nbAlertes, sub: alerts.lowStockCount > 0 ? `${alerts.lowStockCount} ${alerts.lowStockCount > 1 ? t('dash.articlesEpuises') : t('dash.articleEpuise')}` : t('dash.toutEnOrdre'), icon: AlertTriangle, bg: '#DC2626',                               i: 3 },
   ] : [
     { label: t('dash.employees'), value: kpis.nbEmployes, sub: t('dash.dansEquipe'),        icon: Users,         bg: '#DC2626', badge: t('rh.employees'),  href: '/dashboard/rh',     i: 0 },
@@ -674,7 +678,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
         {isFinancial && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
             {[
-              { label: t('dash.revenue'),        value: `${fmt(kpis.revenuMois)} F` },
+              { label: t('dash.revenue'),        value: fmtCurrency(kpis.revenuMois) },
               { label: t('dash.facturesAttente'), value: `${alerts.pendingCount}`   },
               { label: t('dash.employees'),       value: `${kpis.nbEmployes}`       },
               { label: t('dash.alertesStock'),    value: alerts.lowStockCount > 0 ? `${alerts.lowStockCount}` : 'OK' },

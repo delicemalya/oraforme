@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 export interface ExpenseCategory {
   name: string
@@ -8,13 +9,10 @@ export interface ExpenseCategory {
   color: string
 }
 
-function fmtFull(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
-
 const COLORS = ['#DC2626', '#DC2626', '#0F172A', '#7C3AED', '#DC2626', '#7C3AED', '#0F172A', '#84CC16']
 
 const CustomTooltip = ({ active, payload }: any) => {
+  const { fmt: fmtFull } = useFmt()
   if (!active || !payload?.length) return null
   const { name, value, payload: d } = payload[0]
   return (
@@ -29,6 +27,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 }
 
 export default function ExpensesChart({ data }: { data: ExpenseCategory[] }) {
+  const { fmt: fmtFull } = useFmt()
   const hasData = data.some(d => d.value > 0)
   const total = data.reduce((s, d) => s + d.value, 0)
   const enriched = data.map((d, i) => ({ ...d, color: d.color || COLORS[i % COLORS.length] }))

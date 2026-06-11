@@ -4,6 +4,7 @@ import {
   ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 export interface MonthData {
   mois: string
@@ -17,11 +18,8 @@ function fmtAxis(n: number) {
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k`
   return String(n)
 }
-function fmtFull(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
-}
-
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const { fmt: fmtFull } = useFmt()
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-3 shadow-2xl text-xs">
@@ -38,6 +36,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function TreasuryChart({ data }: { data: MonthData[] }) {
+  const { fmt: fmtFull } = useFmt()
   const hasData = data.some(d => d.entrees > 0 || d.sorties > 0)
 
   return (

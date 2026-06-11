@@ -5,6 +5,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 interface DayData { day: string; montant: number; count: number }
 
@@ -31,11 +32,8 @@ function fmtAxis(n: number) {
   return String(n)
 }
 
-function fmtFull(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n))
-}
-
 export default function RevenueChart({ data }: { data: DayData[] }) {
+  const { fmt: fmtFull, devise } = useFmt()
   const { t, locale } = useLocale()
   const intlLocale = LOCALE_TO_INTL[locale] ?? 'fr-FR'
   const hasData = data.some(d => d.montant > 0)
@@ -68,7 +66,7 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
           border: '1px solid var(--border)',
           borderRadius: 6,
           padding: '3px 8px',
-        }}>FCFA</span>
+        }}>{devise}</span>
       </div>
 
       <ResponsiveContainer width="100%" height={180}>
@@ -95,7 +93,7 @@ export default function RevenueChart({ data }: { data: DayData[] }) {
               boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
             }}
             labelStyle={{ color: 'var(--text-secondary)', marginBottom: 4 }}
-            formatter={(val) => [`${fmtFull(Number(val))} FCFA`, t('dash.revenue')]}
+            formatter={(val) => [fmtFull(Number(val)), t('dash.revenue')]}
             cursor={{ stroke: 'rgba(245,30,51,0.2)', strokeWidth: 1 }}
           />
           <Line

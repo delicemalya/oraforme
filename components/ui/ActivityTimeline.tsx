@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { FileText, CheckCircle, Clock, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 export interface ActivityItem {
   id: string
@@ -11,10 +12,6 @@ export interface ActivityItem {
   total: number
   statut: string
   created_at: string
-}
-
-function fmt(n: number) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n))
 }
 
 const STATUT_ICONS: Record<string, { color: string; Icon: React.ElementType; actionKey: string }> = {
@@ -25,6 +22,7 @@ const STATUT_ICONS: Record<string, { color: string; Icon: React.ElementType; act
 }
 
 export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
+  const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
 
   function timeAgo(d: string) {
@@ -81,7 +79,7 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
                 <Icon size={10} style={{ color: st.color }} className="shrink-0" />
                 <span className="text-[10px]" style={{ color: st.color }}>{t(st.actionKey)}</span>
                 <span className="text-[10px] text-[var(--text-secondary)]">·</span>
-                <span className="text-[10px] font-semibold text-[var(--text-secondary)]">{fmt(item.total)} FCFA</span>
+                <span className="text-[10px] font-semibold text-[var(--text-secondary)]">{fmtCurrency(item.total)}</span>
               </div>
             </div>
 

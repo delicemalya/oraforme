@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, FileText, Package } from 'lucide-react'
+import { useFmt } from '@/lib/hooks/useFmt'
 
 interface AlertItem {
   id: string
@@ -19,7 +20,7 @@ interface Props {
 }
 
 export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount }: Props) {
-  const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
+  const { fmt: fmtCurrency } = useFmt()
 
   const initial: AlertItem[] = [
     ...(pendingCount > 0 ? [{
@@ -27,7 +28,7 @@ export default function AlertBanner({ pendingCount, pendingAmount, lowStockCount
       type: 'warning' as const,
       Icon: FileText,
       message: `${pendingCount} facture${pendingCount > 1 ? 's' : ''} en attente de paiement`,
-      sub: pendingAmount > 0 ? `${fmt(pendingAmount)} FCFA non encaissés` : undefined,
+      sub: pendingAmount > 0 ? `${fmtCurrency(pendingAmount)} non encaissés` : undefined,
     }] : []),
     ...(lowStockCount > 0 ? [{
       id: 'stock',
