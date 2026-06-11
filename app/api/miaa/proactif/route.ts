@@ -98,7 +98,7 @@ export async function GET(req: Request) {
 
       alertesCreees++
     } catch (err) {
-      console.error(`[MIAA PREMIUM proactif] tenant ${tenant.id}:`, err)
+      console.error(`[MIAA+ proactif] tenant ${tenant.id}:`, err)
     }
   }
 

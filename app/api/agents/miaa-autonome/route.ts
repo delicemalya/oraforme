@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
-import { chargerMemoireMIAA } from '@/lib/miaa/memory'
+import { chargerMemoireMIAA, sauvegarderRapport } from '@/lib/miaa/memory'
 import { genererNotifications, sauvegarderNotifications } from '@/lib/miaa/notifications'
 import { EXPERTS } from '@/lib/miaa/experts'
 
@@ -97,13 +97,7 @@ export async function POST(req: Request) {
     if (jourMois === 1) {
       try {
         const rapport = await genererRapportMensuel(supabase, tId)
-        await supabase.from('miaa_rapports').insert({
-          tenant_id:   tId,
-          type:        'rapport_mensuel',
-          contenu:     rapport,
-          auto:        true,
-          created_at:  now.toISOString(),
-        })
+        await sauvegarderRapport(supabase, tId, 'rapport_mensuel', rapport, { auto: true })
         actions.push(`rapport_mensuel:${tId}`)
       } catch (e) {
         console.error(`[MIAA autonome] rapport_mensuel ${tId}:`, e)
@@ -131,13 +125,7 @@ export async function POST(req: Request) {
     if (jourMois === 28) {
       try {
         const resume = await genererBulletinsPaie(supabase, tId)
-        await supabase.from('miaa_rapports').insert({
-          tenant_id:  tId,
-          type:       'bulletin_paie',
-          contenu:    resume,
-          auto:       true,
-          created_at: now.toISOString(),
-        })
+        await sauvegarderRapport(supabase, tId, 'bulletin_paie', resume, { auto: true })
         actions.push(`bulletins_paie:${tId}`)
       } catch (e) {
         console.error(`[MIAA autonome] bulletins ${tId}:`, e)

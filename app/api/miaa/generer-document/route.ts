@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
-import { chargerMemoireMIAA } from '@/lib/miaa/memory'
+import { chargerMemoireMIAA, sauvegarderRapport } from '@/lib/miaa/memory'
 import { EXPERTS } from '@/lib/miaa/experts'
 
 export const runtime = 'nodejs'
@@ -68,15 +68,11 @@ ${data ? '\nDonnées supplémentaires :\n' + JSON.stringify(data, null, 2) : ''}
 
     const content = res.content[0].type === 'text' ? res.content[0].text : ''
 
-    // Sauvegarder le rapport généré
     if (tenant_id) {
-      await supabase.from('miaa_rapports').insert({
-        tenant_id,
-        type,
-        contenu:    content,
+      await sauvegarderRapport(supabase, tenant_id, type, content, {
         tokens_used: res.usage.input_tokens + res.usage.output_tokens,
-        created_at: new Date().toISOString(),
-      }).then(() => {}, () => {})
+        meta: { context: context?.slice(0, 200) },
+      })
     }
 
     return Response.json({

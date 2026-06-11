@@ -224,6 +224,7 @@ export async function POST(req: Request) {
         donnees_live:      { solde_tresorerie: 0, factures_impayees: 0, stock_alertes: 0, employes_actifs: 0, ca_mois: 0 },
         historique_resume: '',
         patterns:          { questions_frequentes: [], problemes_recurrents: [], preferences_utilisateur: [] },
+        contexte_metier:   {},
         nb_conversations:  0,
       }
     }
