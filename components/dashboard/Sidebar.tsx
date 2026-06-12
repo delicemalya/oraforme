@@ -716,7 +716,7 @@ export default function Sidebar() {
           }}>
             <LayoutDashboard size={13} style={{ color: dashActive ? '#FFFFFF' : '#94A3B8' }} />
           </div>
-          <span>Direction Générale</span>
+          <span>{t('nav.direction')}</span>
         </Link>
 
         {/* Skeleton */}
@@ -788,7 +788,7 @@ export default function Sidebar() {
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <ShieldAlert size={13} className="shrink-0" />
-            <span>Admin oraforme</span>
+            <span>Admin</span>
             <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
           </Link>
         )}

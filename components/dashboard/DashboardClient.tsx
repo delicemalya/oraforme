@@ -217,15 +217,15 @@ function TresorerieCard({ solde, pending, pendingAmt }: { solde: number; pending
 function QuickLinksCard({ secteur }: { secteur: string | null; modules: string[] }) {
   const { t } = useLocale()
   const actions = secteur === 'ecole' ? [
-    { label: 'Nouvelle inscription', desc: 'Ajouter un étudiant', href: '/dashboard/ecole/scolarite', color: '#DC2626', bg: '#FFFBEB', icon: GraduationCap },
-    { label: 'Valider paiements',    desc: 'Scolarité en attente',  href: '/dashboard/ecole/scolarite', color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
-    { label: 'Bulletins de paie',    desc: 'Générer la paie',        href: '/dashboard/ecole/rh',        color: '#2563EB', bg: '#EFF6FF', icon: FileText },
-    { label: 'Tableau de bord',      desc: 'Direction générale',     href: '/dashboard/ecole/direction', color: '#7C3AED', bg: '#F5F3FF', icon: BarChart2 },
+    { label: t('sc.newEnrollment'),      desc: t('sc.d.newEnrollment'),  href: '/dashboard/ecole/scolarite', color: '#DC2626', bg: '#FFFBEB', icon: GraduationCap },
+    { label: t('sc.validatePayments'),   desc: t('sc.d.paiementsScol'),  href: '/dashboard/ecole/scolarite', color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
+    { label: t('sc.d.paie'),             desc: t('sc.generatePayroll'),   href: '/dashboard/ecole/rh',        color: '#2563EB', bg: '#EFF6FF', icon: FileText },
+    { label: t('nav.dashboard'),         desc: t('nav.directionSub'),     href: '/dashboard/ecole/direction', color: '#7C3AED', bg: '#F5F3FF', icon: BarChart2 },
   ] : [
-    { label: t('dash.newAction'),   desc: t('sc.d.facturation'),   href: '/dashboard/facturation',  color: '#DC2626', bg: '#FFFBEB', icon: FileText },
-    { label: 'Valider factures',    desc: 'Paiements en attente',   href: '/dashboard/facturation',  color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
-    { label: 'Rapports',            desc: 'Analyse des données',    href: '/dashboard/bi',           color: '#2563EB', bg: '#EFF6FF', icon: BarChart2 },
-    { label: 'Paramètres',          desc: 'Configurer le système',  href: '/dashboard/parametres',   color: '#7C3AED', bg: '#F5F3FF', icon: Settings },
+    { label: t('dash.newAction'),        desc: t('sc.d.facturation'),     href: '/dashboard/facturation',  color: '#DC2626', bg: '#FFFBEB', icon: FileText },
+    { label: t('dash.validateInvoices'), desc: t('dash.pendingPayments'), href: '/dashboard/facturation',  color: '#16A34A', bg: '#F0FDF4', icon: CheckCircle },
+    { label: t('nav.rapports'),          desc: t('dash.dataAnalysis'),    href: '/dashboard/bi',           color: '#2563EB', bg: '#EFF6FF', icon: BarChart2 },
+    { label: t('nav.parametres'),        desc: t('dash.systemConfig'),    href: '/dashboard/parametres',   color: '#7C3AED', bg: '#F5F3FF', icon: Settings },
   ]
 
   return (

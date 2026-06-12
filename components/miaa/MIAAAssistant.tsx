@@ -9,6 +9,7 @@ import {
   FileUp, Trash2, ExternalLink, Bot,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from '@/lib/hooks/useLocale'
 import type { MIAANotification } from '@/lib/miaa/notifications'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -133,9 +134,9 @@ Seuil d'alerte minimum = Charges fixes mensuelles × 1,5`,
   },
 ]
 
-// ── Suggestions par module ─────────────────────────────────────────────────────
+// ── Suggestions par module (FR / EN) ─────────────────────────────────────────
 
-const MODULE_SUGGESTIONS: Record<string, string[]> = {
+const MODULE_SUGGESTIONS_FR: Record<string, string[]> = {
   comptabilite: ['Passer une écriture OHADA', 'Vérifier ma balance comptable', 'Calculer la TVA sur 500 000 FCFA'],
   rh:           ['Calculer le salaire net de 450 000 FCFA', 'Obligations CNSS employeur', 'Rédiger un contrat CDI'],
   recrutement:  ['Analyser les candidatures en cours', 'Générer une fiche d\'entretien', 'Meilleurs profils pour ce poste'],
@@ -153,7 +154,25 @@ const MODULE_SUGGESTIONS: Record<string, string[]> = {
   auto:         ['Calculer la TVA sur 500 000 FCFA', 'Quel est mon solde de trésorerie ?', 'Comment calculer le salaire net ?'],
 }
 
-const MODULE_EXPERT_LABELS: Record<string, string> = {
+const MODULE_SUGGESTIONS_EN: Record<string, string[]> = {
+  comptabilite: ['Post an OHADA journal entry', 'Check my trial balance', 'Calculate VAT on 500,000 FCFA'],
+  rh:           ['Calculate net salary for 450,000 FCFA gross', 'Employer CNSS obligations', 'Draft a permanent contract'],
+  recrutement:  ['Analyze ongoing applications', 'Generate an interview sheet', 'Best profiles for this position'],
+  tresorerie:   ['What is my cash balance?', 'Analyze my monthly cash flows', 'Cash forecast for 30 days'],
+  facturation:  ['Create a compliant OHADA invoice', 'Follow up on unpaid client', 'Calculate late payment penalties'],
+  stock:        ['Articles out of stock', 'Value my OHADA inventory', 'Optimize my purchase orders'],
+  crm:          ['Analyze my active clients', 'Monthly sales pipeline', 'Customer retention strategy'],
+  fiscalite:    ['Calculate quarterly VAT', 'DGI Congo tax declaration', 'Optimize my 30% corporate tax'],
+  audit:        ['Launch a full OHADA audit', 'Analyze detected risks', 'Corrective action plan'],
+  ecole:        ['Calculate student averages', 'Manage tuition fees', 'Grade results report'],
+  restaurant:   ['Analyze food cost', 'Calculate a dish margin', 'Daily sales report'],
+  hotel:        ['Monthly occupancy rate', 'Revenue per room (RevPAR)', 'Housekeeping report'],
+  sante:        ['Patients today', 'Follow up unpaid consultations', 'Monthly doctor report'],
+  depenses:     ['My expenses this month', 'Which charges to deduct?', 'Budget forecast'],
+  auto:         ['Calculate VAT on 500,000 FCFA', 'What is my cash balance?', 'How to calculate net salary?'],
+}
+
+const MODULE_EXPERT_LABELS_FR: Record<string, string> = {
   comptabilite: 'Expert Comptabilité · OHADA',
   rh:           'Expert RH · Droit social',
   recrutement:  'Expert Recrutement',
@@ -171,21 +190,56 @@ const MODULE_EXPERT_LABELS: Record<string, string> = {
   auto:         'Expert IA · Oraforme ERP',
 }
 
-// ── Types de documents générables ─────────────────────────────────────────────
+const MODULE_EXPERT_LABELS_EN: Record<string, string> = {
+  comptabilite: 'Accounting Expert · OHADA',
+  rh:           'HR Expert · Labor Law',
+  recrutement:  'Recruitment Expert',
+  tresorerie:   'Treasury Expert',
+  facturation:  'Invoicing Expert',
+  stock:        'Inventory Expert',
+  crm:          'Sales Expert',
+  fiscalite:    'Tax Expert',
+  audit:        'Audit Expert · OHADA',
+  ecole:        'Education Expert',
+  restaurant:   'Restaurant Expert',
+  hotel:        'Hospitality Expert',
+  sante:        'Medical Expert',
+  depenses:     'Expenses Expert',
+  auto:         'AI Expert · Oraforme ERP',
+}
 
-const DOC_TYPES = [
-  { id: 'rapport_mensuel',     label: 'Rapport mensuel',     icon: '📊', desc: 'Analyse complète du mois' },
-  { id: 'rapport_tresorerie',  label: 'Analyse trésorerie',  icon: '💵', desc: 'Flux et prévisions' },
-  { id: 'rapport_stock',       label: 'Rapport stock',       icon: '📦', desc: 'Rotations et ruptures' },
-  { id: 'relance_facture',     label: 'Lettre de relance',   icon: '📨', desc: 'Recouvrement client' },
-  { id: 'contrat_travail',     label: 'Contrat de travail',  icon: '📋', desc: 'CDI/CDD conforme' },
-  { id: 'bulletin_paie',       label: 'Résumé paie',         icon: '💰', desc: 'Synthèse masse salariale' },
-  { id: 'bilan_simplifie',     label: 'Bilan simplifié',     icon: '📒', desc: 'Actif/Passif OHADA' },
+// ── Types de documents générables (FR / EN) ───────────────────────────────────
+
+const DOC_TYPES_FR = [
+  { id: 'rapport_mensuel',    label: 'Rapport mensuel',    icon: '📊', desc: 'Analyse complète du mois' },
+  { id: 'rapport_tresorerie', label: 'Analyse trésorerie', icon: '💵', desc: 'Flux et prévisions' },
+  { id: 'rapport_stock',      label: 'Rapport stock',      icon: '📦', desc: 'Rotations et ruptures' },
+  { id: 'relance_facture',    label: 'Lettre de relance',  icon: '📨', desc: 'Recouvrement client' },
+  { id: 'contrat_travail',    label: 'Contrat de travail', icon: '📋', desc: 'CDI/CDD conforme' },
+  { id: 'bulletin_paie',      label: 'Résumé paie',        icon: '💰', desc: 'Synthèse masse salariale' },
+  { id: 'bilan_simplifie',    label: 'Bilan simplifié',    icon: '📒', desc: 'Actif/Passif OHADA' },
+]
+
+const DOC_TYPES_EN = [
+  { id: 'rapport_mensuel',    label: 'Monthly Report',     icon: '📊', desc: 'Full month analysis' },
+  { id: 'rapport_tresorerie', label: 'Cash Analysis',      icon: '💵', desc: 'Flows & forecasts' },
+  { id: 'rapport_stock',      label: 'Stock Report',       icon: '📦', desc: 'Rotations & shortages' },
+  { id: 'relance_facture',    label: 'Follow-up Letter',   icon: '📨', desc: 'Client debt recovery' },
+  { id: 'contrat_travail',    label: 'Employment Contract',icon: '📋', desc: 'Compliant CDI/CDD' },
+  { id: 'bulletin_paie',      label: 'Payroll Summary',    icon: '💰', desc: 'Payroll mass synthesis' },
+  { id: 'bilan_simplifie',    label: 'Simplified Balance', icon: '📒', desc: 'Assets/Liabilities OHADA' },
 ]
 
 // ── Couleurs priorité ──────────────────────────────────────────────────────────
 
-const PRIORITY_STYLES: Record<string, { bg: string; border: string; dot: string; label: string }> = {
+const PRIORITY_STYLES_FR: Record<string, { bg: string; border: string; dot: string; label: string }> = {
+  critical: { bg: '#FEF2F2', border: '#FECACA', dot: '#DC2626', label: 'Urgent' },
+  high:     { bg: '#FFFBEB', border: '#FDE68A', dot: '#F59E0B', label: 'Important' },
+  medium:   { bg: '#EFF6FF', border: '#BFDBFE', dot: '#2563EB', label: 'Info' },
+  low:      { bg: 'var(--surface)', border: 'var(--border)', dot: '#94A3B8', label: '' },
+}
+
+const PRIORITY_STYLES_EN: Record<string, { bg: string; border: string; dot: string; label: string }> = {
   critical: { bg: '#FEF2F2', border: '#FECACA', dot: '#DC2626', label: 'Urgent' },
   high:     { bg: '#FFFBEB', border: '#FDE68A', dot: '#F59E0B', label: 'Important' },
   medium:   { bg: '#EFF6FF', border: '#BFDBFE', dot: '#2563EB', label: 'Info' },
@@ -196,7 +250,16 @@ const PRIORITY_STYLES: Record<string, { bg: string; border: string; dot: string;
 // Composant principal
 // ══════════════════════════════════════════════════════════════════════════════
 
-export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'fr' }: Props) {
+export default function MIAAAssistant({ tenantData, module = 'auto', langue }: Props) {
+  const { t, locale } = useLocale()
+  const currentLang = langue || locale || 'fr'
+  const isEn = currentLang === 'en'
+
+  const MODULE_SUGGESTIONS = isEn ? MODULE_SUGGESTIONS_EN : MODULE_SUGGESTIONS_FR
+  const MODULE_EXPERT_LABELS = isEn ? MODULE_EXPERT_LABELS_EN : MODULE_EXPERT_LABELS_FR
+  const DOC_TYPES = isEn ? DOC_TYPES_EN : DOC_TYPES_FR
+  const PRIORITY_STYLES = isEn ? PRIORITY_STYLES_EN : PRIORITY_STYLES_FR
+
   const [open,      setOpen]      = useState(false)
   const [maximized, setMaximized] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('chat')
@@ -220,7 +283,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
 
   // Upload
   const [uploadFile,    setUploadFile]    = useState<File | null>(null)
-  const [uploadQ,       setUploadQ]       = useState('Analyse ce document et donne-moi les points importants.')
+  const [uploadQ,       setUploadQ]       = useState(() => t('miaa.widget.uploadQ'))
   const [uploadResult,  setUploadResult]  = useState('')
   const [uploadLoading, setUploadLoading] = useState(false)
 
@@ -276,9 +339,11 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
     setSending(true)
     setStreaming('')
 
+    const nowTime = () => new Date().toLocaleTimeString(currentLang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+
     const newMsg: ChatMessage = {
       role: 'user', content: userMsg,
-      timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      timestamp: nowTime(),
     }
     setMessages(prev => [...prev, newMsg])
 
@@ -287,21 +352,21 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
       const res = await fetch('/api/miaa/chat', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ module, message: userMsg, history, tenantData, langue }),
+        body:    JSON.stringify({ module, message: userMsg, history, tenantData, langue: currentLang }),
       })
-      const data = await res.json()
+      const data: Record<string, unknown> = await res.json().catch(() => ({}))
 
       setMessages(prev => [...prev, {
         role:      'assistant',
-        content:   data.response ?? 'Je suis désolé, une erreur est survenue.',
-        timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-        model:     data.model_used,
-        agent:     data.agent_nom,
+        content:   (data.response as string | undefined) ?? t('miaa.widget.errorReply'),
+        timestamp: nowTime(),
+        model:     data.model_used as string | undefined,
+        agent:     data.agent_nom as string | undefined,
       }])
     } catch {
       setMessages(prev => [...prev, {
-        role: 'assistant', content: 'Erreur de connexion. Vérifiez votre réseau.',
-        timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        role: 'assistant', content: t('miaa.widget.errorConn'),
+        timestamp: new Date().toLocaleTimeString(currentLang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
       }])
     } finally {
       setSending(false)
@@ -321,7 +386,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
         body:    JSON.stringify({ type: docType, context: docCtx, tenant_id: tenantData?.tenant_id }),
       })
       const data = await res.json()
-      setDocResult(data.content ?? data.error ?? 'Erreur de génération')
+      setDocResult((data.content ?? data.error ?? t('miaa.widget.errorGenDoc')) as string)
     } finally {
       setGenDoc(false)
     }
@@ -351,7 +416,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
       fd.append('module', module)
       const res  = await fetch('/api/miaa/upload-analyze', { method: 'POST', body: fd })
       const data = await res.json()
-      setUploadResult(data.analysis ?? data.error ?? 'Erreur d\'analyse')
+      setUploadResult((data.analysis ?? data.error ?? t('miaa.widget.errorAnalysis')) as string)
     } finally {
       setUploadLoading(false)
     }
@@ -378,11 +443,11 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
   const panelH  = maximized ? 'h-[90dvh] sm:h-[85vh]' : 'h-[90dvh] sm:h-[600px]'
 
   const TABS: { id: Tab; label: string; Icon: React.ElementType; badge?: number }[] = [
-    { id: 'chat',      label: 'Chat',       Icon: MessageCircle },
-    { id: 'alertes',   label: 'Alertes',    Icon: Bell,         badge: unreadCount > 0 ? unreadCount : undefined },
-    { id: 'documents', label: 'Documents',  Icon: FileText },
-    { id: 'rapports',  label: 'Rapports',   Icon: BarChart2 },
-    { id: 'formation', label: 'Formation',  Icon: GraduationCap },
+    { id: 'chat',      label: 'Chat',                          Icon: MessageCircle },
+    { id: 'alertes',   label: t('miaa.widget.tabAlertes'),     Icon: Bell,         badge: unreadCount > 0 ? unreadCount : undefined },
+    { id: 'documents', label: t('miaa.widget.tabDocs'),        Icon: FileText },
+    { id: 'rapports',  label: t('miaa.widget.tabRapports'),    Icon: BarChart2 },
+    { id: 'formation', label: t('miaa.widget.tabFormation'),   Icon: GraduationCap },
   ]
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -474,7 +539,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                 <p className="text-white font-bold text-sm leading-none">MIAA+</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse" />
-                  <p className="text-white/75 text-[10px]">{MODULE_EXPERT_LABELS[module ?? 'auto'] ?? 'Expert IA · Oraforme ERP'}</p>
+                  <p className="text-white/75 text-[10px]">{MODULE_EXPERT_LABELS[module ?? 'auto'] ?? MODULE_EXPERT_LABELS.auto}</p>
                 </div>
               </div>
             </div>
@@ -525,9 +590,9 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue = 'f
                         <img src="/miaa-logo.png" alt="MIAA+" className="w-14 h-14 rounded-full object-cover shadow-lg" />
                         <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-400 border-2 border-white" />
                       </div>
-                      <p className="text-sm font-semibold text-[var(--text)]">Bonjour, je suis MIAA+</p>
+                      <p className="text-sm font-semibold text-[var(--text)]">{t('miaa.widget.greeting')}</p>
                       <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-[260px] mx-auto">
-                        Expert IA en comptabilité OHADA, fiscalité africaine, RH, facturation et gestion d&apos;entreprise.
+                        {t('miaa.widget.desc')}
                       </p>
                       <div className="mt-4 space-y-1.5">
                         {(MODULE_SUGGESTIONS[module ?? 'auto'] ?? MODULE_SUGGESTIONS.auto).map(q => (

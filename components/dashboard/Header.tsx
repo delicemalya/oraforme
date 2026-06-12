@@ -130,15 +130,15 @@ export default function Header() {
       {showBack ? (
         <button
           onClick={() => router.back()}
-          title="Retour"
+          title={t('common.back')}
           className="flex items-center gap-1.5 h-9 pl-2 pr-3 rounded-xl
             text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]
             border border-transparent hover:border-[#E2E8F0]
             transition-all shrink-0 group"
-          aria-label="Retour à la page précédente"
+          aria-label={t('common.back')}
         >
           <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-          <span className="text-[12px] font-medium">Retour</span>
+          <span className="text-[12px] font-medium">{t('common.back')}</span>
         </button>
       ) : (
         <div className="hidden lg:block w-2 shrink-0" />
@@ -296,10 +296,10 @@ export default function Header() {
               {/* Menu items */}
               <div className="py-1.5">
                 {[
-                  { icon: User,       label: 'Mon profil',      href: '/dashboard/profil' },
-                  { icon: Settings,   label: 'Paramètres',      href: '/dashboard/parametres' },
-                  { icon: CreditCard, label: 'Abonnement',      href: '/dashboard/abonnement' },
-                  ...(isOwner ? [{ icon: Key, label: 'Clés API', href: '/dashboard/api-keys' }] : []),
+                  { icon: User,       label: t('nav.profil'),      href: '/dashboard/profil' },
+                  { icon: Settings,   label: t('nav.parametres'),  href: '/dashboard/parametres' },
+                  { icon: CreditCard, label: t('nav.abonnement'),  href: '/dashboard/abonnement' },
+                  ...(isOwner ? [{ icon: Key, label: t('nav.api_keys'), href: '/dashboard/api-keys' }] : []),
                 ].map(({ icon: Icon, label, href }) => (
                   <Link
                     key={href}
@@ -326,7 +326,7 @@ export default function Header() {
                     ? <Sun size={14} className="text-[#9CA3AF]" />
                     : <Moon size={14} className="text-[#9CA3AF]" />
                   }
-                  <span className="text-[13px] text-[#374151]">Mode sombre</span>
+                  <span className="text-[13px] text-[#374151]">{t('common.darkMode')}</span>
                 </div>
                 <button
                   onClick={toggleTheme}

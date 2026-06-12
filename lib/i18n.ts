@@ -2067,6 +2067,28 @@ export const translations: Record<Locale, Record<string, string>> = {
     'miaa.ctx.sante':               'Je suis **MIAA+**, votre Assistant Médical chez **{entreprise}**.\n\nJe peux vous aider avec :\n✓ Analyser les données de consultations\n✓ Gérer les rendez-vous et disponibilités\n✓ Suivre les paiements patients\n✓ Générer des rapports d\'activité médicale\n\nComment puis-je vous aider ?',
     'miaa.ctx.crm':                 'Je suis **MIAA+**, votre Expert Commercial chez **{entreprise}**.\n\nJe peux vous aider avec :\n✓ Analyser votre pipeline commercial\n✓ Scorer vos clients et opportunités\n✓ Rédiger des propositions et relances\n✓ Optimiser votre taux de conversion\n\nPar où voulez-vous commencer ?',
 
+    // UI commun manquant
+    'common.darkMode':              'Mode sombre',
+    // Dashboard raccourcis
+    'dash.validateInvoices':        'Valider factures',
+    'dash.pendingPayments':         'Paiements en attente',
+    'dash.dataAnalysis':            'Analyse des données',
+    'dash.systemConfig':            'Configurer le système',
+    // École raccourcis
+    'sc.validatePayments':          'Valider paiements',
+    'sc.generatePayroll':           'Générer la paie',
+    // MIAA widget flottant
+    'miaa.widget.greeting':         'Bonjour, je suis MIAA+',
+    'miaa.widget.desc':             'Expert IA en comptabilité OHADA, fiscalité africaine, RH, facturation et gestion d\'entreprise.',
+    'miaa.widget.tabAlertes':       'Alertes',
+    'miaa.widget.tabDocs':          'Documents',
+    'miaa.widget.tabRapports':      'Rapports',
+    'miaa.widget.tabFormation':     'Formation',
+    'miaa.widget.errorConn':        'Je rencontre un problème temporaire. Veuillez réessayer.',
+    'miaa.widget.errorReply':       'Désolé, une erreur est survenue.',
+    'miaa.widget.errorGenDoc':      'Erreur de génération',
+    'miaa.widget.errorAnalysis':    'Erreur d\'analyse',
+    'miaa.widget.uploadQ':          'Analyse ce document et donne-moi les points importants.',
     // Rapports page
     'rapports.title':               'Rapports Financiers',
     'rapports.subtitle':            'ERP · {entreprise} · {mois}',
@@ -7101,6 +7123,28 @@ export const translations: Record<Locale, Record<string, string>> = {
     'dash.monthCumul': 'Month cumulative', 'dash.restricted': 'Restricted access',
     'dash.billedInvoices': 'Issued invoices', 'dash.lowStock': 'low stock',
     'dash.noData': 'No data',
+    // Common UI
+    'common.darkMode':           'Dark mode',
+    // Dashboard shortcuts
+    'dash.validateInvoices':     'Validate invoices',
+    'dash.pendingPayments':      'Pending payments',
+    'dash.dataAnalysis':         'Data analysis',
+    'dash.systemConfig':         'Configure system',
+    // School shortcuts
+    'sc.validatePayments':       'Validate payments',
+    'sc.generatePayroll':        'Generate payroll',
+    // MIAA floating widget
+    'miaa.widget.greeting':      'Hello, I am MIAA+',
+    'miaa.widget.desc':          'AI Expert in OHADA accounting, African taxation, HR, invoicing and business management.',
+    'miaa.widget.tabAlertes':    'Alerts',
+    'miaa.widget.tabDocs':       'Documents',
+    'miaa.widget.tabRapports':   'Reports',
+    'miaa.widget.tabFormation':  'Training',
+    'miaa.widget.errorConn':     "I'm experiencing a temporary issue. Please try again.",
+    'miaa.widget.errorReply':    'Sorry, an error occurred.',
+    'miaa.widget.errorGenDoc':   'Generation error',
+    'miaa.widget.errorAnalysis': 'Analysis error',
+    'miaa.widget.uploadQ':       'Analyze this document and give me the key points.',
     // Finance
     'finance.vatCollected': 'VAT collected', 'finance.vatDeductible': 'VAT deductible',
     'finance.vatNet': 'Net VAT due', 'finance.payroll': 'Payroll',
