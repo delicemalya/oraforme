@@ -216,7 +216,7 @@ const SIDEBAR_GROUPS = [
   // COMMERCIAL — clients, ventes, recouvrement, stock, achats
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'facturation', 'recouvrement', 'stock', 'achats'] },
   // OUTILS — IA & productivité
-  { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'miaa-agent', 'miaa-rapports', 'miaa-expertise', 'taches'] },
+  { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'taches'] },
   // AUDIT & CONFORMITÉ OHADA
   { id: 'audit_group', labelKey: 'nav.audit',       icon: ShieldAlert, moduleIds: ['audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci', 'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'] },
   // ADMIN — abonnement, automatisation, API
