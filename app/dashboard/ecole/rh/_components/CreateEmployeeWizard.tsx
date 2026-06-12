@@ -487,7 +487,7 @@ export function CreateEmployeeWizard({
                     <p className={SEC}>Fiscalité & Protection sociale</p>
                     <div className="grid grid-cols-2 gap-3">
                       <WFI label="Numéro CNSS"      value={sal_.numero_cnss}   onChange={v => setSal(p => ({ ...p, numero_cnss: v }))}   placeholder="XXXXXXXXXX" />
-                      <WFI label="Numéro fiscal NIF" value={sal_.numero_fiscal} onChange={v => setSal(p => ({ ...p, numero_fiscal: v }))} />
+                      <WFI label="NIU" value={sal_.numero_fiscal} onChange={v => setSal(p => ({ ...p, numero_fiscal: v }))} />
                     </div>
                   </div>
 

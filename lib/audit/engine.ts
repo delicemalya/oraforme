@@ -273,21 +273,21 @@ export async function auditFiscal(supabase: SupabaseClient, tenantId: string): P
   const [factRes, tenantRes] = await Promise.all([
     supabase.from('factures').select('total, tva, statut, created_at').eq('tenant_id', tenantId)
       .gte('created_at', daysAgo(90)),
-    supabase.from('tenants').select('pays, tva_numero, rccm, nif').eq('id', tenantId).maybeSingle(),
+    supabase.from('tenants').select('pays, tva_numero, rccm, niu').eq('id', tenantId).maybeSingle(),
   ])
 
   const factures = factRes.data ?? []
   const tenant   = tenantRes.data
 
-  // 1. NIF manquant
-  if (!tenant?.nif) {
+  // 1. NIU manquant
+  if (!tenant?.niu) {
     anomalies.push({
       id: uid('fisc'), domain: 'fiscal', code: 'T001',
-      titre: 'NIF (Numéro d\'Identification Fiscale) non renseigné',
-      description: 'Le NIF n\'est pas enregistré dans les paramètres de l\'entreprise.',
+      titre: 'NIU (Numéro d\'Identification Unique) non renseigné',
+      description: 'Le NIU n\'est pas enregistré dans les paramètres de l\'entreprise.',
       niveau: 'critical',
-      impact: 'Toutes les factures émises sont invalides sans NIF. Risque de redressement fiscal.',
-      recommandation: 'Renseignez votre NIF dans Paramètres → Entreprise.',
+      impact: 'Toutes les factures émises sont invalides sans NIU. Risque de redressement fiscal.',
+      recommandation: 'Renseignez votre NIU dans Paramètres → Entreprise.',
       reference: 'Code Général des Impôts Congo, Art. 1103',
     })
   }
@@ -535,17 +535,17 @@ export async function auditControleInterne(supabase: SupabaseClient, tenantId: s
 export async function auditOHADA(supabase: SupabaseClient, tenantId: string): Promise<AuditScore> {
   const anomalies: AuditAnomalie[] = []
 
-  const tenantRes = await supabase.from('tenants').select('nif, rccm, pays, tva_numero, nom_entreprise, forme_juridique').eq('id', tenantId).maybeSingle()
+  const tenantRes = await supabase.from('tenants').select('niu, rccm, pays, tva_numero, nom_entreprise, forme_juridique').eq('id', tenantId).maybeSingle()
   const tenant = tenantRes.data
 
-  // 1. NIF manquant — CRITIQUE
-  if (!tenant?.nif) {
+  // 1. NIU manquant — CRITIQUE
+  if (!tenant?.niu) {
     anomalies.push({
       id: uid('ohada'), domain: 'ohada', code: 'OH001',
-      titre: 'NIF absent — Obligation légale',
-      description: 'Le Numéro d\'Identification Fiscale est obligatoire sur tout document commercial.',
+      titre: 'NIU absent — Obligation légale',
+      description: 'Le Numéro d\'Identification Unique est obligatoire sur tout document commercial.',
       niveau: 'critical', impact: 'Toutes les factures émises sont sans valeur légale.',
-      recommandation: 'Renseignez le NIF immédiatement dans Paramètres.',
+      recommandation: 'Renseignez le NIU immédiatement dans Paramètres.',
       reference: 'SYSCOHADA révisé — Art. 8 & CGI Congo Art. 1103',
     })
   }

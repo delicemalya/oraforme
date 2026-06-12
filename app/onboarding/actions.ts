@@ -12,7 +12,7 @@ const supabaseAdmin = createClient(
 
 export async function createTenantAndProfile(data: {
   nomEntreprise:   string
-  nif?:            string
+  niu?:            string
   telephone?:      string
   adresse?:        string
   secteurActivite: SecteurId | string
@@ -81,7 +81,7 @@ export async function createTenantAndProfile(data: {
   // ── Create tenant ──────────────────────────────────────────────────────────
   const tenantInsert: Record<string, unknown> = {
     nom_entreprise:    data.nomEntreprise,
-    nif:               data.nif || null,
+    niu:               data.niu || null,
     plan:              planLegacy,
     secteur_activite:  data.secteurActivite,
     modules_actifs:    modules,

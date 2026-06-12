@@ -44,14 +44,14 @@ export async function GET(req: NextRequest) {
       .maybeSingle(),
     supabaseAdmin
       .from('tenants')
-      .select('nom_entreprise, nif, secteur')
+      .select('nom_entreprise, niu, secteur')
       .eq('id', tenantId)
       .maybeSingle(),
   ])
 
   const prefill = {
     denomination:  config?.nom         ?? tenant?.nom_entreprise ?? '',
-    niu:           tenant?.nif          ?? '',
+    niu:           tenant?.niu          ?? '',
     scien:         config?.scien        ?? '',
     rccm:          config?.rccm         ?? '',
     adresse_siege: config?.adresse      ?? '',

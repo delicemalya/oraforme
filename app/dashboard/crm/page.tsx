@@ -35,7 +35,7 @@ interface Client {
   nb_factures?: number
   nb_impayes?: number
   notes?: string | null
-  nif?: string | null
+  niu?: string | null
   created_at: string
   tags?: string[]
 }
@@ -156,7 +156,7 @@ export default function CRMPage() {
   const [editingActivite, setEditingActivite] = useState<Activite | null>(null)
 
   // Forms
-  const [clientForm, setClientForm] = useState({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif' as ClientStatut, nif: '', notes: '' })
+  const [clientForm, setClientForm] = useState({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif' as ClientStatut, niu: '', notes: '' })
   const [oppForm, setOppForm] = useState({ titre: '', client_id: '', montant_estime: '', probabilite: '30', etape: 'qualification' as OppEtape, date_cloture_prevue: '', notes: '' })
   const [actForm, setActForm] = useState({ titre: '', type: 'note' as ActiviteType, client_id: '', description: '', date_activite: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
@@ -226,7 +226,7 @@ export default function CRMPage() {
 
   function startEditClient(c: Client) {
     setEditingClient(c)
-    setClientForm({ nom: c.nom, email: c.email ?? '', telephone: c.telephone ?? '', entreprise: c.entreprise ?? '', secteur: c.secteur ?? '', ville: c.ville ?? '', statut: c.statut, nif: c.nif ?? '', notes: c.notes ?? '' })
+    setClientForm({ nom: c.nom, email: c.email ?? '', telephone: c.telephone ?? '', entreprise: c.entreprise ?? '', secteur: c.secteur ?? '', ville: c.ville ?? '', statut: c.statut, niu: c.niu ?? '', notes: c.notes ?? '' })
     setSelectedClient(null)
     setShowNewClient(true)
   }
@@ -240,7 +240,7 @@ export default function CRMPage() {
         nom: clientForm.nom.trim(), email: clientForm.email || null,
         telephone: clientForm.telephone || null, entreprise: clientForm.entreprise || null,
         secteur: clientForm.secteur || null, ville: clientForm.ville || null,
-        nif: clientForm.nif || null, notes: clientForm.notes || null,
+        niu: clientForm.niu || null, notes: clientForm.notes || null,
         statut: clientForm.statut,
         type: clientForm.statut === 'prospect' ? 'prospect' : 'client',
       }).eq('id', editingClient.id).eq('tenant_id', tid)
@@ -249,7 +249,7 @@ export default function CRMPage() {
         tenant_id: tid, nom: clientForm.nom.trim(),
         email: clientForm.email || null, telephone: clientForm.telephone || null,
         entreprise: clientForm.entreprise || null, secteur: clientForm.secteur || null,
-        ville: clientForm.ville || null, nif: clientForm.nif || null,
+        ville: clientForm.ville || null, niu: clientForm.niu || null,
         notes: clientForm.notes || null, statut: clientForm.statut,
         type: clientForm.statut === 'prospect' ? 'prospect' : 'client',
       })
@@ -257,7 +257,7 @@ export default function CRMPage() {
     setSaving(false)
     setShowNewClient(false)
     setEditingClient(null)
-    setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', nif: '', notes: '' })
+    setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', niu: '', notes: '' })
     load()
   }
 
@@ -646,7 +646,7 @@ export default function CRMPage() {
                 {selectedClient.telephone && <p className="text-[13px] flex items-center gap-2"><Phone size={13} className="text-[#94A3B8]" />{selectedClient.telephone}</p>}
                 {selectedClient.secteur && <p className="text-[13px] flex items-center gap-2"><Briefcase size={13} className="text-[#94A3B8]" />{selectedClient.secteur}</p>}
                 {selectedClient.ville && <p className="text-[13px] flex items-center gap-2"><Building2 size={13} className="text-[#94A3B8]" />{selectedClient.ville}</p>}
-                {selectedClient.nif && <p className="text-[13px] flex items-center gap-2"><FileText size={13} className="text-[#94A3B8]" />NIF: {selectedClient.nif}</p>}
+                {selectedClient.niu && <p className="text-[13px] flex items-center gap-2"><FileText size={13} className="text-[#94A3B8]" />NIU: {selectedClient.niu}</p>}
               </div>
 
               {/* Historique factures */}
@@ -708,7 +708,7 @@ export default function CRMPage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[16px] font-bold text-[#0F172A]">{editingClient ? 'Modifier le client' : 'Nouveau client / prospect'}</h2>
-              <button onClick={() => { setShowNewClient(false); setEditingClient(null); setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', nif: '', notes: '' }) }} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
+              <button onClick={() => { setShowNewClient(false); setEditingClient(null); setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', niu: '', notes: '' }) }} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
             </div>
             <form onSubmit={saveClient} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -749,8 +749,8 @@ export default function CRMPage() {
                     placeholder="Brazzaville" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">NIF</label>
-                  <input value={clientForm.nif} onChange={e => setClientForm(p=>({...p,nif:e.target.value}))}
+                  <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">NIU</label>
+                  <input value={clientForm.niu} onChange={e => setClientForm(p=>({...p,niu:e.target.value}))}
                     className="mt-1 w-full px-3 py-2 text-[13px] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300"
                     placeholder="M1234567890" />
                 </div>
@@ -771,7 +771,7 @@ export default function CRMPage() {
                 </div>
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => { setShowNewClient(false); setEditingClient(null); setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', nif: '', notes: '' }) }}
+                <button type="button" onClick={() => { setShowNewClient(false); setEditingClient(null); setClientForm({ nom: '', email: '', telephone: '', entreprise: '', secteur: '', ville: '', statut: 'actif', niu: '', notes: '' }) }}
                   className="flex-1 py-2.5 border border-[#E2E8F0] rounded-xl text-[13px] font-semibold text-[#64748B] hover:bg-[#F8FAFC]">
                   Annuler
                 </button>

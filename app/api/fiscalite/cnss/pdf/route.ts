@@ -37,12 +37,12 @@ export async function GET(req: NextRequest) {
   // 2. Config entreprise
   const { data: config } = await supabaseAdmin
     .from('entreprise_config')
-    .select('nom, nif, rccm, adresse')
+    .select('nom, niu, rccm, adresse')
     .eq('tenant_id', ctx.tid)
     .maybeSingle()
 
   const nom     = config?.nom   ?? 'ENTREPRISE'
-  const nif     = config?.nif   ?? '—'
+  const nif     = config?.niu   ?? '—'
   const rccm    = config?.rccm  ?? '—'
   const adresse = config?.adresse ?? '—'
 
@@ -148,7 +148,7 @@ export async function GET(req: NextRequest) {
 <div class="header">
   <div class="logo-block">
     <span class="company">${nom}</span>
-    <span class="sub">NIF: ${nif} · RCCM: ${rccm}</span>
+    <span class="sub">NIU: ${nif} · RCCM: ${rccm}</span>
     <span class="sub">${adresse}</span>
   </div>
   <div class="title-block">

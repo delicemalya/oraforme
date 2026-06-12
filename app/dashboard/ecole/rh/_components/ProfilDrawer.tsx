@@ -202,7 +202,7 @@ function ProfilEmploye({ d }: { d: EmployeFull }) {
           <InfoRow label="RIB"            value={d.rib} />
           <InfoRow label="Mobile Money"   value={d.mobile_money_type ? `${d.mobile_money_type} — ${d.mobile_money_numero ?? ''}` : null} />
           <InfoRow label="N° CNSS"        value={d.numero_cnss} />
-          <InfoRow label="N° Fiscal NIF"  value={d.numero_fiscal} />
+          <InfoRow label="NIU"            value={d.numero_fiscal} />
         </div>
       </Card>
 

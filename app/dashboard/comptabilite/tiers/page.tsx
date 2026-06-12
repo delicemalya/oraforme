@@ -15,7 +15,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 interface Tier {
   id: string; tenant_id: string; type: 'client' | 'fournisseur' | 'partenaire'
   code: string; nom: string; prenom: string; raison_sociale: string
-  siret: string; nif: string; rccm: string; email: string; telephone: string
+  siret: string; niu: string; rccm: string; email: string; telephone: string
   adresse: string; compte_ohada: string; compte_auxiliaire: string
   plafond_credit: number; delai_paiement: number; actif: boolean
 }
@@ -38,7 +38,7 @@ const TYPES = [
 
 const EMPTY_FORM: Partial<Tier> = {
   type: 'client', code: '', nom: '', prenom: '', raison_sociale: '',
-  nif: '', rccm: '', email: '', telephone: '', adresse: '',
+  niu: '', rccm: '', email: '', telephone: '', adresse: '',
   compte_ohada: '411', compte_auxiliaire: '', plafond_credit: 0, delai_paiement: 30, actif: true,
 }
 
@@ -106,7 +106,7 @@ export default function TiersPage() {
           t.nom.toLowerCase().includes(q) ||
           t.raison_sociale?.toLowerCase().includes(q) ||
           t.code.toLowerCase().includes(q) ||
-          t.nif?.toLowerCase().includes(q)
+          t.niu?.toLowerCase().includes(q)
         )
       }
       return true
@@ -145,7 +145,7 @@ export default function TiersPage() {
     const rows = filtered.map(t => ({
       Type: t.type, Code: t.code,
       Nom: t.raison_sociale || `${t.nom} ${t.prenom}`.trim(),
-      NIF: t.nif, RCCM: t.rccm, Email: t.email, Tél: t.telephone,
+      NIU: t.niu, RCCM: t.rccm, Email: t.email, Tél: t.telephone,
       'Compte OHADA': t.compte_ohada, 'Total Débit': t.total_debit,
       'Total Crédit': t.total_credit, Solde: t.solde,
     }))
@@ -300,7 +300,7 @@ export default function TiersPage() {
                     {/* Info panel */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-[#F8FAFC]">
                       {[
-                        { label: 'NIF',          value: t.nif || '—' },
+                        { label: 'NIU',          value: t.niu || '—' },
                         { label: 'RCCM',         value: t.rccm || '—' },
                         { label: 'Email',         value: t.email || '—' },
                         { label: 'Tél',           value: t.telephone || '—' },
@@ -399,7 +399,7 @@ export default function TiersPage() {
                   { key: 'raison_sociale', label: 'Raison sociale', type: 'text', placeholder: 'ACME SARL' },
                   { key: 'nom',           label: 'Nom',           type: 'text', placeholder: 'Dupont' },
                   { key: 'prenom',        label: 'Prénom',        type: 'text', placeholder: 'Jean' },
-                  { key: 'nif',           label: 'NIF',           type: 'text', placeholder: '00000000A' },
+                  { key: 'niu',           label: 'NIU',           type: 'text', placeholder: 'M1234567890' },
                   { key: 'rccm',          label: 'RCCM',          type: 'text', placeholder: 'BZV-A-2024' },
                   { key: 'email',         label: 'Email',         type: 'email', placeholder: 'contact@...' },
                   { key: 'telephone',     label: 'Téléphone',     type: 'tel', placeholder: '+242...' },

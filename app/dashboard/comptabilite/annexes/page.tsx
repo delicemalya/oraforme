@@ -15,7 +15,7 @@ const YEARS = [2024, 2025, 2026, 2027]
 interface Entreprise {
   nom: string; adresse: string | null; ville: string | null
   forme_juridique: string | null; capital_social: number | null
-  rccm: string | null; nif: string | null
+  rccm: string | null; niu: string | null
 }
 
 // ── Accordéon ────────────────────────────────────────────────────────────────
@@ -86,7 +86,7 @@ export default function AnnexesPage() {
           .eq('fiscal_year', year),
         supabase
           .from('tenants')
-          .select('nom, adresse, ville, forme_juridique, capital_social, rccm, nif')
+          .select('nom, adresse, ville, forme_juridique, capital_social, rccm, niu')
           .eq('id', tenantId)
           .maybeSingle(),
       ])
@@ -225,7 +225,7 @@ export default function AnnexesPage() {
             ['Adresse',              entreprise?.adresse ?? '—'],
             ['Capital social',       entreprise?.capital_social ? fmtFCFA(entreprise.capital_social) : '—'],
             ['RCCM',                 entreprise?.rccm ?? '—'],
-            ['NIF',                  entreprise?.nif ?? '—'],
+            ['NIU',                  entreprise?.niu ?? '—'],
             ['Exercice comptable',   `1er janvier − 31 décembre ${year}`],
             ['Référentiel comptable', 'SYSCOHADA révisé 2017'],
             ['Monnaie de présentation', 'Franc CFA (FCFA)'],

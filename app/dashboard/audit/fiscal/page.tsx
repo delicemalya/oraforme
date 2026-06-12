@@ -11,7 +11,7 @@ import AuditAnomalieCard from '../_components/AuditAnomalieCard'
 import AuditScoreHeader from '../_components/AuditScoreHeader'
 
 const CHECKLIST = [
-  { code: 'NIF',    label: 'NIF enregistré',            ref: 'CGI Congo, Art. 1103' },
+  { code: 'NIU',    label: 'NIU enregistré',            ref: 'CGI Congo, Art. 1103' },
   { code: 'RCCM',   label: 'RCCM renseigné',             ref: 'OHADA Commerce, Art. 35' },
   { code: 'TVA',    label: 'TVA calculée sur factures',  ref: 'CGI Congo, Art. 191' },
   { code: 'CA',     label: 'Centime Additionnel (5%)',   ref: 'CGI Congo, Art. 194' },

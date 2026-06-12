@@ -161,7 +161,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         <h2 className="text-sm font-semibold text-[var(--text)] mb-4">Informations</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
-            { label: 'NIF', value: tenant.nif ?? '—' },
+            { label: 'NIU', value: tenant.niu ?? '—' },
             { label: 'Plan', value: tenant.plan ?? '—' },
             { label: 'Inscription', value: new Date(tenant.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) },
           ].map(r => (

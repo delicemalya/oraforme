@@ -91,7 +91,7 @@ export default function OnboardingPage() {
   const [langue,   setLangue]   = useState('fr')
 
   // Step 2
-  const [societe, setSociete] = useState({ nom: '', telephone: '', adresse: '', nif: '' })
+  const [societe, setSociete] = useState({ nom: '', telephone: '', adresse: '', niu: '' })
 
   // Step 3
   const [admin, setAdmin] = useState({ prenom: '', nom: '', email: '', password: '' })
@@ -186,7 +186,7 @@ export default function OnboardingPage() {
     }
     const result = await createTenantAndProfile({
       nomEntreprise:   societe.nom,
-      nif:             societe.nif,
+      niu:             societe.niu,
       telephone:       societe.telephone,
       adresse:         societe.adresse,
       secteurActivite: secteur as SecteurId,
@@ -466,12 +466,12 @@ export default function OnboardingPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">NIF (optionnel)</label>
+                      <label className="block text-[12px] font-bold text-[#64748B] uppercase tracking-wider mb-2">NIU (optionnel)</label>
                       <input
                         type="text"
-                        value={societe.nif}
-                        onChange={e => setSociete(p => ({ ...p, nif: e.target.value }))}
-                        placeholder="Numéro fiscal"
+                        value={societe.niu}
+                        onChange={e => setSociete(p => ({ ...p, niu: e.target.value }))}
+                        placeholder="Numéro d'Identification Unique"
                         className="w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/15"
                       />
                     </div>

@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS tiers (
   prenom           TEXT,
   raison_sociale   TEXT,
   siret            TEXT,
-  nif              TEXT,                        -- Numéro Identifiant Fiscal Congo
+  niu              TEXT,                        -- Numéro d'Identification Unique Congo (NIU)
   rccm             TEXT,                        -- Registre du Commerce Congo
 
   -- Contact

@@ -100,7 +100,7 @@ Règle d'or : Débit = Crédit à chaque écriture.`,
 
 1. Numéro unique et chronologique
 2. Date d'émission
-3. Nom, adresse, RCCM, NIF du vendeur
+3. Nom, adresse, RCCM, NIU du vendeur
 4. Nom et adresse de l'acheteur
 5. Description des biens/services
 6. Quantité et prix unitaire HT

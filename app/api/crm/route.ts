@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const {
     nom, email, telephone, entreprise, secteur, ville,
-    pays, nif, rccm, notes, statut = 'actif', tags,
+    pays, niu, rccm, notes, statut = 'actif', tags,
   } = body
 
   if (!nom?.trim()) {
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       secteur:    secteur?.trim() || null,
       ville:      ville?.trim() || null,
       pays:       pays?.trim() || 'Congo-Brazzaville',
-      nif:        nif?.trim() || null,
+      niu:        niu?.trim() || null,
       rccm:       rccm?.trim() || null,
       notes:      notes?.trim() || null,
       statut,

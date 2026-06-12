@@ -51,7 +51,7 @@ interface BeneficiaireDAS {
   annee:        number
   nom:          string
   prenom?:      string
-  nif?:         string
+  niu?:         string
   adresse?:     string
   type_somme:   TypeSomme
   montant:      number
@@ -77,7 +77,7 @@ export default function DASPage() {
   /* Form */
   const [fNom,     setFNom]     = useState('')
   const [fPrenom,  setFPrenom]  = useState('')
-  const [fNif,     setFNif]     = useState('')
+  const [fNiu,     setFNiu]     = useState('')
   const [fAdresse, setFAdresse] = useState('')
   const [fType,    setFType]    = useState<TypeSomme>('honoraires')
   const [fMontant, setFMontant] = useState('')
@@ -104,7 +104,7 @@ export default function DASPage() {
   const filtered = beneficiaires.filter(b =>
     b.nom.toLowerCase().includes(search.toLowerCase()) ||
     (b.prenom ?? '').toLowerCase().includes(search.toLowerCase()) ||
-    (b.nif ?? '').toLowerCase().includes(search.toLowerCase())
+    (b.niu ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
   /* Stats */
@@ -120,7 +120,7 @@ export default function DASPage() {
     const { error } = await supabase.from('das_beneficiaires').insert({
       tenant_id: tenantId, annee,
       nom: fNom.trim(), prenom: fPrenom || null,
-      nif: fNif || null, adresse: fAdresse || null,
+      niu: fNiu || null, adresse: fAdresse || null,
       type_somme: fType,
       montant: Number(fMontant),
       retenue_a_la_source: fRetenue ? Number(fRetenue) : null,
@@ -144,15 +144,15 @@ export default function DASPage() {
   }
 
   function resetForm() {
-    setFNom(''); setFPrenom(''); setFNif(''); setFAdresse('')
+    setFNom(''); setFPrenom(''); setFNiu(''); setFAdresse('')
     setFType('honoraires'); setFMontant(''); setFRetenue(''); setFNotes('')
     setSaveErr(null); setSaveOk(false)
   }
 
   function exportCSV() {
-    const header = ['Nom','Prénom','NIF','Adresse','Type','Compte SYSCOHADA','Montant','Retenue','Statut']
+    const header = ['Nom','Prénom','NIU','Adresse','Type','Compte SYSCOHADA','Montant','Retenue','Statut']
     const rows = filtered.map(b => [
-      b.nom, b.prenom ?? '', b.nif ?? '', b.adresse ?? '',
+      b.nom, b.prenom ?? '', b.niu ?? '', b.adresse ?? '',
       TYPE_LABELS[b.type_somme], TYPE_COMPTES[b.type_somme],
       b.montant, b.retenue_a_la_source ?? 0, b.statut,
     ])
@@ -226,7 +226,7 @@ export default function DASPage() {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Rechercher par nom, prénom ou NIF..."
+          placeholder="Rechercher par nom, prénom ou NIU..."
           className="w-full border border-[#E2E8F0] rounded-lg pl-8 pr-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#059669]/30"
         />
       </div>
@@ -252,7 +252,7 @@ export default function DASPage() {
             <table className="w-full text-[11px]">
               <thead>
                 <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
-                  {['Bénéficiaire','NIF','Type','Compte SYSCOHADA','Montant','Retenue','Statut','Actions'].map(h => (
+                  {['Bénéficiaire','NIU','Type','Compte SYSCOHADA','Montant','Retenue','Statut','Actions'].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold text-[#94A3B8] uppercase whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -264,7 +264,7 @@ export default function DASPage() {
                       <p className="font-semibold text-[#0F172A]">{b.nom}{b.prenom ? ` ${b.prenom}` : ''}</p>
                       {b.adresse && <p className="text-[10px] text-[#94A3B8] truncate max-w-[160px]">{b.adresse}</p>}
                     </td>
-                    <td className="px-4 py-2.5 font-mono text-[#64748B]">{b.nif || '—'}</td>
+                    <td className="px-4 py-2.5 font-mono text-[#64748B]">{b.niu || '—'}</td>
                     <td className="px-4 py-2.5">
                       <span className="px-2 py-0.5 rounded-full bg-[#F0FDF4] text-[#059669] font-semibold text-[10px] whitespace-nowrap">
                         {TYPE_LABELS[b.type_somme]}
@@ -356,8 +356,8 @@ export default function DASPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">NIF (si applicable)</label>
-                  <input value={fNif} onChange={e => setFNif(e.target.value)}
+                  <label className="text-[11px] font-semibold text-[#64748B] block mb-1">NIU (si applicable)</label>
+                  <input value={fNiu} onChange={e => setFNiu(e.target.value)}
                     placeholder="M-12345678A"
                     className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#059669]/30" />
                 </div>

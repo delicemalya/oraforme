@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 const RAPPORT_TYPES = [
   { id: 'audit_global'  as const, label: 'Rapport d\'Audit Global',      icon: '🛡️', desc: 'Score global + toutes anomalies + plan d\'actions', api: 'rapport_mensuel'    },
-  { id: 'audit_fiscal'  as const, label: 'Rapport Audit Fiscal',         icon: '🏛️', desc: 'TVA, NIF, RCCM, conformité DGI',                    api: 'rapport_mensuel'    },
+  { id: 'audit_fiscal'  as const, label: 'Rapport Audit Fiscal',         icon: '🏛️', desc: 'TVA, NIU, RCCM, conformité DGI',                    api: 'rapport_mensuel'    },
   { id: 'audit_rh'      as const, label: 'Rapport Audit RH & Social',    icon: '👥', desc: 'Contrats, CNSS, paie, conformité sociale',           api: 'rapport_mensuel'    },
   { id: 'audit_compta'  as const, label: 'Rapport Audit Comptable',      icon: '📒', desc: 'Journal, balance, SYSCOHADA',                        api: 'rapport_mensuel'    },
   { id: 'bilan'         as const, label: 'Bilan Simplifié OHADA',        icon: '📊', desc: 'Actif / Passif conforme SYSCOHADA',                  api: 'bilan_simplifie'    },
