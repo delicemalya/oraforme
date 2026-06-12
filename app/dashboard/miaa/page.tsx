@@ -350,14 +350,15 @@ export default function MIAAPage() {
           langue:     currentLocale,
         }),
       })
-      const data = await res.json()
-      const text = data.response ?? t('miaa.errorReply')
-      if (data.agent_detected) setAgentActif(data.agent_detected)
+      // Guard against non-JSON responses (e.g. Vercel 504/503 HTML error pages)
+      const data: Record<string, unknown> = await res.json().catch(() => ({}))
+      const text = (data.response as string | undefined) ?? t('miaa.errorReply')
+      if (data.agent_detected) setAgentActif(data.agent_detected as string)
       setMessages(prev => [...prev, {
         role: 'bot', text, ts: Date.now(),
         peut_telecharger: text.length > 150,
         contenu_telechargeable: text,
-        agent_detected: data.agent_detected,
+        agent_detected: data.agent_detected as string | undefined,
       }])
     } catch {
       setMessages(prev => [...prev, { role: 'bot', text: t('miaa.errorConnection'), ts: Date.now() }])

@@ -155,7 +155,10 @@ async function callAI(
     }
   }
 
-  throw new Error('Aucune clé API IA configurée (ANTHROPIC_API_KEY ou MISTRAL_API_KEY)')
+  return {
+    text: 'Je rencontre un problème technique temporaire. Veuillez réessayer dans quelques instants.',
+    inputTokens: 0, outputTokens: 0, moteur: 'none',
+  }
 }
 
 // ── Suggestions par module ────────────────────────────────────────────────────
