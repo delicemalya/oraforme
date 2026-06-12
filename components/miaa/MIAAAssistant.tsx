@@ -76,27 +76,42 @@ const MOD_TO_CAT: Record<string, string> = {
   sante: 'gestion-clinique',
 }
 
-// ── Recommandations par secteur d'activité ─────────────────────────────────────
+// ── Recommandations par secteur (clés = valeurs exactes de tenants.secteur_activite) ─
 const SECTOR_RECO: Record<string, { cats: string[]; metier: string }> = {
-  sante:              { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','fiscalite','comptabilite-ohada'],      metier: 'Clinique / Hôpital' },
-  clinique:           { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','comptabilite-ohada'],                  metier: 'Clinique' },
-  pharmacie:          { cats: ['gestion-pharmacie','gestion-stock','gestion-clinique','fiscalite','comptabilite-ohada'], metier: 'Pharmacie' },
-  hopital:            { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','finance','audit'],                     metier: 'Hôpital' },
-  restaurant:         { cats: ['gestion-restaurant','gestion-stock','rh-paie','crm-vente','fiscalite'],                 metier: 'Restauration' },
-  hotellerie:         { cats: ['gestion-hoteliere','crm-vente','rh-paie','comptabilite-ohada','fiscalite'],             metier: 'Hôtellerie' },
-  btp:                { cats: ['genie-civil-btp','gestion-stock','rh-paie','comptabilite-ohada','fiscalite'],           metier: 'BTP / Construction' },
-  'génie-civil':      { cats: ['genie-civil-btp','gestion-stock','rh-paie','comptabilite-ohada'],                      metier: 'Génie Civil' },
-  ecole:              { cats: ['gestion-ecole','rh-paie','comptabilite-ohada','fiscalite','management'],                metier: 'École / Formation' },
-  cabinet_comptable:  { cats: ['comptabilite-ohada','fiscalite','audit','cabinet-comptable','controle-gestion'],        metier: 'Cabinet Comptable' },
-  comptabilite:       { cats: ['comptabilite-ohada','fiscalite','audit','controle-gestion','tresorerie'],               metier: 'Comptabilité' },
-  agriculture:        { cats: ['agriculture-elevage','gestion-stock','comptabilite-ohada','rh-paie','entrepreneuriat'], metier: 'Agriculture' },
-  elevage:            { cats: ['agriculture-elevage','gestion-stock','comptabilite-ohada','rh-paie'],                   metier: 'Élevage' },
-  banque:             { cats: ['banque-microfinance','finance','audit','comptabilite-ohada','fiscalite'],               metier: 'Banque / Finance' },
-  microfinance:       { cats: ['banque-microfinance','finance','comptabilite-ohada','tresorerie'],                      metier: 'Microfinance' },
-  ong:                { cats: ['ong-associations','comptabilite-ohada','rh-paie','audit','management'],                 metier: 'ONG / Association' },
-  commerce:           { cats: ['crm-vente','gestion-stock','comptabilite-ohada','fiscalite','tresorerie'],              metier: 'Commerce / Négoce' },
-  industrie:          { cats: ['gestion-stock','rh-paie','comptabilite-ohada','controle-gestion','fiscalite'],         metier: 'Industrie' },
-  petrole:            { cats: ['comptabilite-ohada','fiscalite','audit','finance','rh-paie'],                          metier: 'Pétrole / Mines' },
+  // ── Santé ──────────────────────────────────────────────────────────────────
+  sante:        { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','fiscalite','comptabilite-ohada'],         metier: 'Clinique / Hôpital' },
+  pharmacie:    { cats: ['gestion-pharmacie','gestion-stock','gestion-clinique','fiscalite','comptabilite-ohada'],   metier: 'Pharmacie' },
+  // ── Restauration & Hôtellerie ──────────────────────────────────────────────
+  restaurant:   { cats: ['gestion-restaurant','gestion-stock','rh-paie','crm-vente','fiscalite'],                   metier: 'Restauration' },
+  hotel:        { cats: ['gestion-hoteliere','crm-vente','rh-paie','comptabilite-ohada','fiscalite'],               metier: 'Hôtellerie' },
+  boisson:      { cats: ['gestion-stock','crm-vente','gestion-restaurant','comptabilite-ohada','fiscalite'],        metier: 'Boissons & Distribution' },
+  // ── BTP ────────────────────────────────────────────────────────────────────
+  btp:          { cats: ['genie-civil-btp','gestion-stock','rh-paie','comptabilite-ohada','fiscalite'],             metier: 'BTP & Construction' },
+  // ── Cabinet & Conseil ──────────────────────────────────────────────────────
+  cabinet:      { cats: ['comptabilite-ohada','fiscalite','audit','cabinet-comptable','controle-gestion'],          metier: 'Cabinet Comptable & Conseil' },
+  // ── Éducation ──────────────────────────────────────────────────────────────
+  ecole:        { cats: ['gestion-ecole','rh-paie','comptabilite-ohada','fiscalite','management'],                  metier: 'École & Formation' },
+  // ── Agriculture ────────────────────────────────────────────────────────────
+  agriculture:  { cats: ['agriculture-elevage','gestion-stock','comptabilite-ohada','rh-paie','entrepreneuriat'],   metier: 'Agriculture & Élevage' },
+  // ── Finance & Banque ───────────────────────────────────────────────────────
+  banque:       { cats: ['banque-microfinance','finance','audit','comptabilite-ohada','fiscalite'],                 metier: 'Banque & Microfinance' },
+  // ── ONG ────────────────────────────────────────────────────────────────────
+  ong:          { cats: ['ong-associations','comptabilite-ohada','rh-paie','audit','management'],                   metier: 'ONG & Association' },
+  // ── Commerce ───────────────────────────────────────────────────────────────
+  commerce:     { cats: ['crm-vente','gestion-stock','comptabilite-ohada','fiscalite','tresorerie'],               metier: 'Commerce & Négoce' },
+  supermarche:  { cats: ['gestion-stock','crm-vente','comptabilite-ohada','fiscalite','rh-paie'],                   metier: 'Supermarché & Grande Distribution' },
+  boutique:     { cats: ['crm-vente','gestion-stock','comptabilite-ohada','fiscalite','tresorerie'],               metier: 'Boutique & Commerce Détail' },
+  // ── Pétrole & Mines ────────────────────────────────────────────────────────
+  petrole:      { cats: ['comptabilite-ohada','fiscalite','audit','finance','rh-paie'],                            metier: 'Pétrole & Mines' },
+  // ── Transport ──────────────────────────────────────────────────────────────
+  transport:         { cats: ['gestion-stock','rh-paie','comptabilite-ohada','fiscalite','crm-vente'],             metier: 'Transport & Logistique' },
+  transport_public:  { cats: ['rh-paie','comptabilite-ohada','fiscalite','management','tresorerie'],               metier: 'Transport Public' },
+  // ── Fallbacks alias ────────────────────────────────────────────────────────
+  clinique:     { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','comptabilite-ohada','fiscalite'],        metier: 'Clinique Médicale' },
+  hopital:      { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','finance','audit'],                      metier: 'Hôpital' },
+  hotellerie:   { cats: ['gestion-hoteliere','crm-vente','rh-paie','comptabilite-ohada','fiscalite'],              metier: 'Hôtellerie' },
+  microfinance: { cats: ['banque-microfinance','finance','comptabilite-ohada','tresorerie','audit'],               metier: 'Microfinance' },
+  industrie:    { cats: ['gestion-stock','rh-paie','comptabilite-ohada','controle-gestion','fiscalite'],           metier: 'Industrie & Production' },
 }
 
 // ── Niveaux ────────────────────────────────────────────────────────────────────
@@ -533,7 +548,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     setAcMessages(prev => [...prev, { role: 'user', content: userMsg, timestamp: now() }])
     const cat = ACADEMY_CATS.find(c => c.id === acCat)
     const lvl = LEVELS.find(l => l.id === acLevel)
-    const secteurCtx = sectorInfo ? ` L'apprenant travaille dans le secteur : ${sectorInfo.metier}.` : ''
+    const secteurCtx = activeSectorInfo ? ` L'apprenant travaille dans le secteur : ${activeSectorInfo.metier}.` : ''
     const teacherCtx = `MODE FORMATEUR ACADEMY MIAA+. Catégorie : ${cat?.label ?? acCat}. Niveau apprenant : ${lvl?.label ?? acLevel}.${secteurCtx} Enseigne comme un professeur expert certifié, avec des exemples concrets adaptés au contexte Congo/OHADA/CEMAC. Utilise des cas réels du secteur. Sois pédagogue, structuré, encourage l'apprenant et valide sa progression. Question de l'apprenant : ${userMsg}`
     try {
       const res  = await fetch('/api/miaa/chat', {
@@ -606,10 +621,14 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
   const catLabel = (catId: string) => ACADEMY_CATS.find(c => c.id === catId)?.label ?? catId
   const quizQuestions = QUIZ[acCat] ?? QUIZ.default
 
-  // Détection secteur : tenantData.secteur > module > fallback
-  const rawSector = (tenantData?.secteur ?? module ?? 'auto').toLowerCase().replace(/[^a-z_-]/g, '')
-  const sectorInfo = SECTOR_RECO[rawSector] ?? SECTOR_RECO[MOD_TO_CAT[module] ? module : 'auto'] ?? null
-  const sectorCats = sectorInfo?.cats ?? []
+  // Détection secteur : tenantData.secteur (valeur exacte DB) > module > null
+  // tenantData.secteur = tenants.secteur_activite (ex: 'cabinet', 'btp', 'sante'...)
+  const rawSector = (tenantData?.secteur ?? '').toLowerCase().trim()
+  const sectorInfo = rawSector ? (SECTOR_RECO[rawSector] ?? null) : null
+  // Si pas de secteur détecté, utiliser le module comme fallback
+  const fallbackSector = !sectorInfo ? (SECTOR_RECO[module ?? ''] ?? null) : null
+  const activeSectorInfo = sectorInfo ?? fallbackSector
+  const sectorCats = activeSectorInfo?.cats ?? []
   const recommendedCat = sectorCats[0] ?? MOD_TO_CAT[module] ?? null
 
   // Démarrer la formation : initialise le chat formateur avec le cours du jour
@@ -618,7 +637,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     const lvl = LEVELS.find(l => l.id === acLevel)
     const topic = todayTopic(acCat)
     const date = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-    const secteurLine = sectorInfo ? `\n🏢 Secteur : ${sectorInfo.metier}` : ''
+    const secteurLine = activeSectorInfo ? `\n🏢 Secteur : ${activeSectorInfo.metier}` : ''
     setAcMessages([{
       role: 'assistant',
       content: `Bienvenue dans le cours du ${date} !\n\n📚 Sujet du jour : ${topic}\n🎯 Domaine : ${cat?.label}${secteurLine}\n📊 Votre niveau : ${lvl?.label}\n\nJe suis votre formateur MIAA+. Je vais vous enseigner ce sujet étape par étape avec des exemples concrets adaptés à votre activité et au contexte Congo/OHADA.\n\n💡 Tapez "Commence la leçon" pour démarrer, ou posez directement une question sur ce sujet !`,
@@ -1029,7 +1048,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                       </div>
                       <p className="text-sm font-bold text-[var(--text)]">MIAA+ Academy</p>
                       <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
-                        {sectorInfo ? `Formations ${sectorInfo.metier}` : 'Votre université intégrée — du débutant à l\'expert'}
+                        {activeSectorInfo ? `Formations ${activeSectorInfo.metier}` : 'Votre université intégrée — du débutant à l\'expert'}
                       </p>
                     </div>
 
@@ -1037,7 +1056,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                     {sectorCats.length > 0 && (
                       <div className="px-3 pb-3">
                         <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: GD }}>
-                          🎯 Recommandé pour votre activité — {sectorInfo?.metier}
+                          🎯 Recommandé pour votre activité — {activeSectorInfo?.metier}
                         </p>
                         <div className="space-y-1.5">
                           {sectorCats.slice(0, 3).map((catId, idx) => (
