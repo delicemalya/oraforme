@@ -307,6 +307,15 @@ export default function DecaissementsPage() {
         </div>
       </div>
 
+      {/* Cross-link: distinction Sorties tréso vs Dépenses analytiques */}
+      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-800">
+        <ArrowDownCircle size={13} className="shrink-0 text-amber-600" />
+        <span><strong>Sorties de trésorerie</strong> = paiements effectifs (banque, caisse, mobile money).
+          Pour les charges analytiques par catégorie →{' '}
+          <a href="/dashboard/depenses" className="font-semibold underline hover:text-amber-900">Module Dépenses</a>
+        </span>
+      </div>
+
       {/* KPIs */}
       <div className="grid grid-cols-3 gap-4">
         {[

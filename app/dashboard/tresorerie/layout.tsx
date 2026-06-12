@@ -15,7 +15,7 @@ const TRESO_MODULES = [
   { href: '/dashboard/tresorerie/banques',        label: 'Banques',          icon: Landmark },
   { href: '/dashboard/tresorerie/mobile-money',   label: 'Mobile Money',     icon: Smartphone },
   { href: '/dashboard/tresorerie/encaissements',  label: 'Encaissements',    icon: ArrowUpCircle },
-  { href: '/dashboard/tresorerie/decaissements',  label: 'Décaissements',    icon: ArrowDownCircle },
+  { href: '/dashboard/tresorerie/decaissements',  label: 'Sorties',          icon: ArrowDownCircle },
   { href: '/dashboard/tresorerie/transferts',     label: 'Transferts',       icon: GitMerge },
   { href: '/dashboard/tresorerie/remboursements', label: 'Remboursements',   icon: RefreshCw },
   { href: '/dashboard/tresorerie/validations',    label: 'Validations',      icon: CheckCircle2 },

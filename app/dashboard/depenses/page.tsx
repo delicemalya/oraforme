@@ -170,6 +170,15 @@ export default function DepensesPage() {
         </button>
       </div>
 
+      {/* Cross-link: distinction Dépenses analytiques vs Sorties trésorerie */}
+      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50 border border-blue-200 text-[11px] text-blue-800">
+        <BookOpen size={13} className="shrink-0 text-blue-600" />
+        <span><strong>Dépenses</strong> = charges par catégorie (analyse comptable & reporting).
+          Pour voir les paiements effectifs par compte →{' '}
+          <a href="/dashboard/tresorerie/decaissements" className="font-semibold underline hover:text-blue-900">Trésorerie / Sorties</a>
+        </span>
+      </div>
+
       {/* Periode filter */}
       <div className="flex gap-1">
         {[{ label: t('dep.period7'), days: 7 }, { label: t('dep.period30'), days: 30 }, { label: t('dep.period90'), days: 90 }].map(p => (

@@ -159,7 +159,7 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'recrutement', label: 'Recrutement', sublabel: 'MIAA Job', href: '/dashboard/rh/recrutement' },
   { id: 'salaires', label: 'Paie & Bulletins', sublabel: 'ECAM Congo', href: '/dashboard/rh/paie' },
   { id: 'bi',          label: 'Analytics',              sublabel: '', href: '/dashboard/bi' },
-  { id: 'bi-dg',       label: 'Analytics général',      sublabel: '', href: '/dashboard/bi' },
+  { id: 'bi-dg',       label: 'Analytics & BI',         sublabel: 'Direction · RH · Secteur', href: '/dashboard/bi' },
   { id: 'bi-rh',       label: 'Analytics RH',           sublabel: '', href: '/dashboard/bi/rh' },
   { id: 'bi-ecole',    label: 'Analytics École',        sublabel: '', href: '/dashboard/bi/ecole' },
   { id: 'bi-hotel',    label: 'Analytics Hôtel',        sublabel: '', href: '/dashboard/bi/hotel' },
@@ -205,10 +205,10 @@ const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
 // ─── Sidebar Group definitions ────────────────────────────────────────────────
 
 const SIDEBAR_GROUPS = [
-  // SUPERVISION — KPIs exécutifs, BI, analytics
-  { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['finance', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant', 'analytics', 'audit'] },
-  // FINANCE — gestion financière + déclarations DGI + CNSS
-  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'facturation', 'depenses', 'fiscalite'] },
+  // SUPERVISION — KPIs exécutifs + hub BI (onglets Direction/RH/secteur intégrés)
+  { id: 'supervision', labelKey: 'nav.pilotage',    icon: TrendingUp,  moduleIds: ['finance', 'bi-dg', 'audit'] },
+  // FINANCE — comptabilité, trésorerie, charges, fiscalité
+  { id: 'finance',     labelKey: 'nav.finance_ops', icon: Calculator,  moduleIds: ['comptabilite', 'tresorerie', 'depenses', 'fiscalite'] },
   // RH — personnel & paie (recrutement = rubrique indépendante)
   { id: 'rh',          labelKey: 'nav.rh',          icon: Users,       moduleIds: ['rh', 'salaires', 'roles'] },
   // RECRUTEMENT — module autonome
