@@ -631,6 +631,13 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
   const sectorCats = activeSectorInfo?.cats ?? []
   const recommendedCat = sectorCats[0] ?? MOD_TO_CAT[module] ?? null
 
+  // Catégories universelles toujours utiles quelque soit le secteur
+  const UNIVERSAL_CATS = ['management', 'leadership', 'entrepreneuriat']
+  // Quand un secteur est détecté, n'afficher que les catégories du secteur + universelles
+  const visibleCats = sectorCats.length > 0
+    ? ACADEMY_CATS.filter(c => sectorCats.includes(c.id) || UNIVERSAL_CATS.includes(c.id))
+    : ACADEMY_CATS
+
   // Démarrer la formation : initialise le chat formateur avec le cours du jour
   const startLearning = () => {
     const cat = ACADEMY_CATS.find(c => c.id === acCat)
@@ -1098,11 +1105,13 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                       </div>
                     )}
 
-                    {/* Grille des 22 catégories */}
+                    {/* Grille formations filtrée par secteur */}
                     <div className="px-3 pb-4">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Toutes les formations disponibles</p>
+                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                        {sectorCats.length > 0 ? 'Formations adaptées à votre activité' : 'Toutes les formations disponibles'}
+                      </p>
                       <div className="grid grid-cols-2 gap-2">
-                        {ACADEMY_CATS.map(cat => (
+                        {visibleCats.map(cat => (
                           <button key={cat.id}
                             onClick={() => { setAcCat(cat.id); setAcScreen('level') }}
                             className="flex items-center gap-2 p-2.5 rounded-xl border border-[var(--border)] text-left transition-all hover:shadow-sm"
