@@ -13,11 +13,11 @@ import Link from 'next/link'
 import { useLocale } from '@/lib/hooks/useLocale'
 import type { MIAANotification } from '@/lib/miaa/notifications'
 
-// ── Palette verte (remplace l'orange partout) ──────────────────────────────────
-const GC  = '#16A34A'   // green-600
-const GD  = '#15803D'   // green-700
-const GL  = '#F0FDF4'   // green-50
-const GGR = 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)'
+// ── Palette bleue (professional Academy) ──────────────────────────────────────
+const GC  = '#2563EB'   // blue-600
+const GD  = '#1D4ED8'   // blue-700
+const GL  = '#EFF6FF'   // blue-50
+const GGR = 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface ChatMessage {
@@ -41,28 +41,30 @@ type Tab = 'chat' | 'alertes' | 'documents' | 'rapports' | 'formation'
 type AcademyScreen = 'home' | 'level' | 'learning' | 'quiz' | 'result'
 type Level = 'debutant' | 'intermediaire' | 'avance' | 'expert'
 
-// ── Catégories Academy (20) ────────────────────────────────────────────────────
+// ── Catégories Academy (22) ────────────────────────────────────────────────────
 const ACADEMY_CATS = [
   { id: 'comptabilite-ohada', label: 'Comptabilité OHADA',    icon: '📒', color: '#2563EB' },
-  { id: 'fiscalite',          label: 'Fiscalité',              icon: '🏛️', color: '#7C3AED' },
-  { id: 'audit',              label: 'Audit',                  icon: '🔍', color: '#DC2626' },
+  { id: 'fiscalite',          label: 'Fiscalité Congo',        icon: '🏛️', color: '#7C3AED' },
+  { id: 'audit',              label: 'Audit & Contrôle',       icon: '🔍', color: '#DC2626' },
   { id: 'rh-paie',            label: 'RH & Paie',              icon: '👥', color: '#16A34A' },
   { id: 'controle-gestion',   label: 'Contrôle de Gestion',   icon: '📊', color: '#F59E0B' },
   { id: 'finance',            label: 'Finance',                icon: '💹', color: '#0891B2' },
-  { id: 'tresorerie',         label: 'Trésorerie',             icon: '💵', color: '#059669' },
+  { id: 'tresorerie',         label: 'Trésorerie & BFR',       icon: '💵', color: '#059669' },
   { id: 'entrepreneuriat',    label: 'Entrepreneuriat',        icon: '🚀', color: '#EA580C' },
-  { id: 'creation-entreprise',label: "Création d'entreprise", icon: '🏢', color: '#6366F1' },
+  { id: 'genie-civil-btp',    label: 'Génie Civil & BTP',     icon: '🏗️', color: '#78716C' },
   { id: 'gestion-hoteliere',  label: 'Gestion Hôtelière',    icon: '🏨', color: '#0369A1' },
   { id: 'gestion-restaurant', label: 'Gestion Restaurant',    icon: '🍽️', color: '#D97706' },
   { id: 'gestion-pharmacie',  label: 'Gestion Pharmacie',     icon: '💊', color: '#9333EA' },
-  { id: 'gestion-clinique',   label: 'Gestion Clinique',      icon: '🏥', color: '#DC2626' },
+  { id: 'gestion-clinique',   label: 'Gestion Clinique/Hôpital', icon: '🏥', color: '#DC2626' },
   { id: 'gestion-ecole',      label: 'Gestion École',         icon: '🎓', color: '#2563EB' },
   { id: 'cabinet-comptable',  label: 'Cabinet Comptable',     icon: '⚖️', color: '#64748B' },
-  { id: 'cabinet-juridique',  label: 'Cabinet Juridique',     icon: '📜', color: '#92400E' },
+  { id: 'agriculture-elevage',label: 'Agriculture & Élevage', icon: '🌾', color: '#65A30D' },
   { id: 'gestion-stock',      label: 'Gestion de Stock',      icon: '📦', color: '#16A34A' },
   { id: 'crm-vente',          label: 'CRM & Vente',           icon: '🤝', color: '#F59E0B' },
   { id: 'leadership',         label: 'Leadership',             icon: '⭐', color: '#B45309' },
   { id: 'management',         label: 'Management',             icon: '🎯', color: '#7C3AED' },
+  { id: 'banque-microfinance',label: 'Banque & Microfinance', icon: '🏦', color: '#0891B2' },
+  { id: 'ong-associations',   label: 'ONG & Associations',    icon: '🤲', color: '#16A34A' },
 ]
 
 // Module → catégorie recommandée
@@ -72,6 +74,29 @@ const MOD_TO_CAT: Record<string, string> = {
   stock: 'gestion-stock', crm: 'crm-vente', ecole: 'gestion-ecole',
   restaurant: 'gestion-restaurant', hotel: 'gestion-hoteliere',
   sante: 'gestion-clinique',
+}
+
+// ── Recommandations par secteur d'activité ─────────────────────────────────────
+const SECTOR_RECO: Record<string, { cats: string[]; metier: string }> = {
+  sante:              { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','fiscalite','comptabilite-ohada'],      metier: 'Clinique / Hôpital' },
+  clinique:           { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','comptabilite-ohada'],                  metier: 'Clinique' },
+  pharmacie:          { cats: ['gestion-pharmacie','gestion-stock','gestion-clinique','fiscalite','comptabilite-ohada'], metier: 'Pharmacie' },
+  hopital:            { cats: ['gestion-clinique','gestion-pharmacie','rh-paie','finance','audit'],                     metier: 'Hôpital' },
+  restaurant:         { cats: ['gestion-restaurant','gestion-stock','rh-paie','crm-vente','fiscalite'],                 metier: 'Restauration' },
+  hotellerie:         { cats: ['gestion-hoteliere','crm-vente','rh-paie','comptabilite-ohada','fiscalite'],             metier: 'Hôtellerie' },
+  btp:                { cats: ['genie-civil-btp','gestion-stock','rh-paie','comptabilite-ohada','fiscalite'],           metier: 'BTP / Construction' },
+  'génie-civil':      { cats: ['genie-civil-btp','gestion-stock','rh-paie','comptabilite-ohada'],                      metier: 'Génie Civil' },
+  ecole:              { cats: ['gestion-ecole','rh-paie','comptabilite-ohada','fiscalite','management'],                metier: 'École / Formation' },
+  cabinet_comptable:  { cats: ['comptabilite-ohada','fiscalite','audit','cabinet-comptable','controle-gestion'],        metier: 'Cabinet Comptable' },
+  comptabilite:       { cats: ['comptabilite-ohada','fiscalite','audit','controle-gestion','tresorerie'],               metier: 'Comptabilité' },
+  agriculture:        { cats: ['agriculture-elevage','gestion-stock','comptabilite-ohada','rh-paie','entrepreneuriat'], metier: 'Agriculture' },
+  elevage:            { cats: ['agriculture-elevage','gestion-stock','comptabilite-ohada','rh-paie'],                   metier: 'Élevage' },
+  banque:             { cats: ['banque-microfinance','finance','audit','comptabilite-ohada','fiscalite'],               metier: 'Banque / Finance' },
+  microfinance:       { cats: ['banque-microfinance','finance','comptabilite-ohada','tresorerie'],                      metier: 'Microfinance' },
+  ong:                { cats: ['ong-associations','comptabilite-ohada','rh-paie','audit','management'],                 metier: 'ONG / Association' },
+  commerce:           { cats: ['crm-vente','gestion-stock','comptabilite-ohada','fiscalite','tresorerie'],              metier: 'Commerce / Négoce' },
+  industrie:          { cats: ['gestion-stock','rh-paie','comptabilite-ohada','controle-gestion','fiscalite'],         metier: 'Industrie' },
+  petrole:            { cats: ['comptabilite-ohada','fiscalite','audit','finance','rh-paie'],                          metier: 'Pétrole / Mines' },
 }
 
 // ── Niveaux ────────────────────────────────────────────────────────────────────
@@ -130,13 +155,58 @@ const DAILY_TOPICS: Record<string, string[]> = {
     'Audit fiscal et contrôle DGI',
   ],
   'gestion-clinique': [
-    'Organisation d\'un cabinet médical',
-    'Dossier patient informatisé — CIM-10',
-    'Facturation médicale et assurances',
-    'Protocoles urgences et triage',
-    'Gestion stock pharmacie et DU',
-    'CAMU 80% — Remboursements Congo',
-    'Indicateurs qualité clinique (KPIs)',
+    'Organisation cabinet médical — Triage et flux patients',
+    'Dossier patient informatisé — CIM-10 et codage',
+    'Facturation médicale : actes, consultations, assurances',
+    'Protocoles urgences et réanimation de base',
+    'Gestion stock pharmacie et médicaments DU',
+    'CAMU 80% — Remboursements et tiers-payant Congo',
+    'Indicateurs qualité clinique : taux de remplissage, DMS',
+  ],
+  'gestion-pharmacie': [
+    'Réception et contrôle des médicaments — BPD',
+    'Gestion FEFO des stocks médicamenteux',
+    'Dispensation sur ordonnance — Règles légales',
+    'Stupéfiants et psychotropes — Réglementation Congo',
+    'Calcul des prix de vente officine',
+    'Ruptures de stock — Prévention et substitution',
+    'Pharmacovigilance — Déclaration des effets indésirables',
+  ],
+  'genie-civil-btp': [
+    'Lecture de plans et métrés — Bases fondamentales',
+    'Devis BTP : matériaux, MO, matériel, frais généraux',
+    'Planification PERT/CPM et planning Gantt chantier',
+    'Béton armé — Formulation, dosage, coffrage',
+    'Gestion de chantier : OPC, sous-traitance, réception',
+    'Sécurité chantier — EPI, habilitation, plan PPSPS',
+    'Marchés publics BTP au Congo — Procédures ARMP',
+  ],
+  'agriculture-elevage': [
+    'Rotation des cultures — Pratiques et bénéfices',
+    'Fertilisation NPK — Dosage et calendrier cultural',
+    'Tenue du cahier cultural et des charges',
+    'Valorisation des produits agricoles — Filières Congo',
+    'Élevage bovin/ovin — Alimentation et prophylaxie',
+    'Accès au crédit agricole — CAFI et banques Congo',
+    'Certification biologique et normes export',
+  ],
+  'banque-microfinance': [
+    'Analyse crédit PME — Score et garanties',
+    'Réglementation COBAC — Ratios prudentiels',
+    'Microcrédit solidaire — Méthode et suivi',
+    'Gestion du risque de contrepartie',
+    'Produits d\'épargne et de placement CEMAC',
+    'KYC et lutte anti-blanchiment (LAB/FT)',
+    'Reporting BEAC — Déclarations obligatoires',
+  ],
+  'ong-associations': [
+    'Montage de projet — Cadre logique et budget',
+    'Comptabilité ONG — Plan comptable spécifique',
+    'Reporting bailleur — Indicateurs et justificatifs',
+    'Gestion des ressources humaines bénévoles',
+    'Passation de marchés ONG — Procédures transparentes',
+    'Évaluation d\'impact — Méthodes et outils',
+    'Statuts et gouvernance associative au Congo',
   ],
   'gestion-restaurant': [
     'Food cost et prix de revient',
@@ -234,6 +304,62 @@ const QUIZ: Record<string, QuizQ[]> = {
     { q: 'FRNG = ?', opts: ['Capitaux permanents − Actif immo.','Actif CT − Passif CT','BFR + Trésorerie','CA − Charges'], ans: 0 },
     { q: 'Délai clients idéal :', opts: ['< 30 j','< 60 j','< 90 j','< 120 j'], ans: 0 },
     { q: 'Trésorerie nette = ?', opts: ['FRNG − BFR','BFR − FRNG','Actif − Passif','CA − Charges'], ans: 0 },
+  ],
+  'gestion-clinique': [
+    { q: "Le dossier médical doit être conservé pendant :", opts: ['5 ans','10 ans','20 ans','Toute la vie du patient'], ans: 2 },
+    { q: "CAMU couvre quelle proportion des soins au Congo ?", opts: ['50%','70%','80%','100%'], ans: 2 },
+    { q: "CIM-10 est :", opts: ["Classification Internationale des Maladies","Contrôle Interne Médical","Code International des Médicaments","Certificat Infirmier Médical"], ans: 0 },
+    { q: "Le triage aux urgences classe les patients selon :", opts: ["L'ordre d'arrivée","La priorité médicale","L'assurance","L'âge"], ans: 1 },
+    { q: "La facturation des soins médicaux au Congo est :", opts: ["Exonérée de TVA","Soumise à TVA 18%","Soumise à IS","Soumise à patente"], ans: 0 },
+  ],
+  'gestion-pharmacie': [
+    { q: "FEFO signifie :", opts: ["First Expired First Out","First Entry First Out","Fast Exit Fast Open","Final Entry Final Out"], ans: 0 },
+    { q: "Une ordonnance est valable :", opts: ["7 jours","30 jours","3 mois","1 an"], ans: 1 },
+    { q: "Les stupéfiants sont enregistrés dans :", opts: ["Le stock général","Un registre spécial sécurisé","La caisse","Le bilan"], ans: 1 },
+    { q: "Le stock de sécurité couvre :", opts: ["1 semaine","2-4 semaines","6 mois","1 an"], ans: 1 },
+    { q: "BPD signifie :", opts: ["Bonnes Pratiques de Distribution","Base de Prix Directeurs","Bilan de Production et Distribution","Bon Produit Disponible"], ans: 0 },
+  ],
+  'genie-civil-btp': [
+    { q: "PERT/CPM est utilisé pour :", opts: ["Évaluer les coûts","Planifier les délais et chemins critiques","Calculer la TVA","Gérer le personnel"], ans: 1 },
+    { q: "Le béton C25/30 signifie :", opts: ["25 cm de hauteur","Résistance 25 MPa cylindrique / 30 MPa cubique","Dosage 25 kg/m³","Durée 30 jours"], ans: 1 },
+    { q: "TVA sur travaux de construction au Congo :", opts: ["Exonérée","5%","18% + CA","30%"], ans: 2 },
+    { q: "Un plan de masse montre :", opts: ["Les coupes transversales","L'implantation du bâtiment sur le terrain","Les détails de fondation","Les réseaux électriques"], ans: 1 },
+    { q: "ARMP au Congo gère :", opts: ["Les marchés privés","Les marchés publics","Les concessions minières","Les permis de construire"], ans: 1 },
+  ],
+  'gestion-restaurant': [
+    { q: "Le food cost idéal en restauration est :", opts: ["< 10%","28-35%","50-60%","70-80%"], ans: 1 },
+    { q: "Un plat vendu 8 000 FCFA avec food cost 30% a un coût matière de :", opts: ["2 400 FCFA","800 FCFA","4 000 FCFA","1 600 FCFA"], ans: 0 },
+    { q: "HACCP est :", opts: ["Un label de qualité","Une méthode d'analyse des risques alimentaires","Un logiciel de caisse","Un ratio de rentabilité"], ans: 1 },
+    { q: "Le ticket moyen s'obtient par :", opts: ["CA / Nombre de couverts","CA / Nombre de plats","Charges / CA","CA − Charges"], ans: 0 },
+    { q: "La DLC signifie :", opts: ["Date Limite de Commercialisation","Date Limite de Consommation","Délai Legal de Conservation","Date de Livraison Confirmée"], ans: 1 },
+  ],
+  'gestion-hoteliere': [
+    { q: "RevPAR se calcule par :", opts: ["CA / Chambres disponibles","CA / Chambres occupées","Tarif moyen × Taux occupation","A et C sont identiques"], ans: 2 },
+    { q: "Le taux d'occupation cible en hôtellerie est :", opts: ["30-40%","50-60%","65-80%","95-100%"], ans: 2 },
+    { q: "Le check-in standard est généralement à :", opts: ["10h","12h","14h","18h"], ans: 2 },
+    { q: "OTA signifie :", opts: ["Online Travel Agency","Official Tourism Authority","Open Travel Account","Outbound Tourism Association"], ans: 0 },
+    { q: "Un client no-show engendre :", opts: ["Un remboursement automatique","Des pénalités selon la politique","Rien","Un upgrade automatique"], ans: 1 },
+  ],
+  'agriculture-elevage': [
+    { q: "La rotation des cultures permet :", opts: ["D'épuiser le sol","D'enrichir et préserver le sol","De réduire les rendements","D'augmenter les coûts"], ans: 1 },
+    { q: "NPK signifie :", opts: ["Norme Phytosanitaire du Congo","Azote, Phosphore, Potassium","Nitrate-Potasse-Karite","Normal Plant Kit"], ans: 1 },
+    { q: "HACCP en agro-alimentaire signifie :", opts: ["Hazard Analysis Critical Control Points","High Agricultural Crop Control Plan","Harmonized African Crop Certificate","High Accuracy Crop Control"], ans: 0 },
+    { q: "La valeur agricole tient compte de :", opts: ["Seulement des ventes","Des cycles culturaux et saisonnalité","Des prix mondiaux uniquement","Des subventions uniquement"], ans: 1 },
+    { q: "Le taux de mortalité acceptable en élevage avicole :", opts: ["< 1%","< 5%","< 15%","< 25%"], ans: 1 },
+  ],
+  'banque-microfinance': [
+    { q: "COBAC est :", opts: ["Commission Bancaire d'Afrique Centrale","Banque des États d'Afrique Centrale","Fonds Monétaire Africain","Marché Financier Central"], ans: 0 },
+    { q: "KYC signifie :", opts: ["Keep Your Capital","Know Your Customer","Keep Your Contract","Key Yield Control"], ans: 1 },
+    { q: "Le ratio de solvabilité minimum COBAC est :", opts: ["4%","6%","8%","12%"], ans: 2 },
+    { q: "LAB/FT signifie :", opts: ["Lutte Anti-Blanchiment et Financement du Terrorisme","Loi sur les Actifs Bancaires","Liquidité et Actifs Bancaires Fiduciaires","Livret d'Actifs Bancaires"], ans: 0 },
+    { q: "Le microcrédit solidaire fonctionne par :", opts: ["Garantie individuelle","Caution solidaire du groupe","Hypothèque immobilière","Dépôt de garantie en espèces"], ans: 1 },
+  ],
+  'ong-associations': [
+    { q: "Le cadre logique d'un projet contient :", opts: ["Seulement le budget","Objectifs, activités, indicateurs, hypothèses","Seulement les activités","Le plan comptable"], ans: 1 },
+    { q: "Un rapport bailleur doit inclure :", opts: ["Seulement les dépenses","Activités, résultats, dépenses et justificatifs","Seulement les activités","Le bilan annuel"], ans: 1 },
+    { q: "La transparence financière d'une ONG implique :", opts: ["Garder les comptes secrets","Publier ses états financiers","Payer des dividendes","Réduire les charges"], ans: 1 },
+    { q: "Un AGO (Assemblée Générale Ordinaire) se tient :", opts: ["Chaque semaine","Chaque trimestre","Au moins une fois par an","Tous les 5 ans"], ans: 2 },
+    { q: "La comptabilité d'une ONG suit :", opts: ["Le plan OHADA adapté","Le plan des sociétés commerciales","Le plan fiscal","Aucun plan standard"], ans: 0 },
   ],
   default: [
     { q: 'OHADA signifie :', opts: ["Organisation pour l'Harmonisation en Afrique du Droit des Affaires","Office des Affaires Dominicales en Afrique","Organisation des Hommes d'Affaires","Ordre des Hommes d'Affaires d'Afrique"], ans: 0 },
@@ -407,7 +533,8 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     setAcMessages(prev => [...prev, { role: 'user', content: userMsg, timestamp: now() }])
     const cat = ACADEMY_CATS.find(c => c.id === acCat)
     const lvl = LEVELS.find(l => l.id === acLevel)
-    const teacherCtx = `MODE FORMATEUR ACADEMY. Catégorie : ${cat?.label ?? acCat}. Niveau apprenant : ${lvl?.label ?? acLevel}. Enseigne comme un professeur expert, avec des exemples concrets adaptés au contexte Congo/OHADA. Sois pédagogue, structuré et encourageant. Question de l'apprenant : ${userMsg}`
+    const secteurCtx = sectorInfo ? ` L'apprenant travaille dans le secteur : ${sectorInfo.metier}.` : ''
+    const teacherCtx = `MODE FORMATEUR ACADEMY MIAA+. Catégorie : ${cat?.label ?? acCat}. Niveau apprenant : ${lvl?.label ?? acLevel}.${secteurCtx} Enseigne comme un professeur expert certifié, avec des exemples concrets adaptés au contexte Congo/OHADA/CEMAC. Utilise des cas réels du secteur. Sois pédagogue, structuré, encourage l'apprenant et valide sa progression. Question de l'apprenant : ${userMsg}`
     try {
       const res  = await fetch('/api/miaa/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -478,7 +605,12 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
   const catIcon  = (catId: string) => ACADEMY_CATS.find(c => c.id === catId)?.icon ?? '📚'
   const catLabel = (catId: string) => ACADEMY_CATS.find(c => c.id === catId)?.label ?? catId
   const quizQuestions = QUIZ[acCat] ?? QUIZ.default
-  const recommendedCat = MOD_TO_CAT[module] ?? null
+
+  // Détection secteur : tenantData.secteur > module > fallback
+  const rawSector = (tenantData?.secteur ?? module ?? 'auto').toLowerCase().replace(/[^a-z_-]/g, '')
+  const sectorInfo = SECTOR_RECO[rawSector] ?? SECTOR_RECO[MOD_TO_CAT[module] ? module : 'auto'] ?? null
+  const sectorCats = sectorInfo?.cats ?? []
+  const recommendedCat = sectorCats[0] ?? MOD_TO_CAT[module] ?? null
 
   // Démarrer la formation : initialise le chat formateur avec le cours du jour
   const startLearning = () => {
@@ -486,9 +618,10 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     const lvl = LEVELS.find(l => l.id === acLevel)
     const topic = todayTopic(acCat)
     const date = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+    const secteurLine = sectorInfo ? `\n🏢 Secteur : ${sectorInfo.metier}` : ''
     setAcMessages([{
       role: 'assistant',
-      content: `Bienvenue dans le cours du ${date} !\n\n📚 Sujet : ${topic}\n🎯 Catégorie : ${cat?.label}\n📊 Niveau : ${lvl?.label}\n\nCommençons ! Je vais vous expliquer ce sujet pas à pas avec des exemples concrets adaptés au contexte congolais.\n\nPosez-moi n'importe quelle question sur ce sujet ou tapez "Commence la leçon" pour démarrer.`,
+      content: `Bienvenue dans le cours du ${date} !\n\n📚 Sujet du jour : ${topic}\n🎯 Domaine : ${cat?.label}${secteurLine}\n📊 Votre niveau : ${lvl?.label}\n\nJe suis votre formateur MIAA+. Je vais vous enseigner ce sujet étape par étape avec des exemples concrets adaptés à votre activité et au contexte Congo/OHADA.\n\n💡 Tapez "Commence la leçon" pour démarrer, ou posez directement une question sur ce sujet !`,
       timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
     }])
     setAcScreen('learning')
@@ -890,16 +1023,46 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                 {acScreen === 'home' && (
                   <div className="flex-1 overflow-y-auto">
                     {/* Hero */}
-                    <div className="px-4 py-4 text-center" style={{ background: 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)' }}>
+                    <div className="px-4 py-4 text-center" style={{ background: 'linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%)' }}>
                       <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-2" style={{ background: GGR }}>
                         <GraduationCap size={22} className="text-white" />
                       </div>
                       <p className="text-sm font-bold text-[var(--text)]">MIAA+ Academy</p>
-                      <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">Votre université intégrée — du débutant à l&apos;expert</p>
+                      <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+                        {sectorInfo ? `Formations ${sectorInfo.metier}` : 'Votre université intégrée — du débutant à l\'expert'}
+                      </p>
                     </div>
 
-                    {/* Cours recommandé du jour */}
-                    {recommendedCat && (
+                    {/* Formations recommandées pour votre secteur */}
+                    {sectorCats.length > 0 && (
+                      <div className="px-3 pb-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: GD }}>
+                          🎯 Recommandé pour votre activité — {sectorInfo?.metier}
+                        </p>
+                        <div className="space-y-1.5">
+                          {sectorCats.slice(0, 3).map((catId, idx) => (
+                            <button key={catId}
+                              onClick={() => { setAcCat(catId); setAcScreen('level') }}
+                              className="w-full flex items-center gap-3 p-2.5 rounded-xl border-2 text-left transition-all"
+                              style={{ borderColor: idx === 0 ? catColor(catId) : `${catColor(catId)}60`, background: idx === 0 ? `${catColor(catId)}12` : `${catColor(catId)}06` }}>
+                              <span className="text-xl">{catIcon(catId)}</span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-[var(--text)]">{catLabel(catId)}</p>
+                                <p className="text-[10px] text-[var(--text-secondary)] truncate">{todayTopic(catId)}</p>
+                              </div>
+                              {idx === 0 && (
+                                <span className="text-[9px] font-bold px-2 py-1 rounded-full text-white shrink-0" style={{ background: catColor(catId) }}>
+                                  AUJOURD&apos;HUI
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Cours recommandé du jour (fallback sans secteur) */}
+                    {sectorCats.length === 0 && recommendedCat && (
                       <div className="px-3 pb-2">
                         <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">⭐ Cours du jour recommandé</p>
                         <button
@@ -916,9 +1079,9 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                       </div>
                     )}
 
-                    {/* Grille des 20 catégories */}
+                    {/* Grille des 22 catégories */}
                     <div className="px-3 pb-4">
-                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Toutes les formations</p>
+                      <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Toutes les formations disponibles</p>
                       <div className="grid grid-cols-2 gap-2">
                         {ACADEMY_CATS.map(cat => (
                           <button key={cat.id}
