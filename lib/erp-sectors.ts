@@ -74,6 +74,7 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'sante-labo',            href: '/dashboard/sante/labo',            label: 'Laboratoire',         sublabel: 'Examens biologiques & résultats' },
     { id: 'sante-imagerie',        href: '/dashboard/sante/imagerie',        label: 'Imagerie Médicale',   sublabel: 'Radio, scanner & IRM'            },
     { id: 'sante-bloc',            href: '/dashboard/sante/bloc',            label: 'Bloc Opératoire',     sublabel: 'Interventions chirurgicales'     },
+    { id: 'sante-pharmacie',       href: '/dashboard/sante/pharmacie',       label: 'Pharmacie',           sublabel: 'Stock médicaments & dispensations' },
     { id: 'sante-facturation',     href: '/dashboard/sante/facturation',     label: 'Facturation',         sublabel: 'Factures & paiements patients'   },
     { id: 'sante-assurances',      href: '/dashboard/sante/assurances',      label: 'Assurances',          sublabel: 'Dossiers & prises en charge'     },
     { id: 'sante-medecins',        href: '/dashboard/sante/medecins',        label: 'Médecins',            sublabel: 'Personnel médical'               },

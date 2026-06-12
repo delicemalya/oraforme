@@ -224,6 +224,10 @@ export default function PatientsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1.5">
+                        <Link href={`/dashboard/sante/patients/${p.id}`}
+                          className="text-xs text-[#DC2626] border border-[#FCA5A5] px-2.5 py-1 rounded-lg hover:bg-[#FEF2F2] transition-colors flex items-center gap-1">
+                          <FileText size={10} /> Dossier
+                        </Link>
                         <button onClick={() => openEdit(p)}
                           className="text-xs text-[#2563EB] border border-[#BFDBFE] px-2.5 py-1 rounded-lg hover:bg-[#EFF6FF] transition-colors">
                           Modifier
