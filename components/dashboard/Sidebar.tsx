@@ -25,8 +25,11 @@ import {
   PLATFORM_MODULES,
   SECTOR_LABELS,
   ECOLE_CORE_ROLE_FILTER,
+  ECOLE_NIVEAU,
   type SectorId,
+  type EcoleSousType,
 } from '@/lib/erp-sectors'
+import { canAccessByPlan } from '@/lib/plan-access'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import type { ModulePermission } from '@/lib/hooks/usePermissions'
@@ -397,6 +400,8 @@ export default function Sidebar() {
   const { tenant, loading: tenantLoading } = useTenantContext()
 
   const secteur      = tenant?.secteur    ?? null
+  const sousType     = tenant?.sousType   ?? null
+  const taille       = tenant?.taille     ?? null
   const role         = tenant?.role       ?? null
   const ecoleRole    = tenant?.ecoleRole  ?? null
   const isSuperAdmin = tenant?.isSuperAdmin ?? false
@@ -475,35 +480,50 @@ export default function Sidebar() {
     exact ? pathname === href : pathname.startsWith(href), [pathname])
 
   const canView = useCallback((id: string): boolean => {
-    // Owner voit tout SAUF les BI d'autres secteurs (un compte école ne voit pas bi-hotel/bi-restaurant)
-    if (isOwner) {
-      if (BI_MODULE_IDS.has(id) && secteur) {
-        const allowed = SECTOR_BI_MAP[secteur] ?? ['bi-dg']
-        return allowed.includes(id)
-      }
-      return true
-    }
-    if (ADMIN_MODULE_IDS.has(id)) return role === 'admin'
+    // ── Check plan (toujours en premier) ──────────────────────────────────────
+    if (!canAccessByPlan(taille, id)) return false
+
+    // ── BI : filtrés par secteur, admin uniquement ────────────────────────────
     if (BI_MODULE_IDS.has(id)) {
-      if (role !== 'admin') return false
+      if (!isOwner && role !== 'admin') return false
       if (secteur) {
         const allowed = SECTOR_BI_MAP[secteur] ?? ['bi-dg']
         return allowed.includes(id)
       }
-      return true
+      return isOwner || role === 'admin'
     }
+
+    // ── Modules admin (workflows, api-keys…) ──────────────────────────────────
+    if (ADMIN_MODULE_IDS.has(id)) return isOwner || role === 'admin'
+
+    // ── École : filtre DIRECTION_GENERALE pour modules platform-restricted ────
     if (PLATFORM_RESTRICTED.has(id)) return ecoleRole === 'DIRECTION_GENERALE'
+
+    // ── École : filtre par rôle core + sous_type ─────────────────────────────
     if (secteur === 'ecole') {
-      const allowed = ECOLE_CORE_ROLE_FILTER[id]
-      if (allowed?.length) return ecoleRole ? allowed.includes(ecoleRole) : false
+      // Vérifier minSousType (filtrage par niveau d'établissement)
+      const ecoleMod = (SECTOR_SPECIFIC['ecole'] ?? []).find(m => m.id === id)
+      if (ecoleMod?.minSousType) {
+        const reqNiveau = ECOLE_NIVEAU[ecoleMod.minSousType as EcoleSousType] ?? 0
+        const curNiveau = ECOLE_NIVEAU[(sousType as EcoleSousType) ?? 'primaire'] ?? 0
+        if (curNiveau < reqNiveau) return false
+      }
+      // Vérifier le filtre rôle école pour les modules core
+      const coreAllowed = ECOLE_CORE_ROLE_FILTER[id]
+      if (coreAllowed?.length) return ecoleRole ? coreAllowed.includes(ecoleRole) : false
       return permissions[id]?.can_view !== false
     }
+
+    // ── Sans secteur : vérifier modules_actifs + permissions ─────────────────
     if (!secteur) {
       if (!modulesActifs.includes(id)) return false
       return permissions[id]?.can_view !== false
     }
+
+    // ── Autres secteurs : permissions ou owner ────────────────────────────────
+    if (isOwner) return true
     return permissions[id]?.can_view !== false
-  }, [isOwner, ecoleRole, secteur, permissions, modulesActifs])
+  }, [isOwner, ecoleRole, secteur, sousType, taille, permissions, modulesActifs])
 
   const visibleGroups = useMemo((): NavGroup[] => {
     if (!loaded) return []
@@ -524,6 +544,17 @@ export default function Sidebar() {
     if (!loaded) return null
     if (secteur) {
       const sectorItems = (SECTOR_SPECIFIC[secteur as SectorId] ?? [])
+        .filter(mod => {
+          // Filtre plan
+          if (!canAccessByPlan(taille, mod.id)) return false
+          // Filtre sous_type école (minSousType)
+          if (secteur === 'ecole' && mod.minSousType) {
+            const reqNiveau = ECOLE_NIVEAU[mod.minSousType as EcoleSousType] ?? 0
+            const curNiveau = ECOLE_NIVEAU[(sousType as EcoleSousType) ?? 'primaire'] ?? 0
+            if (curNiveau < reqNiveau) return false
+          }
+          return true
+        })
         .map(mod => ({
           id:   mod.id,
           label: MODULE_LABEL_KEYS[mod.id] ? t(MODULE_LABEL_KEYS[mod.id]) : mod.label,

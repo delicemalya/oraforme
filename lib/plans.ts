@@ -25,7 +25,11 @@ const TPE_MODULES = [
 
 const PME_EXTRA = [
   'comptabilite', 'fiscalite', 'stock', 'achats', 'workflows',
-  'miaa', 'roles', 'audit-light', 'ged', 'mobilemoney',
+  'miaa', 'roles', 'ged', 'mobilemoney',
+  'academy',
+  'audit-comptable', 'audit-financier', 'audit-fiscal',
+  'audit-rh', 'audit-ci', 'audit-risques', 'audit-ohada',
+  'audit-plans', 'audit-rapports',
 ]
 
 const GRANDE_EXTRA = [

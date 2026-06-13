@@ -190,6 +190,7 @@ export default function OnboardingPage() {
       telephone:       societe.telephone,
       adresse:         societe.adresse,
       secteurActivite: secteur as SecteurId,
+      sousType:        sousType || undefined,
       taille,
       pays,
       langue,

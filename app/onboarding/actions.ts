@@ -16,6 +16,7 @@ export async function createTenantAndProfile(data: {
   telephone?:      string
   adresse?:        string
   secteurActivite: SecteurId | string
+  sousType?:       string
   taille:          TailleEntreprise
   pays:            string
   langue:          string
@@ -86,6 +87,7 @@ export async function createTenantAndProfile(data: {
     secteur_activite:  data.secteurActivite,
     modules_actifs:    modules,
     taille_entreprise: data.taille,
+    sous_type:         data.sousType || null,
     pays:              data.pays,
     langue:            data.langue,
   }

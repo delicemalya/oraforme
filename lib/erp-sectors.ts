@@ -34,24 +34,98 @@ export type CoreModuleId = typeof CORE_ERP_MODULES[number]['id']
 // ── COUCHE 2 : Secteur Métier ─────────────────────────────────────────────────
 // Modules UNIQUES à chaque secteur (non présents dans le core).
 
+// ── Types école sous-niveaux ──────────────────────────────────────────────────
+// garderie/primaire/college = niveau basique
+// lycee = niveau intermédiaire (inclut basique)
+// universite = niveau complet (inclut tout)
+
+export type EcoleSousType = 'garderie' | 'primaire' | 'college' | 'lycee' | 'universite'
+
+// Niveaux hiérarchiques pour comparaison
+export const ECOLE_NIVEAU: Record<EcoleSousType, number> = {
+  garderie:   0,
+  primaire:   1,
+  college:    2,
+  lycee:      3,
+  universite: 4,
+}
+
 export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
   id: string
   href: string
   label: string
   sublabel: string
-  roleFilter?: string[]   // Pour l'école : visibilité par rôle école
+  roleFilter?: string[]       // Visibilité par rôle école
+  minSousType?: EcoleSousType // Sous-type minimum requis (pour l'école)
 }>>> = {
   ecole: [
-    { id: 'ecole-direction',        href: '/dashboard/ecole/direction',              label: 'Direction École',        sublabel: 'Pilotage & KPIs école',    roleFilter: ['DIRECTION_GENERALE'] },
-    { id: 'ecole-rh',               href: '/dashboard/ecole/rh',                     label: 'RH École',               sublabel: 'Personnel & enseignants',  roleFilter: ['DIRECTION_GENERALE', 'RH_PAIE'] },
-    { id: 'ecole-comptabilite',     href: '/dashboard/ecole/comptabilite',           label: 'Comptabilité École',     sublabel: 'Finances & OHADA école',   roleFilter: ['DIRECTION_GENERALE', 'RAF'] },
-    { id: 'scolarite',              href: '/dashboard/ecole/scolarite',              label: 'Scolarité',              sublabel: 'Inscriptions & frais',     roleFilter: ['DIRECTION_GENERALE', 'SCOLARITE', 'DAAC'] },
-    { id: 'daac',                   href: '/dashboard/ecole/daac',                   label: 'DAAC',                   sublabel: 'Affaires académiques',     roleFilter: ['DIRECTION_GENERALE', 'DAAC'] },
-    { id: 'espace-formateur',       href: '/dashboard/ecole/espace-formateur',       label: 'Formateurs',             sublabel: 'Cours & heures',           roleFilter: ['FORMATEUR', 'DIRECTION_GENERALE', 'DAAC'] },
-    { id: 'espace-etudiant',        href: '/dashboard/ecole/espace-etudiant',        label: 'Espace Étudiant',        sublabel: 'Mon dossier',              roleFilter: ['ETUDIANT'] },
-    { id: 'espace-parent',          href: '/dashboard/ecole/espace-parent',          label: 'Espace Parent',          sublabel: 'Suivi scolarité',          roleFilter: ['PARENT'] },
-    { id: 'parametres-academiques', href: '/dashboard/ecole/parametres-academiques', label: 'Paramètres académiques', sublabel: 'LMD & mentions',           roleFilter: ['DIRECTION_GENERALE', 'DAAC'] },
-    { id: 'ecole-miaa',             href: '/dashboard/miaa?context=ecole',           label: 'MIAA+',                  sublabel: 'IA assistant école',       roleFilter: ['DIRECTION_GENERALE', 'DAAC', 'FORMATEUR'] },
+    // ─ Toujours visibles (tous niveaux)
+    { id: 'ecole-direction',
+      href:       '/dashboard/ecole/direction',
+      label:      'Direction',
+      sublabel:   'Pilotage & KPIs',
+      roleFilter: ['DIRECTION_GENERALE'] },
+
+    { id: 'scolarite',
+      href:       '/dashboard/ecole/scolarite',
+      label:      'Scolarité',
+      sublabel:   'Inscriptions & frais',
+      roleFilter: ['DIRECTION_GENERALE', 'SCOLARITE', 'DAAC'] },
+
+    { id: 'espace-formateur',
+      href:       '/dashboard/ecole/espace-formateur',
+      label:      'Formateurs',
+      sublabel:   'Cours & heures',
+      roleFilter: ['FORMATEUR', 'DIRECTION_GENERALE', 'DAAC'] },
+
+    { id: 'espace-etudiant',
+      href:       '/dashboard/ecole/espace-etudiant',
+      label:      'Espace Élève',
+      sublabel:   'Mon dossier',
+      roleFilter: ['ETUDIANT'] },
+
+    { id: 'espace-parent',
+      href:       '/dashboard/ecole/espace-parent',
+      label:      'Espace Parent',
+      sublabel:   'Suivi scolarité',
+      roleFilter: ['PARENT'] },
+
+    { id: 'ecole-miaa',
+      href:       '/dashboard/miaa?context=ecole',
+      label:      'MIAA+',
+      sublabel:   'IA assistant école',
+      roleFilter: ['DIRECTION_GENERALE', 'DAAC', 'FORMATEUR'] },
+
+    // ─ À partir du Collège
+    { id: 'ecole-rh',
+      href:        '/dashboard/ecole/rh',
+      label:       'RH & Personnel',
+      sublabel:    'Enseignants & contrats',
+      roleFilter:  ['DIRECTION_GENERALE', 'RH_PAIE'],
+      minSousType: 'college' },
+
+    { id: 'daac',
+      href:        '/dashboard/ecole/daac',
+      label:       'Affaires Académiques',
+      sublabel:    'Examens & programmes',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'college' },
+
+    // ─ À partir du Lycée (Business)
+    { id: 'ecole-comptabilite',
+      href:        '/dashboard/ecole/comptabilite',
+      label:       'Comptabilité',
+      sublabel:    'Finances & OHADA',
+      roleFilter:  ['DIRECTION_GENERALE', 'RAF'],
+      minSousType: 'lycee' },
+
+    // ─ Université uniquement (Entreprise+)
+    { id: 'parametres-academiques',
+      href:        '/dashboard/ecole/parametres-academiques',
+      label:       'Paramètres LMD',
+      sublabel:    'Parcours, diplômes & LMD',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'universite' },
   ],
   restaurant: [
     { id: 'resto-direction',    href: '/dashboard/restaurant/direction',    label: 'Direction',       sublabel: 'KPIs & rentabilité'      },

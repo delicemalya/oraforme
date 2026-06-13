@@ -38,8 +38,9 @@ export interface TenantState {
   profileId:     string
   nomEntreprise: string
   secteur:       string | null
+  sousType:      string | null   // ex. 'primaire','college','lycee','universite'
   plan:          string | null
-  taille:        string | null
+  taille:        string | null   // 'tpe' | 'pme' | 'grande'
   pays:          string | null
   langue:        string | null
   role:          UserRole
@@ -86,7 +87,7 @@ async function fetchTenantForUser(
   // from localStorage will override this default instead of breaking isolation.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, plan, taille_entreprise, pays, langue)')
+    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, sous_type, plan, taille_entreprise, pays, langue)')
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -98,6 +99,7 @@ async function fetchTenantForUser(
     nom_entreprise:    string
     modules_actifs:    string[]
     secteur_activite:  string | null
+    sous_type?:        string | null
     plan?:             string | null
     taille_entreprise?: string | null
     pays?:             string | null
@@ -109,6 +111,7 @@ async function fetchTenantForUser(
     profileId:        profile.id as string,
     nomEntreprise:    t?.nom_entreprise ?? '',
     secteur:          t?.secteur_activite ?? null,
+    sousType:         t?.sous_type ?? null,
     plan:             t?.plan ?? null,
     taille:           t?.taille_entreprise ?? null,
     pays:             t?.pays ?? null,
