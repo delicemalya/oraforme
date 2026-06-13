@@ -97,24 +97,27 @@ export function BannerTicker() {
     // Responsive : pleine largeur sur mobile, auto sur desktop
     <div className="flex items-center justify-between sm:justify-start gap-3 w-full lg:w-auto">
 
-      {/* ── Ticker animé ── */}
-      <div className="flex-1 lg:flex-none" style={{ minWidth: 0 }}>
+      {/* ── Ticker animé — hauteur fixe pour éviter le layout shift ── */}
+      <div
+        className="flex-1 lg:flex-none relative overflow-hidden"
+        style={{ height: 36, minWidth: 160, maxWidth: 260 }}
+      >
         <AnimatePresence mode="wait">
           {show && current && (
             <motion.div key={idx}
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.38, ease: 'easeInOut' }}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl"
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: 'easeInOut' }}
+              className="absolute inset-0 flex items-center gap-2 px-3 rounded-xl"
               style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.22)' }}
             >
               <span className="text-sm leading-none shrink-0">{current.icon}</span>
-              <span className="text-[11px] sm:text-[12px] font-semibold text-white/95 truncate leading-none">
+              <span className="text-[11px] sm:text-[12px] font-semibold text-white/95 truncate leading-none flex-1">
                 {current.text}
               </span>
-              {/* Dots progression — cachés sur très petit écran */}
-              <div className="hidden sm:flex items-center gap-0.5 ml-1 shrink-0">
+              {/* Dots progression */}
+              <div className="hidden sm:flex items-center gap-0.5 shrink-0">
                 {slides.map((_, i) => (
                   <span key={i} className="rounded-full transition-all duration-300"
                     style={{

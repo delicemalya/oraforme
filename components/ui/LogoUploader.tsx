@@ -15,7 +15,6 @@ export function LogoUploader() {
   const nom      = tenant?.nomEntreprise ?? ''
   const initials = nom.slice(0, 2).toUpperCase() || 'EN'
 
-  // Fetch logo from entreprise_config; sync on config-saved events
   useEffect(() => {
     if (!tenantId) return
     supabase
@@ -36,35 +35,23 @@ export function LogoUploader() {
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file || !tenantId) return
-
     if (file.size > 2 * 1024 * 1024) { alert('Logo trop lourd. Maximum 2 MB.'); return }
     if (!['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(file.type)) {
       alert('Format accepté : PNG, JPG, SVG, WebP'); return
     }
-
-    // Instant preview
     const reader = new FileReader()
     reader.onload = ev => setPreview(ev.target?.result as string)
     reader.readAsDataURL(file)
-
-    setLoading(true)
-    setShowMenu(false)
+    setLoading(true); setShowMenu(false)
     try {
       const ext  = file.name.split('.').pop() ?? 'png'
       const path = `logos/${tenantId}_${Date.now()}.${ext}`
-
-      const { error: upErr } = await supabase.storage
-        .from('logos').upload(path, file, { upsert: true })
+      const { error: upErr } = await supabase.storage.from('logos').upload(path, file, { upsert: true })
       if (upErr) throw upErr
-
       const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path)
-
-      // Update both tables idempotently
       await supabase.from('entreprise_config')
         .upsert({ tenant_id: tenantId, logo_url: publicUrl }, { onConflict: 'tenant_id' })
-
-      setLogoUrl(publicUrl)
-      setPreview(null)
+      setLogoUrl(publicUrl); setPreview(null)
       window.dispatchEvent(new CustomEvent('oraforme:config-saved', { detail: { logo_url: publicUrl } }))
     } catch (err) {
       console.error('Logo upload error:', err)
@@ -90,18 +77,20 @@ export function LogoUploader() {
   const src = preview || logoUrl
 
   return (
-    <div className="relative hidden sm:block shrink-0">
-      {/* Logo cliquable */}
+    <div className="relative hidden sm:flex items-center gap-2 shrink-0">
+
+      {/* ── Zone logo cliquable ── */}
       <div
-        className="relative cursor-pointer group"
+        className="relative cursor-pointer"
         onClick={() => setShowMenu(v => !v)}
-        title="Changer le logo"
+        title="Cliquez pour changer votre logo"
       >
+        {/* Conteneur logo : bordure pointillée si pas de logo */}
         <div
-          className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center border-2 transition-all"
+          className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center transition-all"
           style={{
-            borderColor: src ? 'transparent' : 'var(--primary-light)',
-            background:  src ? undefined : 'var(--primary-light)',
+            border: src ? '2px solid var(--primary-light)' : '2px dashed var(--primary)',
+            background: src ? undefined : 'var(--primary-light)',
           }}
         >
           {loading ? (
@@ -117,24 +106,37 @@ export function LogoUploader() {
           )}
         </div>
 
-        {/* Crayon au hover */}
+        {/* Badge caméra TOUJOURS visible — indique que c'est modifiable */}
         <div
-          className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full hidden group-hover:flex items-center justify-center shadow-sm"
+          className="absolute -bottom-1 -right-1 w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-md ring-2 ring-white"
           style={{ background: 'var(--primary)' }}
         >
-          <svg width="7" height="7" viewBox="0 0 24 24" fill="white">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
           </svg>
         </div>
       </div>
 
-      {/* Menu contextuel */}
+      {/* Label cliquable — rend l'action évidente d'un coup d'œil */}
+      <button
+        onClick={() => setShowMenu(v => !v)}
+        className="flex flex-col items-start leading-tight hover:opacity-75 transition-opacity"
+      >
+        <span className="text-[9px] font-semibold uppercase tracking-wide" style={{ color: 'var(--primary)' }}>
+          📸 Modifier
+        </span>
+        <span className="text-[10px] font-bold text-[#0F172A] max-w-[110px] truncate">{nom}</span>
+      </button>
+
+      {/* ── Menu contextuel ── */}
       {showMenu && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-          <div className="absolute left-0 top-11 z-50 bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-52 overflow-hidden"
-            style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
+          <div
+            className="absolute left-0 top-12 z-50 bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-52 overflow-hidden"
+            style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}
+          >
             <div className="px-3 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0]">
               <p className="text-[10px] font-medium text-[#94A3B8]">Logo de l&apos;entreprise</p>
             </div>
@@ -163,9 +165,7 @@ export function LogoUploader() {
             )}
 
             <div className="px-4 py-2 bg-[#F8FAFC] border-t border-[#E2E8F0]">
-              <p className="text-[10px] text-[#94A3B8]">
-                💡 Apparaît sur vos factures et documents
-              </p>
+              <p className="text-[10px] text-[#94A3B8]">💡 Apparaît sur vos factures et documents</p>
             </div>
           </div>
         </>
