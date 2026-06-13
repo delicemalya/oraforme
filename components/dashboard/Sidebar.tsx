@@ -86,6 +86,7 @@ const ICONS: Record<string, LucideIcon> = {
   achats:        ShoppingCart,
   ged:           FolderOpen,
   bizbot:        Bot,
+  academy:       GraduationCap,
   calendrier:    Calendar,
   taches:        CheckSquare,
   profil:        Building2,
@@ -205,6 +206,7 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'audit-ohada',      label: 'Conformité OHADA',          sublabel: '', href: '/dashboard/audit/ohada'          },
   { id: 'audit-plans',      label: "Plans d'Actions",           sublabel: '', href: '/dashboard/audit/plans-actions'  },
   { id: 'audit-rapports',   label: 'Rapports d\'Audit',         sublabel: '', href: '/dashboard/audit/rapports'       },
+  { id: 'academy', label: 'MIAA+ Academy', sublabel: 'Université intelligente', href: '/dashboard/academy' },
   // MIAA+ sous-modules (bizbot = entrée principale → /dashboard/miaa)
   { id: 'miaa-agent',     label: 'Agent Autonome',        sublabel: 'Centre de Commandement',  href: '/dashboard/miaa/agent'     },
   { id: 'miaa-rapports',  label: 'Rapports IA',            sublabel: 'Générés par MIAA+',       href: '/dashboard/miaa/rapports'  },
@@ -227,7 +229,7 @@ const SIDEBAR_GROUPS = [
   // COMMERCIAL — clients, ventes, recouvrement, stock, achats
   { id: 'commercial',  labelKey: 'nav.commercial',  icon: Store,       moduleIds: ['crm', 'facturation', 'recouvrement', 'stock', 'achats'] },
   // OUTILS — IA & productivité
-  { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'taches'] },
+  { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'academy', 'taches'] },
   // AUDIT & CONFORMITÉ OHADA
   { id: 'audit_group', labelKey: 'nav.audit',       icon: ShieldAlert, moduleIds: ['audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci', 'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'] },
   // ADMIN — abonnement, automatisation, API
@@ -258,6 +260,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   achats:       'nav.achats',
   ged:          'nav.ged',
   bizbot:       'nav.bizbot',
+  academy:      'nav.academy',
   calendrier:   'nav.calendrier',
   taches:       'nav.taches',
   profil:       'nav.profil',
@@ -368,6 +371,7 @@ const ALL_MODULE_IDS = [
   'sante-facturation', 'sante-assurances', 'sante-rh', 'sante-miaa', 'sante-hospitalisation',
   'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
   'abonnement', 'fiscalite', 'cnss-congo',
+  'academy',
   'miaa-agent', 'miaa-rapports', 'miaa-expertise',
 ]
 

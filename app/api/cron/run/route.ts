@@ -58,6 +58,9 @@ export async function POST(req: NextRequest) {
   // 8. WhatsApp fiscal deadline alerts (daily check)
   if (hh === 6) results.fiscal_wa_alerts = await checkFiscalDeadlinesWhatsApp()
 
+  // 9. MIAA+ analyse quotidienne — directeur virtuel pour chaque tenant
+  if (hh === 6) results.miaa_daily_analysis = await runMIAADailyAnalysis()
+
   return NextResponse.json({
     ok: true,
     timestamp: now.toISOString(),
@@ -371,4 +374,42 @@ async function checkFiscalDeadlinesWhatsApp(): Promise<number> {
     }
   }
   return sent
+}
+
+// ── MIAA+ Analyse quotidienne — directeur virtuel ─────────────────────────────
+
+async function runMIAADailyAnalysis(): Promise<number> {
+  const { data: tenants } = await supabaseAdmin
+    .from('tenants')
+    .select('id')
+    .eq('is_active', true)
+    .limit(100)
+
+  if (!tenants?.length) return 0
+
+  let processed = 0
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.oraforme.com'
+
+  // Process tenants in batches of 5 to stay within timeout
+  const batchSize = 5
+  for (let i = 0; i < tenants.length; i += batchSize) {
+    const batch = tenants.slice(i, i + batchSize)
+    await Promise.allSettled(
+      batch.map(async (t) => {
+        try {
+          await fetch(`${baseUrl}/api/miaa/analyse-quotidienne`, {
+            method:  'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal':   'true',
+            },
+            body: JSON.stringify({ tenant_id: t.id }),
+          })
+          processed++
+        } catch { /* non-blocking */ }
+      })
+    )
+  }
+
+  return processed
 }

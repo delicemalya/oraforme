@@ -44,9 +44,24 @@ function selectModel(message: string): { model: string; maxTokens: number; isCom
 // et les mots-clés du message. L'utilisateur voit toujours "MIAA+" mais le moteur
 // envoie la personnalité du bon expert.
 const SECTOR_TO_AGENT: Record<string, string> = {
-  restaurant: 'restaurant', ecole: 'ecole', hotel: 'hotel',
-  sante: 'sante', pharmacie: 'sante', cabinet: 'cabinet',
-  audit: 'audit',
+  // Restauration & Hôtellerie
+  restaurant: 'restaurant', hotel: 'hotel', hotellerie: 'hotel', boisson: 'restaurant',
+  // Santé
+  sante: 'sante', pharmacie: 'pharmacie', clinique: 'sante', hopital: 'sante',
+  // Éducation
+  ecole: 'ecole', universite: 'ecole',
+  // Cabinet & Conseil
+  cabinet: 'cabinet', audit: 'audit',
+  // BTP & Transport
+  btp: 'comptabilite', transport: 'tresorerie', transport_public: 'rh',
+  // Agriculture & Commerce
+  agriculture: 'stock', commerce: 'crm', supermarche: 'stock', boutique: 'crm',
+  // Finance & Banque
+  banque: 'tresorerie', microfinance: 'tresorerie',
+  // ONG
+  ong: 'comptabilite',
+  // Industrie
+  industrie: 'stock', petrole: 'comptabilite',
 }
 
 function detectAgent(message: string, secteur?: string): string {
@@ -72,6 +87,20 @@ function detectAgent(message: string, secteur?: string): string {
     return 'crm'
   if (/audit|conformit|anomali|score.*audit|contrôle.*intern|risque.*entreprise|ohada.*conform|plan.*action.*audit|non-conformit|redressement.*fiscal/.test(msg))
     return 'audit'
+  if (/restaurant|cuisine|menu|couverts|food cost|haccp|caisse.*jour|plat.*ven/.test(msg))
+    return 'restaurant'
+  if (/hôtel|chambre|check.in|check.out|revpar|occupat|reservation|housekeeping/.test(msg))
+    return 'hotel'
+  if (/patient|consul|ordonnance|médecin|soins|clinique|camu|hôpital|infirmier/.test(msg))
+    return 'sante'
+  if (/médic|pharmacie|officine|ordonnance.*méd|bpd|fefo.*méd|stupéfiant/.test(msg))
+    return 'pharmacie'
+  if (/élève|étudiant|scolarité|bulletin.*note|classe|enseignant|frais.*scol/.test(msg))
+    return 'ecole'
+  if (/audit.*cabinet|cliente.*cabinet|liasse|commissar|expert.comptable/.test(msg))
+    return 'cabinet'
+  if (/transport|flotte|chauffeur|kilomét|livraison.*route/.test(msg))
+    return 'tresorerie'
 
   // 3. Défaut : comptabilité — l'agent le plus polyvalent
   return 'comptabilite'

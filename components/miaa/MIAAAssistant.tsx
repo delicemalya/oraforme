@@ -7,7 +7,7 @@ import {
   Send, Upload, Download, RefreshCw, Loader2,
   CheckCircle2, ChevronRight, Sparkles, Minimize2, Maximize2,
   FileUp, Trash2, ExternalLink, BookOpen, Award, ChevronLeft,
-  Trophy, RotateCcw,
+  Trophy, RotateCcw, FileSpreadsheet, FileType2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -435,6 +435,44 @@ const PRIORITY_STYLES: Record<string, { bg: string; border: string; dot: string;
   high:     { bg: '#FFFBEB', border: '#FDE68A', dot: '#F59E0B', label: 'Important' },
   medium:   { bg: '#EFF6FF', border: '#BFDBFE', dot: '#2563EB', label: 'Info' },
   low:      { bg: 'var(--surface)', border: 'var(--border)', dot: '#94A3B8', label: '' },
+}
+
+// ── Fonctions d'export client-side ─────────────────────────────────────────────
+
+async function exportAsPDF(content: string, filename: string) {
+  const { default: jsPDF } = await import('jspdf')
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+  doc.setFont('helvetica')
+  doc.setFontSize(11)
+  const lines = doc.splitTextToSize(content, 180)
+  let y = 20
+  doc.setFontSize(14)
+  doc.text('MIAA+ — Oraforme', 15, 12)
+  doc.setFontSize(11)
+  for (const line of lines) {
+    if (y > 280) { doc.addPage(); y = 20 }
+    doc.text(line, 15, y); y += 5.5
+  }
+  doc.save(`${filename}_${new Date().toISOString().slice(0, 10)}.pdf`)
+}
+
+async function exportAsXLSX(content: string, filename: string) {
+  const XLSX = await import('xlsx')
+  const lines = content.split('\n').map(l => [l])
+  const wb = XLSX.utils.book_new()
+  const ws = XLSX.utils.aoa_to_sheet([['Document MIAA+ — Oraforme'], [''], ...lines])
+  ws['!cols'] = [{ wch: 100 }]
+  XLSX.utils.book_append_sheet(wb, ws, 'MIAA+')
+  XLSX.writeFile(wb, `${filename}_${new Date().toISOString().slice(0, 10)}.xlsx`)
+}
+
+function exportAsDOCX(content: string, filename: string) {
+  const htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>${filename}</title><style>body{font-family:Calibri,Arial;font-size:11pt;line-height:1.6}h1{font-size:14pt;color:#1D4ED8}pre{font-family:Calibri;white-space:pre-wrap}</style></head><body><h1>MIAA+ — Oraforme</h1><pre>${content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`
+  const blob = new Blob(['﻿', htmlContent], { type: 'application/msword' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `${filename}_${new Date().toISOString().slice(0, 10)}.doc`
+  a.click()
 }
 
 // ── Composant principal ────────────────────────────────────────────────────────
@@ -913,7 +951,9 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                   <p className="text-white/80 text-[10px]">
                     {activeTab === 'formation'
                       ? (acScreen === 'home' ? 'Academy · Formateur Expert' : `Formateur ${catLabel(acCat)}`)
-                      : (MOD_EXPERT[module ?? 'auto'] ?? MOD_EXPERT.auto)}
+                      : activeSectorInfo
+                        ? `Expert ${activeSectorInfo.metier}`
+                        : (MOD_EXPERT[module ?? 'auto'] ?? MOD_EXPERT.auto)}
                   </p>
                 </div>
               </div>
@@ -1114,12 +1154,30 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                           {genDoc ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
                           {genDoc ? 'Génération…' : 'Générer'}
                         </button>
-                        {docResult && (
-                          <button onClick={downloadDocument} className="p-2 rounded-lg border border-[var(--border)] hover:border-[#16A34A] transition-colors" title="Télécharger">
-                            <Download size={14} style={{ color: GC }} />
-                          </button>
-                        )}
                       </div>
+                      {docResult && (
+                        <div className="flex gap-1.5 mt-2">
+                          <button onClick={() => exportAsPDF(docResult, docType)} title="Télécharger PDF"
+                            className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg border text-[10px] font-medium transition-colors"
+                            style={{ borderColor: '#DC2626', color: '#DC2626' }}>
+                            <FileType2 size={11} /> PDF
+                          </button>
+                          <button onClick={() => exportAsXLSX(docResult, docType)} title="Télécharger Excel"
+                            className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg border text-[10px] font-medium transition-colors"
+                            style={{ borderColor: '#16A34A', color: '#16A34A' }}>
+                            <FileSpreadsheet size={11} /> XLSX
+                          </button>
+                          <button onClick={() => exportAsDOCX(docResult, docType)} title="Télécharger Word"
+                            className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg border text-[10px] font-medium transition-colors"
+                            style={{ borderColor: GC, color: GC }}>
+                            <FileText size={11} /> DOC
+                          </button>
+                          <button onClick={downloadDocument} title="Télécharger TXT"
+                            className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg border text-[10px] font-medium transition-colors border-[var(--border)] text-[var(--text-secondary)]">
+                            <Download size={11} /> TXT
+                          </button>
+                        </div>
+                      )}
                     </>
                   )}
                   {docResult && (
