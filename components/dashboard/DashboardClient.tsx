@@ -20,6 +20,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import GeoDetectionBanner from '@/components/ui/GeoDetectionBanner'
 import { getTenantBrandColor } from '@/lib/utils'
 import { BannerTicker } from '@/components/dashboard/BannerTicker'
+import { useTheme } from '@/lib/contexts/ThemeContext'
 
 export interface DashboardData {
   tenant: { nom_entreprise: string; modules_actifs: string[]; plan: string }
@@ -536,8 +537,10 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
   const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const router = useRouter()
+  const { theme, isExplicit } = useTheme()
   const { tenant, tenantId, kpis, alerts, recentActivity, chartData } = data
-  const brandColor      = getTenantBrandColor(tenantId)
+  // Si l'utilisateur a choisi une couleur explicitement → override le brandColor du banner
+  const brandColor = isExplicit ? theme.primary : getTenantBrandColor(tenantId)
   const isFinancial     = data.isFinancial ?? true
   const secteur         = data.secteur ?? null
   const ecoleRole       = data.ecoleRole ?? null

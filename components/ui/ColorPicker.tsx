@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { THEMES, useTheme } from '@/lib/contexts/ThemeContext'
 
 export function ColorPicker() {
-  const { theme, changerTheme } = useTheme()
+  const { theme, isExplicit, changerTheme, resetTheme } = useTheme()
   const [open, setOpen] = useState(false)
 
   return (
@@ -12,7 +12,7 @@ export function ColorPicker() {
         onClick={() => setOpen(v => !v)}
         title={`Thème : ${theme.nom}`}
         className="w-7 h-7 rounded-full border-2 border-white/40 shadow-sm transition-transform hover:scale-110"
-        style={{ backgroundColor: theme.primary }}
+        style={{ backgroundColor: isExplicit ? theme.primary : '#64748B' }}
       />
 
       {open && (
@@ -23,30 +23,34 @@ export function ColorPicker() {
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] mb-2.5">
               Couleur de l&apos;interface
             </p>
-            <div className="grid grid-cols-5 gap-2 mb-3">
+            <div className="grid grid-cols-4 gap-2 mb-3">
               {THEMES.map(t => (
                 <button
                   key={t.id}
                   onClick={() => { changerTheme(t.id); setOpen(false) }}
                   title={t.nom}
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
                   style={{
                     backgroundColor: t.primary,
-                    outline: theme.id === t.id ? `2px solid #0F172A` : 'none',
+                    outline: (isExplicit && theme.id === t.id) ? `2px solid #0F172A` : 'none',
                     outlineOffset: '2px',
-                    transform: theme.id === t.id ? 'scale(1.15)' : undefined,
-                  }}
-                >
-                  {theme.id === t.id && (
+                  }}>
+                  {isExplicit && theme.id === t.id && (
                     <span className="text-white text-[11px] font-bold">✓</span>
                   )}
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: theme.light }}>
-              <div className="w-3 h-3 rounded-full shrink-0" style={{ background: theme.primary }} />
-              <span className="text-xs font-semibold" style={{ color: theme.primary }}>{theme.nom}</span>
-            </div>
+            {isExplicit ? (
+              <button onClick={() => { resetTheme(); setOpen(false) }}
+                className="w-full text-[10px] text-[#94A3B8] hover:text-[#0F172A] py-1 transition-colors">
+                ↺ Revenir à la couleur secteur
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#F8FAFC]">
+                <span className="text-[10px] text-[#94A3B8]">Couleur basée sur votre secteur</span>
+              </div>
+            )}
           </div>
         </>
       )}

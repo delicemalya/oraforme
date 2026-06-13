@@ -1,22 +1,26 @@
 'use client'
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 
+// Palette officielle Oraforme
 export const THEMES = [
-  { id: 'gold',   nom: 'Gold Congo',     primary: '#F0A30A', hover: '#D4890A', light: '#FFF8E7' },
-  { id: 'rouge',  nom: 'Rouge Oraforme', primary: '#EF4444', hover: '#DC2626', light: '#FEF2F2' },
-  { id: 'bleu',   nom: 'Bleu Océan',    primary: '#3B82F6', hover: '#2563EB', light: '#EFF6FF' },
-  { id: 'violet', nom: 'Violet Premium', primary: '#8B5CF6', hover: '#7C3AED', light: '#F5F3FF' },
-  { id: 'vert',   nom: 'Vert Afrique',   primary: '#10B981', hover: '#059669', light: '#ECFDF5' },
-  { id: 'orange', nom: 'Orange Sunset',  primary: '#F97316', hover: '#EA580C', light: '#FFF7ED' },
-  { id: 'rose',   nom: 'Rose Modern',    primary: '#EC4899', hover: '#DB2777', light: '#FDF2F8' },
-  { id: 'indigo', nom: 'Indigo Night',   primary: '#6366F1', hover: '#4F46E5', light: '#EEF2FF' },
-  { id: 'cyan',   nom: 'Cyan Tech',      primary: '#06B6D4', hover: '#0891B2', light: '#ECFEFF' },
-  { id: 'noir',   nom: 'Noir Élégant',   primary: '#1F2937', hover: '#111827', light: '#F9FAFB' },
+  { id: 'teal',   nom: 'Teal Oraforme',  primary: '#258571', hover: '#1a6559', light: '#e8f5f2' },
+  { id: 'marine', nom: 'Bleu Marine',    primary: '#042654', hover: '#021840', light: '#e6eef8' },
+  { id: 'vert',   nom: 'Vert Émeraude', primary: '#04a269', hover: '#037a50', light: '#e6f7ef' },
+  { id: 'rouge',  nom: 'Rouge Oraforme', primary: '#f61c37', hover: '#d4162f', light: '#fee6e8' },
+  { id: 'orange', nom: 'Orange Soleil',  primary: '#f38604', hover: '#d97203', light: '#fef3e6' },
+  { id: 'violet', nom: 'Violet Royal',   primary: '#830a65', hover: '#6a0853', light: '#f5e6f1' },
+  { id: 'bleu',   nom: 'Bleu Oraforme', primary: '#0148b7', hover: '#013a93', light: '#e6eef8' },
+  { id: 'cyan',   nom: 'Cyan Atlantique',primary: '#268d82', hover: '#1e7169', light: '#e8f5f4' },
 ] as const
 
 export type Theme = typeof THEMES[number]
 
-interface ThemeCtx { theme: Theme; changerTheme: (id: string) => void }
+interface ThemeCtx {
+  theme:      Theme
+  isExplicit: boolean   // true = user picked a color → banner uses theme.primary
+  changerTheme:  (id: string) => void
+  resetTheme:    () => void
+}
 const Ctx = createContext<ThemeCtx | null>(null)
 
 function apply(t: Theme) {
@@ -30,21 +34,32 @@ function apply(t: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(THEMES[0])
+  const [theme,      setTheme]      = useState<Theme>(THEMES[0])
+  const [isExplicit, setIsExplicit] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('oraforme_theme')
     const found = THEMES.find(t => t.id === saved)
-    if (found) { setTheme(found); apply(found) }
+    if (found) { setTheme(found); setIsExplicit(true); apply(found) }
   }, [])
 
   function changerTheme(id: string) {
     const next = THEMES.find(t => t.id === id) ?? THEMES[0]
-    setTheme(next); apply(next)
+    setTheme(next); setIsExplicit(true); apply(next)
     localStorage.setItem('oraforme_theme', id)
   }
 
-  return <Ctx.Provider value={{ theme, changerTheme }}>{children}</Ctx.Provider>
+  function resetTheme() {
+    localStorage.removeItem('oraforme_theme')
+    setIsExplicit(false)
+    setTheme(THEMES[0])
+  }
+
+  return (
+    <Ctx.Provider value={{ theme, isExplicit, changerTheme, resetTheme }}>
+      {children}
+    </Ctx.Provider>
+  )
 }
 
 export function useTheme() {
