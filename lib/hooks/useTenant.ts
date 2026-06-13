@@ -18,5 +18,8 @@ export function useTenant() {
     prenom:        tenant?.prenom        ?? null,
     nom:           tenant?.nom           ?? null,
     nomEntreprise: tenant?.nomEntreprise ?? null,
+    sousType:      tenant?.sousType      ?? null,
+    taille:        tenant?.taille        ?? null,
+    secteur:       tenant?.secteur       ?? null,
   }
 }

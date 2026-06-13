@@ -151,13 +151,28 @@ function RevenueCard({
 
 // -- Main Page -----------------------------------------------------------------
 
+// ── Adaptive config by sousType ───────────────────────────────────────────────
+
+type EcoleSousType = 'garderie' | 'primaire' | 'college' | 'lycee' | 'universite'
+
+const SOUSTYPE_CFG: Record<EcoleSousType, { label: string; badge: string; emoji: string }> = {
+  garderie:   { label: 'Garderie & Crèche',  badge: 'Petite enfance',          emoji: '🐣' },
+  primaire:   { label: 'École Primaire',      badge: 'Enseignement primaire',   emoji: '📚' },
+  college:    { label: 'Collège',             badge: 'Enseignement secondaire', emoji: '🏫' },
+  lycee:      { label: 'Lycée',               badge: 'Enseignement secondaire', emoji: '🎒' },
+  universite: { label: 'Université',          badge: 'Enseignement supérieur',  emoji: '🎓' },
+}
+
 export default function EcoleOverviewPage() {
-  const { tenantId, loading: tenantLoading, prenom, nom, nomEntreprise } = useTenant()
+  const { tenantId, loading: tenantLoading, prenom, nom, nomEntreprise, sousType } = useTenant()
   const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#2977ac'
   const { t } = useLocale()
   const [data,     setData]     = useState<OverviewData | null>(null)
   const [loading,  setLoading]  = useState(true)
   const [nomEcole, setNomEcole] = useState('École')
+
+  const stCfg = SOUSTYPE_CFG[(sousType as EcoleSousType) ?? 'primaire'] ?? SOUSTYPE_CFG.primaire
+  const isUniversite = sousType === 'universite'
 
   const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
@@ -300,32 +315,42 @@ export default function EcoleOverviewPage() {
   return (
     <div className="flex flex-col gap-6 pb-10">
 
-      {/* -- Banner � fond orange plat ------------------------------------------ */}
+      {/* -- Banner adaptatif par sousType --------------------------------------- */}
       <motion.div {...fade(0)} style={{ background: brandColor, borderRadius: 12, padding: '20px 24px', position: 'relative', overflow: 'hidden' }}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{t('school.greeting')}, {displayName}</h1>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span style={{ fontSize: 20 }}>{stCfg.emoji}</span>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{stCfg.label}</h1>
+              <span style={{ fontSize: 10, fontWeight: 700, background: 'rgba(255,255,255,0.2)', color: '#FFFFFF', borderRadius: 20, padding: '2px 10px', letterSpacing: '0.05em' }}>
+                {stCfg.badge}
+              </span>
               <button onClick={load} style={{ color: 'rgba(255,255,255,0.5)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}
                 className="hover:opacity-80 transition-opacity">
                 <RefreshCw size={13} />
               </button>
             </div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>
-              {t('school.dashSubtitle')}
+              {t('school.greeting')}, {displayName}
             </p>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
-              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> � {t('nav.dashboard')}
+              <strong style={{ color: '#FFFFFF' }}>{nomEcole}</strong> &mdash; {t('nav.dashboard')}
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
               <Link href="/dashboard/ecole/scolarite"
                 style={{ background: '#FFFFFF', color: brandColor, fontWeight: 700, fontSize: 13, padding: '8px 16px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <Plus size={13} /> {t('school.enrollment')}
+                <Plus size={13} /> {isUniversite ? 'Inscrire un étudiant' : t('school.enrollment')}
               </Link>
               <Link href="/dashboard/ecole/direction"
                 style={{ background: 'transparent', color: '#FFFFFF', fontWeight: 600, fontSize: 13, padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.5)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 {t('nav.rapports')}
               </Link>
+              {isUniversite && (
+                <Link href="/dashboard/ecole/parametres-academiques"
+                  style={{ background: 'transparent', color: '#FFFFFF', fontWeight: 600, fontSize: 13, padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.3)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <GraduationCap size={13} /> LMD
+                </Link>
+              )}
             </div>
           </div>
 
@@ -345,18 +370,23 @@ export default function EcoleOverviewPage() {
         </div>
       </motion.div>
 
-      {/* -- 5 KPI Cards ------------------------------------------------------- */}
+      {/* -- KPI Cards --------------------------------------------------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
-        <StatCard i={1} icon={GraduationCap} label={t('school.enrolled')}
-          value={d.nbEtudiants} sub={`${d.nbActifs} ${t('common.active').toLowerCase()} � ${d.nbSuspendus} suspendus`}
-          color="#DC2626" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% ${t('common.active').toLowerCase()}`} />
+        <StatCard i={1} icon={GraduationCap}
+          label={isUniversite ? 'Étudiants inscrits' : t('school.enrolled')}
+          value={d.nbEtudiants}
+          sub={`${d.nbActifs} actifs · ${d.nbSuspendus} suspendus`}
+          color="#DC2626" href="/dashboard/ecole/scolarite" badge={`${tauxActifs}% actifs`} />
 
         <StatCard i={2} icon={Users} label={t('school.agents')}
-          value={nbAgents} sub={`${d.nbEmployes} ${t('rh.employees').toLowerCase()} � ${d.nbStaff} staff direction`}
+          value={nbAgents}
+          sub={`${d.nbEmployes} employés · ${d.nbStaff} staff`}
           color="#DC2626" href="/dashboard/ecole/rh" badge={t('rh.employees')} />
 
-        <StatCard i={3} icon={BookOpen} label={t('school.trainers')}
-          value={d.nbEnseignants} sub={`${d.nbEnsEmployes} ${t('rh.employees').toLowerCase()} � ${d.nbEnsPrestataires} prestataires`}
+        <StatCard i={3} icon={BookOpen}
+          label={isUniversite ? 'Enseignants-chercheurs' : t('school.trainers')}
+          value={d.nbEnseignants}
+          sub={`${d.nbEnsEmployes} employés · ${d.nbEnsPrestataires} vacataires`}
           color="#7C3AED" href="/dashboard/ecole/rh" badge={t('common.active')} />
 
         <RevenueCard i={4}
@@ -365,9 +395,24 @@ export default function EcoleOverviewPage() {
 
         <StatCard i={5} icon={Receipt} label={t('school.exits')}
           value={fmt(d.depensesJour)} sub={`FCFA ${t('finance.expenses').toLowerCase()}`}
-          color={d.depensesJour > 100000 ? '#DC2626' : '#DC2626'}
+          color="#DC2626"
           href="/dashboard/ecole/tresorerie" badge={t('finance.expenses')} />
       </div>
+
+      {/* -- KPI université supplémentaires ------------------------------------ */}
+      {isUniversite && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard i={6} icon={GraduationCap} label="Diplômés"
+            value={d.nbDiplomes} sub="Toutes promotions confondues"
+            color="#16A34A" href="/dashboard/ecole/direction" />
+          <StatCard i={7} icon={BookOpen} label="Diplômés actifs"
+            value={d.nbDiplomes} sub="Parcours LMD validés"
+            color="#7C3AED" href="/dashboard/ecole/direction" />
+          <StatCard i={8} icon={TrendingUp} label="Taux de réussite"
+            value={`${tauxActifs}%`} sub="Étudiants actifs sur inscrits"
+            color="#2563EB" href="/dashboard/ecole/direction" />
+        </div>
+      )}
 
       {/* -- Graphique + panel droit -------------------------------------------- */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -379,7 +424,7 @@ export default function EcoleOverviewPage() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{t('school.cashflowAnalysis')}</p>
-              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')} � 8 {t('school.lastMonths')}</p>
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')} &mdash; 8 {t('school.lastMonths')}</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-secondary)' }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#DC2626' }} />
@@ -416,7 +461,7 @@ export default function EcoleOverviewPage() {
                 fontSize: 11, fontWeight: 700,
                 color: recoveryRate >= 80 ? '#DC2626' : recoveryRate >= 50 ? '#DC2626' : '#DC2626',
               }}>
-                {recoveryRate >= 80 ? `? ${t('school.onTrack')}` : recoveryRate >= 50 ? '? � surveiller' : '? Retard'}
+                {recoveryRate >= 80 ? `✓ ${t('school.onTrack')}` : recoveryRate >= 50 ? '⚠ à surveiller' : '✗ Retard'}
               </span>
             </div>
             <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden', marginBottom: 12 }}>
@@ -429,8 +474,8 @@ export default function EcoleOverviewPage() {
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               {d.montantImpayes > 0
-                ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impay�s sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
-                : <>{t('school.noUnpaid')} � <strong style={{ color: '#DC2626' }}>{t('school.excellent')}</strong></>
+                ? <><strong style={{ color: 'var(--text-primary)' }}>{fmt(d.montantImpayes)} FCFA</strong> d&apos;impayés sur {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''}.</>
+                : <>{t('school.noUnpaid')} &mdash; <strong style={{ color: '#DC2626' }}>{t('school.excellent')}</strong></>
               }
             </p>
           </div>
@@ -442,19 +487,24 @@ export default function EcoleOverviewPage() {
         </motion.div>
       </div>
 
-      {/* -- Raccourcis --------------------------------------------------------- */}
+      {/* -- Raccourcis adaptatifs --------------------------------------------- */}
       <motion.div {...fade(8)}>
         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{t('school.shortcuts')}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {[
-            { label: t('nav.comptabilite'),  href: '/dashboard/ecole/comptabilite',  icon: Calculator,    color: '#7C3AED', sub: 'Journal OHADA' },
-            { label: t('nav.rh'),            href: '/dashboard/ecole/rh',            icon: Users,         color: '#DC2626', sub: `${t('rh.employees')} & ${t('rh.payroll')}` },
-            { label: t('nav.roles'),         href: '/dashboard/roles',               icon: ShieldCheck,   color: '#DC2626', sub: t('roles.permission') },
-            { label: t('school.students'),   href: '/dashboard/ecole/scolarite',     icon: GraduationCap, color: '#DC2626', sub: `${t('school.enrollment')} & ${t('school.fees')}` },
-            { label: t('school.annualRevenue'), href: '/dashboard/ecole/direction',  icon: TrendingUp,    color: '#DC2626', sub: `${t('nav.direction')} & ${t('nav.rapports')}` },
-          ].map(({ label, href, color, icon: Icon, sub }) => (
+          {([
+            { label: t('nav.comptabilite'),  href: '/dashboard/ecole/comptabilite',      icon: Calculator,    color: '#7C3AED', sub: 'Journal OHADA' },
+            { label: t('nav.rh'),            href: '/dashboard/ecole/rh',                icon: Users,         color: '#DC2626', sub: `${t('rh.employees')} & ${t('rh.payroll')}` },
+            { label: t('nav.roles'),         href: '/dashboard/roles',                   icon: ShieldCheck,   color: '#DC2626', sub: t('roles.permission') },
+            { label: isUniversite ? 'Étudiants & Inscriptions' : t('school.students'),
+                                             href: '/dashboard/ecole/scolarite',         icon: GraduationCap, color: '#DC2626', sub: `${t('school.enrollment')} & ${t('school.fees')}` },
+            { label: isUniversite ? 'Diplômes & Soutenances' : t('school.annualRevenue'),
+                                             href: '/dashboard/ecole/direction',         icon: TrendingUp,    color: '#DC2626', sub: isUniversite ? 'Parcours LMD, thèses' : `${t('nav.direction')} & ${t('nav.rapports')}` },
+            ...(isUniversite ? [
+              { label: 'Paramètres académiques', href: '/dashboard/ecole/parametres-academiques', icon: BookOpen, color: '#16A34A', sub: 'Système LMD, crédits ECTS, mentions' },
+            ] : []),
+          ] as { label: string; href: string; icon: React.ElementType; color: string; sub: string }[]).map(({ label, href, color, icon: Icon, sub }) => (
             <Link key={href} href={href}
-              className="flex items-center gap-3 transition-all duration-200 group"
+              className="flex items-center gap-3 transition-all duration-200"
               style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', textDecoration: 'none' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = '#DC2626'; el.style.transform = 'translateY(-1px)' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'var(--border)'; el.style.transform = 'translateY(0)' }}
@@ -478,7 +528,7 @@ export default function EcoleOverviewPage() {
             <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{t('school.schoolPayments')}</p>
           </div>
           <Link href="/dashboard/ecole/direction" style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
-            {t('common.seeAll')} ?
+            {t('common.seeAll')} &rarr;
           </Link>
         </div>
 
@@ -543,8 +593,8 @@ export default function EcoleOverviewPage() {
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{t('school.unpaid')} {t('common.pending').toLowerCase()}</p>
             <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} � {fmt(d.montantImpayes)} FCFA {t('school.recovery').toLowerCase()}.{' '}
-              <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>{t('common.validate')} ?</Link>
+              {d.nbImpayes} dossier{d.nbImpayes !== 1 ? 's' : ''} &mdash; {fmt(d.montantImpayes)} FCFA {t('school.recovery').toLowerCase()}.{' '}
+              <Link href="/dashboard/ecole/scolarite" style={{ color: '#DC2626', fontWeight: 600 }}>{t('common.validate')} &rarr;</Link>
             </p>
           </div>
         </motion.div>

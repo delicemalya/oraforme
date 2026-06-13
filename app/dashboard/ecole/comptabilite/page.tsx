@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -98,7 +98,7 @@ function SectionJournal({ tenantId }: { tenantId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <KpiCard label={t('ecole.compta.kpi.produits')} value={fmtCurrency(totalRecettes)} color="#0F172A" />
         <KpiCard label={t('ecole.compta.kpi.charges')} value={fmtCurrency(totalDepenses)} color="#DC2626" />
         <KpiCard label={t('ecole.compta.kpi.solde')} value={fmtCurrency(Math.abs(solde))} sub={solde >= 0 ? 'Excédent' : 'Déficit'} color={solde >= 0 ? '#0F172A' : '#DC2626'} />
@@ -347,13 +347,13 @@ function SectionBilan({ tenantId }: { tenantId: string }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <KpiCard label={t('ecole.compta.kpi.produits')}  value={fmtCurrency(recettes)}         color="#0F172A" />
         <KpiCard label={t('ecole.compta.kpi.charges')}   value={fmtCurrency(depenses)}         color="#DC2626" />
         <KpiCard label={t('ecole.compta.kpi.solde')}     value={fmtCurrency(Math.abs(resultat))} sub={resultat >= 0 ? 'Bénéfice' : 'Perte'} color={resultat >= 0 ? '#0F172A' : '#DC2626'} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="rounded-xl border border-[#0F172A]/20 overflow-hidden">
           <div className="px-4 py-3 border-b border-[var(--border)]" style={{ background: 'rgba(0,185,167,0.06)' }}>
             <p className="text-xs font-bold text-[#00b9a7] uppercase tracking-wider">Produits — Comptes 7xx</p>
@@ -472,7 +472,7 @@ function SectionTresorerie({ tenantId }: { tenantId: string }) {
   return (
     <div className="space-y-4">
       {/* KPIs trésorerie */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { label: 'Total Entrées',  val: totalEntrees, color: '#0F172A', icon: ArrowUpCircle },
           { label: 'Total Sorties',  val: totalSorties, color: '#DC2626', icon: ArrowDownCircle },
@@ -788,7 +788,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
       {/* Projected KPIs */}
       <div>
         <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Projection 3 mois</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {proj.map(m => (
             <div key={m.month} className="rounded-xl border border-[#ff7000]/20 p-4" style={{ background: 'rgba(255,112,0,0.04)' }}>
               <p className="text-[10px] font-bold text-[#ff7000] mb-2">{m.label}</p>

@@ -90,17 +90,17 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiCard label={t('ecole.direction.kpi.enseignants')} value={enseignants.filter(e => e.statut === 'actif').length} color="#7C3AED" />
         <KpiCard label={t('ecole.direction.kpi.classes')}     value={classes.length} color="#0F172A" />
         <KpiCard label={t('ecole.direction.kpi.diplomes')}    value={etudiants.filter(e => e.statut === 'diplome').length} color="#7C3AED" />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="rounded-xl border border-[#DC2626]/30 p-4 space-y-3" style={{ background: 'rgba(248,81,73,0.04)' }}>
           <div className="flex items-center gap-2">
             <AlertTriangle size={14} className="text-[#DC2626]" />
@@ -212,7 +212,7 @@ function SectionFinances({ tenantId }: { tenantId: string }) {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <KpiCard label={t('ecole.direction.fin.totalEncaisse')}   value={loading ? '…' : fmtCurrency(totalPaye)} color="#0F172A" />
         <KpiCard label={t('ecole.direction.fin.nbPaiements')}     value={loading ? '…' : paiements.length}         color="#DC2626" />
         <KpiCard label={t('ecole.direction.fin.moyenne')}         value={loading || !paiements.length ? '…' : fmtCurrency(totalPaye / paiements.length)} color="#DC2626" />
@@ -294,7 +294,6 @@ function SectionEvenements({ tenantId }: { tenantId: string }) {
   }
 
   async function del(id: string) {
-  const { t } = useLocale()
     await supabase.from('planning_ecole').delete().eq('id', id); load()
   }
 
@@ -532,7 +531,7 @@ function SectionPartenaires({ tenantId }: { tenantId: string }) {
       {partenaires.length === 0 ? (
         <div className="text-center py-12 text-[var(--text-secondary)] text-xs">{t('ecole.direction.noPartner')}</div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {partenaires.map(p => (
             <div key={p.id} className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>
               <div className="flex items-start justify-between">
@@ -697,12 +696,12 @@ export default function DirectionPage() {
         <button onClick={load} className="p-2 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#101729] transition-colors"><RefreshCw size={14} /></button>
       </div>
 
-      <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl p-1 w-fit flex-wrap">
+      <div className="flex gap-1 bg-[var(--surface-alt)] border border-[var(--border)] rounded-xl p-1 overflow-x-auto scrollbar-none">
         {SUB_TABS.map(tab_ => {
           const Icon = tab_.icon
           return (
             <button key={tab_.id} onClick={() => setSubTab(tab_.id)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0"
               style={{ background: subTab === tab_.id ? '#00b9a7' : 'transparent', color: subTab === tab_.id ? '#fff' : 'var(--text-secondary)' }}>
               <Icon size={12} /> {tab_.label}
             </button>

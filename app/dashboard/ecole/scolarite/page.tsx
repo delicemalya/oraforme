@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -102,7 +102,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
       </div>
 
@@ -788,7 +788,7 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <KpiCard label="Total �v�nements" value={planning.length} color="#DC2626" />
         <KpiCard label="� venir" value={planning.filter(p => p.date_debut >= today).length} color="#0F172A" />
         <KpiCard label="Examens" value={planning.filter(p => p.type === 'examen').length} color="#DC2626" />
@@ -960,7 +960,7 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
         </div>
       ) : (
         <div className="flex-1 min-w-0 space-y-4">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <KpiCard label="Total absences"  value={totalAbs}            color="#DC2626" />
             <KpiCard label="Justifi�es"      value={justified}           color="#0F172A" />
             <KpiCard label="Non justifi�es"  value={totalAbs - justified} color="#DC2626" />

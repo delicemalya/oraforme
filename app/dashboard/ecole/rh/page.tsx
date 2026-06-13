@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -64,7 +64,7 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
       </div>
 
@@ -299,7 +299,7 @@ function SectionEnseignants({ tenantId, enseignants, onRefresh }: {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
       </div>
 
@@ -712,7 +712,7 @@ function SectionStaff({ tenantId }: { tenantId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
       </div>
 
@@ -1576,7 +1576,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
         <p className="text-sm font-bold text-[#101729]">Payer un agent</p>
 
         {/* S�lection agent + p�riode */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label className="block text-xs text-[var(--text-secondary)] mb-1">Agent *</label>
             <select value={agent?.id ?? ''} onChange={e => handleAgentSelect(e.target.value)}
@@ -1966,7 +1966,7 @@ function SectionHeuresFormateurs({ tenantId, enseignants }: { tenantId: string; 
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {kpis.map(k => <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} />)}
       </div>
 
