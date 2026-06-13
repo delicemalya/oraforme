@@ -6,6 +6,7 @@ import Header from '@/components/dashboard/Header'
 import BackButtonBar from '@/components/dashboard/BackButtonBar'
 import MIAAWidget from '@/components/miaa/MIAAWidget'
 import DashboardShell from '@/components/dashboard/DashboardShell'
+import { InfoBande } from '@/components/ui/InfoBande'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Server-side auth guard — defense-in-depth (proxy.ts is the primary guard)
@@ -21,6 +22,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <Sidebar />
         <div id="main-content" className="flex-1 flex flex-col overflow-hidden min-w-0">
           <Header />
+          <InfoBande />
           <main className="flex-1 overflow-y-auto">
             <div className="p-4 lg:p-6 page-transition">
               <BackButtonBar />

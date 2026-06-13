@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import PWAInstall from '@/components/ui/PWAInstall'
 import { LocaleProvider } from '@/lib/contexts/LocaleContext'
 import { PaysProvider } from '@/lib/contexts/PaysContext'
+import { ThemeProvider } from '@/lib/contexts/ThemeContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -36,12 +37,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="h-full bg-[#F5F7FB] text-[#111827] antialiased">
         {/* LocaleProvider enveloppe toute l'app — changement de langue instantané */}
-        <LocaleProvider>
-          <PaysProvider>
-            {children}
-            <PWAInstall />
-          </PaysProvider>
-        </LocaleProvider>
+        <ThemeProvider>
+          <LocaleProvider>
+            <PaysProvider>
+              {children}
+              <PWAInstall />
+            </PaysProvider>
+          </LocaleProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

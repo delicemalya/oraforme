@@ -13,6 +13,8 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
 import LanguageSelector from '@/components/ui/LanguageSelector'
 import DeviseSelector from '@/components/ui/DeviseSelector'
+import { LogoUploader } from '@/components/ui/LogoUploader'
+import { ColorPicker } from '@/components/ui/ColorPicker'
 
 // Plan badge config
 const PLAN_BADGE: Record<string, { label: string; color: string; bg: string }> = {
@@ -39,11 +41,10 @@ export default function Header() {
   const [userName,     setUserName]     = useState('')
   const [userEmail,    setUserEmail]    = useState('')
   const [initials,     setInitials]     = useState('U')
-  const [logoUrl,      setLogoUrl]      = useState<string | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [theme,        setTheme]        = useState<'dark' | 'light'>('light')
 
-  const nomEntreprise = tenant?.nomEntreprise ?? null
+  // nomEntreprise & logoUrl managed inside LogoUploader
   const planKey       = tenant?.taille ?? tenant?.plan ?? 'tpe'
   const planBadge     = PLAN_BADGE[planKey] ?? PLAN_BADGE.tpe
   const nextPlan      = planKey === 'tpe' ? 'PME' : planKey === 'pme' ? 'Grande' : null
@@ -66,23 +67,6 @@ export default function Header() {
     document.body.classList.toggle('light-mode', effective === 'light')
     localStorage.setItem('oraforme-theme', effective)
   }, [])
-
-  useEffect(() => {
-    if (!tenant?.tenantId) { setLogoUrl(null); return }
-    supabase
-      .from('entreprise_config')
-      .select('logo_url')
-      .eq('tenant_id', tenant.tenantId)
-      .maybeSingle()
-      .then(({ data }) => setLogoUrl(data?.logo_url || null))
-
-    function onConfigSaved(e: Event) {
-      const url = (e as CustomEvent<{ logo_url: string }>).detail?.logo_url
-      setLogoUrl(url || null)
-    }
-    window.addEventListener('oraforme:config-saved', onConfigSaved)
-    return () => window.removeEventListener('oraforme:config-saved', onConfigSaved)
-  }, [tenant?.tenantId])
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -158,25 +142,8 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Company logo / name */}
-      {nomEntreprise && (
-        logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logoUrl}
-            alt={nomEntreprise}
-            className="hidden sm:block shrink-0"
-            style={{ width: 180, height: 36, objectFit: 'contain', display: 'block' }}
-          />
-        ) : (
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-red-50 border border-red-100 shrink-0">
-            <div className="w-5 h-5 rounded-md bg-[#DC2626] flex items-center justify-center shrink-0">
-              <span className="text-[10px] font-black text-white">{nomEntreprise.charAt(0).toUpperCase()}</span>
-            </div>
-            <span className="text-xs font-semibold text-red-700 tracking-wide max-w-[140px] truncate">{nomEntreprise}</span>
-          </div>
-        )
-      )}
+      {/* Company logo — cliquable, modifiable via LogoUploader */}
+      <LogoUploader />
 
       {/* Team link */}
       {canSeeTeam && (
@@ -214,6 +181,9 @@ export default function Header() {
 
         {/* Language */}
         <LanguageSelector />
+
+        {/* Theme color picker */}
+        <ColorPicker />
 
         {/* Notifications */}
         <NotificationsPanel />
