@@ -23,8 +23,9 @@ import type {
 } from '@/lib/whatsapp-business'
 
 export async function POST(req: NextRequest) {
-  const tenantId = await requireTenant(req)
-  if (!tenantId) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+  const tenantId = ctx.tid
 
   const body = await req.json() as { type: string } & Record<string, unknown>
   const wa = createWhatsappService(tenantId)

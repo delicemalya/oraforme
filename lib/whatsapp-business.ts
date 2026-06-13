@@ -13,7 +13,7 @@
  *   await wa.sendInvoice({ to: '+242...', invoiceNumber: 'FAC-001', ... })
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 const META_API_VERSION = 'v20.0'
 const META_API_BASE    = `https://graph.facebook.com/${META_API_VERSION}`
@@ -94,22 +94,20 @@ export interface SendFiscalAlertOpts {
 
 // ── Service ────────────────────────────────────────────────────────────────────
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabaseAdmin as any
+
 export class WhatsappBusinessService {
   private tenantId: string
-  private supabase: ReturnType<typeof createClient>
 
   constructor(tenantId: string) {
     this.tenantId = tenantId
-    this.supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    )
   }
 
   // ── Load tenant config ─────────────────────────────────────────────────────
 
   async getConfig(): Promise<WaConfig | null> {
-    const { data } = await this.supabase
+    const { data } = await db
       .from('whatsapp_config')
       .select('phone_number_id,business_account_id,access_token,webhook_secret,from_phone,actif')
       .eq('tenant_id', this.tenantId)
@@ -167,7 +165,7 @@ export class WhatsappBusinessService {
       errorMessage = (err as Error).message
     }
 
-    await this.supabase.from('whatsapp_logs').insert({
+    await db.from('whatsapp_logs').insert({
       tenant_id:     this.tenantId,
       to_phone:      phone,
       to_name:       toName ?? null,

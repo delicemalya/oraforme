@@ -4,15 +4,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/api/require-tenant'
 
-function adminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabaseAdmin as any
 
 function maskToken(token: string): string {
   if (!token || token.length < 8) return token
@@ -20,10 +16,11 @@ function maskToken(token: string): string {
 }
 
 export async function GET(req: NextRequest) {
-  const tenantId = await requireTenant(req)
-  if (!tenantId) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+  const tenantId = ctx.tid
 
-  const supabase = adminClient()
+  const supabase = db
   const { data, error } = await supabase
     .from('whatsapp_config')
     .select('phone_number_id,business_account_id,access_token,webhook_secret,from_phone,actif,updated_at')
@@ -43,8 +40,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const tenantId = await requireTenant(req)
-  if (!tenantId) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+  const tenantId = ctx.tid
 
   const body = await req.json() as {
     phone_number_id?:     string
@@ -55,7 +53,7 @@ export async function POST(req: NextRequest) {
     actif?:               boolean
   }
 
-  const supabase = adminClient()
+  const supabase = db
 
   const { data: existing } = await supabase
     .from('whatsapp_config')
