@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { MessageCircle, ChevronRight, CheckCircle2, AlertCircle, Settings2 } from 'lucide-react'
+import { MessageCircle, ChevronRight, CheckCircle2, AlertCircle, Settings2, Database, ScanLine } from 'lucide-react'
 import { useTenant } from '@/lib/hooks/useTenant'
 
 interface IntegrationCard {
@@ -39,21 +39,26 @@ function StatusBadge({ status }: { status: 'active' | 'inactive' | 'partial' }) 
 
 export default function IntegrationsPage() {
   const { tenantId } = useTenant()
-  const [waStatus, setWaStatus] = useState<'active' | 'inactive' | 'partial'>('inactive')
-  const [loading,  setLoading]  = useState(true)
+  const [waStatus,      setWaStatus]      = useState<'active' | 'inactive' | 'partial'>('inactive')
+  const [storageStatus, setStorageStatus] = useState<'active' | 'inactive' | 'partial'>('inactive')
+  const [loading,       setLoading]       = useState(true)
 
   useEffect(() => {
     if (!tenantId) return
-    fetch('/api/whatsapp/config')
-      .then(r => r.json())
-      .then(({ config }) => {
-        if (!config) setWaStatus('inactive')
-        else if (config.actif && config.phone_number_id && config.access_token)
-          setWaStatus('active')
-        else setWaStatus('partial')
-      })
-      .catch(() => setWaStatus('inactive'))
-      .finally(() => setLoading(false))
+    Promise.all([
+      fetch('/api/whatsapp/config').then(r => r.json()).catch(() => ({})),
+      fetch('/api/storage/config').then(r => r.json()).catch(() => ({})),
+    ]).then(([wa, st]) => {
+      const waCfg = wa.config
+      if (!waCfg) setWaStatus('inactive')
+      else if (waCfg.actif && waCfg.phone_number_id && waCfg.access_token) setWaStatus('active')
+      else setWaStatus('partial')
+
+      const stCfg = st.config
+      if (!stCfg) setStorageStatus('inactive')
+      else if (stCfg.s3_endpoint && stCfg.s3_bucket && stCfg.s3_access_key) setStorageStatus('active')
+      else setStorageStatus('partial')
+    }).finally(() => setLoading(false))
   }, [tenantId])
 
   const integrations: IntegrationCard[] = [
@@ -71,6 +76,26 @@ export default function IntegrationsPage() {
       bgColor: '#F0FDF4',
       status:  loading ? 'inactive' : waStatus,
     },
+    {
+      id:          'storage',
+      name:        'Stockage Cloud',
+      description: 'Stockage sécurisé des documents (CV, contrats, factures, bulletins) sur AWS S3, Cloudflare R2, Wasabi ou MinIO. Versioning, archivage et audit trail inclus.',
+      icon:        <Database className="w-6 h-6" />,
+      href:        '/dashboard/parametres/stockage',
+      color:       '#2563EB',
+      bgColor:     '#EFF6FF',
+      status:      loading ? 'inactive' : storageStatus,
+    },
+    {
+      id:          'ocr',
+      name:        'OCR Intelligent',
+      description: 'Extraction automatique du texte et des données structurées depuis vos documents scannés via Mistral Pixtral, Claude Vision ou Tesseract. Détection auto du type de document.',
+      icon:        <ScanLine className="w-6 h-6" />,
+      href:        '/dashboard/parametres/stockage',
+      color:       '#7C3AED',
+      bgColor:     '#F5F3FF',
+      status:      loading ? 'inactive' : storageStatus,
+    },
   ]
 
   return (
@@ -78,7 +103,7 @@ export default function IntegrationsPage() {
       <div className="mb-8">
         <h1 className="text-xl font-bold text-[#0F172A]">Intégrations</h1>
         <p className="text-sm text-[#64748B] mt-1">
-          Connectez Oraforme à des services externes pour automatiser vos notifications.
+          Connectez Oraforme à des services externes : notifications, stockage cloud et OCR intelligent.
         </p>
       </div>
 

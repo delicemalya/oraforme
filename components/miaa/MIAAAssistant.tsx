@@ -583,6 +583,79 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     return null
   }
 
+  // ── Recherche documentaire + OCR MIAA+ ────────────────────────────────────
+  async function handleDocumentCommand(msg: string): Promise<string | null> {
+    const lower = msg.toLowerCase()
+
+    // Détection commandes storage/OCR
+    const isSearch   = /cherche|trouve|recherche|où est|montrez.moi|affiche/i.test(lower)
+    const isDoc      = /document|fichier|contrat|facture|cv|bulletin|fiscal|attestation/i.test(lower)
+    const isOcr      = /analyse|scan|lire|extraire|comprendre|ocr/i.test(lower)
+    const isUpload   = /upload|ajouter|enregistrer|stocker/i.test(lower)
+    const isStorage  = /stockage|cloud|s3|bucket|r2|wasabi|minio/i.test(lower)
+
+    if (isStorage && !isSearch) {
+      return `💾 *Stockage Cloud Oraforme*\n\n` +
+        `L'ERP supporte : **AWS S3**, **Cloudflare R2**, **Wasabi**, **MinIO**.\n\n` +
+        `📂 Documents centralisés :\n` +
+        `• CV & Candidatures • Contrats • Factures & Devis\n` +
+        `• Bulletins de paie • Documents CNSS • Documents fiscaux\n` +
+        `• Photos profils • Documents cabinet/hôtel/école/clinique\n\n` +
+        `⚙️ Configurez dans *Paramètres → Intégrations → Stockage Cloud*\n\n` +
+        `Chaque document est : horodaté · versionné · traçable.`
+    }
+
+    if ((isSearch && isDoc) || (isSearch && lower.includes('document'))) {
+      // Extraire le terme de recherche
+      const query = msg.replace(/cherche|trouve|recherche|où est|montrez.moi|affiche|les?|des?|un|une|mes?/gi, '').trim()
+      if (!query || query.length < 2) {
+        return `🔍 *Recherche documentaire*\n\nQue souhaitez-vous trouver ? Exemples :\n• "Cherche le contrat de Jean Dupont"\n• "Trouve les factures de mars 2026"\n• "Recherche les documents TVA"\n• "Cherche le CV d'ingénieur"`
+      }
+
+      try {
+        const res = await fetch(`/api/storage/search?q=${encodeURIComponent(query)}&limit=5`)
+        const { results } = await res.json() as { results?: Array<{ id: string; nom: string; categorie: string; created_at: string }> }
+
+        if (!results?.length) {
+          return `🔍 Aucun document trouvé pour **"${query}"**.\n\n💡 Conseil : assurez-vous que les documents sont uploadés et que l'OCR est activé.`
+        }
+
+        const list = results.slice(0, 5).map((d, i) =>
+          `${i + 1}. **${d.nom}** — ${d.categorie} — ${new Date(d.created_at).toLocaleDateString('fr-FR')}`
+        ).join('\n')
+
+        return `🔍 **${results.length} document(s) trouvé(s)** pour "${query}" :\n\n${list}\n\n📂 Consultez la *GED* pour les télécharger.`
+      } catch {
+        return `🔍 Recherche indisponible — vérifiez votre connexion.`
+      }
+    }
+
+    if (isOcr && isDoc) {
+      return `🔬 *Analyse OCR MIAA+*\n\n` +
+        `Uploadez un document dans la **GED** et MIAA+ l'analysera automatiquement :\n\n` +
+        `📄 **Facture** → Client, TVA, montant, numéro — propose de créer dans Facturation\n` +
+        `👤 **CV** → Nom, diplômes, expérience, compétences — calcule le score recrutement\n` +
+        `📋 **Contrat** → Parties, durée, clauses, risques — génère un rapport\n` +
+        `🏛️ **Document fiscal** → Type, période, montant, NIU — enregistre dans le calendrier\n` +
+        `🪪 **Pièce d'identité** → Nom, date naissance, numéro, expiration\n\n` +
+        `Format supportés : **PDF, JPG, PNG, DOCX, scans, photos téléphone**\n` +
+        `OCR : Mistral Pixtral → Claude Vision → Tesseract (fallback automatique)`
+    }
+
+    if (isUpload && isDoc) {
+      return `📤 *Upload de documents*\n\n` +
+        `Rendez-vous dans la **GED** (Gestion Électronique de Documents) pour uploader :\n\n` +
+        `• Glissez-déposez ou sélectionnez vos fichiers\n` +
+        `• Choisissez la catégorie (CV, Contrat, Facture…)\n` +
+        `• L'OCR démarre automatiquement\n` +
+        `• MIAA+ analyse et propose des actions\n\n` +
+        `📦 Stockage : Supabase (par défaut) ou votre bucket S3/R2/Wasabi/MinIO\n` +
+        `⚙️ Config : *Paramètres → Intégrations → Stockage Cloud*`
+    }
+
+    return null
+  }
+
   // ── Chat principal ─────────────────────────────────────────────────────────
   const sendMessage = async () => {
     if (!input.trim() || sending) return
@@ -592,6 +665,17 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     const now = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     setMessages(prev => [...prev, { role: 'user', content: userMsg, timestamp: now() }])
     try {
+      // Intercept Document/OCR/Storage commands
+      const docReply = await handleDocumentCommand(userMsg)
+      if (docReply) {
+        setMessages(prev => [...prev, {
+          role: 'assistant', content: docReply,
+          timestamp: now(), agent: 'Storage & OCR',
+        }])
+        setSending(false)
+        return
+      }
+
       // Intercept WhatsApp commands before calling AI
       const waReply = await handleWhatsappCommand(userMsg)
       if (waReply) {

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
   Building2, Save, Check, Loader2, FileText,
-  Hash, Upload, X, Plus, Trash2, Layers, Shield, ChevronRight, Calendar,
+  Hash, Upload, X, Plus, Trash2, Layers, Shield, ChevronRight, Calendar, Database,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -305,7 +305,7 @@ export default function ParametresPage() {
       </Link>
 
       <Link href="/dashboard/parametres/integrations"
-        className="flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:shadow-sm group sm:col-span-2"
+        className="flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:shadow-sm group"
         style={{ background: '#F0FDF4', borderColor: '#BBF7D0' }}>
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#25D36620' }}>
@@ -319,6 +319,21 @@ export default function ParametresPage() {
           </div>
         </div>
         <ChevronRight size={16} className="text-[#25D366] group-hover:translate-x-0.5 transition-transform" />
+      </Link>
+
+      <Link href="/dashboard/parametres/stockage"
+        className="flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:shadow-sm group"
+        style={{ background: '#EFF6FF', borderColor: '#BFDBFE' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#2563EB20' }}>
+            <Database size={15} className="text-[#2563EB]" />
+          </div>
+          <div>
+            <p className="text-[13px] font-bold text-[#0F172A]">Stockage Cloud</p>
+            <p className="text-[11px] text-[#1E40AF]">S3, R2, Wasabi, MinIO — documents, OCR, versioning</p>
+          </div>
+        </div>
+        <ChevronRight size={16} className="text-[#2563EB] group-hover:translate-x-0.5 transition-transform" />
       </Link>
 
       </div>{/* end shortcuts grid */}
