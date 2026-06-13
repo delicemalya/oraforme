@@ -105,3 +105,20 @@ export function getPlanLevel(taille: string | null | undefined): 0 | 1 | 2 {
 export function getPlanUpgradeLabel(requiredTaille: TailleEntreprise): string {
   return requiredTaille === 'grande' ? 'Entreprise+' : 'Business'
 }
+
+/**
+ * Retourne le plan requis pour un module, ou null si accessible au plan actuel.
+ * Utile pour afficher le bandeau d'upgrade dans la sidebar.
+ */
+export function getRequiredPlan(
+  taille: string | null | undefined,
+  moduleId: string,
+): 'pme' | 'grande' | null {
+  // Already accessible
+  if (canAccessByPlan(taille, moduleId)) return null
+
+  // What plan unlocks it?
+  if (REQUIRES_GRANDE.has(moduleId)) return 'grande'
+  if (REQUIRES_PME.has(moduleId))    return 'pme'
+  return null
+}
