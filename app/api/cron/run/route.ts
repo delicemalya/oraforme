@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { processPendingExecutions, fireTrigger } from '@/lib/workflow/engine'
 import { processPendingWebhooks } from '@/lib/webhooks/sender'
+import { createWhatsappService } from '@/lib/whatsapp-business'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,8 +52,11 @@ export async function POST(req: NextRequest) {
   // 6. Alert: contracts expiring in 30 days
   results.contract_alerts = await checkContractExpiry()
 
-  // 7. Alert: invoices overdue
+  // 7. Alert: invoices overdue + WhatsApp reminders
   results.invoice_alerts = await checkInvoiceOverdue()
+
+  // 8. WhatsApp fiscal deadline alerts (daily check)
+  if (hh === 6) results.fiscal_wa_alerts = await checkFiscalDeadlinesWhatsApp()
 
   return NextResponse.json({
     ok: true,
@@ -233,36 +237,49 @@ async function checkContractExpiry(): Promise<number> {
   return contracts.length
 }
 
-// ── Invoice overdue check ─────────────────────────────────────────────────────
+// ── Invoice overdue check + WhatsApp reminders ───────────────────────────────
 
 async function checkInvoiceOverdue(): Promise<number> {
   const today = new Date().toISOString().split('T')[0]
 
   const { data: invoices } = await supabaseAdmin
     .from('factures')
-    .select('id, tenant_id, numero, montant_ttc, echeance, client_id')
-    .lt('echeance', today)
-    .eq('statut', 'envoyee')
+    .select('id, tenant_id, invoice_number, total, due_date, client_phone, client_name')
+    .lt('due_date', today)
+    .in('statut', ['envoyee', 'en_retard'])
 
   if (!invoices?.length) return 0
 
   for (const inv of invoices) {
+    const daysOverdue = Math.ceil(
+      (Date.now() - new Date(inv.due_date).getTime()) / 86400_000,
+    )
+
     await fireTrigger({
       type: 'invoice.overdue',
       tenant_id: inv.tenant_id,
       data: {
-        invoice: {
-          id: inv.id,
-          number: inv.numero,
-          montant: inv.montant_ttc,
-          echeance: inv.echeance,
-        },
-        client: { id: inv.client_id },
+        invoice: { id: inv.id, number: inv.invoice_number, montant: inv.total, due_date: inv.due_date },
+        client: { phone: inv.client_phone, name: inv.client_name },
       },
       timestamp: new Date().toISOString(),
     })
 
-    // Update invoice status to 'en_retard'
+    // WhatsApp reminder si numéro client dispo
+    if (inv.client_phone) {
+      const { data: cfgData } = await supabaseAdmin
+        .from('entreprise_config').select('nom').eq('tenant_id', inv.tenant_id).maybeSingle()
+      const wa = createWhatsappService(inv.tenant_id)
+      await wa.sendReminder({
+        to:            inv.client_phone,
+        toName:        inv.client_name ?? undefined,
+        invoiceNumber: inv.invoice_number ?? `INV-${inv.id.slice(0, 8)}`,
+        amount:        `${(inv.total ?? 0).toLocaleString('fr-FR')} FCFA`,
+        daysOverdue,
+        companyName:   cfgData?.nom ?? 'Votre fournisseur',
+      }).catch(() => {})
+    }
+
     await supabaseAdmin
       .from('factures')
       .update({ statut: 'en_retard' })
@@ -270,4 +287,88 @@ async function checkInvoiceOverdue(): Promise<number> {
       .eq('tenant_id', inv.tenant_id)
   }
   return invoices.length
+}
+
+// ── Fiscal deadline WhatsApp alerts (Congo OHADA calendar) ───────────────────
+
+async function checkFiscalDeadlinesWhatsApp(): Promise<number> {
+  const now   = new Date()
+  const month = now.getMonth() + 1  // 1-12
+  const day   = now.getDate()
+
+  // Alertes : envoyer 5 jours avant l'échéance
+  type FiscalAlert = {
+    alertType: 'tva' | 'cnss' | 'das' | 'patente' | 'is' | 'irpp'
+    dueDate: string
+    triggerDay: number
+    triggerMonth?: number  // undefined = chaque mois
+  }
+
+  const year = now.getFullYear()
+  const alerts: FiscalAlert[] = [
+    // TVA trimestrielle — Congo : 20 du mois suivant le trimestre
+    { alertType: 'tva',     dueDate: `20/04/${year}`, triggerDay: 15, triggerMonth: 4  },
+    { alertType: 'tva',     dueDate: `20/07/${year}`, triggerDay: 15, triggerMonth: 7  },
+    { alertType: 'tva',     dueDate: `20/10/${year}`, triggerDay: 15, triggerMonth: 10 },
+    { alertType: 'tva',     dueDate: `20/01/${year+1}`,triggerDay: 15, triggerMonth: 1 },
+    // CNSS mensuelle — avant le 15 de chaque mois
+    { alertType: 'cnss',    dueDate: `15/${String(month).padStart(2,'0')}/${year}`, triggerDay: 10 },
+    // DAS trimestriel — même calendrier TVA
+    { alertType: 'das',     dueDate: `20/04/${year}`, triggerDay: 15, triggerMonth: 4  },
+    { alertType: 'das',     dueDate: `20/07/${year}`, triggerDay: 15, triggerMonth: 7  },
+    // Patente annuelle — mars
+    { alertType: 'patente', dueDate: `31/03/${year}`, triggerDay: 20, triggerMonth: 3  },
+    // IS — acomptes trimestriels
+    { alertType: 'is',      dueDate: `15/04/${year}`, triggerDay: 10, triggerMonth: 4  },
+    { alertType: 'is',      dueDate: `15/07/${year}`, triggerDay: 10, triggerMonth: 7  },
+    { alertType: 'is',      dueDate: `15/10/${year}`, triggerDay: 10, triggerMonth: 10 },
+  ]
+
+  // Filtrer les alertes qui matchent aujourd'hui
+  const todayAlerts = alerts.filter(a => {
+    const monthMatch = a.triggerMonth === undefined ? true : a.triggerMonth === month
+    return a.triggerDay === day && monthMatch
+  })
+
+  if (!todayAlerts.length) return 0
+
+  // Récupérer tous les tenants actifs avec WhatsApp configuré ET un admin avec téléphone
+  const { data: configs } = await supabaseAdmin
+    .from('whatsapp_config')
+    .select('tenant_id, from_phone, actif')
+    .eq('actif', true)
+
+  if (!configs?.length) return 0
+
+  let sent = 0
+  for (const cfg of configs) {
+    // Récupérer le téléphone de l'admin du tenant
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('telephone, nom_complet')
+      .eq('tenant_id', cfg.tenant_id)
+      .in('role', ['admin', 'super_admin'])
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    const adminPhone = profile?.telephone ?? cfg.from_phone
+    if (!adminPhone) continue
+
+    const { data: cfgData } = await supabaseAdmin
+      .from('entreprise_config').select('nom').eq('tenant_id', cfg.tenant_id).maybeSingle()
+    const companyName = cfgData?.nom ?? 'Votre entreprise'
+
+    const wa = createWhatsappService(cfg.tenant_id)
+    for (const alert of todayAlerts) {
+      await wa.sendFiscalAlert({
+        to:          adminPhone,
+        alertType:   alert.alertType,
+        dueDate:     alert.dueDate,
+        companyName,
+      }).catch(() => {})
+      sent++
+    }
+  }
+  return sent
 }

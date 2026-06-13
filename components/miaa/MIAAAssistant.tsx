@@ -513,6 +513,76 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     } finally { setLoadNotifs(false) }
   }, [tenantData?.tenant_id])
 
+  // ── Commandes WhatsApp en langage naturel ─────────────────────────────────
+  async function handleWhatsappCommand(msg: string): Promise<string | null> {
+    const lower = msg.toLowerCase()
+    const isWa = /whatsapp|watsap|whats.?app/i.test(lower)
+    if (!isWa) return null
+
+    // Détecter le type de message
+    const isFacture   = /facture|invoice/i.test(lower)
+    const isDevis     = /devis|proforma/i.test(lower)
+    const isBulletin  = /bulletin|paie|salaire|payroll/i.test(lower)
+    const isRappel    = /rappel|relance|impay|overdue/i.test(lower)
+    const isFiscal    = /tva|cnss|das|patente|fiscal|impôt|declaration/i.test(lower)
+    const isRecruit   = /candidat|recrutement|entretien|convoc/i.test(lower)
+
+    // Extraire un numéro de facture si mentionné
+    const invoiceMatch = msg.match(/(?:facture|invoice|devis)\s+([A-Z0-9\-]+)/i)
+    const phoneMatch   = msg.match(/\+?\d{8,15}/)
+
+    if (!isFacture && !isDevis && !isBulletin && !isRappel && !isFiscal && !isRecruit) {
+      return `📲 *Commandes WhatsApp disponibles :*\n\n` +
+        `• *"Envoie la facture FAC-001 sur WhatsApp"* — Notifie le client\n` +
+        `• *"Envoie le bulletin de paie de Jean sur WhatsApp"* — Notifie l'employé\n` +
+        `• *"Envoie une alerte TVA sur WhatsApp"* — Alerte fiscale admin\n` +
+        `• *"Envoie un rappel de paiement sur WhatsApp"* — Relance impayés\n\n` +
+        `💡 Configurez d'abord WhatsApp dans *Paramètres → Intégrations → WhatsApp Business*`
+    }
+
+    if (isFacture || isDevis) {
+      const num = invoiceMatch?.[1] ?? '???'
+      const to  = phoneMatch?.[0] ?? ''
+      if (!to) {
+        return `📲 Pour envoyer la ${isDevis ? 'devis' : 'facture'} **${num}** sur WhatsApp, j'ai besoin du numéro de téléphone du client.\n\n` +
+          `Exemple : *"Envoie la facture ${num} au +242XXXXXXXXX sur WhatsApp"*`
+      }
+      const res = await fetch('/api/whatsapp/send', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: isDevis ? 'quote' : 'invoice',
+          to, invoiceNumber: num, quoteNumber: num,
+          amount: '—', clientName: 'Client', companyName: tenantData?.nom ?? 'Oraforme',
+        }),
+      })
+      if (res.ok) return `✅ ${isDevis ? 'Devis' : 'Facture'} **${num}** envoyé(e) sur WhatsApp au **${to}** avec succès !`
+      const err = await res.json().catch(() => ({})) as { error?: string }
+      return `⚠️ Échec envoi WhatsApp : ${err.error ?? 'Vérifiez la configuration dans Paramètres → Intégrations → WhatsApp'}`
+    }
+
+    if (isFiscal) {
+      return `📲 *Alerte fiscale WhatsApp*\n\n` +
+        `Les alertes fiscales sont envoyées automatiquement chaque jour selon le calendrier fiscal Congo :\n` +
+        `• TVA trimestrielle (15 du mois d'échéance)\n` +
+        `• CNSS mensuelle (10 de chaque mois)\n` +
+        `• Patente annuelle (20 mars)\n` +
+        `• IS trimestriel (10 avril, juillet, octobre)\n\n` +
+        `💡 Assurez-vous que WhatsApp Business est activé dans *Paramètres → Intégrations*.`
+    }
+
+    if (isRappel) {
+      return `📲 *Rappels WhatsApp impayés*\n\nLes rappels sont envoyés automatiquement chaque matin pour toutes les factures en retard ayant un numéro de téléphone client.\n\n` +
+        `Configurez les numéros clients dans le module **Facturation** pour activer cette fonctionnalité.`
+    }
+
+    if (isBulletin) {
+      return `📲 *Bulletins de paie WhatsApp*\n\nLe bulletin est envoyé automatiquement à la génération si l'employé a un numéro de téléphone enregistré.\n\n` +
+        `Ajoutez les téléphones dans *RH → Employés* pour activer cette fonctionnalité.`
+    }
+
+    return null
+  }
+
   // ── Chat principal ─────────────────────────────────────────────────────────
   const sendMessage = async () => {
     if (!input.trim() || sending) return
@@ -522,6 +592,17 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     const now = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     setMessages(prev => [...prev, { role: 'user', content: userMsg, timestamp: now() }])
     try {
+      // Intercept WhatsApp commands before calling AI
+      const waReply = await handleWhatsappCommand(userMsg)
+      if (waReply) {
+        setMessages(prev => [...prev, {
+          role: 'assistant', content: waReply,
+          timestamp: now(), agent: 'WhatsApp Business',
+        }])
+        setSending(false)
+        return
+      }
+
       const history = messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
       const res  = await fetch('/api/miaa/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },

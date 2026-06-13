@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { hrAuth } from '../../hr/_auth'
+import { createWhatsappService } from '@/lib/whatsapp-business'
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * SYSCOHADA helper — écritures paie conformes SYSCOHADA révisé 2017
@@ -271,6 +272,35 @@ export async function POST(req: NextRequest) {
     })
     if (!e4.ok && e4.error) ohadaErrors.push(e4.error)
   }
+
+  // WhatsApp — notification bulletin de paie (non bloquant)
+  ;(async () => {
+    try {
+      const { data: empPhone } = await supabaseAdmin
+        .from('employes')
+        .select('telephone')
+        .eq('id', employe_id)
+        .eq('tenant_id', auth.tenantId)
+        .maybeSingle()
+      const { data: cfgData } = await supabaseAdmin
+        .from('entreprise_config')
+        .select('nom')
+        .eq('tenant_id', auth.tenantId)
+        .maybeSingle()
+      if (empPhone?.telephone) {
+        const wa = createWhatsappService(auth.tenantId)
+        const MOIS_FULL = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+        await wa.sendPayroll({
+          to:           empPhone.telephone,
+          toName:       emp.nom,
+          employeeName: emp.nom,
+          period:       `${MOIS_FULL[parseInt(mois) - 1]} ${annee}`,
+          netSalary:    `${numNet.toLocaleString('fr-FR')} FCFA`,
+          companyName:  cfgData?.nom ?? 'Votre employeur',
+        })
+      }
+    } catch { /* WhatsApp non configuré — silencieux */ }
+  })()
 
   return NextResponse.json({
     success: true,

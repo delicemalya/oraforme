@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
+import { createWhatsappService } from '@/lib/whatsapp-business'
 
 export const dynamic = 'force-dynamic'
 
@@ -125,6 +126,25 @@ export async function POST(req: NextRequest) {
         piece_number:   pieceNum,
       }))
     )
+  }
+
+  // WhatsApp — notification automatique (non bloquant) si facture émise avec numéro client
+  if (statut !== 'brouillon' && client_phone) {
+    const wa = createWhatsappService(ctx.tenantId)
+    const { data: cfgData } = await supabaseAdmin
+      .from('entreprise_config')
+      .select('nom')
+      .eq('tenant_id', ctx.tenantId)
+      .maybeSingle()
+    wa.sendInvoice({
+      to:            client_phone,
+      toName:        client_name,
+      invoiceNumber: invoice_number ?? `FAC-${facture.id.slice(0, 8).toUpperCase()}`,
+      amount:        `${ttc.toLocaleString('fr-FR')} FCFA`,
+      clientName:    client_name,
+      dueDate:       due_date ?? undefined,
+      companyName:   cfgData?.nom ?? 'Votre entreprise',
+    }).catch(() => { /* WhatsApp non configuré — silencieux */ })
   }
 
   return NextResponse.json({ id: facture.id, ht, tva, ca, ttc })
