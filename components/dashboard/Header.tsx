@@ -14,7 +14,6 @@ import NotificationsPanel from '@/components/ui/NotificationsPanel'
 import LanguageSelector from '@/components/ui/LanguageSelector'
 import DeviseSelector from '@/components/ui/DeviseSelector'
 import { LogoUploader } from '@/components/ui/LogoUploader'
-import { ColorPicker } from '@/components/ui/ColorPicker'
 
 // Plan badge config
 const PLAN_BADGE: Record<string, { label: string; color: string; bg: string }> = {
@@ -181,9 +180,6 @@ export default function Header() {
 
         {/* Language */}
         <LanguageSelector />
-
-        {/* Theme color picker */}
-        <ColorPicker />
 
         {/* Notifications */}
         <NotificationsPanel />

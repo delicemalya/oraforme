@@ -19,6 +19,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import GeoDetectionBanner from '@/components/ui/GeoDetectionBanner'
 import { getTenantBrandColor } from '@/lib/utils'
+import { BannerTicker } from '@/components/dashboard/BannerTicker'
 
 export interface DashboardData {
   tenant: { nom_entreprise: string; modules_actifs: string[]; plan: string }
@@ -654,6 +655,10 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
               {' · '}{tenant.modules_actifs.length} {t('dash.activeModules').toLowerCase()}
             </p>
           </div>
+
+          {/* ── Ticker météo animé + palette couleurs ── */}
+          <BannerTicker />
+
           {/* Buttons */}
           <div className="flex items-center gap-2 shrink-0">
             <Link
