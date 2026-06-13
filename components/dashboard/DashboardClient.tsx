@@ -641,8 +641,9 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
         <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 150, height: 150, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,0,0,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="flex-1 min-w-0">
+        <div className="flex items-start gap-4 flex-wrap justify-between">
+          {/* Texte — ordre 1 partout */}
+          <div className="flex-1 min-w-0 order-1">
             {/* Date badge */}
             <div className="flex items-center gap-2 mb-3">
               <span style={{ background: 'rgba(255,255,255,0.18)', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.3)', padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
@@ -659,11 +660,8 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             </p>
           </div>
 
-          {/* ── Ticker météo animé + palette couleurs ── */}
-          <BannerTicker />
-
-          {/* Buttons */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Boutons — ordre 2 mobile, ordre 3 desktop */}
+          <div className="flex items-center gap-2 shrink-0 order-2 lg:order-3">
             <Link
               href={secteur === 'ecole' ? '/dashboard/ecole/scolarite' : '/dashboard/facturation'}
               prefetch={true}
@@ -679,6 +677,11 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             >
               <RefreshCw size={13} />
             </button>
+          </div>
+
+          {/* ── Ticker météo + palette — ordre 3 mobile (pleine largeur), ordre 2 desktop ── */}
+          <div className="w-full order-3 lg:w-auto lg:order-2 lg:flex-none flex justify-center lg:justify-end mt-1 lg:mt-0">
+            <BannerTicker />
           </div>
         </div>
 
