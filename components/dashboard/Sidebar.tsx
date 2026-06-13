@@ -29,7 +29,7 @@ import {
   type SectorId,
   type EcoleSousType,
 } from '@/lib/erp-sectors'
-import { canAccessByPlan, getRequiredPlan } from '@/lib/plan-access'
+import { canAccessByPlan } from '@/lib/plan-access'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import type { ModulePermission } from '@/lib/hooks/usePermissions'
@@ -38,12 +38,11 @@ import { useLocale } from '@/lib/hooks/useLocale'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type NavItem = {
-  id:       string
-  label:    string
-  icon:     LucideIcon
-  href:     string
-  exact?:   boolean
-  locked?:  'pme' | 'grande'   // set when blocked by plan
+  id:      string
+  label:   string
+  icon:    LucideIcon
+  href:    string
+  exact?:  boolean
 }
 
 type NavGroup = {
@@ -531,22 +530,15 @@ export default function Sidebar() {
     return SIDEBAR_GROUPS.map(grp => {
       const items: NavItem[] = []
       for (const mid of grp.moduleIds) {
+        if (!canView(mid)) continue
         const def = getModuleDef(mid)
         if (!def) continue
         const label = MODULE_LABEL_KEYS[mid] ? t(MODULE_LABEL_KEYS[mid]) : def.label
-        if (canView(mid)) {
-          items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href })
-        } else {
-          // Show as locked only if blocked by plan (not by role/permissions)
-          const req = getRequiredPlan(taille, mid)
-          if (req) {
-            items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: '/dashboard/abonnement', locked: req })
-          }
-        }
+        items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href })
       }
       return { ...grp, label: t(grp.labelKey), items }
     }).filter(g => g.items.length > 0)
-  }, [loaded, canView, taille, t])
+  }, [loaded, canView, t])
 
   const metierGroup = useMemo((): NavGroup | null => {
     if (!loaded) return null
@@ -612,36 +604,6 @@ export default function Sidebar() {
     const canEdit   = isOwner || permissions[item.id]?.can_edit
     const Icon      = item.icon
     const isSubItem = item.id === 'recrutement'
-    const isLocked  = !!item.locked
-
-    if (isLocked) {
-      const upgradeLabel = item.locked === 'grande' ? 'Entreprise+' : 'Business'
-      return (
-        <Link
-          href="/dashboard/abonnement"
-          onClick={() => setMobileOpen(false)}
-          className={`flex items-center gap-2.5 ${isSubItem ? 'pl-6' : 'pl-3'} pr-2 py-1.5 rounded-lg text-[12.5px] transition-all duration-150 relative`}
-          style={{ color: '#C4C9D4', opacity: 0.75 }}
-          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; (e.currentTarget as HTMLAnchorElement).style.background = '#FEF9F0' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.75'; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' }}
-          title={`Disponible avec le plan ${upgradeLabel}`}
-        >
-          <div style={{ width: 22, height: 22, borderRadius: 5, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon size={13} style={{ color: '#CBD5E1' }} />
-          </div>
-          <span className="flex-1 truncate" style={{ color: '#94A3B8' }}>{item.label}</span>
-          <span style={{
-            fontSize: 8, fontWeight: 700, padding: '1px 5px', borderRadius: 4,
-            background: item.locked === 'grande' ? 'rgba(124,58,237,0.1)' : 'rgba(245,158,11,0.12)',
-            color: item.locked === 'grande' ? '#7C3AED' : '#B45309',
-            letterSpacing: '0.03em', whiteSpace: 'nowrap', flexShrink: 0,
-          }}>
-            {upgradeLabel}
-          </span>
-        </Link>
-      )
-    }
-
     return (
       <Link
         href={item.href}
