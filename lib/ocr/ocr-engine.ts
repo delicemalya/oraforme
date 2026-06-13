@@ -42,9 +42,10 @@ export function isDocx(mime: string): boolean {
 // ── PDF text extraction (no OCR needed if native text) ────────────────────────
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
-  const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default
-  const data = await pdfParse(buffer)
-  return data.text?.trim() ?? ''
+  const { PDFParse } = await import('pdf-parse')
+  const parser = new PDFParse({ data: buffer })
+  const result = await parser.getText()
+  return (result.text as string | undefined)?.trim() ?? ''
 }
 
 // ── DOCX extraction ────────────────────────────────────────────────────────────

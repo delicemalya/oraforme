@@ -121,27 +121,36 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (detected.type) {
-      case 'invoice':
+      case 'invoice': {
         const inv  = await extractInvoice(ocr.text)
-        structured = inv
+        structured = inv as unknown as Record<string, unknown>
         suggestion = inv.suggestion ?? undefined
         break
-      case 'cv':
-        structured = await extractCV(ocr.text)
-        suggestion = `CV de ${(structured.nom as string) ?? '?'} — Score : ${(structured.score as number) ?? '?'}/100. Ajouter à la base candidates ?`
+      }
+      case 'cv': {
+        const cv = await extractCV(ocr.text)
+        structured = cv as unknown as Record<string, unknown>
+        suggestion = `CV de ${(cv as unknown as Record<string, unknown>).nom as string ?? '?'} — Score : ${(cv as unknown as Record<string, unknown>).score as number ?? '?'}/100. Ajouter à la base candidates ?`
         break
-      case 'contract':
-        structured = await extractContract(ocr.text)
-        suggestion = `Contrat ${(structured.type as string) ?? ''} détecté. ${(structured.risques as string[])?.length ? 'Risques identifiés !' : 'Aucun risque majeur.'} Voir le rapport ?`
+      }
+      case 'contract': {
+        const ct = await extractContract(ocr.text)
+        structured = ct as unknown as Record<string, unknown>
+        suggestion = `Contrat ${structured.type as string ?? ''} détecté. ${(structured.risques as string[])?.length ? 'Risques identifiés !' : 'Aucun risque majeur.'} Voir le rapport ?`
         break
-      case 'identity':
-        structured = await extractIdentityCard(ocr.text)
-        suggestion = `Pièce d'identité de ${(structured.prenom as string) ?? ''} ${(structured.nom as string) ?? ''} — enregistrée.`
+      }
+      case 'identity': {
+        const id = await extractIdentityCard(ocr.text)
+        structured = id as unknown as Record<string, unknown>
+        suggestion = `Pièce d'identité de ${structured.prenom as string ?? ''} ${structured.nom as string ?? ''} — enregistrée.`
         break
-      case 'fiscal':
-        structured = await extractFiscalDocument(ocr.text)
-        suggestion = `Document fiscal ${(structured.type as string) ?? ''} pour ${(structured.periode as string) ?? '?'}. Montant : ${(structured.montant as string) ?? '?'}. Enregistrer dans le calendrier fiscal ?`
+      }
+      case 'fiscal': {
+        const fsc = await extractFiscalDocument(ocr.text)
+        structured = fsc as unknown as Record<string, unknown>
+        suggestion = `Document fiscal ${structured.type as string ?? ''} pour ${structured.periode as string ?? '?'}. Montant : ${structured.montant as string ?? '?'}. Enregistrer dans le calendrier fiscal ?`
         break
+      }
       default:
         structured = {}
     }

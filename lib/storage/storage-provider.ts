@@ -160,14 +160,16 @@ export class StorageProvider {
         })
         await upload.done()
 
-        const url = this.cfg.publicUrl
+        const urlResult = this.cfg.publicUrl
           ? `${this.cfg.publicUrl.replace(/\/$/, '')}/${key}`
           : await this.presignDownload(key, 3600 * 24 * 7)
+
+        const resolvedUrl = typeof urlResult === 'string' ? urlResult : (urlResult.url || '')
 
         return {
           ok:       true,
           key,
-          url:      url.url || '',
+          url:      resolvedUrl,
           provider: this.cfg.provider,
           bucket:   this.cfg.bucket,
           checksum: StorageProvider.checksum(buffer),
