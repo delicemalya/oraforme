@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { canAccessByPlan } from '@/lib/plan-access'
 
 export type UserRole = 'owner' | 'admin' | 'membre'
 
@@ -145,9 +146,13 @@ export function usePermissions(): UsePermissionsResult {
 
   const role      = tenant?.role      ?? null
   const profileId = tenant?.profileId ?? null
+  const taille    = tenant?.taille    ?? null
 
   const can = useCallback(
     (moduleKey: string, action: PermAction = 'view'): boolean => {
+      // Plan check TOUJOURS en premier — le propriétaire respecte son abonnement
+      if (!canAccessByPlan(taille, moduleKey)) return false
+      // Owner : toutes les actions autorisées dans son plan
       if (role === 'owner') return true
       const p = permissions[moduleKey]
       if (!p) return false
@@ -161,7 +166,7 @@ export function usePermissions(): UsePermissionsResult {
         default:         return false
       }
     },
-    [role, permissions]
+    [role, permissions, taille]
   )
 
   const canView     = useCallback((m: string) => can(m, 'view'),     [can])

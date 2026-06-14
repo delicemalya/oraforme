@@ -391,8 +391,8 @@ export default function RapportsPage() {
               )}
 
               {isActive && r.id === 'balance' && (
-                <div className="border-t border-[#F1F5F9] max-h-64 overflow-y-auto">
-                  <table className="w-full text-[11px]">
+                <div className="border-t border-[#F1F5F9] max-h-64 overflow-y-auto overflow-x-auto">
+                  <table className="w-full text-[11px] min-w-[500px]">
                     <thead className="bg-[#F8FAFC] sticky top-0">
                       <tr>
                         {['Compte','Intitulé','Débit','Crédit','Solde'].map(h => (

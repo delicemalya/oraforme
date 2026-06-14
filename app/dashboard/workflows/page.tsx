@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import { WORKFLOW_PRESETS, getPresetsByCategory } from '@/lib/workflow/presets'
 import type { WorkflowDefinition, WorkflowPreset } from '@/lib/workflow/types'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const BG = '#F5F7FB'
@@ -207,6 +209,7 @@ function PresetCard({ preset, onInstall }: { preset: WorkflowPreset; onInstall: 
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function WorkflowsPage() {
+  const { allowed: canWorkflows } = usePlanFeature('workflows-avances')
   const [workflows, setWorkflows] = useState<WorkflowDefinition[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'workflows' | 'presets'>('workflows')
@@ -286,6 +289,8 @@ export default function WorkflowsPage() {
   const filteredPresets = presetCategory === 'all'
     ? WORKFLOW_PRESETS
     : WORKFLOW_PRESETS.filter(p => p.category === presetCategory)
+
+  if (!canWorkflows) return <PlanFeatureGate feature="workflows-avances" />
 
   return (
     <div style={{ minHeight: '100vh', background: BG, padding: '32px 24px' }}>

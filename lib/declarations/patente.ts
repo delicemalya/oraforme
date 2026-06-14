@@ -1,22 +1,26 @@
 // ─── Moteur de calcul — Contribution de la Patente (CGI Congo) ──────────────
-// Référence : Direction Générale des Impôts et des Domaines (DGID)
-// Formulaire officiel 721M · Données 2026
+// Source : Loi n°42-2025 du 31 décembre 2025 — Loi de Finances 2026
+// Art. 122 CGI — Barème officiel 10 tranches (CORRECTION LF 2026)
+// MINIMUM PERCEPTION : 10 000 FCFA (anciennement 50 000 FCFA)
 
-// Barème officiel — 7 tranches (Art. 235 CGI Congo)
+// Barème officiel LF 2026 — 10 tranches (Art. 122 CGI Congo)
 export const BAREME_PATENTE_CG = [
-  { seuilMax:   5_000_000, taux: 0.010 },
-  { seuilMax:  10_000_000, taux: 0.012 },
-  { seuilMax:  30_000_000, taux: 0.014 },
-  { seuilMax:  50_000_000, taux: 0.016 },
-  { seuilMax: 100_000_000, taux: 0.018 },
-  { seuilMax: 500_000_000, taux: 0.020 },
-  { seuilMax: Infinity,    taux: 0.022 },
+  { seuilMax:               1_000_000, type: 'forfait' as const, montant: 10_000 },
+  { seuilMin:    1_000_001, seuilMax:  20_000_000, taux: 0.0975  },
+  { seuilMin:   20_000_001, seuilMax:  40_000_000, taux: 0.0065  },
+  { seuilMin:   40_000_001, seuilMax: 100_000_000, taux: 0.0045  },
+  { seuilMin:  100_000_001, seuilMax: 300_000_000, taux: 0.0020  },
+  { seuilMin:  300_000_001, seuilMax: 500_000_000, taux: 0.0045  },
+  { seuilMin:  500_000_001, seuilMax: 1_000_000_000, taux: 0.0014  },
+  { seuilMin: 1_000_000_001, seuilMax: 3_000_000_000, taux: 0.00135 },
+  { seuilMin: 3_000_000_001, seuilMax: 20_000_000_000, taux: 0.00125 },
+  { seuilMin: 20_000_000_001, taux: 0.00045 },
 ] as const
 
-export const MINIMUM_PERCEPTION_FCFA    = 50_000  // FCFA
+export const MINIMUM_PERCEPTION_FCFA    = 10_000  // LF 2026 (anciennement 50 000 FCFA)
 export const TAUX_CENTIMES_ADDITIONNELS = 0.05    // 5% sur patente liquidée
-export const TAUX_CAMU                  = 0.005   // 0.5% sur patente liquidée
-export const TAUX_REDUCTION_PETROLIERE  = 0.50    // 50% — sociétés pétrolières uniquement
+export const TAUX_CAMU                  = 0.005   // 0,5% sur patente liquidée
+export const TAUX_REDUCTION_PETROLIERE  = 0.50    // 50% — sociétés pétrolières uniquement (Art. 314 CGI)
 
 export const DEPARTEMENTS_CG = [
   { code: 'BZV', nom: 'Brazzaville' },
@@ -57,11 +61,17 @@ export interface ResultatPatente {
 }
 
 export function getTauxPatente(caImposable: number): number {
-  if (caImposable <= 0) return BAREME_PATENTE_CG[0].taux
-  for (const tranche of BAREME_PATENTE_CG) {
-    if (caImposable <= tranche.seuilMax) return tranche.taux
-  }
-  return 0.022
+  if (caImposable <= 0)             return 0
+  if (caImposable <= 1_000_000)    return 0        // forfait — taux symbolique
+  if (caImposable <= 20_000_000)   return 0.0975
+  if (caImposable <= 40_000_000)   return 0.0065
+  if (caImposable <= 100_000_000)  return 0.0045
+  if (caImposable <= 300_000_000)  return 0.0020
+  if (caImposable <= 500_000_000)  return 0.0045
+  if (caImposable <= 1_000_000_000) return 0.0014
+  if (caImposable <= 3_000_000_000) return 0.00135
+  if (caImposable <= 20_000_000_000) return 0.00125
+  return 0.00045
 }
 
 export function calculerPatente(
@@ -71,8 +81,21 @@ export function calculerPatente(
   creditN1 = 0,
 ): ResultatPatente {
   const ca_imposable = Math.max(0, caAnnuel - caExonere)
-  const taux         = getTauxPatente(ca_imposable)
-  const patente_brute   = Math.round(ca_imposable * taux)
+
+  let taux = 0
+  let patente_brute = 0
+
+  if (ca_imposable <= 0) {
+    patente_brute = MINIMUM_PERCEPTION_FCFA
+  } else if (ca_imposable <= 1_000_000) {
+    // Tranche 1 : forfait 10 000 FCFA
+    taux          = 0
+    patente_brute = 10_000
+  } else {
+    taux          = getTauxPatente(ca_imposable)
+    patente_brute = Math.round(ca_imposable * taux)
+  }
+
   const patente_liquidee = Math.max(patente_brute, MINIMUM_PERCEPTION_FCFA)
 
   const montant_reduction       = estSocietePetroliere

@@ -618,20 +618,28 @@ export async function auditOHADA(supabase: SupabaseClient, tenantId: string): Pr
 export async function runAuditGlobal(supabase: SupabaseClient, tenantId: string): Promise<AuditGlobal> {
   _id = 0 // reset IDs
 
-  const [comptable, financier, fiscal, rh, controle, ohada] = await Promise.all([
+  const [comptable, financier, fiscal, rh, controle, ohada, syscohada] = await Promise.all([
     auditComptable(supabase, tenantId),
     auditFinancier(supabase, tenantId),
     auditFiscal(supabase, tenantId),
     auditRH(supabase, tenantId),
     auditControleInterne(supabase, tenantId),
     auditOHADA(supabase, tenantId),
+    auditSYSCOHADA(supabase, tenantId),
   ])
 
-  const scores = [comptable.score, financier.score, fiscal.score, rh.score, controle.score, ohada.score]
+  // Fusionner auditSYSCOHADA dans auditComptable (même domaine)
+  const comptableFinal = {
+    ...comptable,
+    anomalies: [...comptable.anomalies, ...syscohada.anomalies],
+    score: Math.min(comptable.score, syscohada.score),
+  }
+
+  const scores = [comptableFinal.score, financier.score, fiscal.score, rh.score, controle.score, ohada.score]
   const score_global = Math.round(scores.reduce((s, x) => s + x, 0) / scores.length)
 
   const all_anomalies = [
-    ...comptable.anomalies,
+    ...comptableFinal.anomalies,
     ...financier.anomalies,
     ...fiscal.anomalies,
     ...rh.anomalies,
@@ -643,7 +651,7 @@ export async function runAuditGlobal(supabase: SupabaseClient, tenantId: string)
 
   return {
     score_global,
-    score_comptable:  comptable.score,
+    score_comptable:  comptableFinal.score,
     score_financier:  financier.score,
     score_fiscal:     fiscal.score,
     score_rh:         rh.score,
@@ -654,6 +662,170 @@ export async function runAuditGlobal(supabase: SupabaseClient, tenantId: string)
     nb_actions:       all_anomalies.length,
     anomalies:        all_anomalies,
     computed_at:      new Date().toISOString(),
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AUDIT SYSCOHADA — Vérifications journal & balance
+// ══════════════════════════════════════════════════════════════════════════════
+
+export async function auditSYSCOHADA(supabase: SupabaseClient, tenantId: string): Promise<AuditScore> {
+  const anomalies: AuditAnomalie[] = []
+  const year = new Date().getFullYear()
+
+  const [jeRes, cnssRes] = await Promise.all([
+    supabase.from('journal_entries')
+      .select('id, debit_account, credit_account, montant, libelle, reference, date_operation')
+      .eq('tenant_id', tenantId)
+      .eq('fiscal_year', year)
+      .limit(2000),
+    supabase.from('fiscal_declarations')
+      .select('type, mois, annee, statut, created_at')
+      .eq('tenant_id', tenantId)
+      .eq('annee', year)
+      .in('type', ['cnss', 'tva', 'das']),
+  ])
+
+  const entries = jeRes.data ?? []
+  const declas  = cnssRes.data ?? []
+
+  // 1. Équilibre global de la balance (Total Débit = Total Crédit)
+  if (entries.length > 0) {
+    const totalDebit  = entries.reduce((s, e) => s + (e.montant ?? 0), 0)
+    const totalCredit = entries.reduce((s, e) => s + (e.montant ?? 0), 0)
+    // Dans un système double entrée, chaque écriture génère un débit ET un crédit
+    // Donc le total des débits = total des crédits par construction
+    // On vérifie plutôt les écritures orphelines (débit sans crédit ou vice-versa)
+    const orphelines = entries.filter(e => !e.debit_account || !e.credit_account)
+    if (orphelines.length > 0) {
+      anomalies.push({
+        id: uid('sysco'), domain: 'comptable', code: 'SC001',
+        titre: `${orphelines.length} écriture(s) incomplète(s) — débit ou crédit manquant`,
+        description: `${orphelines.length} entrée(s) de journal sans compte débit ou sans compte crédit.`,
+        niveau: 'critical',
+        impact: 'La balance sera déséquilibrée. Non-conforme SYSCOHADA Art. 18.',
+        recommandation: 'Corrigez chaque écriture pour qu\'elle ait un compte débit ET un compte crédit.',
+        reference: 'SYSCOHADA révisé, Art. 18 — Principe de la partie double',
+        valeur: orphelines.length,
+      })
+    }
+  }
+
+  // 2. Comptes hors plan SYSCOHADA
+  const validClasses = ['1','2','3','4','5','6','7','8','9']
+  const horsClasse = entries.filter(e =>
+    (e.debit_account  && !validClasses.includes(e.debit_account[0])) ||
+    (e.credit_account && !validClasses.includes(e.credit_account[0]))
+  )
+  if (horsClasse.length > 0) {
+    anomalies.push({
+      id: uid('sysco'), domain: 'comptable', code: 'SC002',
+      titre: `${horsClasse.length} écriture(s) avec compte hors plan SYSCOHADA`,
+      description: 'Des écritures utilisent des numéros de comptes non conformes au plan SYSCOHADA (Classes 1-9).',
+      niveau: 'error',
+      impact: 'Comptabilité non conforme OHADA. Risque de rejet lors d\'un contrôle DGI.',
+      recommandation: 'Utilisez uniquement les comptes du Plan Comptable SYSCOHADA Révisé 2017.',
+      reference: 'SYSCOHADA révisé 2017 — Classes comptables 1 à 9',
+      valeur: horsClasse.length,
+    })
+  }
+
+  // 3. Vérifier la TVA collectée vs déclarée
+  const tvaCollectee = entries
+    .filter(e => e.credit_account?.startsWith('4441'))
+    .reduce((s, e) => s + (e.montant ?? 0), 0)
+
+  const tvaDeclaree = entries
+    .filter(e => e.debit_account?.startsWith('4441'))
+    .reduce((s, e) => s + (e.montant ?? 0), 0)
+
+  if (tvaCollectee > 0 && tvaDeclaree < tvaCollectee * 0.5) {
+    anomalies.push({
+      id: uid('sysco'), domain: 'fiscal', code: 'SC003',
+      titre: 'TVA collectée non soldée — déclaration peut être manquante',
+      description: `TVA collectée (Cr 4441) : ${fmt(tvaCollectee)} FCFA. TVA reversée (Dr 4441) : ${fmt(tvaDeclaree)} FCFA. Écart : ${fmt(tvaCollectee - tvaDeclaree)} FCFA.`,
+      niveau: 'warning',
+      impact: 'TVA non reversée à la DGI = dette fiscale non provisionnée.',
+      recommandation: 'Préparez la déclaration TVA et procédez au reversement à la DGI.',
+      reference: 'CGI Congo Art. 232 — Déclaration et paiement TVA',
+      valeur: `${fmt(tvaCollectee - tvaDeclaree)} FCFA`,
+    })
+  }
+
+  // 4. Écritures sans libellé
+  const sansLibelle = entries.filter(e => !e.libelle?.trim())
+  if (sansLibelle.length > 0) {
+    anomalies.push({
+      id: uid('sysco'), domain: 'comptable', code: 'SC004',
+      titre: `${sansLibelle.length} écriture(s) sans libellé`,
+      description: `Toute écriture SYSCOHADA doit avoir un libellé descriptif (objet de l'opération).`,
+      niveau: 'warning',
+      impact: 'Traçabilité insuffisante. Non-conforme SYSCOHADA Art. 17.',
+      recommandation: 'Renseignez le libellé de chaque écriture.',
+      reference: 'SYSCOHADA révisé, Art. 17 — Mentions obligatoires des livres comptables',
+      valeur: sansLibelle.length,
+    })
+  }
+
+  // 5. Comptes CNSS non soldés (431 — cotisations à payer)
+  const cnssCredit = entries.filter(e => e.credit_account === '431').reduce((s, e) => s + (e.montant ?? 0), 0)
+  const cnssDebit  = entries.filter(e => e.debit_account  === '431').reduce((s, e) => s + (e.montant ?? 0), 0)
+  const cnssDette  = cnssCredit - cnssDebit
+
+  if (cnssDette > 100_000) {
+    anomalies.push({
+      id: uid('sysco'), domain: 'rh', code: 'SC005',
+      titre: `Solde CNSS à payer : ${fmt(cnssDette)} FCFA (compte 431)`,
+      description: `Le compte 431 (CNSS) présente un solde créditeur de ${fmt(cnssDette)} FCFA — cotisations non encore versées.`,
+      niveau: cnssDette > 1_000_000 ? 'error' : 'warning',
+      impact: 'Cotisations CNSS en retard = pénalités et poursuites judiciaires.',
+      recommandation: 'Versez les cotisations CNSS à la Caisse Nationale avant le 15 du mois.',
+      reference: 'Loi n°007-2021 sur la Sécurité Sociale, Art. 12',
+      valeur: `${fmt(cnssDette)} FCFA`,
+    })
+  }
+
+  // 6. IRPP non reversé (compte 447 — retenue IRPP)
+  const irppRetenu  = entries.filter(e => e.credit_account === '447').reduce((s, e) => s + (e.montant ?? 0), 0)
+  const irppVerse   = entries.filter(e => e.debit_account  === '447').reduce((s, e) => s + (e.montant ?? 0), 0)
+  const irppDette   = irppRetenu - irppVerse
+
+  if (irppDette > 50_000) {
+    anomalies.push({
+      id: uid('sysco'), domain: 'fiscal', code: 'SC006',
+      titre: `IRPP retenu non reversé : ${fmt(irppDette)} FCFA (compte 447)`,
+      description: `${fmt(irppDette)} FCFA d'IRPP retenu à la source non encore reversé à la DGI.`,
+      niveau: irppDette > 500_000 ? 'error' : 'warning',
+      impact: 'IRPP non reversé avant le 20 = pénalités DGI 10% + intérêts 2%/mois.',
+      recommandation: 'Reversez l\'IRPP retenu à la DGI avant le 20 du mois suivant.',
+      reference: 'CGI Congo Art. 76 — Reversement IRPP avant le 20',
+      valeur: `${fmt(irppDette)} FCFA`,
+    })
+  }
+
+  // 7. Déclarations sociales manquantes (CNSS)
+  const moisActuel = new Date().getMonth() + 1
+  const cnssDeclarees = declas.filter(d => d.type === 'cnss' && d.annee === year)
+  if (cnssDeclarees.length < moisActuel - 1) {
+    const manquantes = (moisActuel - 1) - cnssDeclarees.length
+    anomalies.push({
+      id: uid('sysco'), domain: 'rh', code: 'SC007',
+      titre: `${manquantes} déclaration(s) CNSS manquante(s) pour ${year}`,
+      description: `Attendues : ${moisActuel - 1} déclarations. Trouvées : ${cnssDeclarees.length}.`,
+      niveau: 'error',
+      impact: 'Redressement CNSS possible. Pénalités de retard par déclaration manquante.',
+      recommandation: 'Régularisez les déclarations CNSS manquantes dans le module Fiscalité.',
+      reference: 'Loi n°007-2021 sur la Sécurité Sociale, Art. 30',
+      valeur: manquantes,
+    })
+  }
+
+  return {
+    domain:      'comptable',
+    label:       'Audit SYSCOHADA — Balance & Journal',
+    score:       penalise(100, anomalies),
+    anomalies,
+    computed_at: new Date().toISOString(),
   }
 }
 

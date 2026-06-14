@@ -97,10 +97,10 @@ Quand un fichier (Excel, PDF, Word, image) est analysé :
 Si c'est un bulletin de paie, extrais et présente :
 1. Nom et poste de l'employé
 2. Salaire brut de base + primes et indemnités
-3. Déductions : CNSS salarié (5.04%), IRPP selon barème Congo, autres
+3. Déductions : CNSS salarié (4% plafonné 1 200 000 FCFA — LF 2026), IRPP selon barème 5 tranches Congo, autres
 4. Net à payer
-5. Charges patronales : CNSS (14.36%), coût total employeur
-6. Vérification : les calculs sont-ils corrects ? Signale toute anomalie.
+5. Charges patronales LF 2026 : pension 8% + AF 10,035% + AT 2,25% + TUS 3% = 23,285% total
+6. Vérification : les calculs sont-ils corrects selon LF n°42-2025 du 31/12/2025 ? Signale toute anomalie.
 
 Si c'est un fichier comptable ou financier :
 - Identifie les colonnes et leur signification
@@ -116,7 +116,7 @@ function getModuleContext(module: string, secteur: string): string {
   const contexts: Record<string, string> = {
     facturation:   'EXPERT FACTURATION — Devis, factures OHADA, TVA Congo (18% + CA 5%), recouvrement, relances, DSO.',
     comptabilite:  'EXPERT COMPTABILITÉ OHADA — SYSCOHADA révisé, journaux, grand livre, bilan, compte de résultat, TVA.',
-    rh:            'EXPERT RH & DROIT SOCIAL — Paie Congo (CNSS 5.04%/14.36%), IRPP progressif, contrats CDI/CDD, licenciement.',
+    rh:            'EXPERT RH & DROIT SOCIAL — Paie Congo LF 2026 (CNSS salarié 4% / patronal 20,285% hors TUS 3%), IRPP 5 tranches 0-40%, contrats CDI/CDD, licenciement.',
     tresorerie:    'EXPERT TRÉSORERIE — Cash flow, BFR, FRNG, mobile money Airtel/MTN/Orange, rapprochements, prévisions.',
     stock:         'EXPERT INVENTAIRE — FIFO/FEFO, valorisation OHADA, Wilson, alertes rupture, inventaire physique.',
     achats:        'EXPERT ACHATS — Fournisseurs, bons de commande, réceptions, négociation, scoring fournisseurs.',

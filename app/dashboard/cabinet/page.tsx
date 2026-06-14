@@ -53,6 +53,14 @@ const TYPE_COMPTE_COLORS: Record<string, string> = {
   juridique: '#F59E0B', mixte: '#0F172A',
 }
 
+const SOUSTYPE_LABELS: Record<string, { label: string; emoji: string; color: string }> = {
+  comptable: { label: 'Cabinet Comptable',  emoji: '📊', color: '#2563EB' },
+  fiscal:    { label: 'Cabinet Fiscal',     emoji: '🏛️', color: '#7C3AED' },
+  audit:     { label: "Cabinet d'Audit",    emoji: '🔍', color: '#DC2626' },
+  conseil:   { label: 'Cabinet Conseil',    emoji: '💡', color: '#16A34A' },
+  juridique: { label: 'Cabinet Juridique',  emoji: '⚖️', color: '#F59E0B' },
+}
+
 const STATUT_COLORS: Record<string, string> = {
   actif: '#16A34A', prospect: '#F59E0B', suspendu: '#DC2626',
   archive: '#94A3B8', resilie: '#64748B',
@@ -134,7 +142,9 @@ function RevenueBar({ par_mois }: { par_mois: { mois: number; montant: number }[
 
 export default function CabinetDashboardPage() {
   const { tenant } = useTenantContext()
-  const tid = tenant?.tenantId
+  const tid        = tenant?.tenantId
+  const sousType   = (tenant as unknown as { sousType?: string })?.sousType ?? null
+  const typeInfo   = SOUSTYPE_LABELS[sousType ?? ''] ?? { label: 'Cabinet & Conseil', emoji: '📊', color: '#F59E0B' }
 
   const [clients, setClients]           = useState<Client[]>([])
   const [kpis, setKpis]                 = useState<KPIs | null>(null)
@@ -214,11 +224,12 @@ export default function CabinetDashboardPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-700 flex items-center justify-center shadow-sm">
-                <Building2 size={16} className="text-white" />
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm text-[18px]"
+                style={{ background: typeInfo.color + '22' }}>
+                {typeInfo.emoji}
               </div>
               <div>
-                <h1 className="text-[15px] font-black text-[#0F172A]">Cabinet Comptable</h1>
+                <h1 className="text-[15px] font-black text-[#0F172A]">{typeInfo.label}</h1>
                 <p className="text-[11px] text-[#64748B]">{tenant?.nomEntreprise ?? ''} · Mode Expert</p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useCallback, useEffect } from 'react'
 import { TrendingUp, Calculator, Info, Loader2, RefreshCw } from 'lucide-react'
@@ -177,7 +177,7 @@ export default function IRPPPage() {
           <div style={{ padding: '14px 20px', borderBottom: `1px solid ${BORDER}` }}>
             <h2 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT }}>IRPP retenu à la source — {annee}</h2>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 600 }}>
             <thead>
               <tr style={{ background: TEXT, color: '#fff' }}>
                 {['Mois','Employés','Masse salariale','CNSS salarié','IRPP retenu','Salaire net total'].map(h => (
@@ -205,7 +205,7 @@ export default function IRPPPage() {
                 <td />
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 

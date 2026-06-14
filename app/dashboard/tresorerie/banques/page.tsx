@@ -371,7 +371,7 @@ export default function BanquesPage() {
               <p className="text-[13px] text-[#94A3B8]">Aucun chèque enregistré</p>
             </div>
           ) : (
-            <table className="w-full text-[12px]">
+            <div className="overflow-x-auto"><table className="w-full text-[12px] min-w-[700px]">
               <thead className="bg-[#0F172A] text-white">
                 <tr>
                   {['Type','N° Chèque','Tiers','Banque','Montant','Échéance','Statut','Action'].map(h => (
@@ -418,7 +418,7 @@ export default function BanquesPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           )}
         </div>
       )}
@@ -432,7 +432,7 @@ export default function BanquesPage() {
               <p className="text-[13px] text-[#94A3B8]">Aucun virement enregistré</p>
             </div>
           ) : (
-            <table className="w-full text-[12px]">
+            <div className="overflow-x-auto"><table className="w-full text-[12px] min-w-[600px]">
               <thead className="bg-[#0F172A] text-white">
                 <tr>
                   {['Date','Source','Destination','Montant','Référence','Statut','Action'].map(h => (
@@ -474,7 +474,7 @@ export default function BanquesPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           )}
         </div>
       )}

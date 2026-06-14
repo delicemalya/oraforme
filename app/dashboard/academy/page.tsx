@@ -5,10 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap, BookOpen, Award, RotateCcw, ChevronLeft,
   Send, Loader2, CheckCircle2, Trophy, Sparkles, Download,
-  Search, Filter, Star, TrendingUp, Clock, Users,
-  FileText, FileSpreadsheet, FileType2,
+  Search, Star, TrendingUp, Clock, Users,
+  FileText, FileSpreadsheet, FileType2, Zap, Target, Medal,
+  ChevronRight, Play, Lock, CheckSquare,
 } from 'lucide-react'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 const GC  = '#2563EB'
@@ -18,9 +20,12 @@ const GGR = 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Level   = 'debutant' | 'intermediaire' | 'avance' | 'expert'
-type Screen  = 'home' | 'category' | 'level' | 'learning' | 'quiz' | 'result' | 'certificates'
-interface ChatMsg { role: 'user' | 'assistant'; content: string; timestamp: string }
-interface QuizQ   { q: string; opts: string[]; ans: number }
+type Screen  = 'home' | 'category' | 'level' | 'learning' | 'lesson' | 'quiz' | 'result' | 'certificates' | 'badges' | 'parcours'
+interface ChatMsg  { role: 'user' | 'assistant'; content: string; timestamp: string }
+interface QuizQ    { id?: string; q: string; question?: string; opts?: string[]; options?: string[]; ans?: number; answer_idx?: number; explication?: string }
+interface Lesson   { id: string; titre: string; objectifs: string[]; content_md: string; duree_min: number; sequence: number; tags: string[] }
+interface Badge    { id: string; code: string; nom: string; description: string; icone: string; couleur: string; earned: boolean; obtenu_le: string | null }
+interface Parcours { id: string; code: string; titre: string; description: string; metier: string; icone: string; couleur: string; domaines: string[]; duree_totale_h: number; niveau_min: string; enrolled: boolean; progression: number; statut: string | null }
 
 // ── Données Academy ───────────────────────────────────────────────────────────
 const ACADEMY_CATS = [
@@ -55,7 +60,8 @@ const LEVELS: { id: Level; label: string; desc: string; icon: string; color: str
   { id: 'expert',        label: 'Expert',         desc: 'Je veux me perfectionner',        icon: '⚡', color: '#7C3AED' },
 ]
 
-const QUIZ: Record<string, QuizQ[]> = {
+// Hardcoded quiz fallback (used when DB has no questions)
+const QUIZ_FALLBACK: Record<string, QuizQ[]> = {
   'comptabilite-ohada': [
     { q: 'Le SYSCOHADA révisé comporte combien de classes de comptes ?', opts: ['7','8','9','10'], ans: 2 },
     { q: 'La règle fondamentale : Débit = ?', opts: ['Capital','Actif','Crédit','Résultat'], ans: 2 },
@@ -66,66 +72,24 @@ const QUIZ: Record<string, QuizQ[]> = {
   'fiscalite': [
     { q: 'Taux IS Congo :', opts: ['25%','28%','30%','33%'], ans: 2 },
     { q: 'Déclaration TVA Congo :', opts: ['Mensuelle','Trimestrielle','Annuelle','Semestrielle'], ans: 1 },
-    { q: '1er taux IRPP Congo s\'applique à partir de :', opts: ['100 000','250 000','464 001','1 000 000'], ans: 2 },
     { q: 'NIU = ?', opts: ["N° Interne Unique","N° d'Identification Unique","N° Informatique Unifié","N° Indirect Usuel"], ans: 1 },
     { q: 'DGI = ?', opts: ['Direction Générale des Impôts','Déclaration Générale des Investissements','Direction Gestion Interne','Division des Gains Imposables'], ans: 0 },
+    { q: 'Délai conservation documents fiscaux :', opts: ['3 ans','5 ans','10 ans','15 ans'], ans: 2 },
   ],
   'rh-paie': [
     { q: 'CNSS salarié Congo :', opts: ['4%','4,5%','5,04%','6%'], ans: 2 },
     { q: 'Plafond CNSS Congo :', opts: ['1 000 000','1 500 000','2 000 000','3 000 000'], ans: 1 },
     { q: 'CNSS patronal Congo :', opts: ['10%','12%','14,36%','16%'], ans: 2 },
-    { q: 'Médecine du travail (patronal) :', opts: ['0,25%','0,5%','1%','2%'], ans: 1 },
-    { q: 'NET = Revenu imposable − ?', opts: ['CNSS','IRPP','IS','CA'], ans: 1 },
-  ],
-  'tresorerie': [
-    { q: 'BFR = ?', opts: ['FRNG − Trésorerie','(Stocks+Créances) − Dettes fourn.','Actif − Passif','Capital − Immobil.'], ans: 1 },
-    { q: 'Liquidité générale idéale :', opts: ['> 0,5','> 1','> 1,5','> 2'], ans: 2 },
-    { q: 'FRNG = ?', opts: ['Capitaux permanents − Actif immo.','Actif CT − Passif CT','BFR + Trésorerie','CA − Charges'], ans: 0 },
-    { q: 'Délai clients idéal :', opts: ['< 30 j','< 60 j','< 90 j','< 120 j'], ans: 0 },
-    { q: 'Trésorerie nette = ?', opts: ['FRNG − BFR','BFR − FRNG','Actif − Passif','CA − Charges'], ans: 0 },
-  ],
-  'gestion-clinique': [
-    { q: 'Le dossier médical doit être conservé pendant :', opts: ['5 ans','10 ans','20 ans','Toute la vie du patient'], ans: 2 },
-    { q: 'CAMU couvre quelle proportion des soins au Congo ?', opts: ['50%','70%','80%','100%'], ans: 2 },
-    { q: 'CIM-10 est :', opts: ['Classification Internationale des Maladies','Contrôle Interne Médical','Code International des Médicaments','Certificat Infirmier Médical'], ans: 0 },
-    { q: 'Le triage aux urgences classe les patients selon :', opts: ["L'ordre d'arrivée","La priorité médicale","L'assurance","L'âge"], ans: 1 },
-    { q: 'La facturation des soins médicaux au Congo est :', opts: ['Exonérée de TVA','Soumise à TVA 18%','Soumise à IS','Soumise à patente'], ans: 0 },
-  ],
-  'gestion-restaurant': [
-    { q: 'Le food cost idéal en restauration est :', opts: ['< 10%','28-35%','50-60%','70-80%'], ans: 1 },
-    { q: 'Un plat vendu 8 000 FCFA avec food cost 30% a un coût matière de :', opts: ['2 400 FCFA','800 FCFA','4 000 FCFA','1 600 FCFA'], ans: 0 },
-    { q: 'HACCP est :', opts: ["Un label de qualité","Une méthode d'analyse des risques alimentaires","Un logiciel de caisse","Un ratio de rentabilité"], ans: 1 },
-    { q: 'Le ticket moyen s\'obtient par :', opts: ['CA / Nombre de couverts','CA / Nombre de plats','Charges / CA','CA − Charges'], ans: 0 },
-    { q: 'La DLC signifie :', opts: ['Date Limite de Commercialisation','Date Limite de Consommation','Délai Legal de Conservation','Date de Livraison Confirmée'], ans: 1 },
-  ],
-  'gestion-hoteliere': [
-    { q: 'RevPAR se calcule par :', opts: ['CA / Chambres disponibles','CA / Chambres occupées','Tarif moyen × Taux occupation','A et C sont identiques'], ans: 2 },
-    { q: 'Le taux d\'occupation cible en hôtellerie est :', opts: ['30-40%','50-60%','65-80%','95-100%'], ans: 2 },
-    { q: 'OTA signifie :', opts: ['Online Travel Agency','Official Tourism Authority','Open Travel Account','Outbound Tourism Association'], ans: 0 },
-    { q: 'Le check-in standard est généralement à :', opts: ['10h','12h','14h','18h'], ans: 2 },
-    { q: 'Un client no-show engendre :', opts: ['Un remboursement automatique','Des pénalités selon la politique','Rien','Un upgrade automatique'], ans: 1 },
+    { q: 'Préavis cadre Congo :', opts: ['15 jours','1 mois','3 mois','6 mois'], ans: 2 },
+    { q: 'NET = Brut − CNSS salarié − ?', opts: ['CNSS patronal','IRPP','IS','CA'], ans: 1 },
   ],
   default: [
     { q: 'OHADA signifie :', opts: ["Organisation pour l'Harmonisation en Afrique du Droit des Affaires","Office des Affaires Dominicales en Afrique","Organisation des Hommes d'Affaires","Ordre des Hommes d'Affaires d'Afrique"], ans: 0 },
-    { q: 'Combien de pays membres l\'OHADA compte-t-elle ?', opts: ['12','14','17','20'], ans: 2 },
+    { q: 'Combien de pays membres OHADA ?', opts: ['12','14','17','20'], ans: 2 },
     { q: 'SYSCOHADA est :', opts: ['Un logiciel','Le Système Comptable OHADA','Un règlement bancaire','Une directive fiscale'], ans: 1 },
+    { q: 'Capital minimum SARL Congo :', opts: ['50 000','100 000','500 000','1 000 000'], ans: 1 },
     { q: 'Durée d\'un exercice comptable OHADA :', opts: ['6 mois','9 mois','12 mois','18 mois'], ans: 2 },
-    { q: 'Capital minimum d\'une SARL au Congo :', opts: ['100 000','500 000','1 000 000','5 000 000'], ans: 0 },
   ],
-}
-
-const DAILY_TOPICS: Record<string, string[]> = {
-  'comptabilite-ohada': ['Écritures de base OHADA — Débit, Crédit, Journal','La balance et le grand livre','Bilan SYSCOHADA : actif et passif','Compte de résultat et soldes','Amortissements et provisions OHADA','Clôture annuelle et états financiers','TVA 18% + Centime Additionnel 5% Congo'],
-  'fiscalite': ["IS 30% Congo — Base et calcul","TVA 18%+CA 5% — Déclaration trimestrielle","IRPP progressif — Barème Congo 2024","Patente et taxes locales","Obligations déclaratives DGI Congo","Optimisation fiscale légale OHADA","Contrôles fiscaux : droits et recours"],
-  'rh-paie': ['Contrat CDI/CDD Congo — Clauses obligatoires','Calcul salaire net — CNSS 5,04% + IRPP','Cotisations patronales CNSS 14,36%','Congés annuels et absences légales','Procédures de licenciement au Congo','Avantages en nature et primes','Stagiaires et apprentis — Cadre légal'],
-  'tresorerie': ['BFR et FRNG — Formules fondamentales','Prévisions de trésorerie à 30 jours','Ratios de liquidité','Délais de rotation clients/fournisseurs','Mobile Money pro — Airtel, MTN, Orange','Plan de financement court terme','Gestion de crise de liquidité'],
-  'gestion-clinique': ['Organisation cabinet médical','Dossier patient informatisé — CIM-10','Facturation médicale et assurances','Protocoles urgences de base','Gestion stock pharmacie','CAMU 80% — Remboursements','Indicateurs qualité clinique'],
-  'gestion-restaurant': ['Food cost et prix de revient','Gestion des stocks FIFO','Ingénierie du menu — Stars & Dogs','Ratios de rentabilité','Hygiène HACCP — Obligations','Recrutement personnel','Caisse journalière et réconciliation'],
-  'gestion-hoteliere': ["Taux d'occupation et RevPAR","Channel manager et distribution","Gestion housekeeping","Yield management","Accueil client 5 étoiles","Revenue Management — KPIs","Maintenance préventive"],
-  'gestion-pharmacie': ['Réception et contrôle médicaments','Gestion FEFO stocks','Dispensation sur ordonnance','Stupéfiants — Réglementation Congo','Calcul prix de vente officine','Ruptures de stock — Prévention','Pharmacovigilance'],
-  'audit': ['Audit interne OHADA — Périmètre','Scoring risques (grille 100 pts)','Contrôle interne COSO','Tests de conformité','Rapport audit — Rédaction','Plan d\'action correctif','Audit fiscal et contrôle DGI'],
-  'gestion-ecole': ['Organisation pédagogique','Gestion des inscriptions et frais','Emploi du temps et salles','Bulletins scolaires et moyennes','Recouvrement des frais de scolarité','Rapports DPEI et statistiques','Gestion du personnel enseignant'],
-  default: ['Les fondamentaux de la gestion','Lire un bilan simplifié','Calculer sa rentabilité','Gérer sa trésorerie','Obligations légales Congo','Développer ses ventes','Manager son équipe'],
 }
 
 // ── Composant Stat Card ───────────────────────────────────────────────────────
@@ -143,8 +107,33 @@ function StatCard({ icon, value, label, color }: { icon: React.ReactNode; value:
   )
 }
 
-// ── Export helpers ─────────────────────────────────────────────────────────────
+// ── Markdown simple renderer ──────────────────────────────────────────────────
+function MarkdownContent({ content }: { content: string }) {
+  const html = content
+    .replace(/^### (.+)$/gm, '<h3 class="text-base font-bold text-[#0F172A] mt-4 mb-2">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 class="text-lg font-bold text-[#1D4ED8] mt-5 mb-2 border-b border-[#E2E8F0] pb-1">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 class="text-xl font-bold text-[#0F172A] mb-3">$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-[#0F172A]">$1</strong>')
+    .replace(/`([^`]+)`/g, '<code class="bg-[#F1F5F9] text-[#DC2626] px-1 py-0.5 rounded text-[13px] font-mono">$1</code>')
+    .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-[#2563EB] pl-3 py-1 my-2 bg-[#EFF6FF] text-sm text-[#1D4ED8] rounded-r-lg">$1</blockquote>')
+    .replace(/^```([\s\S]*?)```$/gm, (_: string, c: string) => `<pre class="bg-[#0F172A] text-[#E2E8F0] p-3 rounded-xl text-xs font-mono overflow-x-auto my-3 leading-relaxed">${c.trim()}</pre>`)
+    .replace(/^\| (.+) \|$/gm, (line: string) => {
+      const cells = line.split('|').filter(Boolean).map((c: string) => c.trim())
+      return `<tr>${cells.map((c: string) => `<td class="border border-[#E2E8F0] px-2 py-1.5 text-sm">${c}</td>`).join('')}</tr>`
+    })
+    .replace(/^- (.+)$/gm, '<li class="text-sm text-[#374151] ml-4 mb-1">• $1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li class="text-sm text-[#374151] ml-4 mb-1 list-decimal">$1</li>')
+    .replace(/\n\n/g, '</p><p class="mb-2">')
 
+  return (
+    <div
+      className="prose prose-sm max-w-none text-[#374151] leading-relaxed"
+      dangerouslySetInnerHTML={{ __html: `<p class="mb-2">${html}</p>` }}
+    />
+  )
+}
+
+// ── Export helpers ─────────────────────────────────────────────────────────────
 async function exportCoursAsPDF(content: string, catLabel: string) {
   const { default: jsPDF } = await import('jspdf')
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
@@ -154,7 +143,7 @@ async function exportCoursAsPDF(content: string, catLabel: string) {
   doc.text(new Date().toLocaleDateString('fr-FR'), 15, 22)
   doc.setDrawColor(37, 99, 235); doc.line(15, 25, 195, 25)
   doc.setFontSize(11)
-  const lines = doc.splitTextToSize(content, 180)
+  const lines = doc.splitTextToSize(content.replace(/[#*`>]/g, ''), 180)
   let y = 33
   for (const line of lines) {
     if (y > 280) { doc.addPage(); y = 20 }
@@ -173,11 +162,13 @@ function exportCoursAsDOCX(content: string, catLabel: string) {
 // ── Composant principal ───────────────────────────────────────────────────────
 export default function AcademyPage() {
   const { tenantId } = useTenant()
+  const { allowed: canAcademyPremium } = usePlanFeature('academy-premium')
 
-  const [screen,   setScreen]   = useState<Screen>('home')
-  const [search,   setSearch]   = useState('')
-  const [selCat,   setSelCat]   = useState('')
-  const [selLevel, setSelLevel] = useState<Level>('debutant')
+  const [screen,      setScreen]      = useState<Screen>('home')
+  const [search,      setSearch]      = useState('')
+  const [selCat,      setSelCat]      = useState('')
+  const [selLevel,    setSelLevel]    = useState<Level>('debutant')
+  const [activeTab,   setActiveTab]   = useState<'cours' | 'parcours'>('cours')
 
   // Chat formateur
   const [messages,  setMessages]  = useState<ChatMsg[]>([])
@@ -185,53 +176,103 @@ export default function AcademyPage() {
   const [sending,   setSending]   = useState(false)
   const chatBottom = useRef<HTMLDivElement>(null)
 
+  // Lesson reader
+  const [lessons,      setLessons]      = useState<Lesson[]>([])
+  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null)
+  const [lessonsLoading, setLessonsLoading] = useState(false)
+
   // Quiz
-  const [quizIdx,  setQuizIdx]  = useState(0)
-  const [quizSel,  setQuizSel]  = useState<number | null>(null)
-  const [quizScore, setQuizScore] = useState(0)
-  const [quizDone,  setQuizDone]  = useState(false)
+  const [quizQuestions, setQuizQuestions] = useState<QuizQ[]>([])
+  const [quizIdx,      setQuizIdx]      = useState(0)
+  const [quizSel,      setQuizSel]      = useState<number | null>(null)
+  const [quizScore,    setQuizScore]    = useState(0)
+  const [quizDone,     setQuizDone]     = useState(false)
+  const [quizMode,     setQuizMode]     = useState<'quiz' | 'exam'>('quiz')
+  const [quizFromDb,   setQuizFromDb]   = useState(false)
 
   // Progression / stats
-  const [stats, setStats]   = useState({ total_cours: 0, total_quiz: 0, taux_reussite: 0, nb_certificats: 0, categories_vues: 0 })
-  const [certs, setCerts]   = useState<{ categorie: string; niveau: string; pourcentage: number; delivre_le: string }[]>([])
+  const [stats, setStats]       = useState({ total_cours: 0, total_quiz: 0, taux_reussite: 0, nb_certificats: 0, categories_vues: 0 })
+  const [certs, setCerts]       = useState<{ categorie: string; niveau: string; pourcentage: number; delivre_le: string }[]>([])
+  const [badges, setBadges]     = useState<Badge[]>([])
+  const [parcours, setParcours] = useState<Parcours[]>([])
   const [statsLoaded, setStatsLoaded] = useState(false)
 
-  // Auto-scroll
   useEffect(() => { chatBottom.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
-  // Charger les stats
+  // ── Charger les données ─────────────────────────────────────────────────────
   const loadStats = useCallback(async () => {
     if (!tenantId || statsLoaded) return
     try {
-      const res  = await fetch(`/api/miaa/academy?tenant_id=${tenantId}`)
-      const data = await res.json()
-      setStats(data.stats ?? stats)
-      setCerts(data.certificates ?? [])
+      const [statsRes, badgesRes, parcoursRes] = await Promise.all([
+        fetch(`/api/miaa/academy?tenant_id=${tenantId}`),
+        fetch(`/api/miaa/academy/badges?tenant_id=${tenantId}`),
+        fetch(`/api/miaa/academy/parcours?tenant_id=${tenantId}`),
+      ])
+      const [statsData, badgesData, parcoursData] = await Promise.all([
+        statsRes.json(), badgesRes.json(), parcoursRes.json(),
+      ])
+      setStats(statsData.stats ?? stats)
+      setCerts(statsData.certificates ?? [])
+      setBadges(badgesData.badges ?? [])
+      setParcours(parcoursData.parcours ?? [])
       setStatsLoaded(true)
     } catch { /* silencieux */ }
   }, [tenantId, statsLoaded, stats])
 
   useEffect(() => { loadStats() }, [loadStats])
 
+  // ── Charger les leçons ──────────────────────────────────────────────────────
+  const loadLessons = useCallback(async (domaine: string, niveau: string) => {
+    setLessonsLoading(true)
+    try {
+      const res  = await fetch(`/api/miaa/academy/lessons?domaine=${domaine}&niveau=${niveau}`)
+      const data = await res.json()
+      setLessons(data.lessons ?? [])
+    } catch { setLessons([]) }
+    finally   { setLessonsLoading(false) }
+  }, [])
+
+  // ── Charger les questions quiz depuis la DB ─────────────────────────────────
+  const loadQuizQuestions = useCallback(async (domaine: string, niveau: string, count: number, mode: 'quiz' | 'exam') => {
+    try {
+      const res  = await fetch(`/api/miaa/academy/quiz?domaine=${domaine}&niveau=${niveau}&count=${count}&mode=${mode}`)
+      const data = await res.json()
+      if (data.from_db && data.questions?.length) {
+        // Normaliser format DB → format unifié
+        const normalized: QuizQ[] = data.questions.map((q: { id: string; question: string; options: string[]; answer_idx: number; explication?: string }) => ({
+          id: q.id, q: q.question, opts: q.options, ans: q.answer_idx, explication: q.explication,
+        }))
+        setQuizQuestions(normalized)
+        setQuizFromDb(true)
+        return true
+      }
+    } catch { /* fallback */ }
+    // Fallback sur questions codées en dur
+    const fallback = QUIZ_FALLBACK[domaine] ?? QUIZ_FALLBACK.default
+    setQuizQuestions(fallback.slice(0, count))
+    setQuizFromDb(false)
+    return false
+  }, [])
+
   // ── Démarrer une formation ──────────────────────────────────────────────────
   const startLearning = async () => {
-    const cat   = ACADEMY_CATS.find(c => c.id === selCat)
-    const lvl   = LEVELS.find(l => l.id === selLevel)
-    const topic = (() => { const topics = DAILY_TOPICS[selCat] ?? DAILY_TOPICS.default; return topics[new Date().getDay() % topics.length] })()
-    const date  = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-
+    const cat = ACADEMY_CATS.find(c => c.id === selCat)
+    const lvl = LEVELS.find(l => l.id === selLevel)
     setMessages([{
       role: 'assistant',
-      content: `Bienvenue dans votre cours du ${date} !\n\nSujet du jour : ${topic}\nDomaine : ${cat?.label}\nVotre niveau : ${lvl?.label} ${lvl?.icon}\n\nJe suis votre formateur MIAA+ Academy. Je vais vous enseigner ce sujet étape par étape avec des exemples concrets adaptés au contexte Congo-Brazzaville / OHADA / CEMAC.\n\nTapez "Commence la leçon" pour démarrer, ou posez directement une question !`,
+      content: `Bienvenue ! Je suis votre formateur MIAA+ Academy.\n\nDomaine : ${cat?.label}\nVotre niveau : ${lvl?.label} ${lvl?.icon}\n\nJe vais vous enseigner ce sujet avec des exemples concrets adaptés au contexte Congo-Brazzaville / OHADA / CEMAC.\n\nTapez "Commence la leçon" pour démarrer, ou posez directement une question !`,
       timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
     }])
     setScreen('learning')
-
-    // Sauvegarder la progression
     if (tenantId) {
       await fetch('/api/miaa/academy', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'save_progress', tenant_id: tenantId, categorie: selCat, niveau: selLevel }),
+      }).catch(() => {})
+      // Vérifier badges
+      fetch('/api/miaa/academy/badges', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenant_id: tenantId, event: 'cours', domaine: selCat }),
       }).catch(() => {})
     }
   }
@@ -242,16 +283,14 @@ export default function AcademyPage() {
     const userMsg = input.trim(); setInput(''); setSending(true)
     const now = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     setMessages(prev => [...prev, { role: 'user', content: userMsg, timestamp: now() }])
-
     const cat = ACADEMY_CATS.find(c => c.id === selCat)
     const lvl = LEVELS.find(l => l.id === selLevel)
-
     try {
       const res  = await fetch('/api/miaa/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           module: 'formation',
-          message: `MODE FORMATEUR ACADEMY. Catégorie : ${cat?.label}. Niveau : ${lvl?.label}. Contexte Congo/OHADA/CEMAC. Enseigne comme un professeur expert certifié avec des exemples concrets. Sois pédagogue et structuré. Question : ${userMsg}`,
+          message: `MODE FORMATEUR ACADEMY. Catégorie : ${cat?.label}. Niveau : ${lvl?.label} (${lvl?.desc}). Adapte le niveau de complexité à ${lvl?.id === 'debutant' ? 'un débutant — explications simples, beaucoup d\'exemples concrets' : lvl?.id === 'intermediaire' ? 'un intermédiaire — concepts techniques, cas pratiques' : lvl?.id === 'avance' ? 'un professionnel avancé — techniques expertes, cas complexes' : 'un expert — niveau master, nuances et edge cases'}. Contexte Congo/OHADA/CEMAC. Sois pédagogue, structuré, avec des tableaux et exemples chiffrés. Question : ${userMsg}`,
           history: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
           tenantData: tenantId ? { tenant_id: tenantId } : undefined,
           langue: 'fr',
@@ -268,25 +307,24 @@ export default function AcademyPage() {
     } finally { setSending(false) }
   }
 
-  // ── Quiz ────────────────────────────────────────────────────────────────────
-  const quizQuestions = QUIZ[selCat] ?? QUIZ.default
-
-  const startQuiz = () => {
-    setQuizIdx(0); setQuizScore(0); setQuizSel(null); setQuizDone(false)
+  // ── Quiz / Examen ────────────────────────────────────────────────────────────
+  const startQuiz = async (mode: 'quiz' | 'exam' = 'quiz') => {
+    const count = mode === 'exam' ? 10 : 5
+    setQuizIdx(0); setQuizScore(0); setQuizSel(null); setQuizDone(false); setQuizMode(mode)
+    await loadQuizQuestions(selCat, selLevel, count, mode)
     setScreen('quiz')
   }
 
   const answerQuiz = (idx: number) => {
-    if (quizSel !== null) return
+    if (quizSel !== null || !quizQuestions[quizIdx]) return
     setQuizSel(idx)
-    const correct = quizQuestions[quizIdx].ans === idx
+    const correct = (quizQuestions[quizIdx].ans ?? quizQuestions[quizIdx].answer_idx) === idx
     setTimeout(async () => {
       if (correct) setQuizScore(s => s + 1)
       if (quizIdx + 1 >= quizQuestions.length) {
         const finalScore = quizScore + (correct ? 1 : 0)
         setQuizDone(true)
         setScreen('result')
-        // Sauvegarder le résultat
         if (tenantId) {
           await fetch('/api/miaa/academy', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -297,7 +335,23 @@ export default function AcademyPage() {
               user_name: 'Apprenant',
             }),
           }).catch(() => {})
-          setStatsLoaded(false) // force reload stats
+          if (quizFromDb) {
+            await fetch('/api/miaa/academy/quiz', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                tenant_id: tenantId, domaine: selCat, niveau: selLevel,
+                score: finalScore, score_max: quizQuestions.length,
+              }),
+            }).catch(() => {})
+          }
+          fetch('/api/miaa/academy/badges', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tenant_id: tenantId, event: 'quiz', domaine: selCat,
+              score: finalScore, score_max: quizQuestions.length,
+            }),
+          }).catch(() => {})
+          setStatsLoaded(false)
         }
       } else {
         setQuizIdx(q => q + 1); setQuizSel(null)
@@ -305,18 +359,23 @@ export default function AcademyPage() {
     }, 900)
   }
 
-  // ── Filtrage catégories ─────────────────────────────────────────────────────
+  // ── Navigation catégorie ───────────────────────────────────────────────────
+  const openCategory = async (catId: string) => {
+    setSelCat(catId)
+    setLessons([])
+    setCurrentLesson(null)
+    setScreen('category')
+    await loadLessons(catId, selLevel)
+  }
+
+  // ── Filtrage ─────────────────────────────────────────────────────────────────
   const filteredCats = search.trim()
     ? ACADEMY_CATS.filter(c => c.label.toLowerCase().includes(search.toLowerCase()) || c.desc.toLowerCase().includes(search.toLowerCase()))
     : ACADEMY_CATS
 
   const catInfo   = ACADEMY_CATS.find(c => c.id === selCat)
   const levelInfo = LEVELS.find(l => l.id === selLevel)
-  const todayIdx  = new Date().getDay()
-  const todayTopic = (catId: string) => {
-    const topics = DAILY_TOPICS[catId] ?? DAILY_TOPICS.default
-    return topics[todayIdx % topics.length]
-  }
+  const earnedBadges = badges.filter(b => b.earned)
 
   // ── Rendu ───────────────────────────────────────────────────────────────────
   return (
@@ -326,9 +385,10 @@ export default function AcademyPage() {
       <div className="sticky top-0 z-10 border-b border-[#E2E8F0] px-4 sm:px-6 py-4" style={{ background: 'white' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            {screen !== 'home' && screen !== 'certificates' && (
+            {(screen !== 'home' && screen !== 'certificates' && screen !== 'badges' && screen !== 'parcours') && (
               <button onClick={() => {
-                if (screen === 'learning' || screen === 'quiz') setScreen('level')
+                if (screen === 'lesson')   setScreen('category')
+                else if (screen === 'learning' || screen === 'quiz') setScreen('level')
                 else if (screen === 'level') setScreen('category')
                 else if (screen === 'category') setScreen('home')
                 else setScreen('home')
@@ -341,14 +401,17 @@ export default function AcademyPage() {
                 <GraduationCap size={20} className="text-white" />
               </div>
               <div>
-                <p className="text-base font-bold text-[#0F172A]">MIAA+ Academy</p>
+                <p className="text-base font-bold text-[#0F172A]">MIAA+ Academy Pro</p>
                 <p className="text-xs text-[#64748B]">
                   {screen === 'home'         ? 'Votre université intelligente'
                     : screen === 'certificates' ? 'Mes certificats'
+                    : screen === 'badges'       ? 'Mes badges'
+                    : screen === 'parcours'     ? 'Parcours métiers'
+                    : screen === 'lesson'       ? `Leçon — ${catInfo?.label}`
                     : screen === 'category'   ? catInfo?.label
                     : screen === 'level'      ? `Sélection niveau — ${catInfo?.label}`
                     : screen === 'learning'   ? `Cours — ${catInfo?.label} · ${levelInfo?.label}`
-                    : screen === 'quiz'       ? `Quiz — ${catInfo?.label}`
+                    : screen === 'quiz'       ? `${quizMode === 'exam' ? 'Examen' : 'Quiz'} — ${catInfo?.label}`
                     : `Résultat — ${catInfo?.label}`}
                 </p>
               </div>
@@ -356,9 +419,16 @@ export default function AcademyPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => { setScreen('certificates'); loadStats() }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm font-medium text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] transition-all">
+            <button onClick={() => { setScreen('badges'); loadStats() }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm font-medium text-[#64748B] hover:text-[#0F172A] transition-all">
+              <Medal size={15} style={{ color: '#F59E0B' }} />
+              <span className="hidden sm:inline">Badges</span>
+              {earnedBadges.length > 0 && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: '#F59E0B' }}>{earnedBadges.length}</span>
+              )}
+            </button>
+            <button onClick={() => { setScreen('certificates'); loadStats() }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm font-medium text-[#64748B] hover:text-[#0F172A] transition-all">
               <Award size={15} style={{ color: GC }} />
               <span className="hidden sm:inline">Certificats</span>
               {certs.length > 0 && (
@@ -378,60 +448,124 @@ export default function AcademyPage() {
 
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                <StatCard icon={<BookOpen size={18} />} value={stats.total_cours}      label="Cours suivis"    color={GC} />
-                <StatCard icon={<Trophy size={18} />}   value={`${stats.taux_reussite}%`} label="Taux réussite"  color="#16A34A" />
-                <StatCard icon={<Award size={18} />}    value={stats.nb_certificats}    label="Certificats"     color="#F59E0B" />
-                <StatCard icon={<Star size={18} />}     value={stats.categories_vues}   label="Domaines explorés" color="#7C3AED" />
+                <StatCard icon={<BookOpen size={18} />} value={stats.total_cours}      label="Cours suivis"     color={GC} />
+                <StatCard icon={<Trophy size={18} />}   value={`${stats.taux_reussite}%`} label="Taux réussite" color="#16A34A" />
+                <StatCard icon={<Award size={18} />}    value={stats.nb_certificats}    label="Certificats"      color="#F59E0B" />
+                <StatCard icon={<Medal size={18} />}    value={earnedBadges.length}     label="Badges gagnés"    color="#7C3AED" />
               </div>
 
-              {/* Cours du jour */}
-              <div className="mb-6 p-4 rounded-2xl border-2 text-white" style={{ background: GGR, borderColor: GD }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">⭐</span>
-                  <p className="text-sm font-bold">Cours du jour recommandé</p>
-                </div>
-                <p className="text-xs text-white/80 mb-3">{todayTopic('comptabilite-ohada')}</p>
-                <button
-                  onClick={() => { setSelCat('comptabilite-ohada'); setScreen('level') }}
-                  className="px-4 py-2 rounded-xl bg-white text-sm font-bold transition-all hover:bg-white/90"
-                  style={{ color: GD }}>
-                  Commencer ce cours →
-                </button>
-              </div>
-
-              {/* Recherche */}
-              <div className="relative mb-4">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-                <input
-                  type="text" value={search} onChange={e => setSearch(e.target.value)}
-                  placeholder="Rechercher un domaine (fiscalité, RH, restaurant…)"
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm bg-white focus:outline-none focus:border-[#2563EB]"
-                />
-              </div>
-
-              {/* Grille des formations */}
-              <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">
-                {search ? `${filteredCats.length} résultat(s) pour "${search}"` : `${ACADEMY_CATS.length} domaines disponibles`}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {filteredCats.map((cat, i) => (
-                  <motion.button
-                    key={cat.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                    onClick={() => { setSelCat(cat.id); setScreen('category') }}
-                    className="flex items-start gap-3 p-4 rounded-2xl border-2 border-[#E2E8F0] bg-white text-left transition-all hover:shadow-md hover:-translate-y-0.5 group"
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = cat.color }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#E2E8F0' }}>
-                    <span className="text-3xl leading-none shrink-0 mt-0.5">{cat.icon}</span>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-[#0F172A] leading-tight mb-1">{cat.label}</p>
-                      <p className="text-xs text-[#64748B] leading-relaxed line-clamp-2">{cat.desc}</p>
-                      <p className="text-[10px] font-medium mt-2" style={{ color: cat.color }}>
-                        Sujet du jour : {todayTopic(cat.id).slice(0, 40)}{todayTopic(cat.id).length > 40 ? '…' : ''}
-                      </p>
-                    </div>
-                  </motion.button>
+              {/* Tabs */}
+              <div className="flex gap-2 mb-5 border-b border-[#E2E8F0]">
+                {(['cours', 'parcours'] as const).map(tab => (
+                  <button key={tab} onClick={() => setActiveTab(tab)}
+                    className={`pb-2 px-1 text-sm font-semibold capitalize transition-colors ${activeTab === tab ? 'border-b-2 text-[#2563EB]' : 'text-[#64748B]'}`}
+                    style={activeTab === tab ? { borderBottomColor: GC } : {}}>
+                    {tab === 'cours' ? '📚 Formations' : '🎯 Parcours Métiers'}
+                  </button>
                 ))}
               </div>
+
+              {activeTab === 'parcours' && (
+                <div className="space-y-3 mb-6">
+                  {parcours.length === 0 ? (
+                    <div className="text-center py-8 bg-white rounded-2xl border border-[#E2E8F0]">
+                      <Target size={32} className="mx-auto mb-2 text-[#CBD5E1]" />
+                      <p className="text-sm text-[#64748B]">Chargement des parcours…</p>
+                    </div>
+                  ) : parcours.map(p => (
+                    <motion.div key={p.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                      className="bg-white rounded-2xl border-2 border-[#E2E8F0] p-4 hover:border-[#2563EB] transition-all cursor-pointer"
+                      onClick={async () => {
+                        if (!p.enrolled && tenantId) {
+                          await fetch('/api/miaa/academy/parcours', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'enroll', tenant_id: tenantId, parcours_id: p.id }),
+                          })
+                          setStatsLoaded(false)
+                        }
+                        openCategory(p.domaines[0])
+                      }}>
+                      <div className="flex items-start gap-4">
+                        <span className="text-3xl">{p.icone}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-bold text-[#0F172A]">{p.titre}</p>
+                            {p.enrolled && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ background: p.couleur }}>
+                                {p.statut === 'termine' ? '✅ Terminé' : `${p.progression}%`}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-[#64748B] mb-2">{p.description}</p>
+                          <div className="flex items-center gap-3 text-[10px] text-[#94A3B8]">
+                            <span><Clock size={10} className="inline mr-0.5" />{p.duree_totale_h}h</span>
+                            <span><BookOpen size={10} className="inline mr-0.5" />{p.domaines.length} domaines</span>
+                            <span className="capitalize">{p.niveau_min}</span>
+                          </div>
+                          {p.enrolled && p.progression > 0 && (
+                            <div className="mt-2 h-1.5 rounded-full bg-[#F1F5F9]">
+                              <div className="h-full rounded-full transition-all" style={{ width: `${p.progression}%`, background: p.couleur }} />
+                            </div>
+                          )}
+                        </div>
+                        <ChevronRight size={16} className="text-[#CBD5E1] shrink-0 mt-1" />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'cours' && (
+                <>
+                  {/* Hero cours du jour */}
+                  <div className="mb-5 p-4 rounded-2xl text-white" style={{ background: GGR }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles size={16} />
+                      <p className="text-sm font-bold">Cours recommandé du jour</p>
+                    </div>
+                    <p className="text-xs text-white/80 mb-3">Comptabilité OHADA — SYSCOHADA Révisé 2017</p>
+                    <button onClick={() => openCategory('comptabilite-ohada')}
+                      className="px-4 py-2 rounded-xl bg-white text-sm font-bold" style={{ color: GD }}>
+                      Commencer ce cours →
+                    </button>
+                  </div>
+
+                  {/* Recherche */}
+                  <div className="relative mb-4">
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                    <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                      placeholder="Rechercher un domaine (fiscalité, RH, restaurant…)"
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm bg-white focus:outline-none focus:border-[#2563EB]" />
+                  </div>
+
+                  <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">
+                    {search ? `${filteredCats.length} résultat(s)` : `${ACADEMY_CATS.length} domaines disponibles`}
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {filteredCats.map((cat, i) => {
+                      const catCerts = certs.filter(c => c.categorie === cat.id)
+                      return (
+                        <motion.button key={cat.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.025 }}
+                          onClick={() => openCategory(cat.id)}
+                          className="flex items-start gap-3 p-4 rounded-2xl border-2 border-[#E2E8F0] bg-white text-left transition-all hover:shadow-md hover:-translate-y-0.5"
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = cat.color }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#E2E8F0' }}>
+                          <span className="text-3xl leading-none shrink-0 mt-0.5">{cat.icon}</span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-[#0F172A] leading-tight mb-1">{cat.label}</p>
+                            <p className="text-xs text-[#64748B] leading-relaxed line-clamp-2">{cat.desc}</p>
+                            {catCerts.length > 0 && (
+                              <span className="inline-flex items-center gap-1 mt-2 text-[10px] font-bold" style={{ color: cat.color }}>
+                                <Award size={10} /> {catCerts.length} certificat(s)
+                              </span>
+                            )}
+                          </div>
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
             </motion.div>
           )}
 
@@ -439,30 +573,49 @@ export default function AcademyPage() {
           {screen === 'category' && catInfo && (
             <motion.div key="category" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               {/* Hero */}
-              <div className="rounded-2xl p-6 mb-6 text-white" style={{ background: `linear-gradient(135deg, ${catInfo.color} 0%, ${catInfo.color}CC 100%)` }}>
+              <div className="rounded-2xl p-6 mb-5 text-white" style={{ background: `linear-gradient(135deg, ${catInfo.color} 0%, ${catInfo.color}CC 100%)` }}>
                 <span className="text-5xl">{catInfo.icon}</span>
                 <h1 className="text-xl font-bold mt-3 mb-1">{catInfo.label}</h1>
                 <p className="text-white/80 text-sm">{catInfo.desc}</p>
               </div>
 
-              {/* Sujets de la semaine */}
-              <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 mb-4">
-                <p className="text-sm font-bold text-[#0F172A] mb-3">📅 Programme de la semaine</p>
-                <div className="space-y-2">
-                  {(DAILY_TOPICS[selCat] ?? DAILY_TOPICS.default).map((topic, i) => {
-                    const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
-                    const isToday = i === todayIdx % 7
-                    return (
-                      <div key={i} className={`flex items-center gap-3 p-2.5 rounded-xl text-sm ${isToday ? 'font-bold border-2' : 'border border-[#F1F5F9]'}`}
-                        style={isToday ? { borderColor: catInfo.color, background: `${catInfo.color}10`, color: catInfo.color } : { color: '#64748B' }}>
-                        <span className="text-xs font-medium w-20 shrink-0">{days[i % 7]}</span>
-                        <span className="truncate text-xs">{topic}</span>
-                        {isToday && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white shrink-0" style={{ background: catInfo.color }}>AUJOURD&apos;HUI</span>}
-                      </div>
-                    )
-                  })}
+              {/* Leçons disponibles */}
+              {lessonsLoading ? (
+                <div className="flex items-center gap-2 py-4 text-[#64748B] text-sm">
+                  <Loader2 size={16} className="animate-spin" />
+                  Chargement des leçons…
                 </div>
-              </div>
+              ) : lessons.length > 0 ? (
+                <div className="mb-5">
+                  <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">
+                    📖 {lessons.length} leçon(s) disponible(s)
+                  </p>
+                  <div className="space-y-2">
+                    {lessons.map((lesson, i) => (
+                      <button key={lesson.id} onClick={() => { setCurrentLesson(lesson); setScreen('lesson') }}
+                        className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-[#E2E8F0] bg-white text-left hover:border-[#2563EB] transition-all group">
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold text-white" style={{ background: catInfo.color }}>
+                          {i + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-[#0F172A] group-hover:text-[#2563EB] transition-colors">{lesson.titre}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-xs text-[#94A3B8]"><Clock size={10} className="inline mr-0.5" />{lesson.duree_min} min</span>
+                            {lesson.objectifs?.length > 0 && (
+                              <span className="text-xs text-[#94A3B8]">• {lesson.objectifs.length} objectif(s)</span>
+                            )}
+                          </div>
+                        </div>
+                        <Play size={14} className="text-[#CBD5E1] group-hover:text-[#2563EB] transition-colors shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-700">
+                  Les leçons structurées pour ce niveau sont en cours de préparation. Utilisez le formateur IA pour apprendre ce sujet.
+                </div>
+              )}
 
               {/* Certificats obtenus dans cette catégorie */}
               {certs.filter(c => c.categorie === selCat).length > 0 && (
@@ -480,8 +633,58 @@ export default function AcademyPage() {
               <button onClick={() => setScreen('level')}
                 className="w-full py-3.5 rounded-2xl text-white font-bold text-sm transition-all hover:opacity-90"
                 style={{ background: `linear-gradient(135deg, ${catInfo.color} 0%, ${catInfo.color}CC 100%)` }}>
-                Commencer la formation →
+                Choisir mon niveau et commencer →
               </button>
+            </motion.div>
+          )}
+
+          {/* ═══════════════════════════════════ LESSON ════════════════════ */}
+          {screen === 'lesson' && currentLesson && (
+            <motion.div key="lesson" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              {/* Infos leçon */}
+              <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 mb-4">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: `${catInfo?.color}20` }}>
+                    {catInfo?.icon}
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold text-[#0F172A]">{currentLesson.titre}</h1>
+                    <p className="text-xs text-[#64748B] mt-0.5"><Clock size={10} className="inline mr-1" />{currentLesson.duree_min} min</p>
+                  </div>
+                </div>
+                {currentLesson.objectifs?.length > 0 && (
+                  <div className="bg-[#F8FAFC] rounded-xl p-3 mb-4">
+                    <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">Objectifs de la leçon</p>
+                    <ul className="space-y-1">
+                      {currentLesson.objectifs.map((obj, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-[#374151]">
+                          <CheckSquare size={12} className="mt-0.5 shrink-0" style={{ color: catInfo?.color }} />
+                          {obj}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="prose-lesson border-t border-[#F1F5F9] pt-4">
+                  <MarkdownContent content={currentLesson.content_md} />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => { setScreen('learning'); startLearning() }}
+                  className="flex-1 py-3 rounded-xl text-white text-sm font-medium" style={{ background: GGR }}>
+                  <BookOpen size={14} className="inline mr-2" />
+                  Poser des questions au formateur
+                </button>
+                <button onClick={() => startQuiz('quiz')}
+                  className="px-4 py-3 rounded-xl text-sm font-medium border-2" style={{ borderColor: GC, color: GC, background: GL }}>
+                  <Trophy size={14} className="inline mr-1" />
+                  Quiz
+                </button>
+                <button onClick={() => exportCoursAsPDF(currentLesson.content_md, currentLesson.titre)}
+                  className="px-3 py-3 rounded-xl border border-[#E2E8F0]" title="Télécharger PDF">
+                  <Download size={14} className="text-[#64748B]" />
+                </button>
+              </div>
             </motion.div>
           )}
 
@@ -491,34 +694,52 @@ export default function AcademyPage() {
               <div className="mb-6">
                 <p className="text-xs text-[#64748B] mb-1">{catInfo.icon} {catInfo.label}</p>
                 <h2 className="text-xl font-bold text-[#0F172A]">Choisissez votre niveau</h2>
-                <p className="text-sm text-[#64748B] mt-1">Le cours s&apos;adapte automatiquement à votre niveau.</p>
+                <p className="text-sm text-[#64748B] mt-1">Le cours et les questions s&apos;adaptent à votre niveau.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                {LEVELS.map(lvl => (
-                  <button key={lvl.id} onClick={() => setSelLevel(lvl.id)}
-                    className="flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all"
-                    style={selLevel === lvl.id ? { borderColor: lvl.color, background: `${lvl.color}10` } : { borderColor: '#E2E8F0', background: 'white' }}>
-                    <span className="text-3xl">{lvl.icon}</span>
-                    <div>
-                      <p className="text-sm font-bold text-[#0F172A]">{lvl.label}</p>
-                      <p className="text-xs text-[#64748B]">{lvl.desc}</p>
-                    </div>
-                    {selLevel === lvl.id && <CheckCircle2 size={18} className="ml-auto" style={{ color: lvl.color }} />}
-                  </button>
-                ))}
+                {LEVELS.map(lvl => {
+                  const locked = lvl.id === 'expert' && !canAcademyPremium
+                  return (
+                    <button key={lvl.id}
+                      onClick={() => {
+                        if (!locked) {
+                          setSelLevel(lvl.id)
+                          loadLessons(selCat, lvl.id)
+                        }
+                      }}
+                      disabled={locked}
+                      className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${locked ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      style={selLevel === lvl.id && !locked ? { borderColor: lvl.color, background: `${lvl.color}10` } : { borderColor: '#E2E8F0', background: 'white' }}>
+                      <span className="text-3xl">{locked ? '🔒' : lvl.icon}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold text-[#0F172A]">{lvl.label}</p>
+                          {locked && <span className="text-[10px] font-semibold text-[#F59E0B] bg-[#FEF3C7] px-1.5 py-0.5 rounded-full">Business</span>}
+                        </div>
+                        <p className="text-xs text-[#64748B]">{lvl.desc}</p>
+                      </div>
+                      {selLevel === lvl.id && !locked && <CheckCircle2 size={18} style={{ color: lvl.color }} />}
+                    </button>
+                  )
+                })}
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <button onClick={startLearning}
-                  className="py-3.5 rounded-2xl text-white font-bold text-sm"
-                  style={{ background: GGR }}>
+                  className="py-3.5 rounded-2xl text-white font-bold text-sm" style={{ background: GGR }}>
                   <BookOpen size={15} className="inline mr-2" />
-                  Commencer le cours
+                  Formateur
                 </button>
-                <button onClick={startQuiz}
+                <button onClick={() => startQuiz('quiz')}
                   className="py-3.5 rounded-2xl font-bold text-sm border-2 transition-all"
                   style={{ borderColor: GC, color: GC, background: GL }}>
                   <Trophy size={15} className="inline mr-2" />
-                  Passer le quiz
+                  Quiz (5 Q)
+                </button>
+                <button onClick={() => startQuiz('exam')}
+                  className="py-3.5 rounded-2xl font-bold text-sm border-2 transition-all"
+                  style={{ borderColor: '#7C3AED', color: '#7C3AED', background: '#F5F3FF' }}>
+                  <Zap size={15} className="inline mr-2" />
+                  Examen (10 Q)
                 </button>
               </div>
             </motion.div>
@@ -527,7 +748,6 @@ export default function AcademyPage() {
           {/* ══════════════════════════════ LEARNING ═══════════════════════ */}
           {screen === 'learning' && (
             <motion.div key="learning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col" style={{ height: 'calc(100vh - 140px)' }}>
-              {/* Actions bar */}
               <div className="flex items-center justify-between mb-3 shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{catInfo?.icon}</span>
@@ -539,29 +759,23 @@ export default function AcademyPage() {
                 <div className="flex items-center gap-2">
                   {messages.some(m => m.role === 'assistant' && m.content.length > 100) && (
                     <>
-                      <button
-                        onClick={() => exportCoursAsPDF(messages.filter(m => m.role === 'assistant').map(m => m.content).join('\n\n'), catInfo?.label ?? '')}
-                        title="Télécharger PDF"
-                        className="p-2 rounded-xl border border-[#E2E8F0] hover:border-[#DC2626] transition-colors">
+                      <button onClick={() => exportCoursAsPDF(messages.filter(m => m.role === 'assistant').map(m => m.content).join('\n\n'), catInfo?.label ?? '')}
+                        title="PDF" className="p-2 rounded-xl border border-[#E2E8F0] hover:border-[#DC2626] transition-colors">
                         <FileType2 size={14} style={{ color: '#DC2626' }} />
                       </button>
-                      <button
-                        onClick={() => exportCoursAsDOCX(messages.filter(m => m.role === 'assistant').map(m => m.content).join('\n\n'), catInfo?.label ?? '')}
-                        title="Télécharger DOCX"
-                        className="p-2 rounded-xl border border-[#E2E8F0] hover:border-[#2563EB] transition-colors">
+                      <button onClick={() => exportCoursAsDOCX(messages.filter(m => m.role === 'assistant').map(m => m.content).join('\n\n'), catInfo?.label ?? '')}
+                        title="DOC" className="p-2 rounded-xl border border-[#E2E8F0] hover:border-[#2563EB] transition-colors">
                         <FileText size={14} style={{ color: GC }} />
                       </button>
                     </>
                   )}
-                  <button onClick={startQuiz}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-xs font-medium"
-                    style={{ background: GGR }}>
+                  <button onClick={() => startQuiz('quiz')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-xs font-medium" style={{ background: GGR }}>
                     <Trophy size={13} /> Quiz
                   </button>
                 </div>
               </div>
 
-              {/* Messages */}
               <div className="flex-1 overflow-y-auto space-y-3 rounded-2xl border border-[#E2E8F0] bg-white p-4">
                 {messages.map((m, i) => (
                   <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -571,9 +785,7 @@ export default function AcademyPage() {
                       </div>
                     )}
                     <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                      m.role === 'user'
-                        ? 'text-white rounded-br-sm'
-                        : 'text-[#0F172A] rounded-bl-sm bg-[#F8FAFC] border border-[#E2E8F0]'
+                      m.role === 'user' ? 'text-white rounded-br-sm' : 'text-[#0F172A] rounded-bl-sm bg-[#F8FAFC] border border-[#E2E8F0]'
                     }`} style={m.role === 'user' ? { background: GC } : {}}>
                       <p className="whitespace-pre-wrap">{m.content}</p>
                       <p className="text-[10px] opacity-50 mt-1">{m.timestamp}</p>
@@ -596,48 +808,50 @@ export default function AcademyPage() {
                 <div ref={chatBottom} />
               </div>
 
-              {/* Input */}
               <div className="shrink-0 mt-3">
                 <div className="flex gap-2">
-                  <input
-                    value={input} onChange={e => setInput(e.target.value)}
+                  <input value={input} onChange={e => setInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') sendMessage() }}
                     placeholder="Posez une question au formateur…"
-                    className="flex-1 rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:outline-none focus:border-[#2563EB] bg-white"
-                  />
+                    className="flex-1 rounded-xl border border-[#E2E8F0] px-4 py-3 text-sm focus:outline-none focus:border-[#2563EB] bg-white" />
                   <button onClick={sendMessage} disabled={!input.trim() || sending}
-                    className="px-4 rounded-xl text-white transition-all disabled:opacity-40"
-                    style={{ background: GC }}>
+                    className="px-4 rounded-xl text-white transition-all disabled:opacity-40" style={{ background: GC }}>
                     {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                   </button>
                 </div>
-                <p className="text-[10px] text-center text-[#94A3B8] mt-1.5" style={{ color: GD }}>
-                  MIAA+ enseigne en mode formateur expert certifié
+                <p className="text-[10px] text-center mt-1.5" style={{ color: GD }}>
+                  MIAA+ enseigne en mode formateur expert certifié — Niveau : {levelInfo?.label}
                 </p>
               </div>
             </motion.div>
           )}
 
           {/* ════════════════════════════════ QUIZ ═════════════════════════ */}
-          {screen === 'quiz' && !quizDone && (
+          {screen === 'quiz' && quizQuestions.length > 0 && !quizDone && (
             <motion.div key="quiz" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto">
               <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 mb-4">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-bold text-[#0F172A]">Quiz — {catInfo?.label}</p>
+                  <div>
+                    <p className="text-sm font-bold text-[#0F172A]">
+                      {quizMode === 'exam' ? '📝 Examen' : '🏆 Quiz'} — {catInfo?.label}
+                    </p>
+                    <p className="text-xs text-[#94A3B8]">{quizFromDb ? 'Questions depuis la base de données' : 'Questions standards'}</p>
+                  </div>
                   <span className="text-sm font-bold" style={{ color: GC }}>{quizIdx + 1} / {quizQuestions.length}</span>
                 </div>
                 <div className="h-2 rounded-full bg-[#F1F5F9] overflow-hidden">
                   <motion.div className="h-full rounded-full" style={{ background: GGR }}
-                    animate={{ width: `${((quizIdx + 1) / quizQuestions.length) * 100}%` }}
-                    transition={{ duration: 0.4 }} />
+                    animate={{ width: `${((quizIdx + 1) / quizQuestions.length) * 100}%` }} transition={{ duration: 0.4 }} />
                 </div>
               </div>
 
               <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6">
-                <p className="text-base font-semibold text-[#0F172A] leading-snug mb-5">{quizQuestions[quizIdx].q}</p>
+                <p className="text-base font-semibold text-[#0F172A] leading-snug mb-5">
+                  {quizQuestions[quizIdx]?.q ?? quizQuestions[quizIdx]?.question}
+                </p>
                 <div className="space-y-3">
-                  {quizQuestions[quizIdx].opts.map((opt, i) => {
-                    const correct  = quizQuestions[quizIdx].ans === i
+                  {(quizQuestions[quizIdx]?.opts ?? quizQuestions[quizIdx]?.options ?? []).map((opt: string, i: number) => {
+                    const correct  = (quizQuestions[quizIdx].ans ?? quizQuestions[quizIdx].answer_idx) === i
                     const selected = quizSel === i
                     const show     = quizSel !== null
                     return (
@@ -657,6 +871,11 @@ export default function AcademyPage() {
                     )
                   })}
                 </div>
+                {quizSel !== null && quizQuestions[quizIdx]?.explication && (
+                  <div className="mt-4 p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-800">
+                    <span className="font-bold">Explication : </span>{quizQuestions[quizIdx].explication}
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -664,7 +883,6 @@ export default function AcademyPage() {
           {/* ══════════════════════════════ RESULT ═════════════════════════ */}
           {screen === 'result' && (
             <motion.div key="result" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-lg mx-auto">
-              {/* Score */}
               <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 text-center mb-4">
                 {quizScore >= Math.ceil(quizQuestions.length * 0.8) ? (
                   <>
@@ -687,7 +905,6 @@ export default function AcademyPage() {
                 )}
               </div>
 
-              {/* Certificat */}
               {quizScore >= Math.ceil(quizQuestions.length * 0.8) && (
                 <div className="rounded-2xl border-2 p-5 mb-4" style={{ borderColor: GC, background: GL }}>
                   <div className="flex justify-center gap-1 mb-2">
@@ -699,17 +916,17 @@ export default function AcademyPage() {
                   <p className="text-xs text-[#64748B] text-center">Niveau : {levelInfo?.label} — {Math.round((quizScore / quizQuestions.length) * 100)}%</p>
                   <div className="flex items-center justify-center gap-1 mt-2" style={{ color: GC }}>
                     <CheckCircle2 size={14} />
-                    <span className="text-xs font-bold">Délivré par MIAA+ Academy · {new Date().toLocaleDateString('fr-FR')}</span>
+                    <span className="text-xs font-bold">Délivré par MIAA+ Academy Pro · {new Date().toLocaleDateString('fr-FR')}</span>
                   </div>
                   <div className="flex gap-2 mt-3">
                     <button
-                      onClick={() => exportCoursAsPDF(`CERTIFICAT D'ACCOMPLISSEMENT\n\nDomaine : ${catInfo?.label}\nNiveau : ${levelInfo?.label}\nScore : ${quizScore}/${quizQuestions.length} (${Math.round((quizScore / quizQuestions.length) * 100)}%)\nDélivré par MIAA+ Academy — Oraforme\nDate : ${new Date().toLocaleDateString('fr-FR')}`, `Certificat_${catInfo?.label ?? ''}`)}
+                      onClick={() => exportCoursAsPDF(`CERTIFICAT D'ACCOMPLISSEMENT\n\nDomaine : ${catInfo?.label}\nNiveau : ${levelInfo?.label}\nScore : ${quizScore}/${quizQuestions.length} (${Math.round((quizScore / quizQuestions.length) * 100)}%)\nDélivré par MIAA+ Academy Pro — Oraforme\nDate : ${new Date().toLocaleDateString('fr-FR')}`, `Certificat_${catInfo?.label ?? ''}`)}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium border-2 transition-all"
                       style={{ borderColor: '#DC2626', color: '#DC2626' }}>
                       <FileType2 size={13} /> PDF
                     </button>
                     <button
-                      onClick={() => exportCoursAsDOCX(`CERTIFICAT D'ACCOMPLISSEMENT\n\nDomaine : ${catInfo?.label}\nNiveau : ${levelInfo?.label}\nScore : ${quizScore}/${quizQuestions.length} (${Math.round((quizScore / quizQuestions.length) * 100)}%)\nDélivré par MIAA+ Academy — Oraforme\nDate : ${new Date().toLocaleDateString('fr-FR')}`, `Certificat_${catInfo?.label ?? ''}`)}
+                      onClick={() => exportCoursAsDOCX(`CERTIFICAT D'ACCOMPLISSEMENT\n\nDomaine : ${catInfo?.label}\nNiveau : ${levelInfo?.label}\nScore : ${quizScore}/${quizQuestions.length} (${Math.round((quizScore / quizQuestions.length) * 100)}%)\nDélivré par MIAA+ Academy Pro — Oraforme\nDate : ${new Date().toLocaleDateString('fr-FR')}`, `Certificat_${catInfo?.label ?? ''}`)}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium border-2 transition-all"
                       style={{ borderColor: GC, color: GC }}>
                       <FileText size={13} /> DOC
@@ -718,17 +935,20 @@ export default function AcademyPage() {
                 </div>
               )}
 
-              {/* Actions */}
               <div className="space-y-2">
                 <button onClick={() => setScreen('learning')}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-white font-bold text-sm"
-                  style={{ background: GGR }}>
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-white font-bold text-sm" style={{ background: GGR }}>
                   <BookOpen size={15} /> Continuer la formation
                 </button>
-                <button onClick={startQuiz}
+                <button onClick={() => startQuiz('quiz')}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-medium text-sm border-2 transition-all"
                   style={{ borderColor: GC, color: GC, background: GL }}>
                   <RotateCcw size={15} /> Refaire le quiz
+                </button>
+                <button onClick={() => startQuiz('exam')}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-medium text-sm border-2 transition-all"
+                  style={{ borderColor: '#7C3AED', color: '#7C3AED', background: '#F5F3FF' }}>
+                  <Zap size={15} /> Examen complet (10 questions)
                 </button>
                 <button onClick={() => { setScreen('home'); setSelCat(''); setMessages([]) }}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm border border-[#E2E8F0] text-[#64748B]">
@@ -741,19 +961,21 @@ export default function AcademyPage() {
           {/* ═══════════════════════════ CERTIFICATES ══════════════════════ */}
           {screen === 'certificates' && (
             <motion.div key="certificates" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-[#0F172A]">Mes Certificats</h2>
-                <p className="text-sm text-[#64748B] mt-1">{certs.length} certificat(s) obtenus</p>
+              <div className="flex items-center gap-3 mb-6">
+                <button onClick={() => setScreen('home')} className="p-2 rounded-xl border border-[#E2E8F0]">
+                  <ChevronLeft size={16} className="text-[#64748B]" />
+                </button>
+                <div>
+                  <h2 className="text-xl font-bold text-[#0F172A]">Mes Certificats</h2>
+                  <p className="text-sm text-[#64748B]">{certs.length} certificat(s) obtenus</p>
+                </div>
               </div>
-
               {certs.length === 0 ? (
                 <div className="text-center py-16 bg-white rounded-2xl border border-[#E2E8F0]">
                   <Award size={40} className="mx-auto mb-3 text-[#CBD5E1]" />
                   <p className="text-sm font-medium text-[#64748B]">Aucun certificat pour l&apos;instant</p>
                   <p className="text-xs text-[#94A3B8] mt-1">Complétez un quiz avec 80%+ pour obtenir un certificat</p>
-                  <button onClick={() => setScreen('home')}
-                    className="mt-4 px-5 py-2.5 rounded-xl text-white text-sm font-medium"
-                    style={{ background: GGR }}>
+                  <button onClick={() => setScreen('home')} className="mt-4 px-5 py-2.5 rounded-xl text-white text-sm font-medium" style={{ background: GGR }}>
                     Commencer une formation
                   </button>
                 </div>
@@ -777,10 +999,10 @@ export default function AcademyPage() {
                           ))}
                         </div>
                         <p className="text-[10px] text-[#94A3B8] mb-3">
-                          Délivré le {new Date(cert.delivre_le).toLocaleDateString('fr-FR')} · MIAA+ Academy
+                          Délivré le {new Date(cert.delivre_le).toLocaleDateString('fr-FR')} · MIAA+ Academy Pro
                         </p>
                         <button
-                          onClick={() => exportCoursAsPDF(`CERTIFICAT D'ACCOMPLISSEMENT\n\nDomaine : ${catData?.label}\nNiveau : ${cert.niveau}\nScore : ${cert.pourcentage}%\nDélivré par MIAA+ Academy — Oraforme\nDate : ${new Date(cert.delivre_le).toLocaleDateString('fr-FR')}`, `Certificat_${catData?.label ?? cert.categorie}`)}
+                          onClick={() => exportCoursAsPDF(`CERTIFICAT D'ACCOMPLISSEMENT\n\nDomaine : ${catData?.label}\nNiveau : ${cert.niveau}\nScore : ${cert.pourcentage}%\nDélivré par MIAA+ Academy Pro — Oraforme\nDate : ${new Date(cert.delivre_le).toLocaleDateString('fr-FR')}`, `Certificat_${catData?.label ?? cert.categorie}`)}
                           className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium border transition-all"
                           style={{ borderColor: catData?.color ?? GC, color: catData?.color ?? GC }}>
                           <Download size={12} /> Télécharger le certificat
@@ -790,6 +1012,58 @@ export default function AcademyPage() {
                   })}
                 </div>
               )}
+            </motion.div>
+          )}
+
+          {/* ═══════════════════════════════ BADGES ════════════════════════ */}
+          {screen === 'badges' && (
+            <motion.div key="badges" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="flex items-center gap-3 mb-6">
+                <button onClick={() => setScreen('home')} className="p-2 rounded-xl border border-[#E2E8F0]">
+                  <ChevronLeft size={16} className="text-[#64748B]" />
+                </button>
+                <div>
+                  <h2 className="text-xl font-bold text-[#0F172A]">Mes Badges</h2>
+                  <p className="text-sm text-[#64748B]">{earnedBadges.length}/{badges.length} badges obtenus</p>
+                </div>
+              </div>
+
+              {earnedBadges.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">Badges obtenus</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {earnedBadges.map(badge => (
+                      <motion.div key={badge.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white rounded-2xl border-2 p-4 text-center"
+                        style={{ borderColor: badge.couleur }}>
+                        <span className="text-3xl block mb-2">{badge.icone}</span>
+                        <p className="text-xs font-bold text-[#0F172A]">{badge.nom}</p>
+                        <p className="text-[10px] text-[#64748B] mt-1">{badge.description}</p>
+                        {badge.obtenu_le && (
+                          <p className="text-[9px] text-[#94A3B8] mt-1">{new Date(badge.obtenu_le).toLocaleDateString('fr-FR')}</p>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">Badges à débloquer</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {badges.filter(b => !b.earned).map(badge => (
+                    <div key={badge.id} className="bg-white rounded-2xl border border-[#E2E8F0] p-4 text-center opacity-50">
+                      <span className="text-3xl block mb-2 grayscale">{badge.icone}</span>
+                      <p className="text-xs font-bold text-[#64748B]">{badge.nom}</p>
+                      <p className="text-[10px] text-[#94A3B8] mt-1">{badge.description}</p>
+                      <div className="mt-2 flex items-center justify-center gap-1">
+                        <Lock size={10} className="text-[#CBD5E1]" />
+                        <span className="text-[9px] text-[#CBD5E1]">Non débloqué</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           )}
 

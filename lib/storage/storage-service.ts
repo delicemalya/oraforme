@@ -356,10 +356,9 @@ export async function searchDocuments(
   if (filters?.dateTo)   q = q.lte('created_at', filters.dateTo)
 
   if (query.trim()) {
-    // Recherche dans nom + tags + ocr_text
-    q = q.or(
-      `nom.ilike.%${query}%,ocr_text.ilike.%${query}%,tags.cs.{${query}}`
-    )
+    // FTS sur ocr_text (GIN index) + ILIKE sur nom
+    const safe = query.trim().replace(/[%_'"\\]/g, ' ')
+    q = q.or(`nom.ilike.%${safe}%,ocr_text.plfts(french).${safe}`)
   }
 
   const { data } = await q

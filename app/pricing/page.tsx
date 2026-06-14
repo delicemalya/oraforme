@@ -15,7 +15,7 @@ const FAQ = [
   },
   {
     q: "Y a-t-il une période d'essai gratuite ?",
-    a: "Oui. 14 jours gratuits sur tous les plans, sans carte bancaire.",
+    a: "Oui. 30 jours gratuits sur tous les plans, sans carte bancaire.",
   },
   {
     q: "Le prix inclut combien d'utilisateurs ?",
@@ -52,7 +52,7 @@ export default function PricingPage() {
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
       <section className="text-center px-4 pt-20 pb-14">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F59E0B]/10 border border-[#F59E0B]/20 rounded-full text-[#F59E0B] text-xs font-semibold mb-6">
-          <Zap size={11} /> 14 jours gratuits · Sans carte bancaire
+          <Zap size={11} /> 30 jours gratuits · Sans carte bancaire
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-4 max-w-2xl mx-auto">
           Des packs intelligents<br />
@@ -236,7 +236,7 @@ export default function PricingPage() {
             href="/register"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm bg-[#F59E0B] text-black hover:bg-[#F59E0B]/90 transition-all"
           >
-            <Zap size={15} /> Essai gratuit 14 jours
+            <Zap size={15} /> Essai gratuit 30 jours
           </Link>
         </div>
       </section>

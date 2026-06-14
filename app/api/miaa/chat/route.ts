@@ -101,6 +101,10 @@ function detectAgent(message: string, secteur?: string): string {
     return 'cabinet'
   if (/transport|flotte|chauffeur|kilomét|livraison.*route/.test(msg))
     return 'tresorerie'
+  if (/conformit|anomalie.*compta|anomalie.*fiscal|anomalie.*rh|score.*ohada|balance.*général|grand.*livre.*anomalie|risque.*fiscal|risque.*compta|vérif.*comptab|écritures.*incohérent|pénalité.*tva|retard.*cnss|retard.*déclaration/.test(msg))
+    return 'conformite'
+  if (/score.*audit|audit.*complet|rapport.*audit|contrôle.*interne|fraude.*interne|séparation.*tâches|plan.*remédiation|anomalies.*détect/.test(msg))
+    return 'audit'
 
   // 3. Défaut : comptabilité — l'agent le plus polyvalent
   return 'comptabilite'
@@ -205,12 +209,13 @@ const SUGGESTIONS: Record<string, string[]> = {
 // ── Handler principal ─────────────────────────────────────────────────────────
 export async function POST(req: Request) {
   try {
-    const { module, message, history, tenantData, langue } = await req.json() as {
+    const { module, message, history, tenantData, langue, gedContext } = await req.json() as {
       module:     string
       message:    string
       history:    { role: 'user' | 'assistant'; content: string }[]
       tenantData?: { tenant_id?: string; secteur?: string }
       langue?:    string
+      gedContext?: string
     }
 
     const tenantId = tenantData?.tenant_id
@@ -262,12 +267,17 @@ export async function POST(req: Request) {
     }
 
     // ── 3. System prompt ──────────────────────────────────────────────────────
-    const systemPrompt = getMIAASystemPrompt({
+    let systemPrompt = getMIAASystemPrompt({
       memory,
       module_actuel: effectiveModule || 'general',
       langue:        langue || 'fr',
       agent_context: agent?.personnalite,
     })
+
+    // Injecter le contexte GED si un document est sélectionné
+    if (gedContext) {
+      systemPrompt += `\n\n---\n## Document GED chargé par l'utilisateur\n${gedContext.slice(0, 6000)}\n---\nAnalyse et réponds en tenant compte de ce document. Cite les données précises du document quand tu réponds.`
+    }
 
     // ── 4. Sélection modèle (Haiku par défaut, Opus si analyse complexe) ──────
     const { model, maxTokens } = selectModel(message)

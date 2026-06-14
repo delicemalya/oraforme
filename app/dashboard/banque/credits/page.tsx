@@ -98,7 +98,8 @@ export default function BanqueCreditsPage() {
         </div>
       ) : (
         <div style={{ background:'#fff', border:'1px solid #E2E8F0', borderRadius:12, overflow:'hidden' }}>
-          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:14 }}>
+          <div style={{ overflowX:'auto' }}>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:14, minWidth:700 }}>
             <thead><tr style={{ background:'#F8FAFC', borderBottom:'1px solid #E2E8F0' }}>
               {['Membre','Montant accordé','Taux','Durée','Statut','Date demande','Actions'].map(h => (
                 <th key={h} style={{ padding:'10px 14px', textAlign:'left', fontSize:12, fontWeight:600, color:'#64748B' }}>{h}</th>
@@ -127,6 +128,7 @@ export default function BanqueCreditsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

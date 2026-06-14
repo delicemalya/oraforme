@@ -831,6 +831,19 @@ export default function PaiePage() {
         </div>
       </div>
 
+      {/* ── Banner Mesure Exceptionnelle LF 2026 ────────────────────────────── */}
+      <div className="flex items-start gap-3 bg-[#16A34A]/10 border border-[#16A34A]/30 rounded-xl px-4 py-3">
+        <span className="text-base shrink-0 mt-0.5">🎁</span>
+        <div>
+          <p className="text-sm font-semibold text-[#16A34A]">Mesure Exceptionnelle LF 2026 — Loi n°42-2025 du 31 décembre 2025</p>
+          <p className="text-xs text-[#15803D] mt-0.5">
+            L&apos;État congolais prend en charge <strong>100% de l&apos;IRPP</strong> et <strong>50% des cotisations patronales CNSS</strong> hors TUS
+            pour les <strong>25 000 premiers déclarants</strong> — Art. 15 LF 2026.
+            Taux LF 2026 : CNSS salarié <strong>4%</strong> (plaf. 1 200 000) · patronal <strong>20,285%</strong> + TUS <strong>3%</strong> · minimum patente <strong>10 000 FCFA</strong>.
+          </p>
+        </div>
+      </div>
+
       {/* ── Alerte paie non générée ──────────────────────────────────────────── */}
       <AnimatePresence>
         {isCurrentMonth && notYetGenerated && (

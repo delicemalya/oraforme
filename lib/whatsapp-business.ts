@@ -92,6 +92,14 @@ export interface SendFiscalAlertOpts {
   companyName: string
 }
 
+export interface SendProfilReminderOpts {
+  to:          string   // E.164 : +242XXXXXXXX
+  toName?:     string
+  companyName: string
+  hoursLeft:   number   // heures restantes avant deadline
+  dashboardUrl: string  // lien direct vers le popup
+}
+
 // ── Service ────────────────────────────────────────────────────────────────────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -311,6 +319,36 @@ export class WhatsappBusinessService {
     return this.send(cfg, opts.to, opts.toName, body, `fiscal_${opts.alertType}`, {
       alertType: opts.alertType,
       dueDate: opts.dueDate,
+    })
+  }
+
+  // ── sendProfilCompletionReminder ──────────────────────────────────────────
+
+  async sendProfilCompletionReminder(opts: SendProfilReminderOpts): Promise<WaSendResult> {
+    const cfg = await this.getConfig()
+    if (!cfg) return { ok: false, error: 'WhatsApp non configuré ou désactivé' }
+
+    const urgence = opts.hoursLeft <= 0
+      ? '🔴 DÉLAI DÉPASSÉ'
+      : opts.hoursLeft <= 24
+        ? `🔴 URGENT — ${opts.hoursLeft}h restantes`
+        : opts.hoursLeft <= 48
+          ? `🟠 ${opts.hoursLeft}h restantes`
+          : `🟡 ${opts.hoursLeft}h restantes`
+
+    const body =
+      `[Oraforme] ${urgence}\n\n` +
+      `Bonjour ${opts.toName ?? opts.companyName},\n\n` +
+      `Votre profil entreprise *${opts.companyName}* est incomplet.\n` +
+      `Finalisez-le pour :\n` +
+      `• Apparaître sur vos factures et documents\n` +
+      `• Débloquer toutes les fonctionnalités\n` +
+      `• Recevoir les rappels fiscaux\n\n` +
+      `👉 ${opts.dashboardUrl}\n\n` +
+      `Equipe Oraforme`
+
+    return this.send(cfg, opts.to, opts.toName, body, 'profil_completion_reminder', {
+      hoursLeft: opts.hoursLeft,
     })
   }
 }

@@ -1,14 +1,17 @@
 /**
  * lib/fiscal/congo-calculs.ts
- * Moteur fiscal Congo-Brazzaville — formules exactes ECAM
+ * Moteur fiscal Congo-Brazzaville — LF n°42-2025 du 31 décembre 2025
  *
- * Sources : Déclarations réelles ECAM Pointe-Noire 2024
- * Validées contre bulletins de paie officiels
+ * CORRECTIONS LF 2026 :
+ * - IRPP : 5 tranches (0%/1%/10%/25%/40%) — tranche 1 est à 0%, pas 1%
+ * - CNSS patronal AF : plafonné à 1 200 000 FCFA (vieillesse), non plus à 600 000
+ * - TUS Fiscale 4,5% supprimée — seul le TUS CNSS 3% subsiste (LF 2026)
+ * - Mesure exceptionnelle 2026 : IRPP = 0 + 50% cotisations patronales (25 000 premiers déclarants)
  */
 
 // ── Plafonds ────────────────────────────────────────────────────────────────────
-const PLAFOND_VIEILLESSE = 1_200_000  // CNSS vieillesse 8% + salarié 4%
-const PLAFOND_AUTRES     = 600_000    // CNSS autres régimes 12.28%
+const PLAFOND_VIEILLESSE = 1_200_000  // CNSS vieillesse (8% patronal + 4% salarié) + AF (10,035%)
+const PLAFOND_AT         = 600_000    // AT / Maladie professionnelle (2,25%)
 const TOL_FIXE           = 1_000      // Taxe sur les Opérations de Logement
 
 // ── Types ────────────────────────────────────────────────────────────────────────
@@ -26,6 +29,7 @@ export interface CalculSalaireInput {
   autres_retenues?:        number
   situation_familiale:     'celibataire' | 'marie'
   nombre_enfants:          number
+  mesure_lf2026?:          boolean  // État prend en charge IRPP + 50% patronal (LF 2026)
 }
 
 export interface CalculSalaireResult {
@@ -35,7 +39,7 @@ export interface CalculSalaireResult {
   cnss_salarie:               number   // 4% plafonné 1 200 000
   base_irpp:                  number   // brut - cnss
   nombre_parts:               number
-  irpp:                       number   // barème progressif par NP
+  irpp:                       number   // barème progressif par part
   tol:                        number   // 1 000 FCFA fixe
   autres_retenues:            number
   total_retenues:             number
@@ -45,20 +49,24 @@ export interface CalculSalaireResult {
   net_a_payer:                number
   // Charges patronales
   cnss_patronal_8:            number   // 8% vieillesse, plafonné 1 200 000
-  cnss_patronal_1228:         number   // 12.28% autres, plafonné 600 000
-  tus_cnss_3:                 number   // TUS CNSS 3% sur brut
-  tus_fisc_45:                number   // TUS Fiscale 4.5% sur brut
+  cnss_patronal_1228:         number   // AF 10,035% (plaf. 1 200 000) + AT 2,25% (plaf. 600 000)
+  tus_cnss_3:                 number   // TUS CNSS 3% sur brut — déplafonné
+  tus_fisc_45:                number   // Toujours 0 — TUS Fiscale 4,5% supprimée par LF 2026
   total_charges_patronales:   number
   // Coût total
   cout_total_employeur:       number
+  // Mesure exceptionnelle LF 2026
+  mesure_lf2026:              boolean
+  prise_en_charge_etat_irpp:  number   // Montant IRPP pris en charge par l'État
+  prise_en_charge_etat_pat:   number   // 50% cotisations patronales hors TUS pris en charge
 }
 
 export interface ListeNominativeLine {
   salaire_brut:        number
-  vid_8:               number   // Vieillesse Invalidité Décès 8%
-  alloc_familiales:    number   // Allocations familiales 10.03%
-  at_maladie:          number   // Accident travail + Maladie 2.25%
-  part_agent:          number   // Part agent (salarié) 4%
+  vid_8:               number   // Vieillesse Invalidité Décès 8% (plaf. 1 200 000)
+  alloc_familiales:    number   // Allocations familiales 10,035% (plaf. 1 200 000)
+  at_maladie:          number   // Accident travail + Maladie 2,25% (plaf. 600 000)
+  part_agent:          number   // Part agent (salarié) 4% (plaf. 1 200 000)
   total:               number
 }
 
@@ -74,11 +82,13 @@ export function calculerNombreParts(
   return np
 }
 
-// ── Barème IRPP Congo — tranches mensuelles exactes ECAM ──────────────────────
-// T1 : 0 → 38 667 F    → 1%
-// T2 : 38 667 → 83 333 → 10%
-// T3 : 83 333 → 250 000 → 25%
-// T4 : > 250 000        → 40%
+// ── Barème IRPP Congo — tranches mensuelles LF 2026 (Art. 76 CGI) ──────────────
+// Barème annuel divisé par 12 (par part fiscale) :
+// T1 : 0 → 38 667 F      → 0%   (tranche exonérée)
+// T2 : 38 667 → 83 333 F → 1%
+// T3 : 83 333 → 250 000 F → 10%
+// T4 : 250 000 → 666 667 F → 25%
+// T5 : > 666 667 F        → 40%
 
 export function calculerIRPP(baseIRPP: number, nombreParts: number): number {
   if (baseIRPP <= 0) return 0
@@ -86,27 +96,31 @@ export function calculerIRPP(baseIRPP: number, nombreParts: number): number {
   const baseParPart = baseIRPP / nombreParts
   let irppParPart = 0
 
-  // T1 : 1%
+  // T1 : 0% — tranche exonérée (464 000 / 12 = 38 666,67 FCFA/mois)
   const t1Max = 38_666.67
-  if (baseParPart > 0) {
-    irppParPart += Math.min(baseParPart, t1Max) * 0.01
-  }
+  // irppParPart += 0 (taux = 0%)
 
-  // T2 : 10%
+  // T2 : 1% (1 000 000 / 12 = 83 333,33 FCFA/mois)
   const t2Max = 83_333.33
   if (baseParPart > t1Max) {
-    irppParPart += (Math.min(baseParPart, t2Max) - t1Max) * 0.10
+    irppParPart += (Math.min(baseParPart, t2Max) - t1Max) * 0.01
   }
 
-  // T3 : 25%
+  // T3 : 10% (3 000 000 / 12 = 250 000 FCFA/mois)
   const t3Max = 250_000
   if (baseParPart > t2Max) {
-    irppParPart += (Math.min(baseParPart, t3Max) - t2Max) * 0.25
+    irppParPart += (Math.min(baseParPart, t3Max) - t2Max) * 0.10
   }
 
-  // T4 : 40%
+  // T4 : 25% (8 000 000 / 12 = 666 666,67 FCFA/mois)
+  const t4Max = 666_666.67
   if (baseParPart > t3Max) {
-    irppParPart += (baseParPart - t3Max) * 0.40
+    irppParPart += (Math.min(baseParPart, t4Max) - t3Max) * 0.25
+  }
+
+  // T5 : 40%
+  if (baseParPart > t4Max) {
+    irppParPart += (baseParPart - t4Max) * 0.40
   }
 
   return Math.round(irppParPart * nombreParts)
@@ -116,7 +130,9 @@ export function calculerIRPP(baseIRPP: number, nombreParts: number): number {
 
 export function calculerBulletinPaie(input: CalculSalaireInput): CalculSalaireResult {
 
-  // Brut imposable = somme des éléments imposables
+  const mesure = input.mesure_lf2026 ?? false
+
+  // Brut imposable
   const brut = Math.round(
     (input.salaire_base            || 0)
     + (input.sursalaire            || 0)
@@ -129,17 +145,18 @@ export function calculerBulletinPaie(input: CalculSalaireInput): CalculSalaireRe
   )
 
   // CNSS salarié : 4% plafonné à 1 200 000
-  const baseCnssSalarie = Math.min(brut, PLAFOND_VIEILLESSE)
-  const cnss_salarie    = Math.round(baseCnssSalarie * 0.04)
+  const cnss_salarie = Math.round(Math.min(brut, PLAFOND_VIEILLESSE) * 0.04)
 
-  // Base IRPP = Brut imposable - CNSS salarié
+  // Base IRPP
   const base_irpp = brut - cnss_salarie
 
   // Nombre de parts
   const np = calculerNombreParts(input.situation_familiale, input.nombre_enfants)
 
-  // IRPP par barème progressif
-  const irpp = calculerIRPP(base_irpp, np)
+  // IRPP
+  const irpp_brut = calculerIRPP(base_irpp, np)
+  const prise_en_charge_etat_irpp = mesure ? irpp_brut : 0
+  const irpp = mesure ? 0 : irpp_brut
 
   // TOL fixe
   const tol = TOL_FIXE
@@ -150,7 +167,7 @@ export function calculerBulletinPaie(input: CalculSalaireInput): CalculSalaireRe
   // Total retenues salarié
   const total_retenues = cnss_salarie + irpp + tol + autres
 
-  // Transport (non imposable — hors brut imposable)
+  // Transport (non imposable)
   const transport = Math.round(input.prime_transport || 0)
 
   // Net à payer
@@ -161,30 +178,40 @@ export function calculerBulletinPaie(input: CalculSalaireInput): CalculSalaireRe
   // CNSS 8% vieillesse — plafonné 1 200 000
   const cnss_patronal_8 = Math.round(Math.min(brut, PLAFOND_VIEILLESSE) * 0.08)
 
-  // CNSS 12.28% autres régimes — plafonné 600 000
-  // (allocations familiales 10.03% + AT-maladie 2.25%)
-  const cnss_patronal_1228 = Math.round(Math.min(brut, PLAFOND_AUTRES) * 0.1228)
+  // AF 10,035% — plafonné 1 200 000 (correction LF 2026 : AF sur base vieillesse, non plus base AT)
+  const cnss_patronal_af = Math.round(Math.min(brut, PLAFOND_VIEILLESSE) * 0.10035)
 
-  // TUS CNSS : 3% sur brut (pas de plafond)
+  // AT 2,25% — plafonné 600 000
+  const cnss_patronal_at = Math.round(Math.min(brut, PLAFOND_AT) * 0.0225)
+
+  // AF + AT combinés (conserve la compatibilité du champ cnss_patronal_1228)
+  const cnss_patronal_1228 = cnss_patronal_af + cnss_patronal_at
+
+  // TUS CNSS 3% déplafonné (seule TUS subsistante — TUS Fiscale 4,5% supprimée LF 2026)
   const tus_cnss_3 = Math.round(brut * 0.03)
 
-  // TUS Fiscale : 4.5% sur brut (pas de plafond)
-  const tus_fisc_45 = Math.round(brut * 0.045)
+  // TUS Fiscale : supprimée par LF 2026 — toujours 0
+  const tus_fisc_45 = 0
 
-  const total_charges_patronales = cnss_patronal_8 + cnss_patronal_1228 + tus_cnss_3 + tus_fisc_45
+  // Mesure LF 2026 : État prend en charge 50% cotisations patronales hors TUS
+  const patronal_hors_tus           = cnss_patronal_8 + cnss_patronal_1228
+  const prise_en_charge_etat_pat    = mesure ? Math.round(patronal_hors_tus * 0.5) : 0
+  const patronal_effectif_hors_tus  = patronal_hors_tus - prise_en_charge_etat_pat
+
+  const total_charges_patronales = patronal_effectif_hors_tus + tus_cnss_3
 
   const cout_total_employeur = brut + transport + total_charges_patronales
 
   return {
-    brut_imposable:           brut,
+    brut_imposable:            brut,
     cnss_salarie,
     base_irpp,
-    nombre_parts:             np,
+    nombre_parts:              np,
     irpp,
     tol,
-    autres_retenues:          autres,
+    autres_retenues:           autres,
     total_retenues,
-    prime_transport:          transport,
+    prime_transport:           transport,
     net_a_payer,
     cnss_patronal_8,
     cnss_patronal_1228,
@@ -192,44 +219,44 @@ export function calculerBulletinPaie(input: CalculSalaireInput): CalculSalaireRe
     tus_fisc_45,
     total_charges_patronales,
     cout_total_employeur,
+    mesure_lf2026:             mesure,
+    prise_en_charge_etat_irpp,
+    prise_en_charge_etat_pat,
   }
 }
 
 // ── Liste nominative CNSS ────────────────────────────────────────────────────
 
 export function calculerListeNominative(salaireBrut: number): ListeNominativeLine {
+  const base_vie = Math.min(salaireBrut, PLAFOND_VIEILLESSE)
+  const base_at  = Math.min(salaireBrut, PLAFOND_AT)
   return {
     salaire_brut:     salaireBrut,
-    vid_8:            Math.round(salaireBrut * 0.08),
-    alloc_familiales: Math.round(salaireBrut * 0.1003),
-    at_maladie:       Math.round(salaireBrut * 0.0225),
-    part_agent:       Math.round(salaireBrut * 0.04),
-    total:            Math.round(salaireBrut * (0.08 + 0.1003 + 0.0225 + 0.04)),
+    vid_8:            Math.round(base_vie * 0.08),
+    alloc_familiales: Math.round(base_vie * 0.10035),
+    at_maladie:       Math.round(base_at  * 0.0225),
+    part_agent:       Math.round(base_vie * 0.04),
+    total:            Math.round(base_vie * (0.08 + 0.10035 + 0.04) + base_at * 0.0225),
   }
 }
 
 // ── Bordereau CNSS mensuel ───────────────────────────────────────────────────
 
 export function calculerBordereauCNSS(bulletins: CalculSalaireResult[]) {
-  const totalBruts       = bulletins.reduce((s, b) => s + b.brut_imposable, 0)
-  const nbEmployes       = bulletins.length
-  const plafVieillesse   = PLAFOND_VIEILLESSE * nbEmployes
-  const plafAutres       = PLAFOND_AUTRES * nbEmployes
-
   return {
-    total_salaires_bruts:      totalBruts,
-    // Patronal
-    cotisation_vieillesse_8:   Math.round(Math.min(totalBruts, plafVieillesse) * 0.08),
-    cotisation_autres_1228:    Math.round(Math.min(totalBruts, plafAutres) * 0.1228),
-    tus_cnss_3pct:             Math.round(totalBruts * 0.03),
-    tus_fisc_45:               Math.round(totalBruts * 0.045),
+    total_salaires_bruts:   bulletins.reduce((s, b) => s + b.brut_imposable, 0),
+    // Patronal — depuis bulletins pré-calculés (plafonds appliqués par employé)
+    cotisation_vieillesse_8: bulletins.reduce((s, b) => s + b.cnss_patronal_8,   0),
+    cotisation_autres_1228:  bulletins.reduce((s, b) => s + b.cnss_patronal_1228, 0),
+    tus_cnss_3pct:           bulletins.reduce((s, b) => s + b.tus_cnss_3, 0),
+    tus_fisc_45:             0,  // Supprimée LF 2026
     // Salarié (retenu à la source)
-    total_cnss_salarie:        bulletins.reduce((s, b) => s + b.cnss_salarie, 0),
+    total_cnss_salarie:     bulletins.reduce((s, b) => s + b.cnss_salarie, 0),
     // Fiscaux
-    total_irpp:                bulletins.reduce((s, b) => s + b.irpp, 0),
-    total_tol:                 bulletins.length * TOL_FIXE,
+    total_irpp:             bulletins.reduce((s, b) => s + b.irpp, 0),
+    total_tol:              bulletins.length * TOL_FIXE,
     // Global
-    total_a_verser:            bulletins.reduce((s, b) => s + b.total_charges_patronales, 0),
+    total_a_verser:         bulletins.reduce((s, b) => s + b.total_charges_patronales, 0),
   }
 }
 
@@ -238,28 +265,36 @@ export function calculerBordereauCNSS(bulletins: CalculSalaireResult[]) {
 export const fmt = (n: number) =>
   new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 
-// ── Détail IRPP par tranche (pour affichage bulletin) ───────────────────────
+// ── Détail IRPP par tranche (pour affichage bulletin) — LF 2026 ─────────────
 
 export function detailIRPP(baseIRPP: number, np: number) {
   const bpp = baseIRPP / np
   const tranches = []
 
+  // T1 : 0%
   if (bpp > 0) {
-    tranches.push({ libelle: 'Tranche 1 (1%)',  base: Math.min(bpp, 38_666.67),              taux: 0.01 })
+    tranches.push({ libelle: 'Tranche 1 (0%)',  base: Math.min(bpp, 38_666.67),              taux: 0.00 })
   }
+  // T2 : 1%
   if (bpp > 38_666.67) {
-    tranches.push({ libelle: 'Tranche 2 (10%)', base: Math.min(bpp, 83_333.33) - 38_666.67, taux: 0.10 })
+    tranches.push({ libelle: 'Tranche 2 (1%)',  base: Math.min(bpp, 83_333.33) - 38_666.67, taux: 0.01 })
   }
+  // T3 : 10%
   if (bpp > 83_333.33) {
-    tranches.push({ libelle: 'Tranche 3 (25%)', base: Math.min(bpp, 250_000) - 83_333.33,   taux: 0.25 })
+    tranches.push({ libelle: 'Tranche 3 (10%)', base: Math.min(bpp, 250_000) - 83_333.33,   taux: 0.10 })
   }
+  // T4 : 25%
   if (bpp > 250_000) {
-    tranches.push({ libelle: 'Tranche 4 (40%)', base: bpp - 250_000,                         taux: 0.40 })
+    tranches.push({ libelle: 'Tranche 4 (25%)', base: Math.min(bpp, 666_666.67) - 250_000,  taux: 0.25 })
+  }
+  // T5 : 40%
+  if (bpp > 666_666.67) {
+    tranches.push({ libelle: 'Tranche 5 (40%)', base: bpp - 666_666.67,                      taux: 0.40 })
   }
 
   return tranches.map(t => ({
     ...t,
-    irpp_part: Math.round(t.base * t.taux),
+    irpp_part:  Math.round(t.base * t.taux),
     irpp_total: Math.round(t.base * t.taux * np),
   }))
 }

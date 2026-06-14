@@ -92,18 +92,13 @@ async function analyzeImage(buffer: Buffer, mime: string, question: string, expe
 }
 
 async function analyzePDF(buffer: Buffer, question: string, expert: string, filename: string) {
-  // Extraction texte basique : chercher les séquences de texte dans le PDF
-  const raw = buffer.toString('latin1')
+  let extractedText = ''
+  try {
+    const pdfParse = (await import('pdf-parse') as unknown as { default: (buf: Buffer) => Promise<{ text: string }> }).default
+    const result = await pdfParse(buffer)
+    extractedText = result.text?.trim().slice(0, 6000) ?? ''
+  } catch { /* PDF scanné ou corrompu — pas de texte natif */ }
 
-  // Extraire les strings lisibles (entre parenthèses dans un PDF)
-  const textParts: string[] = []
-  const matches = raw.matchAll(/\(([^\)]{2,200})\)/g)
-  for (const m of matches) {
-    const txt = m[1].replace(/\\n/g, '\n').replace(/\\r/g, '').trim()
-    if (txt.length > 2 && /[a-zA-ZÀ-ÿ0-9]/.test(txt)) textParts.push(txt)
-  }
-
-  const extractedText = textParts.slice(0, 500).join(' ').slice(0, 6000)
   const prompt = `${expert.slice(0, 600)}\n\nFichier : ${filename}\n\nContenu extrait :\n${extractedText || 'Impossible d\'extraire le texte — le PDF est peut-être scanné (image).'}\n\nQuestion : ${question}\n\nAnalyse ce document et réponds en français. Si c'est un bulletin de paie, vérifie les calculs CNSS/IRPP.`
 
   const res = await anthropic.messages.create({
@@ -121,14 +116,17 @@ async function analyzeSpreadsheet(buffer: Buffer, mime: string, question: string
   if (mime === 'text/csv' || filename.endsWith('.csv')) {
     csvText = buffer.toString('utf-8').slice(0, 8000)
   } else {
-    // Pour Excel .xlsx : parser le XML interne
     try {
-      // xlsx est un zip — chercher les feuilles partagées
-      const raw = buffer.toString('binary')
-      const xmlMatches = raw.matchAll(/<si><t[^>]*>([^<]{1,200})<\/t>/g)
-      const cells: string[] = []
-      for (const m of xmlMatches) cells.push(m[1])
-      csvText = cells.slice(0, 1000).join('\t').slice(0, 6000)
+      const XLSX = await import('xlsx')
+      const wb = XLSX.read(buffer, { type: 'buffer', cellDates: true })
+      const rows: string[] = []
+      for (const sheetName of wb.SheetNames.slice(0, 3)) {
+        const ws = wb.Sheets[sheetName]
+        const data = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' })
+        rows.push(`=== ${sheetName} ===`)
+        rows.push(...data.slice(0, 200).map(row => Object.values(row).join('\t')))
+      }
+      csvText = rows.join('\n').slice(0, 8000)
     } catch {
       csvText = 'Impossible d\'extraire le contenu Excel.'
     }

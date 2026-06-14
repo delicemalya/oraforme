@@ -176,6 +176,7 @@ export default function MIAAPage() {
   const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#F59E0B'
   const searchParams = useSearchParams()
   const contextSecteur = searchParams.get('context') ?? undefined
+  const gedDocumentId  = searchParams.get('documentId') ?? null
 
   const [agentActif,     setAgentActif]     = useState<string>('comptabilite')
   const [activeExpert,   setActiveExpert]   = useState<string | null>(null)
@@ -188,6 +189,8 @@ export default function MIAAPage() {
   const [fichierJoint,   setFichierJoint]   = useState<File | null>(null)
   const [uploadLoading,  setUploadLoading]  = useState(false)
   const [rightOpen,      setRightOpen]      = useState(true) // mobile toggle
+  const [gedContext,     setGedContext]     = useState<string | null>(null)
+  const [gedDocNom,      setGedDocNom]      = useState<string | null>(null)
 
   const bottomRef   = useRef<HTMLDivElement>(null)
   const inputRef    = useRef<HTMLInputElement>(null)
@@ -320,6 +323,34 @@ export default function MIAAPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Charger le contexte GED si un documentId est dans l'URL
+  useEffect(() => {
+    if (!gedDocumentId) return
+    setUploadLoading(true)
+    fetch(`/api/miaa/document-context?documentId=${gedDocumentId}`)
+      .then(r => r.json())
+      .then((data: { ok?: boolean; context?: string; detected?: string; chars?: number; message?: string }) => {
+        if (data.ok && data.context) {
+          setGedContext(data.context)
+          const nomMatch = data.context.match(/📄 Document : (.+)/)
+          const nom = nomMatch?.[1] ?? 'Document GED'
+          setGedDocNom(nom)
+          setMessages(prev => [...prev, {
+            role: 'bot',
+            text: `📄 **Document chargé : ${nom}**\n\nJ'ai accès au contenu complet de ce document (${(data.chars ?? 0).toLocaleString('fr-FR')} caractères). Posez vos questions — je répondrai en me basant sur son contenu.`,
+            ts: Date.now(),
+          }])
+        } else {
+          setMessages(prev => [...prev, { role: 'bot', text: data.message ?? 'Impossible de charger ce document.', ts: Date.now() }])
+        }
+      })
+      .catch(() => {
+        setMessages(prev => [...prev, { role: 'bot', text: 'Erreur de chargement du document.', ts: Date.now() }])
+      })
+      .finally(() => setUploadLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gedDocumentId])
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading, uploadLoading])
@@ -348,6 +379,7 @@ export default function MIAAPage() {
           history:    history.slice(0, -1),
           tenantData: { tenant_id: tenantId ?? undefined, secteur: contextSecteur ?? secteur },
           langue:     currentLocale,
+          gedContext: gedContext ?? undefined,
         }),
       })
       // Guard against non-JSON responses (e.g. Vercel 504/503 HTML error pages)
@@ -772,6 +804,15 @@ export default function MIAAPage() {
                   {s}
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* GED document context banner */}
+          {gedContext && gedDocNom && (
+            <div className="px-4 py-1.5 bg-amber-50 border-t border-amber-100 flex items-center gap-2 shrink-0">
+              <FileText size={12} className="text-amber-500 shrink-0" />
+              <span className="text-xs text-amber-700 flex-1 truncate font-medium">📄 {gedDocNom}</span>
+              <button onClick={() => { setGedContext(null); setGedDocNom(null) }} className="text-amber-400 hover:text-amber-600"><X size={12} /></button>
             </div>
           )}
 

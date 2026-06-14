@@ -156,11 +156,22 @@ export async function POST(req: NextRequest) {
     }
   } catch { /* extraction structurée non bloquante */ }
 
+  // Mapper detected.type → DocCategory pour la BDD
+  const DETECTED_TO_CATEGORY: Record<string, string> = {
+    invoice:  'facture',
+    cv:       'cv',
+    contract: 'contrat',
+    identity: 'photo',
+    fiscal:   'fiscal',
+  }
+  const categorie = DETECTED_TO_CATEGORY[detected.type] ?? 'autre'
+
   // ── Sauvegarder en DB ───────────────────────────────────────────────────────
   if (documentId) {
     await db.from('documents').update({
       ocr_text:   ocr.text,
       ocr_status: 'done',
+      categorie,
       ocr_data: {
         provider:    ocr.provider,
         confidence:  ocr.confidence,

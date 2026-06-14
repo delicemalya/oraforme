@@ -9,6 +9,8 @@ import { Lock, ChevronLeft, Loader2, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import AuditAnomalieCard from '../_components/AuditAnomalieCard'
 import AuditScoreHeader from '../_components/AuditScoreHeader'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 
 const PRINCIPES = [
   { titre: 'Séparation des tâches',     desc: 'Personne ne doit avoir accès à toutes les étapes d\'une transaction.' },
@@ -19,6 +21,7 @@ const PRINCIPES = [
 ]
 
 export default function ControleInternePage() {
+  const { allowed: canControle } = usePlanFeature('audit-controle-interne')
   const { tenantId } = useTenant()
   const [result,  setResult]  = useState<AuditScore | null>(null)
   const [loading, setLoading] = useState(false)
@@ -31,6 +34,8 @@ export default function ControleInternePage() {
   }, [tenantId])
 
   useEffect(() => { run() }, [run])
+
+  if (!canControle) return <PlanFeatureGate feature="audit-controle-interne" />
 
   return (
     <div className="space-y-5 w-full">

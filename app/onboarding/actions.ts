@@ -88,8 +88,11 @@ export async function createTenantAndProfile(data: {
     modules_actifs:    modules,
     taille_entreprise: data.taille,
     sous_type:         data.sousType || null,
-    pays:              data.pays,
-    langue:            data.langue,
+    pays:              data.pays || 'CG',
+    langue:            data.langue || 'fr',
+    // Profil completion tracking
+    profil_complet:    false,
+    company_deadline:  new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
   }
 
   // Optional columns (may not exist in older deployments — handled gracefully)

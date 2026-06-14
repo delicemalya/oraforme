@@ -8,6 +8,8 @@ import {
   AlertTriangle, RefreshCw, Loader2, Activity,
   BarChart2, Target, Building2, Download,
 } from 'lucide-react'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 import { BiKpiCard } from '@/components/bi/BiKpiCard'
 import { BiChartCard, BiSectionLabel, BiEmpty } from '@/components/bi/BiChartCard'
 import { BiAlerts } from '@/components/bi/BiAlerts'
@@ -30,6 +32,7 @@ interface Props {
 }
 
 export default function BiDgClient({ initial, year: initialYear }: Props) {
+  const { allowed: canBiAvancee } = usePlanFeature('bi-avancee')
   const { fmt: fmtFCFA, fmtShort: fmtShortFCFA } = useFmt()
   const { t } = useLocale()
   const [data, setData]     = useState<DgInsights>(initial)
@@ -53,6 +56,8 @@ export default function BiDgClient({ initial, year: initialYear }: Props) {
   const caGrowth  = growthPct(k.caMois, k.caPrevMois)
   const depGrowth = growthPct(k.depMois, k.depPrevMois)
   const critAlerts = data.alerts.filter(a => a.severity === 'critical').length
+
+  if (!canBiAvancee) return <PlanFeatureGate feature="bi-avancee" />
 
   return (
     <div className="space-y-5 pb-12 p-5">

@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 import { auditOHADA } from '@/lib/audit/engine'
 import type { AuditScore } from '@/lib/audit/engine'
 import { Award, ChevronLeft, Loader2, CheckCircle2, BookOpen } from 'lucide-react'
@@ -31,6 +33,7 @@ const SYSCOHADA_CLASSES = [
 ]
 
 export default function OhadaPage() {
+  const { allowed: canOhada } = usePlanFeature('audit-ohada')
   const { tenantId } = useTenant()
   const [result,  setResult]  = useState<AuditScore | null>(null)
   const [loading, setLoading] = useState(false)
@@ -43,6 +46,8 @@ export default function OhadaPage() {
   }, [tenantId])
 
   useEffect(() => { run() }, [run])
+
+  if (!canOhada) return <PlanFeatureGate feature="audit-ohada" />
 
   return (
     <div className="space-y-5 w-full">

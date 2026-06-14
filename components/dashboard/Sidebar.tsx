@@ -537,10 +537,11 @@ export default function Sidebar() {
         if (canView(mid)) {
           items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href })
         } else {
-          // Show as locked only if blocked by plan (not by role/permissions)
+          // Show as locked if blocked by plan — navigates to the actual page
+          // (the page renders a PlanFeatureGate overlay rather than hiding the content)
           const req = getRequiredPlan(taille, mid)
           if (req) {
-            items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: '/dashboard/abonnement', locked: req })
+            items.push({ id: mid, label, icon: ICONS[mid] ?? Settings, href: def.href, locked: req })
           }
         }
       }
@@ -618,7 +619,7 @@ export default function Sidebar() {
       const upgradeLabel = item.locked === 'grande' ? 'Entreprise+' : 'Business'
       return (
         <Link
-          href="/dashboard/abonnement"
+          href={item.href}
           onClick={() => setMobileOpen(false)}
           className={`flex items-center gap-2.5 ${isSubItem ? 'pl-6' : 'pl-3'} pr-2 py-1.5 rounded-lg text-[12.5px] transition-all duration-150 relative`}
           style={{ color: '#C4C9D4', opacity: 0.75 }}

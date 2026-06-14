@@ -34,23 +34,25 @@ import type { UserRole } from '@/lib/hooks/usePermissions'
 // ── Public types ──────────────────────────────────────────────────────────────
 
 export interface TenantState {
-  tenantId:      string
-  profileId:     string
-  nomEntreprise: string
-  secteur:       string | null
-  sousType:      string | null   // ex. 'primaire','college','lycee','universite'
-  plan:          string | null
-  taille:        string | null   // 'tpe' | 'pme' | 'grande'
-  pays:          string | null
-  langue:        string | null
-  role:          UserRole
-  ecoleRole:     string | null
-  isSuperAdmin:  boolean
-  modulesActifs: string[]
-  userId:        string
-  userEmail:     string
-  prenom:        string | null
-  nom:           string | null
+  tenantId:        string
+  profileId:       string
+  nomEntreprise:   string
+  secteur:         string | null
+  sousType:        string | null   // ex. 'primaire','college','lycee','universite'
+  plan:            string | null
+  taille:          string | null   // 'tpe' | 'pme' | 'grande'
+  pays:            string | null
+  langue:          string | null
+  role:            UserRole
+  ecoleRole:       string | null
+  isSuperAdmin:    boolean
+  modulesActifs:   string[]
+  userId:          string
+  userEmail:       string
+  prenom:          string | null
+  nom:             string | null
+  profilComplet:   boolean
+  companyDeadline: string | null   // ISO string — 72h après inscription
 }
 
 interface TenantContextValue {
@@ -87,7 +89,7 @@ async function fetchTenantForUser(
   // from localStorage will override this default instead of breaking isolation.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, sous_type, plan, taille_entreprise, pays, langue)')
+    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, sous_type, plan, taille_entreprise, pays, langue, profil_complet, company_deadline)')
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -96,14 +98,16 @@ async function fetchTenantForUser(
   if (!profile) return null
 
   const t = profile.tenants as unknown as {
-    nom_entreprise:    string
-    modules_actifs:    string[]
-    secteur_activite:  string | null
-    sous_type?:        string | null
-    plan?:             string | null
+    nom_entreprise:     string
+    modules_actifs:     string[]
+    secteur_activite:   string | null
+    sous_type?:         string | null
+    plan?:              string | null
     taille_entreprise?: string | null
-    pays?:             string | null
-    langue?:           string | null
+    pays?:              string | null
+    langue?:            string | null
+    profil_complet?:    boolean | null
+    company_deadline?:  string | null
   } | null
 
   return {
@@ -124,6 +128,8 @@ async function fetchTenantForUser(
     userEmail:        email,
     prenom:           (profile as { prenom?: string | null }).prenom ?? null,
     nom:              (profile as { nom?: string | null }).nom ?? null,
+    profilComplet:    t?.profil_complet ?? false,
+    companyDeadline:  t?.company_deadline ?? null,
   }
 }
 

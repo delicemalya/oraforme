@@ -12,6 +12,8 @@ import { BiTrendChart, BiBarChart, BiDonutChart, BiCountBarChart } from '@/compo
 import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 
 // ── Types ─────────────────────────────────────────────────────────
 interface AnalyticsData {
@@ -107,6 +109,7 @@ function ChartCard({ title, icon: Icon, iconColor, children, className = '' }: {
 
 // ── Main ──────────────────────────────────────────────────────────
 export default function AnalyticsPage() {
+  const { allowed: canAnalytics } = usePlanFeature('analytics-avances')
   const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
   const { tenant } = useTenantContext()
@@ -161,6 +164,8 @@ export default function AnalyticsPage() {
       setRunning(false)
     }
   }
+
+  if (!canAnalytics) return <PlanFeatureGate feature="analytics-avances" />
 
   return (
     <div className="space-y-5 pb-12">

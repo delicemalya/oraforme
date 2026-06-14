@@ -5,6 +5,8 @@ import { Send, Loader2, RotateCcw, ChevronLeft, Users, Star, HelpCircle, GitComp
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -30,6 +32,7 @@ function AssistantText({ content }: { content: string }) {
 }
 
 export default function MiaaJobPage() {
+  const { allowed: canRecrutementIA } = usePlanFeature('recrutement-ia')
   const router = useRouter()
   const { tenantId } = useTenant()
   const [messages, setMessages] = useState<Message[]>([])
@@ -87,6 +90,8 @@ export default function MiaaJobPage() {
   }
 
   const canSend = input.trim().length > 0 && !loading
+
+  if (!canRecrutementIA) return <PlanFeatureGate feature="recrutement-ia" />
 
   return (
     <div className="flex flex-col bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden"

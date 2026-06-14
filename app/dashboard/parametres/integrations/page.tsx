@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { MessageCircle, ChevronRight, CheckCircle2, AlertCircle, Settings2, Database, ScanLine } from 'lucide-react'
+import { MessageCircle, ChevronRight, CheckCircle2, AlertCircle, Settings2, Database, ScanLine, Lock } from 'lucide-react'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
 
 interface IntegrationCard {
   id:          string
@@ -39,6 +40,7 @@ function StatusBadge({ status }: { status: 'active' | 'inactive' | 'partial' }) 
 
 export default function IntegrationsPage() {
   const { tenantId } = useTenant()
+  const { allowed: canOCR } = usePlanFeature('ocr-intelligent')
   const [waStatus,      setWaStatus]      = useState<'active' | 'inactive' | 'partial'>('inactive')
   const [storageStatus, setStorageStatus] = useState<'active' | 'inactive' | 'partial'>('inactive')
   const [loading,       setLoading]       = useState(true)
@@ -108,40 +110,62 @@ export default function IntegrationsPage() {
       </div>
 
       <div className="grid gap-4">
-        {integrations.map((intg, i) => (
-          <motion.div
-            key={intg.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
-          >
-            <Link
-              href={intg.href}
-              className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-md transition-all group"
-            >
-              {/* Icon */}
+        {integrations.map((intg, i) => {
+          const isOCR   = intg.id === 'ocr'
+          const locked  = isOCR && !canOCR
+
+          const cardContent = (
+            <>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
-                style={{ background: intg.bgColor, color: intg.color }}
+                style={{ background: intg.bgColor, color: locked ? '#94A3B8' : intg.color }}
               >
                 {intg.icon}
               </div>
-
-              {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-sm font-bold text-[#0F172A]">{intg.name}</span>
-                  <StatusBadge status={intg.status} />
+                  <span className={`text-sm font-bold ${locked ? 'text-[#94A3B8]' : 'text-[#0F172A]'}`}>{intg.name}</span>
+                  {locked ? (
+                    <span className="flex items-center gap-1 text-[11px] font-semibold text-[#F59E0B] bg-[#FEF3C7] px-2 py-0.5 rounded-full">
+                      <Lock size={9} /> Business
+                    </span>
+                  ) : (
+                    <StatusBadge status={intg.status} />
+                  )}
                 </div>
-                <p className="text-xs text-[#64748B] leading-relaxed line-clamp-2">
+                <p className={`text-xs leading-relaxed line-clamp-2 ${locked ? 'text-[#CBD5E1]' : 'text-[#64748B]'}`}>
                   {intg.description}
                 </p>
               </div>
+              {locked
+                ? <Lock size={16} className="text-[#CBD5E1] shrink-0" />
+                : <ChevronRight size={18} className="text-[#CBD5E1] group-hover:text-[#94A3B8] shrink-0 transition-colors" />
+              }
+            </>
+          )
 
-              <ChevronRight size={18} className="text-[#CBD5E1] group-hover:text-[#94A3B8] shrink-0 transition-colors" />
-            </Link>
-          </motion.div>
-        ))}
+          return (
+            <motion.div
+              key={intg.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
+            >
+              {locked ? (
+                <div className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-dashed border-[#E2E8F0] opacity-70 cursor-not-allowed select-none group">
+                  {cardContent}
+                </div>
+              ) : (
+                <Link
+                  href={intg.href}
+                  className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-md transition-all group"
+                >
+                  {cardContent}
+                </Link>
+              )}
+            </motion.div>
+          )
+        })}
       </div>
 
       <p className="text-center text-xs text-[#CBD5E1] mt-8">

@@ -20,6 +20,7 @@ import type {
   SendReminderOpts,
   SendRecruitmentAlertOpts,
   SendFiscalAlertOpts,
+  SendProfilReminderOpts,
 } from '@/lib/whatsapp-business'
 
 export async function POST(req: NextRequest) {
@@ -49,6 +50,9 @@ export async function POST(req: NextRequest) {
       break
     case 'fiscal':
       result = await wa.sendFiscalAlert(body as unknown as SendFiscalAlertOpts)
+      break
+    case 'profil_completion':
+      result = await wa.sendProfilCompletionReminder(body as unknown as SendProfilReminderOpts)
       break
     default:
       return NextResponse.json({ error: `Type inconnu : ${body.type}` }, { status: 400 })

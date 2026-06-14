@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 import { processPendingExecutions, fireTrigger } from '@/lib/workflow/engine'
 import { processPendingWebhooks } from '@/lib/webhooks/sender'
 import { createWhatsappService } from '@/lib/whatsapp-business'
+import { archiveDocument } from '@/lib/storage/storage-service'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,6 +61,9 @@ export async function POST(req: NextRequest) {
 
   // 9. MIAA+ analyse quotidienne — directeur virtuel pour chaque tenant
   if (hh === 6) results.miaa_daily_analysis = await runMIAADailyAnalysis()
+
+  // 10. Archivage automatique des documents expirés (date_expiration dépassée)
+  results.documents_archived = await archiveExpiredDocuments()
 
   return NextResponse.json({
     ok: true,
@@ -374,6 +378,28 @@ async function checkFiscalDeadlinesWhatsApp(): Promise<number> {
     }
   }
   return sent
+}
+
+// ── Archivage automatique des documents expirés ───────────────────────────────
+
+async function archiveExpiredDocuments(): Promise<number> {
+  const today = new Date().toISOString()
+
+  const { data: docs } = await supabaseAdmin
+    .from('documents')
+    .select('id, tenant_id')
+    .eq('statut', 'actif')
+    .lt('date_expiration', today)
+    .limit(200)
+
+  if (!docs?.length) return 0
+
+  let archived = 0
+  for (const doc of docs) {
+    const res = await archiveDocument(doc.id, doc.tenant_id)
+    if (res.ok) archived++
+  }
+  return archived
 }
 
 // ── MIAA+ Analyse quotidienne — directeur virtuel ─────────────────────────────

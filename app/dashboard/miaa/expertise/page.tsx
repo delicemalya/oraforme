@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 import {
   EXPERTISE_CATEGORIES,
   EXPERTISE_DOCS,
@@ -283,6 +285,7 @@ function GenerationForm({
 // ── Page principale ────────────────────────────────────────────────────────────
 
 export default function MIAAExpertisePage() {
+  const { allowed: canMiaaExpert } = usePlanFeature('miaa-expert')
   const { tenantId } = useTenant()
 
   const [search,         setSearch]         = useState('')
@@ -368,6 +371,8 @@ export default function MIAAExpertisePage() {
   const activeCount = activeCategory
     ? getDocsByCategorie(activeCategory).length
     : EXPERTISE_DOCS.length
+
+  if (!canMiaaExpert) return <PlanFeatureGate feature="miaa-expert" />
 
   return (
     <div className="w-full space-y-5 pb-10">

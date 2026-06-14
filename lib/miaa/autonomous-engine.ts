@@ -306,6 +306,96 @@ async function observerRecrutement(
   return proposals
 }
 
+// ── 6. Comptabilité & Conformité SYSCOHADA ────────────────────────────────────
+
+async function observerComptabilite(
+  supabase: SupabaseClient,
+  tenantId: string,
+): Promise<MIAAProposal[]> {
+  const proposals: MIAAProposal[] = []
+  const year = new Date().getFullYear()
+
+  const { data: entries } = await supabase
+    .from('journal_entries')
+    .select('id, debit_account, credit_account, montant, libelle')
+    .eq('tenant_id', tenantId)
+    .eq('fiscal_year', year)
+    .limit(500)
+
+  if (!entries?.length) {
+    proposals.push({
+      id:           pid('compta-0'),
+      module:       'comptabilite',
+      titre:        'Aucune écriture comptable SYSCOHADA',
+      description:  `Aucune entrée de journal pour ${year}. La comptabilité est obligatoire (SYSCOHADA Art. 8).`,
+      action_type:  'audit_anomalie',
+      impact:       'critical',
+      action_label: 'Ouvrir le journal',
+      action_href:  '/dashboard/comptabilite',
+      payload:      { year },
+    })
+    return proposals
+  }
+
+  // Écritures orphelines (débit ou crédit manquant)
+  const orphelines = entries.filter(e => !e.debit_account || !e.credit_account)
+  if (orphelines.length > 0) {
+    proposals.push({
+      id:           pid('compta-orphan'),
+      module:       'comptabilite',
+      titre:        `${orphelines.length} écriture(s) incomplète(s) — bilan déséquilibré`,
+      description:  `Écritures sans compte débit OU crédit — non conformes SYSCOHADA (partie double).`,
+      action_type:  'audit_anomalie',
+      impact:       'critical',
+      action_label: 'Corriger le journal',
+      action_href:  '/dashboard/comptabilite/journal',
+      payload:      { nb: orphelines.length, ids: orphelines.slice(0, 10).map(e => e.id) },
+    })
+  }
+
+  // TVA collectée non soldée
+  const tvaCollectee = entries.filter(e => e.credit_account?.startsWith('4441')).reduce((s, e) => s + (e.montant ?? 0), 0)
+  const tvaVersee    = entries.filter(e => e.debit_account?.startsWith('4441')).reduce((s, e) => s + (e.montant ?? 0), 0)
+  const tvaDue = tvaCollectee - tvaVersee
+
+  if (tvaDue > 50_000) {
+    const joursAvantTVA = joursAvantEcheance(20)
+    proposals.push({
+      id:           pid('compta-tva'),
+      module:       'fiscalite',
+      titre:        `TVA à reverser : ${new Intl.NumberFormat('fr-FR').format(Math.round(tvaDue))} FCFA`,
+      description:  `TVA collectée non encore reversée à la DGI. Échéance dans ${joursAvantTVA} jours.`,
+      action_type:  'rappel_fiscal',
+      impact:       joursAvantTVA <= 3 ? 'critical' : joursAvantTVA <= 7 ? 'high' : 'medium',
+      action_label: 'Déclarer la TVA',
+      action_href:  '/dashboard/fiscalite/tva',
+      payload:      { montant: tvaDue, jours: joursAvantTVA },
+    })
+  }
+
+  // CNSS à verser (solde créditeur compte 431)
+  const cnssCredit = entries.filter(e => e.credit_account === '431').reduce((s, e) => s + (e.montant ?? 0), 0)
+  const cnssDebit  = entries.filter(e => e.debit_account  === '431').reduce((s, e) => s + (e.montant ?? 0), 0)
+  const cnssDue    = cnssCredit - cnssDebit
+
+  if (cnssDue > 100_000) {
+    const joursAvantCNSS = joursAvantEcheance(15)
+    proposals.push({
+      id:           pid('compta-cnss'),
+      module:       'fiscalite',
+      titre:        `CNSS à verser : ${new Intl.NumberFormat('fr-FR').format(Math.round(cnssDue))} FCFA`,
+      description:  `Cotisations CNSS dues non encore versées. Échéance dans ${joursAvantCNSS} jours.`,
+      action_type:  'rappel_cnss',
+      impact:       joursAvantCNSS <= 2 ? 'critical' : 'high',
+      action_label: 'Verser les cotisations CNSS',
+      action_href:  '/dashboard/fiscalite/cnss',
+      payload:      { montant: cnssDue, jours: joursAvantCNSS },
+    })
+  }
+
+  return proposals
+}
+
 // ── Score de santé global ──────────────────────────────────────────────────────
 // 100 = parfait, 0 = urgences multiples
 
@@ -324,12 +414,13 @@ export async function runAgentAnalysis(
   tenantId: string,
   memory:   MIAAMemory,
 ): Promise<AnalyseResult> {
-  const [financeP, stockP, rhP, recrutP, fiscalP] = await Promise.allSettled([
+  const [financeP, stockP, rhP, recrutP, fiscalP, comptaP] = await Promise.allSettled([
     observerFinances(supabase, tenantId, memory),
     observerStock(supabase, tenantId, memory),
     observerRH(supabase, tenantId, memory),
     observerRecrutement(supabase, tenantId),
     observerFiscalite(tenantId, memory),
+    observerComptabilite(supabase, tenantId),
   ])
 
   const proposals: MIAAProposal[] = [
@@ -338,6 +429,7 @@ export async function runAgentAnalysis(
     ...(rhP.status      === 'fulfilled' ? rhP.value      : []),
     ...(recrutP.status  === 'fulfilled' ? recrutP.value  : []),
     ...(fiscalP.status  === 'fulfilled' ? fiscalP.value  : []),
+    ...(comptaP.status  === 'fulfilled' ? comptaP.value  : []),
   ]
 
   // Trier par impact décroissant
@@ -348,7 +440,7 @@ export async function runAgentAnalysis(
 
   return {
     proposals,
-    modules_analyses: ['finance', 'stock', 'rh', 'recrutement', 'fiscalite'],
+    modules_analyses: ['finance', 'stock', 'rh', 'recrutement', 'fiscalite', 'comptabilite'],
     score_sante:      calculerScoreSante(proposals),
     nb_alertes,
     timestamp:        new Date().toISOString(),

@@ -29,7 +29,7 @@ export default async function AbonnementsPage() {
   const totalClients = allTenants.length
 
   // Plan distribution
-  const plans = ['starter', 'business', 'premium']
+  const plans = ['starter', 'pro', 'enterprise']
   const planStats = plans.map(plan => ({
     plan,
     count: allTenants.filter(t => t.plan === plan).length,
@@ -72,7 +72,7 @@ export default async function AbonnementsPage() {
         <h2 className="text-[15px] font-bold text-gray-900 mb-4">Distribution par plan</h2>
         <div className="grid grid-cols-3 gap-4">
           {planStats.map(p => {
-            const colors = { starter: '#6366F1', business: '#F59E0B', premium: '#10B981' }
+            const colors = { starter: '#6366F1', pro: '#F59E0B', enterprise: '#10B981' }
             const color  = colors[p.plan as keyof typeof colors] ?? '#6366F1'
             const pct    = totalClients > 0 ? (p.count / totalClients) * 100 : 0
             return (

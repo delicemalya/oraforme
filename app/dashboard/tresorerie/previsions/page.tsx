@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
+import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
+import PlanFeatureGate from '@/components/PlanFeatureGate'
 import {
   TrendingUp, Plus, Download, Check, X, Loader2, Eye,
   ArrowUpCircle, ArrowDownCircle, Calendar, BarChart3,
@@ -65,6 +67,7 @@ export default function PrevisionsPage() {
   const { fmt: fmtFCFA } = useFmt()
   const { tenantId } = useTenant()
   const { t } = useLocale()
+  const { allowed: canPrevisionsIA } = usePlanFeature('previsions-ia')
   const [rows, setRows]           = useState<Prevision[]>([])
   const [loading, setLoading]     = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -366,6 +369,14 @@ export default function PrevisionsPage() {
           </div>
         )}
       </div>
+
+      {/* Prévisions IA — Business only */}
+      <PlanFeatureGate
+        feature="previsions-ia"
+        mode="section"
+        title="Prévisions IA — Moteur prédictif"
+        description="Analysez vos 12 derniers mois et générez automatiquement vos prévisions de trésorerie. Détection des anomalies, saisonnalité et alertes intelligentes."
+      />
 
       {/* Create modal */}
       {showModal && (

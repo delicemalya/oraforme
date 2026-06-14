@@ -43,7 +43,7 @@ function TableSolde({ lignes, color = '#2563EB' }: { lignes: { num: string; nom:
   const { fmt: fmtFCFA } = useFmt()
   if (!lignes.length) return <p className="text-[12px] text-[#94A3B8] italic">— Aucun solde significatif —</p>
   return (
-    <table className="w-full text-[12px]">
+    <div className="overflow-x-auto"><table className="w-full text-[12px] min-w-[400px]">
       <thead>
         <tr className="border-b border-[#E2E8F0]">
           <th className="text-left py-1.5 text-[11px] text-[#94A3B8] font-semibold w-16">N°</th>
@@ -60,7 +60,7 @@ function TableSolde({ lignes, color = '#2563EB' }: { lignes: { num: string; nom:
           </tr>
         ))}
       </tbody>
-    </table>
+    </table></div>
   )
 }
 

@@ -2,25 +2,28 @@
 // Sources : CGI Congo, CNSS Congo, Code du Travail loi 45-75 et décrets CNSS
 // Validé sur 3 cas test (voir README)
 
-// ── Constantes légales Congo — CNSS (source : ECAM Pointe-Noire 2024) ─────────
+// ── Constantes légales Congo — CNSS (LF n°42-2025 du 31 décembre 2025) ────────
 
 // Vieillesse-Décès (VID) — plafond 1 200 000 FCFA/mois
 export const PLAFOND_CNSS_EMPLOYE  = 1_200_000  // plafond VID salarié
-export const PLAFOND_VID           = 1_200_000  // plafond VID (idem)
+export const PLAFOND_VID           = 1_200_000  // plafond VID + Allocations Familiales
 export const TAUX_CNSS_EMPLOYE     = 0.04       // 4% VID part salariale
 export const TAUX_VID_PATRONAL     = 0.08       // 8% VID part patronale
 
-// Allocations Familiales + Accidents du Travail — plafond 600 000 FCFA/mois
-export const PLAFOND_AT_AF         = 600_000    // plafond AF / AT
-export const TAUX_AF               = 0.1003     // 10.03% Allocations Familiales
-export const TAUX_AT               = 0.0225     // 2.25%  Accidents du Travail
+// Allocations Familiales — plafonné 1 200 000 FCFA/mois (correction LF 2026)
+export const PLAFOND_AF            = 1_200_000  // AF plafonnée sur base vieillesse (LF 2026)
+export const TAUX_AF               = 0.10035    // 10,035% Allocations Familiales (LF 2026)
+
+// Accidents du Travail — plafonné 600 000 FCFA/mois
+export const PLAFOND_AT_AF         = 600_000    // Plafond AT / Maladie professionnelle uniquement
+export const TAUX_AT               = 0.0225     // 2,25%  Accidents du Travail
 
 // TUS + Médecine du travail — déplafonnés
-export const TAUX_TUS              = 0.03       // 3%    Taxe Unique sur les Salaires
-export const TAUX_MEDECINE         = 0.005      // 0.5%  Médecine du travail
+export const TAUX_TUS              = 0.03       // 3%    TUS (LF 2026 — TUS Fiscale 4,5% supprimée)
+export const TAUX_MEDECINE         = 0.005      // 0,5%  Médecine du travail
 
-// Taux patronal global (VID+AF+AT = 20.28%) — utilisé uniquement comme fallback
-export const TAUX_CNSS_PATRONAL    = 0.2028
+// Taux patronal global (VID 8% + AF 10,035% + AT 2,25% = 20,285%) — fallback
+export const TAUX_CNSS_PATRONAL    = 0.20285
 export const SMIG_MENSUEL          = 90_000     // SMIG Congo (arrêté 2020)
 
 // ── Barème IRPP mensuel Congo-Brazzaville ─────────────────────────────────────
@@ -146,9 +149,9 @@ export function calculerPaie(el: ElementsPaie): ResultatPaie {
     cnss_patronal = Math.round(salaire_brut * el.taux_cnss_patronal)
   } else {
     // calcul légal multi-plafond CNSS Congo
-    const vid_patro = Math.round(Math.min(salaire_brut, PLAFOND_VID) * TAUX_VID_PATRONAL)
-    const af_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AT_AF) * TAUX_AF)
-    const at_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AT_AF) * TAUX_AT)
+    const vid_patro = Math.round(Math.min(salaire_brut, PLAFOND_VID)   * TAUX_VID_PATRONAL)
+    const af_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AF)   * TAUX_AF)   // plaf. 1 200 000
+    const at_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AT_AF) * TAUX_AT)  // plaf. 600 000
     cnss_patronal = vid_patro + af_patro + at_patro
   }
   const tus_patronal   = Math.round(salaire_brut * TAUX_TUS)
