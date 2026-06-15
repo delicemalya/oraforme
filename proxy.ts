@@ -58,9 +58,12 @@ export async function proxy(request: NextRequest) {
   }
 
   // ── AUTH ROUTES ───────────────────────────────────────────────────────────
+  // Passe par /api/set-tenant-cookie pour poser le cookie avant /dashboard.
+  // Couvre le cas login email+password qui ne passe pas par /auth/callback.
   if (user && (pathname === '/login' || pathname === '/register')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/api/set-tenant-cookie'
+    url.searchParams.set('redirect', '/dashboard')
     return NextResponse.redirect(url)
   }
 
