@@ -66,7 +66,7 @@ const PLANS = [
     desc: 'Pour indépendants, TPE & petites structures',
     features: ['Tous les modules Oraforme', 'Facturation & Devis illimités', 'RH & Paie complète', 'Comptabilité SYSCOHADA', 'MIAA+ Standard', '5 utilisateurs inclus'],
     cta: 'Commencer gratuitement',
-    href: '/register',
+    href: '/onboarding',
     highlight: false,
     trial: '30 jours gratuits',
   },
@@ -77,7 +77,7 @@ const PLANS = [
     desc: 'Pour PME, cabinets & secteurs spécialisés',
     features: ['Tout Entrepreneur inclus', 'Modules premium activés', 'Analytics & BI avancés', 'Automatisations avancées', 'MIAA+ Premium', '25 utilisateurs inclus'],
     cta: 'Commencer gratuitement',
-    href: '/register',
+    href: '/onboarding',
     highlight: true,
     trial: '30 jours gratuits',
   },
@@ -160,7 +160,7 @@ export default function LandingPage() {
               className="text-sm font-semibold text-[#64748B] hover:text-[#0F172A] px-4 py-2.5 border border-gray-200 rounded-xl transition-colors">
               Se connecter
             </Link>
-            <Link href="/register"
+            <Link href="/onboarding"
               className="text-sm font-bold text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2 shadow-lg shadow-green-100">
               COMMENCER GRATUITEMENT <ArrowRight size={14} />
             </Link>
@@ -191,7 +191,7 @@ export default function LandingPage() {
                   <Link href="/login" className="text-center text-sm font-semibold text-[#64748B] border border-gray-200 rounded-xl py-3">
                     Se connecter
                   </Link>
-                  <Link href="/register" className="text-center text-sm font-bold text-white bg-green-600 rounded-xl py-3">
+                  <Link href="/onboarding" className="text-center text-sm font-bold text-white bg-green-600 rounded-xl py-3">
                     COMMENCER GRATUITEMENT
                   </Link>
                 </div>
@@ -248,7 +248,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.5, delay: 0.15 }}
                 className="flex flex-wrap gap-4 mb-10"
               >
-                <Link href="/register"
+                <Link href="/onboarding"
                   className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-xl shadow-green-100">
                   COMMENCER GRATUITEMENT <ArrowRight size={16} />
                 </Link>
@@ -441,7 +441,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/register"
+              <Link href="/onboarding"
                 className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-xl shadow-orange-900/20">
                 Démarrer gratuitement <ArrowRight size={16} />
               </Link>
@@ -504,7 +504,7 @@ export default function LandingPage() {
                   <p className="text-gray-200 text-sm leading-relaxed mb-6">
                     Intelligence artificielle, Mobile Money, comptabilité automatique — Oraforme vous connecte à la technologie de demain.
                   </p>
-                  <Link href="/register"
+                  <Link href="/onboarding"
                     className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-colors">
                     Découvrir la plateforme <ArrowRight size={15} />
                   </Link>
@@ -722,7 +722,7 @@ export default function LandingPage() {
               Démarrez gratuitement — 30 jours d&apos;essai, sans carte bancaire.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/register"
+              <Link href="/onboarding"
                 className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-xl shadow-orange-900/30">
                 Démarrer gratuitement — 30 jours d&apos;essai <ArrowRight size={16} />
               </Link>
