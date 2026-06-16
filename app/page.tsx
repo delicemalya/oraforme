@@ -1,136 +1,136 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence, useInView } from 'framer-motion'
 import {
-  FileText, Wallet, Users, Package, ChefHat, GraduationCap,
-  Activity, ShoppingCart, Smartphone, Receipt, BarChart2,
-  Building2, Briefcase, CheckCircle2, ArrowRight, Star,
-  Shield, X, Menu, Mail, MapPin,
+  Calculator, Users, Wallet, Bot, FileText, Package,
+  ArrowRight, CheckCircle2, Star, Menu, X, Zap,
+  Shield, Clock, TrendingUp, Brain, BarChart2,
+  ChevronRight, Sparkles, Lock, Globe,
 } from 'lucide-react'
 
-// ── Data ─────────────────────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────────
 
-const MODULES = [
-  { icon: FileText,      title: 'Facturation',    desc: 'Factures et devis en quelques clics, conformes OHADA' },
-  { icon: Wallet,        title: 'Trésorerie',     desc: 'Flux financiers en temps réel, rapprochement bancaire' },
-  { icon: Users,         title: 'RH & Paie',      desc: 'Salaires, congés et bulletins conformes droit congolais' },
-  { icon: Package,       title: 'Stock',           desc: 'Inventaire temps réel, alertes rupture automatiques' },
-  { icon: ChefHat,       title: 'Restaurant',     desc: 'POS tactile, gestion tables, rapports caisse quotidiens' },
-  { icon: GraduationCap, title: 'École',           desc: 'Inscriptions, notes, bulletins et frais scolaires' },
-  { icon: Activity,      title: 'Santé',           desc: 'Consultations, ordonnances, stock médicaments' },
-  { icon: ShoppingCart,  title: 'Achats',          desc: 'Commandes fournisseurs, réception, contrôle qualité' },
-  { icon: Smartphone,    title: 'Mobile Money',    desc: 'Airtel Money & MTN MoMo — moyen de paiement intégré dans tous les modules' },
-  { icon: Receipt,       title: 'Dépenses',        desc: 'Suivi des charges, notes de frais, justificatifs' },
-  { icon: BarChart2,     title: 'Rapports',        desc: 'Tableaux de bord, KPIs, exports PDF et Excel' },
-  { icon: null,          title: 'MIAA+',           desc: 'Assistant IA — analyse, rapports auto, décisions assistées' },
+const NAV_LINKS = [
+  { label: 'Modules',  href: '#modules' },
+  { label: 'Tarifs',   href: '#tarifs' },
+  { label: 'À propos', href: '#apropos' },
 ]
 
-const SECTORS = [
-  { icon: Building2,     title: 'PME & Entreprises',    desc: 'Pilotez votre PME avec un ERP complet : comptabilité, facturation, trésorerie et RH dans une seule plateforme SYSCOHADA.', badge: 'Populaire' },
-  { icon: GraduationCap, title: 'Écoles & Universités', desc: 'Inscriptions, notes, bulletins automatiques et frais scolaires — solution complète pour établissements d\'enseignement.', badge: '' },
-  { icon: ChefHat,       title: 'Restaurants & Hôtels', desc: 'Du POS tactile à la gestion de cuisine. Réduisez le gaspillage et maximisez la rentabilité de votre établissement.', badge: '' },
-  { icon: Briefcase,     title: 'Cabinets & Conseils',  desc: 'Gérez vos dossiers clients, honoraires et comptabilité SYSCOHADA depuis une interface unifiée.', badge: '' },
+const FEATURES = [
+  {
+    icon: Calculator,
+    title: 'Comptabilité',
+    desc: 'Plan comptable automatique, bilan, compte de résultat et grand livre générés en temps réel.',
+    color: 'bg-blue-50 text-blue-600',
+  },
+  {
+    icon: Users,
+    title: 'RH & Paie',
+    desc: 'Bulletins de salaire, congés, contrats et déclarations sociales en quelques clics.',
+    color: 'bg-green-50 text-green-600',
+  },
+  {
+    icon: Wallet,
+    title: 'Trésorerie',
+    desc: 'Suivi des flux financiers en temps réel, prévisions et rapprochement bancaire automatique.',
+    color: 'bg-purple-50 text-purple-600',
+  },
+  {
+    icon: Bot,
+    title: 'MIAA+ Intelligence IA',
+    desc: 'Votre assistant IA analyse vos données, génère des rapports et prédit vos besoins.',
+    color: 'bg-red-50 text-red-600',
+  },
+  {
+    icon: FileText,
+    title: 'Facturation',
+    desc: 'Devis, factures et avoirs professionnels envoyés en un clic, relances automatiques.',
+    color: 'bg-orange-50 text-orange-600',
+  },
+  {
+    icon: Package,
+    title: 'Stock & Inventaire',
+    desc: 'Gestion des articles, alertes de rupture automatiques et valorisation du stock.',
+    color: 'bg-teal-50 text-teal-600',
+  },
+]
+
+const MIAA_FEATURES = [
+  { icon: Brain,     text: 'Analyse prédictive de votre trésorerie' },
+  { icon: BarChart2, text: 'Rapports financiers générés automatiquement' },
+  { icon: Zap,       text: 'Alertes intelligentes sur vos anomalies' },
+  { icon: Shield,    text: 'Détection des risques comptables en temps réel' },
+  { icon: Globe,     text: 'Conformité fiscale et réglementaire assurée' },
+  { icon: Clock,     text: 'Disponible 24h/24 — réponses instantanées' },
 ]
 
 const TESTIMONIALS = [
   {
-    name: 'Jean-Michel Boukaka',
-    role: 'Directeur, PME SOGEC — Pointe-Noire',
+    name: 'Marc Dubois',
+    role: 'Directeur Financier · Paris, France',
+    avatar: 'MD',
     stars: 5,
-    quote: 'Oraforme a transformé notre gestion. La comptabilité SYSCOHADA, la paie et la trésorerie — tout centralisé. Nous économisons 3 jours de travail par mois.',
-    avatar: 'JB',
+    quote: 'Oraforme a réduit notre temps de clôture mensuelle de 3 jours à quelques heures. MIAA+ identifie des anomalies que nos équipes auraient manqué.',
   },
   {
-    name: 'Sandrine Moukassa',
-    role: 'Directrice, Institut Sainte-Famille — Brazzaville',
+    name: 'Amara Sow',
+    role: 'Fondatrice & CEO · Dakar, Sénégal',
+    avatar: 'AS',
     stars: 5,
-    quote: 'Les bulletins s\'impriment en un clic, les frais se paient par Mobile Money. L\'école tourne maintenant avec deux fois moins d\'erreurs administratives.',
-    avatar: 'SM',
+    quote: 'La plateforme tout-en-un dont j\'avais besoin. Comptabilité, paie et trésorerie enfin centralisées. Mon équipe gagne 2 heures par jour.',
   },
   {
-    name: 'Patrick Ngoma',
-    role: 'Gérant, Restaurant Le Flamboyant — Pointe-Noire',
+    name: 'Ricardo Mendes',
+    role: 'Gérant · Lisbonne, Portugal',
+    avatar: 'RM',
     stars: 5,
-    quote: 'MIAA+ m\'envoie chaque soir un résumé du chiffre d\'affaires du jour. Le POS est simple, les erreurs de caisse ont disparu. Je recommande sans hésiter.',
-    avatar: 'PN',
+    quote: 'L\'assistant IA répond à mes questions comptables instantanément. C\'est comme avoir un expert-comptable disponible en permanence.',
   },
 ]
 
 const PLANS = [
   {
-    name: 'Entrepreneur',
+    name: 'Starter',
     price: '15 000',
-    period: 'FCFA / mois',
-    desc: 'Pour indépendants, TPE & petites structures',
-    features: ['Tous les modules Oraforme', 'Facturation & Devis illimités', 'RH & Paie complète', 'Comptabilité SYSCOHADA', 'MIAA+ Standard', '5 utilisateurs inclus'],
-    cta: 'Commencer gratuitement',
-    href: '/onboarding',
+    currency: 'FCFA',
+    period: '/ mois',
+    desc: 'Pour indépendants et petites structures',
     highlight: false,
-    trial: '30 jours gratuits',
+    features: [
+      'Comptabilité complète',
+      'RH & Paie jusqu\'à 10 employés',
+      'Facturation illimitée',
+      'Trésorerie & rapports',
+      'MIAA+ Standard',
+      '3 utilisateurs inclus',
+    ],
+    cta: 'Commencer gratuitement',
   },
   {
     name: 'Business',
     price: '25 000',
-    period: 'FCFA / mois',
-    desc: 'Pour PME, cabinets & secteurs spécialisés',
-    features: ['Tout Entrepreneur inclus', 'Modules premium activés', 'Analytics & BI avancés', 'Automatisations avancées', 'MIAA+ Premium', '25 utilisateurs inclus'],
-    cta: 'Commencer gratuitement',
-    href: '/onboarding',
+    currency: 'FCFA',
+    period: '/ mois',
+    desc: 'Pour PME, cabinets et secteurs spécialisés',
     highlight: true,
-    trial: '30 jours gratuits',
-  },
-  {
-    name: 'Entreprise+',
-    price: 'Sur devis',
-    period: '',
-    desc: 'Groupes, multi-sites & universités',
-    features: ['Tout Business inclus', 'Utilisateurs illimités', 'Multi-branches & multi-sites', 'MIAA+ Illimité', 'API & intégrations', 'Manager dédié · SLA 99.9%'],
-    cta: 'Nous contacter',
-    href: 'mailto:contact@oraforme.com',
-    highlight: false,
-    trial: null,
+    features: [
+      'Tout Starter inclus',
+      'RH & Paie illimitée',
+      'Modules secteur activés',
+      'Analytics & BI avancés',
+      'MIAA+ Premium complet',
+      '25 utilisateurs inclus',
+    ],
+    cta: 'Commencer gratuitement',
   },
 ]
 
-const SPECIAL_PLANS = [
-  { name: 'Cabinet comptable',         price: '20 000', note: '+ 5 000 FCFA / client actif' },
-  { name: 'École (primaire/collège/lycée)', price: '35 000', note: null },
-  { name: 'Université',                price: '56 000', note: null },
+const STATS = [
+  { value: '12+',   label: 'Modules métier' },
+  { value: '99.9%', label: 'Disponibilité' },
+  { value: '24/7',  label: 'Support & IA' },
 ]
-
-const NAV_LINKS = [
-  { label: 'Modules',  href: '#modules' },
-  { label: 'Secteurs', href: '#secteurs' },
-  { label: 'Tarifs',   href: '#tarifs' },
-  { label: 'À propos', href: '#apropos' },
-  { label: 'Contact',  href: '#contact' },
-]
-
-const TRUST_BADGES = ['OHADA', 'SYSCOHADA', 'CNSS Congo', 'TVA Congo', 'Airtel Money', 'MTN MoMo']
-
-// ── FadeIn ────────────────────────────────────────────────────────────────────
-
-function FadeIn({ children, delay = 0, className = '' }: {
-  children: React.ReactNode
-  delay?: number
-  className?: string
-}) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -138,645 +138,401 @@ export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <div className="font-sans bg-white text-[#0F172A] overflow-x-hidden" style={{ scrollBehavior: 'smooth' }}>
+    <>
+      {/* Keyframe animations CSS */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        .anim-1 { animation: fadeUp 0.55s ease both; }
+        .anim-2 { animation: fadeUp 0.55s ease 0.1s both; }
+        .anim-3 { animation: fadeUp 0.55s ease 0.2s both; }
+        .anim-4 { animation: fadeUp 0.55s ease 0.3s both; }
+        .anim-fade { animation: fadeIn 0.7s ease both; }
+        .card-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+        .btn-transition { transition: background-color 0.18s ease, transform 0.15s ease; }
+        .btn-transition:hover { transform: translateY(-1px); }
+        .btn-transition:active { transform: translateY(0); }
+      `}</style>
 
-      {/* ══ NAVBAR ══════════════════════════════════════════════════════════ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-8">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Oraforme" className="h-12 w-auto shrink-0" />
+      <div className="font-sans bg-white text-[#111827] overflow-x-hidden">
 
-          <div className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map(l => (
-              <a key={l.href} href={l.href}
-                className="text-sm font-semibold text-[#64748B] hover:text-[#DC2626] transition-colors">
-                {l.label}
-              </a>
-            ))}
-          </div>
+        {/* ══ 1. NAVBAR ══════════════════════════════════════════════════════ */}
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/96 backdrop-blur-md border-b border-gray-100 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-6" style={{ height: 68 }}>
 
-          <div className="hidden md:flex items-center gap-3">
-            <Link href="/login"
-              className="text-sm font-semibold text-[#64748B] hover:text-[#0F172A] px-4 py-2.5 border border-gray-200 rounded-xl transition-colors">
-              Se connecter
-            </Link>
-            <Link href="/onboarding"
-              className="text-sm font-bold text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-xl transition-colors inline-flex items-center gap-2 shadow-lg shadow-green-100">
-              COMMENCER GRATUITEMENT <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <button className="md:hidden p-2 rounded-lg text-[#64748B] hover:bg-gray-100"
-            onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
-            >
-              <div className="px-6 py-5 flex flex-col gap-4">
-                {NAV_LINKS.map(l => (
-                  <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
-                    className="text-base font-semibold text-[#0F172A] hover:text-[#DC2626]">
-                    {l.label}
-                  </a>
-                ))}
-                <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
-                  <Link href="/login" className="text-center text-sm font-semibold text-[#64748B] border border-gray-200 rounded-xl py-3">
-                    Se connecter
-                  </Link>
-                  <Link href="/onboarding" className="text-center text-sm font-bold text-white bg-green-600 rounded-xl py-3">
-                    COMMENCER GRATUITEMENT
-                  </Link>
-                </div>
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#DC2626] flex items-center justify-center">
+                <Sparkles size={16} className="text-white" />
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+              <span className="text-lg font-black text-[#111827] tracking-tight">oraforme</span>
+            </Link>
 
-      {/* ══ HERO ════════════════════════════════════════════════════════════ */}
-      <section className="min-h-screen flex items-center pt-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-            {/* Left — text */}
-            <div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="flex flex-wrap items-center gap-3 mb-8"
-              >
-                <div className="w-1 h-10 bg-red-500 rounded-full" />
-                <span className="text-sm font-bold text-[#DC2626] uppercase tracking-widest">
-                  MIAA+ · ASSISTANT IA INTÉGRÉ
-                </span>
-                <span className="text-[11px] font-bold text-white bg-[#7C3AED] rounded-full px-3 py-1">
-                  Moteur SYSCOHADA Révisé 2017
-                </span>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.05 }}
-                className="text-5xl sm:text-6xl lg:text-[64px] font-black text-[#0F172A] leading-[1.05] tracking-tight mb-6"
-              >
-                L&apos;ERP conçu<br />pour les{' '}
-                <span className="text-[#DC2626]">entreprises<br />africaines</span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-lg text-[#64748B] leading-relaxed mb-8 max-w-lg"
-              >
-                Comptabilité SYSCOHADA, RH & Paie, Trésorerie, Scolarité, Restaurant — une seule plateforme pensée pour l&apos;Afrique, accessible depuis votre téléphone.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.15 }}
-                className="flex flex-wrap gap-4 mb-10"
-              >
-                <Link href="/onboarding"
-                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-xl shadow-green-100">
-                  COMMENCER GRATUITEMENT <ArrowRight size={16} />
-                </Link>
-                <p className="text-[13px] text-[#94A3B8] mt-1 w-full text-center sm:text-left">
-                  30 jours d&apos;essai gratuit · Aucune carte bancaire requise
-                </p>
-                <a href="#modules"
-                  className="inline-flex items-center gap-2 text-[#0F172A] font-semibold text-base px-8 py-4 rounded-xl border-2 border-gray-200 hover:border-[#DC2626]/40 hover:text-[#DC2626] transition-colors">
-                  Voir les modules
+            {/* Nav links — desktop */}
+            <div className="hidden md:flex items-center gap-8">
+              {NAV_LINKS.map(l => (
+                <a key={l.href} href={l.href}
+                  className="text-sm font-semibold text-[#6B7280] hover:text-[#111827] transition-colors">
+                  {l.label}
                 </a>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.18 }}
-                className="flex flex-wrap items-center gap-2 mb-10"
-              >
-                {TRUST_BADGES.map(b => (
-                  <span key={b} className="text-[11px] font-bold text-[#64748B] border border-gray-200 bg-gray-50 rounded-full px-3 py-1">
-                    {b}
-                  </span>
-                ))}
-              </motion.div>
-
-              {/* Stats row — James style */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.22 }}
-                className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-100"
-              >
-                {[
-                  { value: '50+',   label: 'Entreprises actives' },
-                  { value: '12',    label: 'Modules métier' },
-                  { value: '99.9%', label: 'Disponibilité' },
-                ].map(s => (
-                  <div key={s.value} className="text-center">
-                    <div className="text-3xl font-black text-[#DC2626]">{s.value}</div>
-                    <div className="text-xs text-[#64748B] font-medium mt-1">{s.label}</div>
-                  </div>
-                ))}
-              </motion.div>
+              ))}
             </div>
 
-            {/* Right — photo */}
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.65, delay: 0.1 }}
-              className="relative"
-            >
-              {/* Decorative bg square */}
-              <div className="absolute -right-4 -bottom-4 w-full h-full rounded-3xl bg-red-500/10 -z-0" />
-
-              {/* Photo */}
-              <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-red-50">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/hero.jpg"
-                  alt="Entrepreneur africain avec technologie avancée"
-                  className="w-full aspect-[4/5] object-cover"
-                />
-                {/* Overlay gradient bottom */}
-                <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/50 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="flex items-center gap-3 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl">
-                    <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
-                      <Shield size={18} className="text-[#DC2626]" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-[#0F172A]">SYSCOHADA Conforme</div>
-                      <div className="text-xs text-[#64748B]">Comptabilité officielle Congo</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating MIAA+ badge */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-5 -left-5 z-20 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100 flex items-center gap-3"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/miaa-logo.png" alt="MIAA+" className="w-10 h-10 rounded-xl object-cover shrink-0" />
-                <div>
-                  <div className="text-xs font-bold text-[#0F172A]">MIAA+ a analysé</div>
-                  <div className="text-[10px] text-[#94A3B8]">Rapport trésorerie ✓</div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ TRUST STRIP ═════════════════════════════════════════════════════ */}
-      <div className="bg-gray-50 border-y border-gray-100 py-5 px-4">
-        <div className="max-w-7xl mx-auto flex items-center gap-6 flex-wrap justify-center sm:justify-between">
-          <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest shrink-0 hidden sm:block">NORMES & PAIEMENTS</span>
-          <div className="flex items-center gap-8 flex-wrap justify-center">
-            {TRUST_BADGES.map(b => (
-              <span key={b} className="text-sm font-bold text-gray-300">{b}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ══ MODULES ═════════════════════════════════════════════════════════ */}
-      <section id="modules" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">12 MODULES COMPLETS</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
-              Tout ce dont votre entreprise a besoin
-            </h2>
-            <p className="text-lg text-[#64748B] max-w-xl mx-auto leading-relaxed">
-              De la comptabilité SYSCOHADA à la gestion scolaire, chaque module est pensé pour les réalités africaines.
-            </p>
-          </FadeIn>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {MODULES.map((m, i) => {
-              const Icon = m.icon
-              return (
-                <FadeIn key={m.title} delay={Math.min(i * 0.04, 0.32)}>
-                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:border-[#DC2626]/30 hover:shadow-lg hover:shadow-red-50 transition-all duration-200 group cursor-pointer h-full">
-                    <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center mb-3 group-hover:bg-red-100 transition-colors">
-                      {Icon
-                        ? <Icon size={18} className="text-[#DC2626]" />
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        : <img src="/miaa-logo.png" alt="MIAA+" className="w-7 h-7 rounded-full object-cover" />
-                      }
-                    </div>
-                    <h3 className="text-sm font-bold text-[#0F172A] mb-1">{m.title}</h3>
-                    <p className="text-xs text-[#64748B] leading-relaxed">{m.desc}</p>
-                  </div>
-                </FadeIn>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ FEATURE SPLIT — teal background (James "Do Some Awesome Stuff") ══ */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#0F172A] relative overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-white/5 pointer-events-none" />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-white/5 pointer-events-none" />
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-
-            {/* Image */}
-            <FadeIn>
-              <div className="relative">
-                <div className="absolute -top-4 -left-4 w-full h-full rounded-3xl border-2 border-white/20" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/office-team.jpg"
-                  alt="Équipe professionnelle africaine"
-                  className="relative z-10 w-full aspect-[4/3] object-cover rounded-3xl shadow-2xl"
-                />
-                {/* Floating stat card */}
-                <div className="absolute z-20 -bottom-6 -right-4 bg-white rounded-2xl p-5 shadow-2xl">
-                  <div className="text-4xl font-black text-[#DC2626]">50+</div>
-                  <div className="text-sm text-[#64748B] font-medium">Entreprises actives</div>
-                </div>
-              </div>
-            </FadeIn>
-
-            {/* Text */}
-            <FadeIn delay={0.12} className="text-white">
-              <span className="text-gray-300 text-xs font-bold uppercase tracking-[0.14em]">NOTRE PLATEFORME</span>
-              <h2 className="text-4xl sm:text-5xl font-black mt-4 mb-6 leading-tight">
-                Gérez toute votre entreprise depuis un seul outil
-              </h2>
-              <p className="text-gray-200 text-lg leading-relaxed mb-10">
-                Comptabilité SYSCOHADA, RH &amp; Paie, Trésorerie, Scolarité, Restaurant — une seule plateforme pensée pour l&apos;Afrique, accessible depuis votre téléphone.
-              </p>
-              <ul className="space-y-4 mb-10">
-                {[
-                  'Comptabilité SYSCOHADA certifiée',
-                  'Paie et RH conformes au droit congolais',
-                  'Mobile Money Airtel & MTN intégré',
-                  'Assistant IA MIAA+ inclus dans tous les plans',
-                  'Accessible depuis smartphone ou ordinateur',
-                ].map(item => (
-                  <li key={item} className="flex items-center gap-3">
-                    <CheckCircle2 size={18} className="text-gray-300 shrink-0" />
-                    <span className="text-white font-medium text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/onboarding"
-                className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-xl shadow-orange-900/20">
-                Démarrer gratuitement <ArrowRight size={16} />
+            {/* CTA — desktop */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/login"
+                className="text-sm font-semibold text-[#374151] hover:text-[#111827] px-4 py-2.5 border border-gray-200 rounded-xl transition-colors">
+                Se connecter
               </Link>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
+              <Link href="/onboarding"
+                className="btn-transition text-sm font-bold text-white bg-[#DC2626] hover:bg-[#B91C1C] px-5 py-2.5 rounded-xl inline-flex items-center gap-2">
+                Commencer gratuitement <ArrowRight size={14} />
+              </Link>
+            </div>
 
-      {/* ══ SECTORS ═════════════════════════════════════════════════════════ */}
-      <section id="secteurs" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">SOLUTIONS PAR SECTEUR</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
-              Adapté à chaque métier
-            </h2>
-            <p className="text-lg text-[#64748B] max-w-xl mx-auto leading-relaxed">
-              Que vous soyez une PME, une école ou un restaurant, Oraforme s&apos;adapte précisément à votre secteur.
-            </p>
-          </FadeIn>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {SECTORS.map((s, i) => {
-              const Icon = s.icon
-              return (
-                <FadeIn key={s.title} delay={i * 0.08}>
-                  <div className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#DC2626]/30 hover:shadow-xl hover:shadow-red-50 transition-all duration-200 h-full group">
-                    {s.badge && (
-                      <span className="absolute top-4 right-4 text-[9px] font-bold text-orange-600 bg-orange-50 border border-orange-100 rounded-full px-2 py-0.5">
-                        {s.badge}
-                      </span>
-                    )}
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-4 group-hover:bg-red-100 transition-colors">
-                      <Icon size={22} className="text-[#DC2626]" />
-                    </div>
-                    <h3 className="text-base font-bold text-[#0F172A] mb-2">{s.title}</h3>
-                    <p className="text-sm text-[#64748B] leading-relaxed">{s.desc}</p>
-                  </div>
-                </FadeIn>
-              )
-            })}
+            {/* Hamburger — mobile */}
+            <button
+              className="md:hidden p-2 rounded-lg text-[#6B7280] hover:bg-gray-100 transition-colors"
+              onClick={() => setMenuOpen(v => !v)}
+              aria-label="Menu">
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
 
-          {/* Photo showcase — VR futuristic */}
-          <FadeIn className="mt-16">
-            <div className="relative rounded-3xl overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/vr-tech.jpg"
-                alt="Technologie avancée pour entreprises africaines"
-                className="w-full h-72 sm:h-96 object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/80 via-teal-900/40 to-transparent" />
-              <div className="absolute inset-0 flex items-center px-10 sm:px-16">
-                <div className="max-w-lg">
-                  <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">TECHNOLOGIE AVANCÉE</span>
-                  <h3 className="text-3xl sm:text-4xl font-black text-white mt-3 mb-4 leading-tight">
-                    L&apos;avenir de la gestion d&apos;entreprise en Afrique
-                  </h3>
-                  <p className="text-gray-200 text-sm leading-relaxed mb-6">
-                    Intelligence artificielle, Mobile Money, comptabilité automatique — Oraforme vous connecte à la technologie de demain.
-                  </p>
-                  <Link href="/onboarding"
-                    className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-colors">
-                    Découvrir la plateforme <ArrowRight size={15} />
-                  </Link>
-                </div>
+          {/* Mobile menu */}
+          {menuOpen && (
+            <div className="md:hidden bg-white border-t border-gray-100 px-6 py-5 flex flex-col gap-4 anim-fade">
+              {NAV_LINKS.map(l => (
+                <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
+                  className="text-base font-semibold text-[#111827] hover:text-[#DC2626] transition-colors">
+                  {l.label}
+                </a>
+              ))}
+              <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
+                <Link href="/login" onClick={() => setMenuOpen(false)}
+                  className="text-center text-sm font-semibold text-[#374151] border border-gray-200 rounded-xl py-3">
+                  Se connecter
+                </Link>
+                <Link href="/onboarding" onClick={() => setMenuOpen(false)}
+                  className="text-center text-sm font-bold text-white bg-[#DC2626] rounded-xl py-3">
+                  Commencer gratuitement
+                </Link>
               </div>
             </div>
-          </FadeIn>
-        </div>
-      </section>
+          )}
+        </nav>
 
-      {/* ══ WHY ORAFORME — image cards (portfolio style) ════════════════════ */}
-      <section id="apropos" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">POURQUOI ORAFORME</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
-              Fait pour vous, fait pour l&apos;Afrique
-            </h2>
-            <p className="text-lg text-[#64748B] max-w-lg mx-auto leading-relaxed">
-              Trois piliers qui font d&apos;Oraforme la solution préférée des entrepreneurs africains.
-            </p>
-          </FadeIn>
+        {/* ══ 2. HERO (sombre) ═══════════════════════════════════════════════ */}
+        <section className="bg-[#111827] min-h-screen flex items-center pt-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 w-full">
+            <div className="max-w-4xl mx-auto text-center">
 
-          <div className="grid sm:grid-cols-3 gap-6">
-            {[
-              {
-                img: '/images/mobile-payment.jpg',
-                accent: 'bg-orange-500',
-                tag: 'MOBILE MONEY',
-                title: 'Mobile Money natif',
-                desc: 'Airtel Money et MTN MoMo sont intégrés comme moyen de paiement dans tous les modules — facturation, scolarité, restaurant. Vos clients paient naturellement.',
-              },
-              {
-                img: '/images/analytics.jpg',
-                accent: 'bg-red-500',
-                tag: 'ANALYTIQUE',
-                title: 'Rapports & Tableaux de bord',
-                desc: 'KPIs en temps réel, exports PDF et Excel, rapports SYSCOHADA — toutes vos données financières en un coup d\'œil.',
-              },
-              {
-                img: '/images/ai-miaa.jpg',
-                accent: 'bg-indigo-500',
-                tag: 'INTELLIGENCE ARTIFICIELLE',
-                title: 'IA intégrée — MIAA+',
-                desc: 'Votre assistant intelligent analyse vos données, génère vos rapports automatiquement et vous aide à prendre de meilleures décisions métier.',
-              },
-            ].map((item, i) => (
-              <FadeIn key={item.title} delay={i * 0.1}>
-                <div className="rounded-3xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-red-50 transition-all duration-300 group h-full flex flex-col">
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.img}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                    <span className={`absolute top-4 left-4 ${item.accent} text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full`}>
-                      {item.tag}
-                    </span>
+              {/* Badge */}
+              <div className="anim-1 inline-flex items-center gap-2 bg-[#DC2626]/10 border border-[#DC2626]/20 text-[#F87171] text-xs font-bold uppercase tracking-widest rounded-full px-4 py-2 mb-8">
+                <Sparkles size={12} className="shrink-0" />
+                Propulsé par MIAA+ — Intelligence IA Métier
+              </div>
+
+              {/* Titre */}
+              <h1 className="anim-2 text-4xl sm:text-5xl lg:text-[62px] font-black text-white leading-[1.08] tracking-tight mb-6">
+                Gérez votre entreprise<br />
+                avec{' '}
+                <span className="text-[#DC2626]">l&apos;intelligence artificielle</span>
+              </h1>
+
+              {/* Sous-titre */}
+              <p className="anim-3 text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto mb-10">
+                La plateforme tout-en-un qui automatise votre comptabilité, RH, trésorerie et bien plus — propulsée par MIAA+
+              </p>
+
+              {/* CTAs */}
+              <div className="anim-4 flex flex-wrap items-center justify-center gap-4 mb-16">
+                <Link href="/onboarding"
+                  className="btn-transition inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-base px-8 py-4 rounded-xl shadow-xl shadow-red-900/30">
+                  Commencer gratuitement — 30 jours <ArrowRight size={16} />
+                </Link>
+                <Link href="/login"
+                  className="btn-transition inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-base px-7 py-4 rounded-xl border border-white/15 hover:border-white/40">
+                  Se connecter <ChevronRight size={16} />
+                </Link>
+              </div>
+
+              {/* Stats */}
+              <div className="anim-4 grid grid-cols-3 gap-8 max-w-xl mx-auto pt-12 border-t border-white/10">
+                {STATS.map(s => (
+                  <div key={s.label} className="text-center">
+                    <div className="text-3xl sm:text-4xl font-black text-white mb-1">{s.value}</div>
+                    <div className="text-xs sm:text-sm text-gray-400 font-medium">{s.label}</div>
                   </div>
-                  <div className="p-6 flex-1 flex flex-col">
-                    <h3 className="text-lg font-bold text-[#0F172A] mb-3">{item.title}</h3>
-                    <p className="text-sm text-[#64748B] leading-relaxed flex-1">{item.desc}</p>
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
+                ))}
+              </div>
+            </div>
           </div>
+        </section>
 
-          {/* Congo/Afrique card */}
-          <FadeIn className="mt-8">
-            <div className="bg-gray-50 rounded-3xl p-8 sm:p-12 border border-gray-100 text-center">
-              <div className="text-5xl mb-5">🇨🇬</div>
-              <h3 className="text-2xl font-bold text-[#0F172A] mb-4">Fait pour le Congo</h3>
-              <p className="text-[#64748B] max-w-2xl mx-auto leading-relaxed">
-                SYSCOHADA rénové, TVA Congo, CNSS, droit du travail congolais — tout est intégré nativement. Pas besoin d&apos;adapter un outil étranger à vos réalités.
+        {/* ══ 3. FEATURES (clair) ════════════════════════════════════════════ */}
+        <section id="modules" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.16em]">MODULES INTÉGRÉS</span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#111827] tracking-tight mt-3 mb-4">
+                Tout ce dont votre équipe a besoin
+              </h2>
+              <p className="text-lg text-[#6B7280] max-w-xl mx-auto leading-relaxed">
+                Une solution de gestion complète, pensée pour simplifier chaque aspect de votre activité.
               </p>
             </div>
-          </FadeIn>
-        </div>
-      </section>
 
-      {/* ══ TESTIMONIALS ════════════════════════════════════════════════════ */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">TÉMOIGNAGES</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
-              Ce que disent nos clients
-            </h2>
-            <p className="text-lg text-[#64748B] max-w-lg mx-auto leading-relaxed">
-              Des professionnels à travers le Congo font confiance à Oraforme chaque jour.
-            </p>
-          </FadeIn>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {FEATURES.map((f) => {
+                const Icon = f.icon
+                return (
+                  <div key={f.title} className="card-hover bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                    <div className={`w-12 h-12 rounded-xl ${f.color} flex items-center justify-center mb-4`}>
+                      <Icon size={22} />
+                    </div>
+                    <h3 className="text-base font-bold text-[#111827] mb-2">{f.title}</h3>
+                    <p className="text-sm text-[#6B7280] leading-relaxed">{f.desc}</p>
+                  </div>
+                )
+              })}
+            </div>
 
-          <div className="grid sm:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t, i) => (
-              <FadeIn key={t.name} delay={i * 0.1}>
-                <div className="bg-white rounded-3xl p-8 border border-gray-100 hover:border-[#DC2626]/30 hover:shadow-xl hover:shadow-red-50 transition-all h-full flex flex-col">
-                  {/* Quote mark */}
-                  <div className="text-6xl font-black text-gray-200 leading-none mb-2 select-none">&ldquo;</div>
-                  <div className="flex gap-1 mb-4">
+            <div className="text-center mt-12">
+              <Link href="/onboarding"
+                className="btn-transition inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold px-7 py-3.5 rounded-xl">
+                Découvrir tous les modules <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ 4. SECTION IA (sombre) ═════════════════════════════════════════ */}
+        <section id="apropos" className="py-24 px-4 sm:px-6 lg:px-8 bg-[#111827]">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+              {/* Texte gauche */}
+              <div>
+                <span className="text-xs font-bold text-[#F87171] uppercase tracking-[0.16em]">INTELLIGENCE ARTIFICIELLE</span>
+                <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-4 mb-6 leading-tight">
+                  Votre assistant IA métier<br />
+                  <span className="text-[#DC2626]">intégré nativement</span>
+                </h2>
+                <p className="text-gray-300 text-lg leading-relaxed mb-10">
+                  MIAA+ analyse vos données en temps réel, génère vos rapports automatiquement et vous aide à prendre de meilleures décisions — sans aucune expertise technique requise.
+                </p>
+                <Link href="/onboarding"
+                  className="btn-transition inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold px-7 py-3.5 rounded-xl">
+                  Essayer MIAA+ gratuitement <ArrowRight size={15} />
+                </Link>
+              </div>
+
+              {/* Grille features IA droite */}
+              <div className="grid grid-cols-2 gap-4">
+                {MIAA_FEATURES.map((f) => {
+                  const Icon = f.icon
+                  return (
+                    <div key={f.text}
+                      className="card-hover bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#DC2626]/15 flex items-center justify-center">
+                        <Icon size={18} className="text-[#F87171]" />
+                      </div>
+                      <p className="text-sm text-gray-300 font-medium leading-snug">{f.text}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ 5. TÉMOIGNAGES (clair) ═════════════════════════════════════════ */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.16em]">TÉMOIGNAGES</span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#111827] tracking-tight mt-3 mb-4">
+                Ils ont transformé leur gestion
+              </h2>
+              <div className="flex items-center justify-center gap-1 mt-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} size={16} className="text-yellow-400 fill-yellow-400" />
+                ))}
+                <span className="ml-2 text-sm text-[#6B7280] font-medium">4.9 / 5 — Plus de 200 avis</span>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-6">
+              {TESTIMONIALS.map((t) => (
+                <div key={t.name} className="card-hover bg-white rounded-2xl p-7 border border-gray-100 flex flex-col">
+                  <div className="flex gap-1 mb-5">
                     {Array.from({ length: t.stars }).map((_, j) => (
-                      <Star key={j} size={14} className="text-orange-400 fill-orange-400" />
+                      <Star key={j} size={13} className="text-yellow-400 fill-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-sm text-[#334155] leading-relaxed flex-1 mb-6">
-                    {t.quote}
+                  <p className="text-sm text-[#374151] leading-relaxed flex-1 mb-6">
+                    &ldquo;{t.quote}&rdquo;
                   </p>
                   <div className="flex items-center gap-3 pt-5 border-t border-gray-100">
-                    <div className="w-11 h-11 rounded-full bg-red-500 flex items-center justify-center font-bold text-white text-sm shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#DC2626] flex items-center justify-center font-bold text-white text-sm shrink-0">
                       {t.avatar}
                     </div>
                     <div>
-                      <div className="text-sm font-bold text-[#0F172A]">{t.name}</div>
-                      <div className="text-xs text-[#64748B]">{t.role}</div>
+                      <div className="text-sm font-bold text-[#111827]">{t.name}</div>
+                      <div className="text-xs text-[#9CA3AF]">{t.role}</div>
                     </div>
                   </div>
                 </div>
-              </FadeIn>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ══ PRICING ═════════════════════════════════════════════════════════ */}
-      <section id="tarifs" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-16">
-            <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.14em]">TARIFICATION</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mt-3 mb-4">
-              Des tarifs accessibles, aucun frais caché
-            </h2>
-            <p className="text-lg text-[#64748B] max-w-lg mx-auto">
-              Commencez gratuitement. Évoluez à votre rythme.
-            </p>
-          </FadeIn>
+        {/* ══ 6. TARIFS (clair) ══════════════════════════════════════════════ */}
+        <section id="tarifs" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <span className="text-xs font-bold text-[#DC2626] uppercase tracking-[0.16em]">TARIFS</span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#111827] tracking-tight mt-3 mb-4">
+                Simple, transparent, sans surprise
+              </h2>
+              <p className="text-lg text-[#6B7280]">30 jours d&apos;essai gratuit · Aucune carte bancaire requise</p>
+            </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
-            {PLANS.map((plan, i) => (
-              <FadeIn key={plan.name} delay={i * 0.08}>
-                <div className={`rounded-3xl p-7 border relative ${
-                  plan.highlight
-                    ? 'bg-[#0F172A] border-teal-600 shadow-2xl shadow-red-100'
-                    : 'bg-gray-50 border-gray-100'
-                }`}>
+            <div className="grid sm:grid-cols-2 gap-6">
+              {PLANS.map((plan) => (
+                <div key={plan.name}
+                  className={`card-hover rounded-2xl p-8 border relative ${
+                    plan.highlight
+                      ? 'bg-[#111827] border-[#DC2626]/40 shadow-2xl'
+                      : 'bg-gray-50 border-gray-200'
+                  }`}>
                   {plan.highlight && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[10px] font-bold px-4 py-1 rounded-full whitespace-nowrap shadow-lg">
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#DC2626] text-white text-[10px] font-bold px-4 py-1 rounded-full whitespace-nowrap">
                       LE PLUS POPULAIRE
                     </div>
                   )}
-                  <div className={`text-lg font-bold mb-1 ${plan.highlight ? 'text-white' : 'text-[#0F172A]'}`}>{plan.name}</div>
-                  <div className={`text-xs mb-5 ${plan.highlight ? 'text-gray-300' : 'text-[#64748B]'}`}>{plan.desc}</div>
-                  <div className="mb-6">
-                    <span className={`text-3xl font-black ${plan.highlight ? 'text-white' : 'text-[#0F172A]'}`}>{plan.price}</span>
-                    {plan.period && <span className={`text-xs ml-1.5 ${plan.highlight ? 'text-gray-300' : 'text-[#64748B]'}`}>{plan.period}</span>}
+
+                  <div className={`text-xl font-black mb-1 ${plan.highlight ? 'text-white' : 'text-[#111827]'}`}>
+                    {plan.name}
                   </div>
-                  <ul className="space-y-2.5 mb-7">
+                  <div className={`text-xs mb-6 ${plan.highlight ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+                    {plan.desc}
+                  </div>
+
+                  <div className="flex items-baseline gap-1 mb-7">
+                    <span className={`text-4xl font-black ${plan.highlight ? 'text-white' : 'text-[#111827]'}`}>
+                      {plan.price}
+                    </span>
+                    <span className={`text-sm ${plan.highlight ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+                      {plan.currency} {plan.period}
+                    </span>
+                  </div>
+
+                  <ul className="space-y-3 mb-8">
                     {plan.features.map(f => (
-                      <li key={f} className={`flex items-center gap-2 text-xs font-medium ${plan.highlight ? 'text-gray-200' : 'text-[#475569]'}`}>
-                        <CheckCircle2 size={13} className={plan.highlight ? 'text-gray-300 shrink-0' : 'text-[#DC2626] shrink-0'} />
+                      <li key={f} className={`flex items-center gap-2.5 text-sm font-medium ${plan.highlight ? 'text-gray-200' : 'text-[#374151]'}`}>
+                        <CheckCircle2 size={14} className={`shrink-0 ${plan.highlight ? 'text-[#F87171]' : 'text-[#DC2626]'}`} />
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <Link href={plan.href}
-                    className={`block text-center text-sm font-bold py-3 rounded-xl transition-colors ${
+
+                  <Link href="/onboarding"
+                    className={`btn-transition block text-center text-sm font-bold py-3.5 rounded-xl ${
                       plan.highlight
-                        ? 'bg-white text-[#B91C1C] hover:bg-red-50'
-                        : 'bg-red-50 text-[#B91C1C] hover:bg-red-100 border border-teal-100'
+                        ? 'bg-[#DC2626] hover:bg-[#B91C1C] text-white'
+                        : 'bg-[#DC2626] hover:bg-[#B91C1C] text-white'
                     }`}>
                     {plan.cta}
                   </Link>
                 </div>
-              </FadeIn>
-            ))}
-          </div>
-
-          <FadeIn className="text-center mt-12">
-            <p className="text-xs text-gray-400 mb-3 font-medium">Modes de paiement acceptés</p>
-            <div className="flex justify-center gap-3 flex-wrap">
-              {['Airtel Money', 'MTN MoMo', 'Virement bancaire', 'Carte Visa / MasterCard'].map(m => (
-                <span key={m} className="text-xs font-semibold text-[#64748B] border border-gray-200 bg-gray-50 rounded-lg px-3 py-1.5">{m}</span>
               ))}
             </div>
-          </FadeIn>
-        </div>
-      </section>
 
-      {/* ══ CTA BANNER — background image ═══════════════════════════════════ */}
-      <section className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Background photo */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/cta-bg.jpg"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        />
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-[2px]" />
+            <p className="text-center text-xs text-[#9CA3AF] mt-8">
+              Besoin d&apos;une solution sur mesure pour un grand groupe ?{' '}
+              <a href="mailto:contact@oraforme.com" className="text-[#DC2626] font-semibold hover:underline">
+                Contactez-nous
+              </a>
+            </p>
+          </div>
+        </section>
 
-        {/* Decorative circles */}
-        <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-white/5 pointer-events-none" />
-        <div className="absolute -bottom-28 -right-16 w-96 h-96 rounded-full bg-white/5 pointer-events-none" />
-
-        <div className="max-w-2xl mx-auto text-center relative z-10">
-          <FadeIn>
+        {/* ══ 7. CTA FINAL (sombre) ══════════════════════════════════════════ */}
+        <section className="py-28 px-4 sm:px-6 lg:px-8 bg-[#111827]">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-[#DC2626]/10 border border-[#DC2626]/20 text-[#F87171] text-xs font-bold uppercase tracking-widest rounded-full px-4 py-2 mb-8">
+              <TrendingUp size={12} />
+              Résultats mesurables dès le premier mois
+            </div>
             <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-5 leading-tight">
-              Prêt à transformer<br className="hidden sm:block" /> votre entreprise ?
+              Prêt à transformer<br />votre gestion ?
             </h2>
-            <p className="text-lg text-gray-300 mb-10 leading-relaxed">
-              Rejoignez plus de 50 entreprises africaines qui utilisent Oraforme chaque jour.<br className="hidden sm:block" />
-              Démarrez gratuitement — 30 jours d&apos;essai, sans carte bancaire.
+            <p className="text-lg text-gray-300 leading-relaxed mb-10">
+              Rejoignez des centaines d&apos;entreprises qui ont choisi l&apos;intelligence artificielle pour piloter leur activité.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/onboarding"
-                className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-xl shadow-orange-900/30">
-                Démarrer gratuitement — 30 jours d&apos;essai <ArrowRight size={16} />
+                className="btn-transition inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-base px-8 py-4 rounded-xl shadow-xl shadow-red-900/30">
+                Démarrer gratuitement — 30 jours <ArrowRight size={16} />
               </Link>
-              <a href="mailto:contact@oraforme.com"
-                className="inline-flex items-center gap-2 text-white font-semibold text-base px-8 py-4 rounded-xl border-2 border-white/30 hover:border-white/60 transition-colors">
-                <Mail size={16} /> Nous contacter
-              </a>
+              <Link href="/login"
+                className="btn-transition inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-base px-7 py-4 rounded-xl border border-white/20 hover:border-white/50">
+                J&apos;ai déjà un compte
+              </Link>
             </div>
-          </FadeIn>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      {/* ══ FOOTER ══════════════════════════════════════════════════════════ */}
-      <footer id="contact" className="bg-[#0F172A] py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-            <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-white.png" alt="Oraforme" className="h-10 w-auto mb-5" />
-              <p className="text-sm text-gray-500 leading-relaxed mb-5 max-w-xs">
-                L&apos;ERP intelligent conçu pour les PME africaines. SYSCOHADA, RH, Trésorerie, Scolarité — tout en un.
-              </p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <MapPin size={13} className="shrink-0" />
-                <span>Pointe-Noire, Congo 🇨🇬</span>
+        {/* ══ FOOTER ═════════════════════════════════════════════════════════ */}
+        <footer className="bg-[#0D1117] py-12 px-4 sm:px-6 lg:px-8 border-t border-white/5">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
+              <Link href="/" className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#DC2626] flex items-center justify-center">
+                  <Sparkles size={13} className="text-white" />
+                </div>
+                <span className="text-base font-black text-white tracking-tight">oraforme</span>
+              </Link>
+              <div className="flex items-center gap-8">
+                {[
+                  { label: 'Modules',  href: '#modules' },
+                  { label: 'Tarifs',   href: '#tarifs' },
+                  { label: 'Contact',  href: 'mailto:contact@oraforme.com' },
+                  { label: 'CGU',      href: '#' },
+                ].map(l => (
+                  <a key={l.label} href={l.href}
+                    className="text-xs text-gray-500 hover:text-gray-300 transition-colors font-medium">
+                    {l.label}
+                  </a>
+                ))}
               </div>
             </div>
-
-            {[
-              { title: 'Produit',    links: ['Modules', 'Tarifs', 'MIAA+', 'API', 'Nouveautés'] },
-              { title: 'Entreprise', links: ['À propos', 'Blog', 'Partenaires', 'Carrières'] },
-              { title: 'Contact',    links: ['contact@oraforme.com', 'Support', 'Documentation', 'CGU'] },
-            ].map(col => (
-              <div key={col.title}>
-                <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-5">{col.title}</h4>
-                <ul className="space-y-3">
-                  {col.links.map(l => (
-                    <li key={l}>
-                      <a href="#" className="text-sm text-gray-500 hover:text-[#DC2626] transition-colors">{l}</a>
-                    </li>
-                  ))}
-                </ul>
+            <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <span className="text-xs text-gray-600">© 2026 Oraforme. Tous droits réservés.</span>
+              <div className="flex items-center gap-2">
+                <Lock size={11} className="text-gray-600" />
+                <span className="text-xs text-gray-600">Données chiffrées · Hébergement sécurisé</span>
               </div>
-            ))}
+            </div>
           </div>
+        </footer>
 
-          <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xs text-gray-600">© 2025 Oraforme. Tous droits réservés.</span>
-            <span className="text-xs text-gray-600">
-              Fait avec <span className="text-red-400">❤️</span> à Pointe-Noire, Congo 🇨🇬
-            </span>
-          </div>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </>
   )
 }
