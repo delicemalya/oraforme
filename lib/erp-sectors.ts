@@ -56,8 +56,9 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
   href: string
   label: string
   sublabel: string
-  roleFilter?: string[]       // Visibilité par rôle école
-  minSousType?: EcoleSousType // Sous-type minimum requis (pour l'école)
+  roleFilter?: string[]         // Visibilité par rôle école
+  minSousType?: EcoleSousType   // Sous-type minimum requis (pour l'école)
+  onlyCabinetTypes?: string[]   // Restreint à certains types de cabinet
 }>>> = {
   ecole: [
     // ─ Toujours visibles (tous niveaux)
@@ -217,15 +218,22 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'agriculture-intrants',  href: '/dashboard/agriculture/intrants',  label: 'Intrants',     sublabel: 'Semences, engrais & outils'},
   ],
   cabinet: [
-    { id: 'cabinet',                href: '/dashboard/cabinet',                label: 'Cabinet',          sublabel: 'Tableau de bord direction'  },
-    { id: 'cabinet-clients',        href: '/dashboard/cabinet/clients',        label: 'Portefeuille',     sublabel: 'Clients & dossiers'         },
-    { id: 'cabinet-declarations',   href: '/dashboard/cabinet/declarations',   label: 'Déclarations',     sublabel: 'Agenda fiscal & social'     },
-    { id: 'cabinet-honoraires',     href: '/dashboard/cabinet/honoraires',     label: 'Honoraires',       sublabel: 'Facturation & encaissements'},
-    { id: 'cabinet-conformite',     href: '/dashboard/cabinet/conformite',     label: 'Conformité',       sublabel: 'Checklists & compliance'    },
-    { id: 'cabinet-analytiques',    href: '/dashboard/cabinet/analytiques',    label: 'Analytiques',      sublabel: 'KPIs & croissance'          },
-    { id: 'cabinet-projets',        href: '/dashboard/cabinet/projets',        label: 'Missions',         sublabel: 'Projets & livrables'        },
-    { id: 'cabinet-documents',      href: '/dashboard/ged',                    label: 'Documents',        sublabel: 'GED & dossiers clients'     },
-    { id: 'cabinet-miaa',           href: '/dashboard/miaa?context=cabinet',   label: 'MIAA+ Expert',     sublabel: 'IA assistant cabinet'       },
+    { id: 'cabinet',              href: '/dashboard/cabinet',              label: 'Cabinet',       sublabel: 'Tableau de bord direction'   },
+    { id: 'cabinet-clients',      href: '/dashboard/cabinet/clients',      label: 'Portefeuille',  sublabel: 'Clients & dossiers'          },
+    // Agenda fiscal — uniquement comptable & fiscal
+    { id: 'cabinet-declarations', href: '/dashboard/cabinet/declarations', label: 'Déclarations',  sublabel: 'Agenda fiscal & social',
+      onlyCabinetTypes: ['comptable', 'fiscal'] },
+    // Affaires judiciaires — uniquement juridique & avocat
+    { id: 'cabinet-affaires',     href: '/dashboard/cabinet/affaires',     label: 'Affaires',      sublabel: 'Dossiers & procédures',
+      onlyCabinetTypes: ['juridique', 'avocat'] },
+    { id: 'cabinet-honoraires',   href: '/dashboard/cabinet/honoraires',   label: 'Honoraires',    sublabel: 'Facturation & encaissements' },
+    // Conformité OHADA/légale — comptable, fiscal, audit
+    { id: 'cabinet-conformite',   href: '/dashboard/cabinet/conformite',   label: 'Conformité',    sublabel: 'Checklists & compliance',
+      onlyCabinetTypes: ['comptable', 'fiscal', 'audit'] },
+    { id: 'cabinet-analytiques',  href: '/dashboard/cabinet/analytiques',  label: 'Analytiques',   sublabel: 'KPIs & croissance'           },
+    { id: 'cabinet-projets',      href: '/dashboard/cabinet/projets',      label: 'Missions',      sublabel: 'Projets & livrables'         },
+    { id: 'cabinet-documents',    href: '/dashboard/ged',                  label: 'Documents',     sublabel: 'GED & dossiers clients'      },
+    { id: 'cabinet-miaa',         href: '/dashboard/miaa?context=cabinet', label: 'MIAA+ Expert',  sublabel: 'IA assistant cabinet'        },
   ],
   petrole: [
     { id: 'petrole',            href: '/dashboard/petrole',            label: 'Tableau de bord', sublabel: 'KPIs exploitation pétrolière'},

@@ -54,11 +54,12 @@ const TYPE_COMPTE_COLORS: Record<string, string> = {
 }
 
 const SOUSTYPE_LABELS: Record<string, { label: string; emoji: string; color: string }> = {
-  comptable: { label: 'Cabinet Comptable',  emoji: '📊', color: '#2563EB' },
-  fiscal:    { label: 'Cabinet Fiscal',     emoji: '🏛️', color: '#7C3AED' },
-  audit:     { label: "Cabinet d'Audit",    emoji: '🔍', color: '#DC2626' },
-  conseil:   { label: 'Cabinet Conseil',    emoji: '💡', color: '#16A34A' },
-  juridique: { label: 'Cabinet Juridique',  emoji: '⚖️', color: '#F59E0B' },
+  comptable: { label: 'Cabinet Comptable',    emoji: '📊', color: '#2563EB' },
+  fiscal:    { label: 'Cabinet Fiscal',       emoji: '🏛️', color: '#7C3AED' },
+  audit:     { label: "Cabinet d'Audit",      emoji: '🔍', color: '#DC2626' },
+  conseil:   { label: 'Cabinet Conseil',      emoji: '💡', color: '#16A34A' },
+  juridique: { label: 'Cabinet Juridique',    emoji: '⚖️', color: '#F59E0B' },
+  avocat:    { label: "Cabinet d'Avocats",    emoji: '🧑‍⚖️', color: '#0F172A' },
 }
 
 const STATUT_COLORS: Record<string, string> = {

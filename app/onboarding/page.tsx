@@ -36,7 +36,12 @@ const SECTORS_TPE: SectorOption[] = [
 
 // Business — 17 secteurs
 const SECTORS_PME: SectorOption[] = [
-  { id: 'cabinet',         label: 'Cabinet',                 secteur: 'cabinet',     sousType: null                  },
+  { id: 'cabinet-comptable',  label: 'Cabinet Comptable',        secteur: 'cabinet',     sousType: 'comptable'           },
+  { id: 'cabinet-fiscal',     label: 'Cabinet Fiscal',           secteur: 'cabinet',     sousType: 'fiscal'              },
+  { id: 'cabinet-audit',      label: "Cabinet d'Audit",          secteur: 'cabinet',     sousType: 'audit'               },
+  { id: 'cabinet-conseil',    label: 'Cabinet Conseil',          secteur: 'cabinet',     sousType: 'conseil'             },
+  { id: 'cabinet-juridique',  label: 'Cabinet Juridique',        secteur: 'cabinet',     sousType: 'juridique'           },
+  { id: 'cabinet-avocat',     label: "Cabinet d'Avocats",        secteur: 'cabinet',     sousType: 'avocat'              },
   { id: 'hotel',           label: 'Hôtel',                   secteur: 'hotel',       sousType: null                  },
   { id: 'universite',      label: 'Université',              secteur: 'ecole',       sousType: 'universite'          },
   { id: 'lycee',           label: 'Lycée',                   secteur: 'ecole',       sousType: 'lycee'               },

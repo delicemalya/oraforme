@@ -576,6 +576,10 @@ export default function Sidebar() {
             const curNiveau = ECOLE_NIVEAU[(sousType as EcoleSousType) ?? 'primaire'] ?? 0
             if (curNiveau < reqNiveau) return false
           }
+          // Filtre sous_type cabinet (onlyCabinetTypes)
+          if (secteur === 'cabinet' && mod.onlyCabinetTypes) {
+            if (!sousType || !mod.onlyCabinetTypes.includes(sousType)) return false
+          }
           return true
         })
         .map(mod => ({
