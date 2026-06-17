@@ -66,7 +66,8 @@ const EMPTY_FORM = {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function SinistresPage() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [sinistres, setSinistres] = useState<Sinistre[]>([])
   const [loading,   setLoading]   = useState(true)
   const [saving,    setSaving]    = useState(false)

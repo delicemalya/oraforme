@@ -73,7 +73,8 @@ const EMPTY: Omit<Police,'id'|'numero_police'|'created_at'|'ass_agents'> = {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function PoliciesPage() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [polices,  setPolices]  = useState<Police[]>([])
   const [loading,  setLoading]  = useState(true)
   const [saving,   setSaving]   = useState(false)

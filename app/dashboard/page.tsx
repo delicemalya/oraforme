@@ -1,7 +1,6 @@
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/dashboard/DashboardClient'
-import AlertesFiscales from '@/components/dashboard/AlertesFiscales'
 
 // Values are i18n keys — resolved client-side in ModuleChart
 const MODULE_LABELS: Record<string, string> = {
@@ -221,8 +220,6 @@ export default async function DashboardPage() {
   }
 
   return (
-    <>
-      <AlertesFiscales />
     <DashboardClient
       userName={userName ?? undefined}
       data={{
@@ -236,7 +233,6 @@ export default async function DashboardPage() {
         alerts:        { pendingCount: nbPending, pendingAmount, lowStockCount: nbStockZero },
         recentActivity,
         chartData:     { daily, moduleBreakdown },
-        // Extensions pour le RBAC
         isFinancial,
         secteur,
         ecoleRole,
@@ -246,6 +242,5 @@ export default async function DashboardPage() {
         ecoleFinancials,
       }}
     />
-    </>
   )
 }

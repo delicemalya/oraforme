@@ -36,7 +36,8 @@ const typeColor = (t: string) => TYPES.find(x => x.value === t)?.color ?? 'bg-gr
 const typeLabel = (t: string) => TYPES.find(x => x.value === t)?.label ?? t
 
 export default function PartenairesPage() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [partenaires, setPartenaires] = useState<Partenaire[]>([])
   const [loading,     setLoading]     = useState(true)
   const [saving,      setSaving]      = useState(false)

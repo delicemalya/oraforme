@@ -23,7 +23,8 @@ const STATUT_COLORS: Record<string,string> = {
 }
 
 export default function AnalyticsPage() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [loading,       setLoading]       = useState(true)
   const [kpis,          setKpis]          = useState({ primes: 0, sinistres_declares: 0, taux_sinistralite: 0, commissions_dues: 0, polices_actives: 0, sinistres_payes: 0 })
   const [byType,        setByType]        = useState<ByType[]>([])
@@ -79,8 +80,9 @@ export default function AnalyticsPage() {
 
       // By agent
       const agentMap = new Map<string, ByAgent>()
-      commissions.forEach((c: { ass_agents: { nom: string; prenom: string; code_agent: string } | null; montant: number; statut_paiement: string }) => {
-        const ag = c.ass_agents
+      commissions.forEach((c: { ass_agents: { nom: string; prenom: string; code_agent: string }[] | { nom: string; prenom: string; code_agent: string } | null; montant: number; statut_paiement: string }) => {
+        const raw = c.ass_agents
+        const ag = Array.isArray(raw) ? raw[0] : raw
         if (!ag) return
         const key = ag.code_agent
         if (!agentMap.has(key)) agentMap.set(key, { agent: `${ag.prenom} ${ag.nom}`, code: ag.code_agent, nb_polices: 0, commissions: 0, paye: 0 })

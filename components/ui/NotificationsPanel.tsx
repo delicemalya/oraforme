@@ -1,11 +1,12 @@
 'use client'
 import { useLocale } from '@/lib/hooks/useLocale'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bell, X, CheckCheck, Info, AlertTriangle, CheckCircle, XCircle, ExternalLink, Wifi, WifiOff } from 'lucide-react'
+import { Bell, X, CheckCheck, Info, AlertTriangle, CheckCircle, XCircle, ExternalLink, Wifi, WifiOff, Calendar } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { getEcheances } from '@/lib/fiscal/alertes-fiscales'
 
 interface Notification {
   id: string
@@ -37,6 +38,12 @@ function timeAgo(date: string): string {
   return `il y a ${Math.floor(hours / 24)}j`
 }
 
+const URGENCE_CONFIG = {
+  rouge:  { color: '#DC2626', bg: '#DC262615', label: 'Urgent' },
+  orange: { color: '#EA580C', bg: '#EA580C15', label: 'Proche' },
+  normal: { color: '#64748B', bg: '#64748B15', label: '' },
+}
+
 export default function NotificationsPanel() {
   const { t } = useLocale()
   const [open, setOpen] = useState(false)
@@ -46,7 +53,10 @@ export default function NotificationsPanel() {
   const ref = useRef<HTMLDivElement>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
-  const unread = notifs.filter(n => !n.read).length
+
+  const echeances = useMemo(() => getEcheances(30), [])
+  const urgentFiscal = echeances.filter(e => e.urgence === 'rouge').length
+  const unread = notifs.filter(n => !n.read).length + urgentFiscal
 
   // ─── Chargement des notifications REST (toujours fiable) ─────────────────
   const load = useCallback(async (silent = false) => {
@@ -210,9 +220,59 @@ export default function NotificationsPanel() {
 
             {/* List */}
             <div className="max-h-[420px] overflow-y-auto">
+              {/* ── Section Échéances fiscales ─────────────────────────── */}
+              {echeances.length > 0 && (
+                <>
+                  <div className="px-4 py-2 flex items-center gap-2 bg-[var(--card-bg)] sticky top-0 border-b border-[var(--border)] z-10">
+                    <Calendar size={11} className="text-[var(--text-secondary)]" />
+                    <span className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Échéances fiscales</span>
+                  </div>
+                  {echeances.map((e) => {
+                    const ucfg = URGENCE_CONFIG[e.urgence]
+                    return (
+                      <Link
+                        key={e.id}
+                        href="/dashboard/fiscalite"
+                        onClick={() => setOpen(false)}
+                        className="flex items-start gap-3 px-4 py-3 border-b border-[var(--border)] hover:bg-white/5 transition-colors"
+                      >
+                        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: ucfg.bg }}>
+                          <Calendar size={13} style={{ color: ucfg.color }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-xs font-semibold leading-tight text-[var(--text)]">{e.nom}</p>
+                            {e.urgence !== 'normal' && (
+                              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: ucfg.bg, color: ucfg.color }}>
+                                {ucfg.label}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-[var(--text-secondary)] mt-0.5 line-clamp-1">{e.description}</p>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-[9px] text-[var(--text-secondary)]">
+                              J-{e.joursRestants} — {e.dateLimite.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                            </span>
+                            <span className="text-[9px] text-[var(--text-secondary)]">{e.base}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </>
+              )}
+
+              {/* ── Section Notifications système ─────────────────────── */}
+              {!loading && notifs.length > 0 && (
+                <div className="px-4 py-2 flex items-center gap-2 bg-[var(--card-bg)] sticky top-0 border-b border-[var(--border)] z-10">
+                  <Bell size={11} className="text-[var(--text-secondary)]" />
+                  <span className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Système</span>
+                </div>
+              )}
+
               {loading ? (
                 <div className="px-4 py-8 text-center text-xs text-[var(--text-secondary)]">{t('common.loading')}</div>
-              ) : notifs.length === 0 ? (
+              ) : notifs.length === 0 && echeances.length === 0 ? (
                 <div className="px-4 py-12 text-center">
                   <Bell size={24} className="text-[var(--text-secondary)] mx-auto mb-3" />
                   <p className="text-sm text-[var(--text-secondary)]">Aucune notification</p>

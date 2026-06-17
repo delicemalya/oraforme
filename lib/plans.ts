@@ -13,7 +13,7 @@ export type SecteurId =
   | 'commerce' | 'restaurant' | 'ecole' | 'sante' | 'btp'
   | 'transport' | 'hotel' | 'agriculture' | 'pharmacie' | 'banque'
   | 'ong' | 'cabinet' | 'boisson' | 'petrole' | 'supermarche'
-  | 'boutique' | 'autre'
+  | 'boutique' | 'assurance' | 'autre'
 
 // ── Modules par plan (cumulatifs vers le haut) ────────────────────────────────
 
@@ -180,6 +180,7 @@ export const SECTEUR_CONFIG: Record<SecteurId, {
   petrole:     { label: 'Pétrole & Énergie',         emoji: '⛽', description: 'Station service, énergie' },
   supermarche: { label: 'Supermarché & GMS',         emoji: '🛒', description: 'Grande distribution' },
   boutique:    { label: 'Boutique & Magasin',        emoji: '👗', description: 'Mode, accessoires, bijoux' },
+  assurance:   { label: 'Assurance & Réassurance',  emoji: '🛡️', description: 'Compagnie, courtier, agent assurance' },
   autre:       { label: 'Autre activité',            emoji: '🏢', description: "Autre type d'entreprise" },
 }
 

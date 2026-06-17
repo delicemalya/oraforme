@@ -26,7 +26,8 @@ const STATUT_CONFIG = {
 }
 
 export default function CommissionsPage() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [commissions, setCommissions] = useState<Commission[]>([])
   const [loading,     setLoading]     = useState(true)
   const [updating,    setUpdating]    = useState<string | null>(null)

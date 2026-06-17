@@ -73,7 +73,8 @@ const TYPE_LABELS: Record<string, string> = {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function AssuranceDashboard() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [data, setData]     = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
 

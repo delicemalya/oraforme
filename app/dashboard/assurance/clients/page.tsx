@@ -29,7 +29,8 @@ const TYPE_LABELS: Record<string, string> = {
 }
 
 export default function ClientsPage() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [clients,  setClients]  = useState<ClientRecord[]>([])
   const [loading,  setLoading]  = useState(true)
   const [search,   setSearch]   = useState('')

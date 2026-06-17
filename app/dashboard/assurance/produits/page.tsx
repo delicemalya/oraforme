@@ -42,7 +42,8 @@ const TYPE_COLORS: Record<string, string> = {
 const EMPTY = { nom_produit: '', type_police: 'auto', description: '', prime_base: 0, franchise_defaut: 0, duree_mois: 12, garanties: [] as string[], exclusions: [] as string[], actif: true }
 
 export default function ProduitsPage() {
-  const { tenantId } = useTenantContext()
+  const { tenant } = useTenantContext()
+  const tenantId = tenant?.tenantId ?? ''
   const [produits, setProduits] = useState<Produit[]>([])
   const [loading,  setLoading]  = useState(true)
   const [saving,   setSaving]   = useState(false)
