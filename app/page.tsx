@@ -707,7 +707,7 @@ export default function LandingPage() {
             </div>
 
             <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <span className="text-xs text-gray-600">© 2026 Oraforme. Tous droits réservés.</span>
+              <span className="text-xs text-gray-600">© 2026 Oraforme. Tous droits réservés. · by POLYVALON TECHNOLOGY</span>
               <div className="flex items-center gap-5">
                 {['CGU', 'Confidentialité', 'Cookies'].map(l => (
                   <a key={l} href="#"
