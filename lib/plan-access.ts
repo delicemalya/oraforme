@@ -1,10 +1,12 @@
 /**
- * lib/plan-access.ts — Contrôle d'accès par plan (Entrepreneur / Business / Entreprise+)
+ * lib/plan-access.ts — Contrôle d'accès par plan (Entrepreneur / Business)
  *
- * Règle : les modules sont cumulatifs vers le haut.
+ * Deux plans vendus :
  *   tpe   (Entrepreneur) — modules de base
- *   pme   (Business)     — tout tpe + modules avancés
- *   grande (Entreprise+) — tout pme + analytics, audit complet, API
+ *   pme   (Business)     — tout débloqué (tpe + avancés + analytics/BI/audit)
+ *
+ * Le niveau 'grande' (Entreprise+) est conservé pour rétro-compatibilité
+ * et usage interne futur, mais Business (pme) = grande en termes d'accès.
  */
 
 import type { TailleEntreprise } from './plans'
@@ -79,11 +81,8 @@ export function canAccessByPlan(
   // Pas de plan connu → legacy, on laisse passer
   if (!taille) return true
 
-  // Entreprise+ → tout est accessible
-  if (taille === 'grande') return true
-
-  // Business → bloque uniquement les modules Entreprise+
-  if (taille === 'pme') return !REQUIRES_GRANDE.has(moduleId)
+  // Business et Entreprise+ → accès complet
+  if (taille === 'grande' || taille === 'pme') return true
 
   // Entrepreneur (tpe) → bloque Business ET Entreprise+
   return !REQUIRES_PME.has(moduleId) && !REQUIRES_GRANDE.has(moduleId)
@@ -117,8 +116,6 @@ export function getRequiredPlan(
   // Already accessible
   if (canAccessByPlan(taille, moduleId)) return null
 
-  // What plan unlocks it?
-  if (REQUIRES_GRANDE.has(moduleId)) return 'grande'
-  if (REQUIRES_PME.has(moduleId))    return 'pme'
-  return null
+  // Pour un Entrepreneur, tout module avancé nécessite Business
+  return 'pme'
 }

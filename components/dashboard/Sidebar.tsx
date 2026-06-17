@@ -630,7 +630,6 @@ export default function Sidebar() {
     const isLocked  = !!item.locked
 
     if (isLocked) {
-      const upgradeLabel = item.locked === 'grande' ? 'Entreprise+' : 'Business'
       return (
         <Link
           href={item.href}
@@ -639,7 +638,7 @@ export default function Sidebar() {
           style={{ color: '#C4C9D4', opacity: 0.75 }}
           onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; (e.currentTarget as HTMLAnchorElement).style.background = '#FEF9F0' }}
           onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.75'; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' }}
-          title={`Disponible avec le plan ${upgradeLabel}`}
+          title="Disponible avec le plan Business"
         >
           <div style={{ width: 22, height: 22, borderRadius: 5, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon size={13} style={{ color: '#CBD5E1' }} />
@@ -647,11 +646,11 @@ export default function Sidebar() {
           <span className="flex-1 truncate" style={{ color: '#94A3B8' }}>{item.label}</span>
           <span style={{
             fontSize: 8, fontWeight: 700, padding: '1px 5px', borderRadius: 4,
-            background: item.locked === 'grande' ? 'rgba(124,58,237,0.1)' : 'rgba(245,158,11,0.12)',
-            color: item.locked === 'grande' ? '#7C3AED' : '#B45309',
+            background: 'rgba(245,158,11,0.12)',
+            color: '#B45309',
             letterSpacing: '0.03em', whiteSpace: 'nowrap', flexShrink: 0,
           }}>
-            {upgradeLabel}
+            Business
           </span>
         </Link>
       )

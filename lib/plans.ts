@@ -37,9 +37,10 @@ const GRANDE_EXTRA = [
   'audit', 'api-keys', 'abonnement',
 ]
 
+// Business (pme) inclut tous les modules — il n'y a que 2 plans vendus (Entrepreneur / Business)
 export const PLAN_MODULES: Record<TailleEntreprise, string[]> = {
   tpe:    TPE_MODULES,
-  pme:    [...TPE_MODULES, ...PME_EXTRA],
+  pme:    [...TPE_MODULES, ...PME_EXTRA, ...GRANDE_EXTRA],
   grande: [...TPE_MODULES, ...PME_EXTRA, ...GRANDE_EXTRA],
 }
 

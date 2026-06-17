@@ -15,14 +15,14 @@ import LanguageSelector from '@/components/ui/LanguageSelector'
 import DeviseSelector from '@/components/ui/DeviseSelector'
 import { LogoUploader } from '@/components/ui/LogoUploader'
 
-// Plan badge config
+// Plan badge config — 2 plans vendus : Entrepreneur (tpe) / Business (pme)
 const PLAN_BADGE: Record<string, { label: string; color: string; bg: string }> = {
-  tpe:    { label: 'TPE',    color: '#2563EB', bg: '#EFF6FF' },
-  pme:    { label: 'PME',    color: '#D97706', bg: '#FFFBEB' },
-  grande: { label: 'GRANDE', color: '#7C3AED', bg: '#F5F3FF' },
-  starter:    { label: 'TPE',    color: '#2563EB', bg: '#EFF6FF' },
-  pro:        { label: 'PME',    color: '#D97706', bg: '#FFFBEB' },
-  enterprise: { label: 'GRANDE', color: '#7C3AED', bg: '#F5F3FF' },
+  tpe:        { label: 'Entrepreneur', color: '#2563EB', bg: '#EFF6FF' },
+  pme:        { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
+  grande:     { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
+  starter:    { label: 'Entrepreneur', color: '#2563EB', bg: '#EFF6FF' },
+  pro:        { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
+  enterprise: { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
 }
 
 export default function Header() {
@@ -46,7 +46,7 @@ export default function Header() {
   // nomEntreprise & logoUrl managed inside LogoUploader
   const planKey       = tenant?.taille ?? tenant?.plan ?? 'tpe'
   const planBadge     = PLAN_BADGE[planKey] ?? PLAN_BADGE.tpe
-  const nextPlan      = planKey === 'tpe' ? 'PME' : planKey === 'pme' ? 'Grande' : null
+  const nextPlan      = planKey === 'tpe' ? 'Business' : null
 
   // Close dropdown on outside click
   useEffect(() => {
