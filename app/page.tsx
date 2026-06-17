@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   Calculator, Users, Wallet, Bot, FileText, Package,
   ArrowRight, CheckCircle2, Star, Menu, X, Zap,
@@ -173,11 +174,8 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-6" style={{ height: 68 }}>
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-[#DC2626] flex items-center justify-center">
-                <Sparkles size={16} className="text-white" />
-              </div>
-              <span className="text-lg font-black text-[#111827] tracking-tight">oraforme</span>
+            <Link href="/" className="flex items-center shrink-0">
+              <img src="/logo.png" alt="Oraforme" style={{ height: 38, width: 'auto' }} />
             </Link>
 
             {/* Nav links — desktop */}
@@ -236,48 +234,78 @@ export default function LandingPage() {
 
         {/* ══ 2. HERO (sombre) ═══════════════════════════════════════════════ */}
         <section className="bg-[#111827] min-h-screen flex items-center pt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 w-full">
-            <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24 w-full">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-              {/* Badge */}
-              <div className="anim-1 inline-flex items-center gap-2 bg-[#DC2626]/10 border border-[#DC2626]/20 text-[#F87171] text-xs font-bold uppercase tracking-widest rounded-full px-4 py-2 mb-8">
-                <Sparkles size={12} className="shrink-0" />
-                Propulsé par MIAA+ — Intelligence IA Métier
+              {/* Colonne texte */}
+              <div>
+                {/* Badge */}
+                <div className="anim-1 inline-flex items-center gap-2 bg-[#DC2626]/10 border border-[#DC2626]/20 text-[#F87171] text-xs font-bold uppercase tracking-widest rounded-full px-4 py-2 mb-8">
+                  <Sparkles size={12} className="shrink-0" />
+                  Propulsé par MIAA+ — Intelligence IA Métier
+                </div>
+
+                {/* Titre */}
+                <h1 className="anim-2 text-4xl sm:text-5xl lg:text-[58px] font-black text-white leading-[1.08] tracking-tight mb-6">
+                  Gérez votre entreprise<br />
+                  avec{' '}
+                  <span className="text-[#DC2626]">l&apos;intelligence artificielle</span>
+                </h1>
+
+                {/* Sous-titre */}
+                <p className="anim-3 text-lg text-gray-300 leading-relaxed mb-10">
+                  La plateforme tout-en-un qui automatise votre comptabilité, RH, trésorerie et bien plus — propulsée par MIAA+
+                </p>
+
+                {/* CTAs */}
+                <div className="anim-4 flex flex-wrap items-center gap-4 mb-12">
+                  <Link href="/onboarding"
+                    className="btn-transition inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-base px-8 py-4 rounded-xl shadow-xl shadow-red-900/30">
+                    Commencer gratuitement — 30 jours <ArrowRight size={16} />
+                  </Link>
+                  <Link href="/login"
+                    className="btn-transition inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-base px-7 py-4 rounded-xl border border-white/15 hover:border-white/40">
+                    Se connecter <ChevronRight size={16} />
+                  </Link>
+                </div>
+
+                {/* Stats */}
+                <div className="anim-4 grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
+                  {STATS.map(s => (
+                    <div key={s.label} className="text-center">
+                      <div className="text-3xl font-black text-white mb-1">{s.value}</div>
+                      <div className="text-xs text-gray-400 font-medium">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Titre */}
-              <h1 className="anim-2 text-4xl sm:text-5xl lg:text-[62px] font-black text-white leading-[1.08] tracking-tight mb-6">
-                Gérez votre entreprise<br />
-                avec{' '}
-                <span className="text-[#DC2626]">l&apos;intelligence artificielle</span>
-              </h1>
-
-              {/* Sous-titre */}
-              <p className="anim-3 text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto mb-10">
-                La plateforme tout-en-un qui automatise votre comptabilité, RH, trésorerie et bien plus — propulsée par MIAA+
-              </p>
-
-              {/* CTAs */}
-              <div className="anim-4 flex flex-wrap items-center justify-center gap-4 mb-16">
-                <Link href="/onboarding"
-                  className="btn-transition inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-base px-8 py-4 rounded-xl shadow-xl shadow-red-900/30">
-                  Commencer gratuitement — 30 jours <ArrowRight size={16} />
-                </Link>
-                <Link href="/login"
-                  className="btn-transition inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-base px-7 py-4 rounded-xl border border-white/15 hover:border-white/40">
-                  Se connecter <ChevronRight size={16} />
-                </Link>
-              </div>
-
-              {/* Stats */}
-              <div className="anim-4 grid grid-cols-3 gap-8 max-w-xl mx-auto pt-12 border-t border-white/10">
-                {STATS.map(s => (
-                  <div key={s.label} className="text-center">
-                    <div className="text-3xl sm:text-4xl font-black text-white mb-1">{s.value}</div>
-                    <div className="text-xs sm:text-sm text-gray-400 font-medium">{s.label}</div>
+              {/* Colonne image */}
+              <div className="anim-fade hidden lg:block">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                  <Image
+                    src="/images/hero.jpg"
+                    alt="Équipe professionnelle avec Oraforme"
+                    width={700}
+                    height={520}
+                    className="w-full h-auto object-cover"
+                    priority
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#111827]/70 to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-4 py-3 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-[#DC2626] flex items-center justify-center shrink-0">
+                        <Zap size={14} className="text-white" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white">MIAA+ actif</div>
+                        <div className="text-[11px] text-gray-300">Analyse en temps réel de vos données</div>
+                      </div>
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
+
             </div>
           </div>
         </section>
@@ -502,11 +530,8 @@ export default function LandingPage() {
         <footer className="bg-[#0D1117] py-12 px-4 sm:px-6 lg:px-8 border-t border-white/5">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
-              <Link href="/" className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-[#DC2626] flex items-center justify-center">
-                  <Sparkles size={13} className="text-white" />
-                </div>
-                <span className="text-base font-black text-white tracking-tight">oraforme</span>
+              <Link href="/" className="flex items-center">
+                <img src="/logo-white.png" alt="Oraforme" style={{ height: 30, width: 'auto' }} />
               </Link>
               <div className="flex items-center gap-8">
                 {[
