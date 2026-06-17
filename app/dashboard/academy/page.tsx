@@ -28,7 +28,24 @@ interface Badge    { id: string; code: string; nom: string; description: string;
 interface Parcours { id: string; code: string; titre: string; description: string; metier: string; icone: string; couleur: string; domaines: string[]; duree_totale_h: number; niveau_min: string; enrolled: boolean; progression: number; statut: string | null }
 
 // ── Données Academy ───────────────────────────────────────────────────────────
-const ACADEMY_CATS = [
+
+// Les domaines sectoriels incluent 5 pilliers de gestion (finance, fiscalité, audit, RH, droit)
+// appliqués au contexte métier spécifique du secteur.
+type AcademyCat = {
+  id: string; label: string; icon: string; color: string; desc: string
+  pillars?: { icon: string; label: string; detail: string }[]
+}
+
+const SECTOR_PILLARS = (sector: string) => [
+  { icon: '💰', label: 'Finance & Comptabilité', detail: `SYSCOHADA — comptes, bilan, résultat d'une ${sector}` },
+  { icon: '🏛️', label: 'Fiscalité Congo',         detail: `TVA, IS, IRPP, patente — obligations d'une ${sector}` },
+  { icon: '🔍', label: 'Audit & Contrôle interne', detail: `COSO, risques opérationnels, conformité OHADA ${sector}` },
+  { icon: '👥', label: 'RH & Droit du travail',    detail: `CNSS, contrats, paie — personnel d'une ${sector}` },
+  { icon: '⚖️', label: 'Droit des affaires',       detail: `Réglementation, contrats, litiges secteur ${sector}` },
+]
+
+const ACADEMY_CATS: AcademyCat[] = [
+  // ── Domaines transversaux (sans pilliers : déjà un pilier lui-même) ──────────
   { id: 'comptabilite-ohada',  label: 'Comptabilité OHADA',       icon: '📒', color: '#2563EB', desc: 'SYSCOHADA révisé, bilan, compte de résultat, TVA' },
   { id: 'fiscalite',           label: 'Fiscalité Congo',           icon: '🏛️', color: '#7C3AED', desc: 'TVA 18%+CA, IS 30%, IRPP, patente, DGI' },
   { id: 'audit',               label: 'Audit & Contrôle Interne',  icon: '🔍', color: '#DC2626', desc: 'COSO, scoring risques, conformité OHADA' },
@@ -37,20 +54,42 @@ const ACADEMY_CATS = [
   { id: 'finance',             label: 'Finance',                   icon: '💹', color: '#0891B2', desc: 'Évaluation, investissements, levée de fonds' },
   { id: 'tresorerie',          label: 'Trésorerie & BFR',          icon: '💵', color: '#059669', desc: 'Cash flow, BFR, FRNG, mobile money' },
   { id: 'entrepreneuriat',     label: 'Entrepreneuriat',           icon: '🚀', color: '#EA580C', desc: 'Business plan, SARL Congo, MVP, croissance' },
-  { id: 'genie-civil-btp',     label: 'Génie Civil & BTP',        icon: '🏗️', color: '#78716C', desc: 'Métrés, devis BTP, Gantt, marchés publics ARMP' },
-  { id: 'gestion-hoteliere',   label: 'Gestion Hôtelière',        icon: '🏨', color: '#0369A1', desc: 'RevPAR, yield management, channel manager' },
-  { id: 'gestion-restaurant',  label: 'Gestion Restaurant',       icon: '🍽️', color: '#D97706', desc: 'Food cost, HACCP, ingénierie menu, caisse' },
-  { id: 'gestion-pharmacie',   label: 'Gestion Pharmacie',        icon: '💊', color: '#9333EA', desc: 'FEFO, BPD, ordonnances, stupéfiants, prix' },
-  { id: 'gestion-clinique',    label: 'Gestion Clinique',         icon: '🏥', color: '#DC2626', desc: 'Patients, CIM-10, CAMU 80%, facturation médicale' },
-  { id: 'gestion-ecole',       label: 'Gestion École',            icon: '🎓', color: '#2563EB', desc: 'Scolarité, bulletins, recouvrement frais, CRE' },
-  { id: 'cabinet-comptable',   label: 'Cabinet Comptable',        icon: '⚖️', color: '#64748B', desc: 'Multi-clients, liasses fiscales, CAC' },
-  { id: 'agriculture-elevage', label: 'Agriculture & Élevage',    icon: '🌾', color: '#65A30D', desc: 'Cultures tropicales, NPK, CAFI, certifications' },
-  { id: 'gestion-stock',       label: 'Gestion de Stock',         icon: '📦', color: '#16A34A', desc: 'FIFO/FEFO, Wilson, ABC, inventaire OHADA' },
-  { id: 'crm-vente',           label: 'CRM & Vente',              icon: '🤝', color: '#F59E0B', desc: 'Pipeline, scoring leads, LTV client, KPIs commerciaux' },
   { id: 'leadership',          label: 'Leadership',               icon: '⭐', color: '#B45309', desc: 'Management situationnel, délégation, conflits' },
   { id: 'management',          label: 'Management',               icon: '🎯', color: '#7C3AED', desc: 'MBO, planification SMART, gestion du temps' },
-  { id: 'banque-microfinance',  label: 'Banque & Microfinance',   icon: '🏦', color: '#0891B2', desc: 'COBAC, KYC, LAB/FT, microcrédit solidaire' },
-  { id: 'ong-associations',    label: 'ONG & Associations',       icon: '🤲', color: '#16A34A', desc: 'Cadre logique, rapport bailleur, gouvernance' },
+
+  // ── Domaines sectoriels — couvrent les 5 pilliers appliqués au métier ────────
+  { id: 'gestion-clinique',    label: 'Gestion Clinique',         icon: '🏥', color: '#DC2626',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à la gestion d\'une clinique / hôpital',
+    pillars: SECTOR_PILLARS('clinique') },
+  { id: 'gestion-pharmacie',   label: 'Gestion Pharmacie',        icon: '💊', color: '#9333EA',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à la gestion d\'une pharmacie',
+    pillars: SECTOR_PILLARS('pharmacie') },
+  { id: 'gestion-restaurant',  label: 'Gestion Restaurant',       icon: '🍽️', color: '#D97706',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à la restauration',
+    pillars: SECTOR_PILLARS('restaurant') },
+  { id: 'gestion-hoteliere',   label: 'Gestion Hôtelière',        icon: '🏨', color: '#0369A1',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à l\'hôtellerie',
+    pillars: SECTOR_PILLARS('hôtel') },
+  { id: 'gestion-ecole',       label: 'Gestion École',            icon: '🎓', color: '#2563EB',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à la gestion scolaire',
+    pillars: SECTOR_PILLARS('école') },
+  { id: 'cabinet-comptable',   label: 'Cabinet Comptable',        icon: '⚖️', color: '#64748B',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à la gestion d\'un cabinet comptable',
+    pillars: SECTOR_PILLARS('cabinet comptable') },
+  { id: 'genie-civil-btp',     label: 'Génie Civil & BTP',        icon: '🏗️', color: '#78716C',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués au BTP et marchés publics',
+    pillars: SECTOR_PILLARS('entreprise BTP') },
+  { id: 'agriculture-elevage', label: 'Agriculture & Élevage',    icon: '🌾', color: '#65A30D',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à l\'exploitation agricole',
+    pillars: SECTOR_PILLARS('exploitation agricole') },
+  { id: 'banque-microfinance',  label: 'Banque & Microfinance',   icon: '🏦', color: '#0891B2',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués à la banque et microfinance COBAC',
+    pillars: SECTOR_PILLARS('banque / microfinance') },
+  { id: 'ong-associations',    label: 'ONG & Associations',       icon: '🤲', color: '#16A34A',
+    desc: 'Finance, fiscalité, audit, RH & droit — appliqués aux ONG et associations',
+    pillars: SECTOR_PILLARS('ONG') },
+  { id: 'gestion-stock',       label: 'Gestion de Stock',         icon: '📦', color: '#16A34A', desc: 'FIFO/FEFO, Wilson, ABC, inventaire OHADA' },
+  { id: 'crm-vente',           label: 'CRM & Vente',              icon: '🤝', color: '#F59E0B', desc: 'Pipeline, scoring leads, LTV client, KPIs commerciaux' },
 ]
 
 const LEVELS: { id: Level; label: string; desc: string; icon: string; color: string }[] = [
@@ -258,9 +297,12 @@ export default function AcademyPage() {
   const startLearning = async () => {
     const cat = ACADEMY_CATS.find(c => c.id === selCat)
     const lvl = LEVELS.find(l => l.id === selLevel)
+    const pillarsText = cat?.pillars
+      ? `\n\nCe parcours couvre **5 pilliers de gestion** appliqués à ce secteur :\n${cat.pillars.map(p => `${p.icon} **${p.label}** — ${p.detail}`).join('\n')}`
+      : ''
     setMessages([{
       role: 'assistant',
-      content: `Bienvenue ! Je suis votre formateur MIAA+ Academy.\n\nDomaine : ${cat?.label}\nVotre niveau : ${lvl?.label} ${lvl?.icon}\n\nJe vais vous enseigner ce sujet avec des exemples concrets adaptés au contexte Congo-Brazzaville / OHADA / CEMAC.\n\nTapez "Commence la leçon" pour démarrer, ou posez directement une question !`,
+      content: `Bienvenue ! Je suis votre formateur MIAA+ Academy.\n\nDomaine : **${cat?.label}**\nVotre niveau : ${lvl?.label} ${lvl?.icon}${pillarsText}\n\nJe vais vous enseigner ce sujet avec des exemples concrets adaptés au contexte Congo-Brazzaville / OHADA / CEMAC.\n\nTapez "Commence la leçon" pour démarrer, ou posez directement une question !`,
       timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
     }])
     setScreen('learning')
@@ -290,7 +332,7 @@ export default function AcademyPage() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           module: 'formation',
-          message: `MODE FORMATEUR ACADEMY. Catégorie : ${cat?.label}. Niveau : ${lvl?.label} (${lvl?.desc}). Adapte le niveau de complexité à ${lvl?.id === 'debutant' ? 'un débutant — explications simples, beaucoup d\'exemples concrets' : lvl?.id === 'intermediaire' ? 'un intermédiaire — concepts techniques, cas pratiques' : lvl?.id === 'avance' ? 'un professionnel avancé — techniques expertes, cas complexes' : 'un expert — niveau master, nuances et edge cases'}. Contexte Congo/OHADA/CEMAC. Sois pédagogue, structuré, avec des tableaux et exemples chiffrés. Question : ${userMsg}`,
+          message: `MODE FORMATEUR ACADEMY. Catégorie : ${cat?.label}. Niveau : ${lvl?.label} (${lvl?.desc}). ${cat?.pillars ? `Ce domaine SECTORIEL couvre 5 pilliers : Finance & Comptabilité OHADA, Fiscalité Congo, Audit & Contrôle interne, RH & Droit du travail, Droit des affaires — tous APPLIQUÉS au contexte spécifique d'une ${cat.label}. Enseigne comment un gestionnaire de ${cat.label} maîtrise ces 5 domaines dans la pratique quotidienne.` : ''} Adapte le niveau de complexité à ${lvl?.id === 'debutant' ? 'un débutant — explications simples, beaucoup d\'exemples concrets' : lvl?.id === 'intermediaire' ? 'un intermédiaire — concepts techniques, cas pratiques' : lvl?.id === 'avance' ? 'un professionnel avancé — techniques expertes, cas complexes' : 'un expert — niveau master, nuances et edge cases'}. Contexte Congo/OHADA/CEMAC. Sois pédagogue, structuré, avec des tableaux et exemples chiffrés. Question : ${userMsg}`,
           history: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
           tenantData: tenantId ? { tenant_id: tenantId } : undefined,
           langue: 'fr',
@@ -553,7 +595,17 @@ export default function AcademyPage() {
                           <span className="text-3xl leading-none shrink-0 mt-0.5">{cat.icon}</span>
                           <div className="min-w-0">
                             <p className="text-sm font-bold text-[#0F172A] leading-tight mb-1">{cat.label}</p>
-                            <p className="text-xs text-[#64748B] leading-relaxed line-clamp-2">{cat.desc}</p>
+                            {cat.pillars ? (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {cat.pillars.map(p => (
+                                  <span key={p.label} className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: `${cat.color}15`, color: cat.color }}>
+                                    {p.icon} {p.label.split(' ')[0]}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-xs text-[#64748B] leading-relaxed line-clamp-2">{cat.desc}</p>
+                            )}
                             {catCerts.length > 0 && (
                               <span className="inline-flex items-center gap-1 mt-2 text-[10px] font-bold" style={{ color: cat.color }}>
                                 <Award size={10} /> {catCerts.length} certificat(s)
@@ -577,6 +629,15 @@ export default function AcademyPage() {
                 <span className="text-5xl">{catInfo.icon}</span>
                 <h1 className="text-xl font-bold mt-3 mb-1">{catInfo.label}</h1>
                 <p className="text-white/80 text-sm">{catInfo.desc}</p>
+                {catInfo.pillars && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {catInfo.pillars.map(p => (
+                      <span key={p.label} className="flex items-center gap-1 bg-white/20 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur-sm">
+                        {p.icon} {p.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Leçons disponibles */}

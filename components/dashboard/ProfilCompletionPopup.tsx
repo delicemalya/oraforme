@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   X, Upload, Building2, User, FileText, Globe,
-  Check, Save, ChevronDown, ChevronUp,
+  Check, Save, ChevronDown, ChevronUp, Camera, Loader2,
 } from 'lucide-react'
 import { saveProfilCompletion, fetchProfilCompletion, type ProfilCompletionData } from '@/app/dashboard/profil/actions'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { supabase } from '@/lib/supabase'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -54,16 +55,19 @@ function computeLocalPct(form: Record<string, unknown>): number {
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function ProfilCompletionPopup({ open, onClose }: Props) {
-  const { reload } = useTenantContext()
+  const { reload, tenant } = useTenantContext()
 
   const [form, setForm] = useState<ProfilCompletionData & {
     nom_entreprise?: string; secteur_activite?: string; pays?: string
   }>({})
-  const [pct,       setPct]       = useState(0)
-  const [saving,    setSaving]    = useState(false)
-  const [saved,     setSaved]     = useState(false)
-  const [loadErr,   setLoadErr]   = useState('')
-  const [openSec,   setOpenSec]   = useState<SectionId>('entreprise')
+  const [pct,           setPct]           = useState(0)
+  const [saving,        setSaving]        = useState(false)
+  const [saved,         setSaved]         = useState(false)
+  const [loadErr,       setLoadErr]       = useState('')
+  const [openSec,       setOpenSec]       = useState<SectionId>('entreprise')
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoPreview,   setLogoPreview]   = useState<string | null>(null)
+  const logoFileRef = useRef<HTMLInputElement>(null)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -102,6 +106,35 @@ export default function ProfilCompletionPopup({ open, onClose }: Props) {
     debounceRef.current = setTimeout(() => {
       setForm(prev => { autoSave({ reseaux_sociaux: prev.reseaux_sociaux }); return prev })
     }, 1500)
+  }
+
+  async function handleLogoFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { alert('Logo trop lourd. Maximum 2 MB.'); return }
+    if (!['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(file.type)) {
+      alert('Format accepté : PNG, JPG, SVG, WebP'); return
+    }
+    const reader = new FileReader()
+    reader.onload = ev => setLogoPreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+    setLogoUploading(true)
+    try {
+      const tenantId = tenant?.tenantId ?? 'unknown'
+      const ext  = file.name.split('.').pop() ?? 'png'
+      const path = `logos/${tenantId}_${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage.from('logos').upload(path, file, { upsert: true })
+      if (upErr) throw upErr
+      const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path)
+      upd('logo_url', publicUrl)
+      setLogoPreview(null)
+    } catch {
+      alert('Erreur upload. Vérifiez que le bucket "logos" est public dans Supabase Storage.')
+      setLogoPreview(null)
+    } finally {
+      setLogoUploading(false)
+      if (logoFileRef.current) logoFileRef.current.value = ''
+    }
   }
 
   const autoSave = useCallback(async (partial: ProfilCompletionData) => {
@@ -186,24 +219,58 @@ export default function ProfilCompletionPopup({ open, onClose }: Props) {
             open={openSec === 'entreprise'} onToggle={() => toggleSection('entreprise')}>
             <div className="space-y-3">
 
-              {/* Logo placeholder */}
+              {/* Logo — upload direct */}
               <div>
                 <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1.5">Logo</label>
-                <div className="flex items-center gap-3">
-                  {form.logo_url
-                    ? <img src={form.logo_url} alt="Logo" className="w-12 h-12 rounded-xl object-contain border border-[#E2E8F0]" />
-                    : <div className="w-12 h-12 rounded-xl bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center text-[#94A3B8] text-[10px] font-bold">LOGO</div>
-                  }
-                  <div>
-                    <input type="url" placeholder="URL du logo (https://...)"
-                      value={form.logo_url ?? ''}
-                      onChange={e => upd('logo_url', e.target.value)}
-                      className={INPUT} />
-                    <p className="text-[10px] text-[#94A3B8] mt-1">
-                      Upload S3 disponible prochainement — collez l&apos;URL pour l&apos;instant.
-                    </p>
+                <div className="flex items-center gap-4">
+                  {/* Zone cliquable logo */}
+                  <button
+                    type="button"
+                    onClick={() => logoFileRef.current?.click()}
+                    className="relative w-20 h-20 rounded-2xl border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-center overflow-hidden shrink-0 hover:border-[#F59E0B] transition-colors group"
+                  >
+                    {logoUploading ? (
+                      <Loader2 size={20} className="text-[#F59E0B] animate-spin" />
+                    ) : (logoPreview || form.logo_url) ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={logoPreview ?? form.logo_url ?? ''} alt="Logo" className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <span className="text-[10px] font-bold text-[#CBD5E1]">LOGO</span>
+                    )}
+                    {/* Overlay caméra au hover */}
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
+                      <Camera size={18} className="text-white" />
+                    </div>
+                  </button>
+                  {/* Instructions */}
+                  <div className="flex-1 min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => logoFileRef.current?.click()}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-white text-[12px] font-semibold text-[#0F172A] hover:border-[#F59E0B] hover:text-[#F59E0B] transition-all w-full justify-center"
+                    >
+                      <Camera size={13} />
+                      {form.logo_url ? 'Changer le logo' : 'Télécharger un logo'}
+                    </button>
+                    <p className="text-[10px] text-[#94A3B8] mt-1.5 text-center">PNG, JPG, SVG, WebP — Max 2 MB</p>
+                    {form.logo_url && !logoPreview && (
+                      <button
+                        type="button"
+                        onClick={() => upd('logo_url', '')}
+                        className="text-[10px] text-[#DC2626] hover:underline mt-1 w-full text-center block"
+                      >
+                        Supprimer
+                      </button>
+                    )}
                   </div>
                 </div>
+                <input
+                  ref={logoFileRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                  className="hidden"
+                  onChange={handleLogoFile}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">

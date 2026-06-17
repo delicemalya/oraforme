@@ -1106,7 +1106,6 @@ const iCls = 'w-full bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 text-
 // ── Page principale ────────────────────────────────────────────────────────────
 
 const MAIN_TABS_DEF = [
-  { id: 'dashboard', labelKey: 'rh.dashboard', icon: LayoutDashboard },
   { id: 'equipe',    labelKey: 'rh.team',       icon: Users },
   { id: 'conges',    labelKey: 'rh.leave',      icon: Calendar },
   { id: 'alertes',   labelKey: 'rh.alerts',     icon: Bell },
@@ -1117,7 +1116,7 @@ export default function RHPage() {
   const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()
-  const [activeTab,  setActiveTab]  = useState('dashboard')
+  const [activeTab,  setActiveTab]  = useState('equipe')
   const [employes,   setEmployes]   = useState<Employe[]>([])
   const [conges,     setConges]     = useState<Conge[]>([])
   const [bulletins,  setBulletins]  = useState<BulletinPaie[]>([])
@@ -1348,14 +1347,16 @@ export default function RHPage() {
         })}
       </div>
 
-      {/* Content */}
+      {/* KPIs & modules toujours visibles */}
+      <DashboardTab />
+
+      {/* Content onglets */}
       <AnimatePresence mode="wait">
         <motion.div key={activeTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}>
-          {activeTab === 'dashboard' && <DashboardTab />}
-          {activeTab === 'equipe'    && <TabEquipe    tenantId={tenantId!} employes={employes} onRefresh={load} />}
-          {activeTab === 'conges'    && <TabConges   tenantId={tenantId!} employes={employes} conges={conges} onRefresh={load} />}
-          {activeTab === 'alertes'   && <TabAlertes  employes={employes} />}
-          {activeTab === 'rapports'  && <TabRapports employes={employes} conges={conges} />}
+          {activeTab === 'equipe'   && <TabEquipe   tenantId={tenantId!} employes={employes} onRefresh={load} />}
+          {activeTab === 'conges'   && <TabConges   tenantId={tenantId!} employes={employes} conges={conges} onRefresh={load} />}
+          {activeTab === 'alertes'  && <TabAlertes  employes={employes} />}
+          {activeTab === 'rapports' && <TabRapports employes={employes} conges={conges} />}
         </motion.div>
       </AnimatePresence>
 

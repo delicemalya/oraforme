@@ -14,12 +14,10 @@ import {
 } from 'lucide-react'
 
 const RH_MODULES = [
-  { id: 'dashboard',    href: '/dashboard/rh',               label: 'Dashboard',    icon: LayoutDashboard, exact: true },
-  { id: 'equipe',       href: '/dashboard/rh#equipe',        label: 'Employés',     icon: Users,           exact: false },
-  { id: 'recrutement',  href: '/dashboard/rh/recrutement',   label: 'Recrutement',  icon: Briefcase        },
+  { id: 'dashboard',    href: '/dashboard/rh',               label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
+  { id: 'recrutement',  href: '/dashboard/rh/recrutement',   label: 'Recrutement',     icon: Briefcase        },
   { id: 'contrats',     href: '/dashboard/rh/contrats',      label: 'Contrats',     icon: FileText         },
   { id: 'presences',    href: '/dashboard/rh/presences',     label: 'Présences',    icon: Clock            },
-  { id: 'conges',       href: '/dashboard/rh#conges',        label: 'Congés',       icon: Calendar,        exact: false },
   { id: 'paie',         href: '/dashboard/rh/paie',          label: 'Paie',         icon: DollarSign       },
   { id: 'evaluations',  href: '/dashboard/rh/evaluations',   label: 'Évaluations',  icon: Star             },
   { id: 'organigramme', href: '/dashboard/rh/organigramme',  label: 'Organigramme', icon: GitBranch        },
