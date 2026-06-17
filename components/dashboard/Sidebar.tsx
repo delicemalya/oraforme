@@ -127,6 +127,16 @@ const ICONS: Record<string, LucideIcon> = {
   'sante-direction':   LayoutDashboard,
   'sante-miaa':        Sparkles,
   'sante-hospitalisation': BedDouble,
+  // ── Assurance ──────────────────────────────────────────────────────────────
+  'assurance-direction':   LayoutDashboard,
+  'assurance-polices':     FileText,
+  'assurance-sinistres':   ShieldAlert,
+  'assurance-clients':     Users,
+  'assurance-produits':    Package,
+  'assurance-partenaires': Building2,
+  'assurance-commissions': DollarSign,
+  'assurance-analytics':   BarChart2,
+  'assurance-miaa':        Sparkles,
   pharmacie:           Pill,
   'pharmacie-meds':    Package,
   'pharmacie-ventes':  ShoppingCart,
@@ -377,6 +387,10 @@ const ALL_MODULE_IDS = [
   'abonnement', 'fiscalite', 'cnss-congo',
   'academy',
   'miaa-agent', 'miaa-rapports', 'miaa-expertise',
+  // ── Assurance ──────────────────────────────────────────────────────────────
+  'assurance-direction', 'assurance-polices', 'assurance-sinistres',
+  'assurance-clients', 'assurance-produits', 'assurance-partenaires',
+  'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {

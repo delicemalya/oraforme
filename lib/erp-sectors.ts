@@ -11,6 +11,7 @@ export type SectorId =
   | 'ecole' | 'restaurant' | 'commerce' | 'supermarche' | 'boutique'
   | 'boisson' | 'sante' | 'transport' | 'transport_public' | 'hotel'
   | 'btp' | 'cabinet' | 'petrole' | 'ong' | 'banque' | 'pharmacie' | 'agriculture'
+  | 'assurance'
 
 // ── COUCHE 1 : Core ERP ───────────────────────────────────────────────────────
 // Ces 10 modules apparaissent dans TOUTES les sidebars, tous secteurs confondus.
@@ -248,6 +249,17 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'boisson-tournees',  href: '/dashboard/boisson/tournees',   label: 'Tournées',        sublabel: 'Livraisons & chauffeurs'    },
     { id: 'boisson-commandes', href: '/dashboard/boisson/commandes',  label: 'Commandes',       sublabel: 'Commandes clients & suivi'  },
   ],
+  assurance: [
+    { id: 'assurance-direction',   href: '/dashboard/assurance',                  label: 'Direction Générale', sublabel: 'KPIs & portefeuille exécutif'   },
+    { id: 'assurance-polices',     href: '/dashboard/assurance/polices',           label: 'Polices',            sublabel: 'Contrats, renouvellements & résiliations' },
+    { id: 'assurance-sinistres',   href: '/dashboard/assurance/sinistres',         label: 'Sinistres',          sublabel: 'Déclarations, expertise & règlements'     },
+    { id: 'assurance-clients',     href: '/dashboard/assurance/clients',           label: 'Clients & Assurés',  sublabel: 'Portefeuille & historique'      },
+    { id: 'assurance-produits',    href: '/dashboard/assurance/produits',          label: 'Produits',           sublabel: 'Catalogue & tarification'       },
+    { id: 'assurance-partenaires', href: '/dashboard/assurance/partenaires',       label: 'Partenaires',        sublabel: 'Réassureurs, garages & experts' },
+    { id: 'assurance-commissions', href: '/dashboard/assurance/commissions',       label: 'Commissions',        sublabel: 'Agents, courtiers & paiements'  },
+    { id: 'assurance-analytics',   href: '/dashboard/assurance/analytics',         label: 'Analytics',          sublabel: 'Ratio sinistres, rentabilité'   },
+    { id: 'assurance-miaa',        href: '/dashboard/miaa?context=assurance',      label: 'MIAA+ Expert',       sublabel: 'IA assistant assurance'         },
+  ],
 }
 
 // ── COUCHE 3 : Plateforme ─────────────────────────────────────────────────────
@@ -287,6 +299,7 @@ export const SECTOR_LABELS: Record<string, string> = {
   banque:           'Banque & Microfinance',
   pharmacie:        'Pharmacie',
   agriculture:      'Agriculture',
+  assurance:        'Assurance & Réassurance',
 }
 
 // ── Rôles école (visibilité sidebar core) ─────────────────────────────────────

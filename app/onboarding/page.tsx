@@ -51,8 +51,11 @@ const SECTORS_PME: SectorOption[] = [
   { id: 'industrie',       label: 'Industrie',               secteur: 'autre',       sousType: 'industrie'           },
   { id: 'btp',             label: 'BTP',                     secteur: 'btp',         sousType: null                  },
   { id: 'petrole',         label: 'Pétrole & Mines',         secteur: 'petrole',     sousType: null                  },
-  { id: 'grande_distrib',  label: 'Grande distribution',     secteur: 'supermarche', sousType: 'grande_distribution' },
-  { id: 'autre_business',  label: 'Autre activité',          secteur: 'autre',       sousType: null                  },
+  { id: 'grande_distrib',      label: 'Grande distribution',      secteur: 'supermarche', sousType: 'grande_distribution' },
+  { id: 'compagnie_assurance', label: 'Compagnie d\'assurance',   secteur: 'assurance',   sousType: 'compagnie'           },
+  { id: 'courtier_assurance',  label: 'Courtier en assurance',    secteur: 'assurance',   sousType: 'courtier'            },
+  { id: 'agent_assurance',     label: 'Agent d\'assurance',       secteur: 'assurance',   sousType: 'agent'               },
+  { id: 'autre_business',      label: 'Autre activité',           secteur: 'autre',       sousType: null                  },
 ]
 
 // ── Left-panel gradient by step ───────────────────────────────────────────────
