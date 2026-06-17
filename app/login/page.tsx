@@ -169,7 +169,7 @@ function LoginPageInner() {
         {/* Bottom CTA */}
         <div>
           <p className="text-white/50 text-[12px] mb-3">Pas encore de compte ?</p>
-          <Link href="/register"
+          <Link href="/onboarding"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-white/30 text-white text-[13px] font-bold hover:bg-white/10 hover:border-white/50 transition-all">
             COMMENCER GRATUITEMENT <ArrowRight size={14} />
           </Link>
@@ -323,7 +323,7 @@ function LoginPageInner() {
 
           <p className="text-center text-[12px] text-[#94A3B8] mt-8">
             Pas encore de compte ?{' '}
-            <Link href="/register" className="text-[#DC2626] font-bold hover:underline">Créer un compte</Link>
+            <Link href="/onboarding" className="text-[#DC2626] font-bold hover:underline">Créer un compte</Link>
           </p>
 
         </div>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Check, Zap, Building2, Users } from 'lucide-react'
+import { Check, Zap, Users } from 'lucide-react'
 import { PLAN_CONFIG, SECTEUR_CONFIG } from '@/lib/plans'
 
 export const metadata = { title: 'Tarifs — Oraforme' }
@@ -7,11 +7,11 @@ export const metadata = { title: 'Tarifs — Oraforme' }
 const FAQ = [
   {
     q: "Puis-je changer de plan après l'inscription ?",
-    a: "Oui. Vous pouvez upgrader ou downgrader à tout moment depuis votre espace abonnement.",
+    a: "Oui. Vous pouvez upgrader à tout moment depuis votre espace abonnement.",
   },
   {
     q: "Les modules s'adaptent automatiquement à mon secteur ?",
-    a: "Absolument. Oraforme génère votre espace de travail selon votre secteur d'activité et votre pack. Un restaurant n'a jamais accès aux modules d'une école.",
+    a: "Absolument. Oraforme génère votre espace de travail selon votre secteur d'activité et votre plan. Un restaurant n'a jamais accès aux modules d'une école.",
   },
   {
     q: "Y a-t-il une période d'essai gratuite ?",
@@ -19,7 +19,7 @@ const FAQ = [
   },
   {
     q: "Le prix inclut combien d'utilisateurs ?",
-    a: "TPE : 5 utilisateurs. PME : 25 utilisateurs. Grande entreprise : illimité.",
+    a: "Entrepreneur : 5 utilisateurs. Business : 25 utilisateurs.",
   },
   {
     q: "Quels modes de paiement acceptez-vous ?",
@@ -28,7 +28,8 @@ const FAQ = [
 ]
 
 export default function PricingPage() {
-  const plans = Object.entries(PLAN_CONFIG) as [keyof typeof PLAN_CONFIG, typeof PLAN_CONFIG[keyof typeof PLAN_CONFIG]][]
+  // Seulement les 2 plans vendus — Entrepreneur (tpe) et Business (pme)
+  const plans = (['tpe', 'pme'] as const).map(key => [key, PLAN_CONFIG[key]] as const)
   const sectors = Object.entries(SECTEUR_CONFIG)
 
   return (
@@ -42,7 +43,7 @@ export default function PricingPage() {
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-white/50 text-sm hover:text-white transition-colors">Se connecter</Link>
-          <Link href="/register"
+          <Link href="/onboarding"
             className="px-4 py-2 rounded-xl text-sm font-bold bg-[#F59E0B] text-black hover:bg-[#F59E0B]/90 transition-colors">
             Commencer gratuitement
           </Link>
@@ -55,8 +56,8 @@ export default function PricingPage() {
           <Zap size={11} /> 30 jours gratuits · Sans carte bancaire
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-4 max-w-2xl mx-auto">
-          Des packs intelligents<br />
-          <span className="text-[#F59E0B]">adaptés à votre entreprise</span>
+          Deux offres claires<br />
+          <span className="text-[#F59E0B]">adaptées à votre entreprise</span>
         </h1>
         <p className="text-white/40 text-lg max-w-xl mx-auto">
           Oraforme comprend automatiquement votre activité et génère votre ERP en quelques secondes.
@@ -64,8 +65,8 @@ export default function PricingPage() {
       </section>
 
       {/* ── Plans ─────────────────────────────────────────────────────────────── */}
-      <section className="px-4 pb-20 max-w-5xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-5">
+      <section className="px-4 pb-20 max-w-3xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-5">
           {plans.map(([key, cfg]) => {
             const isPopular = cfg.badge === 'Populaire'
             return (
@@ -95,7 +96,8 @@ export default function PricingPage() {
                     </span>
                     <span className="text-white/40 text-sm">FCFA/mois</span>
                   </div>
-                  <p className="text-white/25 text-xs mt-1">
+                  <p className="text-white/25 text-xs mt-1 flex items-center gap-1">
+                    <Users size={10} />
                     {cfg.max_users === -1 ? 'Utilisateurs illimités' : `${cfg.max_users} utilisateurs inclus`}
                   </p>
                 </div>
@@ -112,7 +114,7 @@ export default function PricingPage() {
 
                 {/* CTA */}
                 <Link
-                  href="/register"
+                  href="/onboarding"
                   className="block text-center py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90"
                   style={{
                     background: isPopular ? cfg.color : `${cfg.color}15`,
@@ -144,7 +146,7 @@ export default function PricingPage() {
           {sectors.map(([key, cfg]) => (
             <Link
               key={key}
-              href={`/register`}
+              href="/onboarding"
               className="p-4 rounded-xl border border-white/6 bg-white/2 hover:bg-white/5 hover:border-white/15 transition-all group"
             >
               <span className="text-2xl block mb-2">{cfg.emoji}</span>
@@ -158,54 +160,59 @@ export default function PricingPage() {
       </section>
 
       {/* ── Comparison table ──────────────────────────────────────────────────── */}
-      <section className="px-4 pb-20 max-w-3xl mx-auto">
+      <section className="px-4 pb-20 max-w-2xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-white mb-2">Comparaison des packs</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">Comparaison des offres</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/8">
                 <th className="text-left py-3 text-white/40 font-medium">Fonctionnalité</th>
-                {plans.map(([key, cfg]) => (
-                  <th key={key} className="text-center py-3 font-bold" style={{ color: cfg.color }}>{cfg.label}</th>
-                ))}
+                <th className="text-center py-3 font-bold" style={{ color: PLAN_CONFIG.tpe.color }}>
+                  {PLAN_CONFIG.tpe.label}
+                </th>
+                <th className="text-center py-3 font-bold" style={{ color: PLAN_CONFIG.pme.color }}>
+                  {PLAN_CONFIG.pme.label}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {[
-                ['Facturation & Devis',             true, true, true],
-                ['CRM & Clients',                   true, true, true],
-                ['Trésorerie & Caisse',              true, true, true],
-                ['RH & Paie',                       true, true, true],
-                ['Comptabilité OHADA',               false, true, true],
-                ['Déclarations fiscales',            false, true, true],
-                ['Gestion des stocks',               false, true, true],
-                ['MIAA+ Intelligence Artificielle',  false, true, true],
-                ['Workflows & Automatisation',       false, true, true],
-                ['Business Intelligence',            false, false, true],
-                ['Audit & Conformité',               false, false, true],
-                ['API Publique',                     false, false, true],
-                ['Multi-branches',                   false, false, true],
-                ['Support prioritaire',              false, false, true],
-              ].map(([feature, tpe, pme, grande]) => (
+                ['Facturation & Devis',             true,  true ],
+                ['CRM & Clients',                   true,  true ],
+                ['Trésorerie & Caisse',              true,  true ],
+                ['RH & Paie',                       true,  true ],
+                ['Comptabilité OHADA',               false, true ],
+                ['Déclarations fiscales',            false, true ],
+                ['Gestion des stocks',               false, true ],
+                ['MIAA+ Intelligence Artificielle',  false, true ],
+                ['Workflows & Automatisation',       false, true ],
+                ['Business Intelligence',            false, true ],
+                ['Audit & Conformité',               false, true ],
+                ['API Publique',                     false, true ],
+                ['Support prioritaire',              false, true ],
+              ].map(([feature, entrepreneur, business]) => (
                 <tr key={feature as string}>
                   <td className="py-3 text-white/60">{feature as string}</td>
-                  {[tpe, pme, grande].map((has, i) => (
-                    <td key={i} className="py-3 text-center">
-                      {has
-                        ? <Check size={15} className="mx-auto text-[#16A34A]" />
-                        : <span className="text-white/15 text-lg">—</span>
-                      }
-                    </td>
-                  ))}
+                  <td className="py-3 text-center">
+                    {entrepreneur
+                      ? <Check size={15} className="mx-auto text-[#16A34A]" />
+                      : <span className="text-white/15 text-lg">—</span>
+                    }
+                  </td>
+                  <td className="py-3 text-center">
+                    {business
+                      ? <Check size={15} className="mx-auto text-[#16A34A]" />
+                      : <span className="text-white/15 text-lg">—</span>
+                    }
+                  </td>
                 </tr>
               ))}
               <tr className="border-t border-white/8">
                 <td className="py-3 text-white/60">Utilisateurs inclus</td>
                 <td className="py-3 text-center text-white/60 text-xs">5</td>
                 <td className="py-3 text-center text-white/60 text-xs">25</td>
-                <td className="py-3 text-center text-white/60 text-xs">∞</td>
               </tr>
             </tbody>
           </table>
@@ -230,10 +237,10 @@ export default function PricingPage() {
         <div className="max-w-xl mx-auto p-8 bg-gradient-to-br from-[#F59E0B]/10 to-[#F59E0B]/3 border border-[#F59E0B]/20 rounded-3xl">
           <h2 className="text-2xl font-bold text-white mb-3">Prêt à transformer votre entreprise ?</h2>
           <p className="text-white/40 text-sm mb-6">
-            Rejoignez des centaines d'entreprises africaines qui font confiance à Oraforme.
+            Rejoignez des centaines d&apos;entreprises africaines qui font confiance à Oraforme.
           </p>
           <Link
-            href="/register"
+            href="/onboarding"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm bg-[#F59E0B] text-black hover:bg-[#F59E0B]/90 transition-all"
           >
             <Zap size={15} /> Essai gratuit 30 jours
@@ -243,7 +250,7 @@ export default function PricingPage() {
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}
       <footer className="border-t border-white/5 px-8 py-6 text-center text-white/20 text-xs">
-        © 2025 Oraforme · SaaS ERP africain · oraforms.com
+        © 2026 Oraforme · SaaS ERP africain · oraforms.com
       </footer>
     </div>
   )

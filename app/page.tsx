@@ -40,19 +40,19 @@ const MIAA_POINTS = [
 
 const PLANS = [
   {
-    name: 'Starter',
+    name: 'Entrepreneur',
     price: '15 000',
     currency: 'FCFA',
     period: '/ mois',
-    desc: 'Pour indépendants et petites structures',
+    desc: 'Pour indépendants, ETS et petites structures',
     highlight: false,
     features: [
-      'Comptabilité complète',
-      'RH & Paie jusqu\'à 10 employés',
-      'Facturation illimitée',
-      'Trésorerie & rapports',
-      'MIAA+ Standard',
-      '3 utilisateurs inclus',
+      'Facturation & Devis illimités',
+      'CRM, Trésorerie & Caisse',
+      'RH & Paie complète',
+      'MIAA+ Standard (IA intégrée)',
+      'Dépenses & Notes de frais',
+      '5 utilisateurs inclus',
     ],
   },
   {
