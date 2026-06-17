@@ -41,6 +41,7 @@ const EXPERTS: ExpertPersona[] = [
   { id: 'agronome',   labelKey: 'miaa.expert.agronome',   descKey: 'miaa.expert.agronomeDesc',   icon: Leaf,           color: '#15803D', sectors: ['agriculture'] },
   { id: 'ong',        labelKey: 'miaa.expert.ong',        descKey: 'miaa.expert.ongDesc',        icon: Heart,          color: '#7C3AED', sectors: ['ong'] },
   { id: 'banquier',   labelKey: 'miaa.expert.banquier',   descKey: 'miaa.expert.banquierDesc',   icon: Landmark,       color: '#2563EB', sectors: ['banque'] },
+  { id: 'assureur',   labelKey: 'miaa.expert.assureur',   descKey: 'miaa.expert.assureurDesc',   icon: Shield,         color: '#DC2626', sectors: ['assurance', 'compagnie_assurance', 'courtier_assurance', 'agent_assurance'] },
   // Universal (always shown)
   { id: 'comptable',  labelKey: 'miaa.expert.comptable',  descKey: 'miaa.expert.comptableDesc',  icon: BookOpen,       color: '#6366F1', sectors: null },
   { id: 'fiscaliste', labelKey: 'miaa.expert.fiscaliste', descKey: 'miaa.expert.fiscalisteDesc', icon: Calculator,     color: '#F59E0B', sectors: null },
@@ -76,6 +77,7 @@ const AGENT_LABELS: Record<string, { label: string; color: string; emoji: string
   hotel:        { label: 'Hôtel',       color: '#0891B2', emoji: '🏨' },
   cabinet:      { label: 'Cabinet',     color: '#7C3AED', emoji: '🏛️' },
   audit:        { label: 'Audit IA',    color: '#DC2626', emoji: '🛡️' },
+  assurance:    { label: 'Assurance',   color: '#DC2626', emoji: '🛡️' },
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
-import { BarChart2, RefreshCw, TrendingUp, TrendingDown, Shield, DollarSign, AlertTriangle } from 'lucide-react'
+import { BarChart2, RefreshCw, TrendingUp, TrendingDown, Shield, DollarSign, AlertTriangle, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 const fmt  = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
@@ -24,11 +24,13 @@ const STATUT_COLORS: Record<string,string> = {
 
 export default function AnalyticsPage() {
   const { tenantId } = useTenantContext()
-  const [loading,    setLoading]    = useState(true)
-  const [kpis,       setKpis]       = useState({ primes: 0, sinistres_declares: 0, taux_sinistralite: 0, commissions_dues: 0, polices_actives: 0, sinistres_payes: 0 })
-  const [byType,     setByType]     = useState<ByType[]>([])
-  const [byAgent,    setByAgent]    = useState<ByAgent[]>([])
-  const [sinBySt,    setSinBySt]    = useState<SinBySt[]>([])
+  const [loading,       setLoading]       = useState(true)
+  const [kpis,          setKpis]          = useState({ primes: 0, sinistres_declares: 0, taux_sinistralite: 0, commissions_dues: 0, polices_actives: 0, sinistres_payes: 0 })
+  const [byType,        setByType]        = useState<ByType[]>([])
+  const [byAgent,       setByAgent]       = useState<ByAgent[]>([])
+  const [sinBySt,       setSinBySt]       = useState<SinBySt[]>([])
+  const [miaaInsights,  setMiaaInsights]  = useState<string | null>(null)
+  const [miaaLoading,   setMiaaLoading]   = useState(false)
 
   const load = useCallback(async () => {
     if (!tenantId) return
@@ -92,6 +94,39 @@ export default function AnalyticsPage() {
   }, [tenantId])
 
   useEffect(() => { load() }, [load])
+
+  const generateMIAAInsights = async () => {
+    setMiaaLoading(true)
+    setMiaaInsights(null)
+    try {
+      const prompt = `Tu es MIAA Expert Assurance. Génère un résumé analytique hebdomadaire pour ce portefeuille assurance.
+
+Données du portefeuille :
+- Primes actives : ${fmtM(kpis.primes)} FCFA (${kpis.polices_actives} polices)
+- Sinistres déclarés : ${kpis.sinistres_declares}
+- Taux de sinistralité : ${kpis.taux_sinistralite.toFixed(1)}%
+- Indemnisations payées : ${fmtM(kpis.sinistres_payes)} FCFA
+- Commissions dues aux agents : ${fmtM(kpis.commissions_dues)} FCFA
+- Répartition par type : ${byType.slice(0,4).map(t => `${TYPE_LABELS[t.type] ?? t.type}: ${t.actives} polices`).join(', ')}
+
+Donne un résumé en 3 points clés (sans markdown, sans astérisques) :
+1. Tendance sinistralité cette semaine
+2. Alertes anomalies ou risques à surveiller
+3. Recommandations actuarielles concrètes`
+
+      const res  = await fetch('/api/miaa/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ module: 'assurance', message: prompt, tenantData: { secteur: 'assurance' } }),
+      })
+      const data = await res.json()
+      setMiaaInsights(data.response ?? 'Analyse non disponible.')
+    } catch {
+      setMiaaInsights('Impossible de contacter MIAA+.')
+    } finally {
+      setMiaaLoading(false)
+    }
+  }
 
   const maxPrimes = Math.max(...byType.map(t => t.primes), 1)
   const sinTotal  = sinBySt.reduce((s, x) => s + x.count, 0)
@@ -223,6 +258,27 @@ export default function AnalyticsPage() {
               </tbody>
             </table>
           </div>
+        )}
+      </div>
+
+      {/* Insights MIAA+ */}
+      <div className="bg-white rounded-2xl border border-purple-100 p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-black text-[#0F172A] text-sm flex items-center gap-2">
+            <Sparkles size={16} className="text-purple-600" /> Insights MIAA+
+          </h2>
+          <button
+            onClick={generateMIAAInsights}
+            disabled={miaaLoading || loading}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl transition-colors">
+            {miaaLoading ? <RefreshCw size={11} className="animate-spin" /> : <Sparkles size={11} />}
+            {miaaLoading ? 'Génération...' : 'Générer le résumé IA'}
+          </button>
+        </div>
+        {miaaInsights ? (
+          <p className="text-sm text-[#374151] leading-relaxed whitespace-pre-line">{miaaInsights}</p>
+        ) : (
+          <p className="text-sm text-[#94A3B8]">Cliquez sur &quot;Générer le résumé IA&quot; pour obtenir une analyse hebdomadaire de votre portefeuille — tendances sinistralité, alertes anomalies, recommandations actuarielles.</p>
         )}
       </div>
 

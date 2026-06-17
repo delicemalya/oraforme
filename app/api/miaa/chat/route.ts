@@ -62,6 +62,8 @@ const SECTOR_TO_AGENT: Record<string, string> = {
   ong: 'comptabilite',
   // Industrie
   industrie: 'stock', petrole: 'comptabilite',
+  // Assurance
+  assurance: 'assurance', compagnie_assurance: 'assurance', courtier_assurance: 'assurance', agent_assurance: 'assurance',
 }
 
 function detectAgent(message: string, secteur?: string): string {
@@ -105,6 +107,8 @@ function detectAgent(message: string, secteur?: string): string {
     return 'conformite'
   if (/score.*audit|audit.*complet|rapport.*audit|contrôle.*interne|fraude.*interne|séparation.*tâches|plan.*remédiation|anomalies.*détect/.test(msg))
     return 'audit'
+  if (/assur|police.*assurance|sinistre|prime.*assurance|garantie.*assurance|franchise.*assurance|réassurance|actuariat|ratio.*sinistres|cima\b|souscription|indemnisation|courtier|avenant.*police/.test(msg))
+    return 'assurance'
 
   // 3. Défaut : comptabilité — l'agent le plus polyvalent
   return 'comptabilite'

@@ -5,7 +5,7 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   Shield, Plus, Search, Filter, RefreshCw, X,
   FileText, Calendar, DollarSign, User, ChevronDown,
-  CheckCircle2, AlertTriangle, Clock,
+  CheckCircle2, AlertTriangle, Clock, Sparkles,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -83,7 +83,40 @@ export default function PoliciesPage() {
   const [showModal,    setShowModal]    = useState(false)
   const [editing,      setEditing]      = useState<Police | null>(null)
   const [form,         setForm]         = useState({ ...EMPTY })
-  const [error,        setError]        = useState('')
+  const [error,           setError]          = useState('')
+  const [miaaSuggestion,  setMiaaSuggestion]  = useState<string | null>(null)
+  const [miaaLoading,     setMiaaLoading]     = useState(false)
+
+  const getMiaaSuggestion = async () => {
+    setMiaaLoading(true)
+    setMiaaSuggestion(null)
+    try {
+      const prompt = `Tu es MIAA Expert Assurance. Voici un profil de risque pour une nouvelle police.
+Type police : ${form.type_police}
+Type assuré : ${form.assure_type}
+Prime saisie : ${form.prime_montant} FCFA / ${form.prime_frequence}
+Capital assuré : ${form.capital_assure} FCFA
+Franchise : ${form.franchise} FCFA
+Durée : ${form.date_effet} → ${form.date_echeance}
+
+Donne une recommandation courte (3-4 phrases, sans markdown) sur :
+1. Si la prime est cohérente avec le profil
+2. Une prime suggérée si elle semble trop basse ou trop haute
+3. Une alerte si garanties ou conditions semblent incohérentes`
+
+      const res  = await fetch('/api/miaa/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ module: 'assurance', message: prompt, tenantData: { secteur: 'assurance' } }),
+      })
+      const data = await res.json()
+      setMiaaSuggestion(data.response ?? 'Analyse non disponible.')
+    } catch {
+      setMiaaSuggestion('Impossible de contacter MIAA+.')
+    } finally {
+      setMiaaLoading(false)
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -343,6 +376,23 @@ export default function PoliciesPage() {
                 <label className="text-xs font-bold text-[#374151] uppercase tracking-wide mb-1.5 block">Franchise (FCFA)</label>
                 <input type="number" value={form.franchise} onChange={e => setForm(f => ({ ...f, franchise: +e.target.value }))}
                   className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:border-[#DC2626] outline-none" />
+              </div>
+
+              {/* MIAA+ Suggestion prime */}
+              <div className="border border-purple-100 rounded-2xl p-4 bg-purple-50/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-purple-700 flex items-center gap-1.5"><Sparkles size={12} /> Suggestion MIAA+</span>
+                  <button onClick={getMiaaSuggestion} disabled={miaaLoading || !form.assure_nom}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl transition-colors">
+                    {miaaLoading ? <RefreshCw size={11} className="animate-spin" /> : <Sparkles size={11} />}
+                    {miaaLoading ? 'Analyse...' : 'Analyser le profil'}
+                  </button>
+                </div>
+                {miaaSuggestion ? (
+                  <p className="text-xs text-[#374151] leading-relaxed whitespace-pre-line">{miaaSuggestion}</p>
+                ) : (
+                  <p className="text-xs text-[#94A3B8]">Cliquez sur &quot;Analyser le profil&quot; pour obtenir une recommandation de prime basée sur le risque saisi.</p>
+                )}
               </div>
 
               <div>

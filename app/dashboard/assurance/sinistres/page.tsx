@@ -5,7 +5,7 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   AlertTriangle, Plus, Search, RefreshCw, X,
   CheckCircle2, Clock, Shield, ChevronRight,
-  FileText, ArrowRight,
+  FileText, ArrowRight, Sparkles, AlertCircle,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -25,6 +25,14 @@ interface Sinistre {
   notes: string
   created_at: string
   ass_polices?: { numero_police: string; type_police: string; assure_nom: string; prime_montant: number }
+}
+
+interface MIAAResult {
+  score: number
+  niveau: 'faible' | 'moyen' | 'eleve'
+  facteurs: string[]
+  justification: string
+  recommandation: string
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -69,6 +77,19 @@ export default function SinistresPage() {
   const [form,         setForm]         = useState({ ...EMPTY_FORM })
   const [error,        setError]        = useState('')
   const [taux,         setTaux]         = useState(0)
+  const [miaaResults,  setMiaaResults]  = useState<Record<string, MIAAResult>>({})
+  const [miaaLoading,  setMiaaLoading]  = useState<Record<string, boolean>>({})
+
+  const analyzeWithMIAA = async (s: Sinistre) => {
+    setMiaaLoading(prev => ({ ...prev, [s.id]: true }))
+    try {
+      const res  = await fetch('/api/miaa/assurance-fraude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sinistre_id: s.id }) })
+      const data = await res.json()
+      setMiaaResults(prev => ({ ...prev, [s.id]: data }))
+    } finally {
+      setMiaaLoading(prev => ({ ...prev, [s.id]: false }))
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -272,7 +293,53 @@ export default function SinistresPage() {
                         <X size={13} /> Refuser
                       </button>
                     )}
+                    <button
+                      onClick={() => analyzeWithMIAA(s)}
+                      disabled={miaaLoading[s.id]}
+                      className="inline-flex items-center gap-1.5 bg-white border border-purple-200 text-purple-700 text-xs font-semibold px-4 py-2 rounded-xl hover:bg-purple-50 disabled:opacity-60 transition-colors">
+                      {miaaLoading[s.id]
+                        ? <RefreshCw size={12} className="animate-spin" />
+                        : <Sparkles size={12} />}
+                      Analyser avec MIAA+
+                    </button>
                   </div>
+
+                  {/* Résultat analyse MIAA+ */}
+                  {miaaResults[s.id] && (() => {
+                    const r = miaaResults[s.id]
+                    const niveauCfg = {
+                      faible: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', label: 'Risque faible' },
+                      moyen:  { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', label: 'Risque moyen — investigation' },
+                      eleve:  { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', label: 'Risque élevé — expertise requise' },
+                    }[r.niveau]
+                    return (
+                      <div className={`mt-3 rounded-2xl border p-4 ${niveauCfg.bg} ${niveauCfg.border}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sparkles size={13} className="text-purple-600" />
+                          <span className="text-xs font-black text-[#0F172A]">Analyse MIAA+ — Score fraude</span>
+                          <span className={`ml-auto text-xs font-black px-2 py-0.5 rounded-full ${niveauCfg.bg} ${niveauCfg.text}`}>
+                            {r.score}/100 · {niveauCfg.label}
+                          </span>
+                        </div>
+                        {r.facteurs.length > 0 && (
+                          <div className="mb-2">
+                            <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wide mb-1">Facteurs détectés</div>
+                            <ul className="space-y-0.5">
+                              {r.facteurs.map((f, i) => (
+                                <li key={i} className="flex items-start gap-1.5 text-xs text-[#374151]">
+                                  <AlertCircle size={10} className={`shrink-0 mt-0.5 ${niveauCfg.text}`} />{f}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        <div className="text-xs text-[#374151] mb-2">{r.justification}</div>
+                        <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl ${niveauCfg.bg} ${niveauCfg.text} border ${niveauCfg.border}`}>
+                          <CheckCircle2 size={11} /> Recommandation : {r.recommandation}
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
             </div>

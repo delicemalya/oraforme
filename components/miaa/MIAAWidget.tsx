@@ -25,6 +25,7 @@ function detectModule(path: string): string {
   if (path.includes('/banque'))                return 'tresorerie'
   if (path.includes('/agriculture'))           return 'stock'
   if (path.includes('/cabinet'))               return 'comptabilite'
+  if (path.includes('/assurance'))             return 'assurance'
   return 'auto'
 }
 
