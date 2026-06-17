@@ -250,7 +250,7 @@ export default function PricingPage() {
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}
       <footer className="border-t border-white/5 px-8 py-6 text-center text-white/20 text-xs">
-        © 2026 Oraforme · SaaS ERP africain · oraforms.com · by POLYVALON TECHNOLOGY
+        © 2026 Oraforme. Tous droits réservés. · by POLYVALON TECHNOLOGY
       </footer>
     </div>
   )
