@@ -20,8 +20,11 @@ export function useGeolocation() {
       return
     }
 
-    // IP detection
-    fetch('https://ipapi.co/json/')
+    // IP detection with 5 s timeout
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 5_000)
+
+    fetch('https://ipapi.co/json/', { signal: ctrl.signal })
       .then(r => r.json())
       .then((data: { country_code?: string }) => {
         if (data.country_code) {
@@ -32,9 +35,12 @@ export function useGeolocation() {
         }
       })
       .catch(() => {
-        // Fallback: keep default
+        // Fallback: keep default CG
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        clearTimeout(timer)
+        setLoading(false)
+      })
   }, [])
 
   function setPays(code: string) {

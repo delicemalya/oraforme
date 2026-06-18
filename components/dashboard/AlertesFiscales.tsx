@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { AlertTriangle, Clock, CheckCircle2, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { getEcheances, type EcheanceFiscale } from '@/lib/fiscal/alertes-fiscales'
+import { usePays } from '@/lib/contexts/PaysContext'
 
 // ── Badge urgence ─────────────────────────────────────────────────────────────
 
@@ -33,7 +34,8 @@ function formatDate(d: Date): string {
 // ── Composant principal ───────────────────────────────────────────────────────
 
 export default function AlertesFiscales() {
-  const echeances = useMemo(() => getEcheances(30), [])
+  const { pays, paysGeo } = usePays()
+  const echeances = useMemo(() => getEcheances(30, pays), [pays])
 
   if (echeances.length === 0) {
     return (
@@ -60,7 +62,7 @@ export default function AlertesFiscales() {
           </div>
           <div>
             <span className="text-sm font-bold text-[#0F172A]">Échéances fiscales</span>
-            <p className="text-[10px] text-[#94A3B8]">CGI Congo · 30 prochains jours</p>
+            <p className="text-[10px] text-[#94A3B8]">{paysGeo.nom} · 30 prochains jours</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5">

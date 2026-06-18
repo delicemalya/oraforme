@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { usePays } from '@/lib/contexts/PaysContext'
 import {
   Receipt, Users, FileText, Building2, Landmark, TrendingUp,
   GraduationCap, ClipboardList, History, AlertTriangle,
@@ -50,7 +51,8 @@ const LEGAL_ITEMS = [
 ]
 
 export default function FiscalitePage() {
-  const [pays, setPays]             = useState<PaysFiscal>('CG')
+  const { pays: paysDétecté } = usePays()
+  const [pays, setPays]             = useState<PaysFiscal>(() => paysDétecté as PaysFiscal || 'CG')
   const [annee, setAnnee]           = useState(new Date().getFullYear())
   const [kpis, setKpis]             = useState<KpiData | null>(null)
   const [echeances, setEcheances]   = useState<EcheanceData[]>([])
@@ -107,6 +109,13 @@ export default function FiscalitePage() {
   }, [pays, annee])
 
   useEffect(() => { void load() }, [load])
+
+  // Sync when tenant/geolocation resolves to a different country
+  useEffect(() => {
+    if (paysDétecté && paysDétecté !== pays) {
+      setPays(paysDétecté as PaysFiscal)
+    }
+  }, [paysDétecté]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const KPI_CARDS = [
     { label: 'TVA à payer',   value: kpis ? fmtN(kpis.tva_a_payer, devise) : '—', sub: 'Ce mois',        icon: Receipt,   gradient: 'from-blue-500 to-blue-700',    shadow: 'rgba(59,130,246,0.35)'  },

@@ -110,7 +110,7 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
     devise: 'FCFA', symbole: '₣',
     systeme_comptable: 'SYSCOHADA', zone: 'CEMAC',
     tva: {
-      taux_normal: 0.1925,   // TVA 17.5% + CAC 10% sur TVA = 19.25% effectif
+      taux_normal: 0.175,    // TVA 17.5% — CAC 10% ajouté via taxes_additionnelles
       taxes_additionnelles: [
         { code: 'CAC', nom: 'Centimes Additionnels Communaux (10% sur TVA)', taux: 0.10, base: 'tva_collectee' },
       ],
@@ -147,7 +147,7 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
       { code: 'PATENTE', nom: 'Droit de Patente', base: 'CA', echeance_mois: 1, echeance_jour: 31 },
     ],
     notes_importantes: [
-      'TVA 19.25% (17.5% TVA + 1.75% CAC) — déclaration au 15 du mois suivant',
+      'TVA 17.5% + CAC 10% sur TVA = 19.25% effectif sur HT — déclaration au 15 du mois suivant',
       'CNPS plafond : 750 000 FCFA/mois',
       'IS (Impôt sur les Sociétés) : 30% + CAC 10% = 33%',
     ],

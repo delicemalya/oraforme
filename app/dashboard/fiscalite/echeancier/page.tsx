@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar, AlertTriangle, CheckCircle, Clock, Bell, Filter } from 'lucide-react'
 import { PAYS_LIST } from '@/lib/fiscalite/pays'
 import { calculerEcheancier } from '@/lib/fiscalite/engine'
 import type { PaysFiscal, EcheanceFiscale } from '@/lib/fiscalite/types'
+import { usePays } from '@/lib/contexts/PaysContext'
 
 const TEXT  = '#0F172A'
 const MUTED = '#64748B'
@@ -29,9 +30,17 @@ const TYPE_COLORS: Record<string, string> = {
 }
 
 export default function EcheancierPage() {
-  const [pays, setPays] = useState<PaysFiscal>('CG')
+  const { pays: paysDétecté } = usePays()
+  const [pays, setPays] = useState<PaysFiscal>(() => paysDétecté as PaysFiscal || 'CG')
   const [annee, setAnnee] = useState(new Date().getFullYear())
   const [filter, setFilter] = useState<'tous' | 'urgent' | 'retard' | 'ok'>('tous')
+
+  // Sync when tenant/geolocation resolves to a different country
+  useEffect(() => {
+    if (paysDétecté && paysDétecté !== pays) {
+      setPays(paysDétecté as PaysFiscal)
+    }
+  }, [paysDétecté]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const echeances = useMemo<EcheanceFiscale[]>(() => calculerEcheancier(pays, annee), [pays, annee])
 

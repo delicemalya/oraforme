@@ -1,5 +1,6 @@
 'use client'
 import { useLocale } from '@/lib/hooks/useLocale'
+import { usePays } from '@/lib/contexts/PaysContext'
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -46,6 +47,7 @@ const URGENCE_CONFIG = {
 
 export default function NotificationsPanel() {
   const { t } = useLocale()
+  const { pays } = usePays()
   const [open, setOpen] = useState(false)
   const [notifs, setNotifs] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,7 +56,7 @@ export default function NotificationsPanel() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
 
-  const echeances = useMemo(() => getEcheances(30), [])
+  const echeances = useMemo(() => getEcheances(30, pays), [pays])
   const urgentFiscal = echeances.filter(e => e.urgence === 'rouge').length
   const unread = notifs.filter(n => !n.read).length + urgentFiscal
 
