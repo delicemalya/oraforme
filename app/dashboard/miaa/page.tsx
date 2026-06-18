@@ -17,7 +17,9 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import { getTenantBrandColor } from '@/lib/utils'
-import { getMiaaFiscalContext } from '@/lib/miaa-fiscal-router'
+import { getMiaaFiscalContext }                              from '@/lib/miaa-fiscal-router'
+import { getAcademyModules, type AcademyModule }            from '@/lib/miaa-fiscal-academy'
+import { evaluerConformiteFiscale, type DonneesTenant }     from '@/lib/miaa-fiscal-audit'
 
 // ── Expert persona config ─────────────────────────────────────────────────────
 
@@ -159,6 +161,79 @@ function fileToBase64(file: File): Promise<string> {
     reader.onerror = reject
     reader.readAsDataURL(file)
   })
+}
+
+// ── Academy & Audit response formatters ──────────────────────────────────────
+
+const PAYS_LABELS: Record<string, string> = {
+  CG: 'Congo', CM: 'Cameroun', GA: 'Gabon',
+  TD: 'Tchad', CF: 'RCA', GQ: 'Guinée Équatoriale', CD: 'RDC', CD_USD: 'RDC',
+}
+const NIVEAU_ICON: Record<AcademyModule['niveau'], string> = {
+  debutant: '🟢', intermediaire: '🟡', avance: '🔴',
+}
+const SEVERITE_ICON: Record<string, string> = {
+  critique: '🚨', eleve: '🔶', moyen: '⚠️', faible: 'ℹ️',
+}
+
+function formatAcademyResponse(paysCode: string): string {
+  const code   = paysCode === 'CD_USD' ? 'CD' : paysCode
+  const modules = getAcademyModules(code)
+  if (!modules.length) return `📚 Aucun module Academy disponible pour le code pays "${paysCode}".`
+  const pays  = PAYS_LABELS[paysCode] ?? modules[0].pays
+  const lines: string[] = [
+    `📚 **MIAA+ Academy — Fiscalité ${pays}** (${modules.length} modules)\n`,
+    `Cliquez sur une question pour approfondir chaque sujet avec MIAA+.\n`,
+  ]
+  modules.forEach((m, i) => {
+    lines.push(
+      `**${i + 1}. ${m.titre}** ${NIVEAU_ICON[m.niveau]}`,
+      m.contenu.split('\n')[0].slice(0, 220) + (m.contenu.length > 220 ? '…' : ''),
+      m.piegesFrequents?.length ? `⚠️ Piège : ${m.piegesFrequents[0]}` : '',
+      m.sourceReglementaire ? `_📎 ${m.sourceReglementaire}_\n` : '',
+    )
+  })
+  return lines.filter(l => l !== '').join('\n')
+}
+
+function formatAuditResponse(paysCode: string, secteur: string | null): string {
+  const code    = paysCode === 'CD_USD' ? 'CD' : paysCode
+  const donnees: DonneesTenant = {
+    chiffreAffaires: 0,
+    dateCreation:    new Date(),
+    secteur:         secteur ?? 'commerce',
+  }
+  const result  = evaluerConformiteFiscale(code, donnees)
+  const pays    = PAYS_LABELS[paysCode] ?? paysCode
+  const niveauLabel: Record<string, string> = {
+    conforme: '✅ CONFORME', attention: '⚠️ ATTENTION', risque: '🔶 RISQUE', critique: '🚨 CRITIQUE',
+  }
+  const lines: string[] = [
+    `🔍 **Audit conformité fiscale — ${pays}**`,
+    `Score : **${result.score}/100** — ${niveauLabel[result.niveau] ?? result.niveau}\n`,
+  ]
+  if (result.risques.length > 0) {
+    lines.push(`**Risques détectés (${result.risques.length}) :**`)
+    result.risques.forEach(r => {
+      lines.push(
+        `${SEVERITE_ICON[r.severite] ?? '•'} **${r.type}** — ${r.description}`,
+        `  → Correction : ${r.correction}`,
+      )
+    })
+    lines.push('')
+  } else {
+    lines.push('✅ Aucun risque détecté sur les données disponibles.\n')
+  }
+  if (result.recommandations.length > 0) {
+    lines.push('**Recommandations :**')
+    result.recommandations.forEach(rec => lines.push(`• ${rec}`))
+    lines.push('')
+  }
+  if (result.prochainEcheance) {
+    lines.push(`📅 **Prochaine échéance :** ${result.prochainEcheance}`)
+  }
+  lines.push('\n_Audit basé sur les données disponibles dans Oraforme. Connectez vos modules ERP pour un audit complet._')
+  return lines.join('\n')
 }
 
 // ── Quick navigation ──────────────────────────────────────────────────────────
@@ -364,6 +439,26 @@ export default function MIAAPage() {
     const msg = text.trim()
     if (!msg || loading) return
     setInput('')
+
+    // ── Academy intercept (local — no API call) ────────────────────────────
+    if (msg.startsWith('📚 Apprendre la fiscalité')) {
+      const response = formatAcademyResponse(paysCode ?? 'CG')
+      setMessages(prev => [...prev,
+        { role: 'user', text: msg, ts: Date.now() },
+        { role: 'bot', text: response, ts: Date.now() + 1, peut_telecharger: true, contenu_telechargeable: response },
+      ])
+      return
+    }
+
+    // ── Audit intercept (local — no API call) ─────────────────────────────
+    if (msg === '🔍 Auditer ma conformité fiscale') {
+      const response = formatAuditResponse(paysCode ?? 'CG', secteur)
+      setMessages(prev => [...prev,
+        { role: 'user', text: msg, ts: Date.now() },
+        { role: 'bot', text: response, ts: Date.now() + 1, peut_telecharger: true, contenu_telechargeable: response },
+      ])
+      return
+    }
 
     const newMessages: Message[] = [...messages, { role: 'user', text: msg, ts: Date.now() }]
     setMessages(newMessages)
@@ -600,6 +695,32 @@ export default function MIAAPage() {
           + {t('miaa.uploadBtn')}
         </button>
       </div>
+
+      {/* Academy & Audit */}
+      {paysCode && (
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <p className="text-xs font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <GraduationCap size={13} style={{ color: brandColor }} />
+            Academy & Audit MIAA+
+          </p>
+          <div className="space-y-2">
+            <button
+              onClick={() => send(`📚 Apprendre la fiscalité ${PAYS_LABELS[paysCode] ?? paysCode}`)}
+              className="w-full text-left px-3 py-2.5 rounded-xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all"
+            >
+              <p className="text-[11px] font-semibold text-gray-800">📚 Apprendre la fiscalité {PAYS_LABELS[paysCode] ?? paysCode}</p>
+              <p className="text-[9px] text-gray-400 mt-0.5">Modules pratiques OHADA personnalisés</p>
+            </button>
+            <button
+              onClick={() => send('🔍 Auditer ma conformité fiscale')}
+              className="w-full text-left px-3 py-2.5 rounded-xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all"
+            >
+              <p className="text-[11px] font-semibold text-gray-800">🔍 Auditer ma conformité fiscale</p>
+              <p className="text-[9px] text-gray-400 mt-0.5">Score + risques détectés automatiquement</p>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Config */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
