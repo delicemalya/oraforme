@@ -176,7 +176,7 @@ export default function LandingPage() {
           <div style={{ minHeight: '100vh', display: 'flex' }}>
 
             {/* Gauche — texte sombre */}
-            <div className="flex-1 bg-[#111827] flex items-center px-8 sm:px-12 lg:px-16 py-20">
+            <div className="flex-1 bg-[#00454c] flex items-center px-8 sm:px-12 lg:px-16 py-20">
               <div className="max-w-xl w-full">
                 <div className="a1 inline-flex items-center gap-2 bg-[#DC2626]/10 border border-[#DC2626]/25 text-[#F87171] text-[10px] font-bold uppercase tracking-[0.18em] rounded-full px-4 py-1.5 mb-7">
                   <Sparkles size={10} />
@@ -227,7 +227,7 @@ export default function LandingPage() {
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#111827]/50 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#00454c]/50 to-transparent" />
             </div>
 
           </div>
@@ -249,7 +249,7 @@ export default function LandingPage() {
                 className="flex-1 min-w-0 px-4 py-3 rounded-xl text-sm font-medium text-[#111827] placeholder-gray-400 outline-none"
               />
               <Link href="/onboarding"
-                className="bt shrink-0 bg-[#111827] hover:bg-black text-white font-bold text-sm px-6 py-3 rounded-xl whitespace-nowrap inline-flex items-center gap-1.5">
+                className="bt shrink-0 bg-[#00454c] hover:bg-[#003438] text-white font-bold text-sm px-6 py-3 rounded-xl whitespace-nowrap inline-flex items-center gap-1.5">
                 COMMENCER <ArrowRight size={13} />
               </Link>
             </div>
@@ -345,7 +345,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ IA — texte gauche / image droite (fond sombre) ════════════════════ */}
-        <section className="bg-[#0F172A]">
+        <section className="bg-[#00454c]">
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2">
 
             {/* Texte */}
@@ -391,7 +391,7 @@ export default function LandingPage() {
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#00454c]/60 to-transparent" />
             </div>
 
           </div>
@@ -503,7 +503,7 @@ export default function LandingPage() {
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-[#111827]/85" />
+            <div className="absolute inset-0 bg-[#00454c]/85" />
           </div>
 
           <div className="relative max-w-5xl mx-auto">
@@ -588,7 +588,7 @@ export default function LandingPage() {
                 <div key={plan.name}
                   className={`ch rounded-2xl p-8 border relative ${
                     plan.highlight
-                      ? 'bg-[#111827] border-[#DC2626]/40 shadow-2xl'
+                      ? 'bg-[#00454c] border-[#DC2626]/40 shadow-2xl'
                       : 'bg-gray-50 border-gray-200'
                   }`}>
                   {plan.highlight && (
@@ -639,7 +639,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ FOOTER ════════════════════════════════════════════════════════════ */}
-        <footer className="bg-[#0D1117] border-t border-white/5 pt-16 pb-8 px-4 sm:px-6 lg:px-8">
+        <footer className="bg-[#002d33] border-t border-white/5 pt-16 pb-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
 
