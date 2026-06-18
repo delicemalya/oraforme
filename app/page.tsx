@@ -4,11 +4,16 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  Calculator, Users, Wallet, Bot, FileText, Package,
+  // modules phares
+  BookOpen, Layers, Users, Wallet, FileText, Package, Receipt,
+  UserCheck, ShoppingCart, CreditCard, Brain, ClipboardCheck,
+  TrendingUp, Calculator, UserCog, Shield, AlertTriangle, Scale,
+  // modules sectoriels
+  Building2, School, Heart, Pill, Utensils, Truck,
+  HardHat, Leaf, Briefcase, GraduationCap, ShoppingBag,
+  // layout / ui
   ArrowRight, CheckCircle2, Star, Menu, X, Zap,
-  Shield, Clock, Brain, BarChart2,
-  ChevronRight, Sparkles, Lock, Globe, Mail,
-  Building2, ShoppingCart, School,
+  ChevronDown, BarChart2, Sparkles, Lock, Globe, Mail,
 } from 'lucide-react'
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -20,15 +25,39 @@ const NAV_LINKS = [
   { label: 'Contact',   href: 'mailto:contact@oraforme.com' },
 ]
 
-const MODULES = [
-  { icon: Calculator,   label: 'Comptabilité' },
-  { icon: Users,        label: 'RH & Paie' },
-  { icon: Wallet,       label: 'Trésorerie' },
-  { icon: FileText,     label: 'Facturation' },
-  { icon: Package,      label: 'Stock' },
-  { icon: Bot,          label: 'MIAA+ IA' },
-  { icon: Building2,    label: 'Hôtellerie' },
-  { icon: School,       label: 'Éducation' },
+const MODULES_PHARES = [
+  { icon: BookOpen,       label: 'Comptabilité SYSCOHADA',      badge: 'OHADA' },
+  { icon: Layers,         label: 'IFRS & Consolidation',        badge: 'International' },
+  { icon: Users,          label: 'RH & Paie',                   badge: null },
+  { icon: Wallet,         label: 'Trésorerie',                  badge: null },
+  { icon: FileText,       label: 'Facturation',                 badge: null },
+  { icon: Receipt,        label: 'Fiscalité & Déclarations',    badge: null },
+  { icon: Package,        label: 'Stock & Inventaire',          badge: null },
+  { icon: UserCheck,      label: 'Recrutement Premium',         badge: 'IA' },
+  { icon: ShoppingCart,   label: 'CRM',                         badge: null },
+  { icon: CreditCard,     label: 'Recouvrement',                badge: null },
+  { icon: Brain,          label: 'MIAA+',                       badge: 'IA Métier' },
+  { icon: ClipboardCheck, label: 'Audit Comptable',             badge: null },
+  { icon: TrendingUp,     label: 'Audit Financier',             badge: null },
+  { icon: Calculator,     label: 'Audit Fiscal',                badge: null },
+  { icon: UserCog,        label: 'Audit RH',                    badge: null },
+  { icon: Shield,         label: 'Contrôle Interne',            badge: null },
+  { icon: AlertTriangle,  label: 'Gestion des Risques',         badge: null },
+  { icon: Scale,          label: 'Conformité OHADA',            badge: null },
+]
+
+const MODULES_SECTEURS = [
+  { icon: Building2,    label: 'Hôtellerie & Resort',       badge: null },
+  { icon: School,       label: 'Éducation & Scolarité',     badge: null },
+  { icon: Heart,        label: 'Santé & Clinique',          badge: null },
+  { icon: Pill,         label: 'Pharmacie',                 badge: null },
+  { icon: Utensils,     label: 'Restaurant & POS',          badge: null },
+  { icon: Truck,        label: 'Transport & Logistique',    badge: null },
+  { icon: HardHat,      label: 'BTP & Construction',        badge: null },
+  { icon: Leaf,         label: 'Agriculture',               badge: null },
+  { icon: Briefcase,    label: 'Cabinet Comptable',         badge: null },
+  { icon: ShoppingBag,  label: 'Achats & Fournisseurs',     badge: null },
+  { icon: GraduationCap,label: 'Formation Academy',         badge: 'IA' },
 ]
 
 const MIAA_POINTS = [
@@ -84,6 +113,7 @@ const REGIONS = [
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [email, setEmail] = useState('')
+  const [showAllModules, setShowAllModules] = useState(false)
 
   return (
     <>
@@ -263,37 +293,82 @@ export default function LandingPage() {
         {/* ══ MODULES ═══════════════════════════════════════════════════════════ */}
         <section id="modules" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-7xl mx-auto">
+
             <div className="text-center mb-12">
               <span className="text-[10px] font-bold text-[#DC2626] uppercase tracking-[0.18em]">CE QUE NOUS OFFRONS</span>
               <h2 className="text-3xl sm:text-4xl font-black text-[#111827] tracking-tight mt-3 mb-3">
-                Nos Modules de Gestion
+                Nos Modules Phares
               </h2>
-              <p className="text-[#6B7280] max-w-md mx-auto text-sm">
-                Une solution intégrée qui couvre tous les aspects de votre activité.
+              <p className="text-[#6B7280] max-w-lg mx-auto text-sm">
+                Suite complète pensée pour les entreprises africaines — OHADA, IFRS, paie, fiscalité,
+                audit et intelligence artificielle intégrée.
               </p>
             </div>
 
-            <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-              {MODULES.map(m => {
+            {/* Modules phares — toujours visibles */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {MODULES_PHARES.map(m => {
                 const Icon = m.icon
                 return (
                   <div key={m.label}
-                    className="ch flex flex-col items-center gap-3 py-6 px-3 rounded-2xl border border-gray-100 bg-gray-50 text-center">
-                    <div className="w-12 h-12 rounded-xl bg-[#DC2626]/8 border border-[#DC2626]/15 flex items-center justify-center">
-                      <Icon size={22} className="text-[#DC2626]" />
+                    className="ch flex flex-col items-center gap-2.5 py-5 px-3 rounded-2xl border border-gray-100 bg-gray-50 text-center">
+                    <div className="w-11 h-11 rounded-xl bg-[#DC2626]/8 border border-[#DC2626]/15 flex items-center justify-center">
+                      <Icon size={20} className="text-[#DC2626]" />
                     </div>
                     <span className="text-[11px] font-bold text-[#374151] leading-tight">{m.label}</span>
+                    {m.badge && (
+                      <span className="text-[9px] font-bold bg-[#DC2626]/10 text-[#DC2626] px-2 py-0.5 rounded-full uppercase tracking-wide leading-none">
+                        {m.badge}
+                      </span>
+                    )}
                   </div>
                 )
               })}
             </div>
 
+            {/* Modules sectoriels — dépliables */}
+            {showAllModules && (
+              <div className="mt-10 pt-10 border-t border-gray-100">
+                <div className="text-center mb-8">
+                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.18em]">MODULES SECTORIELS</span>
+                  <h3 className="text-xl font-black text-[#111827] mt-2 mb-1">Solutions spécialisées par secteur</h3>
+                  <p className="text-[#6B7280] text-sm">Hôtellerie, éducation, santé, BTP, transport, agriculture et plus encore.</p>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {MODULES_SECTEURS.map(m => {
+                    const Icon = m.icon
+                    return (
+                      <div key={m.label}
+                        className="ch flex flex-col items-center gap-2.5 py-5 px-3 rounded-2xl border border-gray-100 bg-[#F8FAFC] text-center">
+                        <div className="w-11 h-11 rounded-xl bg-[#00454c]/8 border border-[#00454c]/15 flex items-center justify-center">
+                          <Icon size={20} className="text-[#00454c]" />
+                        </div>
+                        <span className="text-[11px] font-bold text-[#374151] leading-tight">{m.label}</span>
+                        {m.badge && (
+                          <span className="text-[9px] font-bold bg-[#00454c]/10 text-[#00454c] px-2 py-0.5 rounded-full uppercase tracking-wide leading-none">
+                            {m.badge}
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="text-center mt-10">
-              <Link href="/onboarding"
-                className="bt inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-sm px-7 py-3.5 rounded-xl">
-                Voir tous les modules <ArrowRight size={14} />
-              </Link>
+              <button
+                onClick={() => setShowAllModules(v => !v)}
+                className="bt inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-sm px-7 py-3.5 rounded-xl"
+              >
+                {showAllModules ? (
+                  <><ChevronDown size={14} style={{ transform: 'rotate(180deg)' }} /> Masquer les modules</>
+                ) : (
+                  <>Voir tous les modules <ChevronDown size={14} /></>
+                )}
+              </button>
             </div>
+
           </div>
         </section>
 
