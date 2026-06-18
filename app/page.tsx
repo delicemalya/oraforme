@@ -10,7 +10,9 @@ import {
   TrendingUp, Calculator, UserCog, Shield, AlertTriangle, Scale,
   // modules sectoriels
   Building2, School, Heart, Pill, Utensils, Truck,
-  HardHat, Leaf, Briefcase, GraduationCap, ShoppingBag,
+  HardHat, Leaf, GraduationCap, ShoppingBag,
+  // cabinets professionnels
+  BookMarked, FileSearch, Microscope, Lightbulb, Gavel,
   // layout / ui
   ArrowRight, CheckCircle2, Star, Menu, X, Zap,
   ChevronDown, BarChart2, Sparkles, Lock, Globe, Mail,
@@ -47,17 +49,24 @@ const MODULES_PHARES = [
 ]
 
 const MODULES_SECTEURS = [
-  { icon: Building2,    label: 'Hôtellerie & Resort',       badge: null },
-  { icon: School,       label: 'Éducation & Scolarité',     badge: null },
-  { icon: Heart,        label: 'Santé & Clinique',          badge: null },
-  { icon: Pill,         label: 'Pharmacie',                 badge: null },
-  { icon: Utensils,     label: 'Restaurant & POS',          badge: null },
-  { icon: Truck,        label: 'Transport & Logistique',    badge: null },
-  { icon: HardHat,      label: 'BTP & Construction',        badge: null },
-  { icon: Leaf,         label: 'Agriculture',               badge: null },
-  { icon: Briefcase,    label: 'Cabinet Comptable',         badge: null },
-  { icon: ShoppingBag,  label: 'Achats & Fournisseurs',     badge: null },
-  { icon: GraduationCap,label: 'Formation Academy',         badge: 'IA' },
+  // Secteurs métier
+  { icon: Building2,    label: 'Hôtellerie & Resort',       badge: null,     isCabinet: false },
+  { icon: School,       label: 'Éducation & Scolarité',     badge: null,     isCabinet: false },
+  { icon: Heart,        label: 'Santé & Clinique',          badge: null,     isCabinet: false },
+  { icon: Pill,         label: 'Pharmacie',                 badge: null,     isCabinet: false },
+  { icon: Utensils,     label: 'Restaurant & POS',          badge: null,     isCabinet: false },
+  { icon: Truck,        label: 'Transport & Logistique',    badge: null,     isCabinet: false },
+  { icon: HardHat,      label: 'BTP & Construction',        badge: null,     isCabinet: false },
+  { icon: Leaf,         label: 'Agriculture',               badge: null,     isCabinet: false },
+  { icon: ShoppingBag,  label: 'Achats & Fournisseurs',     badge: null,     isCabinet: false },
+  { icon: GraduationCap,label: 'Formation Academy',         badge: 'IA',     isCabinet: false },
+  // Cabinets professionnels
+  { icon: BookMarked,   label: 'Cabinet Comptable',         badge: 'OHADA',  isCabinet: true },
+  { icon: FileSearch,   label: 'Cabinet Fiscal',            badge: null,     isCabinet: true },
+  { icon: Microscope,   label: "Cabinet d'Audit",           badge: null,     isCabinet: true },
+  { icon: Lightbulb,    label: 'Cabinet Conseil',           badge: null,     isCabinet: true },
+  { icon: Scale,        label: 'Cabinet Juridique',         badge: null,     isCabinet: true },
+  { icon: Gavel,        label: "Cabinet d'Avocats",         badge: null,     isCabinet: true },
 ]
 
 const MIAA_POINTS = [
@@ -329,13 +338,15 @@ export default function LandingPage() {
             {/* Modules sectoriels — dépliables */}
             {showAllModules && (
               <div className="mt-10 pt-10 border-t border-gray-100">
+
+                {/* Secteurs métier */}
                 <div className="text-center mb-8">
                   <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.18em]">MODULES SECTORIELS</span>
                   <h3 className="text-xl font-black text-[#111827] mt-2 mb-1">Solutions spécialisées par secteur</h3>
                   <p className="text-[#6B7280] text-sm">Hôtellerie, éducation, santé, BTP, transport, agriculture et plus encore.</p>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                  {MODULES_SECTEURS.map(m => {
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-10">
+                  {MODULES_SECTEURS.filter(m => !m.isCabinet).map(m => {
                     const Icon = m.icon
                     return (
                       <div key={m.label}
@@ -353,6 +364,38 @@ export default function LandingPage() {
                     )
                   })}
                 </div>
+
+                {/* Cabinets professionnels */}
+                <div className="border-t border-gray-100 pt-8 mb-8">
+                  <div className="text-center mb-7">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.18em]">CABINETS PROFESSIONNELS</span>
+                    <h3 className="text-xl font-black text-[#111827] mt-2 mb-1">Suite dédiée aux cabinets & conseils</h3>
+                    <p className="text-[#6B7280] text-sm max-w-lg mx-auto">
+                      Gestion multi-clients, honoraires, missions, Mode Expert, agenda fiscal & social,
+                      conformité OHADA, dossiers judiciaires — uniquement disponible en plan Business.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    {MODULES_SECTEURS.filter(m => m.isCabinet).map(m => {
+                      const Icon = m.icon
+                      return (
+                        <div key={m.label}
+                          className="ch flex flex-col items-center gap-2.5 py-5 px-3 rounded-2xl border border-[#00454c]/20 bg-[#00454c]/4 text-center">
+                          <div className="w-11 h-11 rounded-xl bg-[#00454c]/12 border border-[#00454c]/20 flex items-center justify-center">
+                            <Icon size={20} className="text-[#00454c]" />
+                          </div>
+                          <span className="text-[11px] font-bold text-[#374151] leading-tight">{m.label}</span>
+                          {m.badge && (
+                            <span className="text-[9px] font-bold bg-[#00454c]/10 text-[#00454c] px-2 py-0.5 rounded-full uppercase tracking-wide leading-none">
+                              {m.badge}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
               </div>
             )}
 
