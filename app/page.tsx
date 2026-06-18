@@ -112,9 +112,12 @@ const PLANS = [
 ]
 
 const REGIONS = [
-  { name: 'Europe',    flag: '🇪🇺', cities: 'France · Portugal · Belgique' },
-  { name: 'Afrique',   flag: '🌍', cities: 'Congo · Sénégal · Côte d\'Ivoire' },
-  { name: 'Amériques', flag: '🌎', cities: 'Canada · Brésil · USA' },
+  { name: 'Afrique Centrale',    flags: ['🇨🇬','🇨🇲','🇬🇦','🇨🇩','🇹🇩','🇨🇫'], cities: 'Congo · Cameroun · Gabon · RDC · Tchad · RCA' },
+  { name: 'Afrique de l\'Ouest', flags: ['🇸🇳','🇨🇮','🇧🇫','🇲🇱','🇹🇬','🇧🇯'], cities: 'Sénégal · Côte d\'Ivoire · Burkina Faso · Mali · Togo · Bénin' },
+  { name: 'Afrique Anglophone',  flags: ['🇳🇬','🇰🇪','🇷🇼','🇿🇦','🇬🇭'], cities: 'Nigeria · Kenya · Rwanda · Afrique du Sud · Ghana' },
+  { name: 'Maghreb & Angola',    flags: ['🇲🇦','🇩🇿','🇹🇳','🇦🇴'], cities: 'Maroc · Algérie · Tunisie · Angola' },
+  { name: 'Europe',              flags: ['🇫🇷','🇧🇪','🇨🇭'], cities: 'France · Belgique · Suisse' },
+  { name: 'Amériques',           flags: ['🇨🇦','🇧🇷','🇺🇸'], cities: 'Canada · Brésil · USA' },
 ]
 
 // ── Page ─────────────────────────────────────────────────────────────────────
@@ -250,9 +253,9 @@ export default function LandingPage() {
                     className="bt inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-sm px-7 py-4 rounded-xl shadow-xl shadow-red-900/30 uppercase tracking-wide">
                     COMMENCER GRATUITEMENT <ArrowRight size={15} />
                   </Link>
-                  <button className="bt inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-sm px-6 py-4 rounded-xl border border-white/15 hover:border-white/40">
-                    ▶ Voir la démo
-                  </button>
+                  <a href="#modules" className="bt inline-flex items-center gap-2 text-gray-300 hover:text-white font-semibold text-sm px-6 py-4 rounded-xl border border-white/15 hover:border-white/40">
+                    ▶ Voir les modules
+                  </a>
                 </div>
               </div>
             </div>
@@ -454,10 +457,10 @@ export default function LandingPage() {
                 répétitives, en protégeant vos données et en vous donnant une vision claire et en
                 temps réel de votre activité. Ça, on fait.
               </p>
-              <Link href="/onboarding"
+              <a href="#tarifs"
                 className="bt inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-sm px-7 py-3.5 rounded-xl w-fit">
-                En savoir plus <ArrowRight size={14} />
-              </Link>
+                Voir nos tarifs <ArrowRight size={14} />
+              </a>
             </div>
           </div>
         </section>
@@ -495,7 +498,7 @@ export default function LandingPage() {
                   )
                 })}
               </ul>
-              <Link href="/onboarding"
+              <Link href="/onboarding?ref=miaa"
                 className="bt inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-sm px-7 py-3.5 rounded-xl w-fit">
                 Essayer MIAA+ gratuitement <ArrowRight size={14} />
               </Link>
@@ -600,12 +603,16 @@ export default function LandingPage() {
               <span className="text-[10px] font-bold text-[#DC2626] uppercase tracking-[0.18em]">ZONES DE SERVICE</span>
               <h2 className="text-2xl sm:text-3xl font-black text-[#111827] mt-2">Notre présence internationale</h2>
             </div>
-            <div className="grid sm:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {REGIONS.map(r => (
-                <div key={r.name} className="ch bg-white rounded-2xl p-7 border border-gray-200 text-center">
-                  <div className="text-4xl mb-3">{r.flag}</div>
-                  <div className="font-black text-[#111827] text-lg mb-1">{r.name}</div>
-                  <div className="text-sm text-[#6B7280]">{r.cities}</div>
+                <div key={r.name} className="ch bg-white rounded-2xl p-5 border border-gray-200 text-center flex flex-col items-center gap-2">
+                  <div className="flex flex-wrap justify-center gap-0.5 mb-1">
+                    {r.flags.map(f => (
+                      <span key={f} className="text-xl leading-tight">{f}</span>
+                    ))}
+                  </div>
+                  <div className="font-black text-[#111827] text-sm">{r.name}</div>
+                  <div className="text-[10px] text-[#6B7280] leading-relaxed">{r.cities}</div>
                 </div>
               ))}
             </div>
