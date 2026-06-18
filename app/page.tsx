@@ -111,13 +111,37 @@ const PLANS = [
   },
 ]
 
-const REGIONS = [
-  { name: 'Afrique Centrale',    flags: ['🇨🇬','🇨🇲','🇬🇦','🇨🇩','🇹🇩','🇨🇫'], cities: 'Congo · Cameroun · Gabon · RDC · Tchad · RCA' },
-  { name: 'Afrique de l\'Ouest', flags: ['🇸🇳','🇨🇮','🇧🇫','🇲🇱','🇹🇬','🇧🇯'], cities: 'Sénégal · Côte d\'Ivoire · Burkina Faso · Mali · Togo · Bénin' },
-  { name: 'Afrique Anglophone',  flags: ['🇳🇬','🇰🇪','🇷🇼','🇿🇦','🇬🇭'], cities: 'Nigeria · Kenya · Rwanda · Afrique du Sud · Ghana' },
-  { name: 'Maghreb & Angola',    flags: ['🇲🇦','🇩🇿','🇹🇳','🇦🇴'], cities: 'Maroc · Algérie · Tunisie · Angola' },
-  { name: 'Europe',              flags: ['🇫🇷','🇧🇪','🇨🇭'], cities: 'France · Belgique · Suisse' },
-  { name: 'Amériques',           flags: ['🇨🇦','🇧🇷','🇺🇸'], cities: 'Canada · Brésil · USA' },
+const FLAG_COUNTRIES: { code: string; nom: string }[] = [
+  { code: 'cg', nom: 'Congo' },
+  { code: 'cm', nom: 'Cameroun' },
+  { code: 'ga', nom: 'Gabon' },
+  { code: 'cd', nom: 'RD Congo' },
+  { code: 'td', nom: 'Tchad' },
+  { code: 'cf', nom: 'RCA' },
+  { code: 'gq', nom: 'Guinée Éq.' },
+  { code: 'sn', nom: 'Sénégal' },
+  { code: 'ci', nom: "Côte d'Ivoire" },
+  { code: 'ml', nom: 'Mali' },
+  { code: 'bf', nom: 'Burkina Faso' },
+  { code: 'tg', nom: 'Togo' },
+  { code: 'bj', nom: 'Bénin' },
+  { code: 'ne', nom: 'Niger' },
+  { code: 'gn', nom: 'Guinée' },
+  { code: 'ao', nom: 'Angola' },
+  { code: 'ng', nom: 'Nigeria' },
+  { code: 'ke', nom: 'Kenya' },
+  { code: 'gh', nom: 'Ghana' },
+  { code: 'rw', nom: 'Rwanda' },
+  { code: 'za', nom: 'Afrique du Sud' },
+  { code: 'ma', nom: 'Maroc' },
+  { code: 'dz', nom: 'Algérie' },
+  { code: 'tn', nom: 'Tunisie' },
+  { code: 'fr', nom: 'France' },
+  { code: 'be', nom: 'Belgique' },
+  { code: 'ch', nom: 'Suisse' },
+  { code: 'ca', nom: 'Canada' },
+  { code: 'br', nom: 'Brésil' },
+  { code: 'us', nom: 'USA' },
 ]
 
 // ── Page ─────────────────────────────────────────────────────────────────────
@@ -597,22 +621,26 @@ export default function LandingPage() {
         </section>
 
         {/* ══ REGIONS DE SERVICE ════════════════════════════════════════════════ */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 border-t border-gray-100">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-10">
-              <span className="text-[10px] font-bold text-[#DC2626] uppercase tracking-[0.18em]">ZONES DE SERVICE</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#111827] mt-2">Notre présence internationale</h2>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {REGIONS.map(r => (
-                <div key={r.name} className="ch bg-white rounded-2xl p-5 border border-gray-200 text-center flex flex-col items-center gap-2">
-                  <div className="flex flex-wrap justify-center gap-0.5 mb-1">
-                    {r.flags.map(f => (
-                      <span key={f} className="text-xl leading-tight">{f}</span>
-                    ))}
-                  </div>
-                  <div className="font-black text-[#111827] text-sm">{r.name}</div>
-                  <div className="text-[10px] text-[#6B7280] leading-relaxed">{r.cities}</div>
+        <section className="py-16 bg-gray-50 border-t border-gray-100 overflow-hidden">
+          <div className="text-center mb-10 px-4">
+            <span className="text-[10px] font-bold text-[#DC2626] uppercase tracking-[0.18em]">ZONES DE SERVICE</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#111827] mt-2">Notre présence internationale</h2>
+            <p className="text-sm text-[#6B7280] mt-2">30 pays · 4 continents</p>
+          </div>
+          {/* Carousel infini */}
+          <div className="overflow-hidden">
+            <div className="flags-track">
+              {[...FLAG_COUNTRIES, ...FLAG_COUNTRIES].map((c, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5 mx-4 shrink-0">
+                  <img
+                    src={`https://flagcdn.com/w80/${c.code}.png`}
+                    alt={c.nom}
+                    width={56}
+                    height={42}
+                    className="rounded-md shadow-sm object-cover"
+                    loading="lazy"
+                  />
+                  <span className="text-[10px] text-[#6B7280] whitespace-nowrap">{c.nom}</span>
                 </div>
               ))}
             </div>

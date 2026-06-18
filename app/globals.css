@@ -363,3 +363,15 @@ input:-webkit-autofill:focus {
 /* Page transition — fade in on navigation */
 @keyframes fadeIn { from { opacity: 0.8; } to { opacity: 1; } }
 .page-transition { animation: fadeIn 0.1s ease; }
+
+/* Flags carousel */
+@keyframes flags-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.flags-track {
+  display: flex;
+  animation: flags-scroll 30s linear infinite;
+  width: max-content;
+}
+.flags-track:hover { animation-play-state: paused; }
