@@ -307,11 +307,11 @@ export async function POST(req: Request) {
       if (ctxDetecte) {
         // Pays avec moteur fiscal → basculer le contexte pour cette réponse
         paysEffectif = paysDetecte
-        crossCountryNote = `\n\n═══ CONTEXTE CROSS-PAYS ═══\nL'utilisateur interroge sur la fiscalité de ${ctxDetecte.countryName}, qui diffère du pays de son entreprise (${nomPaysTenant}). Utilise EXCLUSIVEMENT les données fiscales de ${ctxDetecte.countryName} listées dans le MODULE FISCAL CONTEXTUEL ci-dessus — ne mélange pas avec les règles de ${nomPaysTenant}. Propose en fin de réponse de clarifier si la question concerne une filiale, un client étranger, un fournisseur ou une opération transfrontalière.`
+        crossCountryNote = `\n\n[CROSS-PAYS: ${ctxDetecte.countryName}]\nL'utilisateur interroge sur la fiscalité de ${ctxDetecte.countryName}, qui diffère du pays de son entreprise (${nomPaysTenant}). Utilise EXCLUSIVEMENT les données fiscales de ${ctxDetecte.countryName} listées dans le contexte fiscal ci-dessus — ne mélange pas avec les règles de ${nomPaysTenant}. Propose en fin de réponse de clarifier si la question concerne une filiale, un client étranger, un fournisseur ou une opération transfrontalière.`
       } else {
         // Pays sans moteur fiscal → signaler l'absence de données vérifiées
         const nomPaysDetecte = getNomPaysSansMoteur(paysDetecte)
-        crossCountryNote = `\n\n═══ CONTEXTE CROSS-PAYS ═══\nL'utilisateur interroge sur la fiscalité de ${nomPaysDetecte}. Aucun module fiscal spécialisé pour ce pays n'est disponible dans Oraforme. Commence ta réponse par : "Je n'ai pas de module fiscal spécialisé pour ${nomPaysDetecte} dans Oraforme — voici une réponse générale à vérifier avec un expert-comptable local." Puis réponds avec tes connaissances générales.`
+        crossCountryNote = `\n\n[CROSS-PAYS: ${nomPaysDetecte} - sans module]\nL'utilisateur interroge sur la fiscalité de ${nomPaysDetecte}. Aucun module fiscal spécialisé pour ce pays n'est disponible dans Oraforme. Commence ta réponse par : "Je n'ai pas de module fiscal spécialisé pour ${nomPaysDetecte} dans Oraforme — voici une réponse générale à vérifier avec un expert-comptable local." Puis réponds avec tes connaissances générales.`
       }
     }
 

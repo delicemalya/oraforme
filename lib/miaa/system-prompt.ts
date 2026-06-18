@@ -51,7 +51,7 @@ Employés actifs : ${d.employes_actifs}${d.solde_tresorerie < 0 ? '\n⚠️ ATTE
 ${getModuleContext(module_actuel, e.secteur)}
 
 ${agent_context ? `═══ EXPERTISE SPÉCIALISÉE ═══\n${agent_context}\n` : ''}
-${pays ? `═══ MODULE FISCAL CONTEXTUEL ═══\n${getMiaaFiscalSystemPrompt(pays)}\n` : ''}
+${pays ? `[FISCAL CONTEXTUEL - ${pays}]\n${getMiaaFiscalSystemPrompt(pays)}\n` : ''}
 ═══ MÉMOIRE & APPRENTISSAGE ═══
 ${m.historique_resume || `Première interaction avec ${e.nom}.`}
 Conversations mémorisées : ${m.nb_conversations}
