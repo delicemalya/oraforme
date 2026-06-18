@@ -1,6 +1,6 @@
 // Registre des pays supportés par Oraforme
-// fiscaliteDisponible : moteur fiscal complet disponible
-// getMoteurFiscal     : retourne le slug du moteur ou null (pas encore implémenté)
+// fiscaliteDisponible : moteur fiscal disponible (Phase 1 : CG, CM, GA, TD, CF, GQ, CD)
+// getMoteurFiscal     : retourne le slug du moteur ou null si non encore implémenté
 
 export interface PaysDisponible {
   code:                 string
@@ -13,14 +13,14 @@ export interface PaysDisponible {
 export const PAYS_DISPONIBLES: PaysDisponible[] = [
   { code: 'CG', nom: 'Congo-Brazzaville',           drapeau: '🇨🇬', devise: 'XAF', fiscaliteDisponible: true  },
   { code: 'CM', nom: 'Cameroun',                     drapeau: '🇨🇲', devise: 'XAF', fiscaliteDisponible: true  },
-  { code: 'GA', nom: 'Gabon',                        drapeau: '🇬🇦', devise: 'XAF', fiscaliteDisponible: false },
-  { code: 'TD', nom: 'Tchad',                        drapeau: '🇹🇩', devise: 'XAF', fiscaliteDisponible: false },
-  { code: 'CF', nom: 'République Centrafricaine',    drapeau: '🇨🇫', devise: 'XAF', fiscaliteDisponible: false },
-  { code: 'CD', nom: 'RD Congo',                     drapeau: '🇨🇩', devise: 'CDF', fiscaliteDisponible: false },
+  { code: 'GA', nom: 'Gabon',                        drapeau: '🇬🇦', devise: 'XAF', fiscaliteDisponible: true  },
+  { code: 'TD', nom: 'Tchad',                        drapeau: '🇹🇩', devise: 'XAF', fiscaliteDisponible: true  },
+  { code: 'CF', nom: 'République Centrafricaine',    drapeau: '🇨🇫', devise: 'XAF', fiscaliteDisponible: true  },
+  { code: 'CD', nom: 'RD Congo',                     drapeau: '🇨🇩', devise: 'CDF', fiscaliteDisponible: true  },
   { code: 'ML', nom: 'Mali',                         drapeau: '🇲🇱', devise: 'XOF', fiscaliteDisponible: false },
   { code: 'CI', nom: "Côte d'Ivoire",                drapeau: '🇨🇮', devise: 'XOF', fiscaliteDisponible: false },
   { code: 'SN', nom: 'Sénégal',                      drapeau: '🇸🇳', devise: 'XOF', fiscaliteDisponible: false },
-  { code: 'GQ', nom: 'Guinée Équatoriale',           drapeau: '🇬🇶', devise: 'XAF', fiscaliteDisponible: false },
+  { code: 'GQ', nom: 'Guinée Équatoriale',           drapeau: '🇬🇶', devise: 'XAF', fiscaliteDisponible: true  },
   { code: 'GW', nom: 'Guinée-Bissau',                drapeau: '🇬🇼', devise: 'XOF', fiscaliteDisponible: false },
   { code: 'BF', nom: 'Burkina Faso',                 drapeau: '🇧🇫', devise: 'XOF', fiscaliteDisponible: false },
   { code: 'NE', nom: 'Niger',                        drapeau: '🇳🇪', devise: 'XOF', fiscaliteDisponible: false },
@@ -39,12 +39,24 @@ export const PAYS_DISPONIBLES: PaysDisponible[] = [
   { code: 'AO', nom: 'Angola',                       drapeau: '🇦🇴', devise: 'AOA', fiscaliteDisponible: false },
 ]
 
-export type MoteurFiscal = 'congo' | 'cameroun'
+export type MoteurFiscal =
+  | 'congo'
+  | 'cameroun'
+  | 'gabon'
+  | 'tchad'
+  | 'rca'
+  | 'guinee-equatoriale'
+  | 'rdc'
 
 export function getMoteurFiscal(codePays: string): MoteurFiscal | null {
   switch (codePays) {
     case 'CG': return 'congo'
     case 'CM': return 'cameroun'
+    case 'GA': return 'gabon'
+    case 'TD': return 'tchad'
+    case 'CF': return 'rca'
+    case 'GQ': return 'guinee-equatoriale'
+    case 'CD': return 'rdc'
     default:   return null
   }
 }
