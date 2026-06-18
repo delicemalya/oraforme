@@ -6,6 +6,7 @@ import { ChevronRight, Eye, EyeOff, Check, Loader2, CheckCircle2, ArrowLeft } fr
 import { supabase } from '@/lib/supabase'
 import { createTenantAndProfile } from './actions'
 import type { TailleEntreprise, SecteurId } from '@/lib/plans'
+import PaysSelector from '@/components/onboarding/PaysSelector'
 
 // ── Step type ─────────────────────────────────────────────────────────────────
 
@@ -96,10 +97,11 @@ const PLAN_FEATURES = {
 const DRAFT_KEY = 'oraforme_onb_v5'
 
 interface Draft {
-  plan?:         TailleEntreprise
-  sectorId?:     string
+  plan?:          TailleEntreprise
+  sectorId?:      string
   nomEntreprise?: string
-  telephone?:    string
+  telephone?:     string
+  pays?:          string
 }
 
 function saveDraft(d: Draft)  { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d))         } catch {} }
@@ -137,6 +139,9 @@ export default function OnboardingPage() {
   const [pwdConfirm,    setPwdConfirm]    = useState('')
   const [showPwd,       setShowPwd]       = useState(false)
   const [showConfirm,   setShowConfirm]   = useState(false)
+
+  // Pays (géolocalisation + sélecteur)
+  const [pays, setPays] = useState('CG')
 
   // Step google-complete
   const [gcNom, setGcNom] = useState('')
@@ -177,6 +182,7 @@ export default function OnboardingPage() {
         if (draft?.nomEntreprise) setGcNom(draft.nomEntreprise)
         if (draft?.telephone)     setGcTel(draft.telephone)
         if (draft?.sectorId)      setSectorId(draft.sectorId)
+        if (draft?.pays)          setPays(draft.pays)
         setStep('google-complete')
 
       } else if (draft?.plan && draft?.sectorId && draft?.nomEntreprise) {
@@ -190,7 +196,7 @@ export default function OnboardingPage() {
             secteurActivite: sect.secteur,
             sousType:        sect.sousType || undefined,
             taille:          draft.plan,
-            pays:            'CG',
+            pays:            draft.pays || 'CG',
             langue:          'fr',
             prenom:          '',
             nom:             '',
@@ -214,7 +220,7 @@ export default function OnboardingPage() {
       secteurActivite: opts.secteur,
       sousType:        opts.sousType || undefined,
       taille:          opts.taille,
-      pays:            'CG',
+      pays:            pays,
       langue:          'fr',
       prenom:          '',
       nom:             '',
@@ -237,7 +243,7 @@ export default function OnboardingPage() {
     if (err) { setError(err.message); setLoading(false); return }
 
     if (!data.session) {
-      saveDraft({ plan, sectorId, nomEntreprise, telephone })
+      saveDraft({ plan, sectorId, nomEntreprise, telephone, pays })
       setPendingEmail(email)
       setStep('email-sent')
       setLoading(false)
@@ -252,7 +258,7 @@ export default function OnboardingPage() {
   // ── Google OAuth ───────────────────────────────────────────────────────────
   async function handleGoogle() {
     if (!plan) { setError('Veuillez d\'abord choisir une offre'); return }
-    saveDraft({ plan, ...(sectorId ? { sectorId } : {}), ...(nomEntreprise.trim() ? { nomEntreprise: nomEntreprise.trim() } : {}), ...(telephone.trim() ? { telephone: telephone.trim() } : {}) })
+    saveDraft({ plan, pays, ...(sectorId ? { sectorId } : {}), ...(nomEntreprise.trim() ? { nomEntreprise: nomEntreprise.trim() } : {}), ...(telephone.trim() ? { telephone: telephone.trim() } : {}) })
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options:  { redirectTo: `${window.location.origin}/auth/callback?next=/onboarding` },
@@ -600,6 +606,13 @@ export default function OnboardingPage() {
                   </label>
                   <input type="tel" value={telephone} onChange={e => setTelephone(e.target.value)}
                     placeholder="+242 06 xxx xxxx" className={INPUT} />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1.5">
+                    Pays <span className="text-[#DC2626]">*</span>
+                  </label>
+                  <PaysSelector value={pays} onChange={setPays} accent={accent} />
                 </div>
 
                 <div>

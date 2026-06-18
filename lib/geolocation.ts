@@ -65,6 +65,32 @@ export function mapIpCountryToAppCode(ipCountry: string): string {
 // Devises sans décimales (entiers uniquement)
 const ZERO_DECIMAL_CURRENCIES = new Set(['FCFA', 'GNF', 'CDF'])
 
+// Reverse geocoding via Nominatim (OpenStreetMap) — free, no key required
+// Returns ISO 3166-1 alpha-2 country code, or null on failure/permission denied
+export async function detecterPaysParGPS(): Promise<string | null> {
+  if (typeof navigator === 'undefined' || !navigator.geolocation) return null
+
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords: { latitude, longitude } }) => {
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            { headers: { 'Accept-Language': 'fr' } }
+          )
+          const data = await res.json()
+          const iso = (data?.address?.country_code as string | undefined)?.toUpperCase()
+          resolve(iso ? mapIpCountryToAppCode(iso) : null)
+        } catch {
+          resolve(null)
+        }
+      },
+      () => resolve(null),
+      { timeout: 10_000, maximumAge: 60_000 }
+    )
+  })
+}
+
 export function formaterMontant(montant: number, code: string): string {
   const pays = getPaysGeo(code)
   const { devise, locale } = pays

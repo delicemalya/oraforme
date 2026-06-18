@@ -5,7 +5,10 @@ import { usePathname } from 'next/navigation'
 import {
   Receipt, Users, FileText, Building2, History,
   TrendingUp, GraduationCap, ClipboardList, Landmark,
+  CheckCircle2, Clock,
 } from 'lucide-react'
+import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { getMoteurFiscal, getPaysDisponible } from '@/lib/pays-config'
 
 const NAV = [
   { href: '/dashboard/fiscalite/tva',               label: 'TVA',                   icon: Receipt        },
@@ -18,6 +21,52 @@ const NAV = [
   { href: '/dashboard/fiscalite/liasse-fiscale',    label: 'Déclarations annuelles',icon: ClipboardList  },
   { href: '/dashboard/fiscalite/historique',        label: 'Historique',            icon: History        },
 ]
+
+function PaysBanner() {
+  const { tenant } = useTenantContext()
+  const codePays = tenant?.pays ?? 'CG'
+  const moteur   = getMoteurFiscal(codePays)
+  const pays     = getPaysDisponible(codePays)
+  const drapeau  = pays?.drapeau ?? '🌍'
+  const nom      = pays?.nom ?? codePays
+
+  if (moteur) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '7px 20px',
+        background: '#F0FDF4', borderBottom: '1px solid #BBF7D0',
+        fontSize: 12, color: '#15803D',
+      }}>
+        <CheckCircle2 size={13} style={{ flexShrink: 0 }} />
+        <span style={{ fontWeight: 600 }}>
+          {drapeau} Moteur fiscal {nom} activé
+        </span>
+        <span style={{ color: '#4ADE80', margin: '0 4px' }}>·</span>
+        <span style={{ color: '#166534' }}>
+          {moteur === 'congo'    && 'TVA 18% + CA · CNSS 4%/23,28% · IRPP Congo'}
+          {moteur === 'cameroun' && 'TVA 19,25% · Patente PM/ME/GE · IRPP Cameroun'}
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 8,
+      padding: '7px 20px',
+      background: '#FFFBEB', borderBottom: '1px solid #FDE68A',
+      fontSize: 12, color: '#92400E',
+    }}>
+      <Clock size={13} style={{ flexShrink: 0 }} />
+      <span style={{ fontWeight: 600 }}>
+        {drapeau} Module fiscal pour {nom} en cours de développement
+      </span>
+      <span style={{ color: '#FCD34D', margin: '0 4px' }}>·</span>
+      <span>Les calculs affichés sont basés sur les paramètres Congo par défaut</span>
+    </div>
+  )
+}
 
 export default function FiscaliteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -71,6 +120,9 @@ export default function FiscaliteLayout({ children }: { children: React.ReactNod
           })}
         </div>
       </div>
+
+      {/* Country fiscal banner */}
+      <PaysBanner />
 
       {/* Content */}
       <div style={{ padding: '24px 20px', maxWidth: 1200, margin: '0 auto' }}>
