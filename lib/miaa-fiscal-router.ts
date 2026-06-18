@@ -95,7 +95,8 @@ export function getMiaaFiscalContext(countryCode: string): MiaaFiscalContext | n
 }
 
 export function getMiaaFiscalSystemPrompt(countryCode: string): string {
-  const ctx = getMiaaFiscalContext(countryCode)
+  const code = countryCode === 'CD_USD' ? 'CD' : countryCode
+  const ctx = getMiaaFiscalContext(code)
 
   if (!ctx) {
     const countryNames: Record<string, string> = {
@@ -104,7 +105,7 @@ export function getMiaaFiscalSystemPrompt(countryCode: string): string {
       ET: 'Éthiopie', RW: 'Rwanda', EG: 'Égypte', MA: 'Maroc',
       TN: 'Tunisie', DZ: 'Algérie', AO: 'Angola', GW: 'Guinée-Bissau',
     }
-    const nom = countryNames[countryCode] ?? 'ce pays'
+    const nom = countryNames[code] ?? 'ce pays'
     return `Le module fiscal spécialisé pour ${nom} est en cours de développement. Je peux donner des informations générales sur la fiscalité africaine et OHADA, mais je recommande de consulter un expert-comptable local pour les règles spécifiques à ${nom}.`
   }
 
@@ -113,7 +114,7 @@ export function getMiaaFiscalSystemPrompt(countryCode: string): string {
     ctx.dataConfidence === 'estimated' ? 'Données partiellement estimées — à confirmer pour usage officiel' :
                                          'Données à vérifier — confirmer auprès de l\'administration fiscale locale'
 
-  const rdcClause = countryCode === 'CD' ? `\n\n${RDC_REFORME_CLAUSE}${RDC_IPR_CLAUSE}` : ''
+  const rdcClause = code === 'CD' ? `\n\n${RDC_REFORME_CLAUSE}${RDC_IPR_CLAUSE}` : ''
 
   return `Tu es ${ctx.expertName}, expert fiscal spécialisé en ${ctx.countryName}.
 Administration de référence : ${ctx.administrationFiscale}

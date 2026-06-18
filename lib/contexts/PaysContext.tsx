@@ -35,7 +35,8 @@ function calculerIRPP(baseImposable: number, config: PaysConfig): number {
 export function PaysProvider({ children }: { children: ReactNode }) {
   const { pays, setPays, detected, loading } = useGeolocation()
   const paysGeo = getPaysGeo(pays)
-  const paysFiscal = PAYS_CONFIGS[pays] ?? PAYS_CONFIGS['CG']
+  const fiscalCode = pays === 'CD_USD' ? 'CD' : pays
+  const paysFiscal = PAYS_CONFIGS[fiscalCode] ?? PAYS_CONFIGS['CG']
 
   const fmt = (montant: number) => formaterMontant(montant, pays)
 
