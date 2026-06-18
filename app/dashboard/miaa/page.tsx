@@ -406,6 +406,7 @@ export default function MIAAPage() {
   // Charger le contexte GED si un documentId est dans l'URL
   useEffect(() => {
     if (!gedDocumentId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUploadLoading(true)
     fetch(`/api/miaa/document-context?documentId=${gedDocumentId}`)
       .then(r => r.json())
@@ -428,7 +429,6 @@ export default function MIAAPage() {
         setMessages(prev => [...prev, { role: 'bot', text: 'Erreur de chargement du document.', ts: Date.now() }])
       })
       .finally(() => setUploadLoading(false))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gedDocumentId])
 
   useEffect(() => {
@@ -497,6 +497,7 @@ export default function MIAAPage() {
     } finally {
       setLoading(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, messages, tenantId, secteur, contextSecteur, currentLocale, t])
 
   async function handleFichier(e: React.ChangeEvent<HTMLInputElement>) {

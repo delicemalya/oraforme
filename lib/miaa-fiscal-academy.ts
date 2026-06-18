@@ -10,9 +10,8 @@ import {
   TAUX_IRVM   as IRVM_GA,
 }                                                         from './fiscalite-gabon'
 import {
-  TAUX_IS      as IS_TD,
-  TAUX_TVA     as TVA_TD,
-  TAUX_PATENTE as PATENTE_TD,
+  TAUX_IS              as IS_TD,
+  TAUX_TVA             as TVA_TD,
   REGLES_DEDUCTIBILITE as DEDUCT_TD,
 }                                                         from './fiscalite-tchad'
 import {
@@ -26,11 +25,9 @@ import {
   TRANCHES_IRPP_GQ,
 }                                                         from './fiscalite-guinee-equatoriale'
 import {
-  TAUX_IS       as IS_CD,
-  TAUX_TVA      as TVA_CD,
+  TAUX_IS  as IS_CD,
+  TAUX_TVA as TVA_CD,
   IPR_RDC,
-  IERE_RDC,
-  IM_RDC,
 }                                                         from './fiscalite-rdc'
 
 // ── Interface ─────────────────────────────────────────────────────────────────
