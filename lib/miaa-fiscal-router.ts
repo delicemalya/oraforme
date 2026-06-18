@@ -17,7 +17,41 @@ export interface MiaaFiscalContext {
   specificites:          readonly string[]
 }
 
-// Clause réforme RDC — injectée dans tous les prompts RDC
+// ── Détection du pays mentionné dans un message utilisateur ──────────────────
+// Chaque code pays → liste de mots-clés en minuscules
+const PAYS_KEYWORDS: Record<string, string[]> = {
+  CG: ['congo-brazzaville', 'congo brazzaville', 'brazzaville', 'republic of congo'],
+  CM: ['cameroun', 'cameroon', 'camerounais', 'cameroonian'],
+  GA: ['gabon', 'gabonais', 'gabonese'],
+  TD: ['tchad', 'tchadien', 'chad', 'chadian'],
+  CF: ['centrafrique', 'centrafricaine', 'rca', 'central african republic', 'república centroafricana'],
+  GQ: ['guinée équatoriale', 'guinee equatoriale', 'equatorial guinea', 'guinea ecuatorial', 'guinée-équatoriale'],
+  CD: ['rdc', 'rd congo', 'congo kinshasa', 'congo-kinshasa', 'kinshasa',
+       'république démocratique du congo', 'republique democratique du congo',
+       'democratic republic of the congo', 'drc'],
+}
+
+export function detecterPaysMentionne(message: string): string | null {
+  const lower = message.toLowerCase()
+  for (const [code, keywords] of Object.entries(PAYS_KEYWORDS)) {
+    if (keywords.some(kw => lower.includes(kw))) return code
+  }
+  return null
+}
+
+// ── Noms des pays sans moteur (pour messages fallback) ────────────────────────
+const PAYS_SANS_MOTEUR_NOMS: Record<string, string> = {
+  ML: 'Mali', CI: "Côte d'Ivoire", SN: 'Sénégal', BF: 'Burkina Faso',
+  NE: 'Niger', NG: 'Nigéria', ZA: 'Afrique du Sud', KE: 'Kenya',
+  ET: 'Éthiopie', RW: 'Rwanda', EG: 'Égypte', MA: 'Maroc',
+  TN: 'Tunisie', DZ: 'Algérie', AO: 'Angola', GW: 'Guinée-Bissau',
+}
+
+export function getNomPaysSansMoteur(code: string): string {
+  return PAYS_SANS_MOTEUR_NOMS[code] ?? code
+}
+
+// ── Clause réforme RDC — injectée dans tous les prompts RDC
 const RDC_REFORME_CLAUSE = `⚠️ CLAUSE RÉFORME OBLIGATOIRE — RDC : Une réforme fiscale majeure (Lois n°23/052 et n°23/053 du 30 novembre 2023) est entrée en vigueur le 1er janvier 2026. Le système cédulaire précédent (impôts séparés par catégorie de revenus) est obsolète et remplacé par un système unifié IS + IRPP. Si l'utilisateur fait référence à l'ancien système ou pose une question qui semble se référer à des règles pré-2026, signale-lui explicitement ce changement avant de répondre.`
 
 export function getMiaaFiscalContext(countryCode: string): MiaaFiscalContext | null {

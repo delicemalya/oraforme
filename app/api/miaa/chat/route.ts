@@ -5,6 +5,7 @@ import { MIAA_AGENTS, type MIAAModule } from '@/lib/miaa-agents'
 import { chargerMemoireMIAA, mettreAJourMemoire } from '@/lib/miaa/memory'
 import { getMIAASystemPrompt } from '@/lib/miaa/system-prompt'
 import { trackUsage } from '@/lib/miaa/usage-tracker'
+import { detecterPaysMentionne, getMiaaFiscalContext, getNomPaysSansMoteur } from '@/lib/miaa-fiscal-router'
 
 export const runtime = 'nodejs'
 
@@ -289,16 +290,40 @@ export async function POST(req: Request) {
     }
 
     // ── 3. System prompt ──────────────────────────────────────────────────────
-    // Résolution du code pays : priorité au pays transmis par le client, sinon extraire depuis la mémoire
+    // Résolution du code pays du tenant
     const paysCode = tenantData?.pays ?? extractPaysCode(memory.entreprise.pays)
+
+    // Détection du pays mentionné dans la question — priorité sur le pays tenant
+    const paysDetecte = detecterPaysMentionne(message)
+    let paysEffectif = paysCode
+    let crossCountryNote = ''
+
+    if (paysDetecte && paysDetecte !== paysCode) {
+      const ctxDetecte = getMiaaFiscalContext(paysDetecte)
+      const nomPaysTenant = paysCode
+        ? (getMiaaFiscalContext(paysCode)?.countryName ?? paysCode)
+        : 'celui de l\'entreprise'
+
+      if (ctxDetecte) {
+        // Pays avec moteur fiscal → basculer le contexte pour cette réponse
+        paysEffectif = paysDetecte
+        crossCountryNote = `\n\n═══ CONTEXTE CROSS-PAYS ═══\nL'utilisateur interroge sur la fiscalité de ${ctxDetecte.countryName}, qui diffère du pays de son entreprise (${nomPaysTenant}). Utilise EXCLUSIVEMENT les données fiscales de ${ctxDetecte.countryName} listées dans le MODULE FISCAL CONTEXTUEL ci-dessus — ne mélange pas avec les règles de ${nomPaysTenant}. Propose en fin de réponse de clarifier si la question concerne une filiale, un client étranger, un fournisseur ou une opération transfrontalière.`
+      } else {
+        // Pays sans moteur fiscal → signaler l'absence de données vérifiées
+        const nomPaysDetecte = getNomPaysSansMoteur(paysDetecte)
+        crossCountryNote = `\n\n═══ CONTEXTE CROSS-PAYS ═══\nL'utilisateur interroge sur la fiscalité de ${nomPaysDetecte}. Aucun module fiscal spécialisé pour ce pays n'est disponible dans Oraforme. Commence ta réponse par : "Je n'ai pas de module fiscal spécialisé pour ${nomPaysDetecte} dans Oraforme — voici une réponse générale à vérifier avec un expert-comptable local." Puis réponds avec tes connaissances générales.`
+      }
+    }
 
     let systemPrompt = getMIAASystemPrompt({
       memory,
       module_actuel: effectiveModule || 'general',
       langue:        langue || 'fr',
       agent_context: agent?.personnalite,
-      pays:          paysCode,
+      pays:          paysEffectif,
     })
+
+    if (crossCountryNote) systemPrompt += crossCountryNote
 
     // Injecter le contexte GED si un document est sélectionné
     if (gedContext) {
