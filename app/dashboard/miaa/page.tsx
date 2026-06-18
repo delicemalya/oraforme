@@ -17,6 +17,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import { getTenantBrandColor } from '@/lib/utils'
+import { getMiaaFiscalContext } from '@/lib/miaa-fiscal-router'
 
 // ── Expert persona config ─────────────────────────────────────────────────────
 
@@ -174,7 +175,9 @@ export default function MIAAPage() {
   const { t, locale } = useLocale()
   const { tenantId, prenom, nom, nomEntreprise } = useTenant()
   const { tenant } = useTenantContext()
-  const secteur = tenant?.secteur ?? null
+  const secteur   = tenant?.secteur ?? null
+  const paysCode  = tenant?.pays ?? null
+  const fiscalCtx = paysCode ? getMiaaFiscalContext(paysCode) : null
   const brandColor = tenantId ? getTenantBrandColor(tenantId) : '#F59E0B'
   const searchParams = useSearchParams()
   const contextSecteur = searchParams.get('context') ?? undefined
@@ -379,7 +382,7 @@ export default function MIAAPage() {
           module:     'auto',
           message:    msg,
           history:    history.slice(0, -1),
-          tenantData: { tenant_id: tenantId ?? undefined, secteur: contextSecteur ?? secteur },
+          tenantData: { tenant_id: tenantId ?? undefined, secteur: contextSecteur ?? secteur, pays: paysCode ?? undefined },
           langue:     currentLocale,
           gedContext: gedContext ?? undefined,
         }),
@@ -446,7 +449,7 @@ export default function MIAAPage() {
             ? "Sur la base de ces informations, génère un rapport professionnel complet avec titre, introduction, sections numérotées et conclusion avec recommandations."
             : "Based on this information, generate a complete professional report with title, introduction, numbered sections and conclusion with recommendations.",
           history: [{ role: 'assistant', content: contexte }],
-          tenantData: { tenant_id: tenantId ?? undefined, secteur: contextSecteur ?? secteur },
+          tenantData: { tenant_id: tenantId ?? undefined, secteur: contextSecteur ?? secteur, pays: paysCode ?? undefined },
         }),
       })
       const data = await res.json()
@@ -676,6 +679,17 @@ export default function MIAAPage() {
                   >
                     <Brain size={8} />
                     {AGENT_LABELS[agentActif].label}
+                  </span>
+                )}
+                {/* Fiscal expert badge — shown when tenant has a fiscal engine */}
+                {fiscalCtx && (
+                  <span
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                    style={{ background: '#F59E0B18', color: '#B45309' }}
+                    title={`Administration : ${fiscalCtx.administrationFiscale}`}
+                  >
+                    <Calculator size={8} />
+                    {fiscalCtx.expertName}
                   </span>
                 )}
               </div>

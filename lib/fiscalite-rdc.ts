@@ -186,3 +186,28 @@ export const TVA_RDC = {
   echeance:                 TAUX_TVA.echeance_declaration,
   autoliquidation_b2b:      TAUX_TVA.autoliquidation_b2b_taux,
 } as const
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXTE MIAA+ EXPERT FISCAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const MIAA_FISCAL_CONTEXT = {
+  country:               'CD',
+  countryName:           'République Démocratique du Congo',
+  currency:              'CDF',
+  administrationFiscale: 'Direction Générale des Impôts (DGI RDC)',
+  systemeFiscal:         'OHADA / SYSCOHADA — Lois n°23/052 et n°23/053 du 30/11/2023 (réforme 2026)',
+  expertName:            'MIAA+ Expert Fiscal RDC',
+  dataConfidence:        DATA_CONFIDENCE,
+  specificites: [
+    '⚠️ RÉFORME 2026 EN VIGUEUR : système cédulaire remplacé par IS + IRPP unifié (Lois 23/052 et 23/053 du 30/11/2023)',
+    'IS 30% bénéfice net ; taxe minimale 1% CA si déficitaire',
+    'Report des pertes limité à 3 exercices (NOUVEAUTÉ 2026 — avant : illimité)',
+    'Prix de transfert : méthodes OCDE intégrées depuis 2026',
+    'TVA 16% — seuil 80 000 000 CDF/an ; professions libérales assujetties sans seuil',
+    'Facture normalisée e-UF/e-MCF obligatoire depuis décembre 2025',
+    'Autoliquidation TVA 16% B2B si fournisseur étranger sans représentant fiscal local',
+    'IRS 14% sur services rendus en RDC par non-résidents',
+    'Devise : CDF (Franc Congolais) — distinct du XAF Congo-Brazzaville',
+  ],
+} as const

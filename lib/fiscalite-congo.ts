@@ -565,3 +565,28 @@ export const AUTRES_TAXES_CONGO = {
   douanes:         C.douanes,
   foncier:         C.foncier,
 } as const
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXTE MIAA+ EXPERT FISCAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const MIAA_FISCAL_CONTEXT = {
+  country:               'CG',
+  countryName:           'Congo-Brazzaville',
+  currency:              'XAF',
+  administrationFiscale: 'Direction Générale des Impôts (DGI Congo)',
+  systemeFiscal:         'OHADA / SYSCOHADA — Loi de Finances 2026 (Loi n°42-2025 du 31/12/2025)',
+  expertName:            'MIAA+ Expert Fiscal Congo-Brazzaville',
+  dataConfidence:        'verified' as const,
+  specificites: [
+    'TVA 18% + Centime Additionnel (CA) 5% de la TVA — TTC = HT × 1,189',
+    'IS 30% ; minimum 1% du CA HT ; acomptes trimestriels 25% de l\'IS N-1',
+    'IRPP 5 tranches 0–40% — abattement professionnel 20%',
+    'Mesure LF 2026 : État prend en charge 100% IRPP salariés (25 000 premiers déclarants CNSS)',
+    'Mesure LF 2026 : État prend en charge 50% cotisations patronales CNSS',
+    'CNSS salarié 4% (plafonné 540 000 FCFA/mois) ; patronal 20,29% + TUS 3% déplafonné',
+    'Patente dégressif de 9,75% (CA ≤ 5M) à 0,045% (CA > 1Mrd) — échéance 31 mars',
+    'Redevance Informatique Douanière (Art. 44 LF 2026) : 2% import/export, 1% régimes suspensifs',
+    'SMIG : 90 000 FCFA/mois',
+  ],
+} as const

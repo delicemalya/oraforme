@@ -166,3 +166,27 @@ export const TVA_TCHAD = {
   taux_normal: TAUX_TVA.taux_normal,   // ⚠️ to_verify
   echeance:    TAUX_TVA.echeance_declaration,
 } as const
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXTE MIAA+ EXPERT FISCAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const MIAA_FISCAL_CONTEXT = {
+  country:               'TD',
+  countryName:           'Tchad',
+  currency:              'XAF',
+  administrationFiscale: 'Direction Générale des Impôts et du Domaine (DGID Tchad)',
+  systemeFiscal:         'OHADA / SYSCOHADA, zone CEMAC',
+  expertName:            'MIAA+ Expert Fiscal Tchad',
+  dataConfidence:        DATA_CONFIDENCE,
+  specificites: [
+    'IS 35% ; minimum fiscal fixe 1M–2M XAF/an selon activité, payé par douzième mensuel (15 du mois suivant)',
+    'TVA 18% estimé par cohérence CEMAC — à confirmer (taux zéro : exportations + transport international)',
+    'Patente 0,35% du CA N-2 — échéance 31 mars',
+    'Retenue source prestataires non-résidents : 25% ; dividendes non-résidents : 20% (exonéré CEMAC)',
+    'Frais siège hors Tchad/CEMAC : déductibles limite 10% des charges',
+    'Frais restauration/hôtels et dons : déductibles limite 0,5% du CA net d\'impôts',
+    'Amortissements : taux légal 5% minimum, 33,33% maximum',
+    '⚠️ Données TVA classées to_verify — confirmer auprès de la DGID Tchad avant usage officiel',
+  ],
+} as const

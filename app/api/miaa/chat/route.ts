@@ -114,6 +114,24 @@ function detectAgent(message: string, secteur?: string): string {
   return 'comptabilite'
 }
 
+// ── Conversion nom de pays → code ISO pour le routing fiscal ─────────────────
+// La mémoire stocke parfois le nom complet ('Congo-Brazzaville') au lieu du code ('CG')
+const PAYS_NAME_TO_CODE: Record<string, string> = {
+  'congo-brazzaville': 'CG', 'congo': 'CG', 'republic of the congo': 'CG',
+  'cameroun': 'CM', 'cameroon': 'CM',
+  'gabon': 'GA',
+  'tchad': 'TD', 'chad': 'TD',
+  'rca': 'CF', 'centrafrique': 'CF', 'république centrafricaine': 'CF', 'central african republic': 'CF',
+  'guinée équatoriale': 'GQ', 'equatorial guinea': 'GQ', 'guinea ecuatorial': 'GQ',
+  'rdc': 'CD', 'rd congo': 'CD', 'congo-kinshasa': 'CD', 'democratic republic of the congo': 'CD',
+}
+
+function extractPaysCode(pays: string | undefined): string | undefined {
+  if (!pays) return undefined
+  if (pays.length === 2) return pays.toUpperCase() // déjà un code ISO
+  return PAYS_NAME_TO_CODE[pays.toLowerCase()] ?? undefined
+}
+
 // ── Cache in-memory ────────────────────────────────────────────────────────────
 // Portée : instance serveur (process). Persiste entre requêtes sur le même worker.
 // En production (Vercel serverless) : cache par instance — toujours bénéfique
@@ -217,7 +235,7 @@ export async function POST(req: Request) {
       module:     string
       message:    string
       history:    { role: 'user' | 'assistant'; content: string }[]
-      tenantData?: { tenant_id?: string; secteur?: string }
+      tenantData?: { tenant_id?: string; secteur?: string; pays?: string }
       langue?:    string
       gedContext?: string
     }
@@ -271,11 +289,15 @@ export async function POST(req: Request) {
     }
 
     // ── 3. System prompt ──────────────────────────────────────────────────────
+    // Résolution du code pays : priorité au pays transmis par le client, sinon extraire depuis la mémoire
+    const paysCode = tenantData?.pays ?? extractPaysCode(memory.entreprise.pays)
+
     let systemPrompt = getMIAASystemPrompt({
       memory,
       module_actuel: effectiveModule || 'general',
       langue:        langue || 'fr',
       agent_context: agent?.personnalite,
+      pays:          paysCode,
     })
 
     // Injecter le contexte GED si un document est sélectionné

@@ -2,6 +2,7 @@
  * lib/miaa/system-prompt.ts — Prompt omniscient MIAA+
  */
 import type { MIAAMemory } from './memory'
+import { getMiaaFiscalSystemPrompt } from '@/lib/miaa-fiscal-router'
 
 const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
 
@@ -10,8 +11,9 @@ export function getMIAASystemPrompt(ctx: {
   module_actuel: string
   langue:        string
   agent_context?: string  // contexte spécialisé injecté par lib/miaa-agents.ts
+  pays?:         string   // code pays ISO (ex: 'CG', 'CM') pour routing fiscal contextuel
 }): string {
-  const { memory: m, module_actuel, langue, agent_context } = ctx
+  const { memory: m, module_actuel, langue, agent_context, pays } = ctx
   const { entreprise: e, donnees_live: d } = m
 
   return `Tu es MIAA+, l'agent général intelligent d'Oraforme — la plateforme ERP africaine leader.
@@ -49,7 +51,7 @@ Employés actifs : ${d.employes_actifs}${d.solde_tresorerie < 0 ? '\n⚠️ ATTE
 ${getModuleContext(module_actuel, e.secteur)}
 
 ${agent_context ? `═══ EXPERTISE SPÉCIALISÉE ═══\n${agent_context}\n` : ''}
-
+${pays ? `═══ MODULE FISCAL CONTEXTUEL ═══\n${getMiaaFiscalSystemPrompt(pays)}\n` : ''}
 ═══ MÉMOIRE & APPRENTISSAGE ═══
 ${m.historique_resume || `Première interaction avec ${e.nom}.`}
 Conversations mémorisées : ${m.nb_conversations}

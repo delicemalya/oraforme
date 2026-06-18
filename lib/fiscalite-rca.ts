@@ -182,3 +182,27 @@ export const TVA_RCA = {
   seuil_assujettissement: TAUX_TVA.seuil_assujettissement,
   echeance:               TAUX_TVA.echeance_declaration,
 } as const
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXTE MIAA+ EXPERT FISCAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const MIAA_FISCAL_CONTEXT = {
+  country:               'CF',
+  countryName:           'République Centrafricaine',
+  currency:              'XAF',
+  administrationFiscale: 'Direction Générale des Impôts et des Domaines (DGID RCA)',
+  systemeFiscal:         'OHADA / SYSCOHADA, zone CEMAC',
+  expertName:            'MIAA+ Expert Fiscal RCA',
+  dataConfidence:        DATA_CONFIDENCE,
+  specificites: [
+    'IS assis sur le CHIFFRE D\'AFFAIRES (pas le bénéfice) : général 1,85% CA (min 1 850 000 XAF) ; agricole 0,3% CA (min 300 000 XAF)',
+    'Acompte IS : 3% retenu à la source sur les paiements',
+    'TVA 19% — assujettissement si CA ≥ 30 000 000 XAF',
+    'CDS (Contribution pour le Développement Social) : 10% masse salariale brute mensuelle',
+    'Retenue source : 15% sur CA des services étrangers rendus en RCA',
+    'Frais siège hors RCA : déductibles max 20% des charges avant déduction',
+    'Paiements en espèces > 200 000 XAF : non déductibles fiscalement',
+    'Propriété non bâtie : taxe unique 27,50% toutes catégories',
+  ],
+} as const

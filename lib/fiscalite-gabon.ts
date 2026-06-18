@@ -168,3 +168,27 @@ export const TVA_GABON = {
   taux_reduit:  TAUX_TVA.taux_reduit,
   echeance:     TAUX_TVA.echeance_declaration,
 } as const
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXTE MIAA+ EXPERT FISCAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const MIAA_FISCAL_CONTEXT = {
+  country:               'GA',
+  countryName:           'Gabon',
+  currency:              'XAF',
+  administrationFiscale: 'Direction Générale des Impôts (DGI Gabon)',
+  systemeFiscal:         'OHADA / SYSCOHADA, zone CEMAC',
+  expertName:            'MIAA+ Expert Fiscal Gabon',
+  dataConfidence:        DATA_CONFIDENCE,
+  specificites: [
+    'TVA 18% estimé par cohérence CEMAC — à confirmer DGI Gabon (taux réduit 5%)',
+    'IS 35% ; minimum 1,1% du CA HT avec plancher 600 000 XAF',
+    'Exonération du minimum IS les 2 premières années d\'activité',
+    'Acomptes IS : 1/4 (30 nov), 1/3 (30 jan), solde (30 avr)',
+    'IRVM dividendes : 20% (10% sous conditions)',
+    'Retenue source prestataires étrangers : 20%',
+    'Patente 0,35% du CA N-2 — échéance estimée',
+    '⚠️ Données classées to_verify — recommander confirmation DGI Gabon avant usage officiel',
+  ],
+} as const

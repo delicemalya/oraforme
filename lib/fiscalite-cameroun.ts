@@ -268,3 +268,26 @@ export const CHARGES_SALARIALES_CAMEROUN = {
 } as const
 
 export const DROITS_ENREGISTREMENT_CAMEROUN = C.droits_enregistrement
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXTE MIAA+ EXPERT FISCAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const MIAA_FISCAL_CONTEXT = {
+  country:               'CM',
+  countryName:           'Cameroun',
+  currency:              'XAF',
+  administrationFiscale: 'Direction Générale des Impôts (DGI Cameroun)',
+  systemeFiscal:         'OHADA / SYSCOHADA, zone CEMAC',
+  expertName:            'MIAA+ Expert Fiscal Cameroun',
+  dataConfidence:        'verified' as const,
+  specificites: [
+    'TVA effective 19,25% (décomposition informative : 17,25% base + 10% CAC sur TVA)',
+    'IRPP progressif 4 tranches : 10% → 15% → 25% → 35% + centimes additionnels communaux 10%',
+    'Patente dégressif : PE 0,494% (CA ≤ 50M) ; ME 0,283% (50M–3Mrd) ; GE 0,159% (> 3Mrd) — échéance 28 fév',
+    'Crédit Foncier : 1% salarié + 1,5% employeur (mensuel)',
+    'FNE (Fonds National de l\'Emploi) : 1% employeur (mensuel)',
+    'Droits enregistrement : vente fonds 15%, immobilier 10%, baux illimités 15%, habitation 5%',
+    '⚠️ Vérifier éventuelles modifications LF 2026 avant usage officiel',
+  ],
+} as const

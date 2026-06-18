@@ -211,3 +211,28 @@ export const IRPP_GQ = {
   taux_max:     0.25,
   seuil_taux_max: 20_000_000,
 } as const
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXTE MIAA+ EXPERT FISCAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const MIAA_FISCAL_CONTEXT = {
+  country:               'GQ',
+  countryName:           'Guinée Équatoriale',
+  currency:              'XAF',
+  administrationFiscale: 'Direction Générale des Impôts (DGI Guinée Équatoriale)',
+  systemeFiscal:         'OHADA / SYSCOHADA, zone CEMAC',
+  expertName:            'MIAA+ Expert Fiscal Guinée Équatoriale',
+  dataConfidence:        DATA_CONFIDENCE,
+  specificites: [
+    'TVA 15% standard ; 6% réduit (produits de base, livres) ; 0% exportations',
+    'IRPP progressif : max 25% au-delà de 20 000 000 XAF [verified] — tranches inférieures estimées',
+    'IS estimé à 25% par cohérence CEMAC — à confirmer auprès de la DGI GQ',
+    'MIT (Impôt Minimum des Sociétés) : 2 paiements annuels obligatoires',
+    'Retenue source : 20% individus non-résidents ; 25% dividendes entreprises étrangères',
+    'Retenue secteur pétrolier/minier : 10% non-résidents, 3% résidents',
+    'Résidence fiscale : >3 mois/an ou 6 mois sur 2 années civiles',
+    'SMIG : 129 035 XAF/mois',
+    '⚠️ Données partiellement estimées — confirmer IS et tranches IRPP auprès de la DGI GQ',
+  ],
+} as const
