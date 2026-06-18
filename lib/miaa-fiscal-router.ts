@@ -52,7 +52,34 @@ export function getNomPaysSansMoteur(code: string): string {
 }
 
 // ── Clause réforme RDC — injectée dans tous les prompts RDC
-const RDC_REFORME_CLAUSE = `⚠️ CLAUSE RÉFORME OBLIGATOIRE — RDC : Une réforme fiscale majeure (Lois n°23/052 et n°23/053 du 30 novembre 2023) est entrée en vigueur le 1er janvier 2026. Le système cédulaire précédent (impôts séparés par catégorie de revenus) est obsolète et remplacé par un système unifié IS + IRPP. Si l'utilisateur fait référence à l'ancien système ou pose une question qui semble se référer à des règles pré-2026, signale-lui explicitement ce changement avant de répondre.`
+const RDC_REFORME_CLAUSE = `⚠️ CLAUSE RÉFORME OBLIGATOIRE — RDC : Une réforme fiscale majeure (Lois n°23/052 et n°23/053 du 30 novembre 2023, LF N°25/060 du 29/12/2025) est entrée en vigueur le 1er janvier 2026. La terminologie officielle est IBP (Impôt sur Bénéfices et Profits) et IPR (Impôt Professionnel sur Rémunérations) — et non plus "IS" et "IRPP". Si l'utilisateur fait référence à l'ancien système, signale-lui explicitement ce changement avant de répondre.`
+
+// ── Clause IPR RDC — barème officiel LF 2025, interdiction barème alternatif
+const RDC_IPR_CLAUSE = `\n\nBARÈME IPR OFFICIEL — SOURCE : LF N°25/060 DU 29/12/2025 (Ministère des Finances RDC)
+IPR = Impôt Professionnel sur les Rémunérations (remplace IRPP dans terminologie officielle 2025)
+Barème marginal progressif annuel (Francs Congolais) :
+  0%    : 0 – 524 160 FC
+  15%   : 524 161 – 1 428 000 FC
+  20%   : 1 428 001 – 2 700 000 FC
+  22,5% : 2 700 001 – 4 620 000 FC
+  25%   : 4 620 001 – 7 260 000 FC
+  30%   : 7 260 001 – 10 260 000 FC
+  32,5% : 10 260 001 – 13 908 000 FC
+  35%   : 13 908 001 – 16 824 000 FC
+  37,5% : 16 824 001 – 22 956 000 FC
+  40%   : au-delà de 22 956 001 FC
+Exonération : personnel diplomatique (Convention de Vienne)
+
+INTERDICTION ABSOLUE : Ne génère JAMAIS un barème IPR/IRPP avec des tranches exprimées en dizaines de millions FC (60 000 000 / 120 000 000 / 300 000 000 / 600 000 000 FC etc.). Ce barème est INCORRECT pour la RDC. Le barème officiel plafonne sa première tranche imposable à 1 428 000 FC, pas à 60 000 000 FC.
+
+IBP RÉGIMES SPÉCIAUX (LF N°25/060) :
+  - Standard : 30% bénéfice net
+  - Petites Entreprises : 1% sur ventes / 2% sur prestations de services
+  - Micro-entreprises : forfait fixe 30 000 FC
+  - Impôt minimum (si déficit) : 1% CA — planchers : 2 500 000 FC (GE) / 750 000 FC (ME) / 30 000 FC (PE)
+IERE (expatriés) : 25%
+IM (capitaux mobiliers) : 20%
+IRS (services non-résidents) : 14%`
 
 export function getMiaaFiscalContext(countryCode: string): MiaaFiscalContext | null {
   switch (countryCode) {
@@ -86,7 +113,7 @@ export function getMiaaFiscalSystemPrompt(countryCode: string): string {
     ctx.dataConfidence === 'estimated' ? 'Données partiellement estimées — à confirmer pour usage officiel' :
                                          'Données à vérifier — confirmer auprès de l\'administration fiscale locale'
 
-  const rdcClause = countryCode === 'CD' ? `\n\n${RDC_REFORME_CLAUSE}` : ''
+  const rdcClause = countryCode === 'CD' ? `\n\n${RDC_REFORME_CLAUSE}${RDC_IPR_CLAUSE}` : ''
 
   return `Tu es ${ctx.expertName}, expert fiscal spécialisé en ${ctx.countryName}.
 Administration de référence : ${ctx.administrationFiscale}
@@ -97,5 +124,5 @@ Fiabilité des données : ${fiabilite}
 Particularités fiscales de ${ctx.countryName} :
 ${ctx.specificites.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
-Réponds uniquement avec les taux et règles de ${ctx.countryName}. Si une donnée est marquée "to_verify" ou "estimated" dans les particularités ci-dessus, précise à l'utilisateur qu'elle doit être confirmée auprès d'un expert-comptable local ou de l'${ctx.administrationFiscale} avant usage officiel.${rdcClause}`
+Réponds UNIQUEMENT avec les taux et règles de ${ctx.countryName} listés ci-dessus. Si une information précise n'est pas disponible dans ce contexte fiscal, dis-le explicitement plutôt que de compléter avec des connaissances générales non vérifiées. Si une donnée est marquée "to_verify" ou "estimated", précise à l'utilisateur qu'elle doit être confirmée auprès d'un expert-comptable local ou de l'${ctx.administrationFiscale} avant usage officiel.${rdcClause}`
 }
