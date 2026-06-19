@@ -87,8 +87,9 @@ function StatCard({ icon: Icon, label, value, trend, color }: {
   return (
     <div className="bg-white rounded-2xl border border-[#E8ECF0] p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: color + '18' }}>
-          <Icon size={16} className="opacity-80" style={{ color } as React.CSSProperties} />
+        {/* color set on wrapper so lucide icon inherits via currentColor */}
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: color + '18', color }}>
+          <Icon size={16} className="opacity-80" />
         </div>
         {trend !== undefined && (
           <span className={`text-[11px] font-bold flex items-center gap-0.5 ${trend >= 0 ? 'text-green-600' : 'text-red-500'}`}>
