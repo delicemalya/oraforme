@@ -36,48 +36,72 @@ const SECTORS_TPE: SectorOption[] = [
   { id: 'autre',       label: 'Autre activité',            secteur: 'autre',       sousType: null          },
 ]
 
-// Business — 17 secteurs
+// Business — secteurs regroupés par famille
 const SECTORS_PME: SectorOption[] = [
-  { id: 'cabinet-comptable',  label: 'Cabinet Comptable',        secteur: 'cabinet',     sousType: 'comptable'           },
-  { id: 'cabinet-fiscal',     label: 'Cabinet Fiscal',           secteur: 'cabinet',     sousType: 'fiscal'              },
-  { id: 'cabinet-audit',      label: "Cabinet d'Audit",          secteur: 'cabinet',     sousType: 'audit'               },
-  { id: 'cabinet-conseil',    label: 'Cabinet Conseil',          secteur: 'cabinet',     sousType: 'conseil'             },
-  { id: 'cabinet-juridique',  label: 'Cabinet Juridique',        secteur: 'cabinet',     sousType: 'juridique'           },
-  { id: 'cabinet-avocat',     label: "Cabinet d'Avocats",        secteur: 'cabinet',     sousType: 'avocat'              },
-  { id: 'hotel',           label: 'Hôtel',                   secteur: 'hotel',       sousType: null                  },
-  { id: 'universite',      label: 'Université',              secteur: 'ecole',       sousType: 'universite'          },
-  { id: 'lycee',           label: 'Lycée',                   secteur: 'ecole',       sousType: 'lycee'               },
-  { id: 'clinique',        label: 'Clinique',                secteur: 'sante',       sousType: 'clinique'            },
-  { id: 'hopital',         label: 'Hôpital',                 secteur: 'sante',       sousType: 'hopital'             },
-  { id: 'ong',             label: 'ONG',                     secteur: 'ong',         sousType: null                  },
-  { id: 'logistique',      label: 'Logistique',              secteur: 'transport',   sousType: 'logistique'          },
-  { id: 'transport',       label: 'Transport',               secteur: 'transport',   sousType: null                  },
-  { id: 'supermarche',     label: 'Supermarché',             secteur: 'supermarche', sousType: null                  },
-  { id: 'banque',          label: 'Banque',                  secteur: 'banque',      sousType: 'banque_comm'         },
-  { id: 'microfinance',    label: 'Microfinance',            secteur: 'banque',      sousType: 'microfinance'        },
-  { id: 'industrie',       label: 'Industrie',               secteur: 'autre',       sousType: 'industrie'           },
-  { id: 'btp',             label: 'BTP',                     secteur: 'btp',         sousType: null                  },
-  { id: 'petrole',         label: 'Pétrole & Mines',         secteur: 'petrole',     sousType: null                  },
-  { id: 'grande_distrib',      label: 'Grande distribution',      secteur: 'supermarche', sousType: 'grande_distribution' },
-  { id: 'compagnie_assurance',   label: "Compagnie d'assurance",    secteur: 'assurance',     sousType: 'compagnie'          },
-  { id: 'courtier_assurance',    label: 'Courtier en assurance',    secteur: 'assurance',     sousType: 'courtier'           },
-  { id: 'agent_assurance',       label: "Agent d'assurance",        secteur: 'assurance',     sousType: 'agent'              },
-  { id: 'cabinet-recrutement',   label: 'Cabinet de recrutement',   secteur: 'recrutement',   sousType: 'cabinet_recrutement'},
-  { id: 'cabinet-rh',            label: 'Cabinet RH',               secteur: 'recrutement',   sousType: 'cabinet_rh'         },
-  { id: 'societe-placement',     label: 'Société de placement',     secteur: 'recrutement',   sousType: 'placement'          },
-  { id: 'interim',               label: "Société d'intérim",        secteur: 'recrutement',   sousType: 'interim'            },
-  { id: 'mise-disposition',      label: 'Mise à disposition',       secteur: 'recrutement',   sousType: 'mise_disposition'   },
-  { id: 'chasseur-tetes',        label: 'Chasseur de têtes',        secteur: 'recrutement',   sousType: 'chasseur_tetes'     },
-  { id: 'agence-rh',             label: 'Agence RH',                secteur: 'recrutement',   sousType: 'agence_rh'          },
-  { id: 'staffing',              label: 'Staffing',                 secteur: 'recrutement',   sousType: 'staffing'           },
-  { id: 'autre_business',        label: 'Autre activité',           secteur: 'autre',         sousType: null                 },
+  // Cabinets & Conseil
+  { id: 'cabinet-comptable',     label: 'Cabinet Comptable',        secteur: 'cabinet',     sousType: 'comptable'            },
+  { id: 'cabinet-fiscal',        label: 'Cabinet Fiscal',           secteur: 'cabinet',     sousType: 'fiscal'               },
+  { id: 'cabinet-audit',         label: "Cabinet d'Audit",          secteur: 'cabinet',     sousType: 'audit'                },
+  { id: 'cabinet-conseil',       label: 'Cabinet Conseil',          secteur: 'cabinet',     sousType: 'conseil'              },
+  { id: 'cabinet-juridique',     label: 'Cabinet Juridique',        secteur: 'cabinet',     sousType: 'juridique'            },
+  { id: 'cabinet-avocat',        label: "Cabinet d'Avocats",        secteur: 'cabinet',     sousType: 'avocat'               },
+  // Santé
+  { id: 'clinique',              label: 'Clinique',                 secteur: 'sante',       sousType: 'clinique'             },
+  { id: 'hopital',               label: 'Hôpital',                  secteur: 'sante',       sousType: 'hopital'              },
+  // Éducation
+  { id: 'lycee',                 label: 'Lycée',                    secteur: 'ecole',       sousType: 'lycee'                },
+  { id: 'universite',            label: 'Université',               secteur: 'ecole',       sousType: 'universite'           },
+  // Finance & Banque
+  { id: 'banque',                label: 'Banque',                   secteur: 'banque',      sousType: 'banque_comm'          },
+  { id: 'microfinance',          label: 'Microfinance',             secteur: 'banque',      sousType: 'microfinance'         },
+  // Hôtellerie
+  { id: 'hotel',                 label: 'Hôtel',                    secteur: 'hotel',       sousType: null                   },
+  // Commerce & Industrie
+  { id: 'supermarche',           label: 'Supermarché',              secteur: 'supermarche', sousType: null                   },
+  { id: 'grande_distrib',        label: 'Grande distribution',      secteur: 'supermarche', sousType: 'grande_distribution'  },
+  { id: 'logistique',            label: 'Logistique',               secteur: 'transport',   sousType: 'logistique'           },
+  { id: 'transport',             label: 'Transport',                secteur: 'transport',   sousType: null                   },
+  { id: 'btp',                   label: 'BTP',                      secteur: 'btp',         sousType: null                   },
+  { id: 'industrie',             label: 'Industrie',                secteur: 'autre',       sousType: 'industrie'            },
+  { id: 'petrole',               label: 'Pétrole & Mines',          secteur: 'petrole',     sousType: null                   },
+  // Assurance
+  { id: 'compagnie_assurance',   label: "Compagnie d'assurance",    secteur: 'assurance',   sousType: 'compagnie'            },
+  { id: 'courtier_assurance',    label: 'Courtier en assurance',    secteur: 'assurance',   sousType: 'courtier'             },
+  { id: 'agent_assurance',       label: "Agent d'assurance",        secteur: 'assurance',   sousType: 'agent'                },
+  // Recrutement & RH (3 familles au lieu de 8 doublons)
+  { id: 'cabinet-recrutement',   label: 'Recrutement & Placement',  secteur: 'recrutement', sousType: 'cabinet_recrutement'  },
+  { id: 'interim',               label: 'Intérim & Staffing',       secteur: 'recrutement', sousType: 'interim'              },
+  { id: 'chasseur-tetes',        label: 'Executive Search',         secteur: 'recrutement', sousType: 'chasseur_tetes'       },
+  // Autres
+  { id: 'ong',                   label: 'ONG',                      secteur: 'ong',         sousType: null                   },
+  { id: 'autre_business',        label: 'Autre activité',           secteur: 'autre',       sousType: null                   },
 ]
+
+// Groupes pour l'affichage PME
+const PME_GROUPS: { label: string; icon: string; ids: string[] }[] = [
+  { label: 'Cabinets & Conseil',   icon: '💼', ids: ['cabinet-comptable','cabinet-fiscal','cabinet-audit','cabinet-conseil','cabinet-juridique','cabinet-avocat'] },
+  { label: 'Santé',                icon: '🏥', ids: ['clinique','hopital'] },
+  { label: 'Éducation',            icon: '🎓', ids: ['lycee','universite'] },
+  { label: 'Finance & Banque',     icon: '🏦', ids: ['banque','microfinance'] },
+  { label: 'Hôtellerie',           icon: '🏨', ids: ['hotel'] },
+  { label: 'Commerce & Industrie', icon: '🏭', ids: ['supermarche','grande_distrib','logistique','transport','btp','industrie','petrole'] },
+  { label: 'Assurance',            icon: '🛡️', ids: ['compagnie_assurance','courtier_assurance','agent_assurance'] },
+  { label: 'Recrutement & RH',     icon: '👥', ids: ['cabinet-recrutement','interim','chasseur-tetes'] },
+  { label: 'Autres',               icon: '✦',  ids: ['ong','autre_business'] },
+]
+
+// Icônes par secteur TPE
+const TPE_ICONS: Record<string, string> = {
+  commerce: '🛍️', restaurant: '🍽️', pharmacie: '💊', agriculture: '🌾',
+  boulangerie: '🥖', boisson: '🍺', creche: '👶', primaire: '✏️',
+  college: '📚', autre: '✦',
+}
 
 // ── Left-panel gradient by step ───────────────────────────────────────────────
 
 const STEP_GRADIENT: Record<Step, string> = {
   plan:            'linear-gradient(145deg,#7F1D1D 0%,#DC2626 60%,#EF4444 100%)',
-  sector:          'linear-gradient(145deg,#78350F 0%,#D97706 55%,#F59E0B 100%)',
+  sector:          'linear-gradient(145deg,#064E3B 0%,#16A34A 60%,#34D399 100%)',
   form:            'linear-gradient(145deg,#14532D 0%,#16A34A 60%,#22C55E 100%)',
   'google-complete':'linear-gradient(145deg,#14532D 0%,#16A34A 60%,#22C55E 100%)',
   creating:        'linear-gradient(145deg,#14532D 0%,#16A34A 60%,#22C55E 100%)',
@@ -87,7 +111,7 @@ const STEP_GRADIENT: Record<Step, string> = {
 // Accent color for buttons on the RIGHT panel (matches left panel)
 const STEP_ACCENT: Record<Step, string> = {
   plan:            '#DC2626',
-  sector:          '#D97706',
+  sector:          '#16A34A',
   form:            '#16A34A',
   'google-complete':'#16A34A',
   creating:        '#16A34A',
@@ -363,7 +387,7 @@ export default function OnboardingPage() {
 
   const leftDesc =
     step === 'plan'   ? 'Trois offres conçues pour chaque niveau d\'activité. Commencez gratuitement.' :
-    step === 'sector' ? `Offre ${plan === 'tpe' ? 'Entrepreneur' : 'Business'} sélectionnée. Choisissez maintenant votre secteur.` :
+    step === 'sector' ? `Offre ${plan === 'tpe' ? 'Entrepreneur' : plan === 'grande' ? 'Compagnie' : 'Business'} sélectionnée. Choisissez votre secteur d'activité.` :
     step === 'google-complete' ? 'Quelques infos pour finaliser votre espace Oraforme.' :
     'Votre espace professionnel est à quelques secondes.'
 
@@ -638,7 +662,7 @@ export default function OnboardingPage() {
                   style={{ background: plan === 'grande' ? '#7C3AED' : plan === 'tpe' ? '#DC2626' : '#D97706' }}>
                   {plan ? PLAN_CONFIG[plan].label : ''}
                 </span>
-                <span className="text-[11px] text-[#94A3B8] group-hover:text-[#64748B]">← Changer</span>
+                <span className="text-[11px] text-[#94A3B8] group-hover:text-[#64748B] transition-colors">← Changer</span>
               </button>
 
               <h1 className="text-[22px] font-black text-[#0F172A] mb-1">Votre secteur d&apos;activité</h1>
@@ -646,28 +670,85 @@ export default function OnboardingPage() {
                 {plan ? `Secteurs disponibles pour l'offre ${PLAN_CONFIG[plan].label}.` : 'Choisissez votre secteur.'}
               </p>
 
-              <div className="grid grid-cols-2 gap-2 mb-7">
-                {sectors.map(s => (
-                  <button key={s.id} type="button"
-                    onClick={() => setSectorId(s.id)}
-                    className="px-3 py-3 rounded-xl border-2 text-left text-[12px] font-semibold transition-all leading-tight"
-                    style={{
-                      borderColor: sectorId === s.id ? accent : '#E2E8F0',
-                      background:  sectorId === s.id ? (plan === 'tpe' ? '#FEF2F2' : plan === 'grande' ? '#F5F3FF' : '#FFFBEB') : 'white',
-                      color:       sectorId === s.id ? (plan === 'tpe' ? '#991B1B' : plan === 'grande' ? '#4C1D95' : '#92400E') : '#0F172A',
-                    }}>
-                    {s.label}
-                  </button>
-                ))}
-              </div>
+              {/* TPE — grille simple avec icônes */}
+              {plan === 'tpe' && (
+                <div className="grid grid-cols-2 gap-2 mb-7">
+                  {SECTORS_TPE.map(s => (
+                    <button key={s.id} type="button"
+                      onClick={() => setSectorId(s.id)}
+                      className="flex items-center gap-2.5 px-3 py-3 rounded-xl border-2 text-left text-[12px] font-semibold transition-all"
+                      style={{
+                        borderColor: sectorId === s.id ? '#16A34A' : '#E2E8F0',
+                        background:  sectorId === s.id ? '#F0FDF4' : 'white',
+                        color:       sectorId === s.id ? '#14532D' : '#374151',
+                      }}>
+                      <span className="text-[15px] leading-none shrink-0">
+                        {TPE_ICONS[s.id] ?? '✦'}
+                      </span>
+                      <span className="leading-tight">{s.label}</span>
+                      {sectorId === s.id && (
+                        <Check size={11} style={{ color: '#16A34A', marginLeft: 'auto' }} strokeWidth={3} className="shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-              <button
-                onClick={() => { if (sectorId) setStep('form') }}
-                disabled={!sectorId}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[14px] font-black text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                style={{ background: accent }}>
-                Continuer <ChevronRight size={16} />
-              </button>
+              {/* PME / Grande — groupes par famille */}
+              {plan !== 'tpe' && (
+                <div className="space-y-4 mb-7">
+                  {PME_GROUPS.map(group => {
+                    const groupSectors = SECTORS_PME.filter(s => group.ids.includes(s.id))
+                    return (
+                      <div key={group.label}>
+                        {/* En-tête de groupe */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-[13px] leading-none">{group.icon}</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">
+                            {group.label}
+                          </span>
+                          <div className="flex-1 h-px bg-[#F1F5F9]" />
+                        </div>
+                        {/* Cartes du groupe */}
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {groupSectors.map(s => (
+                            <button key={s.id} type="button"
+                              onClick={() => setSectorId(s.id)}
+                              className="flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-left text-[12px] font-semibold transition-all leading-tight"
+                              style={{
+                                borderColor: sectorId === s.id ? '#16A34A' : '#E2E8F0',
+                                background:  sectorId === s.id ? '#F0FDF4' : 'white',
+                                color:       sectorId === s.id ? '#14532D' : '#374151',
+                              }}>
+                              <span className="flex-1 leading-snug">{s.label}</span>
+                              {sectorId === s.id && (
+                                <Check size={11} style={{ color: '#16A34A' }} strokeWidth={3} className="shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Bouton Continuer */}
+              <div className="sticky bottom-0 pt-3 pb-1 bg-white">
+                {sectorId && (
+                  <p className="text-[11px] text-[#16A34A] font-semibold mb-2 flex items-center gap-1.5">
+                    <Check size={11} strokeWidth={3} />
+                    {sectors.find(s => s.id === sectorId)?.label} sélectionné
+                  </p>
+                )}
+                <button
+                  onClick={() => { if (sectorId) setStep('form') }}
+                  disabled={!sectorId}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[14px] font-black text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  style={{ background: '#16A34A' }}>
+                  Continuer <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
           )}
 
