@@ -18,6 +18,8 @@ import {
   ChevronDown, BarChart2, Sparkles, Lock, Globe, Mail,
 } from 'lucide-react'
 
+import { PLAN_CONFIG } from '@/lib/plans'
+
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
@@ -78,36 +80,40 @@ const MIAA_POINTS = [
 
 const PLANS = [
   {
-    name: 'Entrepreneur',
-    price: '15 000',
-    currency: 'FCFA',
-    period: '/ mois',
-    desc: 'Pour indépendants, ETS et petites structures',
-    highlight: false,
-    features: [
-      'Facturation & Devis illimités',
-      'CRM, Trésorerie & Caisse',
-      'RH & Paie complète',
-      'MIAA+ Standard (IA intégrée)',
-      'Dépenses & Notes de frais',
-      '5 utilisateurs inclus',
-    ],
+    name:        'Entrepreneur',
+    price:       '10 000',
+    currency:    'FCFA',
+    period:      '/ mois',
+    benefit:     'Lancez votre activité sans vous perdre dans la gestion',
+    desc:        'Pour indépendants, ETS et petites structures',
+    highlight:   false,
+    isCompagnie: false,
+    color:       '#DC2626',
+    features:    PLAN_CONFIG.tpe.features,
   },
   {
-    name: 'Business',
-    price: '25 000',
-    currency: 'FCFA',
-    period: '/ mois',
-    desc: 'Pour PME, cabinets et secteurs spécialisés',
-    highlight: true,
-    features: [
-      'Tout Starter inclus',
-      'RH & Paie illimitée',
-      'Modules secteur activés',
-      'Analytics & BI avancés',
-      'MIAA+ Premium complet',
-      '25 utilisateurs inclus',
-    ],
+    name:        'Business',
+    price:       '25 000',
+    currency:    'FCFA',
+    period:      '/ mois',
+    benefit:     'Pilotez votre PME avec la puissance de l\'IA',
+    desc:        'Pour PME, cabinets et secteurs spécialisés',
+    highlight:   true,
+    isCompagnie: false,
+    color:       '#DC2626',
+    features:    PLAN_CONFIG.pme.features,
+  },
+  {
+    name:        'Compagnie',
+    price:       '46 000',
+    currency:    'FCFA',
+    period:      '/ mois',
+    benefit:     'Gérez votre groupe international depuis une seule plateforme',
+    desc:        'Groupes, filiales et structures multi-entités',
+    highlight:   false,
+    isCompagnie: true,
+    color:       '#7C3AED',
+    features:    PLAN_CONFIG.grande.features,
   },
 ]
 
@@ -263,7 +269,7 @@ export default function LandingPage() {
                   <div className="bg-white rounded-2xl px-5 py-3 text-center shadow-lg">
                     <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-0.5">à partir de</div>
                     <div className="text-2xl font-black text-[#111827] leading-none">
-                      15 000 <span className="text-sm font-bold">FCFA</span>
+                      10 000 <span className="text-sm font-bold">FCFA</span>
                     </div>
                     <div className="text-[10px] text-gray-400 mt-0.5">/mois · 30j gratuits</div>
                   </div>
@@ -727,66 +733,87 @@ export default function LandingPage() {
 
         {/* ══ TARIFS ════════════════════════════════════════════════════════════ */}
         <section id="tarifs" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14">
               <span className="text-[10px] font-bold text-[#DC2626] uppercase tracking-[0.18em]">TARIFS</span>
               <h2 className="text-3xl sm:text-4xl font-black text-[#111827] tracking-tight mt-3 mb-3">
-                Simple, transparent, sans surprise
+                Trois offres, une seule plateforme
               </h2>
               <p className="text-[#6B7280] text-sm">30 jours d&apos;essai gratuit · Aucune carte bancaire requise</p>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-6">
-              {PLANS.map(plan => (
-                <div key={plan.name}
-                  className={`ch rounded-2xl p-8 border relative ${
-                    plan.highlight
-                      ? 'bg-[#00454c] border-[#DC2626]/40 shadow-2xl'
-                      : 'bg-gray-50 border-gray-200'
-                  }`}>
-                  {plan.highlight && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#DC2626] text-white text-[9px] font-bold px-4 py-1 rounded-full whitespace-nowrap uppercase tracking-wide">
-                      LE PLUS POPULAIRE
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {PLANS.map(plan => {
+                const isDark = plan.highlight || plan.isCompagnie
+                const darkBg = plan.isCompagnie ? '#1e0a3c' : '#00454c'
+                const darkBorder = plan.isCompagnie ? 'rgba(124,58,237,0.4)' : 'rgba(220,38,38,0.4)'
+                return (
+                  <div key={plan.name}
+                    className="ch rounded-2xl p-7 border relative flex flex-col"
+                    style={{
+                      background:   isDark ? darkBg : '#F9FAFB',
+                      border:       `1px solid ${isDark ? darkBorder : '#E5E7EB'}`,
+                      boxShadow:    isDark ? '0 20px 60px rgba(0,0,0,0.3)' : 'none',
+                    }}>
+                    {plan.highlight && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#DC2626] text-white text-[9px] font-bold px-4 py-1 rounded-full whitespace-nowrap uppercase tracking-wide">
+                        LE PLUS POPULAIRE
+                      </div>
+                    )}
+                    {plan.isCompagnie && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#7C3AED] text-white text-[9px] font-bold px-4 py-1 rounded-full whitespace-nowrap uppercase tracking-wide">
+                        🏢 COMPAGNIE
+                      </div>
+                    )}
+
+                    {/* Plan name + benefit */}
+                    <div className="mb-5">
+                      <div className={`text-xl font-black mb-1 ${isDark ? 'text-white' : 'text-[#111827]'}`}>
+                        {plan.name}
+                      </div>
+                      <p className={`text-xs font-semibold mb-2 ${isDark ? 'text-gray-300' : 'text-[#374151]'}`}>
+                        {plan.benefit}
+                      </p>
+                      <div className={`text-[11px] ${isDark ? 'text-gray-500' : 'text-[#6B7280]'}`}>
+                        {plan.desc}
+                      </div>
                     </div>
-                  )}
-                  <div className={`text-xl font-black mb-1 ${plan.highlight ? 'text-white' : 'text-[#111827]'}`}>
-                    {plan.name}
+
+                    {/* Price */}
+                    <div className="flex items-baseline gap-1 mb-6">
+                      <span className={`text-4xl font-black`} style={{ color: isDark ? '#fff' : plan.color }}>
+                        {plan.price}
+                      </span>
+                      <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+                        {plan.currency} {plan.period}
+                      </span>
+                    </div>
+
+                    {/* Features */}
+                    <ul className="space-y-2.5 mb-7 flex-1">
+                      {plan.features.map(f => (
+                        <li key={f}
+                          className={`flex items-start gap-2.5 text-sm font-medium ${
+                            isDark ? 'text-gray-200' : 'text-[#374151]'
+                          }`}>
+                          <CheckCircle2 size={14} className="shrink-0 mt-0.5" style={{ color: isDark ? (plan.isCompagnie ? '#A78BFA' : '#F87171') : plan.color }} />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link href="/onboarding"
+                      className="bt block text-center text-sm font-bold py-3.5 rounded-xl text-white uppercase tracking-wide"
+                      style={{ background: plan.color }}>
+                      Commencer gratuitement
+                    </Link>
                   </div>
-                  <div className={`text-xs mb-6 ${plan.highlight ? 'text-gray-400' : 'text-[#6B7280]'}`}>
-                    {plan.desc}
-                  </div>
-                  <div className="flex items-baseline gap-1 mb-7">
-                    <span className={`text-4xl font-black ${plan.highlight ? 'text-white' : 'text-[#111827]'}`}>
-                      {plan.price}
-                    </span>
-                    <span className={`text-sm ${plan.highlight ? 'text-gray-400' : 'text-[#6B7280]'}`}>
-                      {plan.currency} {plan.period}
-                    </span>
-                  </div>
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map(f => (
-                      <li key={f}
-                        className={`flex items-center gap-2.5 text-sm font-medium ${
-                          plan.highlight ? 'text-gray-200' : 'text-[#374151]'
-                        }`}>
-                        <CheckCircle2 size={14} className={`shrink-0 ${plan.highlight ? 'text-[#F87171]' : 'text-[#DC2626]'}`} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href="/onboarding"
-                    className="bt block text-center text-sm font-bold py-3.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white uppercase tracking-wide">
-                    Commencer gratuitement
-                  </Link>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             <p className="text-center text-xs text-[#9CA3AF] mt-8">
-              Besoin d&apos;une solution sur mesure pour un grand groupe ?{' '}
-              <a href="mailto:contact@oraforme.com" className="text-[#DC2626] font-semibold hover:underline">
-                Contactez-nous
-              </a>
+              Paiement Mobile Money · Virement bancaire · Tarification selon votre devise
             </p>
           </div>
         </section>

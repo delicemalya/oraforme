@@ -82,7 +82,7 @@ export default function PricingPage() {
 
       {/* ── Plans ──────────────────────────────────────────────────────────────── */}
       <section className="px-4 pb-20 max-w-5xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {plans.map(([key, cfg]) => {
             const isPopular  = cfg.badge === 'Populaire'
             const isCompany  = key === 'grande'

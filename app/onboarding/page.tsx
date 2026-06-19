@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronRight, Eye, EyeOff, Check, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { createTenantAndProfile } from './actions'
+import { PLAN_CONFIG } from '@/lib/plans'
 import type { TailleEntreprise, SecteurId } from '@/lib/plans'
 import PaysSelector from '@/components/onboarding/PaysSelector'
 
@@ -88,8 +89,9 @@ const STEP_ACCENT: Record<Step, string> = {
 // ── Plan features ─────────────────────────────────────────────────────────────
 
 const PLAN_FEATURES = {
-  tpe: ['TPE · ETS · Petite entreprise', '1 à 5 employés', 'Facturation & CRM', 'Trésorerie & Caisse', 'RH & Paie', 'Comptabilité SYSCOHADA'],
-  pme: ['PME · Grande entreprise', 'Cabinet · ONG · Université', 'Hôtel · Clinique · Banque', '5 employés et plus', 'Modules premium activés', 'Analytics & BI · MIAA+'],
+  tpe:    ['TPE · ETS · Petite entreprise', '1 à 5 employés', 'Facturation & CRM', 'Trésorerie & Caisse', 'RH & Paie', 'Mode hors-ligne inclus'],
+  pme:    ['PME · Grande entreprise', 'Cabinet · ONG · Université', 'Hôtel · Clinique · Banque', '5 employés et plus', 'Comptabilité OHADA & Fiscalité', 'Analytics & BI · MIAA+ Premium'],
+  grande: ['Groupe · Filiales · International', 'Structure multi-entités', 'Vue consolidée groupe', 'Gestion email & réseaux sociaux', 'MIAA+ Illimité', 'Utilisateurs illimités'],
 }
 
 // ── Draft ─────────────────────────────────────────────────────────────────────
@@ -148,10 +150,14 @@ export default function OnboardingPage() {
   const [gcTel, setGcTel] = useState('')
 
   // ── Derived ────────────────────────────────────────────────────────────────
+  // grande uses PME sectors (same businesses, just bigger structure)
   const sectors      = plan === 'tpe' ? SECTORS_TPE : SECTORS_PME
   const selectedSect = [...SECTORS_TPE, ...SECTORS_PME].find(s => s.id === sectorId) ?? null
   const pwdMatch     = pwd === pwdConfirm
-  const accent       = STEP_ACCENT[step]
+  // On plan step, accent follows selected plan color so the Continue button matches
+  const accent = step === 'plan'
+    ? (plan === 'grande' ? '#7C3AED' : plan === 'pme' ? '#D97706' : '#DC2626')
+    : STEP_ACCENT[step]
 
   // ── Init: detect OAuth return vs fresh visit ───────────────────────────────
   useEffect(() => {
@@ -316,7 +322,7 @@ export default function OnboardingPage() {
     'Créez\nvotre espace'
 
   const leftDesc =
-    step === 'plan'   ? 'Deux offres conçues pour chaque niveau d\'activité. Commencez gratuitement.' :
+    step === 'plan'   ? 'Trois offres conçues pour chaque niveau d\'activité. Commencez gratuitement.' :
     step === 'sector' ? `Offre ${plan === 'tpe' ? 'Entrepreneur' : 'Business'} sélectionnée. Choisissez maintenant votre secteur.` :
     step === 'google-complete' ? 'Quelques infos pour finaliser votre espace Oraforme.' :
     'Votre espace professionnel est à quelques secondes.'
@@ -376,7 +382,7 @@ export default function OnboardingPage() {
               <div className="bg-white/15 rounded-2xl p-4">
                 <p className="text-white/60 text-[11px] font-bold uppercase tracking-wider mb-2">Offre sélectionnée</p>
                 <p className="text-white font-black text-[15px] mb-1">
-                  {plan === 'tpe' ? 'Entrepreneur — 15 000 FCFA/mois' : 'Business — 25 000 FCFA/mois'}
+                  {plan ? `${PLAN_CONFIG[plan].label} — ${PLAN_CONFIG[plan].price_fcfa.toLocaleString('fr-FR')} FCFA/mois` : ''}
                 </p>
                 {selectedSect && (
                   <p className="text-white/70 text-[13px]">
@@ -426,20 +432,19 @@ export default function OnboardingPage() {
 
                 {/* Entrepreneur */}
                 <button type="button" onClick={() => setPlan('tpe')}
-                  className="w-full p-5 rounded-2xl border-2 text-left transition-all"
+                  className="w-full p-4 rounded-2xl border-2 text-left transition-all"
                   style={{
                     borderColor: plan === 'tpe' ? '#DC2626' : '#E2E8F0',
                     background:  plan === 'tpe' ? '#FEF2F2' : 'white',
                   }}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <p className="text-[16px] font-black" style={{ color: plan === 'tpe' ? '#991B1B' : '#0F172A' }}>
-                          Entrepreneur
-                        </p>
-                        <span className="text-[11px] font-black text-[#DC2626]">15 000 FCFA/mois</span>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-[15px] font-black" style={{ color: plan === 'tpe' ? '#991B1B' : '#0F172A' }}>Entrepreneur</p>
+                        <span className="text-[11px] font-black text-[#DC2626]">10 000 FCFA/mois</span>
                       </div>
-                      <div className="space-y-1">
+                      <p className="text-[11px] text-[#64748B] mb-1.5">Lancez votre activité, gérez votre quotidien sans effort.</p>
+                      <div className="space-y-0.5">
                         {PLAN_FEATURES.tpe.map(f => (
                           <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
                             <span style={{ color: plan === 'tpe' ? '#DC2626' : '#CBD5E1' }}>·</span> {f}
@@ -458,23 +463,22 @@ export default function OnboardingPage() {
 
                 {/* Business */}
                 <button type="button" onClick={() => setPlan('pme')}
-                  className="w-full p-5 rounded-2xl border-2 text-left relative transition-all"
+                  className="w-full p-4 rounded-2xl border-2 text-left relative transition-all"
                   style={{
                     borderColor: plan === 'pme' ? '#D97706' : '#E2E8F0',
                     background:  plan === 'pme' ? '#FFFBEB' : 'white',
                   }}>
-                  <span className="absolute top-3 right-12 px-2 py-0.5 bg-[#D97706] text-white text-[10px] font-black rounded-full uppercase">
+                  <span className="absolute top-3 right-11 px-2 py-0.5 bg-[#D97706] text-white text-[10px] font-black rounded-full uppercase">
                     Populaire
                   </span>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <p className="text-[16px] font-black" style={{ color: plan === 'pme' ? '#92400E' : '#0F172A' }}>
-                          Business
-                        </p>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-[15px] font-black" style={{ color: plan === 'pme' ? '#92400E' : '#0F172A' }}>Business</p>
                         <span className="text-[11px] font-black text-[#D97706]">25 000 FCFA/mois</span>
                       </div>
-                      <div className="space-y-1">
+                      <p className="text-[11px] text-[#64748B] mb-1.5">Automatisez, analysez et développez votre PME.</p>
+                      <div className="space-y-0.5">
                         {PLAN_FEATURES.pme.map(f => (
                           <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
                             <span style={{ color: plan === 'pme' ? '#D97706' : '#CBD5E1' }}>·</span> {f}
@@ -486,6 +490,37 @@ export default function OnboardingPage() {
                       <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
                         style={{ borderColor: plan === 'pme' ? '#D97706' : '#CBD5E1', background: plan === 'pme' ? '#D97706' : 'white' }}>
                         {plan === 'pme' && <Check size={10} color="white" strokeWidth={3} />}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Compagnie */}
+                <button type="button" onClick={() => setPlan('grande')}
+                  className="w-full p-4 rounded-2xl border-2 text-left transition-all"
+                  style={{
+                    borderColor: plan === 'grande' ? '#7C3AED' : '#E2E8F0',
+                    background:  plan === 'grande' ? '#F5F3FF' : 'white',
+                  }}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-[15px] font-black" style={{ color: plan === 'grande' ? '#4C1D95' : '#0F172A' }}>Compagnie</p>
+                        <span className="text-[11px] font-black text-[#7C3AED]">46 000 FCFA/mois</span>
+                      </div>
+                      <p className="text-[11px] text-[#64748B] mb-1.5">Pilotez votre groupe international depuis une seule plateforme.</p>
+                      <div className="space-y-0.5">
+                        {PLAN_FEATURES.grande.map(f => (
+                          <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
+                            <span style={{ color: plan === 'grande' ? '#7C3AED' : '#CBD5E1' }}>·</span> {f}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+                        style={{ borderColor: plan === 'grande' ? '#7C3AED' : '#CBD5E1', background: plan === 'grande' ? '#7C3AED' : 'white' }}>
+                        {plan === 'grande' && <Check size={10} color="white" strokeWidth={3} />}
                       </div>
                     </div>
                   </div>
@@ -515,17 +550,15 @@ export default function OnboardingPage() {
               {/* Breadcrumb */}
               <button onClick={() => setStep('plan')} className="flex items-center gap-1.5 mb-5 group">
                 <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-full text-white"
-                  style={{ background: '#DC2626' }}>
-                  {plan === 'tpe' ? 'Entrepreneur' : 'Business'}
+                  style={{ background: plan === 'grande' ? '#7C3AED' : plan === 'tpe' ? '#DC2626' : '#D97706' }}>
+                  {plan ? PLAN_CONFIG[plan].label : ''}
                 </span>
                 <span className="text-[11px] text-[#94A3B8] group-hover:text-[#64748B]">← Changer</span>
               </button>
 
               <h1 className="text-[22px] font-black text-[#0F172A] mb-1">Votre secteur d&apos;activité</h1>
               <p className="text-[13px] text-[#64748B] mb-6">
-                {plan === 'tpe'
-                  ? 'Secteurs disponibles pour l\'offre Entrepreneur.'
-                  : 'Secteurs disponibles pour l\'offre Business.'}
+                {plan ? `Secteurs disponibles pour l'offre ${PLAN_CONFIG[plan].label}.` : 'Choisissez votre secteur.'}
               </p>
 
               <div className="grid grid-cols-2 gap-2 mb-7">
@@ -535,8 +568,8 @@ export default function OnboardingPage() {
                     className="px-3 py-3 rounded-xl border-2 text-left text-[12px] font-semibold transition-all leading-tight"
                     style={{
                       borderColor: sectorId === s.id ? accent : '#E2E8F0',
-                      background:  sectorId === s.id ? (plan === 'tpe' ? '#FEF2F2' : '#FFFBEB') : 'white',
-                      color:       sectorId === s.id ? (plan === 'tpe' ? '#991B1B' : '#92400E') : '#0F172A',
+                      background:  sectorId === s.id ? (plan === 'tpe' ? '#FEF2F2' : plan === 'grande' ? '#F5F3FF' : '#FFFBEB') : 'white',
+                      color:       sectorId === s.id ? (plan === 'tpe' ? '#991B1B' : plan === 'grande' ? '#4C1D95' : '#92400E') : '#0F172A',
                     }}>
                     {s.label}
                   </button>
@@ -562,7 +595,7 @@ export default function OnboardingPage() {
               <button onClick={() => setStep('sector')} className="flex items-center gap-1.5 mb-5 group">
                 <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-full text-white"
                   style={{ background: accent }}>
-                  {selectedSect?.label ?? (plan === 'tpe' ? 'Entrepreneur' : 'Business')}
+                  {selectedSect?.label ?? (plan ? PLAN_CONFIG[plan].label : 'Offre')}
                 </span>
                 <span className="text-[11px] text-[#94A3B8] group-hover:text-[#64748B]">← Changer</span>
               </button>
@@ -700,7 +733,7 @@ export default function OnboardingPage() {
               <div className="mb-5">
                 <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wide text-white"
                   style={{ background: accent }}>
-                  {plan === 'tpe' ? 'Entrepreneur' : 'Business'}
+                  {plan ? PLAN_CONFIG[plan].label : ''}
                   {selectedSect ? ` · ${selectedSect.label}` : ''}
                 </span>
               </div>
