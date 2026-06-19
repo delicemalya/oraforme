@@ -271,20 +271,25 @@ export default function GroupeDashboardPage() {
             {tree.map(node => {
               const kpi = kpis.find(k => k.tenantId === node.tenantId)
               if (!kpi) return (
-                <div key={node.tenantId} className="px-4 py-3 flex items-center gap-3">
+                <button
+                  key={node.tenantId}
+                  onClick={() => router.push(`/dashboard/groupe/${node.tenantId}`)}
+                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#F8FAFC] transition-colors text-left"
+                >
                   <span
                     className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                     style={{ background: `${TYPE_COLOR[node.typeEntite] ?? '#94A3B8'}15`, color: TYPE_COLOR[node.typeEntite] ?? '#94A3B8' }}
                   >
                     {TYPE_ICON[node.typeEntite] ?? <Building2 size={14} />}
                   </span>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-semibold text-[#0F172A]">{node.nomEntreprise}</p>
                     <p className="text-[10px] text-[#94A3B8]">{node.typeEntite} · profondeur {node.depth}</p>
                   </div>
-                </div>
+                  <ChevronRight size={14} className="text-[#CBD5E1] shrink-0" />
+                </button>
               )
-              return <EntityRow key={kpi.tenantId} kpi={kpi} onClick={() => router.push('/dashboard')} />
+              return <EntityRow key={kpi.tenantId} kpi={kpi} onClick={() => router.push(`/dashboard/groupe/${kpi.tenantId}`)} />
             })}
           </div>
         )}
