@@ -13,7 +13,7 @@ export type SecteurId =
   | 'commerce' | 'restaurant' | 'ecole' | 'sante' | 'btp'
   | 'transport' | 'hotel' | 'agriculture' | 'pharmacie' | 'banque'
   | 'ong' | 'cabinet' | 'boisson' | 'petrole' | 'supermarche'
-  | 'boutique' | 'assurance' | 'autre'
+  | 'boutique' | 'assurance' | 'recrutement' | 'autre'
 
 // ── Modules par plan (cumulatifs vers le haut) ────────────────────────────────
 
@@ -68,6 +68,12 @@ export const SECTOR_EXTRA_MODULES: Partial<Record<SecteurId, string[]>> = {
   petrole:     ['petrole'],
   pharmacie:   ['pharmacie'],
   agriculture: ['agriculture'],
+  recrutement: [
+    'recrutement-direction', 'recrutement-offres', 'recrutement-candidatures',
+    'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
+    'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
+    'recrutement-miaa',
+  ],
 }
 
 /** Calcule la liste finale des modules pour un tenant */
@@ -184,8 +190,9 @@ export const SECTEUR_CONFIG: Record<SecteurId, {
   petrole:     { label: 'Pétrole & Énergie',         emoji: '⛽', description: 'Station service, énergie' },
   supermarche: { label: 'Supermarché & GMS',         emoji: '🛒', description: 'Grande distribution' },
   boutique:    { label: 'Boutique & Magasin',        emoji: '👗', description: 'Mode, accessoires, bijoux' },
-  assurance:   { label: 'Assurance & Réassurance',  emoji: '🛡️', description: 'Compagnie, courtier, agent assurance' },
-  autre:       { label: 'Autre activité',            emoji: '🏢', description: "Autre type d'entreprise" },
+  assurance:   { label: 'Assurance & Réassurance',    emoji: '🛡️', description: 'Compagnie, courtier, agent assurance' },
+  recrutement: { label: 'Recrutement & Placement RH', emoji: '👔', description: 'Cabinet RH, recrutement, intérim, placement' },
+  autre:       { label: 'Autre activité',              emoji: '🏢', description: "Autre type d'entreprise" },
 }
 
 // ── Pays ──────────────────────────────────────────────────────────────────────

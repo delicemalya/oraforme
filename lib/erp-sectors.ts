@@ -11,7 +11,7 @@ export type SectorId =
   | 'ecole' | 'restaurant' | 'commerce' | 'supermarche' | 'boutique'
   | 'boisson' | 'sante' | 'transport' | 'transport_public' | 'hotel'
   | 'btp' | 'cabinet' | 'petrole' | 'ong' | 'banque' | 'pharmacie' | 'agriculture'
-  | 'assurance'
+  | 'assurance' | 'recrutement'
 
 // ── COUCHE 1 : Core ERP ───────────────────────────────────────────────────────
 // Ces 10 modules apparaissent dans TOUTES les sidebars, tous secteurs confondus.
@@ -268,6 +268,18 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'assurance-analytics',   href: '/dashboard/assurance/analytics',         label: 'Analytics',          sublabel: 'Ratio sinistres, rentabilité'   },
     { id: 'assurance-miaa',        href: '/dashboard/miaa?context=assurance',      label: 'MIAA+ Expert',       sublabel: 'IA assistant assurance'         },
   ],
+  recrutement: [
+    { id: 'recrutement-direction',    href: '/dashboard/recrutement',                  label: 'Direction RH',      sublabel: 'KPIs & tableau de bord RH'          },
+    { id: 'recrutement-offres',       href: '/dashboard/recrutement/offres',           label: "Offres d'emploi",   sublabel: 'Postes ouverts & diffusion'         },
+    { id: 'recrutement-candidatures', href: '/dashboard/recrutement/candidatures',     label: 'Candidatures',      sublabel: 'Pipeline & scoring IA'              },
+    { id: 'recrutement-entretiens',   href: '/dashboard/recrutement/entretiens',       label: 'Entretiens',        sublabel: 'Planning & évaluations'             },
+    { id: 'recrutement-cvtheque',     href: '/dashboard/recrutement/cvtheque',         label: 'CV-thèque',         sublabel: 'Vivier de talents'                  },
+    { id: 'recrutement-placement',    href: '/dashboard/recrutement/placement',        label: 'Placements',        sublabel: 'Missions & contrats placés'         },
+    { id: 'recrutement-contrats',     href: '/dashboard/recrutement/contrats',         label: 'Contrats',          sublabel: 'CDI, CDD, intérim & stage'          },
+    { id: 'recrutement-partenaires',  href: '/dashboard/recrutement/partenaires',      label: 'Partenaires',       sublabel: 'Clients entreprises & prestataires' },
+    { id: 'recrutement-analytics',    href: '/dashboard/recrutement/analytics',        label: 'Analytics RH',     sublabel: 'KPIs & performance recrutement'     },
+    { id: 'recrutement-miaa',         href: '/dashboard/miaa?context=recrutement',     label: 'MIAA+ Job',         sublabel: 'IA matching CV & offres'            },
+  ],
 }
 
 // ── COUCHE 3 : Plateforme ─────────────────────────────────────────────────────
@@ -308,6 +320,7 @@ export const SECTOR_LABELS: Record<string, string> = {
   pharmacie:        'Pharmacie',
   agriculture:      'Agriculture',
   assurance:        'Assurance & Réassurance',
+  recrutement:      'Recrutement & Placement RH',
 }
 
 // ── Rôles école (visibilité sidebar core) ─────────────────────────────────────

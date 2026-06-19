@@ -11,7 +11,7 @@ import {
   TrendingUp, Calculator, UserCog, Shield, AlertTriangle, Scale,
   // modules sectoriels
   Building2, School, Heart, Pill, Utensils, Truck,
-  HardHat, Leaf, GraduationCap, ShoppingBag,
+  HardHat, Leaf, GraduationCap, ShoppingBag, Briefcase,
   // cabinets professionnels
   BookMarked, FileSearch, Microscope, Lightbulb, Gavel,
   // layout / ui
@@ -53,23 +53,24 @@ const MODULES_PHARES = [
 
 const MODULES_SECTEURS = [
   // Secteurs métier
-  { icon: Building2,    label: 'Hôtellerie & Resort',       badge: null,     isCabinet: false },
-  { icon: School,       label: 'Éducation & Scolarité',     badge: null,     isCabinet: false },
-  { icon: Heart,        label: 'Santé & Clinique',          badge: null,     isCabinet: false },
-  { icon: Pill,         label: 'Pharmacie',                 badge: null,     isCabinet: false },
-  { icon: Utensils,     label: 'Restaurant & POS',          badge: null,     isCabinet: false },
-  { icon: Truck,        label: 'Transport & Logistique',    badge: null,     isCabinet: false },
-  { icon: HardHat,      label: 'BTP & Construction',        badge: null,     isCabinet: false },
-  { icon: Leaf,         label: 'Agriculture',               badge: null,     isCabinet: false },
-  { icon: ShoppingBag,  label: 'Achats & Fournisseurs',     badge: null,     isCabinet: false },
-  { icon: GraduationCap,label: 'Formation Academy',         badge: 'IA',     isCabinet: false },
+  { icon: Building2,    label: 'Hôtellerie & Resort',            badge: null,     isCabinet: false },
+  { icon: School,       label: 'Éducation & Scolarité',          badge: null,     isCabinet: false },
+  { icon: Heart,        label: 'Santé & Clinique',               badge: null,     isCabinet: false },
+  { icon: Pill,         label: 'Pharmacie',                      badge: null,     isCabinet: false },
+  { icon: Utensils,     label: 'Restaurant & POS',               badge: null,     isCabinet: false },
+  { icon: Truck,        label: 'Transport & Logistique',         badge: null,     isCabinet: false },
+  { icon: HardHat,      label: 'BTP & Construction',             badge: null,     isCabinet: false },
+  { icon: Leaf,         label: 'Agriculture',                    badge: null,     isCabinet: false },
+  { icon: ShoppingBag,  label: 'Achats & Fournisseurs',          badge: null,     isCabinet: false },
+  { icon: Briefcase,    label: 'Recrutement & Placement RH',     badge: 'MIAA',   isCabinet: false },
+  { icon: GraduationCap,label: 'Formation Academy',              badge: 'IA',     isCabinet: false },
   // Cabinets professionnels
-  { icon: BookMarked,   label: 'Cabinet Comptable',         badge: 'OHADA',  isCabinet: true },
-  { icon: FileSearch,   label: 'Cabinet Fiscal',            badge: null,     isCabinet: true },
-  { icon: Microscope,   label: "Cabinet d'Audit",           badge: null,     isCabinet: true },
-  { icon: Lightbulb,    label: 'Cabinet Conseil',           badge: null,     isCabinet: true },
-  { icon: Scale,        label: 'Cabinet Juridique',         badge: null,     isCabinet: true },
-  { icon: Gavel,        label: "Cabinet d'Avocats",         badge: null,     isCabinet: true },
+  { icon: BookMarked,   label: 'Cabinet Comptable',              badge: 'OHADA',  isCabinet: true },
+  { icon: FileSearch,   label: 'Cabinet Fiscal',                 badge: null,     isCabinet: true },
+  { icon: Microscope,   label: "Cabinet d'Audit",                badge: null,     isCabinet: true },
+  { icon: Lightbulb,    label: 'Cabinet Conseil',                badge: null,     isCabinet: true },
+  { icon: Scale,        label: 'Cabinet Juridique',              badge: null,     isCabinet: true },
+  { icon: Gavel,        label: "Cabinet d'Avocats",              badge: null,     isCabinet: true },
 ]
 
 const MIAA_POINTS = [
@@ -121,6 +122,7 @@ const PLANS = [
       'Assurances & Transport',
       'Logistique & ONG',
       'Supermarchés & BTP',
+      'Cabinets RH & Agences de placement',
     ],
   },
   {
@@ -173,6 +175,11 @@ const LANDING_SECTORS = [
   { id: 'universite',          label: 'Université'                   },
   { id: 'lycee',               label: 'Lycée'                        },
   { id: 'compagnie_assurance', label: "Compagnie d'Assurance"       },
+  { id: 'cabinet-recrutement', label: 'Cabinet de Recrutement'       },
+  { id: 'cabinet-rh',          label: 'Cabinet RH'                   },
+  { id: 'societe-placement',   label: 'Société de Placement RH'      },
+  { id: 'interim',             label: "Société d'Intérim"            },
+  { id: 'agence-rh',           label: 'Agence RH & Staffing'         },
   { id: 'autre_business',      label: 'Autre activité'               },
 ]
 

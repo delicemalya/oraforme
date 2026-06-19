@@ -59,10 +59,18 @@ const SECTORS_PME: SectorOption[] = [
   { id: 'btp',             label: 'BTP',                     secteur: 'btp',         sousType: null                  },
   { id: 'petrole',         label: 'Pétrole & Mines',         secteur: 'petrole',     sousType: null                  },
   { id: 'grande_distrib',      label: 'Grande distribution',      secteur: 'supermarche', sousType: 'grande_distribution' },
-  { id: 'compagnie_assurance', label: 'Compagnie d\'assurance',   secteur: 'assurance',   sousType: 'compagnie'           },
-  { id: 'courtier_assurance',  label: 'Courtier en assurance',    secteur: 'assurance',   sousType: 'courtier'            },
-  { id: 'agent_assurance',     label: 'Agent d\'assurance',       secteur: 'assurance',   sousType: 'agent'               },
-  { id: 'autre_business',      label: 'Autre activité',           secteur: 'autre',       sousType: null                  },
+  { id: 'compagnie_assurance',   label: "Compagnie d'assurance",    secteur: 'assurance',     sousType: 'compagnie'          },
+  { id: 'courtier_assurance',    label: 'Courtier en assurance',    secteur: 'assurance',     sousType: 'courtier'           },
+  { id: 'agent_assurance',       label: "Agent d'assurance",        secteur: 'assurance',     sousType: 'agent'              },
+  { id: 'cabinet-recrutement',   label: 'Cabinet de recrutement',   secteur: 'recrutement',   sousType: 'cabinet_recrutement'},
+  { id: 'cabinet-rh',            label: 'Cabinet RH',               secteur: 'recrutement',   sousType: 'cabinet_rh'         },
+  { id: 'societe-placement',     label: 'Société de placement',     secteur: 'recrutement',   sousType: 'placement'          },
+  { id: 'interim',               label: "Société d'intérim",        secteur: 'recrutement',   sousType: 'interim'            },
+  { id: 'mise-disposition',      label: 'Mise à disposition',       secteur: 'recrutement',   sousType: 'mise_disposition'   },
+  { id: 'chasseur-tetes',        label: 'Chasseur de têtes',        secteur: 'recrutement',   sousType: 'chasseur_tetes'     },
+  { id: 'agence-rh',             label: 'Agence RH',                secteur: 'recrutement',   sousType: 'agence_rh'          },
+  { id: 'staffing',              label: 'Staffing',                 secteur: 'recrutement',   sousType: 'staffing'           },
+  { id: 'autre_business',        label: 'Autre activité',           secteur: 'autre',         sousType: null                 },
 ]
 
 // ── Left-panel gradient by step ───────────────────────────────────────────────

@@ -178,6 +178,17 @@ const ICONS: Record<string, LucideIcon> = {
   // Compagnie — communication
   'email-management': Mail,
   'social-media':     Share2,
+  // Recrutement & Placement RH
+  'recrutement-direction':    BarChart2,
+  'recrutement-offres':       Briefcase,
+  'recrutement-candidatures': Users,
+  'recrutement-entretiens':   CalendarClock,
+  'recrutement-cvtheque':     FolderOpen,
+  'recrutement-placement':    CheckSquare,
+  'recrutement-contrats':     FileText,
+  'recrutement-partenaires':  Building2,
+  'recrutement-analytics':    TrendingUp,
+  'recrutement-miaa':         Sparkles,
 }
 
 // ─── Module Registry ──────────────────────────────────────────────────────────
@@ -231,6 +242,17 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'miaa-agent',     label: 'Agent Autonome',        sublabel: 'Centre de Commandement',  href: '/dashboard/miaa/agent'     },
   { id: 'miaa-rapports',  label: 'Rapports IA',            sublabel: 'Générés par MIAA+',       href: '/dashboard/miaa/rapports'  },
   { id: 'miaa-expertise', label: 'Expertise & Documents',  sublabel: 'Marketplace 82 modèles', href: '/dashboard/miaa/expertise' },
+  // Recrutement & Placement RH — secteur métier
+  { id: 'recrutement-direction',    label: 'Direction RH',       sublabel: 'KPIs & tableau de bord',    href: '/dashboard/recrutement'                  },
+  { id: 'recrutement-offres',       label: "Offres d'emploi",    sublabel: 'Postes ouverts & diffusion', href: '/dashboard/recrutement/offres'           },
+  { id: 'recrutement-candidatures', label: 'Candidatures',       sublabel: 'Pipeline & scoring IA',     href: '/dashboard/recrutement/candidatures'     },
+  { id: 'recrutement-entretiens',   label: 'Entretiens',         sublabel: 'Planning & évaluations',    href: '/dashboard/recrutement/entretiens'       },
+  { id: 'recrutement-cvtheque',     label: 'CV-thèque',          sublabel: 'Vivier de talents',         href: '/dashboard/recrutement/cvtheque'         },
+  { id: 'recrutement-placement',    label: 'Placements',         sublabel: 'Missions & contrats placés',href: '/dashboard/recrutement/placement'        },
+  { id: 'recrutement-contrats',     label: 'Contrats',           sublabel: 'CDI, CDD, intérim & stage', href: '/dashboard/recrutement/contrats'         },
+  { id: 'recrutement-partenaires',  label: 'Partenaires',        sublabel: 'Clients entreprises',       href: '/dashboard/recrutement/partenaires'      },
+  { id: 'recrutement-analytics',    label: 'Analytics RH',      sublabel: 'KPIs & performance',        href: '/dashboard/recrutement/analytics'        },
+  { id: 'recrutement-miaa',         label: 'MIAA+ Job',          sublabel: 'IA matching CV & offres',   href: '/dashboard/miaa?context=recrutement'     },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -340,6 +362,17 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   // Compagnie communication
   'email-management': 'nav.email_management',
   'social-media':     'nav.social_media',
+  // Recrutement & Placement RH
+  'recrutement-direction':    'nav.recrutement_direction',
+  'recrutement-offres':       'nav.recrutement_offres',
+  'recrutement-candidatures': 'nav.recrutement_candidatures',
+  'recrutement-entretiens':   'nav.recrutement_entretiens',
+  'recrutement-cvtheque':     'nav.recrutement_cvtheque',
+  'recrutement-placement':    'nav.recrutement_placement',
+  'recrutement-contrats':     'nav.recrutement_contrats',
+  'recrutement-partenaires':  'nav.recrutement_partenaires',
+  'recrutement-analytics':    'nav.recrutement_analytics',
+  'recrutement-miaa':         'nav.recrutement_miaa',
 }
 
 const SECTOR_LABEL_KEYS: Record<string, string> = {
@@ -356,6 +389,7 @@ const SECTOR_LABEL_KEYS: Record<string, string> = {
   petrole:          'nav.petrole',
   ong:              'nav.ong',
   boisson:          'nav.boisson',
+  recrutement:      'nav.recrutement',
 }
 
 // roles : gestion des rôles école — réservé à DIRECTION_GENERALE uniquement
@@ -384,6 +418,7 @@ const SECTOR_BI_MAP: Record<string, string[]> = {
   petrole:          ['bi-dg', 'bi-rh'],
   cabinet:          ['bi-dg'],
   boisson:          ['bi-dg'],
+  recrutement:      ['bi-dg', 'bi-rh'],
 }
 
 const ALL_MODULE_IDS = [
@@ -403,6 +438,11 @@ const ALL_MODULE_IDS = [
   'assurance-direction', 'assurance-polices', 'assurance-sinistres',
   'assurance-clients', 'assurance-produits', 'assurance-partenaires',
   'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
+  // ── Recrutement & Placement RH ─────────────────────────────────────────────
+  'recrutement-direction', 'recrutement-offres', 'recrutement-candidatures',
+  'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
+  'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
+  'recrutement-miaa',
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
@@ -411,6 +451,7 @@ function getSectorIcon(secteur: string): LucideIcon {
     transport: Truck, transport_public: Truck, commerce: Store,
     supermarche: Store, boutique: Store, sante: Activity,
     btp: Building2, banque: Wallet, ong: HeartHandshake,
+    recrutement: Briefcase,
   }
   return M[secteur] ?? Settings
 }
@@ -511,6 +552,8 @@ export default function Sidebar() {
   const canView = useCallback((id: string): boolean => {
     // ── Check plan (toujours en premier) ──────────────────────────────────────
     if (!canAccessByPlan(taille, id)) return false
+    // Masquer l'ancien sous-module RH recrutement pour les agences recrutement
+    if (id === 'recrutement' && secteur === 'recrutement') return false
 
     // ── BI : filtrés par secteur, admin uniquement ────────────────────────────
     if (BI_MODULE_IDS.has(id)) {

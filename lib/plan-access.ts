@@ -68,6 +68,13 @@ const ALWAYS_VISIBLE = new Set([
   'ong', 'ong-projets', 'ong-dons',
   'boisson', 'boisson-tournees',
   'petrole', 'petrole-sites',
+  'assurance-direction', 'assurance-polices', 'assurance-sinistres',
+  'assurance-clients', 'assurance-produits', 'assurance-partenaires',
+  'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
+  'recrutement-direction', 'recrutement-offres', 'recrutement-candidatures',
+  'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
+  'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
+  'recrutement-miaa',
 ])
 
 /**
