@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { Mistral } from '@mistralai/mistralai'
 import { EXPERTS } from '@/lib/miaa/experts'
+import { checkPlanAccess } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -21,6 +22,12 @@ export async function POST(req: Request) {
 
     if (!file) return Response.json({ error: 'Aucun fichier fourni' }, { status: 400 })
     if (file.size > MAX_FILE_SIZE) return Response.json({ error: 'Fichier trop volumineux (max 10 Mo)' }, { status: 400 })
+
+    const tenantId = formData.get('tenant_id') as string | null
+    if (tenantId) {
+      const planDenied = await checkPlanAccess(tenantId, 'academy')
+      if (planDenied) return planDenied
+    }
 
     const mime   = file.type
     const buffer = Buffer.from(await file.arrayBuffer())

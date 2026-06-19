@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { chargerMemoireMIAA, sauvegarderRapport } from '@/lib/miaa/memory'
 import { EXPERTS } from '@/lib/miaa/experts'
+import { checkPlanAccess } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -38,6 +39,11 @@ export async function POST(req: Request) {
 
     if (!type || !DOC_PROMPTS[type]) {
       return Response.json({ error: 'Type de document inconnu' }, { status: 400 })
+    }
+
+    if (tenant_id) {
+      const planDenied = await checkPlanAccess(tenant_id, 'academy')
+      if (planDenied) return planDenied
     }
 
     const supabase = getSupabase()

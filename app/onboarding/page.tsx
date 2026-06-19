@@ -161,6 +161,7 @@ interface Draft {
   nomEntreprise?: string
   telephone?:     string
   pays?:          string
+  email?:         string
 }
 
 function saveDraft(d: Draft)  { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d))         } catch {} }
@@ -226,6 +227,7 @@ export default function OnboardingPage() {
         if (draft?.telephone)     setTelephone(draft.telephone)
         if (draft?.pays)          setPays(draft.pays)
         if (draft?.sectorId)      setSectorId(draft.sectorId)
+        if (draft?.email)         setEmail(draft.email)
         // Jump to the right step based on what was pre-filled (e.g. from landing form)
         if (draft?.plan && draft?.sectorId) setStep('form')
         else if (draft?.plan)               setStep('sector')

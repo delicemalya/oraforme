@@ -212,13 +212,23 @@ export default function LandingPage() {
   const [ctaSecteur, setCtaSecteur] = useState('')
 
   function handleCtaStart() {
-    // Save to localStorage — onboarding reads this draft on load
     try {
       localStorage.setItem('oraforme_onb_v5', JSON.stringify({
         plan:          ctaPlan,
         sectorId:      ctaSecteur || undefined,
         nomEntreprise: ctaNom.trim()  || undefined,
         telephone:     ctaTel.trim()  || undefined,
+      }))
+    } catch { /* localStorage unavailable */ }
+    router.push('/onboarding')
+  }
+
+  function handleLeadBarStart() {
+    try {
+      const existing = JSON.parse(localStorage.getItem('oraforme_onb_v5') || '{}')
+      localStorage.setItem('oraforme_onb_v5', JSON.stringify({
+        ...existing,
+        email: email.trim() || undefined,
       }))
     } catch { /* localStorage unavailable */ }
     router.push('/onboarding')
@@ -255,7 +265,7 @@ export default function LandingPage() {
             style={{ height: 70 }}>
 
             <Link href="/" className="shrink-0">
-              <img src="/logo.png" alt="Oraforme" style={{ height: 40, width: 'auto' }} />
+              <Image src="/logo.png" alt="Oraforme" width={120} height={40} style={{ height: 40, width: 'auto' }} priority />
             </Link>
 
             <div className="hidden lg:flex items-center gap-8">
@@ -387,10 +397,11 @@ export default function LandingPage() {
                 placeholder="Votre adresse e-mail professionnelle"
                 className="flex-1 min-w-0 px-4 py-3 rounded-xl text-sm font-medium text-[#111827] placeholder-gray-400 outline-none"
               />
-              <Link href="/onboarding"
+              <button
+                onClick={handleLeadBarStart}
                 className="bt shrink-0 bg-[#00454c] hover:bg-[#003438] text-white font-bold text-sm px-6 py-3 rounded-xl whitespace-nowrap inline-flex items-center gap-1.5">
                 COMMENCER <ArrowRight size={13} />
-              </Link>
+              </button>
             </div>
             <div className="shrink-0 flex items-center gap-2 text-white/70 text-[11px] font-medium">
               <CheckCircle2 size={13} className="text-white/80" />
@@ -974,7 +985,7 @@ export default function LandingPage() {
               {/* Brand */}
               <div>
                 <Link href="/" className="flex items-center mb-5">
-                  <img src="/logo-white.png" alt="Oraforme" style={{ height: 32, width: 'auto' }} />
+                  <Image src="/logo-white.png" alt="Oraforme" width={100} height={32} style={{ height: 32, width: 'auto' }} />
                 </Link>
                 <p className="text-sm text-gray-500 leading-relaxed mb-5">
                   La plateforme de gestion propulsée par l&apos;intelligence artificielle MIAA+.

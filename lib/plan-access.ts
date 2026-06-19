@@ -46,6 +46,9 @@ const ALWAYS_VISIBLE = new Set([
   'devis', 'equipe', 'recouvrement', 'rapports',
   // Navigation essentielle
   'abonnement', 'bizbot',
+  // MIAA+ — accès de base (chat) pour tous les plans ; les features premium
+  // (expertise, agent, academy, analyze-file) sont bloquées côté API pour TPE
+  'miaa', 'miaa-chat', 'miaa-rapports',
   // Modules secteur — toujours visibles dans leur contexte
   'ecole-direction', 'ecole-rh', 'ecole-comptabilite', 'scolarite',
   'daac', 'espace-formateur', 'espace-etudiant', 'espace-parent',
