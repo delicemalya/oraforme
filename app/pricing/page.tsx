@@ -4,6 +4,40 @@ import { PLAN_CONFIG, SECTEUR_CONFIG } from '@/lib/plans'
 
 export const metadata = { title: 'Tarifs — Oraforme' }
 
+const PLAN_TARGETS: Record<string, string[]> = {
+  tpe: [
+    'Auto-entrepreneurs',
+    'ETS',
+    'TPE',
+    'Boutiques & Commerces',
+    'Restaurants indépendants',
+    'Pharmacies indépendantes',
+    'Écoles primaires & Collèges',
+    'Petites agences',
+  ],
+  pme: [
+    'PME',
+    'Cabinets (compta, audit, fiscal…)',
+    'Hôtels & Universités',
+    'Cliniques & Hôpitaux',
+    'Assurances & Transport',
+    'Logistique & ONG',
+    'Supermarchés & BTP',
+    'Banques & Microfinances',
+  ],
+  grande: [
+    'Groupes internationaux',
+    'Holdings & Multinationales',
+    'Entreprises multi-pays & multi-filiales',
+    'Réseaux de franchises',
+    'Banques régionales',
+    'Assurances internationales',
+    'Grandes ONG internationales',
+    'Universités multi-campus',
+    'Chaînes hôtelières & Réseaux de cliniques',
+  ],
+}
+
 const CURRENCY_TABLE = [
   { devise: 'FCFA (XAF/CEMAC)', tpe: '10 000', pme: '25 000', grande: '46 000' },
   { devise: 'FC (Congo-RDC)',    tpe: '47 000', pme: '117 500', grande: '216 200' },
@@ -119,9 +153,9 @@ export default function PricingPage() {
                 </div>
 
                 {/* Header */}
-                <div className="mb-6">
+                <div className="mb-5">
                   <h3 className="text-xl font-bold text-white mb-0.5">{cfg.label}</h3>
-                  <p className="text-white/40 text-sm mb-4">{cfg.subtitle}</p>
+                  <p className="text-white/40 text-sm mb-3">{cfg.subtitle}</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-bold" style={{ color: cfg.color }}>
                       {new Intl.NumberFormat('fr-FR').format(cfg.price_fcfa)}
@@ -134,7 +168,36 @@ export default function PricingPage() {
                   </p>
                 </div>
 
-                {/* Features */}
+                {/* ── Pour ─────────────────────────────────────────── */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span
+                      className="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full"
+                      style={{ background: `${cfg.color}20`, color: cfg.color }}
+                    >
+                      POUR
+                    </span>
+                    <div className="h-px flex-1 bg-white/8" />
+                  </div>
+                  <ul className="space-y-1 mb-1">
+                    {(PLAN_TARGETS[key] ?? []).map(t => (
+                      <li key={t} className="flex items-center gap-2 text-[12px] text-white/60">
+                        <span className="w-1 h-1 rounded-full shrink-0" style={{ background: cfg.color }} />
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* ── Inclus ───────────────────────────────────────── */}
+                <div className="mb-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded-full bg-white/5 text-white/30">
+                      INCLUS
+                    </span>
+                    <div className="h-px flex-1 bg-white/8" />
+                  </div>
+                </div>
                 <ul className="space-y-2.5 flex-1 mb-6">
                   {cfg.features.map(f => (
                     <li key={f} className="flex items-start gap-2.5 text-sm">

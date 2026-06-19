@@ -88,10 +88,35 @@ const STEP_ACCENT: Record<Step, string> = {
 
 // ── Plan features ─────────────────────────────────────────────────────────────
 
+// "Pour :" — cibles de chaque plan (affichées en priorité dans les cartes)
+const PLAN_TARGETS = {
+  tpe: [
+    'Auto-entrepreneurs · ETS · TPE',
+    'Boutiques & Restaurants indépendants',
+    'Pharmacies indépendantes',
+    'Écoles primaires & Collèges',
+    'Petites agences',
+  ],
+  pme: [
+    'PME · Cabinets (compta, audit, fiscal…)',
+    'Hôtels · Universités · Cliniques',
+    'Hôpitaux · Assurances · Transport',
+    'Logistique · ONG · Supermarchés',
+    'BTP · Banques · Microfinances',
+  ],
+  grande: [
+    'Groupes internationaux & Holdings',
+    'Multinationales · Entreprises multi-pays',
+    'Réseaux de franchises',
+    'Banques régionales & Assurances int.',
+    'Chaînes hôtelières & Réseaux de cliniques',
+  ],
+}
+
 const PLAN_FEATURES = {
-  tpe:    ['TPE · ETS · Petite entreprise', '1 à 5 employés', 'Facturation & CRM', 'Trésorerie & Caisse', 'RH & Paie', 'Mode hors-ligne inclus'],
-  pme:    ['PME · Grande entreprise', 'Cabinet · ONG · Université', 'Hôtel · Clinique · Banque', '5 employés et plus', 'Comptabilité OHADA & Fiscalité', 'Analytics & BI · MIAA+ Premium'],
-  grande: ['Groupe · Filiales · International', 'Structure multi-entités', 'Vue consolidée groupe', 'Gestion email & réseaux sociaux', 'MIAA+ Illimité', 'Utilisateurs illimités'],
+  tpe:    ['Facturation & CRM', 'Trésorerie & Caisse', 'RH & Paie complète', 'MIAA+ Standard', 'Mode hors-ligne inclus'],
+  pme:    ['Tout Entrepreneur inclus', 'Comptabilité OHADA & Fiscalité', 'Analytics & BI', 'MIAA+ Premium', 'Audit & Conformité'],
+  grande: ['Tout Business inclus', 'Vue consolidée groupe', 'Gestion email & réseaux sociaux', 'MIAA+ Illimité', 'Utilisateurs illimités'],
 }
 
 // ── Draft ─────────────────────────────────────────────────────────────────────
@@ -450,13 +475,28 @@ export default function OnboardingPage() {
                         <p className="text-[15px] font-black" style={{ color: plan === 'tpe' ? '#991B1B' : '#0F172A' }}>Entrepreneur</p>
                         <span className="text-[11px] font-black text-[#DC2626]">10 000 FCFA/mois</span>
                       </div>
-                      <p className="text-[11px] text-[#64748B] mb-1.5">Lancez votre activité, gérez votre quotidien sans effort.</p>
-                      <div className="space-y-0.5">
-                        {PLAN_FEATURES.tpe.map(f => (
-                          <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
-                            <span style={{ color: plan === 'tpe' ? '#DC2626' : '#CBD5E1' }}>·</span> {f}
-                          </p>
-                        ))}
+                      <p className="text-[11px] text-[#64748B] mb-2">Lancez votre activité, gérez votre quotidien sans effort.</p>
+                      {/* Pour : */}
+                      <div className="mb-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: '#FEF2F2', color: '#DC2626' }}>POUR</span>
+                        <div className="mt-1 space-y-0.5">
+                          {PLAN_TARGETS.tpe.map(t => (
+                            <p key={t} className="text-[11px] font-semibold leading-tight flex items-center gap-1.5" style={{ color: plan === 'tpe' ? '#991B1B' : '#374151' }}>
+                              <span style={{ color: plan === 'tpe' ? '#DC2626' : '#CBD5E1' }}>›</span> {t}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Inclus : */}
+                      <div className="mt-1.5 pt-1.5 border-t border-[#F1F5F9]">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-[#94A3B8]">INCLUS</span>
+                        <div className="mt-1 space-y-0.5">
+                          {PLAN_FEATURES.tpe.map(f => (
+                            <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
+                              <span style={{ color: plan === 'tpe' ? '#DC2626' : '#CBD5E1' }}>·</span> {f}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <div className="shrink-0 mt-0.5">
@@ -484,13 +524,28 @@ export default function OnboardingPage() {
                         <p className="text-[15px] font-black" style={{ color: plan === 'pme' ? '#92400E' : '#0F172A' }}>Business</p>
                         <span className="text-[11px] font-black text-[#D97706]">25 000 FCFA/mois</span>
                       </div>
-                      <p className="text-[11px] text-[#64748B] mb-1.5">Automatisez, analysez et développez votre PME.</p>
-                      <div className="space-y-0.5">
-                        {PLAN_FEATURES.pme.map(f => (
-                          <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
-                            <span style={{ color: plan === 'pme' ? '#D97706' : '#CBD5E1' }}>·</span> {f}
-                          </p>
-                        ))}
+                      <p className="text-[11px] text-[#64748B] mb-2">Automatisez, analysez et développez votre PME.</p>
+                      {/* Pour : */}
+                      <div className="mb-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: '#FFFBEB', color: '#D97706' }}>POUR</span>
+                        <div className="mt-1 space-y-0.5">
+                          {PLAN_TARGETS.pme.map(t => (
+                            <p key={t} className="text-[11px] font-semibold leading-tight flex items-center gap-1.5" style={{ color: plan === 'pme' ? '#92400E' : '#374151' }}>
+                              <span style={{ color: plan === 'pme' ? '#D97706' : '#CBD5E1' }}>›</span> {t}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Inclus : */}
+                      <div className="mt-1.5 pt-1.5 border-t border-[#F1F5F9]">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-[#94A3B8]">INCLUS</span>
+                        <div className="mt-1 space-y-0.5">
+                          {PLAN_FEATURES.pme.map(f => (
+                            <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
+                              <span style={{ color: plan === 'pme' ? '#D97706' : '#CBD5E1' }}>·</span> {f}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <div className="shrink-0 mt-0.5">
@@ -515,13 +570,28 @@ export default function OnboardingPage() {
                         <p className="text-[15px] font-black" style={{ color: plan === 'grande' ? '#4C1D95' : '#0F172A' }}>Compagnie</p>
                         <span className="text-[11px] font-black text-[#7C3AED]">46 000 FCFA/mois</span>
                       </div>
-                      <p className="text-[11px] text-[#64748B] mb-1.5">Pilotez votre groupe international depuis une seule plateforme.</p>
-                      <div className="space-y-0.5">
-                        {PLAN_FEATURES.grande.map(f => (
-                          <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
-                            <span style={{ color: plan === 'grande' ? '#7C3AED' : '#CBD5E1' }}>·</span> {f}
-                          </p>
-                        ))}
+                      <p className="text-[11px] text-[#64748B] mb-2">Pilotez votre groupe international depuis une seule plateforme.</p>
+                      {/* Pour : */}
+                      <div className="mb-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: '#F5F3FF', color: '#7C3AED' }}>POUR</span>
+                        <div className="mt-1 space-y-0.5">
+                          {PLAN_TARGETS.grande.map(t => (
+                            <p key={t} className="text-[11px] font-semibold leading-tight flex items-center gap-1.5" style={{ color: plan === 'grande' ? '#4C1D95' : '#374151' }}>
+                              <span style={{ color: plan === 'grande' ? '#7C3AED' : '#CBD5E1' }}>›</span> {t}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Inclus : */}
+                      <div className="mt-1.5 pt-1.5 border-t border-[#F1F5F9]">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-[#94A3B8]">INCLUS</span>
+                        <div className="mt-1 space-y-0.5">
+                          {PLAN_FEATURES.grande.map(f => (
+                            <p key={f} className="text-[11px] text-[#64748B] leading-tight flex items-center gap-1.5">
+                              <span style={{ color: plan === 'grande' ? '#7C3AED' : '#CBD5E1' }}>·</span> {f}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <div className="shrink-0 mt-0.5">

@@ -91,6 +91,16 @@ const PLANS = [
     isCompagnie: false,
     color:       '#DC2626',
     features:    PLAN_CONFIG.tpe.features,
+    targets: [
+      'Auto-entrepreneurs',
+      'ETS',
+      'TPE',
+      'Boutiques & Commerces',
+      'Restaurants indépendants',
+      'Pharmacies indépendantes',
+      'Écoles primaires & Collèges',
+      'Petites agences',
+    ],
   },
   {
     name:        'Business',
@@ -101,8 +111,17 @@ const PLANS = [
     desc:        'Pour PME, cabinets et secteurs spécialisés',
     highlight:   true,
     isCompagnie: false,
-    color:       '#DC2626',
+    color:       '#D97706',
     features:    PLAN_CONFIG.pme.features,
+    targets: [
+      'PME',
+      'Cabinets (compta, fiscal, audit…)',
+      'Hôtels & Universités',
+      'Cliniques & Hôpitaux',
+      'Assurances & Transport',
+      'Logistique & ONG',
+      'Supermarchés & BTP',
+    ],
   },
   {
     name:        'Compagnie',
@@ -115,6 +134,15 @@ const PLANS = [
     isCompagnie: true,
     color:       '#7C3AED',
     features:    PLAN_CONFIG.grande.features,
+    targets: [
+      'Groupes internationaux',
+      'Holdings & Multinationales',
+      'Entreprises multi-pays & multi-filiales',
+      'Réseaux de franchises',
+      'Banques régionales & Assurances int.',
+      'Grandes ONG internationales',
+      'Chaînes hôtelières & Réseaux de cliniques',
+    ],
   },
 ]
 
@@ -867,21 +895,18 @@ export default function LandingPage() {
                     )}
 
                     {/* Plan name + benefit */}
-                    <div className="mb-5">
+                    <div className="mb-4">
                       <div className={`text-xl font-black mb-1 ${isDark ? 'text-white' : 'text-[#111827]'}`}>
                         {plan.name}
                       </div>
-                      <p className={`text-xs font-semibold mb-2 ${isDark ? 'text-gray-300' : 'text-[#374151]'}`}>
+                      <p className={`text-xs font-semibold ${isDark ? 'text-gray-300' : 'text-[#374151]'}`}>
                         {plan.benefit}
                       </p>
-                      <div className={`text-[11px] ${isDark ? 'text-gray-500' : 'text-[#6B7280]'}`}>
-                        {plan.desc}
-                      </div>
                     </div>
 
                     {/* Price */}
-                    <div className="flex items-baseline gap-1 mb-6">
-                      <span className={`text-4xl font-black`} style={{ color: isDark ? '#fff' : plan.color }}>
+                    <div className="flex items-baseline gap-1 mb-5">
+                      <span className="text-4xl font-black" style={{ color: isDark ? '#fff' : plan.color }}>
                         {plan.price}
                       </span>
                       <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
@@ -889,18 +914,59 @@ export default function LandingPage() {
                       </span>
                     </div>
 
-                    {/* Features */}
-                    <ul className="space-y-2.5 mb-7 flex-1">
-                      {plan.features.map(f => (
-                        <li key={f}
-                          className={`flex items-start gap-2.5 text-sm font-medium ${
-                            isDark ? 'text-gray-200' : 'text-[#374151]'
-                          }`}>
-                          <CheckCircle2 size={14} className="shrink-0 mt-0.5" style={{ color: isDark ? (plan.isCompagnie ? '#A78BFA' : '#F87171') : plan.color }} />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
+                    {/* ── Pour : section ── */}
+                    <div className="mb-5">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span
+                          className="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full"
+                          style={{
+                            background: isDark ? (plan.isCompagnie ? 'rgba(167,139,250,0.2)' : 'rgba(248,113,113,0.15)') : plan.color + '15',
+                            color: isDark ? (plan.isCompagnie ? '#C4B5FD' : '#FCA5A5') : plan.color,
+                          }}
+                        >
+                          POUR
+                        </span>
+                        <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                      </div>
+                      <ul className="space-y-1">
+                        {(plan as typeof plan & { targets: string[] }).targets.map(t => (
+                          <li key={t}
+                            className={`flex items-center gap-2 text-[12px] font-medium ${
+                              isDark ? 'text-gray-300' : 'text-[#374151]'
+                            }`}>
+                            <span className="w-1 h-1 rounded-full shrink-0" style={{ background: isDark ? (plan.isCompagnie ? '#A78BFA' : '#F87171') : plan.color }} />
+                            {t}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* ── Inclus : section ── */}
+                    <div className="mb-6">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span
+                          className="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full"
+                          style={{
+                            background: isDark ? 'rgba(255,255,255,0.08)' : '#F1F5F9',
+                            color: isDark ? '#94A3B8' : '#64748B',
+                          }}
+                        >
+                          INCLUS
+                        </span>
+                        <div className={`h-px flex-1 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                      </div>
+                      <ul className="space-y-2 flex-1">
+                        {plan.features.map(f => (
+                          <li key={f}
+                            className={`flex items-start gap-2.5 text-sm font-medium ${
+                              isDark ? 'text-gray-200' : 'text-[#374151]'
+                            }`}>
+                            <CheckCircle2 size={13} className="shrink-0 mt-0.5" style={{ color: isDark ? (plan.isCompagnie ? '#A78BFA' : '#F87171') : plan.color }} />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
                     <Link href="/onboarding"
                       className="bt block text-center text-sm font-bold py-3.5 rounded-xl text-white uppercase tracking-wide"
