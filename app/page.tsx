@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -117,6 +118,42 @@ const PLANS = [
   },
 ]
 
+// Sectors compatible with onboarding sector IDs (direct match for pre-fill)
+const LANDING_SECTORS = [
+  { id: 'restaurant',          label: 'Restaurant / Fast-food'      },
+  { id: 'commerce',            label: 'Commerce & Boutique'          },
+  { id: 'pharmacie',           label: 'Pharmacie'                    },
+  { id: 'agriculture',         label: 'Agriculture & Élevage'       },
+  { id: 'boisson',             label: 'Distribution Boissons'        },
+  { id: 'boulangerie',         label: 'Boulangerie / Pâtisserie'    },
+  { id: 'hotel',               label: 'Hôtel & Hébergement'         },
+  { id: 'clinique',            label: 'Clinique / Santé'             },
+  { id: 'hopital',             label: 'Hôpital'                      },
+  { id: 'btp',                 label: 'BTP & Construction'           },
+  { id: 'transport',           label: 'Transport & Logistique'       },
+  { id: 'logistique',          label: 'Logistique'                   },
+  { id: 'banque',              label: 'Banque & Finance'             },
+  { id: 'microfinance',        label: 'Microfinance'                 },
+  { id: 'supermarche',         label: 'Supermarché / GMS'           },
+  { id: 'ong',                 label: 'ONG & Association'            },
+  { id: 'petrole',             label: 'Pétrole & Énergie'           },
+  { id: 'industrie',           label: 'Industrie'                    },
+  { id: 'cabinet-comptable',   label: 'Cabinet Comptable'            },
+  { id: 'cabinet-fiscal',      label: 'Cabinet Fiscal'               },
+  { id: 'cabinet-audit',       label: "Cabinet d'Audit"              },
+  { id: 'cabinet-conseil',     label: 'Cabinet Conseil'              },
+  { id: 'universite',          label: 'Université'                   },
+  { id: 'lycee',               label: 'Lycée'                        },
+  { id: 'compagnie_assurance', label: "Compagnie d'Assurance"       },
+  { id: 'autre_business',      label: 'Autre activité'               },
+]
+
+const PLAN_PILLS = [
+  { key: 'tpe' as const,    label: 'Entrepreneur', price: '10 000', color: '#DC2626', bg: '#FEF2F2'  },
+  { key: 'pme' as const,    label: 'Business',     price: '25 000', color: '#D97706', bg: '#FFFBEB'  },
+  { key: 'grande' as const, label: 'Compagnie',    price: '46 000', color: '#7C3AED', bg: '#F5F3FF'  },
+]
+
 const FLAG_COUNTRIES: { code: string; nom: string }[] = [
   { code: 'cg', nom: 'Congo' },
   { code: 'cm', nom: 'Cameroun' },
@@ -153,9 +190,29 @@ const FLAG_COUNTRIES: { code: string; nom: string }[] = [
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [showAllModules, setShowAllModules] = useState(false)
+
+  // ── CTA form state ──────────────────────────────────────────────────────────
+  const [ctaNom,     setCtaNom]     = useState('')
+  const [ctaTel,     setCtaTel]     = useState('')
+  const [ctaPlan,    setCtaPlan]    = useState<'tpe' | 'pme' | 'grande'>('pme')
+  const [ctaSecteur, setCtaSecteur] = useState('')
+
+  function handleCtaStart() {
+    // Save to localStorage — onboarding reads this draft on load
+    try {
+      localStorage.setItem('oraforme_onb_v5', JSON.stringify({
+        plan:          ctaPlan,
+        sectorId:      ctaSecteur || undefined,
+        nomEntreprise: ctaNom.trim()  || undefined,
+        telephone:     ctaTel.trim()  || undefined,
+      }))
+    } catch { /* localStorage unavailable */ }
+    router.push('/onboarding')
+  }
 
   return (
     <>
@@ -653,21 +710,22 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══ CTA FORM — image bg + formulaire ════════════════════════════════ */}
+        {/* ══ CTA FORM — image bg + formulaire fonctionnel ════════════════════ */}
         <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
           <div className="absolute inset-0">
             <Image
-              src="/images/office-team.jpg"
-              alt="Bureau Oraforme"
+              src="/images/oraforme-cta.jpg"
+              alt="Oraforme — Démarrer"
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-[#00454c]/85" />
+            <div className="absolute inset-0 bg-[#00454c]/82" />
           </div>
 
           <div className="relative max-w-5xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
 
+              {/* Gauche — pitch */}
               <div>
                 <span className="text-[10px] font-bold text-[#F87171] uppercase tracking-[0.18em] mb-4 block">
                   COMMENCER MAINTENANT
@@ -675,10 +733,20 @@ export default function LandingPage() {
                 <h2 className="text-3xl sm:text-4xl font-black text-white mb-5 leading-tight">
                   Obtenez votre<br />accès gratuit
                 </h2>
-                <p className="text-gray-300 text-sm leading-relaxed mb-7">
-                  Créez votre compte en 2 minutes et commencez à piloter votre entreprise avec
-                  l&apos;intelligence artificielle MIAA+. Aucune carte bancaire requise.
+                <p className="text-gray-300 text-sm leading-relaxed mb-6">
+                  Choisissez votre offre, sélectionnez votre secteur et créez votre entreprise en 2 minutes.
+                  MIAA+ active vos modules automatiquement. Aucune carte bancaire requise.
                 </p>
+                <ul className="space-y-2 mb-7">
+                  {[
+                    '✓ 30 jours gratuits sans engagement',
+                    '✓ Modules activés selon votre secteur',
+                    '✓ Fonctionne hors-ligne en Afrique',
+                    '✓ Mobile Money accepté',
+                  ].map(t => (
+                    <li key={t} className="text-gray-300 text-sm">{t}</li>
+                  ))}
+                </ul>
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                   <Mail size={13} className="text-[#DC2626]" />
                   <a href="mailto:contact@oraforme.com" className="hover:text-white transition-colors">
@@ -687,42 +755,74 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 shadow-2xl">
-                <h3 className="text-sm font-black text-[#111827] mb-6 uppercase tracking-wider">
-                  CRÉER MON COMPTE GRATUIT
+              {/* Droite — formulaire fonctionnel */}
+              <div className="bg-white rounded-2xl p-7 shadow-2xl">
+                <h3 className="text-sm font-black text-[#111827] mb-1 uppercase tracking-wider">
+                  CRÉER MON ENTREPRISE
                 </h3>
+                <p className="text-[11px] text-gray-400 mb-5">Sélectionnez votre offre et secteur pour démarrer</p>
+
+                {/* Plan pills */}
+                <div className="grid grid-cols-3 gap-1.5 mb-4">
+                  {PLAN_PILLS.map(p => (
+                    <button
+                      key={p.key}
+                      type="button"
+                      onClick={() => setCtaPlan(p.key)}
+                      className="py-2 px-1 rounded-xl border-2 text-center transition-all"
+                      style={{
+                        borderColor: ctaPlan === p.key ? p.color : '#E5E7EB',
+                        background:  ctaPlan === p.key ? p.bg  : 'white',
+                      }}
+                    >
+                      <p className="text-[11px] font-black leading-none" style={{ color: ctaPlan === p.key ? p.color : '#374151' }}>
+                        {p.label}
+                      </p>
+                      <p className="text-[9px] mt-0.5" style={{ color: ctaPlan === p.key ? p.color : '#9CA3AF' }}>
+                        {p.price} FCFA
+                      </p>
+                    </button>
+                  ))}
+                </div>
+
                 <div className="space-y-3">
                   <input
                     type="text"
-                    placeholder="Nom de l'entreprise"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#DC2626] transition-colors"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Adresse e-mail professionnelle"
+                    value={ctaNom}
+                    onChange={e => setCtaNom(e.target.value)}
+                    placeholder="Nom de l'entreprise *"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#DC2626] transition-colors"
                   />
                   <input
                     type="tel"
-                    placeholder="Téléphone (optionnel)"
+                    value={ctaTel}
+                    onChange={e => setCtaTel(e.target.value)}
+                    placeholder="Téléphone (ex: +242 06 xxx xxxx)"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#DC2626] transition-colors"
                   />
-                  <select className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#DC2626] transition-colors text-[#374151]">
-                    <option value="">Secteur d&apos;activité</option>
-                    <option>Commerce & Distribution</option>
-                    <option>Services & Conseil</option>
-                    <option>Hôtellerie & Restauration</option>
-                    <option>Éducation & Formation</option>
-                    <option>Santé & Pharmacie</option>
-                    <option>Autre</option>
+                  <select
+                    value={ctaSecteur}
+                    onChange={e => setCtaSecteur(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#DC2626] transition-colors text-[#374151]"
+                  >
+                    <option value="">Secteur d&apos;activité *</option>
+                    {LANDING_SECTORS.map(s => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
                   </select>
-                  <Link href="/onboarding"
-                    className="bt block w-full text-center bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold text-sm py-4 rounded-xl uppercase tracking-wide">
-                    COMMENCER GRATUITEMENT
-                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleCtaStart}
+                    disabled={!ctaNom.trim() || !ctaSecteur}
+                    className="bt block w-full text-center text-white font-bold text-sm py-4 rounded-xl uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    style={{ background: PLAN_PILLS.find(p => p.key === ctaPlan)?.color ?? '#DC2626' }}
+                  >
+                    CRÉER MON ESPACE — {PLAN_PILLS.find(p => p.key === ctaPlan)?.label}
+                  </button>
                   <p className="text-[10px] text-gray-400 text-center">
-                    En créant un compte, vous acceptez nos{' '}
-                    <a href="#" className="text-[#DC2626] hover:underline">CGU</a>
+                    Gratuit 30 jours · Vous créerez votre mot de passe à l&apos;étape suivante ·{' '}
+                    <a href="/cgu" className="text-[#DC2626] hover:underline">CGU</a>
                   </p>
                 </div>
               </div>

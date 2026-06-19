@@ -164,7 +164,14 @@ export default function OnboardingPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session?.user) {
         const draft = loadDraft()
-        if (draft?.plan) setPlan(draft.plan)
+        if (draft?.plan)          setPlan(draft.plan)
+        if (draft?.nomEntreprise) setNomEntreprise(draft.nomEntreprise)
+        if (draft?.telephone)     setTelephone(draft.telephone)
+        if (draft?.pays)          setPays(draft.pays)
+        if (draft?.sectorId)      setSectorId(draft.sectorId)
+        // Jump to the right step based on what was pre-filled (e.g. from landing form)
+        if (draft?.plan && draft?.sectorId) setStep('form')
+        else if (draft?.plan)               setStep('sector')
         return
       }
 
