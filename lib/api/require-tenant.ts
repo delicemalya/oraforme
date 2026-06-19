@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { canAccessByPlan } from '@/lib/plan-access'
 
 export type TenantRole = 'owner' | 'admin' | 'membre'
 
@@ -81,6 +82,48 @@ export async function requireRole(
   }
 
   return ctx
+}
+
+/**
+ * Retourne le plan (taille_entreprise) d'un tenant.
+ * Utilisé pour enforcer les restrictions d'offre côté API.
+ */
+export async function getTenantPlan(tenantId: string): Promise<string | null> {
+  const { data } = await supabaseAdmin
+    .from('tenants')
+    .select('taille_entreprise')
+    .eq('id', tenantId)
+    .maybeSingle()
+  return data?.taille_entreprise ?? null
+}
+
+/**
+ * Retourne une réponse 403 avec un message d'upgrade.
+ * À utiliser quand un tenant essaie d'accéder à une feature premium.
+ */
+export function planError(required: 'pme' | 'grande'): Response {
+  const label = required === 'grande' ? 'Compagnie' : 'Business'
+  return Response.json(
+    { error: `Cette fonctionnalité nécessite un abonnement ${label} ou supérieur.`, upgrade_required: required },
+    { status: 403 },
+  )
+}
+
+/**
+ * Vérifie qu'un tenant a accès à un module donné selon son plan.
+ * Retourne planError() si refusé, null si autorisé.
+ */
+export async function checkPlanAccess(
+  tenantId: string,
+  moduleId: string,
+): Promise<Response | null> {
+  const plan = await getTenantPlan(tenantId)
+  if (!canAccessByPlan(plan, moduleId)) {
+    return planError(
+      moduleId === 'groupe' || moduleId === 'email-management' ? 'grande' : 'pme',
+    )
+  }
+  return null
 }
 
 /** API Key authentication — for /api/v1/ public endpoints */

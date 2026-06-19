@@ -10,8 +10,17 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: "Oraforme — Gestion d'entreprise tout-en-un",
-  description: 'Facturation, stock, RH, restaurant — tout en un.',
+  title: "Oraforme — ERP tout-en-un pour l'Afrique centrale",
+  description: 'Comptabilité OHADA, facturation, RH, trésorerie, MIAA+ IA — pour 10 pays d\'Afrique centrale. Disponible pour TPE, PME et grandes entreprises.',
+  keywords: ['ERP Afrique', 'comptabilité OHADA', 'logiciel gestion Congo', 'facturation PME', 'MIAA intelligence artificielle', 'gestion RH Cameroun'],
+  openGraph: {
+    title: "Oraforme — ERP tout-en-un pour l'Afrique centrale",
+    description: 'Comptabilité OHADA, facturation, RH, trésorerie, MIAA+ IA — pour 10 pays d\'Afrique centrale.',
+    url: 'https://www.oraforme.com',
+    siteName: 'Oraforme',
+    locale: 'fr_FR',
+    type: 'website',
+  },
   manifest: '/manifest.json',
   icons: {
     icon: [

@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { requireTenant } from '@/lib/api/require-tenant'
+import { requireTenant, checkPlanAccess } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import {
   runAuditGlobal,
@@ -140,6 +140,9 @@ async function getBalanceSummary(tenantId: string): Promise<string> {
 export async function POST(req: NextRequest) {
   const ctx = await requireTenant(req)
   if (!ctx.ok) return ctx.error
+
+  const planDenied = await checkPlanAccess(ctx.tid, 'audit-comptable')
+  if (planDenied) return planDenied
 
   const body = await req.json() as { question?: string; mode?: string }
   const question = body.question?.trim() || 'Donne-moi le score de conformité OHADA complet et les anomalies prioritaires.'

@@ -6,6 +6,7 @@ import { chargerMemoireMIAA } from '@/lib/miaa/memory'
 import { getMIAASystemPrompt } from '@/lib/miaa/system-prompt'
 import { trackUsage } from '@/lib/miaa/usage-tracker'
 import { createClient } from '@supabase/supabase-js'
+import { checkPlanAccess } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -74,6 +75,12 @@ export async function POST(req: Request) {
     }
 
     const tenantId = tenantData?.tenant_id
+
+    if (tenantId) {
+      const planDenied = await checkPlanAccess(tenantId, 'academy')
+      if (planDenied) return planDenied
+    }
+
     const supabase = tenantId
       ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
       : null

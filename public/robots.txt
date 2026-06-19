@@ -1,8 +1,9 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
-Disallow: /dashboard
-Disallow: /onboarding
-Disallow: /admin
-Disallow: /api
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /onboarding/
+Disallow: /admin/
 
-Sitemap: https://www.oraforms.com/sitemap.xml
+Sitemap: https://www.oraforme.com/sitemap.xml
+

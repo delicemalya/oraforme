@@ -12,6 +12,7 @@ import { chargerMemoireMIAA } from '@/lib/miaa/memory'
 import { getDocById } from '@/lib/miaa/expertise-catalog'
 import { getPaysConfig } from '@/lib/miaa/pays-localization'
 import type { DocContext } from '@/lib/miaa/expertise-catalog'
+import { checkPlanAccess } from '@/lib/api/require-tenant'
 
 export const runtime     = 'nodejs'
 export const maxDuration = 60
@@ -42,6 +43,9 @@ export async function POST(req: Request) {
     if (!tenant_id || !type_doc) {
       return Response.json({ error: 'tenant_id et type_doc requis' }, { status: 400 })
     }
+
+    const planDenied = await checkPlanAccess(tenant_id, 'academy')
+    if (planDenied) return planDenied
 
     const docDef = getDocById(type_doc)
     if (!docDef) {

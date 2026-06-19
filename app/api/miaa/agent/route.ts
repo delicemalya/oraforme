@@ -13,6 +13,7 @@ import {
   sauvegarderProposals,
   chargerProposals,
 } from '@/lib/miaa/autonomous-engine'
+import { checkPlanAccess } from '@/lib/api/require-tenant'
 
 export const runtime  = 'nodejs'
 export const maxDuration = 30
@@ -44,6 +45,9 @@ export async function GET(req: Request) {
   if (!tenantId) {
     return Response.json({ error: 'tenant_id requis' }, { status: 400 })
   }
+
+  const planDenied = await checkPlanAccess(tenantId, 'academy')
+  if (planDenied) return planDenied
 
   try {
     const supabase = getSupabase()
@@ -95,6 +99,9 @@ export async function POST(req: Request) {
     if (!tenant_id) {
       return Response.json({ error: 'tenant_id requis' }, { status: 400 })
     }
+
+    const planDenied = await checkPlanAccess(tenant_id, 'academy')
+    if (planDenied) return planDenied
 
     const supabase = getSupabase()
 

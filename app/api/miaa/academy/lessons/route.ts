@@ -4,6 +4,7 @@
  * Query: ?domaine=&niveau=&tenant_id=
  */
 import { createClient } from '@supabase/supabase-js'
+import { checkPlanAccess } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -16,10 +17,16 @@ function db() {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
-  const domaine  = searchParams.get('domaine')
-  const niveau   = searchParams.get('niveau') ?? 'debutant'
+  const domaine   = searchParams.get('domaine')
+  const niveau    = searchParams.get('niveau') ?? 'debutant'
+  const tenant_id = searchParams.get('tenant_id')
 
   if (!domaine) return Response.json({ error: 'domaine requis' }, { status: 400 })
+
+  if (tenant_id) {
+    const planDenied = await checkPlanAccess(tenant_id, 'academy')
+    if (planDenied) return planDenied
+  }
 
   const supabase = db()
 

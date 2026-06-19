@@ -832,7 +832,7 @@ export default function LandingPage() {
                   </button>
                   <p className="text-[10px] text-gray-400 text-center">
                     Gratuit 30 jours · Vous créerez votre mot de passe à l&apos;étape suivante ·{' '}
-                    <a href="/cgu" className="text-[#DC2626] hover:underline">CGU</a>
+                    <a href="/legal/cgu" className="text-[#DC2626] hover:underline">CGU</a>
                   </p>
                 </div>
               </div>
@@ -1037,10 +1037,9 @@ export default function LandingPage() {
             <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
               <span className="text-xs text-gray-600">© 2026 Oraforme. Tous droits réservés. · by POLYVALON TECHNOLOGY</span>
               <div className="flex items-center gap-5">
-                {['CGU', 'Confidentialité', 'Cookies'].map(l => (
-                  <a key={l} href="#"
-                    className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{l}</a>
-                ))}
+                <a href="/legal/cgu" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">CGU</a>
+                <a href="/legal/privacy" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Confidentialité</a>
+                <a href="/legal/cookies" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Cookies</a>
               </div>
             </div>
           </div>

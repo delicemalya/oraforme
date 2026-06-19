@@ -20,8 +20,13 @@ export default function BTPDashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        // Placeholder: real KPIs will come from API once btp_chantiers table is created
-        setKpi({ chantiers_actifs: 0, chantiers_termines: 0, ca_mois: 0, devis_en_attente: 0 })
+        const res = await fetch('/api/btp/kpis')
+        if (res.ok) {
+          const data = await res.json()
+          setKpi(data)
+        }
+      } catch {
+        // table not yet seeded — keep zeros
       } finally {
         setLoading(false)
       }
