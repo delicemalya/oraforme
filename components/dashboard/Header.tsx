@@ -46,7 +46,7 @@ export default function Header() {
   // nomEntreprise & logoUrl managed inside LogoUploader
   const planKey       = tenant?.taille ?? tenant?.plan ?? 'tpe'
   const planBadge     = PLAN_BADGE[planKey] ?? PLAN_BADGE.tpe
-  const nextPlan      = planKey === 'tpe' ? 'Business' : null
+  const nextPlan      = planKey === 'tpe' ? 'Business' : planKey === 'pme' ? 'Compagnie' : null
 
   // Close dropdown on outside click
   useEffect(() => {

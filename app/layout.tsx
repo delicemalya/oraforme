@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import PWAInstall from '@/components/ui/PWAInstall'
+import OfflineIndicator from '@/components/ui/OfflineIndicator'
 import { LocaleProvider } from '@/lib/contexts/LocaleContext'
 import { PaysProvider } from '@/lib/contexts/PaysContext'
 import { ThemeProvider } from '@/lib/contexts/ThemeContext'
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <PaysProvider>
               {children}
               <PWAInstall />
+              <OfflineIndicator />
             </PaysProvider>
           </LocaleProvider>
         </ThemeProvider>

@@ -18,6 +18,7 @@ import {
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
   CreditCard, LineChart, Zap, Key, Landmark, Briefcase, ClipboardList,
   MessageSquare, DollarSign, FlaskConical, Shield, Siren, BedDouble,
+  Mail, Share2,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -174,6 +175,9 @@ const ICONS: Record<string, LucideIcon> = {
   'miaa-agent':     Zap,
   'miaa-rapports':  FileText,
   'miaa-expertise': Sparkles,
+  // Compagnie — communication
+  'email-management': Mail,
+  'social-media':     Share2,
 }
 
 // ─── Module Registry ──────────────────────────────────────────────────────────
@@ -221,6 +225,8 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'audit-plans',      label: "Plans d'Actions",           sublabel: '', href: '/dashboard/audit/plans-actions'  },
   { id: 'audit-rapports',   label: 'Rapports d\'Audit',         sublabel: '', href: '/dashboard/audit/rapports'       },
   { id: 'academy', label: 'MIAA+ Academy', sublabel: 'Université intelligente', href: '/dashboard/academy' },
+  { id: 'email-management', label: 'Gestion Emails',    sublabel: 'Compagnie', href: '/dashboard/email-management' },
+  { id: 'social-media',     label: 'Réseaux Sociaux',   sublabel: 'Compagnie', href: '/dashboard/social-media' },
   // MIAA+ sous-modules (bizbot = entrée principale → /dashboard/miaa)
   { id: 'miaa-agent',     label: 'Agent Autonome',        sublabel: 'Centre de Commandement',  href: '/dashboard/miaa/agent'     },
   { id: 'miaa-rapports',  label: 'Rapports IA',            sublabel: 'Générés par MIAA+',       href: '/dashboard/miaa/rapports'  },
@@ -246,6 +252,8 @@ const SIDEBAR_GROUPS = [
   { id: 'outils',      labelKey: 'nav.outils',      icon: FolderOpen,  moduleIds: ['ged', 'bizbot', 'academy', 'taches'] },
   // AUDIT & CONFORMITÉ OHADA
   { id: 'audit_group', labelKey: 'nav.audit',       icon: ShieldAlert, moduleIds: ['audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci', 'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'] },
+  // COMMUNICATION — email & réseaux sociaux (Compagnie uniquement)
+  { id: 'communication', labelKey: 'nav.communication', icon: Mail, moduleIds: ['email-management', 'social-media'] },
   // ADMIN — abonnement, automatisation, API
   { id: 'params',      labelKey: 'nav.params',      icon: Settings,    moduleIds: ['abonnement', 'workflows', 'api-keys'] },
 ]
@@ -329,6 +337,9 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'miaa-agent':     'nav.miaa_agent',
   'miaa-rapports':  'nav.miaa_rapports',
   'miaa-expertise': 'nav.miaa_expertise',
+  // Compagnie communication
+  'email-management': 'nav.email_management',
+  'social-media':     'nav.social_media',
 }
 
 const SECTOR_LABEL_KEYS: Record<string, string> = {
@@ -387,6 +398,7 @@ const ALL_MODULE_IDS = [
   'abonnement', 'fiscalite', 'cnss-congo',
   'academy',
   'miaa-agent', 'miaa-rapports', 'miaa-expertise',
+  'email-management', 'social-media',
   // ── Assurance ──────────────────────────────────────────────────────────────
   'assurance-direction', 'assurance-polices', 'assurance-sinistres',
   'assurance-clients', 'assurance-produits', 'assurance-partenaires',
