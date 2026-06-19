@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   const tid = profile.tenant_id
   const url = new URL(req.url)
-  const module = url.searchParams.get('module') ?? 'dg'
+  const moduleKey = url.searchParams.get('module') ?? 'dg'
   const year = parseInt(url.searchParams.get('year') ?? String(new Date().getFullYear()))
 
   const yearStart = `${year}-01-01`
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
   const lastUpdated = new Date().toISOString()
 
   // ── DG (Direction Générale) ────────────────────────────────────────────────
-  if (module === 'dg') {
+  if (moduleKey === 'dg') {
     const [
       { data: txAll },
       { data: txMois },
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
   }
 
   // ── RH ────────────────────────────────────────────────────────────────────
-  if (module === 'rh') {
+  if (moduleKey === 'rh') {
     const [
       { data: emps },
       { data: buls },
@@ -213,7 +213,7 @@ export async function GET(req: NextRequest) {
   }
 
   // ── École ─────────────────────────────────────────────────────────────────
-  if (module === 'ecole') {
+  if (moduleKey === 'ecole') {
     const [
       { data: eleves },
       { data: paies },
@@ -274,7 +274,7 @@ export async function GET(req: NextRequest) {
   }
 
   // ── Hôtel ──────────────────────────────────────────────────────────────────
-  if (module === 'hotel') {
+  if (moduleKey === 'hotel') {
     const [{ data: chambres }, { data: reservations }] = await Promise.all([
       supabaseAdmin.from('chambres').select('id,statut,prix_nuit').eq('tenant_id', tid),
       supabaseAdmin.from('reservations').select('montant_total,statut,date_debut,date_fin').eq('tenant_id', tid).gte('date_debut', yearStart),
@@ -301,7 +301,7 @@ export async function GET(req: NextRequest) {
   }
 
   // ── Restaurant ─────────────────────────────────────────────────────────────
-  if (module === 'resto') {
+  if (moduleKey === 'resto') {
     const [{ data: commandes }] = await Promise.all([
       supabaseAdmin.from('commandes_resto').select('total,statut,created_at').eq('tenant_id', tid).gte('created_at', yearStart).lte('created_at', yearEnd),
     ])

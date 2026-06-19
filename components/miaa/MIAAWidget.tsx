@@ -31,7 +31,7 @@ function detectModule(path: string): string {
 
 export default function MIAAWidget() {
   const pathname = usePathname()
-  const module   = detectModule(pathname ?? '')
+  const activeModule = detectModule(pathname ?? '')
   const [tenantData, setTenantData] = useState<{ tenant_id?: string; secteur?: string } | undefined>()
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function MIAAWidget() {
   return (
     <MIAAAssistant
       tenantData={tenantData}
-      module={module}
+      module={activeModule}
     />
   )
 }

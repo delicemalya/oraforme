@@ -17,14 +17,14 @@ export async function POST(req: Request) {
     const formData = await req.formData()
     const file     = formData.get('file') as File | null
     const question = (formData.get('question') as string) || 'Analyse ce document et donne-moi les points importants.'
-    const module   = (formData.get('module') as string) || 'general'
+    const moduleKey = (formData.get('module') as string) || 'general'
 
     if (!file) return Response.json({ error: 'Aucun fichier fourni' }, { status: 400 })
     if (file.size > MAX_FILE_SIZE) return Response.json({ error: 'Fichier trop volumineux (max 10 Mo)' }, { status: 400 })
 
     const mime   = file.type
     const buffer = Buffer.from(await file.arrayBuffer())
-    const expert = EXPERTS[module] ?? EXPERTS.general
+    const expert = EXPERTS[moduleKey] ?? EXPERTS.general
 
     // ── Images : Mistral Pixtral OCR ou Claude Vision ──────────────────────────
     if (mime.startsWith('image/')) {
