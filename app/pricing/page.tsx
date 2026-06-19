@@ -1,8 +1,15 @@
 import Link from 'next/link'
-import { Check, Zap, Users } from 'lucide-react'
+import { Check, Zap, Users, Globe, Building2, Layers } from 'lucide-react'
 import { PLAN_CONFIG, SECTEUR_CONFIG } from '@/lib/plans'
 
 export const metadata = { title: 'Tarifs — Oraforme' }
+
+const CURRENCY_TABLE = [
+  { devise: 'FCFA (XAF/CEMAC)', tpe: '10 000', pme: '25 000', grande: '46 000' },
+  { devise: 'FC (Congo-RDC)',    tpe: '47 000', pme: '117 500', grande: '216 200' },
+  { devise: 'EUR (€)',           tpe: '15',     pme: '38',      grande: '70'      },
+  { devise: 'USD ($)',           tpe: '17',     pme: '42',      grande: '77'      },
+]
 
 const FAQ = [
   {
@@ -19,23 +26,30 @@ const FAQ = [
   },
   {
     q: "Le prix inclut combien d'utilisateurs ?",
-    a: "Entrepreneur : 5 utilisateurs. Business : 25 utilisateurs.",
+    a: "Entrepreneur : 5 utilisateurs. Business : 25 utilisateurs. Compagnie : utilisateurs illimités.",
+  },
+  {
+    q: "Qu'est-ce que le plan Compagnie apporte en plus ?",
+    a: "Le plan Compagnie débloque la gestion multi-entités (groupe, filiales, agences), la vue consolidée groupe, la gestion d'emails d'entreprise et les réseaux sociaux depuis Oraforme.",
   },
   {
     q: "Quels modes de paiement acceptez-vous ?",
     a: "Mobile Money (Airtel, MTN, Orange), virement bancaire, et paiement en espèces via nos partenaires.",
   },
+  {
+    q: "Oraforme fonctionne-t-il sans connexion internet ?",
+    a: "Oui. Le mode hors-ligne est disponible pour les opérations courantes (facturation, caisse, saisie), avec synchronisation automatique dès le retour de la connexion.",
+  },
 ]
 
 export default function PricingPage() {
-  // Seulement les 2 plans vendus — Entrepreneur (tpe) et Business (pme)
-  const plans = (['tpe', 'pme'] as const).map(key => [key, PLAN_CONFIG[key]] as const)
+  const plans = (['tpe', 'pme', 'grande'] as const).map(key => [key, PLAN_CONFIG[key]] as const)
   const sectors = Object.entries(SECTEUR_CONFIG)
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
 
-      {/* ── Nav ──────────────────────────────────────────────────────────────── */}
+      {/* ── Nav ────────────────────────────────────────────────────────────────── */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -43,48 +57,66 @@ export default function PricingPage() {
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-white/50 text-sm hover:text-white transition-colors">Se connecter</Link>
-          <Link href="/onboarding"
-            className="px-4 py-2 rounded-xl text-sm font-bold bg-[#F59E0B] text-black hover:bg-[#F59E0B]/90 transition-colors">
+          <Link
+            href="/onboarding"
+            className="px-4 py-2 rounded-xl text-sm font-bold bg-[#F59E0B] text-black hover:bg-[#F59E0B]/90 transition-colors"
+          >
             Commencer gratuitement
           </Link>
         </div>
       </nav>
 
-      {/* ── Hero ─────────────────────────────────────────────────────────────── */}
+      {/* ── Hero ───────────────────────────────────────────────────────────────── */}
       <section className="text-center px-4 pt-20 pb-14">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F59E0B]/10 border border-[#F59E0B]/20 rounded-full text-[#F59E0B] text-xs font-semibold mb-6">
           <Zap size={11} /> 30 jours gratuits · Sans carte bancaire
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-4 max-w-2xl mx-auto">
-          Deux offres claires<br />
-          <span className="text-[#F59E0B]">adaptées à votre entreprise</span>
+        <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-4 max-w-3xl mx-auto">
+          Trois offres claires<br />
+          <span className="text-[#F59E0B]">adaptées à votre structure</span>
         </h1>
         <p className="text-white/40 text-lg max-w-xl mx-auto">
-          Oraforme comprend automatiquement votre activité et génère votre ERP en quelques secondes.
+          De la petite entreprise au groupe international, Oraforme grandit avec vous.
         </p>
       </section>
 
-      {/* ── Plans ─────────────────────────────────────────────────────────────── */}
-      <section className="px-4 pb-20 max-w-3xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-5">
+      {/* ── Plans ──────────────────────────────────────────────────────────────── */}
+      <section className="px-4 pb-20 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-5">
           {plans.map(([key, cfg]) => {
-            const isPopular = cfg.badge === 'Populaire'
+            const isPopular  = cfg.badge === 'Populaire'
+            const isCompany  = key === 'grande'
+            const glowColor  = isPopular ? cfg.color : isCompany ? cfg.color : null
             return (
               <div
                 key={key}
                 className="relative rounded-2xl p-6 border transition-all flex flex-col"
                 style={{
-                  border:     isPopular ? `1.5px solid ${cfg.color}` : '1px solid rgba(255,255,255,0.08)',
-                  background: isPopular ? `${cfg.color}08` : 'rgba(255,255,255,0.02)',
-                  boxShadow:  isPopular ? `0 0 40px ${cfg.color}20` : 'none',
+                  border:     glowColor ? `1.5px solid ${glowColor}` : '1px solid rgba(255,255,255,0.08)',
+                  background: glowColor ? `${glowColor}08` : 'rgba(255,255,255,0.02)',
+                  boxShadow:  glowColor ? `0 0 40px ${glowColor}20` : 'none',
                 }}
               >
                 {cfg.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-bold"
-                    style={{ background: cfg.color, color: '#000' }}>
-                    {cfg.badge}
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap"
+                    style={{ background: cfg.color, color: '#fff' }}
+                  >
+                    {isCompany ? '🏢 ' : ''}{cfg.badge}
                   </div>
                 )}
+
+                {/* Plan icon */}
+                <div className="mb-4">
+                  <span
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: `${cfg.color}18`, color: cfg.color }}
+                  >
+                    {key === 'tpe'    ? <Users     size={18} /> :
+                     key === 'pme'    ? <Building2 size={18} /> :
+                                        <Globe     size={18} />}
+                  </span>
+                </div>
 
                 {/* Header */}
                 <div className="mb-6">
@@ -117,9 +149,9 @@ export default function PricingPage() {
                   href="/onboarding"
                   className="block text-center py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90"
                   style={{
-                    background: isPopular ? cfg.color : `${cfg.color}15`,
-                    color:      isPopular ? '#000' : cfg.color,
-                    border:     isPopular ? 'none' : `1px solid ${cfg.color}30`,
+                    background: (isPopular || isCompany) ? cfg.color : `${cfg.color}15`,
+                    color:      (isPopular || isCompany) ? '#fff'     : cfg.color,
+                    border:     (isPopular || isCompany) ? 'none'     : `1px solid ${cfg.color}30`,
                   }}
                 >
                   Démarrer gratuitement
@@ -129,12 +161,42 @@ export default function PricingPage() {
           })}
         </div>
 
-        <p className="text-center text-white/25 text-sm mt-6">
+        {/* Devise equivalences */}
+        <div className="mt-8 rounded-2xl border border-white/6 bg-white/2 overflow-hidden">
+          <div className="px-5 py-3 border-b border-white/5 flex items-center gap-2">
+            <Globe size={13} className="text-white/30" />
+            <p className="text-white/40 text-xs font-medium">Équivalences indicatives par devise</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-white/5">
+                  <th className="text-left py-2.5 px-5 text-white/30 font-normal">Devise</th>
+                  <th className="text-center py-2.5 px-3 font-medium" style={{ color: PLAN_CONFIG.tpe.color }}>Entrepreneur</th>
+                  <th className="text-center py-2.5 px-3 font-medium" style={{ color: PLAN_CONFIG.pme.color }}>Business</th>
+                  <th className="text-center py-2.5 px-3 font-medium" style={{ color: PLAN_CONFIG.grande.color }}>Compagnie</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/4">
+                {CURRENCY_TABLE.map(row => (
+                  <tr key={row.devise}>
+                    <td className="py-2.5 px-5 text-white/40">{row.devise}</td>
+                    <td className="py-2.5 px-3 text-center text-white/60">{row.tpe}</td>
+                    <td className="py-2.5 px-3 text-center text-white/60">{row.pme}</td>
+                    <td className="py-2.5 px-3 text-center text-white/60">{row.grande}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p className="text-center text-white/25 text-sm mt-5">
           Paiement en FCFA · Mobile Money accepté · Facturation mensuelle sans engagement
         </p>
       </section>
 
-      {/* ── Secteurs ─────────────────────────────────────────────────────────── */}
+      {/* ── Secteurs ───────────────────────────────────────────────────────────── */}
       <section className="px-4 pb-20 max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-2xl font-bold text-white mb-2">
@@ -159,67 +221,117 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ── Comparison table ──────────────────────────────────────────────────── */}
-      <section className="px-4 pb-20 max-w-2xl mx-auto">
+      {/* ── Comparison table ────────────────────────────────────────────────────── */}
+      <section className="px-4 pb-20 max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-2xl font-bold text-white mb-2">Comparaison des offres</h2>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border border-white/6">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/8">
-                <th className="text-left py-3 text-white/40 font-medium">Fonctionnalité</th>
-                <th className="text-center py-3 font-bold" style={{ color: PLAN_CONFIG.tpe.color }}>
-                  {PLAN_CONFIG.tpe.label}
+              <tr className="border-b border-white/8 bg-white/2">
+                <th className="text-left py-3.5 px-5 text-white/40 font-medium">Fonctionnalité</th>
+                <th className="text-center py-3.5 px-4 font-bold" style={{ color: PLAN_CONFIG.tpe.color }}>
+                  Entrepreneur
                 </th>
-                <th className="text-center py-3 font-bold" style={{ color: PLAN_CONFIG.pme.color }}>
-                  {PLAN_CONFIG.pme.label}
+                <th className="text-center py-3.5 px-4 font-bold" style={{ color: PLAN_CONFIG.pme.color }}>
+                  Business
+                </th>
+                <th className="text-center py-3.5 px-4 font-bold" style={{ color: PLAN_CONFIG.grande.color }}>
+                  Compagnie
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              {[
-                ['Facturation & Devis',             true,  true ],
-                ['CRM & Clients',                   true,  true ],
-                ['Trésorerie & Caisse',              true,  true ],
-                ['RH & Paie',                       true,  true ],
-                ['Comptabilité OHADA',               false, true ],
-                ['Déclarations fiscales',            false, true ],
-                ['Gestion des stocks',               false, true ],
-                ['MIAA+ Intelligence Artificielle',  false, true ],
-                ['Workflows & Automatisation',       false, true ],
-                ['Business Intelligence',            false, true ],
-                ['Audit & Conformité',               false, true ],
-                ['API Publique',                     false, true ],
-                ['Support prioritaire',              false, true ],
-              ].map(([feature, entrepreneur, business]) => (
-                <tr key={feature as string}>
-                  <td className="py-3 text-white/60">{feature as string}</td>
-                  <td className="py-3 text-center">
+            <tbody className="divide-y divide-white/4">
+              {([
+                ['Facturation & Devis',              true,  true,  true  ],
+                ['CRM & Clients',                    true,  true,  true  ],
+                ['Trésorerie & Caisse',               true,  true,  true  ],
+                ['RH & Paie',                        true,  true,  true  ],
+                ['Mode hors-ligne',                  true,  true,  true  ],
+                ['Comptabilité OHADA',                false, true,  true  ],
+                ['Déclarations fiscales',             false, true,  true  ],
+                ['Gestion des stocks',                false, true,  true  ],
+                ['MIAA+ Intelligence Artificielle',   false, true,  true  ],
+                ['Workflows & Automatisation',        false, true,  true  ],
+                ['Business Intelligence',             false, true,  true  ],
+                ['Audit & Conformité',                false, true,  true  ],
+                ['API Publique',                      false, true,  true  ],
+                ['Groupe & Filiales',                 false, false, true  ],
+                ['Vue consolidée multi-entités',      false, false, true  ],
+                ['Gestion emails d\'entreprise',      false, false, true  ],
+                ['Gestion réseaux sociaux',           false, false, true  ],
+                ['Support dédié prioritaire',         false, false, true  ],
+              ] as [string, boolean, boolean, boolean][]).map(([feature, entrepreneur, business, compagnie]) => (
+                <tr key={feature} className="hover:bg-white/2 transition-colors">
+                  <td className="py-3 px-5 text-white/60">{feature}</td>
+                  <td className="py-3 px-4 text-center">
                     {entrepreneur
-                      ? <Check size={15} className="mx-auto text-[#16A34A]" />
-                      : <span className="text-white/15 text-lg">—</span>
+                      ? <Check size={15} className="mx-auto" style={{ color: PLAN_CONFIG.tpe.color }} />
+                      : <span className="text-white/15 text-lg leading-none">—</span>
                     }
                   </td>
-                  <td className="py-3 text-center">
+                  <td className="py-3 px-4 text-center">
                     {business
-                      ? <Check size={15} className="mx-auto text-[#16A34A]" />
-                      : <span className="text-white/15 text-lg">—</span>
+                      ? <Check size={15} className="mx-auto" style={{ color: PLAN_CONFIG.pme.color }} />
+                      : <span className="text-white/15 text-lg leading-none">—</span>
+                    }
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    {compagnie
+                      ? <Check size={15} className="mx-auto" style={{ color: PLAN_CONFIG.grande.color }} />
+                      : <span className="text-white/15 text-lg leading-none">—</span>
                     }
                   </td>
                 </tr>
               ))}
-              <tr className="border-t border-white/8">
-                <td className="py-3 text-white/60">Utilisateurs inclus</td>
-                <td className="py-3 text-center text-white/60 text-xs">5</td>
-                <td className="py-3 text-center text-white/60 text-xs">25</td>
+              <tr className="border-t border-white/8 bg-white/2">
+                <td className="py-3 px-5 text-white/60 font-medium">Utilisateurs inclus</td>
+                <td className="py-3 px-4 text-center text-white/60 text-xs font-semibold">5</td>
+                <td className="py-3 px-4 text-center text-white/60 text-xs font-semibold">25</td>
+                <td className="py-3 px-4 text-center text-xs font-bold" style={{ color: PLAN_CONFIG.grande.color }}>
+                  Illimités
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      {/* ── FAQ ──────────────────────────────────────────────────────────────── */}
+      {/* ── Compagnie highlight ─────────────────────────────────────────────────── */}
+      <section className="px-4 pb-20 max-w-3xl mx-auto">
+        <div className="rounded-3xl border border-[#7C3AED]/25 bg-gradient-to-br from-[#7C3AED]/8 to-[#7C3AED]/2 p-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#7C3AED]/15 text-[#7C3AED]">
+              <Globe size={20} />
+            </span>
+            <div>
+              <h3 className="text-lg font-bold text-white">Plan Compagnie</h3>
+              <p className="text-white/40 text-sm">Pour les groupes et structures multi-entités</p>
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[
+              { icon: <Layers size={14} />, title: 'Groupe & Filiales', desc: "Gérez toutes vos filiales, sociétés et agences depuis un seul tableau de bord consolidé." },
+              { icon: <Building2 size={14} />, title: 'Vue consolidée', desc: "KPIs agrégés sur l'ensemble du groupe : CA, trésorerie, effectifs, score audit." },
+              { icon: <Zap size={14} />, title: 'Email d\'entreprise', desc: "Gérez vos boîtes email professionnelles directement depuis Oraforme." },
+              { icon: <Globe size={14} />, title: 'Réseaux sociaux', desc: "Planifiez et publiez sur vos réseaux depuis votre ERP. Tout au même endroit." },
+            ].map(item => (
+              <div key={item.title} className="flex items-start gap-3">
+                <span className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#7C3AED]/15 text-[#7C3AED] mt-0.5">
+                  {item.icon}
+                </span>
+                <div>
+                  <p className="text-white/90 text-sm font-semibold">{item.title}</p>
+                  <p className="text-white/40 text-xs mt-0.5 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ────────────────────────────────────────────────────────────────── */}
       <section className="px-4 pb-20 max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold text-white text-center mb-10">Questions fréquentes</h2>
         <div className="space-y-4">
@@ -232,7 +344,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ── CTA bottom ───────────────────────────────────────────────────────── */}
+      {/* ── CTA bottom ─────────────────────────────────────────────────────────── */}
       <section className="px-4 pb-20 text-center">
         <div className="max-w-xl mx-auto p-8 bg-gradient-to-br from-[#F59E0B]/10 to-[#F59E0B]/3 border border-[#F59E0B]/20 rounded-3xl">
           <h2 className="text-2xl font-bold text-white mb-3">Prêt à transformer votre entreprise ?</h2>
@@ -248,7 +360,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────────────────────────────── */}
+      {/* ── Footer ─────────────────────────────────────────────────────────────── */}
       <footer className="border-t border-white/5 px-8 py-6 text-center text-white/20 text-xs">
         © 2026 Oraforme. Tous droits réservés. · by POLYVALON TECHNOLOGY
       </footer>

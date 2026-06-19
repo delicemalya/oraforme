@@ -1,18 +1,15 @@
 /**
- * lib/plan-access.ts — Contrôle d'accès par plan (Entrepreneur / Business)
+ * lib/plan-access.ts — Contrôle d'accès par plan (Entrepreneur / Business / Compagnie)
  *
- * Deux plans vendus :
- *   tpe   (Entrepreneur) — modules de base
- *   pme   (Business)     — tout débloqué (tpe + avancés + analytics/BI/audit)
- *
- * Le niveau 'grande' (Entreprise+) est conservé pour rétro-compatibilité
- * et usage interne futur, mais Business (pme) = grande en termes d'accès.
+ * Trois plans vendus :
+ *   tpe    (Entrepreneur) — modules de base
+ *   pme    (Business)     — tpe + avancés + analytics/BI/audit
+ *   grande (Compagnie)    — tout débloqué + groupe/multi-entités
  */
 
 import type { TailleEntreprise } from './plans'
 
 // ── Modules réservés Business (pme) et au-dessus ──────────────────────────────
-// Un compte Entrepreneur ne doit PAS voir ces modules
 const REQUIRES_PME = new Set([
   // Gestion avancée
   'comptabilite', 'fiscalite', 'stock', 'achats',
@@ -25,7 +22,7 @@ const REQUIRES_PME = new Set([
   'audit-plans', 'audit-rapports',
 ])
 
-// ── Modules réservés Entreprise+ (grande) uniquement ─────────────────────────
+// ── Modules réservés Business ET Compagnie (bloqués pour tpe uniquement) ──────
 const REQUIRES_GRANDE = new Set([
   // BI & Analytics
   'bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant',
@@ -34,6 +31,12 @@ const REQUIRES_GRANDE = new Set([
   'audit',        // audit module principal (le hub)
   'api-keys',
   'direction',    // KPIs exécutifs Direction Générale
+])
+
+// ── Modules exclusifs Compagnie (grande) — bloqués pour tpe ET pme ────────────
+const REQUIRES_COMPAGNIE = new Set([
+  'groupe', 'groupe-vue', 'entity-switcher',
+  'email-management', 'social-media',
 ])
 
 // ── Modules TOUJOURS visibles (peu importe le plan) ───────────────────────────
@@ -76,17 +79,17 @@ export function canAccessByPlan(
   taille: TailleEntreprise | string | null | undefined,
   moduleId: string,
 ): boolean {
-  // Toujours visible → pas de restriction plan
   if (ALWAYS_VISIBLE.has(moduleId)) return true
-
-  // Pas de plan connu → legacy, on laisse passer
   if (!taille) return true
 
-  // Business et Entreprise+ → accès complet
-  if (taille === 'grande' || taille === 'pme') return true
+  // Compagnie (grande) → accès complet
+  if (taille === 'grande') return true
 
-  // Entrepreneur (tpe) → bloque Business ET Entreprise+
-  return !REQUIRES_PME.has(moduleId) && !REQUIRES_GRANDE.has(moduleId)
+  // Business (pme) → bloque uniquement les modules Compagnie exclusifs
+  if (taille === 'pme') return !REQUIRES_COMPAGNIE.has(moduleId)
+
+  // Entrepreneur (tpe) → bloque Business, Compagnie et Compagnie-only
+  return !REQUIRES_PME.has(moduleId) && !REQUIRES_GRANDE.has(moduleId) && !REQUIRES_COMPAGNIE.has(moduleId)
 }
 
 /**
@@ -103,7 +106,7 @@ export function getPlanLevel(taille: string | null | undefined): 0 | 1 | 2 {
  * Label à afficher dans les bandeaux "upgrade"
  */
 export function getPlanUpgradeLabel(requiredTaille: TailleEntreprise): string {
-  return requiredTaille === 'grande' ? 'Entreprise+' : 'Business'
+  return requiredTaille === 'grande' ? 'Compagnie' : 'Business'
 }
 
 /**
@@ -114,9 +117,7 @@ export function getRequiredPlan(
   taille: string | null | undefined,
   moduleId: string,
 ): 'pme' | 'grande' | null {
-  // Already accessible
   if (canAccessByPlan(taille, moduleId)) return null
-
-  // Pour un Entrepreneur, tout module avancé nécessite Business
+  if (REQUIRES_COMPAGNIE.has(moduleId)) return 'grande'
   return 'pme'
 }

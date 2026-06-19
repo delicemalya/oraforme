@@ -825,8 +825,8 @@ export default function Sidebar() {
           <span>{t('nav.direction')}</span>
         </Link>
 
-        {/* Groupe link — visible for hierarchical tenants */}
-        {isGroupeUser && (
+        {/* Groupe link — visible for hierarchical tenants on Compagnie plan */}
+        {isGroupeUser && canAccessByPlan(taille, 'groupe') && (
           <Link
             href="/dashboard/groupe"
             prefetch={true}

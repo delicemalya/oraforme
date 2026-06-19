@@ -37,11 +37,15 @@ const GRANDE_EXTRA = [
   'audit', 'api-keys', 'abonnement',
 ]
 
-// Business (pme) inclut tous les modules — il n'y a que 2 plans vendus (Entrepreneur / Business)
+const COMPAGNIE_EXTRA = [
+  'groupe', 'groupe-vue', 'entity-switcher',
+  'email-management', 'social-media',
+]
+
 export const PLAN_MODULES: Record<TailleEntreprise, string[]> = {
   tpe:    TPE_MODULES,
   pme:    [...TPE_MODULES, ...PME_EXTRA, ...GRANDE_EXTRA],
-  grande: [...TPE_MODULES, ...PME_EXTRA, ...GRANDE_EXTRA],
+  grande: [...TPE_MODULES, ...PME_EXTRA, ...GRANDE_EXTRA, ...COMPAGNIE_EXTRA],
 }
 
 // ── Modules spécifiques au secteur (ajoutés quel que soit le plan) ─────────────
@@ -101,19 +105,18 @@ export const PLAN_CONFIG: Record<TailleEntreprise, {
   tpe: {
     label:      'Entrepreneur',
     subtitle:   'Pour indépendants, TPE & petites structures',
-    price_fcfa: 15_000,
+    price_fcfa: 10_000,
     max_users:  5,
     color:      '#16A34A',
     badge:      null,
     miaa:       'MIAA+ Standard',
     features: [
-      'Tous les modules Oraforme',
       'Facturation & Devis illimités',
       'CRM, Trésorerie & Caisse',
       'RH & Paie complète',
-      'Comptabilité SYSCOHADA',
-      'MIAA+ Standard (IA intégrée)',
       'Dépenses & Notes de frais',
+      'Rapports & Calendrier',
+      'MIAA+ Standard (IA intégrée)',
       '5 utilisateurs inclus',
     ],
   },
@@ -127,31 +130,31 @@ export const PLAN_CONFIG: Record<TailleEntreprise, {
     miaa:       'MIAA+ Premium',
     features: [
       'Tout Entrepreneur inclus',
-      'Modules premium activés',
+      'Comptabilité OHADA & Fiscalité',
+      'Stock, Achats & Workflows',
       'Analytics & Business Intelligence',
-      'Automatisations avancées',
+      'Audit & Conformité',
       'MIAA+ Premium (IA avancée)',
-      'Workflows & Intégrations',
       'GED & Documents',
       '25 utilisateurs inclus',
     ],
   },
   grande: {
-    label:      'Entreprise+',
-    subtitle:   'Structure complexe & multi-sites',
-    price_fcfa: 56_000,
+    label:      'Compagnie',
+    subtitle:   'Groupes internationaux, filiales & multi-entités',
+    price_fcfa: 46_000,
     max_users:  -1,
     color:      '#7C3AED',
-    badge:      'Premium',
+    badge:      'Compagnie',
     miaa:       'MIAA+ Illimité',
     features: [
       'Tout Business inclus',
-      'Business Intelligence avancée',
-      'Audit & Conformité',
-      'API Publique & Intégrations',
-      'Multi-branches & multi-sites',
+      'Gestion groupe & filiales',
+      'Vue consolidée multi-entités',
+      'Gestion emails d\'entreprise',
+      'Gestion réseaux sociaux',
       'MIAA+ Illimité',
-      'Reporting exécutif',
+      'API Publique & Intégrations',
       'Utilisateurs illimités',
       'Support dédié prioritaire',
     ],
@@ -218,8 +221,28 @@ export const LANGUES_LIST = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+const PAYS_DEVISE: Record<string, { symbol: string; rate: number }> = {
+  CG: { symbol: 'FCFA', rate: 1      },
+  CM: { symbol: 'FCFA', rate: 1      },
+  GA: { symbol: 'FCFA', rate: 1      },
+  CI: { symbol: 'FCFA', rate: 1      },
+  SN: { symbol: 'FCFA', rate: 1      },
+  ML: { symbol: 'FCFA', rate: 1      },
+  BF: { symbol: 'FCFA', rate: 1      },
+  TG: { symbol: 'FCFA', rate: 1      },
+  BJ: { symbol: 'FCFA', rate: 1      },
+  CD: { symbol: 'FC',   rate: 4.7    },
+  MG: { symbol: 'Ar',   rate: 6.0    },
+  RW: { symbol: 'RWF',  rate: 1.7    },
+  KE: { symbol: 'KES',  rate: 0.22   },
+  NG: { symbol: '₦',    rate: 2.2    },
+  GH: { symbol: 'GH₵',  rate: 0.016  },
+}
+
 export function formatPrice(fcfa: number, paysCode: string = 'CG'): string {
-  return new Intl.NumberFormat('fr-FR').format(fcfa) + ' FCFA'
+  const devise = PAYS_DEVISE[paysCode] ?? { symbol: 'FCFA', rate: 1 }
+  const converted = Math.round(fcfa * devise.rate)
+  return new Intl.NumberFormat('fr-FR').format(converted) + ' ' + devise.symbol
 }
 
 export function getPlanFromLegacy(plan: string): TailleEntreprise {

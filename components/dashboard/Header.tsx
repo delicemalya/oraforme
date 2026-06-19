@@ -16,14 +16,13 @@ import DeviseSelector from '@/components/ui/DeviseSelector'
 import { LogoUploader } from '@/components/ui/LogoUploader'
 import EntitySwitcher from '@/components/dashboard/EntitySwitcher'
 
-// Plan badge config — 2 plans vendus : Entrepreneur (tpe) / Business (pme)
 const PLAN_BADGE: Record<string, { label: string; color: string; bg: string }> = {
   tpe:        { label: 'Entrepreneur', color: '#2563EB', bg: '#EFF6FF' },
   pme:        { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
-  grande:     { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
+  grande:     { label: 'Compagnie',    color: '#7C3AED', bg: '#F5F3FF' },
   starter:    { label: 'Entrepreneur', color: '#2563EB', bg: '#EFF6FF' },
   pro:        { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
-  enterprise: { label: 'Business',     color: '#D97706', bg: '#FFFBEB' },
+  enterprise: { label: 'Compagnie',    color: '#7C3AED', bg: '#F5F3FF' },
 }
 
 export default function Header() {
