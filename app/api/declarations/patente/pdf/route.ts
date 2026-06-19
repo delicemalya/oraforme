@@ -1,3 +1,5 @@
+export const runtime = 'nodejs'
+
 // API route — Génération PDF Patente 721M
 // POST /api/declarations/patente/pdf
 // Body : PatentePDFData (données complètes de la déclaration)

@@ -1,3 +1,5 @@
+export const runtime = 'nodejs'
+
 // POST /api/declarations/mensuelle/pdf — Génération PDF Déclaration Générale DGI
 
 import { NextRequest, NextResponse } from 'next/server'

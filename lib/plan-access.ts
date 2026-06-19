@@ -71,10 +71,26 @@ const ALWAYS_VISIBLE = new Set([
   'assurance-direction', 'assurance-polices', 'assurance-sinistres',
   'assurance-clients', 'assurance-produits', 'assurance-partenaires',
   'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
-  'recrutement-direction', 'recrutement-offres', 'recrutement-candidatures',
+  'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
   'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
-  'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
+  'recrutement-mad', 'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
   'recrutement-miaa',
+  // Commerce
+  'commerce', 'commerce-catalogue', 'commerce-clients', 'commerce-analytics',
+  // Boisson
+  'boisson-commandes',
+  // Transport
+  'transport-flotte', 'transport-carburant', 'transport-analytique',
+  // Hôtel
+  'hotel-chambres',
+  // École — niveaux supérieurs
+  'ecole-theses', 'ecole-soutenances', 'ecole-diplomes',
+  // BTP
+  'btp-avancement',
+  // ONG
+  'ong-bailleurs',
+  // Portails externes
+  'portail-client', 'portail-candidat',
 ])
 
 /**

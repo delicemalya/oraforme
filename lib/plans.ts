@@ -69,9 +69,9 @@ export const SECTOR_EXTRA_MODULES: Partial<Record<SecteurId, string[]>> = {
   pharmacie:   ['pharmacie'],
   agriculture: ['agriculture'],
   recrutement: [
-    'recrutement-direction', 'recrutement-offres', 'recrutement-candidatures',
+    'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
     'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
-    'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
+    'recrutement-mad', 'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
     'recrutement-miaa',
   ],
 }

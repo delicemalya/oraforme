@@ -1,5 +1,5 @@
 {
-  "buildCommand": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+  "buildCommand": "NODE_OPTIONS=--max-old-space-size=4096 next build",
   "framework": "nextjs",
   "crons": [
     { "path": "/api/agents/securite/attaques",   "schedule": "0 2 * * *"  },

@@ -18,7 +18,7 @@ import {
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
   CreditCard, LineChart, Zap, Key, Landmark, Briefcase, ClipboardList,
   MessageSquare, DollarSign, FlaskConical, Shield, Siren, BedDouble,
-  Mail, Share2,
+  Mail, Share2, Kanban, UserCog,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -181,10 +181,12 @@ const ICONS: Record<string, LucideIcon> = {
   // Recrutement & Placement RH
   'recrutement-direction':    BarChart2,
   'recrutement-offres':       Briefcase,
+  'recrutement-ats':          Kanban,
   'recrutement-candidatures': Users,
   'recrutement-entretiens':   CalendarClock,
   'recrutement-cvtheque':     FolderOpen,
   'recrutement-placement':    CheckSquare,
+  'recrutement-mad':          UserCog,
   'recrutement-contrats':     FileText,
   'recrutement-partenaires':  Building2,
   'recrutement-analytics':    TrendingUp,
@@ -245,14 +247,16 @@ const MODULE_DEFS: ModuleDef[] = [
   // Recrutement & Placement RH — secteur métier
   { id: 'recrutement-direction',    label: 'Direction RH',       sublabel: 'KPIs & tableau de bord',    href: '/dashboard/recrutement'                  },
   { id: 'recrutement-offres',       label: "Offres d'emploi",    sublabel: 'Postes ouverts & diffusion', href: '/dashboard/recrutement/offres'           },
+  { id: 'recrutement-ats',          label: 'ATS Pipeline',       sublabel: 'Kanban recrutement complet', href: '/dashboard/recrutement/ats'              },
   { id: 'recrutement-candidatures', label: 'Candidatures',       sublabel: 'Pipeline & scoring IA',     href: '/dashboard/recrutement/candidatures'     },
   { id: 'recrutement-entretiens',   label: 'Entretiens',         sublabel: 'Planning & évaluations',    href: '/dashboard/recrutement/entretiens'       },
   { id: 'recrutement-cvtheque',     label: 'CV-thèque',          sublabel: 'Vivier de talents',         href: '/dashboard/recrutement/cvtheque'         },
   { id: 'recrutement-placement',    label: 'Placements',         sublabel: 'Missions & contrats placés',href: '/dashboard/recrutement/placement'        },
+  { id: 'recrutement-mad',          label: 'Mise à disposition', sublabel: 'Secondment RH externalisé', href: '/dashboard/recrutement/mad'              },
   { id: 'recrutement-contrats',     label: 'Contrats',           sublabel: 'CDI, CDD, intérim & stage', href: '/dashboard/recrutement/contrats'         },
   { id: 'recrutement-partenaires',  label: 'Partenaires',        sublabel: 'Clients entreprises',       href: '/dashboard/recrutement/partenaires'      },
   { id: 'recrutement-analytics',    label: 'Analytics RH',      sublabel: 'KPIs & performance',        href: '/dashboard/recrutement/analytics'        },
-  { id: 'recrutement-miaa',         label: 'MIAA+ Job',          sublabel: 'IA matching CV & offres',   href: '/dashboard/miaa?context=recrutement'     },
+  { id: 'recrutement-miaa',         label: 'MIAA+ RH Expert',    sublabel: 'IA RH : CV, contrats, risques', href: '/dashboard/recrutement/miaa'         },
 ]
 
 const getModuleDef = (id: string) => MODULE_DEFS.find(m => m.id === id)
@@ -365,10 +369,12 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   // Recrutement & Placement RH
   'recrutement-direction':    'nav.recrutement_direction',
   'recrutement-offres':       'nav.recrutement_offres',
+  'recrutement-ats':          'nav.recrutement_ats',
   'recrutement-candidatures': 'nav.recrutement_candidatures',
   'recrutement-entretiens':   'nav.recrutement_entretiens',
   'recrutement-cvtheque':     'nav.recrutement_cvtheque',
   'recrutement-placement':    'nav.recrutement_placement',
+  'recrutement-mad':          'nav.recrutement_mad',
   'recrutement-contrats':     'nav.recrutement_contrats',
   'recrutement-partenaires':  'nav.recrutement_partenaires',
   'recrutement-analytics':    'nav.recrutement_analytics',
@@ -439,8 +445,8 @@ const ALL_MODULE_IDS = [
   'assurance-clients', 'assurance-produits', 'assurance-partenaires',
   'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
   // ── Recrutement & Placement RH ─────────────────────────────────────────────
-  'recrutement-direction', 'recrutement-offres', 'recrutement-candidatures',
-  'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
+  'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
+  'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement', 'recrutement-mad',
   'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
   'recrutement-miaa',
 ]
@@ -915,6 +921,38 @@ export default function Sidebar() {
             </div>
             <span>Vue Groupe</span>
           </Link>
+        )}
+
+        {/* Groupe sub-links — Gestion + MIAA+ Executive */}
+        {isGroupeUser && canAccessByPlan(taille, 'groupe') && (
+          <>
+            <Link
+              href="/dashboard/groupe/gestion"
+              prefetch={true}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11.5px] transition-all duration-150 ml-3"
+              style={isActive('/dashboard/groupe/gestion')
+                ? { background: 'rgba(245,158,11,0.08)', color: '#D97706', fontWeight: 600 }
+                : { color: '#94A3B8' }
+              }
+            >
+              <Settings size={11} style={{ color: isActive('/dashboard/groupe/gestion') ? '#D97706' : '#94A3B8' }} />
+              <span>Gérer les entités</span>
+            </Link>
+            <Link
+              href="/dashboard/groupe/miaa"
+              prefetch={true}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11.5px] transition-all duration-150 ml-3"
+              style={isActive('/dashboard/groupe/miaa')
+                ? { background: 'rgba(124,58,237,0.08)', color: '#7C3AED', fontWeight: 600 }
+                : { color: '#94A3B8' }
+              }
+            >
+              <Sparkles size={11} style={{ color: isActive('/dashboard/groupe/miaa') ? '#7C3AED' : '#94A3B8' }} />
+              <span>MIAA+ Executive</span>
+            </Link>
+          </>
         )}
 
         {/* Skeleton */}

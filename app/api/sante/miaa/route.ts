@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import Anthropic from '@anthropic-ai/sdk'
-import { getHisKPIs } from '../direction/route'
+import { getHisKPIs } from '@/lib/sante/his-kpis'
 
 const anthropic = new Anthropic()
 

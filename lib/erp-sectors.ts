@@ -271,14 +271,16 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
   recrutement: [
     { id: 'recrutement-direction',    href: '/dashboard/recrutement',                  label: 'Direction RH',      sublabel: 'KPIs & tableau de bord RH'          },
     { id: 'recrutement-offres',       href: '/dashboard/recrutement/offres',           label: "Offres d'emploi",   sublabel: 'Postes ouverts & diffusion'         },
+    { id: 'recrutement-ats',          href: '/dashboard/recrutement/ats',              label: 'ATS Pipeline',      sublabel: 'Kanban recrutement complet'          },
     { id: 'recrutement-candidatures', href: '/dashboard/recrutement/candidatures',     label: 'Candidatures',      sublabel: 'Pipeline & scoring IA'              },
     { id: 'recrutement-entretiens',   href: '/dashboard/recrutement/entretiens',       label: 'Entretiens',        sublabel: 'Planning & évaluations'             },
     { id: 'recrutement-cvtheque',     href: '/dashboard/recrutement/cvtheque',         label: 'CV-thèque',         sublabel: 'Vivier de talents'                  },
     { id: 'recrutement-placement',    href: '/dashboard/recrutement/placement',        label: 'Placements',        sublabel: 'Missions & contrats placés'         },
+    { id: 'recrutement-mad',          href: '/dashboard/recrutement/mad',              label: 'Mise à disposition', sublabel: 'Secondment & gestion RH externalisée' },
     { id: 'recrutement-contrats',     href: '/dashboard/recrutement/contrats',         label: 'Contrats',          sublabel: 'CDI, CDD, intérim & stage'          },
     { id: 'recrutement-partenaires',  href: '/dashboard/recrutement/partenaires',      label: 'Partenaires',       sublabel: 'Clients entreprises & prestataires' },
     { id: 'recrutement-analytics',    href: '/dashboard/recrutement/analytics',        label: 'Analytics RH',     sublabel: 'KPIs & performance recrutement'     },
-    { id: 'recrutement-miaa',         href: '/dashboard/miaa?context=recrutement',     label: 'MIAA+ Job',         sublabel: 'IA matching CV & offres'            },
+    { id: 'recrutement-miaa',         href: '/dashboard/recrutement/miaa',             label: 'MIAA+ RH Expert',   sublabel: 'IA RH : CV, contrats, risques, plans' },
   ],
 }
 
