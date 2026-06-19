@@ -34,25 +34,30 @@ import type { UserRole } from '@/lib/hooks/usePermissions'
 // ── Public types ──────────────────────────────────────────────────────────────
 
 export interface TenantState {
-  tenantId:        string
-  profileId:       string
-  nomEntreprise:   string
-  secteur:         string | null
-  sousType:        string | null   // ex. 'primaire','college','lycee','universite'
-  plan:            string | null
-  taille:          string | null   // 'tpe' | 'pme' | 'grande'
-  pays:            string | null
-  langue:          string | null
-  role:            UserRole
-  ecoleRole:       string | null
-  isSuperAdmin:    boolean
-  modulesActifs:   string[]
-  userId:          string
-  userEmail:       string
-  prenom:          string | null
-  nom:             string | null
-  profilComplet:   boolean
-  companyDeadline: string | null   // ISO string — 72h après inscription
+  tenantId:          string
+  profileId:         string
+  nomEntreprise:     string
+  secteur:           string | null
+  sousType:          string | null   // ex. 'primaire','college','lycee','universite'
+  plan:              string | null
+  taille:            string | null   // 'tpe' | 'pme' | 'grande'
+  pays:              string | null
+  langue:            string | null
+  role:              UserRole
+  ecoleRole:         string | null
+  isSuperAdmin:      boolean
+  modulesActifs:     string[]
+  userId:            string
+  userEmail:         string
+  prenom:            string | null
+  nom:               string | null
+  profilComplet:     boolean
+  companyDeadline:   string | null   // ISO string — 72h après inscription
+  // Enterprise hierarchy (migration 107)
+  typeEntite:        string          // 'standalone' | 'groupe' | 'societe' | 'filiale' | 'agence'
+  parentTenantId:    string | null
+  codeGroupe:        string | null
+  allowConsolidation: boolean
 }
 
 interface TenantContextValue {
@@ -89,7 +94,7 @@ async function fetchTenantForUser(
   // from localStorage will override this default instead of breaking isolation.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, sous_type, plan, taille_entreprise, pays, langue, profil_complet, company_deadline)')
+    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, sous_type, plan, taille_entreprise, pays, langue, profil_complet, company_deadline, type_entite, parent_tenant_id, code_groupe, allow_consolidation)')
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -98,44 +103,52 @@ async function fetchTenantForUser(
   if (!profile) return null
 
   const t = profile.tenants as unknown as {
-    nom_entreprise:     string
-    modules_actifs:     string[]
-    secteur_activite:   string | null
-    sous_type?:         string | null
-    plan?:              string | null
-    taille_entreprise?: string | null
-    pays?:              string | null
-    langue?:            string | null
-    profil_complet?:    boolean | null
-    company_deadline?:  string | null
+    nom_entreprise:      string
+    modules_actifs:      string[]
+    secteur_activite:    string | null
+    sous_type?:          string | null
+    plan?:               string | null
+    taille_entreprise?:  string | null
+    pays?:               string | null
+    langue?:             string | null
+    profil_complet?:     boolean | null
+    company_deadline?:   string | null
+    type_entite?:        string | null
+    parent_tenant_id?:   string | null
+    code_groupe?:        string | null
+    allow_consolidation?: boolean | null
   } | null
 
   return {
-    tenantId:         profile.tenant_id as string,
-    profileId:        profile.id as string,
-    nomEntreprise:    t?.nom_entreprise ?? '',
-    secteur:          t?.secteur_activite ?? null,
-    sousType:         t?.sous_type ?? null,
-    plan:             t?.plan ?? null,
-    taille:           t?.taille_entreprise ?? null,
-    pays:             t?.pays ?? null,
-    langue:           t?.langue ?? null,
-    role:             profile.role as UserRole,
-    ecoleRole:        (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null,
-    isSuperAdmin:     SUPER_ADMIN_EMAILS.includes(email),
-    modulesActifs:    t?.modules_actifs ?? [],
+    tenantId:           profile.tenant_id as string,
+    profileId:          profile.id as string,
+    nomEntreprise:      t?.nom_entreprise ?? '',
+    secteur:            t?.secteur_activite ?? null,
+    sousType:           t?.sous_type ?? null,
+    plan:               t?.plan ?? null,
+    taille:             t?.taille_entreprise ?? null,
+    pays:               t?.pays ?? null,
+    langue:             t?.langue ?? null,
+    role:               profile.role as UserRole,
+    ecoleRole:          (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null,
+    isSuperAdmin:       SUPER_ADMIN_EMAILS.includes(email),
+    modulesActifs:      t?.modules_actifs ?? [],
     userId,
-    userEmail:        email,
-    prenom:           (profile as { prenom?: string | null }).prenom ?? null,
-    nom:              (profile as { nom?: string | null }).nom ?? null,
-    profilComplet:    t?.profil_complet ?? false,
-    companyDeadline:  t?.company_deadline ?? null,
+    userEmail:          email,
+    prenom:             (profile as { prenom?: string | null }).prenom ?? null,
+    nom:                (profile as { nom?: string | null }).nom ?? null,
+    profilComplet:      t?.profil_complet ?? false,
+    companyDeadline:    t?.company_deadline ?? null,
+    typeEntite:         t?.type_entite ?? 'standalone',
+    parentTenantId:     t?.parent_tenant_id ?? null,
+    codeGroupe:         t?.code_groupe ?? null,
+    allowConsolidation: t?.allow_consolidation ?? false,
   }
 }
 
 // ── localStorage cache — instant render on page navigation ───────────────────
 
-const CACHE_KEY = 'oraforme_tenant_v1'
+const CACHE_KEY = 'oraforme_tenant_v2'
 
 function readCache(): TenantState | null {
   if (typeof window === 'undefined') return null

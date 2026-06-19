@@ -7,7 +7,7 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   LayoutDashboard, FileText, Package, Users,
   ChefHat, GraduationCap, Hotel, Bot,
-  LogOut, Menu, X, Lock,
+  LogOut, Menu, X, Lock, Globe,
   Settings, ShieldAlert, ShieldCheck, Store,
   Wallet, BookOpen, ShoppingCart,
   Receipt, BarChart2, Truck,
@@ -420,6 +420,8 @@ export default function Sidebar() {
   const role         = tenant?.role       ?? null
   const ecoleRole    = tenant?.ecoleRole  ?? null
   const isSuperAdmin = tenant?.isSuperAdmin ?? false
+  const typeEntite   = tenant?.typeEntite ?? 'standalone'
+  const isGroupeUser = typeEntite !== 'standalone'
 
   const [mobileOpen,    setMobileOpen]    = useState(false)
   const [modulesActifs, setModulesActifs] = useState<string[]>([])
@@ -822,6 +824,43 @@ export default function Sidebar() {
           </div>
           <span>{t('nav.direction')}</span>
         </Link>
+
+        {/* Groupe link — visible for hierarchical tenants */}
+        {isGroupeUser && (
+          <Link
+            href="/dashboard/groupe"
+            prefetch={true}
+            onClick={() => setMobileOpen(false)}
+            className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12.5px] transition-all duration-150 mb-1 relative"
+            style={isActive('/dashboard/groupe', true)
+              ? { background: 'rgba(245,158,11,0.08)', color: '#D97706', fontWeight: 600 }
+              : { color: '#64748B' }
+            }
+            onMouseEnter={!isActive('/dashboard/groupe', true) ? e => {
+              (e.currentTarget as HTMLAnchorElement).style.background = '#FFFBEB'
+              ;(e.currentTarget as HTMLAnchorElement).style.color = '#D97706'
+            } : undefined}
+            onMouseLeave={!isActive('/dashboard/groupe', true) ? e => {
+              (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
+              ;(e.currentTarget as HTMLAnchorElement).style.color = '#64748B'
+            } : undefined}
+          >
+            {isActive('/dashboard/groupe', true) && (
+              <div style={{
+                position: 'absolute', left: 0, top: '20%', bottom: '20%',
+                width: 3, borderRadius: '0 3px 3px 0', background: '#F59E0B',
+              }} />
+            )}
+            <div style={{
+              width: 22, height: 22, borderRadius: 5, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: isActive('/dashboard/groupe', true) ? 'rgba(245,158,11,0.12)' : 'transparent',
+            }}>
+              <Globe size={13} style={{ color: isActive('/dashboard/groupe', true) ? '#F59E0B' : '#94A3B8' }} />
+            </div>
+            <span>Vue Groupe</span>
+          </Link>
+        )}
 
         {/* Skeleton */}
         {!loaded && (

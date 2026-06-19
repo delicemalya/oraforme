@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   Search, ChevronDown, LogOut, Sun, Moon, UsersRound, ChevronLeft,
-  Calendar, User, Settings, CreditCard, Zap, Key, Workflow,
+  Calendar, User, Settings, CreditCard, Zap, Key,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
@@ -14,6 +14,7 @@ import NotificationsPanel from '@/components/ui/NotificationsPanel'
 import LanguageSelector from '@/components/ui/LanguageSelector'
 import DeviseSelector from '@/components/ui/DeviseSelector'
 import { LogoUploader } from '@/components/ui/LogoUploader'
+import EntitySwitcher from '@/components/dashboard/EntitySwitcher'
 
 // Plan badge config — 2 plans vendus : Entrepreneur (tpe) / Business (pme)
 const PLAN_BADGE: Record<string, { label: string; color: string; bg: string }> = {
@@ -126,6 +127,9 @@ export default function Header() {
       ) : (
         <div className="hidden lg:block w-2 shrink-0" />
       )}
+
+      {/* Entity switcher — visible only for groupe/societe/filiale/agence */}
+      <EntitySwitcher />
 
       {/* Search */}
       <div className="flex-1 max-w-xs">
