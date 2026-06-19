@@ -504,8 +504,8 @@ export default function OnboardingPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <p className="text-[15px] font-black" style={{ color: plan === 'tpe' ? '#991B1B' : '#0F172A' }}>Entrepreneur</p>
-                        <span className="text-[11px] font-black text-[#DC2626]">10 000 FCFA/mois</span>
+                        <p className="text-[15px] font-black" style={{ color: plan === 'tpe' ? '#991B1B' : '#0F172A' }}>{PLAN_CONFIG.tpe.label}</p>
+                        <span className="text-[11px] font-black text-[#DC2626]">{new Intl.NumberFormat('fr-FR').format(PLAN_CONFIG.tpe.price_fcfa)} FCFA/mois</span>
                       </div>
                       <p className="text-[11px] text-[#64748B] mb-2">Lancez votre activité, gérez votre quotidien sans effort.</p>
                       {/* Pour : */}
@@ -553,8 +553,8 @@ export default function OnboardingPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <p className="text-[15px] font-black" style={{ color: plan === 'pme' ? '#92400E' : '#0F172A' }}>Business</p>
-                        <span className="text-[11px] font-black text-[#D97706]">25 000 FCFA/mois</span>
+                        <p className="text-[15px] font-black" style={{ color: plan === 'pme' ? '#92400E' : '#0F172A' }}>{PLAN_CONFIG.pme.label}</p>
+                        <span className="text-[11px] font-black text-[#D97706]">{new Intl.NumberFormat('fr-FR').format(PLAN_CONFIG.pme.price_fcfa)} FCFA/mois</span>
                       </div>
                       <p className="text-[11px] text-[#64748B] mb-2">Automatisez, analysez et développez votre PME.</p>
                       {/* Pour : */}
@@ -599,8 +599,8 @@ export default function OnboardingPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <p className="text-[15px] font-black" style={{ color: plan === 'grande' ? '#4C1D95' : '#0F172A' }}>Compagnie</p>
-                        <span className="text-[11px] font-black text-[#7C3AED]">46 000 FCFA/mois</span>
+                        <p className="text-[15px] font-black" style={{ color: plan === 'grande' ? '#4C1D95' : '#0F172A' }}>{PLAN_CONFIG.grande.label}</p>
+                        <span className="text-[11px] font-black text-[#7C3AED]">{new Intl.NumberFormat('fr-FR').format(PLAN_CONFIG.grande.price_fcfa)} FCFA/mois</span>
                       </div>
                       <p className="text-[11px] text-[#64748B] mb-2">Pilotez votre groupe international depuis une seule plateforme.</p>
                       {/* Pour : */}

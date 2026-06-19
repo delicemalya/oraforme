@@ -38,11 +38,17 @@ const PLAN_TARGETS: Record<string, string[]> = {
   ],
 }
 
+const FMT = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
 const CURRENCY_TABLE = [
-  { devise: 'FCFA (XAF/CEMAC)', tpe: '10 000', pme: '25 000', grande: '46 000' },
-  { devise: 'FC (Congo-RDC)',    tpe: '47 000', pme: '117 500', grande: '216 200' },
-  { devise: 'EUR (€)',           tpe: '15',     pme: '38',      grande: '70'      },
-  { devise: 'USD ($)',           tpe: '17',     pme: '42',      grande: '77'      },
+  {
+    devise: 'FCFA (XAF/CEMAC)',
+    tpe:    FMT(PLAN_CONFIG.tpe.price_fcfa),
+    pme:    FMT(PLAN_CONFIG.pme.price_fcfa),
+    grande: FMT(PLAN_CONFIG.grande.price_fcfa),
+  },
+  { devise: 'FC (Congo-RDC)',    tpe: '47 000',  pme: '117 500', grande: '216 200' },
+  { devise: 'EUR (€)',           tpe: '15',      pme: '38',      grande: '70'      },
+  { devise: 'USD ($)',           tpe: '17',      pme: '42',      grande: '77'      },
 ]
 
 const FAQ = [

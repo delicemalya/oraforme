@@ -80,10 +80,12 @@ const MIAA_POINTS = [
   { icon: Shield,    text: 'Détection des risques comptables en temps réel' },
 ]
 
+const FMT = (n: number) => new Intl.NumberFormat('fr-FR').format(n)
+
 const PLANS = [
   {
-    name:        'Entrepreneur',
-    price:       '10 000',
+    name:        PLAN_CONFIG.tpe.label,
+    price:       FMT(PLAN_CONFIG.tpe.price_fcfa),
     currency:    'FCFA',
     period:      '/ mois',
     benefit:     'Lancez votre activité sans vous perdre dans la gestion',
@@ -94,18 +96,16 @@ const PLANS = [
     features:    PLAN_CONFIG.tpe.features,
     targets: [
       'Auto-entrepreneurs',
-      'ETS',
-      'TPE',
+      'ETS · TPE',
       'Boutiques & Commerces',
       'Restaurants indépendants',
       'Pharmacies indépendantes',
       'Écoles primaires & Collèges',
-      'Petites agences',
     ],
   },
   {
-    name:        'Business',
-    price:       '25 000',
+    name:        PLAN_CONFIG.pme.label,
+    price:       FMT(PLAN_CONFIG.pme.price_fcfa),
     currency:    'FCFA',
     period:      '/ mois',
     benefit:     'Pilotez votre PME avec la puissance de l\'IA',
@@ -120,14 +120,12 @@ const PLANS = [
       'Hôtels & Universités',
       'Cliniques & Hôpitaux',
       'Assurances & Transport',
-      'Logistique & ONG',
-      'Supermarchés & BTP',
-      'Cabinets RH & Agences de placement',
+      'Recrutement & Placement RH',
     ],
   },
   {
-    name:        'Compagnie',
-    price:       '46 000',
+    name:        PLAN_CONFIG.grande.label,
+    price:       FMT(PLAN_CONFIG.grande.price_fcfa),
     currency:    'FCFA',
     period:      '/ mois',
     benefit:     'Gérez votre groupe international depuis une seule plateforme',
@@ -137,12 +135,10 @@ const PLANS = [
     color:       '#7C3AED',
     features:    PLAN_CONFIG.grande.features,
     targets: [
-      'Groupes internationaux',
-      'Holdings & Multinationales',
-      'Entreprises multi-pays & multi-filiales',
+      'Groupes internationaux & Holdings',
+      'Multinationales multi-pays',
       'Réseaux de franchises',
       'Banques régionales & Assurances int.',
-      'Grandes ONG internationales',
       'Chaînes hôtelières & Réseaux de cliniques',
     ],
   },
@@ -150,45 +146,44 @@ const PLANS = [
 
 // Sectors compatible with onboarding sector IDs (direct match for pre-fill)
 const LANDING_SECTORS = [
-  { id: 'restaurant',          label: 'Restaurant / Fast-food'      },
-  { id: 'commerce',            label: 'Commerce & Boutique'          },
-  { id: 'pharmacie',           label: 'Pharmacie'                    },
-  { id: 'agriculture',         label: 'Agriculture & Élevage'       },
-  { id: 'boisson',             label: 'Distribution Boissons'        },
-  { id: 'boulangerie',         label: 'Boulangerie / Pâtisserie'    },
-  { id: 'hotel',               label: 'Hôtel & Hébergement'         },
-  { id: 'clinique',            label: 'Clinique / Santé'             },
-  { id: 'hopital',             label: 'Hôpital'                      },
-  { id: 'btp',                 label: 'BTP & Construction'           },
-  { id: 'transport',           label: 'Transport & Logistique'       },
-  { id: 'logistique',          label: 'Logistique'                   },
-  { id: 'banque',              label: 'Banque & Finance'             },
-  { id: 'microfinance',        label: 'Microfinance'                 },
-  { id: 'supermarche',         label: 'Supermarché / GMS'           },
-  { id: 'ong',                 label: 'ONG & Association'            },
-  { id: 'petrole',             label: 'Pétrole & Énergie'           },
-  { id: 'industrie',           label: 'Industrie'                    },
-  { id: 'cabinet-comptable',   label: 'Cabinet Comptable'            },
-  { id: 'cabinet-fiscal',      label: 'Cabinet Fiscal'               },
-  { id: 'cabinet-audit',       label: "Cabinet d'Audit"              },
-  { id: 'cabinet-conseil',     label: 'Cabinet Conseil'              },
-  { id: 'universite',          label: 'Université'                   },
-  { id: 'lycee',               label: 'Lycée'                        },
-  { id: 'compagnie_assurance', label: "Compagnie d'Assurance"       },
-  { id: 'cabinet-recrutement', label: 'Cabinet de Recrutement'       },
-  { id: 'cabinet-rh',          label: 'Cabinet RH'                   },
-  { id: 'societe-placement',   label: 'Société de Placement RH'      },
-  { id: 'interim',             label: "Société d'Intérim"            },
-  { id: 'agence-rh',           label: 'Agence RH & Staffing'         },
-  { id: 'autre_business',      label: 'Autre activité'               },
+  { id: 'restaurant',          label: 'Restaurant / Fast-food'       },
+  { id: 'commerce',            label: 'Commerce & Boutique'           },
+  { id: 'pharmacie',           label: 'Pharmacie'                     },
+  { id: 'agriculture',         label: 'Agriculture & Élevage'        },
+  { id: 'boisson',             label: 'Distribution Boissons'         },
+  { id: 'boulangerie',         label: 'Boulangerie / Pâtisserie'     },
+  { id: 'hotel',               label: 'Hôtel & Hébergement'          },
+  { id: 'clinique',            label: 'Clinique / Santé'              },
+  { id: 'hopital',             label: 'Hôpital'                       },
+  { id: 'btp',                 label: 'BTP & Construction'            },
+  { id: 'transport',           label: 'Transport & Logistique'        },
+  { id: 'logistique',          label: 'Logistique'                    },
+  { id: 'banque',              label: 'Banque & Finance'              },
+  { id: 'microfinance',        label: 'Microfinance'                  },
+  { id: 'supermarche',         label: 'Supermarché / GMS'            },
+  { id: 'ong',                 label: 'ONG & Association'             },
+  { id: 'petrole',             label: 'Pétrole & Énergie'            },
+  { id: 'industrie',           label: 'Industrie'                     },
+  { id: 'cabinet-comptable',   label: 'Cabinet Comptable'             },
+  { id: 'cabinet-fiscal',      label: 'Cabinet Fiscal'                },
+  { id: 'cabinet-audit',       label: "Cabinet d'Audit"               },
+  { id: 'cabinet-conseil',     label: 'Cabinet Conseil'               },
+  { id: 'universite',          label: 'Université'                    },
+  { id: 'lycee',               label: 'Lycée'                         },
+  { id: 'compagnie_assurance', label: "Compagnie d'Assurance"        },
+  { id: 'cabinet-recrutement', label: 'Recrutement & Placement RH'   },
+  { id: 'interim',             label: 'Intérim & Staffing'            },
+  { id: 'chasseur-tetes',      label: 'Executive Search'              },
+  { id: 'autre_business',      label: 'Autre activité'                },
 ]
 
 const PLAN_PILLS = [
-  { key: 'tpe' as const,    label: 'Entrepreneur', price: '10 000', color: '#DC2626', bg: '#FEF2F2'  },
-  { key: 'pme' as const,    label: 'Business',     price: '25 000', color: '#D97706', bg: '#FFFBEB'  },
-  { key: 'grande' as const, label: 'Compagnie',    price: '46 000', color: '#7C3AED', bg: '#F5F3FF'  },
+  { key: 'tpe' as const,    label: PLAN_CONFIG.tpe.label,    price: FMT(PLAN_CONFIG.tpe.price_fcfa),    color: '#DC2626', bg: '#FEF2F2'  },
+  { key: 'pme' as const,    label: PLAN_CONFIG.pme.label,    price: FMT(PLAN_CONFIG.pme.price_fcfa),    color: '#D97706', bg: '#FFFBEB'  },
+  { key: 'grande' as const, label: PLAN_CONFIG.grande.label, price: FMT(PLAN_CONFIG.grande.price_fcfa), color: '#7C3AED', bg: '#F5F3FF'  },
 ]
 
+// 10 pays avec support fiscal ou présence confirmée
 const FLAG_COUNTRIES: { code: string; nom: string }[] = [
   { code: 'cg', nom: 'Congo' },
   { code: 'cm', nom: 'Cameroun' },
@@ -199,27 +194,7 @@ const FLAG_COUNTRIES: { code: string; nom: string }[] = [
   { code: 'gq', nom: 'Guinée Éq.' },
   { code: 'sn', nom: 'Sénégal' },
   { code: 'ci', nom: "Côte d'Ivoire" },
-  { code: 'ml', nom: 'Mali' },
-  { code: 'bf', nom: 'Burkina Faso' },
-  { code: 'tg', nom: 'Togo' },
-  { code: 'bj', nom: 'Bénin' },
-  { code: 'ne', nom: 'Niger' },
-  { code: 'gn', nom: 'Guinée' },
-  { code: 'ao', nom: 'Angola' },
-  { code: 'ng', nom: 'Nigeria' },
-  { code: 'ke', nom: 'Kenya' },
-  { code: 'gh', nom: 'Ghana' },
   { code: 'rw', nom: 'Rwanda' },
-  { code: 'za', nom: 'Afrique du Sud' },
-  { code: 'ma', nom: 'Maroc' },
-  { code: 'dz', nom: 'Algérie' },
-  { code: 'tn', nom: 'Tunisie' },
-  { code: 'fr', nom: 'France' },
-  { code: 'be', nom: 'Belgique' },
-  { code: 'ch', nom: 'Suisse' },
-  { code: 'ca', nom: 'Canada' },
-  { code: 'br', nom: 'Brésil' },
-  { code: 'us', nom: 'USA' },
 ]
 
 // ── Page ─────────────────────────────────────────────────────────────────────
@@ -723,7 +698,7 @@ export default function LandingPage() {
           <div className="text-center mb-10 px-4">
             <span className="text-[10px] font-bold text-[#DC2626] uppercase tracking-[0.18em]">ZONES DE SERVICE</span>
             <h2 className="text-2xl sm:text-3xl font-black text-[#111827] mt-2">Notre présence internationale</h2>
-            <p className="text-sm text-[#6B7280] mt-2">30 pays · 4 continents</p>
+            <p className="text-sm text-[#6B7280] mt-2">10 pays · 3 continents · moteur fiscal intégré</p>
           </div>
           {/* Carousel infini */}
           <div className="overflow-hidden">
