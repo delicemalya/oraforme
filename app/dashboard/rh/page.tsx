@@ -16,6 +16,7 @@ import {
   GitBranch, BarChart2, User,
 } from 'lucide-react'
 import Link from 'next/link'
+import { FolderOpen } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
@@ -202,7 +203,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
     statut: 'actif' as Statut, cnss: '',
     date_embauche: '', date_naissance: '',
     date_fin_contrat: '', notes: '',
-    ville: 'PNR', departement: '', manager: '',
+    ville: '', departement: '', manager: '',
     photo_url: '',
     situation_matrimoniale: 'celibataire' as SituFiscale,
     nb_enfants: '0',
@@ -254,7 +255,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   }
 
   function resetForm() {
-    setForm({ nom:'',poste:'',email:'',telephone:'',salaire_base:'',contrat:'cdi',statut:'actif',cnss:'',date_embauche:'',date_naissance:'',date_fin_contrat:'',notes:'',ville:'PNR',departement:'',manager:'',photo_url:'',situation_matrimoniale:'celibataire',nb_enfants:'0',prime_transport:'',prime_logement:'',prime_rendement:'',prime_responsabilite:'' })
+    setForm({ nom:'',poste:'',email:'',telephone:'',salaire_base:'',contrat:'cdi',statut:'actif',cnss:'',date_embauche:'',date_naissance:'',date_fin_contrat:'',notes:'',ville:'',departement:'',manager:'',photo_url:'',situation_matrimoniale:'celibataire',nb_enfants:'0',prime_transport:'',prime_logement:'',prime_rendement:'',prime_responsabilite:'' })
   }
 
   async function updateStatut(id: string, statut: string) {
@@ -366,12 +367,20 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
             ))}
           </div>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-3 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold hover:bg-amber-600 transition-colors shadow-sm"
-        >
-          <Plus size={13} /> {t('rh.addEmployee')}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 px-3 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold hover:bg-amber-600 transition-colors shadow-sm"
+          >
+            <Plus size={13} /> {t('rh.addEmployee')}
+          </button>
+          <Link
+            href="/dashboard/rh/employes/nouveau"
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-amber-300 text-amber-700 rounded-xl text-[12px] font-bold hover:bg-amber-50 transition-colors shadow-sm"
+          >
+            <FolderOpen size={13} /> Dossier complet
+          </Link>
+        </div>
       </div>
 
       {/* Employee table */}
