@@ -419,7 +419,7 @@ const AVATAR_PALETTE = ['#00b9a7', '#ff7000', '#0F172A']
 
 export function Avatar({ nom, prenom, photoUrl, size = 32, avatarIndex }: { nom: string; prenom: string; photoUrl: string | null; size?: number; avatarIndex?: number }) {
   if (photoUrl) {
-    // eslint-disable-next-line @next/next/no-img-element
+     
     return <img src={photoUrl} alt={nom} className="rounded-full object-cover shrink-0" style={{ width: size, height: size }} />
   }
   const idx = avatarIndex !== undefined

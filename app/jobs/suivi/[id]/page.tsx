@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { Loader2, Check, Clock, X, ChevronRight, Mail, Briefcase } from 'lucide-react'
+import { Loader2, Check, Clock, X, Mail, Briefcase } from 'lucide-react'
 
 interface TrackingData {
   id: string
@@ -68,7 +68,6 @@ export default function SuiviPage() {
   const isRejete = data.statut === 'rejete'
   const currentStep = isRejete ? -1 : (STATUT_ORDER[data.statut as Statut] ?? 0)
   const prenom = data.candidat?.prenom ?? ''
-  const nom = [data.candidat?.prenom, data.candidat?.nom].filter(Boolean).join(' ') || 'Candidat'
 
   return (
     <div className="min-h-screen bg-[#F1F5F9]">

@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
-  TrendingUp, Download, Info, CheckCircle2, Clock, AlertTriangle, Plus, X,
+  TrendingUp, Download, Info, CheckCircle2, Clock, Plus, X,
 } from 'lucide-react'
 
 const TAUX_IS        = 0.30

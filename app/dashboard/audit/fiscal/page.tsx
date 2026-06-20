@@ -35,8 +35,6 @@ export default function AuditFiscalPage() {
 
   useEffect(() => { run() }, [run])
 
-  const anomalyCodes = result?.anomalies.map(a => a.code) ?? []
-
   return (
     <div className="space-y-5 w-full">
       <Link href="/dashboard/audit" className="inline-flex items-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
@@ -57,7 +55,6 @@ export default function AuditFiscalPage() {
         </div>
         <div className="divide-y divide-[var(--border)]">
           {CHECKLIST.map(item => {
-            const hasAnomaly = anomalyCodes.some(c => c.startsWith('T') && result?.anomalies.some(a => a.code === c && (a.titre.toLowerCase().includes(item.label.toLowerCase().slice(0, 5)))))
             return (
               <div key={item.code} className="flex items-center justify-between px-4 py-2.5">
                 <div className="flex items-center gap-2">

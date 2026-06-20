@@ -494,7 +494,7 @@ export default function ParametresAcademiquesPage() {
       })
     }
     setLoading(false)
-  }, [supabase, tenantId])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

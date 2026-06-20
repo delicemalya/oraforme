@@ -10,7 +10,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import type { HotelInsights } from '@/lib/analytics/types'
 
 export default function BiHotelPage() {
-  const { fmt: fmtFCFA, fmtShort: fmtShortFCFA } = useFmt()
+  const { fmtShort: fmtShortFCFA } = useFmt()
   const [data, setData]       = useState<HotelInsights | null>(null)
   const [loading, setLoading] = useState(true)
   const [year, setYear]       = useState(new Date().getFullYear())

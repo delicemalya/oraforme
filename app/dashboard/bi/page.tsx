@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { buildDgAlerts } from '@/lib/analytics/alerts-engine'
-import { growthPct } from '@/lib/analytics/formatters'
 import type { DgInsights } from '@/lib/analytics/types'
 import BiDgClient from './BiDgClient'
 

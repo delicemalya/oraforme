@@ -7,8 +7,8 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Users2, Plus, Edit2, Trash2, X, Save, Search,
-  Phone, Mail, MapPin, Globe, Star, Package,
-  TrendingUp, FileText, Building2, CreditCard
+  Phone, Mail, MapPin, Star,
+  TrendingUp, FileText, Building2
 } from 'lucide-react'
 
 interface Fournisseur {
@@ -104,7 +104,7 @@ export default function FournisseursPage() {
       setFournisseurs(list)
     } catch { setFournisseurs([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

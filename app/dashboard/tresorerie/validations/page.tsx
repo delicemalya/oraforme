@@ -8,12 +8,11 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   CheckCircle2, Plus, Search, Download, Check, X, Loader2, Eye,
-  Clock, Ban, AlertCircle, User, ArrowRight, Shield, MessageSquare,
+  User, ArrowRight, Shield, MessageSquare,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type Niveau = 'RAF' | 'DG' | 'Comptable' | 'Directeur'
 
 interface DemandePaiement {
   id: string

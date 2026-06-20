@@ -35,8 +35,6 @@ export default function OffresPage() {
   const [search, setSearch]     = useState('')
   const [filtreStatut, setFiltreStatut] = useState<string>('active')
 
-  useEffect(() => { if (tenantId) void load() }, [tenantId, filtreStatut])
-
   async function load() {
     if (!tenantId) return
     setLoading(true)
@@ -65,6 +63,9 @@ export default function OffresPage() {
     }
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tenantId) void load() }, [tenantId, filtreStatut])
 
   const filtered = offres.filter(o =>
     !search || o.titre.toLowerCase().includes(search.toLowerCase()) ||

@@ -6,10 +6,9 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   AlertTriangle, CheckCircle, Clock, Send, X,
-  ChevronRight, RefreshCw, Filter, Loader2,
-  DollarSign, Users, TrendingDown, ShieldAlert,
-  Mail, Phone, FileText, History, Plus,
-  MessageSquare, Download,
+  RefreshCw, Loader2,
+  DollarSign, Users, TrendingDown,
+  Mail, History, MessageSquare,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -67,25 +66,6 @@ function niveauConfig(n: Niveau) {
   }
   return configs[n] ?? configs[1]
 }
-function scoreColor(s?: number) {
-  if (!s) return '#64748B'
-  if (s >= 70) return '#16A34A'
-  if (s >= 40) return '#F59E0B'
-  return '#DC2626'
-}
-
-// ── Composants ────────────────────────────────────────────────────────────────
-
-function RetardBadge({ jours }: { jours: number }) {
-  const { bg, text, label } = retardColor(jours)
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold"
-      style={{ background: bg, color: text }}>
-      <Clock size={9} /> J+{jours} — {label}
-    </span>
-  )
-}
-
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function RecouvrementPage() {

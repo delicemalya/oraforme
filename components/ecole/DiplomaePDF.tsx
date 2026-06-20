@@ -1,5 +1,5 @@
 ﻿import {
-  Document, Page, View, Text, Image, StyleSheet, Canvas,
+  Document, Page, View, Text, Image, StyleSheet,
 } from '@react-pdf/renderer'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -35,12 +35,9 @@ export interface DiplomaePDFData {
 // ── Design ────────────────────────────────────────────────────────────────────
 
 const GOLD    = '#C8A400'
-const GOLD2   = '#DC2626'
 const BLACK   = '#0A0A0A'
 const GRAY    = '#6B7280'
 const WHITE   = '#FFFFFF'
-const LGRAY   = '#F9FAFB'
-const BORDER  = '#D4AF37'
 
 const s = StyleSheet.create({
   page: {

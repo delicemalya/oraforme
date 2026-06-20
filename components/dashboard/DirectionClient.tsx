@@ -6,7 +6,7 @@
  */
 
 import ERPPageLayout, {
-  ERPKpiGrid, ERPSectionCard, ERPStatusBadge,
+  ERPSectionCard, ERPStatusBadge,
   type ERPKpi,
 } from '@/components/ui/ERPPageLayout'
 import { BarChart2, TrendingUp, Users, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react'

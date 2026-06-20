@@ -6,7 +6,7 @@ import {
   Users2, Plus, Trash2, Check, Search, Phone, Mail,
   FileText, CalendarOff, Loader2, RefreshCw, DollarSign,
   UserPlus, AlertCircle, Camera, Upload, Smartphone,
-  Building2, CreditCard, Shield, Clock, X, Printer,
+  Building2, CreditCard, Clock, Printer,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -168,22 +168,6 @@ function SectionEmployes({ tenantId }: { tenantId: string }) {
         )}
         {profil && <ProfilDrawer person={profil} onClose={() => setProfil(null)} />}
       </AnimatePresence>
-    </div>
-  )
-}
-
-// -- Info item helper ---------------------------------------------------------
-
-function InfoItem({ icon: Icon, label, value, color = '#64748B' }: { icon: React.ElementType; label: string; value: string; color?: string }) {
-  return (
-    <div className="flex items-start gap-2">
-      <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ background: `${color}18` }}>
-        <Icon size={11} style={{ color }} />
-      </div>
-      <div className="min-w-0">
-        <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">{label}</p>
-        <p className="text-xs font-medium text-[#101729] mt-0.5 break-all">{value}</p>
-      </div>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import {
   Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
-import { calculerPaie, TAUX_CNSS_EMPLOYE, TAUX_CNSS_PATRONAL, TAUX_TUS, TAUX_MEDECINE } from '@/lib/paie/calcul-paie'
+import { calculerPaie, TAUX_CNSS_EMPLOYE } from '@/lib/paie/calcul-paie'
 
 export interface PayslipData {
   // Entreprise
@@ -42,7 +42,6 @@ const GRAY  = '#6B7280'
 const LGRAY = '#F9FAFB'
 const WHITE = '#FFFFFF'
 const MGRAY = '#374151'
-const BLUE  = '#DC2626'
 
 const s = StyleSheet.create({
   page: { padding: 40, backgroundColor: WHITE, fontFamily: 'Helvetica', fontSize: 9, color: BLACK },
@@ -116,8 +115,6 @@ export function PayslipPDF({ data }: { data: PayslipData }) {
   const montantHeuresSup = calc.heures_sup_montant
   const totalDed = cnss + irpp + totalRetenues
   const net = data.net_a_payer ?? calc.salaire_net
-  const cnssPatronalMontant = calc.cnss_patronal
-  const tusMontant = calc.tus_patronal
 
   return (
     <Document>

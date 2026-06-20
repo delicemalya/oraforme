@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { UserCheck, Plus, Briefcase, Clock, CheckCircle, TrendingUp } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { UserCheck, Plus, Briefcase, Clock, TrendingUp } from 'lucide-react'
 
 const DEMO_PLACEMENTS = [
   {
@@ -34,7 +33,6 @@ const STATUT_CFG: Record<string, { label: string; color: string; bg: string }> =
 }
 
 export default function PlacementPage() {
-  const router = useRouter()
   const [filtre, setFiltre] = useState<'tous' | 'actif' | 'essai' | 'termine'>('actif')
 
   const filtered = DEMO_PLACEMENTS.filter(p => filtre === 'tous' || p.statut === filtre)

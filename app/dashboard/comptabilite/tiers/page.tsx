@@ -9,7 +9,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { Users, Plus, Search, Download, ChevronDown, ChevronRight, X, Save, TrendingUp, TrendingDown } from 'lucide-react'
+import { Users, Plus, Search, Download, ChevronDown, ChevronRight, X, Save } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Tier {

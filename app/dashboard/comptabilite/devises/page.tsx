@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
-  DEVISES, TAUX_REFERENCE, PARITE_EUR_XAF, formatDevise,
+  DEVISES, TAUX_REFERENCE, PARITE_EUR_XAF,
   type TauxChange,
 } from '@/lib/syscohada/multidevises'
 import { Globe, Plus, X, CheckCircle2, RefreshCw, ChevronLeft, AlertTriangle } from 'lucide-react'

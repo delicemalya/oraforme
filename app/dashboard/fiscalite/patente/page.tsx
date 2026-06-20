@@ -37,7 +37,6 @@ export default function PatentePage() {
   const [caAnnuel, setCaAnnuel] = useState<number>(0)
 
   const cfg = getPaysConfig(pays)
-  const devise = PAYS_LIST.find(p => p.code === pays)?.devise ?? 'FCFA'
 
   const load = useCallback(async () => {
     setLoading(true)

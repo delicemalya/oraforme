@@ -4,7 +4,7 @@ import { requireTenant } from '@/lib/tenant-guard'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const { ctx, error } = await requireTenant()
   if (error) return error
 

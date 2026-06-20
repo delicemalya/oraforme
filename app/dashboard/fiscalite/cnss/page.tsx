@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { Users, Download, Loader2, RefreshCw, Info, FileText, CheckCircle, ExternalLink } from 'lucide-react'
 import { PAYS_LIST, getPaysConfig } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'

@@ -63,11 +63,6 @@ interface Evaluation {
 const MONTHS_SHORT = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
 
-function pct(a: number, b: number) {
-  if (!b) return 0
-  return Math.round((a / b) * 100)
-}
-
 /* ─── Mini Bar Chart ─────────────────────────────────────── */
 function MiniBar({ data, color = '#F59E0B', label }: {
   data: { label: string; value: number }[]
@@ -165,8 +160,7 @@ function ProgressBar({ value, max, color, label, sublabel }: {
 export default function AnalyticsRHPage() {
   const { fmt: fmtFCFA } = useFmt()
   const { tenantId, loading: tenantLoading } = useTenant()
-  const { t, locale } = useLocale()
-  const intlLocale = locale === 'fr' ? 'fr-FR' : locale
+  const { t } = useLocale()
   const [employes, setEmployes]     = useState<Employe[]>([])
   const [bulletins, setBulletins]   = useState<BulletinPaie[]>([])
   const [conges, setConges]         = useState<Conge[]>([])

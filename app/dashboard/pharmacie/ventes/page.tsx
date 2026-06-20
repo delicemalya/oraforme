@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
-  ShoppingCart, Search, Plus, X, Loader2, ChevronLeft,
+  ShoppingCart, Search, X, Loader2, ChevronLeft,
   Trash2, CheckCircle, Printer, AlertTriangle, Package,
   Clock, Receipt,
 } from 'lucide-react'

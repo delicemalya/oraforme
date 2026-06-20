@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import {
   Globe, Building2, Layers, MapPin, Plus, X, Save,
   ChevronRight, AlertCircle, Loader2, Trash2, Edit3,
-  Crown, Settings, ArrowLeft, CheckCircle,
+  Settings, ArrowLeft, CheckCircle,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'

@@ -104,22 +104,6 @@ function KpiCard({ label, value, sub, color, icon: Icon }: {
   )
 }
 
-function StatutBadge({ statut }: { statut: string }) {
-  const MAP: Record<string, { label: string; color: string; bg: string }> = {
-    brouillon: { label: 'Brouillon', color: '#6B7280', bg: '#6B728018' },
-    generee:   { label: 'Générée',   color: '#D97706', bg: '#D9770618' },
-    validee:   { label: 'Validée',   color: '#2563EB', bg: '#2563EB18' },
-    payee:     { label: 'Payée',     color: '#16A34A', bg: '#16A34A18' },
-  }
-  const s = MAP[statut] ?? MAP.generee
-  return (
-    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
-          style={{ color: s.color, backgroundColor: s.bg }}>
-      {s.label}
-    </span>
-  )
-}
-
 function NumInput({ value, onChange, disabled, placeholder }: {
   value: number; onChange: (v: number) => void; disabled?: boolean; placeholder?: string
 }) {

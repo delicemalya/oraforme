@@ -7,8 +7,8 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   BarChart3, TrendingUp, TrendingDown, ArrowUpCircle, ArrowDownCircle,
-  GitMerge, Download, Calendar, RefreshCw, Building2, Archive,
-  Smartphone, Wallet2, ChevronUp, ChevronDown, Loader2,
+  RefreshCw, Building2, Archive,
+  Smartphone, ChevronUp, ChevronDown, Loader2,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────

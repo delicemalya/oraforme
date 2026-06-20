@@ -26,7 +26,6 @@ export default function ActivityTimeline({ items }: { items: ActivityItem[] }) {
   const { t } = useLocale()
 
   function timeAgo(d: string) {
-  const { t } = useLocale()
     const diff = Date.now() - new Date(d).getTime()
     const m = Math.floor(diff / 60000)
     const h = Math.floor(diff / 3600000)

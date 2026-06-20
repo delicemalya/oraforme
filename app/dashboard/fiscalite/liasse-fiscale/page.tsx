@@ -243,7 +243,7 @@ export default function LiasseFiscalePage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {tab.lignes.map((ligne, i) => {
+                    {tab.lignes.map((ligne, _i) => {
                       const montant = getLigneMontant(tab.id, ligne.code, ligne.comptes)
                       const isTotal = ligne.code.startsWith('BZ') || ligne.code.startsWith('DZ') || ligne.code === 'XI' || ligne.code === 'F7' || ligne.code === 'XA'
                       return (

@@ -3,12 +3,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  FileText, Plus, Trash2, Eye, Edit3, Send, Download,
+  FileText, Plus, Trash2, Eye, Edit3, Send,
   CheckCircle, Clock, AlertTriangle, XCircle, Search,
-  Loader2, X, ArrowRight, Calendar, RotateCcw, Copy,
-  TrendingUp, Users, DollarSign, Ban,
+  Loader2, X, ArrowRight, Calendar, Copy,
+  TrendingUp,
 } from 'lucide-react'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -145,7 +144,7 @@ export default function DevisPage() {
   const { t } = useLocale()
 
   const [devis,          setDevis]          = useState<Devis[]>([])
-  const [config,         setConfig]         = useState<EntrepriseConfig>({ prefixe_facture: 'FAC', message_defaut: null, delai_paiement: 30, nom: null })
+  const [_config,        setConfig]         = useState<EntrepriseConfig>({ prefixe_facture: 'FAC', message_defaut: null, delai_paiement: 30, nom: null })
   const [loading,        setLoading]        = useState(true)
   const [filter,         setFilter]         = useState<'tous' | StatutDevis>('tous')
   const [search,         setSearch]         = useState('')

@@ -7,8 +7,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Package, Plus, Search, Download, Check, X, Loader2, Eye,
-  Edit2, Trash2, AlertTriangle, QrCode, Filter, Tag,
-  ArrowUpCircle, ArrowDownCircle, ChevronDown,
+  Edit2, Trash2, Tag,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────

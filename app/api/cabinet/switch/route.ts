@@ -68,7 +68,7 @@ export async function DELETE(req: NextRequest) {
 }
 
 // GET /api/cabinet/switch — Lister les sessions actives
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const { ctx, error } = await requireTenant()
   if (error) return error
 

@@ -4,7 +4,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, X, Search, Pencil, CreditCard } from 'lucide-react'
+import { Plus, X, Search, CreditCard } from 'lucide-react'
 
 interface Membre {
   id: string; numero_compte: string; nom: string; prenom: string

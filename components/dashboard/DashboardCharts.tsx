@@ -1,6 +1,6 @@
-import { useLocale } from '@/lib/hooks/useLocale'
-﻿'use client'
+'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,

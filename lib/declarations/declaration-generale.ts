@@ -27,7 +27,7 @@ export async function preRemplirDeclaration(
   tenantId: string,
   mois: number,
   annee: number,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   supabase: any,
 ): Promise<PreRemplissageResult> {
   const debutDate = `${annee}-${String(mois).padStart(2, '0')}-01`
@@ -42,9 +42,6 @@ export async function preRemplirDeclaration(
     .eq('statut', 'payee')
     .gte('created_at', debutDate)
     .lte('created_at', finDate + 'T23:59:59Z')
-
-  const caHT = (factures as Array<{ montant_ht: number; tva: number }> | null)
-    ?.reduce((s, f) => s + Number(f.montant_ht || 0), 0) ?? 0
 
   const tvaCollectee = (factures as Array<{ montant_ht: number; tva: number }> | null)
     ?.reduce((s, f) => {

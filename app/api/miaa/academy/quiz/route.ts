@@ -26,30 +26,35 @@ export async function GET(req: Request) {
 
   if (!domaine) return Response.json({ error: 'domaine requis' }, { status: 400 })
 
-  const supabase = db()
+  try {
+    const supabase = db()
 
-  // Charger plus pour permettre le mélange
-  const { data: questions } = await supabase
-    .from('academy_questions')
-    .select('id, question, options, answer_idx, explication, points')
-    .eq('domaine', domaine)
-    .eq('actif', true)
-    .or(`niveau.eq.${niveau},niveau.eq.debutant`)
-    .limit(count * 4)
+    // Charger plus pour permettre le mélange
+    const { data: questions } = await supabase
+      .from('academy_questions')
+      .select('id, question, options, answer_idx, explication, points')
+      .eq('domaine', domaine)
+      .eq('actif', true)
+      .or(`niveau.eq.${niveau},niveau.eq.debutant`)
+      .limit(count * 4)
 
-  if (!questions?.length) {
-    return Response.json({ questions: [], from_db: false })
+    if (!questions?.length) {
+      return Response.json({ questions: [], from_db: false })
+    }
+
+    // Mélanger et prendre N questions
+    const shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, count)
+
+    return Response.json({
+      questions: shuffled,
+      total_available: questions.length,
+      mode,
+      from_db: true,
+    })
+  } catch (e) {
+    console.error('[miaa/academy/quiz GET]', e)
+    return Response.json({ error: 'Erreur serveur' }, { status: 500 })
   }
-
-  // Mélanger et prendre N questions
-  const shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, count)
-
-  return Response.json({
-    questions: shuffled,
-    total_available: questions.length,
-    mode,
-    from_db: true,
-  })
 }
 
 export async function POST(req: Request) {
@@ -68,46 +73,51 @@ export async function POST(req: Request) {
     return Response.json({ error: 'tenant_id et domaine requis' }, { status: 400 })
   }
 
-  const supabase  = db()
-  const pct       = Math.round((score / score_max) * 100)
-  const passed    = pct >= 80
+  try {
+    const supabase  = db()
+    const pct       = Math.round((score / score_max) * 100)
+    const passed    = pct >= 80
 
-  await supabase.from('academy_exam_attempts').insert({
-    tenant_id,
-    user_id:     user_id ?? null,
-    domaine,
-    niveau,
-    score,
-    score_max,
-    pourcentage: pct,
-    reponses:    reponses ?? [],
-    passed,
-  })
-
-  // Mettre à jour la mémoire apprenant
-  const { data: mem } = await supabase
-    .from('academy_learner_memory')
-    .select('id, questions_vues')
-    .eq('tenant_id', tenant_id)
-    .eq('domaine', domaine)
-    .maybeSingle()
-
-  if (mem) {
-    await supabase.from('academy_learner_memory').update({
-      questions_vues:    (mem.questions_vues ?? 0) + score_max,
-      niveau_courant:    niveau,
-      derniere_activite: new Date().toISOString().slice(0, 10),
-    }).eq('id', mem.id)
-  } else {
-    await supabase.from('academy_learner_memory').insert({
+    await supabase.from('academy_exam_attempts').insert({
       tenant_id,
-      user_id:           user_id ?? null,
+      user_id:     user_id ?? null,
       domaine,
-      questions_vues:    score_max,
-      niveau_courant:    niveau,
-      derniere_activite: new Date().toISOString().slice(0, 10),
+      niveau,
+      score,
+      score_max,
+      pourcentage: pct,
+      reponses:    reponses ?? [],
+      passed,
     })
-  }
 
-  return Response.json({ ok: true, passed, pourcentage: pct })
+    // Mettre à jour la mémoire apprenant
+    const { data: mem } = await supabase
+      .from('academy_learner_memory')
+      .select('id, questions_vues')
+      .eq('tenant_id', tenant_id)
+      .eq('domaine', domaine)
+      .maybeSingle()
+
+    if (mem) {
+      await supabase.from('academy_learner_memory').update({
+        questions_vues:    (mem.questions_vues ?? 0) + score_max,
+        niveau_courant:    niveau,
+        derniere_activite: new Date().toISOString().slice(0, 10),
+      }).eq('id', mem.id)
+    } else {
+      await supabase.from('academy_learner_memory').insert({
+        tenant_id,
+        user_id:           user_id ?? null,
+        domaine,
+        questions_vues:    score_max,
+        niveau_courant:    niveau,
+        derniere_activite: new Date().toISOString().slice(0, 10),
+      })
+    }
+
+    return Response.json({ ok: true, passed, pourcentage: pct })
+  } catch (e) {
+    console.error('[miaa/academy/quiz POST]', e)
+    return Response.json({ error: 'Erreur serveur' }, { status: 500 })
+  }
 }

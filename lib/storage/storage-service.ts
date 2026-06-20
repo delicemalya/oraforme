@@ -10,7 +10,7 @@
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createStorageProvider, StorageProvider } from './storage-provider'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const db = supabaseAdmin as any
 
 // ── Types ──────────────────────────────────────────────────────────────────────

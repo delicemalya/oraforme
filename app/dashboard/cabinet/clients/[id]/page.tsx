@@ -7,11 +7,11 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
-  ArrowLeft, Building2, Phone, Mail, Globe, MapPin,
+  ArrowLeft,
   FileText, CheckSquare, DollarSign, MessageSquare, Settings,
-  Plus, X, Upload, Send, Loader2, CheckCircle, AlertTriangle,
-  ChevronDown, ChevronUp, Edit3, Trash2, Clock,
-  BarChart3, RefreshCw, Download, Eye,
+  Plus, X, Send, Loader2, CheckCircle, AlertTriangle,
+  ChevronDown, ChevronUp,
+  BarChart3, RefreshCw, Download,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   ArrowLeft, Calendar, AlertTriangle, CheckCircle2, Clock,
-  Plus, RefreshCw, Loader2, X, Sparkles, Filter,
-  ChevronDown, FileText, DollarSign,
+  Plus, RefreshCw, Loader2, X, Sparkles,
+  ChevronDown, FileText,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

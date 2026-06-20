@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import {
   Search, GraduationCap, Loader2, BookOpen, CreditCard,
   ClipboardList, Lock, Unlock, Bell, ChevronRight,
@@ -284,7 +284,6 @@ export default function EspaceEtudiantPage() {
   const [adminSearching,setAdminSearching] = useState(false)
 
   const isStudent = ecoleRole === 'ETUDIANT'
-  const isAdmin   = !isStudent
 
   useEffect(() => {
     async function init() {

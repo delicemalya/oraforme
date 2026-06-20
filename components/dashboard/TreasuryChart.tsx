@@ -2,7 +2,7 @@
 
 import {
   ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend,
+  ResponsiveContainer,
 } from 'recharts'
 import { useFmt } from '@/lib/hooks/useFmt'
 
@@ -36,7 +36,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function TreasuryChart({ data }: { data: MonthData[] }) {
-  const { fmt: fmtFull } = useFmt()
   const hasData = data.some(d => d.entrees > 0 || d.sorties > 0)
 
   return (

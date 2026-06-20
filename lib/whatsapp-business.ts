@@ -102,7 +102,7 @@ export interface SendProfilReminderOpts {
 
 // ── Service ────────────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const db = supabaseAdmin as any
 
 export class WhatsappBusinessService {

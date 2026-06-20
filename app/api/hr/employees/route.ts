@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     nom, poste, email, telephone, salaire_base, contrat, statut, cnss,
     date_embauche, date_naissance, date_fin_contrat, notes,
     nationalite, adresse, departement_id, manager_id, agent_code, ville,
+    photo_url, situation_matrimoniale, nombre_enfants,
   } = body
 
   if (!nom?.trim()) {
@@ -67,12 +68,15 @@ export async function POST(req: NextRequest) {
       date_embauche:   date_embauche || null,
       date_naissance:  date_naissance || null,
       date_fin_contrat: date_fin_contrat || null,
-      solde_conges:    26,
-      notes:           notes || null,
-      nationalite:     nationalite || 'Congolaise',
-      adresse:         adresse || null,
-      departement_id:  departement_id || null,
-      manager_id:      manager_id || null,
+      solde_conges:             26,
+      notes:                    notes || null,
+      nationalite:              nationalite || 'Congolaise',
+      adresse:                  adresse || null,
+      departement_id:           departement_id || null,
+      manager_id:               manager_id || null,
+      photo_url:                photo_url || null,
+      situation_matrimoniale:   situation_matrimoniale || null,
+      nb_enfants:               Number(nombre_enfants) || 0,
     })
     .select()
     .single()

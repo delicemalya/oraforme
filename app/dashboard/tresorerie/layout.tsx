@@ -6,7 +6,6 @@ import {
   LayoutDashboard, Archive, Landmark, Smartphone,
   ArrowUpCircle, ArrowDownCircle, GitMerge, RefreshCw,
   TrendingUp, CheckCircle2, History, Bell, BarChart3, Receipt,
-  FileCheck, ArrowRightLeft,
 } from 'lucide-react'
 
 const TRESO_MODULES = [

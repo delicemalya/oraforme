@@ -8,7 +8,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import {
   FileText, Plus, X, Save, Search, ChevronDown, ChevronRight,
   Building2, Calendar, CheckCircle2, AlertTriangle,
-  Package, Truck, Clock, Download, Printer
+  Package, Truck, Clock
 } from 'lucide-react'
 
 interface PurchaseOrder {
@@ -104,7 +104,7 @@ export default function CommandesPage() {
       })))
     } catch { setOrders([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

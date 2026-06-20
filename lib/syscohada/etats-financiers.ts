@@ -3,7 +3,6 @@
 // Bilan + Compte de Résultat selon le Système Normal OHADA
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { getCompte } from './plan-comptable'
 
 export interface LigneEcriture {
   compte:  string   // numéro de compte

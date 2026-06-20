@@ -137,7 +137,7 @@ function LoginPageInner() {
       >
         {/* Logo + retour */}
         <div className="flex items-center justify-between">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img src="/logo-white.png" alt="Oraforme" className="h-9 w-auto"
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
           <Link href="/"

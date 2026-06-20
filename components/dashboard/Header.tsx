@@ -105,7 +105,7 @@ export default function Header() {
 
       {/* Logo Oraforme — visible uniquement sur mobile quand pas de retour */}
       {!showBack && (
-        // eslint-disable-next-line @next/next/no-img-element
+         
         <img src="/logo.png" alt="Oraforme" className="lg:hidden h-6 w-auto shrink-0" />
       )}
 

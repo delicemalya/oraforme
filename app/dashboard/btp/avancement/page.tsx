@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useFmt } from '@/lib/hooks/useFmt'
+
 import Link from 'next/link'
 import { HardHat, RefreshCw, Loader2, Plus, X, CheckCircle, Circle, Clock, AlertTriangle } from 'lucide-react'
 
@@ -80,7 +80,6 @@ function ModalPhase({ chantier, onClose, onSaved }: { chantier: Chantier; onClos
 }
 
 export default function BTPAvancementPage() {
-  const { fmt } = useFmt()
   const [chantiers, setChantiers] = useState<Chantier[]>([])
   const [phases,    setPhases]    = useState<Phase[]>([])
   const [loading,   setLoading]   = useState(true)
@@ -100,6 +99,7 @@ export default function BTPAvancementPage() {
     setLoading(false)
   }, [selected])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [])
 
   async function updatePhase(id: string, updates: Partial<Phase>) {
@@ -212,7 +212,7 @@ export default function BTPAvancementPage() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {selectedPhases.map((p, i) => (
+                    {selectedPhases.map((p, _i) => (
                       <div key={p.id} className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4">
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[11px] font-black text-[#64748B]">{p.ordre}</div>

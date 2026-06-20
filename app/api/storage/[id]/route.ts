@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   // Rename
   if (body.nom) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const db = (await import('@/lib/supabase-server')).supabaseAdmin as any
     const { error } = await db.from('documents').update({ nom: body.nom }).eq('id', id).eq('tenant_id', ctx.tid)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })

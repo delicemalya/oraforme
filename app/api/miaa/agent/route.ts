@@ -29,11 +29,6 @@ function getSupabase() {
   )
 }
 
-async function getTenantId(req: Request): Promise<string | null> {
-  const url = new URL(req.url)
-  return url.searchParams.get('tenant_id') ?? null
-}
-
 // ── GET — Lancer l'analyse et retourner les propositions ──────────────────────
 
 export async function GET(req: Request) {

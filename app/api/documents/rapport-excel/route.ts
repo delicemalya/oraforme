@@ -13,9 +13,7 @@ const GRIS_L  = 'FFF8FAFC'
 const VERT    = 'FF16A34A'
 const VERT_L  = 'FFDCFCE7'
 const AMBER   = 'FFF59E0B'
-const AMBER_L = 'FFFEF3C7'
 const BLEU    = 'FF2563EB'
-const BLEU_L  = 'FFDBEAFE'
 const WHITE   = 'FFFFFFFF'
 
 function styleHeader(cell: ExcelJS.Cell, bgColor: string = NOIR, textColor: string = WHITE) {

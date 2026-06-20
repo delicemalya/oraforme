@@ -16,7 +16,7 @@ import {
   NIVEAUX, TYPES_EXAM, TYPES_ATTESTATION,
   STATUT_DIPLOME, STATUT_DEFENSE, MENTIONS_DIPLOME,
   calcExamMoyenne, getMention, printAttestation, printDiploma,
-  fmt, FI, KpiCard, Avatar, EmptyState,
+  FI, KpiCard, Avatar, EmptyState,
 } from './shared'
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
@@ -284,7 +284,7 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
   const [showForm, setShowForm] = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [activeExam, setActiveExam] = useState<Exam | null>(null)
-  const [grades,     setGrades]    = useState<ExamGrade[]>([])
+  const [, setGrades]    = useState<ExamGrade[]>([])
   const [gradeInputs, setGradeInputs] = useState<Record<string, string>>({})
   const [savingGrades, setSavingGrades] = useState(false)
 
@@ -503,7 +503,7 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
 
       {/* Synthèse des moyennes par session */}
       {sessions.filter(s => s.statut === 'en_cours').length > 0 && (
-        <MoyennesSynthese tenantId={tenantId} sessions={sessions.filter(s => s.statut !== 'archive')} exams={exams} etudiants={etudiants} />
+        <MoyennesSynthese _tenantId={tenantId} sessions={sessions.filter(s => s.statut !== 'archive')} exams={exams} etudiants={etudiants} />
       )}
     </div>
   )
@@ -511,8 +511,8 @@ export function SectionExamens({ tenantId, etudiants, classes }: {
 
 // ── Synthèse moyennes ─────────────────────────────────────────────────────────
 
-function MoyennesSynthese({ tenantId, sessions, exams, etudiants }: {
-  tenantId: string; sessions: SessionEcole[]; exams: Exam[]; etudiants: Etudiant[]
+function MoyennesSynthese({ _tenantId, sessions, exams, etudiants }: {
+  _tenantId: string; sessions: SessionEcole[]; exams: Exam[]; etudiants: Etudiant[]
 }) {
   const [open,    setOpen]    = useState(false)
   const [selSes,  setSelSes]  = useState(sessions[0]?.id ?? '')

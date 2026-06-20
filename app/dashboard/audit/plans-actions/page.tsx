@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { runAuditGlobal } from '@/lib/audit/engine'
 import type { AuditAnomalie } from '@/lib/audit/engine'
-import { CheckCircle2, ChevronLeft, Loader2, Clock, AlertTriangle, User, MessageCircle } from 'lucide-react'
+import { CheckCircle2, ChevronLeft, Loader2, Clock, User, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 
 interface ActionPlan {
@@ -77,7 +77,11 @@ export default function PlansActionsPage() {
   useEffect(() => { run() }, [run])
 
   const toggle = (id: string) =>
-    setDone(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
+    setDone(prev => {
+      const s = new Set(prev)
+      if (s.has(id)) s.delete(id); else s.add(id)
+      return s
+    })
 
   const pending   = actions.filter(a => !done.has(a.id))
   const completed = actions.filter(a => done.has(a.id))

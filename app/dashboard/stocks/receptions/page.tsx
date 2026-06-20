@@ -7,9 +7,9 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
-  Truck, Plus, X, Save, Search, CheckCircle2,
-  Package, Warehouse, Calendar, Building2,
-  ChevronDown, ChevronRight, AlertTriangle, Hash
+  Truck, Plus, X, Save, Search,
+  Warehouse, Calendar, Building2,
+  ChevronDown, ChevronRight, AlertTriangle
 } from 'lucide-react'
 
 interface Reception {
@@ -114,7 +114,7 @@ export default function ReceptionsPage() {
       setReceptions(list)
     } catch { setReceptions([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 
@@ -242,7 +242,6 @@ export default function ReceptionsPage() {
     (r.order_numero || '').toLowerCase().includes(search.toLowerCase())
   )
 
-  const totalValeurGlobal = receptions.length
 
   return (
     <div className="space-y-5">

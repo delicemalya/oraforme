@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { calculerSolde, type LigneEcriture, type SoldeCompte } from '@/lib/syscohada/etats-financiers'
+import { calculerSolde, type LigneEcriture } from '@/lib/syscohada/etats-financiers'
 import { FileText, ChevronLeft, Download, ChevronDown, ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 

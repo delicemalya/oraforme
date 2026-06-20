@@ -362,7 +362,7 @@ export default function ParametresPage() {
             <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-[var(--border)]"
               style={{ background: cfg.logo_url ? 'transparent' : 'rgba(240,163,10,0.1)' }}>
               {cfg.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img src={cfg.logo_url} alt="Logo" className="w-full h-full object-contain" />
               ) : (
                 <span className="text-2xl font-black text-[#DC2626]">

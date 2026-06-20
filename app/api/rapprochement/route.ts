@@ -2,7 +2,7 @@
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 
-async function getProfile(req: NextRequest) {
+async function getProfile() {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -14,7 +14,7 @@ async function getProfile(req: NextRequest) {
 
 // GET /api/rapprochement?statut=all|non_rapproche|rapproche|ecart
 export async function GET(req: NextRequest) {
-  const profile = await getProfile(req)
+  const profile = await getProfile()
   if (!profile) return NextResponse.json({ error: 'Non authentifié ou accès refusé' }, { status: 401 })
 
   const url = new URL(req.url)
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/rapprochement — create entry
 export async function POST(req: NextRequest) {
-  const profile = await getProfile(req)
+  const profile = await getProfile()
   if (!profile) return NextResponse.json({ error: 'Non authentifié ou accès refusé' }, { status: 401 })
 
   const body = await req.json()
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/rapprochement — update statut
 export async function PATCH(req: NextRequest) {
-  const profile = await getProfile(req)
+  const profile = await getProfile()
   if (!profile) return NextResponse.json({ error: 'Non authentifié ou accès refusé' }, { status: 401 })
 
   const body = await req.json()
@@ -97,7 +97,7 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/rapprochement?id=...
 export async function DELETE(req: NextRequest) {
-  const profile = await getProfile(req)
+  const profile = await getProfile()
   if (!profile) return NextResponse.json({ error: 'Non authentifié ou accès refusé' }, { status: 401 })
 
   const id = new URL(req.url).searchParams.get('id')

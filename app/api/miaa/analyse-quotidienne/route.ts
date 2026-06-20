@@ -88,7 +88,7 @@ async function analyserRH(supabase: ReturnType<typeof db>, tenantId: string) {
   const nbEmployes = employes?.length ?? 0
 
   // Vérifier si les bulletins du mois courant ont été générés
-  const { data: bulletins, count: bulletinCount } = await supabase
+  const { count: bulletinCount } = await supabase
     .from('bulletins_paie')
     .select('id', { count: 'exact' })
     .eq('tenant_id', tenantId)
@@ -117,7 +117,7 @@ async function analyserRH(supabase: ReturnType<typeof db>, tenantId: string) {
   return { nb_employes: nbEmployes, alertes }
 }
 
-async function analyserFiscalite(tenantId: string) {
+async function analyserFiscalite() {
   const today = new Date()
   const month = today.getMonth() + 1
   const day   = today.getDate()
@@ -196,7 +196,7 @@ export async function POST(req: Request) {
       analyserFactures(supabase, tenant_id),
       analyserStock(supabase, tenant_id),
       analyserRH(supabase, tenant_id),
-      analyserFiscalite(tenant_id),
+      analyserFiscalite(),
       analyserTresorerie(supabase, tenant_id),
     ])
 

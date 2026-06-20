@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { runAuditGlobal, sauvegarderAudit, type AuditGlobal } from '@/lib/audit/engine'
 import {
-  Shield, RefreshCw, AlertTriangle, CheckCircle2, TrendingUp,
+  Shield, RefreshCw, CheckCircle2, TrendingUp,
   BookOpen, DollarSign, FileText, Users, Lock, BarChart2,
   Award, ChevronRight, Loader2, Download, Bot,
 } from 'lucide-react'

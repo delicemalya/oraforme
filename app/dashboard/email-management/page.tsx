@@ -6,8 +6,6 @@ import {
   Paperclip, ChevronDown, Settings, Users, MailOpen,
   ArrowLeft, Check, X, AlertCircle, ExternalLink, Download,
 } from 'lucide-react'
-import Link from 'next/link'
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface EmailAccount {

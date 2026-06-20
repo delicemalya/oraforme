@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
   const ctx = await requireTenant(req)
   if (!ctx.ok) return ctx.error
 
+  try {
   const now   = new Date()
   const mois  = now.getMonth() + 1
   const annee = now.getFullYear()
@@ -190,4 +191,8 @@ export async function GET(req: NextRequest) {
 
     score_conformite: Math.max(0, 100 - (anomalies.filter(a => a.gravite === 'critique').length * 20) - (anomalies.filter(a => a.gravite === 'haute').length * 8) - (anomalies.filter(a => a.gravite === 'moyenne').length * 3)),
   })
+  } catch (e) {
+    console.error('[agents/rh/analyse]', e)
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+  }
 }

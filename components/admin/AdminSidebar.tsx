@@ -7,9 +7,9 @@ import {
   LayoutDashboard, Building2, Package, TrendingUp, Bot,
   LogOut, Menu, X, Activity, Users, CreditCard, Bell,
   Shield, FileSearch, LifeBuoy, Settings, ServerCrash,
-  Zap, Key, HardDrive, Wrench, BarChart3, Receipt,
+  Zap, Key, HardDrive, Wrench, BarChart3,
   ArrowRightLeft, ChevronDown, Cpu, Globe,
-  Wallet, Banknote, RefreshCw, PieChart, BookOpen, Scale,
+  Wallet, RefreshCw, PieChart,
   DollarSign, Plus,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -103,7 +103,7 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
         <div className="flex items-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img src="/logo.png" alt="Oraforme" className="h-7 w-auto shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
           <p className="text-[10px] text-gray-400 font-semibold">Platform HQ</p>
         </div>

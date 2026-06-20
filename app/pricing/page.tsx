@@ -92,7 +92,7 @@ export default function PricingPage() {
       {/* ── Nav ────────────────────────────────────────────────────────────────── */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img src="/logo-white.png" alt="Oraforme" className="h-8 w-auto" />
         </Link>
         <div className="flex items-center gap-4">

@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Sparkles, Crown, ArrowLeft, Loader2, Download, Copy, Check,
-  RotateCcw, Globe, Building2, Layers, MapPin, GitCompare,
+  RotateCcw, Globe, Building2, Layers, MapPin,
   FileBarChart, TrendingUp, AlertTriangle, ChevronRight,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'

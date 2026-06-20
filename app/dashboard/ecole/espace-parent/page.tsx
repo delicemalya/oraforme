@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   Search, HeartHandshake, Loader2, BookOpen, CreditCard,
   ClipboardList, Phone, Mail, Bell, ChevronRight, AlertCircle,
-  CheckCircle, TrendingUp,
+  CheckCircle,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -291,8 +291,6 @@ export default function EspaceParentPage() {
   const [initLoading,setInitLoading]= useState(true)
 
   const isParentRole = ecoleRole === 'PARENT'
-  const isAdmin      = ['DIRECTION_GENERALE', 'RAF', 'SCOLARITE', 'RH_PAIE'].includes(ecoleRole ?? '')
-    || (!isParentRole && !['ETUDIANT', 'FORMATEUR'].includes(ecoleRole ?? ''))
 
   const load = useCallback(async () => {
     if (!tenantId) return

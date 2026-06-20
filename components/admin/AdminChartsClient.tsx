@@ -2,7 +2,7 @@
 
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  LineChart, Line, CartesianGrid, Legend,
+  LineChart, Line, CartesianGrid,
 } from 'recharts'
 import { fmtFCFA } from '@/lib/admin-config'
 
@@ -10,7 +10,6 @@ type ModuleRevData = { module: string; clients: number; mrr: number }
 type GrowthData = { date: string; inscriptions: number }
 
 const RED = '#DC2626'
-const ORANGE = '#DC2626'
 const GREEN = '#0F172A'
 const BLUE = '#DC2626'
 

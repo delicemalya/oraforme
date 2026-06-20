@@ -2,7 +2,7 @@
 
 import { getPaysConfig } from './pays'
 import type {
-  PaysFiscal, ResultatTVA, ResultatCNSS, ResultatIRPP,
+  PaysFiscal, ResultatTVA, ResultatCNSS,
   EcheanceFiscale, TypeDeclaration,
 } from './types'
 

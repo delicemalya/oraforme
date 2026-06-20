@@ -145,7 +145,7 @@ export default function ComptabilitePage() {
     }
     setMonthlyData(monthly)
     setLoading(false)
-  }, [tenantId])
+  }, [tenantId, MONTHS_FR])
 
   useEffect(() => { load() }, [load])
 

@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  BookOpen, Clock, DollarSign, FileText, Plus, Trash2, Check,
-  X, Loader2, ChevronRight, ClipboardList, GraduationCap,
-  Upload, Video, BookMarked, AlertCircle, CheckCircle,
-  Calendar, Users2, BarChart3, Layers,
+  BookOpen, Clock, DollarSign, Plus, Trash2, Check,
+  Loader2, ChevronRight, ClipboardList, GraduationCap,
+  Video, AlertCircle, CheckCircle,
+  BarChart3,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -246,7 +246,7 @@ export default function EspaceFormateurPage() {
 
 // ── Tab Dashboard ─────────────────────────────────────────────────────────────
 
-function TabDashboard({ enseignant, totalHeures, valideeHeures, payeeHeures, totalNet, nbCours, nbDevoirs, heures }: {
+function TabDashboard({ enseignant: _enseignant, totalHeures, valideeHeures, payeeHeures, totalNet, nbCours, nbDevoirs, heures }: {
   enseignant: Enseignant; totalHeures: number; valideeHeures: number; payeeHeures: number
   totalNet: number; nbCours: number; nbDevoirs: number; heures: TeacherHour[]
 }) {
@@ -533,7 +533,7 @@ function TabExamens({ tenantId, enseignant, exams, classes, onRefresh, showToast
   const [saving,     setSaving]    = useState(false)
   const [selectedEx, setSelectedEx]= useState<Exam | null>(null)
   const [grades,     setGrades]    = useState<(ExamGrade & { nom?: string; prenom?: string })[]>([])
-  const [etudiants,  setEtudiants] = useState<{ id: string; nom: string; prenom: string; classe: string | null }[]>([])
+  const [,  setEtudiants] = useState<{ id: string; nom: string; prenom: string; classe: string | null }[]>([])
   const [loadingG,   setLoadingG]  = useState(false)
   const [form, setForm] = useState({ nom: '', type_exam: 'devoir' as Exam['type_exam'], matiere: enseignant.matiere ?? '', classe_id: '', date_exam: '', note_max: '20', coefficient: '1' })
 

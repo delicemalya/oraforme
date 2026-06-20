@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 import { Database, Download, CheckCircle2, AlertTriangle, Clock, HardDrive, RefreshCw, Shield } from 'lucide-react'
 
 export default async function BackupsPage() {
+  const now = new Date()
   const [tenantsRes, profilesRes, facturesRes, txRes, journalRes] = await Promise.all([
     supabaseAdmin.from('tenants').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('profiles').select('id', { count: 'exact', head: true }),
@@ -29,16 +30,16 @@ export default async function BackupsPage() {
   ]
 
   const backupHistory = [
-    { id: 'bk-001', type: 'Auto',   date: new Date(Date.now() - 3600000).toISOString(),    status: 'success', size: '2.4 MB',  tables: 18, duration: '4s'  },
-    { id: 'bk-002', type: 'Auto',   date: new Date(Date.now() - 90000000).toISOString(),   status: 'success', size: '2.3 MB',  tables: 18, duration: '4s'  },
-    { id: 'bk-003', type: 'Manuel', date: new Date(Date.now() - 172800000).toISOString(),  status: 'success', size: '2.1 MB',  tables: 18, duration: '3s'  },
-    { id: 'bk-004', type: 'Auto',   date: new Date(Date.now() - 259200000).toISOString(),  status: 'success', size: '2.0 MB',  tables: 18, duration: '3s'  },
-    { id: 'bk-005', type: 'Auto',   date: new Date(Date.now() - 345600000).toISOString(),  status: 'warning', size: '—',       tables: 0,  duration: '—'   },
-    { id: 'bk-006', type: 'Auto',   date: new Date(Date.now() - 432000000).toISOString(),  status: 'success', size: '1.9 MB',  tables: 18, duration: '3s'  },
+    { id: 'bk-001', type: 'Auto',   date: new Date(now.getTime() - 3600000).toISOString(),    status: 'success', size: '2.4 MB',  tables: 18, duration: '4s'  },
+    { id: 'bk-002', type: 'Auto',   date: new Date(now.getTime() - 90000000).toISOString(),   status: 'success', size: '2.3 MB',  tables: 18, duration: '4s'  },
+    { id: 'bk-003', type: 'Manuel', date: new Date(now.getTime() - 172800000).toISOString(),  status: 'success', size: '2.1 MB',  tables: 18, duration: '3s'  },
+    { id: 'bk-004', type: 'Auto',   date: new Date(now.getTime() - 259200000).toISOString(),  status: 'success', size: '2.0 MB',  tables: 18, duration: '3s'  },
+    { id: 'bk-005', type: 'Auto',   date: new Date(now.getTime() - 345600000).toISOString(),  status: 'warning', size: '—',       tables: 0,  duration: '—'   },
+    { id: 'bk-006', type: 'Auto',   date: new Date(now.getTime() - 432000000).toISOString(),  status: 'success', size: '1.9 MB',  tables: 18, duration: '3s'  },
   ]
 
   function timeAgo(d: string) {
-    const diff = Date.now() - new Date(d).getTime()
+    const diff = now.getTime() - new Date(d).getTime()
     const m = Math.floor(diff / 60000)
     const h = Math.floor(diff / 3600000)
     if (m < 60) return `il y a ${m} min`

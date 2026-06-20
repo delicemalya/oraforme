@@ -169,25 +169,21 @@ export async function auditFinancier(supabase: SupabaseClient, tenantId: string)
   const anomalies: AuditAnomalie[] = []
   const since30 = daysAgo(30)
 
-  const [txRes, factRes, stockRes] = await Promise.all([
+  const [txRes, factRes] = await Promise.all([
     supabase.from('transactions').select('type, montant, created_at').eq('tenant_id', tenantId).gte('created_at', since30),
     supabase.from('factures').select('statut, total, montant_paye, date_echeance').eq('tenant_id', tenantId).in('statut', ['envoyee', 'retard', 'payee']),
-    supabase.from('stock_articles').select('quantite, prix_unitaire, seuil_alerte').eq('tenant_id', tenantId),
   ])
 
   const tx       = txRes.data ?? []
   const factures  = factRes.data ?? []
-  const stock    = stockRes.data ?? []
 
   const entrees  = tx.filter(t => t.type === 'entree').reduce((s, t) => s + (t.montant ?? 0), 0)
   const sorties  = tx.filter(t => t.type === 'sortie').reduce((s, t) => s + (t.montant ?? 0), 0)
   const solde    = entrees - sorties
 
   const creances    = factures.filter(f => f.statut !== 'payee').reduce((s, f) => s + ((f.total ?? 0) - (f.montant_paye ?? 0)), 0)
-  const valeurStock = stock.reduce((s, a) => s + (a.quantite ?? 0) * (a.prix_unitaire ?? 0), 0)
 
   // Ratios
-  const liquidite = entrees > 0 ? solde / sorties : 0
   const dso = entrees > 0 ? (creances / entrees) * 30 : 0 // jours
 
   // 1. Trésorerie négative
@@ -465,7 +461,6 @@ export async function auditControleInterne(supabase: SupabaseClient, tenantId: s
   const roles    = rolesRes.data ?? []
   const profiles = profilesRes.data ?? []
 
-  const owners = profiles.filter(p => p.role === 'owner')
   const admins = profiles.filter(p => p.role === 'admin')
   const total  = profiles.length
 
@@ -691,8 +686,6 @@ export async function auditSYSCOHADA(supabase: SupabaseClient, tenantId: string)
 
   // 1. Équilibre global de la balance (Total Débit = Total Crédit)
   if (entries.length > 0) {
-    const totalDebit  = entries.reduce((s, e) => s + (e.montant ?? 0), 0)
-    const totalCredit = entries.reduce((s, e) => s + (e.montant ?? 0), 0)
     // Dans un système double entrée, chaque écriture génère un débit ET un crédit
     // Donc le total des débits = total des crédits par construction
     // On vérifie plutôt les écritures orphelines (débit sans crédit ou vice-versa)

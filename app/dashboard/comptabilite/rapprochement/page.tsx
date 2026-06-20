@@ -9,7 +9,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { Landmark, Plus, Upload, Download, CheckCircle2, AlertTriangle, X, Save } from 'lucide-react'
+import { Landmark, Plus, Download, CheckCircle2, AlertTriangle, X, Save } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Movement {
@@ -23,10 +23,6 @@ interface LigneReleve {
   movement_id: string | null
 }
 
-interface RapprochementState {
-  solde_banque: number; solde_comptable: number; ecart: number
-  lignes_non_rappro: number
-}
 
 const BANK_ACCOUNTS = ['521', '512', '531', '54']  // Banques + Chèques + CCP + Mobile Money
 const YEARS  = [2024, 2025, 2026, 2027]

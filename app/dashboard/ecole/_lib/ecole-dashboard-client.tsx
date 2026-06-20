@@ -387,7 +387,7 @@ function EtudiantView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   )
 }
 
-function ParentView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
+function ParentView({ _k, nomEcole }: { _k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
@@ -529,7 +529,7 @@ export default function EcoleDashboardClient({
       {role === 'RH_PAIE'            && <RhView        k={kpis} nomEcole={nomEcole} />}
       {role === 'FORMATEUR'          && <FormateurView k={kpis} nomEcole={nomEcole} />}
       {role === 'ETUDIANT'           && <EtudiantView  k={kpis} nomEcole={nomEcole} />}
-      {role === 'PARENT'             && <ParentView    k={kpis} nomEcole={nomEcole} />}
+      {role === 'PARENT'             && <ParentView    _k={kpis} nomEcole={nomEcole} />}
       {role === 'DTI'                && <DtiView       k={kpis} nomEcole={nomEcole} />}
       {role === 'DAAC'               && <DaacView      k={kpis} nomEcole={nomEcole} />}
     </div>

@@ -106,7 +106,7 @@ export default function SortiesPage() {
       })))
     } catch { setSorties([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

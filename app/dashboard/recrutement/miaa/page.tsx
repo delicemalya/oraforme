@@ -2,8 +2,8 @@
 
 import { useState, useRef, useCallback } from 'react'
 import {
-  Sparkles, FileText, Users, Megaphone, CalendarClock,
-  ScrollText, Star, TrendingUp, AlertTriangle,
+  Sparkles, FileText, Megaphone, CalendarClock,
+  ScrollText, TrendingUp, AlertTriangle,
   Lock, ChevronRight, Download, Loader2, RotateCcw,
   CheckCircle, Copy, Check, GitCompare, UserCheck,
   Crown, Zap, Shield,

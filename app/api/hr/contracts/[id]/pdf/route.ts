@@ -1,6 +1,8 @@
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
+import type { ReactElement } from 'react'
+import type { DocumentProps } from '@react-pdf/renderer'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { hrAuth } from '../../../_auth'
 
@@ -61,7 +63,10 @@ export async function GET(
   const { renderToBuffer } = await import('@react-pdf/renderer')
   const { ContratPDF }    = await import('@/components/rh/ContratPDF')
 
-  const element = React.createElement(ContratPDF, { data: pdfData as any }) as any
+  const element = React.createElement(
+    ContratPDF as React.ComponentType<{ data: typeof pdfData }>,
+    { data: pdfData },
+  ) as ReactElement<DocumentProps>
   const buffer  = await renderToBuffer(element)
 
   const nomFichier = `contrat-${contrat.employes?.nom?.replace(/\s+/g, '-').toLowerCase() ?? id}-${contrat.date_debut}.pdf`

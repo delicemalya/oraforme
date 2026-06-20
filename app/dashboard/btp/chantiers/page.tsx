@@ -4,8 +4,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { Plus, X, Pencil, Trash2, ChevronRight } from 'lucide-react'
+import { Plus, X, Pencil, Trash2 } from 'lucide-react'
 
 interface Chantier {
   id: string; nom: string; client_nom: string | null; adresse: string | null
@@ -23,7 +22,6 @@ const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString('fr-FR'
 export default function BTPChantiersPage() {
   const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
-  const router = useRouter()
   const [chantiers, setChantiers] = useState<Chantier[]>([])
   const [loading, setLoading]     = useState(true)
   const [showForm, setShowForm]   = useState(false)

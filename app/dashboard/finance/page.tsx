@@ -13,9 +13,9 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   AreaChart, Area, BarChart, Bar,
-  LineChart, Line, ComposedChart,
+  Line, ComposedChart,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ResponsiveContainer, ReferenceLine, Cell,
+  ResponsiveContainer, ReferenceLine,
 } from 'recharts'
 import {
   TrendingUp, TrendingDown, Minus,
@@ -24,7 +24,7 @@ import {
   ArrowUpRight, ArrowDownRight, RefreshCw, Calendar,
   Download, AlertCircle, Clock, ChevronRight,
   Activity, Target, BarChart2, Layers,
-  CheckCircle, AlertTriangle, XCircle, Info,
+  AlertTriangle,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -847,7 +847,6 @@ export default function FinancePage() {
                 {prevs.map(p => {
                   const isEntry = p.type === 'entree'
                   const probColor = p.probabilite >= 80 ? '#10B981' : p.probabilite >= 50 ? '#F59E0B' : '#EF4444'
-                  const StatusIcon = p.statut === 'réalisé' ? CheckCircle : p.statut === 'annulé' ? XCircle : Info
                   return (
                     <div key={p.id} className="flex items-center gap-4 px-5 py-3">
                       <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isEntry ? 'bg-emerald-400' : 'bg-red-400'}`} />

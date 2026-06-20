@@ -167,7 +167,7 @@ function LeftPanel() {
       style={{ background: 'linear-gradient(145deg,#7F1D1D 0%,#DC2626 60%,#EF4444 100%)' }}
     >
       <div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        { }
         <img src="/logo-white.png" alt="Oraforme" className="h-9 w-auto"
           onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
       </div>

@@ -24,7 +24,7 @@ async function getAuth() {
   return profile?.tenant_id ? { tenantId: profile.tenant_id as string } : null
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const auth = await getAuth()
   if (!auth) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 

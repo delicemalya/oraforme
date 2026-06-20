@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
-import { ArrowLeft, TrendingUp, ShoppingBag, Users, AlertTriangle, RefreshCw, Loader2, ChevronRight } from 'lucide-react'
+import { ArrowLeft, TrendingUp, ShoppingBag, AlertTriangle, RefreshCw, Loader2, ChevronRight } from 'lucide-react'
 
 interface KPIs {
   ca_aujourd: number; ca_semaine: number; ca_mois: number
@@ -17,7 +17,6 @@ interface ByMode { salle: number; livraison: number; emporter: number }
 interface ByPaiement { especes: number; airtel: number; mtn: number; carte: number }
 interface Histo { mois: number; annee: number; ca: number }
 
-function fmtNum(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) }
 function fmtMonth(m: number) { return ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'][m - 1] }
 
 export default function DirectionRestaurantPage() {

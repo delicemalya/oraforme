@@ -57,7 +57,7 @@ export async function PATCH(req: NextRequest) {
 
   if (!body.key) return NextResponse.json({ error: 'key requis' }, { status: 400 })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const db = (await import('@/lib/supabase-server')).supabaseAdmin as any
   const { createStorageProvider } = await import('@/lib/storage/storage-provider')
   const storage = await createStorageProvider(ctx.tid)

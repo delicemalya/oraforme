@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const { createElement }  = await import('react')
     const { PatentePDFDocument } = await import('@/components/declarations/PatentePDF')
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const element = createElement(PatentePDFDocument, { data: body as any }) as any
     const buffer = await renderToBuffer(element)
 

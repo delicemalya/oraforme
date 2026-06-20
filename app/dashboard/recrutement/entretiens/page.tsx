@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   Calendar, Plus, Loader2, Video, Phone, MapPin,
-  CheckCircle, Clock, XCircle, Users, Pencil,
+  CheckCircle, Clock,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -38,6 +37,7 @@ export default function EntretiensPage() {
   })
   const [saving, setSaving] = useState(false)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (tenantId) void load() }, [tenantId])
 
   async function load() {

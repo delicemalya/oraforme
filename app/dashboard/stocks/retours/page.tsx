@@ -8,8 +8,8 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   RotateCcw, Plus, X, Save, Search,
-  Package, Calendar, CheckCircle2, AlertTriangle,
-  ChevronDown, ChevronRight, Building2, Users
+  Package, AlertTriangle,
+  Users
 } from 'lucide-react'
 
 interface Retour {
@@ -97,7 +97,7 @@ export default function RetoursPage() {
       })))
     } catch { setRetours([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 
@@ -120,7 +120,7 @@ export default function RetoursPage() {
     try {
       const numero = `RET-${new Date().getFullYear()}-${String(retours.length + 1).padStart(4, '0')}`
 
-      const { data: retour, error: e } = await supabase
+      const { error: e } = await supabase
         .from('stock_retours')
         .insert({
           tenant_id: tenantId,

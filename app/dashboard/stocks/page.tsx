@@ -8,8 +8,8 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
 import {
   Package, AlertTriangle, TrendingDown, Loader2,
-  ArrowUpCircle, ArrowDownCircle, Warehouse, Users2,
-  ShoppingCart, BarChart3, RefreshCw, Eye,
+  Warehouse, Users2,
+  ShoppingCart, RefreshCw,
   DollarSign, ClipboardList, Boxes, Truck,
 } from 'lucide-react'
 import MIAAContextButton from '@/components/miaa/MIAAContextButton'

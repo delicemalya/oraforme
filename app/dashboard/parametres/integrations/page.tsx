@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { MessageCircle, ChevronRight, CheckCircle2, AlertCircle, Settings2, Database, ScanLine, Lock } from 'lucide-react'
+import { ChevronRight, CheckCircle2, AlertCircle, Settings2, Database, ScanLine, Lock } from 'lucide-react'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
 

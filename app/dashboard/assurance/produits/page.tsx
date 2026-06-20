@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
-import { Package, Plus, RefreshCw, X, CheckCircle2, Shield, Search } from 'lucide-react'
+import { Package, Plus, RefreshCw, X, CheckCircle2, Search } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 interface Produit {

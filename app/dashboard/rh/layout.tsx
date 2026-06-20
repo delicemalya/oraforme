@@ -8,7 +8,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Users, FileText, Clock, Calendar,
+  LayoutDashboard, FileText, Clock,
   DollarSign, Star, GitBranch, Shield, Gift,
   FolderOpen, User, BarChart2, Briefcase, ChevronRight,
 } from 'lucide-react'
@@ -31,12 +31,6 @@ const RH_MODULES = [
 export default function RHLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  function isActive(href: string, exact?: boolean) {
-    const cleanHref = href.split('#')[0]
-    if (exact) return pathname === cleanHref
-    return pathname.startsWith(cleanHref) && cleanHref !== '/dashboard/rh'
-  }
-
   return (
     <div className="space-y-0">
 
@@ -54,11 +48,6 @@ export default function RHLayout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-0.5 overflow-x-auto pb-0 scrollbar-hide -mb-px touch-pan-x">
           {RH_MODULES.map(mod => {
             const Icon   = mod.icon
-            const active = mod.exact
-              ? pathname === mod.href.split('#')[0]
-              : pathname.startsWith(mod.href.split('#')[0]) && mod.href.split('#')[0] !== '/dashboard/rh'
-                ? true
-                : mod.id === 'dashboard' ? pathname === '/dashboard/rh' : false
 
             // Special logic: dashboard is active only on exact /dashboard/rh
             const isDashActive = mod.id === 'dashboard' && pathname === '/dashboard/rh'

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Users, Loader2, X, Calendar, AlertTriangle, ChevronDown, FileText } from 'lucide-react'
+import { Users, Loader2, X, Calendar, AlertTriangle, FileText } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 

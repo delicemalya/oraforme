@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, AlertTriangle, CheckCircle, Clock, Bell, Filter } from 'lucide-react'
+import { Calendar, AlertTriangle, CheckCircle, Clock, Filter } from 'lucide-react'
 import { PAYS_LIST } from '@/lib/fiscalite/pays'
 import { calculerEcheancier } from '@/lib/fiscalite/engine'
 import type { PaysFiscal, EcheanceFiscale } from '@/lib/fiscalite/types'

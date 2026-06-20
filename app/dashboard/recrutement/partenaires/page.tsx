@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Building2, Plus, Phone, Mail, Globe, Users, TrendingUp } from 'lucide-react'
+import { Building2, Plus, Phone, Mail, Users, TrendingUp } from 'lucide-react'
 
 const DEMO_PARTENAIRES = [
   {

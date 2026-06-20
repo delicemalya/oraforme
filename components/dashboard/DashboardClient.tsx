@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import {
-  TrendingUp, Users, Package, AlertTriangle, Plus, Download,
-  Clock, ChevronDown, GraduationCap, UserX, CalendarOff, Lock,
+  TrendingUp, Users, Package, AlertTriangle, Download,
+  Clock, GraduationCap, UserX, CalendarOff, Lock,
   Wallet, CheckCircle, FileText, ArrowUpRight,
   Zap, BarChart2, Star, ChevronRight, ChefHat, Bot, ShoppingCart,
   Receipt, Truck, Hotel, BookOpen, Calculator, HeartHandshake,
@@ -14,7 +14,7 @@ import {
 import Link from 'next/link'
 import RevenueChart from '@/components/dashboard/RevenueChart'
 import ModuleChart from '@/components/dashboard/ModuleChart'
-import ActivityTimeline, { type ActivityItem } from '@/components/ui/ActivityTimeline'
+import { type ActivityItem } from '@/components/ui/ActivityTimeline'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import GeoDetectionBanner from '@/components/ui/GeoDetectionBanner'
@@ -39,11 +39,6 @@ export interface DashboardData {
   daacKpis?:    { sessionsEnCours: number; diplomesEnAttente: number; nbSoutenances: number } | null
   rhKpis?:      { nbActifs: number; nbConges: number } | null
   ecoleFinancials?: { revenusMois: number; nbPaiementsMois: number; nbImpayesDossiers: number; montantImpayeTotal: number } | null
-}
-
-function fmt(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)} M`
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n))
 }
 
 function fadeUp(i: number) {
@@ -71,7 +66,7 @@ interface HeroCardProps {
 const ACCENT_COLORS = ['#DC2626', '#2563EB', '#16A34A', '#8B5CF6']
 
 // Animated spring counter for numeric KPI values
-function SpringCounter({ target, accent }: { target: number; accent: string }) {
+function SpringCounter({ target, accent: _accent }: { target: number; accent: string }) {
   const mv      = useMotionValue(0)
   const spring  = useSpring(mv, { stiffness: 50, damping: 18, restDelta: 0.5 })
   const display = useTransform(spring, v => Math.floor(v).toLocaleString('fr-FR'))

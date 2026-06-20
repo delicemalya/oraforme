@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import {
   Users, Plus, Search, X, AlertTriangle,
-  User, Phone, Calendar, Droplets, FileText,
+  User, Phone, Droplets, FileText,
   Loader2, ChevronLeft,
 } from 'lucide-react'
 import Link from 'next/link'

@@ -6,9 +6,9 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
-  DollarSign, Package, TrendingUp, TrendingDown,
-  BarChart3, RefreshCw, Search, Filter,
-  AlertTriangle, CheckCircle2, Calculator
+  DollarSign, Package, TrendingUp,
+  BarChart3, RefreshCw, Search,
+  AlertTriangle
 } from 'lucide-react'
 
 interface ProductValuation {
@@ -123,7 +123,7 @@ export default function ValorisationPage() {
 
     } catch { setProducts([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

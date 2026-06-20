@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertTriangle, XCircle, Info, CheckCircle2, ChevronDown, ChevronUp, MessageCircle, ExternalLink } from 'lucide-react'
+import { AlertTriangle, XCircle, Info, ChevronDown, ChevronUp, MessageCircle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { AuditAnomalie } from '@/lib/audit/engine'
 

@@ -844,7 +844,6 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function ComptabilitePage() {
-  const { fmt: fmtCurrency } = useFmt()
   useRoleGuard(['DIRECTION_GENERALE', 'RAF'])
   const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()

@@ -28,8 +28,6 @@ export default function CVtheque() {
   const [sortBy, setSortBy] = useState<'score' | 'date'>('score')
   const [selected, setSelected] = useState<Candidat | null>(null)
 
-  useEffect(() => { if (tenantId) void load() }, [tenantId])
-
   async function load() {
     if (!tenantId) return
     setLoading(true)
@@ -54,6 +52,9 @@ export default function CVtheque() {
     }
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tenantId) void load() }, [tenantId])
 
   const filtered = candidats
     .filter(c => !search || [c.prenom, c.nom, c.email, ...(c.competences ?? [])].join(' ').toLowerCase().includes(search.toLowerCase()))

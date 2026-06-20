@@ -66,7 +66,7 @@ export default function PWAInstall() {
       >
         <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl">
           <div className="flex items-start gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img src="/logo-icon.png" alt="Oraforme" className="w-11 h-11 rounded-xl object-cover shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-[var(--text)]">Installer Oraforme</p>

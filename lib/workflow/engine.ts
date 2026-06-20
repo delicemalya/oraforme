@@ -1,7 +1,7 @@
 // ── Workflow Execution Engine ───────────────────────────────────────────────
 
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { executeAction, interpolate } from './actions'
+import { executeAction } from './actions'
 import type {
   WorkflowDefinition,
   WorkflowCondition,

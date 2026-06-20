@@ -5,9 +5,9 @@ import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import {
-  CheckCircle, AlertTriangle, Clock, RefreshCw, Loader2,
-  ChevronDown, ChevronRight, Building2, ShieldCheck, X,
-  TrendingUp, FileText, Calendar, Search, Filter,
+  CheckCircle, RefreshCw, Loader2,
+  ChevronDown, ChevronRight, ShieldCheck,
+  Search,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -140,7 +140,6 @@ export default function CabinetConformitePage() {
   const filtered = clients.filter(c => {
     const q = search.toLowerCase()
     const matchQ = !q || c.client_nom.toLowerCase().includes(q)
-    const sc = scoreColor(c.score)
     const matchF = filterScore === 'tous'
       || (filterScore === 'conforme'    && c.score >= 85)
       || (filterScore === 'surveiller'  && c.score >= 60 && c.score < 85)

@@ -165,7 +165,7 @@ export default function ConformitePage() {
               onClick={() => fileRef.current?.click()}
             >
               {data.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img src={data.logo_url} alt="Logo" className="max-h-20 max-w-full object-contain" />
               ) : (
                 <>
@@ -187,7 +187,7 @@ export default function ConformitePage() {
             <div className="w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center"
               style={{ borderColor: '#E2E8F0' }}>
               {data.photo_dirigeant ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img src={data.photo_dirigeant} alt="Dirigeant" className="max-h-20 max-w-full object-contain rounded-lg" />
               ) : (
                 <>

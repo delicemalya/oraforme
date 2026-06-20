@@ -255,7 +255,7 @@ async function handleStatusUpdate(
 
 async function handleWait(
   action: WorkflowAction,
-  _ctx: ActionContext,
+  _: ActionContext,
 ): Promise<ActionResult> {
   const t0 = Date.now()
   const cfg = action.config as { duration_ms?: number; value?: number; unit?: string }

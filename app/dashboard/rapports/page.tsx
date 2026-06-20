@@ -136,7 +136,6 @@ export default function RapportsPage() {
   const [aiLoading, setAiLoading] = useState(false)
   const [nomEntreprise, setNomEntreprise] = useState('votre entreprise')
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
-  const [tenantId, setTenantId] = useState<string | null>(null)
 
   const now = new Date()
   const moisLabel = `${MONTHS_FR[now.getMonth()]} ${now.getFullYear()}`
@@ -149,7 +148,6 @@ export default function RapportsPage() {
       .from('profiles').select('tenant_id, tenants(nom_entreprise)').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle()
     if (!profile?.tenant_id) return
     const tid = profile.tenant_id
-    setTenantId(tid)
     const tenant = profile.tenants as unknown as { nom_entreprise: string } | null
     if (tenant?.nom_entreprise) setNomEntreprise(tenant.nom_entreprise)
 
@@ -218,7 +216,6 @@ export default function RapportsPage() {
   useEffect(() => { load() }, [load])
 
   async function genererAnalyse() {
-  const { t } = useLocale()
     if (!data) return
     setAiLoading(true)
     const produits = data.ventesFactures + data.prestations + data.autresProduits

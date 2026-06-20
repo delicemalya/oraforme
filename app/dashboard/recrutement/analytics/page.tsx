@@ -5,8 +5,6 @@ import { BarChart2, TrendingUp, Clock, Target, Users, Briefcase, Loader2 } from 
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 
-const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
-
 const SOURCES_DEMO = [
   { label: 'MIAA+ Job IA',    pct: 42, color: '#F59E0B' },
   { label: 'Réseau LinkedIn', pct: 28, color: '#2563EB' },
@@ -28,8 +26,6 @@ export default function AnalyticsRH() {
   const [loading, setLoading] = useState(true)
   const [periode, setPeriode] = useState<'30j' | '90j' | '1an'>('30j')
 
-  useEffect(() => { if (tenantId) void load() }, [tenantId])
-
   async function load() {
     if (!tenantId) return
     setLoading(true)
@@ -42,6 +38,9 @@ export default function AnalyticsRH() {
     setTotals({ offres: o ?? 0, candidatures: c ?? 0, entretiens: e ?? 0, retenus: r ?? 0 })
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tenantId) void load() }, [tenantId])
 
   const tauxConv = totals.candidatures > 0 ? Math.round((totals.retenus / totals.candidatures) * 100) : 0
 

@@ -106,7 +106,7 @@ Si on te demande d'analyser des performances, utilise les KPIs ci-dessus.`
 }
 
 // GET /api/hotel/miaa — briefing journalier automatique
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const { ctx, error } = await requireTenant()
   if (error) return error
 

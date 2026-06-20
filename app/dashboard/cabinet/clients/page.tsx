@@ -7,8 +7,8 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import {
   Users, Plus, Search, Building2, Phone, Mail,
-  ChevronRight, RefreshCw, Filter, Loader2,
-  CheckSquare, FileText, MessageSquare, DollarSign,
+  ChevronRight, RefreshCw, Loader2,
+  DollarSign,
   TrendingUp, AlertCircle, Star, MoreVertical, X,
 } from 'lucide-react'
 

@@ -27,10 +27,6 @@ interface JournalEntry {
   created_at:     string
 }
 
-function fmtFCFA(n: number) {
-  return new Intl.NumberFormat('fr-CG', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(n)
-}
-
 const SOURCE_CSS: Record<string, string> = {
   facture:  'bg-blue-100 text-blue-700',
   achat:    'bg-purple-100 text-purple-700',
@@ -50,7 +46,6 @@ const SOURCE_CSS: Record<string, string> = {
 function CompteAutocomplete({
   value, onChange, placeholder,
 }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
-  const { fmt: fmtFCFA } = useFmt()
   const [query, setQuery]       = useState(value)
   const [results, setResults]   = useState<CompteFlat[]>([])
   const [open, setOpen]         = useState(false)

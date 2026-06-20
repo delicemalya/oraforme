@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  UsersRound, Plus, Mail, Shield, User, Check, X,
+  UsersRound, Plus, Shield, Check, X,
   ChevronDown, Eye, Edit3, Trash2, Loader2,
   BookMarked, BarChart2, Users, Calculator,
   GraduationCap, HeartHandshake, Bot,
@@ -234,7 +234,6 @@ export default function EquipePage() {
 
   // ── Retirer un membre ─────────────────────────────────────────────────────
   async function removeMember(member: Member) {
-  const { t } = useLocale()
     if (!confirm(t('equipe.removeConfirm').replace('{name}', `${member.prenom} ${member.nom}`))) return
     await supabase.from('user_permissions').delete().eq('profile_id', member.id)
     await supabase.from('profiles').update({ tenant_id: null }).eq('id', member.id)
@@ -244,7 +243,6 @@ export default function EquipePage() {
 
   // ── Inviter un membre ─────────────────────────────────────────────────────
   async function sendInvite() {
-  const { t } = useLocale()
     if (!inviteEmail.trim() || !tenantId) return
     setInviting(true)
     setInviteMsg(null)

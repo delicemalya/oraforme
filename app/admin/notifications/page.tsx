@@ -44,7 +44,7 @@ export default async function NotificationsPage() {
       icon:     Zap,
       title:    'Migration 046 exécutée',
       message:  '11 triggers OHADA actifs — toutes les opérations financières sont automatiquement journalisées',
-      time:     new Date(Date.now() - 7200000).toISOString(),
+      time:     new Date(now.getTime() -7200000).toISOString(),
       read:     true,
       priority: 'success' as const,
     },
@@ -54,7 +54,7 @@ export default async function NotificationsPage() {
       icon:     CreditCard,
       title:    'Facturation mensuelle',
       message:  'Rappel : vérifier les abonnements expirant ce mois',
-      time:     new Date(Date.now() - 86400000).toISOString(),
+      time:     new Date(now.getTime() -86400000).toISOString(),
       read:     false,
       priority: 'warn' as const,
     },
@@ -64,7 +64,7 @@ export default async function NotificationsPage() {
       icon:     Bot,
       title:    'MIAA+ actif',
       message:  `${tenants.filter(t => (t.modules_actifs ?? []).includes('bizbot')).length} entreprises utilisent l'assistant IA`,
-      time:     new Date(Date.now() - 3600000).toISOString(),
+      time:     new Date(now.getTime() -3600000).toISOString(),
       read:     true,
       priority: 'info' as const,
     },
@@ -74,7 +74,7 @@ export default async function NotificationsPage() {
       icon:     Activity,
       title:    'Pic d\'activité détecté',
       message:  `${profiles.filter(p => p.created_at >= startMonth).length} nouveaux utilisateurs ce mois`,
-      time:     new Date(Date.now() - 1800000).toISOString(),
+      time:     new Date(now.getTime() -1800000).toISOString(),
       read:     false,
       priority: 'info' as const,
     },
@@ -88,7 +88,7 @@ export default async function NotificationsPage() {
   }
 
   function timeAgo(d: string) {
-    const diff = Date.now() - new Date(d).getTime()
+    const diff = now.getTime() - new Date(d).getTime()
     const m = Math.floor(diff / 60000)
     const h = Math.floor(diff / 3600000)
     if (m < 60) return `il y a ${m} min`

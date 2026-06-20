@@ -101,7 +101,7 @@ Si on te parle de rentabilité, utilise les données de marge ci-dessus. Pour le
 }
 
 // GET /api/resto/miaa — briefing journalier
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const { ctx, error } = await requireTenant()
   if (error) return error
 

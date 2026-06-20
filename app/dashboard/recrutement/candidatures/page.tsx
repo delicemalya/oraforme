@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import {
-  Users, Search, Filter, Loader2, Star,
-  CheckCircle, XCircle, Clock, ArrowUpDown,
+  Users, Search, Loader2, Star,
+  ArrowUpDown,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -32,7 +32,6 @@ const STATUTS: Array<{ key: string; label: string; color: string; bg: string }> 
 ]
 
 function CandidaturesContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const offreId = searchParams.get('offre')
   const { tenantId, loading: tl } = useTenant()
@@ -41,8 +40,6 @@ function CandidaturesContent() {
   const [search, setSearch]     = useState('')
   const [filtreStatut, setFiltreStatut] = useState('all')
   const [sortBy, setSortBy]     = useState<'date' | 'score'>('date')
-
-  useEffect(() => { if (tenantId) void load() }, [tenantId, offreId])
 
   async function load() {
     if (!tenantId) return
@@ -66,6 +63,9 @@ function CandidaturesContent() {
     })))
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tenantId) void load() }, [tenantId, offreId])
 
   async function updateStatut(id: string, statut: string) {
     await supabase.from('candidatures').update({ statut }).eq('id', id)

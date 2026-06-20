@@ -3,7 +3,7 @@
 // Rendu via @react-pdf/renderer (server-side)
 
 import {
-  Document, Page, View, Text, StyleSheet, Font,
+  Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────

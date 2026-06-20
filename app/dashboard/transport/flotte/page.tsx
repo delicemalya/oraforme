@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import {
   Truck, Plus, Search, RefreshCw, Loader2, X,
-  Wrench, CheckCircle, AlertTriangle, Fuel,
-  Calendar, Star, Phone, Edit3, Gauge,
+  Wrench, CheckCircle, Fuel,
+  Phone, Edit3, Gauge,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -178,7 +177,6 @@ function ModalVehicule({
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function TransportFlottePage() {
-  const { fmt } = useFmt()
   const { tenant } = useTenantContext()
   const tid = tenant?.tenantId
 

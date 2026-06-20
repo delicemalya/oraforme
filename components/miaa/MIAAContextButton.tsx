@@ -73,7 +73,7 @@ export default function MIAAContextButton({
           : { borderColor: '#FDE68A', color: '#D97706', background: '#FFFBEB' }
       }
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      { }
       <img
         src="/miaa-logo.png"
         alt="MIAA+"

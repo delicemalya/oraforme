@@ -8,19 +8,20 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  UserCheck, Plus, Trash2, ChevronRight, X, Check,
+  Plus, Trash2, X, Check,
   AlertTriangle, Calendar, Clock, TrendingUp,
   Users, Bell, FileText, Loader2, Briefcase,
-  DollarSign, Star, Shield, ArrowRight, Activity,
-  CheckCircle, XCircle, Building2, Phone, Mail, Edit3,
-  GitBranch, BarChart2, Gift, FolderOpen, User, LayoutDashboard,
+  DollarSign, Star, ArrowRight,
+  CheckCircle, XCircle, Edit3,
+  GitBranch, BarChart2, User,
 } from 'lucide-react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { calculerPaie } from '@/lib/paie/calcul-paie'
+import { calculerBulletinPaie } from '@/lib/fiscal/congo-calculs'
+import { EmployeePhotoUploader } from '@/components/rh/EmployeePhotoUploader'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,8 @@ interface Employe {
   departement?: string | null
   manager?: string | null
   photo_url?: string | null
+  situation_matrimoniale?: string | null
+  nb_enfants?: number | null
   date_embauche: string | null
   date_naissance: string | null
   date_fin_contrat: string | null
@@ -96,14 +99,26 @@ const STATUT_STYLES: Record<string, { label: string; color: string; bg: string }
   retraite: { label: 'Retraité',  color: '#9CA3AF', bg: '#F9FAFB' },
 }
 
-const TAUX_CNSS_PATRONAL = 0.1436
-
 const MOIS_LABELS = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
-// Wrapper autour du moteur officiel lib/paie/calcul-paie.ts (barème CGI Congo révisé)
-function calcNet(brut: number) {
-  const r = calculerPaie({ salaire_base: brut })
-  return { cnss: r.cnss_employe, irpp: r.irpp, net: r.salaire_net, patro: r.cnss_patronal }
+// Moteur fiscal LF 2026 avec quotient familial (barème mensuel par part, Art. 76 CGI Congo)
+type SituFiscale = 'celibataire' | 'marie'
+type PrimesInput = { transport?: number; logement?: number; rendement?: number; responsabilite?: number }
+
+function toSituFiscale(s?: string | null): SituFiscale {
+  return s === 'marie' ? 'marie' : 'celibataire'
+}
+
+function calcNet(brut: number, situation: SituFiscale = 'celibataire', nbEnfants = 0, primes: PrimesInput = {}) {
+  const r = calculerBulletinPaie({
+    salaire_base:          brut,
+    situation_familiale:   situation,
+    nombre_enfants:        nbEnfants,
+    prime_transport:       (primes.transport ?? 0) + (primes.logement ?? 0),  // non-imposables
+    prime_rendement:       primes.rendement,
+    prime_responsabilite:  primes.responsabilite,
+  })
+  return { cnss: r.cnss_salarie, irpp: r.irpp, net: r.net_a_payer, patro: r.total_charges_patronales, parts: r.nombre_parts }
 }
 
 function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) }
@@ -137,7 +152,7 @@ function EmployeeAvatar({ emp, size = 'sm' }: { emp: Employe; size?: 'sm' | 'md'
   const sz = size === 'lg' ? 'w-14 h-14 text-lg' : size === 'md' ? 'w-10 h-10 text-sm' : 'w-7 h-7 text-[10px]'
   if (emp.photo_url) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
+       
       <img src={emp.photo_url} alt={emp.nom} className={`${sz} rounded-full object-cover border-2 border-white shadow-sm`} />
     )
   }
@@ -185,6 +200,12 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
     date_fin_contrat: '', notes: '',
     ville: 'PNR', departement: '', manager: '',
     photo_url: '',
+    situation_matrimoniale: 'celibataire' as SituFiscale,
+    nb_enfants: '0',
+    prime_transport: '',
+    prime_logement: '',
+    prime_rendement: '',
+    prime_responsabilite: '',
   })
 
   const displayed = employes
@@ -213,6 +234,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
         departement: form.departement || null,
         manager: form.manager || null,
         photo_url: form.photo_url || null,
+        situation_matrimoniale: form.situation_matrimoniale || null,
+        nombre_enfants: Number(form.nb_enfants) || 0,
       }),
     })
     setSaving(false)
@@ -227,7 +250,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
   }
 
   function resetForm() {
-    setForm({ nom:'',poste:'',email:'',telephone:'',salaire_base:'',contrat:'cdi',statut:'actif',cnss:'',date_embauche:'',date_naissance:'',date_fin_contrat:'',notes:'',ville:'PNR',departement:'',manager:'',photo_url:'' })
+    setForm({ nom:'',poste:'',email:'',telephone:'',salaire_base:'',contrat:'cdi',statut:'actif',cnss:'',date_embauche:'',date_naissance:'',date_fin_contrat:'',notes:'',ville:'PNR',departement:'',manager:'',photo_url:'',situation_matrimoniale:'celibataire',nb_enfants:'0',prime_transport:'',prime_logement:'',prime_rendement:'',prime_responsabilite:'' })
   }
 
   async function updateStatut(id: string, statut: string) {
@@ -289,7 +312,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
           { label: t('rh.activeSalary'),    val: employes.filter(e=>e.statut==='actif').length,                   color: '#10B981', icon: Users },
           { label: t('rh.onLeaveOrSick'),   val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, color: '#F59E0B', icon: Calendar },
           { label: t('rh.payrollMass'),     val: fmtFCFA(masseBrute),                                             color: '#3B82F6', icon: TrendingUp },
-          { label: t('rh.employerCharge'),  val: fmtFCFA(employes.filter(e=>e.statut==='actif').reduce((s,e)=>s+calculerPaie({salaire_base:e.salaire_base}).cnss_patronal, 0)), color: '#8B5CF6', icon: AlertTriangle },
+          { label: t('rh.employerCharge'),  val: fmtFCFA(employes.filter(e=>e.statut==='actif').reduce((s,e)=>s+calcNet(e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).patro, 0)), color: '#8B5CF6', icon: AlertTriangle },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -488,6 +511,7 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     [t('rh.cnss'),        selected.cnss || '—'],
                     [t('rh.department'),  selected.departement || '—'],
                     [t('rh.manager'),     selected.manager || '—'],
+                    ['Situation',         selected.situation_matrimoniale ? `${selected.situation_matrimoniale} · ${selected.nb_enfants ?? 0} enfant(s)` : '—'],
                     [t('rh.startDate'),   selected.date_embauche ? new Date(selected.date_embauche).toLocaleDateString('fr-FR') : '—'],
                     [t('rh.birthDate'),   selected.date_naissance ? `${new Date(selected.date_naissance).toLocaleDateString('fr-FR')} (${ageYears(selected.date_naissance)} ans)` : '—'],
                     [t('rh.endDate'),     selected.date_fin_contrat ? new Date(selected.date_fin_contrat).toLocaleDateString('fr-FR') : '—'],
@@ -501,14 +525,20 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
 
                 {/* Payroll preview */}
                 <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 space-y-2">
-                  <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide mb-3">{t('rh.paySimulation')}</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wide">{t('rh.paySimulation')}</p>
+                  </div>
                   {(() => {
-                    const { cnss, irpp, net, patro } = calcNet(selected.salaire_base)
+                    const situ = toSituFiscale(selected.situation_matrimoniale)
+                    const { cnss, irpp, net, patro, parts } = calcNet(selected.salaire_base, situ, selected.nb_enfants ?? 0)
                     return (
                       <>
                         <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.gross')}</span><span className="font-semibold text-[#0F172A]">{fmt(selected.salaire_base)} FCFA</span></div>
-                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.cnss')} (5,04%)</span><span className="text-red-500">−{fmt(cnss)} FCFA</span></div>
-                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.irpp')}</span><span className="text-red-500">−{fmt(irpp)} FCFA</span></div>
+                        <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.cnss')} (4%)</span><span className="text-red-500">−{fmt(cnss)} FCFA</span></div>
+                        <div className="flex justify-between text-[12px]">
+                          <span className="text-[#64748B]">{t('rh.irpp')} ({parts} part{parts > 1 ? 's' : ''})</span>
+                          <span className="text-red-500">−{fmt(irpp)} FCFA</span>
+                        </div>
                         <div className="flex justify-between font-bold text-[13px] pt-2 border-t border-[#E2E8F0]">
                           <span className="text-[#0F172A]">{t('rh.netToPay')}</span>
                           <span className="text-[#10B981]">{fmt(net)} FCFA</span>
@@ -517,6 +547,12 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                           <span className="text-[#94A3B8]">{t('rh.employerCnss')}</span>
                           <span className="text-[#94A3B8]">{fmt(patro)} FCFA</span>
                         </div>
+                        {selected.situation_matrimoniale && (
+                          <div className="flex justify-between text-[10px] text-[#94A3B8]">
+                            <span>{selected.situation_matrimoniale} — {selected.nb_enfants ?? 0} enfant(s)</span>
+                            <span>{parts} part{parts > 1 ? 's' : ''} fiscale{parts > 1 ? 's' : ''}</span>
+                          </div>
+                        )}
                       </>
                     )
                   })()}
@@ -671,12 +707,13 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                   <button onClick={() => setShowForm(false)}><X size={18} className="text-[#64748B]" /></button>
                 </div>
 
-                {/* Photo URL */}
-                <div className="mb-4">
-                  <label className={lCls}>{t('rh.photoUrl')}</label>
-                  <input value={form.photo_url} onChange={e => setForm(p => ({...p, photo_url: e.target.value}))}
-                    placeholder="https://..." className={iCls} />
-                </div>
+                {/* Photo employé */}
+                <EmployeePhotoUploader
+                  value={form.photo_url}
+                  nom={form.nom}
+                  tenantId={tenantId}
+                  onChange={url => setForm(p => ({ ...p, photo_url: url }))}
+                />
 
                 <div className="grid grid-cols-2 gap-3">
                   {[
@@ -746,6 +783,56 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                   )}
                 </div>
 
+                {/* Situation familiale & enfants (quotient fiscal) */}
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className={lCls}>Situation matrimoniale</label>
+                    <select value={form.situation_matrimoniale}
+                      onChange={e => setForm(p => ({...p, situation_matrimoniale: e.target.value as SituFiscale}))}
+                      className={iCls}>
+                      <option value="celibataire">Célibataire</option>
+                      <option value="marie">Marié(e)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={lCls}>Nombre d&apos;enfants à charge</label>
+                    <input type="number" min="0" max="20" value={form.nb_enfants}
+                      onChange={e => setForm(p => ({...p, nb_enfants: e.target.value}))}
+                      className={iCls} />
+                  </div>
+                </div>
+
+                {/* Primes & avantages */}
+                <div className="mt-3">
+                  <p className={`${lCls} mb-2`}>Primes & avantages</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] text-[#10B981] font-bold uppercase tracking-wide block mb-1">Transport (non-imposable)</label>
+                      <input type="number" min="0" value={form.prime_transport}
+                        onChange={e => setForm(p => ({...p, prime_transport: e.target.value}))}
+                        placeholder="0 FCFA" className={iCls} />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-[#10B981] font-bold uppercase tracking-wide block mb-1">Logement (non-imposable)</label>
+                      <input type="number" min="0" value={form.prime_logement}
+                        onChange={e => setForm(p => ({...p, prime_logement: e.target.value}))}
+                        placeholder="0 FCFA" className={iCls} />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-[#F59E0B] font-bold uppercase tracking-wide block mb-1">Rendement (imposable)</label>
+                      <input type="number" min="0" value={form.prime_rendement}
+                        onChange={e => setForm(p => ({...p, prime_rendement: e.target.value}))}
+                        placeholder="0 FCFA" className={iCls} />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-[#F59E0B] font-bold uppercase tracking-wide block mb-1">Responsabilité (imposable)</label>
+                      <input type="number" min="0" value={form.prime_responsabilite}
+                        onChange={e => setForm(p => ({...p, prime_responsabilite: e.target.value}))}
+                        placeholder="0 FCFA" className={iCls} />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="mt-3">
                   <label className={lCls}>{t('rh.internalNotes')}</label>
                   <textarea value={form.notes} onChange={e => setForm(p => ({...p, notes: e.target.value}))}
@@ -753,23 +840,44 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                     className={`${iCls} resize-none`} />
                 </div>
 
-                {/* Matricule preview */}
+                {/* Matricule preview — format réel généré par generate_matricule() */}
                 <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
                   <p className="text-[10px] font-bold text-amber-700 mb-1">{t('rh.autoMatricule')}</p>
                   <p className="font-mono text-[13px] font-bold text-amber-900">
-                    {form.nom ? form.nom.substring(0, 3).toUpperCase() : 'XXX'}-{new Date().getFullYear()}-{form.ville || 'PNR'}-####
+                    EMP-{new Date().getFullYear()}-###
                   </p>
+                  <p className="text-[10px] text-amber-600 mt-0.5">Attribué automatiquement à la création</p>
                 </div>
 
-                {/* Payroll preview */}
+                {/* Payroll preview avec parts fiscales */}
                 {Number(form.salaire_base) > 0 && (() => {
-                  const { cnss, irpp, net } = calcNet(Number(form.salaire_base))
+                  const primes = {
+                    transport:     Number(form.prime_transport) || 0,
+                    logement:      Number(form.prime_logement) || 0,
+                    rendement:     Number(form.prime_rendement) || 0,
+                    responsabilite: Number(form.prime_responsabilite) || 0,
+                  }
+                  const { cnss, irpp, net, parts } = calcNet(Number(form.salaire_base), form.situation_matrimoniale, Number(form.nb_enfants) || 0, primes)
+                  const brut = Number(form.salaire_base)
+                  const totalPrimesImposables = primes.rendement + primes.responsabilite
+                  const totalPrimesNonImposables = primes.transport + primes.logement
                   return (
                     <div className="mt-3 bg-[#F8FAFC] rounded-xl p-3 text-[12px] space-y-1">
-                      <p className="font-bold text-[#64748B] mb-2">{t('rh.payPreview')}</p>
-                      <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.cnss')}</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
-                      <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.irpp')}</span><span className="text-red-500">−{fmt(irpp)} F</span></div>
-                      <div className="flex justify-between font-bold border-t border-[#E2E8F0] pt-1"><span>{t('rh.netToPay')}</span><span className="text-[#10B981]">{fmt(net)} F</span></div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-bold text-[#64748B]">{t('rh.payPreview')}</p>
+                        <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 font-bold">
+                          {parts} part{parts > 1 ? 's' : ''} fiscale{parts > 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <div className="flex justify-between"><span className="text-[#64748B]">Salaire de base</span><span className="font-medium text-[#0F172A]">{fmt(brut)} F</span></div>
+                      {totalPrimesImposables > 0 && <div className="flex justify-between"><span className="text-amber-600">Primes imposables</span><span className="text-amber-700">+{fmt(totalPrimesImposables)} F</span></div>}
+                      {totalPrimesNonImposables > 0 && <div className="flex justify-between"><span className="text-[#10B981]">Indemnités (non-imp.)</span><span className="text-[#10B981]">+{fmt(totalPrimesNonImposables)} F</span></div>}
+                      <div className="border-t border-[#E2E8F0] pt-1 space-y-1">
+                        <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.cnss')} (4%)</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
+                        <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.irpp')}</span><span className="text-red-500">−{fmt(irpp)} F</span></div>
+                        <div className="flex justify-between"><span className="text-[#64748B]">TOL</span><span className="text-red-500">−1 000 F</span></div>
+                      </div>
+                      <div className="flex justify-between font-bold border-t border-[#E2E8F0] pt-1 text-[13px]"><span>{t('rh.netToPay')}</span><span className="text-[#10B981]">{fmt(net)} F</span></div>
                     </div>
                   )
                 })()}
@@ -1036,8 +1144,8 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
   const { t } = useLocale()
   const actifs      = employes.filter(e => e.statut === 'actif')
   const masseBrute  = actifs.reduce((s, e) => s + e.salaire_base, 0)
-  const massePatro  = actifs.reduce((s, e) => s + calculerPaie({ salaire_base: e.salaire_base }).cnss_patronal, 0)
-  const masseNette  = actifs.reduce((s, e) => s + calculerPaie({ salaire_base: e.salaire_base }).salaire_net, 0)
+  const massePatro  = actifs.reduce((s, e) => s + calcNet(e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).patro, 0)
+  const masseNette  = actifs.reduce((s, e) => s + calcNet(e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).net, 0)
   const congesApp   = conges.filter(c => c.statut === 'approuve')
   const totalJours  = congesApp.reduce((s, c) => s + c.nb_jours, 0)
 

@@ -57,8 +57,6 @@ const MODULE_CONFIG: Record<string, { label: string; icon: React.ComponentType<{
   recrutement: { label: 'Recrutement', icon: Briefcase },
 }
 
-const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
-
 // ── Composant ProposalCard ─────────────────────────────────────────────────────
 
 function ProposalCard({

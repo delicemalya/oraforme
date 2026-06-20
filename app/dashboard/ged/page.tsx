@@ -440,7 +440,6 @@ export default function GEDPage() {
   }
 
   async function deleteDoc(id: string) {
-  const { t } = useLocale()
     if (!confirm(t('ged.deleteConfirm'))) return
     await supabase.from('documents').update({ statut: 'supprime' }).eq('id', id)
     load()

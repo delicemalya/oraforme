@@ -1,7 +1,5 @@
 'use client'
 
-import { useLocale } from '@/lib/hooks/useLocale'
-
 import { useState } from 'react'
 import Link from 'next/link'
 import { Search, ExternalLink, PauseCircle, PlayCircle, Trash2, X, AlertTriangle, Loader2 } from 'lucide-react'

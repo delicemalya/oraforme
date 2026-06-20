@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Kanban, Users, Upload, Search, Star, Plus, X,
-  ChevronRight, ChevronLeft, Mail, Phone, Link2,
+  Mail, Phone, Link2,
   Briefcase, GraduationCap, Award, FlaskConical,
-  Calendar, MapPin, Clock, DollarSign, CheckCircle,
-  AlertCircle, ArrowRight, Download, FileText,
-  Sparkles, Eye, Trash2, MoreHorizontal,
+  Calendar, MapPin, Clock, DollarSign,
+  AlertCircle, Download, FileText,
+  Sparkles, Trash2, MoreHorizontal,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -1108,7 +1108,6 @@ export default function ATSPage() {
               filteredCandidats.map(c => {
                 const candCandidatures = candidatures.filter(cc => cc.candidat_id === c.id)
                 const bestCandidature = candCandidatures.sort((a, b) => b.score_ia - a.score_ia)[0]
-                const sc = scoreCls(c.score_global)
                 return (
                   <div key={c.id}
                     onClick={() => loadProfile(c.id)}

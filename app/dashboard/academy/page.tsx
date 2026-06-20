@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   GraduationCap, BookOpen, Award, RotateCcw, ChevronLeft,
   Send, Loader2, CheckCircle2, Trophy, Sparkles, Download,
-  Search, Star, TrendingUp, Clock, Users,
-  FileText, FileSpreadsheet, FileType2, Zap, Target, Medal,
+  Search, Star, Clock,
+  FileText, FileType2, Zap, Target, Medal,
   ChevronRight, Play, Lock, CheckSquare,
 } from 'lucide-react'
 import { useTenant } from '@/lib/hooks/useTenant'

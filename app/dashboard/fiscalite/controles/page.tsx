@@ -35,8 +35,6 @@ export default function ControlesPage() {
   const [cnssData, setCnssData] = useState<{ declarations?: { mois: number; nb_employes: number; total_cnss: number }[] } | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const devise = PAYS_LIST.find(p => p.code === pays)?.devise ?? 'FCFA'
-
   const load = useCallback(async () => {
     setLoading(true)
     try {
@@ -154,7 +152,7 @@ export default function ControlesPage() {
     }
 
     return items
-  }, [declarations, tvaData, cnssData, pays, annee, currentMois, devise])
+  }, [declarations, tvaData, cnssData, pays, annee, currentMois])
 
   const score = useMemo(() => {
     if (auditItems.length === 0) return 100

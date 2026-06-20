@@ -8,7 +8,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Grid3X3, Plus, Edit2, Trash2, X, Save, Search,
   Package, TrendingUp, AlertTriangle, ChevronRight,
-  Tag, Hash, BarChart3, Archive
+  Archive
 } from 'lucide-react'
 
 interface Category {
@@ -100,7 +100,7 @@ export default function CategoriesPage() {
       setCategories(listWithParent)
     } catch { setCategories([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

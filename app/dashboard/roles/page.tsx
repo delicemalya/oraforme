@@ -165,7 +165,6 @@ export default function RolesPage() {
   }
 
   async function del(r: Role) {
-  const { t } = useLocale()
     if (!confirm(`${t('common.delete')} "${r.name}" ?`)) return
     await supabase.from('roles').delete().eq('id', r.id)
     if (selRole?.id === r.id) { setSelRole(null); setPerms({}) }
@@ -178,7 +177,6 @@ export default function RolesPage() {
   }
 
   async function defaults() {
-  const { t } = useLocale()
     if (!tenantId || !confirm(t('roles.createConfirm'))) return
     setSaving(true)
     await supabase.rpc('fn_create_default_roles', { p_tenant_id: tenantId })
@@ -348,11 +346,11 @@ export default function RolesPage() {
                           { _g: true, grp: g, count: ms.length, open: openGrp.has(g), key: '', label: '' },
                           ...(openGrp.has(g) ? ms.map(m => ({ _g: false, grp: g, ...m })) : []),
                         ])
-                    ).map((row: Record<string, unknown>, i: number) => {
+                    ).map((row: Record<string, unknown>, _i: number) => {
                       if (row._g) {
                         return (
                           <tr key={'g-' + row.grp} className="cursor-pointer"
-                            onClick={() => setOpenGrp(prev => { const n = new Set(prev); n.has(row.grp as string) ? n.delete(row.grp as string) : n.add(row.grp as string); return n })}>
+                            onClick={() => setOpenGrp(prev => { const n = new Set(prev); if (n.has(row.grp as string)) n.delete(row.grp as string); else n.add(row.grp as string); return n })}>
                             <td colSpan={7} className="px-4 py-2 bg-[#F8FAFC] border-b border-[#F1F5F9]">
                               <div className="flex items-center gap-2">
                                 {row.open ? <ChevronDown size={11} className="text-[#94A3B8]" /> : <ChevronRight size={11} className="text-[#94A3B8]" />}

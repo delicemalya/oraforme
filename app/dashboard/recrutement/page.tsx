@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Briefcase, Users, Calendar, CheckCircle, TrendingUp,
+  Briefcase, Users, Calendar, CheckCircle,
   Plus, UserCheck, Target, ArrowRight, ArrowUpRight,
   ArrowDownRight, Minus, Clock, Star, Building2,
   FileText, Activity, Sparkles, AlertCircle,
@@ -187,7 +187,6 @@ function BarChart({ data, labels, color, height = 140 }: { data: number[]; label
 function DonutChart({ segments, total }: { segments: ContractSeg[]; total: number }) {
   const r = 34; const cx = 50; const cy = 50
   const circ = 2 * Math.PI * r
-  let cum = 0
   if (total === 0) {
     return (
       <svg viewBox="0 0 100 100" className="w-full max-w-[150px]">
@@ -196,6 +195,12 @@ function DonutChart({ segments, total }: { segments: ContractSeg[]; total: numbe
       </svg>
     )
   }
+  const offsets: number[] = []
+  let cum = 0
+  for (const seg of segments) {
+    offsets.push(circ * (1 - cum))
+    cum += seg.count / total
+  }
   return (
     <svg viewBox="0 0 100 100" className="w-full max-w-[150px]">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F1F5F9" strokeWidth="14" />
@@ -203,13 +208,11 @@ function DonutChart({ segments, total }: { segments: ContractSeg[]; total: numbe
         if (seg.count === 0) return null
         const pct = seg.count / total
         const dash = pct * circ
-        const offset = circ * (1 - cum)
-        cum += pct
         return (
           <circle key={i} cx={cx} cy={cy} r={r} fill="none"
             stroke={seg.color} strokeWidth="14"
             strokeDasharray={`${dash} ${circ - dash}`}
-            strokeDashoffset={offset}
+            strokeDashoffset={offsets[i]}
             transform={`rotate(-90 ${cx} ${cy})`}
           />
         )
@@ -246,7 +249,6 @@ function KpiCard({
   delta?: number; unit?: string; onClick?: () => void
 }) {
   const isUp   = (dlt ?? 0) > 0
-  const isDown = (dlt ?? 0) < 0
   return (
     <button
       onClick={onClick}
@@ -432,7 +434,6 @@ export default function RecrutementPremiumDashboard() {
       safe(supabase.from('candidatures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).in('statut', ['en_cours', 'entretien'])),
       safe(supabase.from('candidatures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('statut', 'entretien')),
     ])
-    const maxPipeline = Math.max(nbCandTotal, 1)
     setPipeline([
       { label: 'Candidatures reçues',   value: nbCandTotal,      color: '#2563EB' },
       { label: 'En cours de traitement', value: nbEnCours,        color: '#7C3AED' },

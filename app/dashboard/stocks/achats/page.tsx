@@ -7,10 +7,10 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
-  ShoppingCart, Plus, X, Save, Search, Filter,
-  FileText, Truck, CheckCircle2, AlertTriangle,
-  Calendar, Building2, Package, TrendingUp, Download,
-  ChevronDown, ChevronRight, Edit2, Eye
+  ShoppingCart, Plus, X, Save, Search,
+  CheckCircle2, AlertTriangle,
+  Calendar, Building2, TrendingUp,
+  ChevronDown, ChevronRight
 } from 'lucide-react'
 
 interface Purchase {
@@ -100,7 +100,7 @@ export default function AchatsPage() {
       setPurchases(list)
     } catch { setPurchases([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

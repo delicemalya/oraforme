@@ -4,11 +4,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { useFmt } from '@/lib/hooks/useFmt'
 import {
   AlertTriangle, Bell, CheckCircle2, Package,
-  TrendingDown, RefreshCw, Settings, X,
-  Filter, Search, Calendar, Zap
+  TrendingDown, RefreshCw, Settings,
+  Calendar, Zap
 } from 'lucide-react'
 
 interface StockAlerte {
@@ -49,8 +48,6 @@ const TYPE_CONFIG: Record<string, { label: string; icon: any }> = {
 }
 
 export default function AlertesStocksPage() {
-  const { fmt: fmtFCFA } = useFmt()
-
   const { tenantId } = useTenant()
   const { t } = useLocale()
 
@@ -60,7 +57,6 @@ export default function AlertesStocksPage() {
   const [typeFilter, setTypeFilter] = useState('')
   const [prioriteFilter, setPrioriteFilter] = useState('')
   const [showLues, setShowLues] = useState(false)
-  const [saving, setSaving] = useState(false)
 
   const [config, setConfig] = useState<AlertConfig>({
     seuil_stock_faible_global: 10,
@@ -135,7 +131,7 @@ export default function AlertesStocksPage() {
     }
 
     return generated
-  }, [tenantId, supabase, config])
+  }, [tenantId, config])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -151,7 +147,6 @@ export default function AlertesStocksPage() {
   }
 
   const markAllLues = () => {
-  const { t } = useLocale()
     setAlertes(als => als.map(a => ({ ...a, lue: true })))
   }
 

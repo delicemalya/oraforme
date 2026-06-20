@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertTriangle, Download, X } from 'lucide-react'
+import { Upload, FileSpreadsheet, CheckCircle2, Download } from 'lucide-react'
 
 export interface ImportColumn {
   key: string

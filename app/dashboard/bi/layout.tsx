@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   BarChart2, Users, GraduationCap, Building2,
-  ShoppingCart, Zap, Activity,
+  ShoppingCart, Activity,
 } from 'lucide-react'
 
 const ALL_TABS = [

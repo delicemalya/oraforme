@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { Star, Plus, X, Check, TrendingUp, Users, Award, Loader2 } from 'lucide-react'
+import { Star, Plus, X, Check, TrendingUp, Award, Loader2 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -179,7 +179,7 @@ export default function EvaluationsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {evals.map((ev, i) => {
+          {evals.map((ev, _i) => {
             const emp = (ev.employes as unknown as { nom: string; poste: string })
             const nl  = noteLabel(ev.note_globale)
             return (

@@ -11,7 +11,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import {
   GitBranch, Users, ChevronDown, ChevronRight,
-  User, Building2, Search, Download, ZoomIn, ZoomOut,
+  User, Building2, Search,
 } from 'lucide-react'
 
 /* ─── Types ─────────────────────────────────────────────── */
@@ -150,7 +150,7 @@ function OrgTreeNode({ node, collapseTip }: { node: OrgNode; collapseTip: string
 
           {/* Horizontal bar + children */}
           <div className="flex items-start gap-4">
-            {node.children.map((child, idx) => (
+            {node.children.map((child, _idx) => (
               <div key={child.employe.id} className="flex flex-col items-center">
                 {/* Top connector */}
                 <div className="w-px h-4 bg-[#CBD5E1]" />
@@ -248,7 +248,7 @@ export default function OrganigrammePage() {
     return Array.from(map.entries())
       .map(([name, employees]) => ({ name, employees, headCount: employees.length }))
       .sort((a, b) => b.headCount - a.headCount)
-  }, [employes, search])
+  }, [employes, search, t])
 
   /* Build org tree */
   const orgTree = useMemo<OrgNode[]>(() => {

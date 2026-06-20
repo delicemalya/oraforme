@@ -30,7 +30,7 @@ export type TenantError = {
 
 export type TenantResult = TenantContext | TenantError
 
-export async function requireTenant(req?: NextRequest): Promise<TenantResult> {
+export async function requireTenant(_req?: NextRequest): Promise<TenantResult> {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 

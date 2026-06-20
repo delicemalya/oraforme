@@ -6,9 +6,9 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
-  Bell, Plus, Check, X, Loader2, Eye,
+  Bell, Plus, Check, X, Loader2,
   AlertTriangle, AlertCircle, Info, CheckCircle2,
-  TrendingDown, Archive, Building2, Smartphone, Wallet2,
+  TrendingDown, Archive, Building2, Smartphone,
   Settings, Trash2,
 } from 'lucide-react'
 
@@ -172,7 +172,7 @@ export default function AlertesPage() {
     } finally {
       setLoading(false)
     }
-  }, [tenantId])
+  }, [tenantId, fmtFCFA])
 
   useEffect(() => { load() }, [load])
 

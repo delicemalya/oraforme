@@ -5,12 +5,11 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
-  ArrowUpCircle, Plus, Search, Filter, Download, Check, X, Loader2,
-  Building2, Archive, Smartphone, CreditCard, Wallet2, Eye, RefreshCw,
-  ChevronDown, Calendar, FileText, Tag, AlertCircle,
+  ArrowUpCircle, Plus, Search, Download, Check, X, Loader2,
+  Building2, Archive, Smartphone, CreditCard, Wallet2, Eye,
+  Calendar, FileText, Tag, AlertCircle,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────

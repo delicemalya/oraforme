@@ -97,7 +97,7 @@ export function LogoUploader() {
             <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
               style={{ borderColor: 'var(--primary)' }} />
           ) : src ? (
-            // eslint-disable-next-line @next/next/no-img-element
+             
             <img src={src} alt={nom} className="w-full h-full object-contain p-0.5" />
           ) : (
             <span className="text-[10px] font-bold" style={{ color: 'var(--primary)' }}>

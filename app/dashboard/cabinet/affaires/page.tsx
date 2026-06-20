@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
-  Scale, Plus, Search, X, ChevronDown, ChevronRight,
-  Calendar, FileText, Users, Clock, AlertTriangle, CheckCircle2,
-  Loader2, Eye, Filter,
+  Scale, Plus, Search, X, ChevronDown,
+  Calendar, FileText, AlertTriangle, CheckCircle2,
+  Loader2, Eye,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

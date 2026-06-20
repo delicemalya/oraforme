@@ -6,8 +6,8 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import {
   DollarSign, Plus, Search, RefreshCw, Loader2, CheckCircle,
-  Clock, AlertTriangle, ChevronRight, FileText, Send,
-  TrendingUp, Users, Calendar, X, Check, Eye,
+  AlertTriangle, FileText, Send,
+  TrendingUp, X, Check,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

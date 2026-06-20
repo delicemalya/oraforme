@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
-  Shield, Plus, Search, Filter, RefreshCw, X,
-  FileText, Calendar, DollarSign, User, ChevronDown,
-  CheckCircle2, AlertTriangle, Clock, Sparkles,
+  Shield, Plus, Search, RefreshCw, X,
+  FileText, ChevronDown,
+  CheckCircle2, Sparkles,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { checkRateLimit, RATE_LIMITS } from '@/lib/api/rate-limit'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { calculerTVA, fmtMontantPays } from '@/lib/fiscalite/engine'
+import { calculerTVA } from '@/lib/fiscalite/engine'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 
 export const dynamic = 'force-dynamic'

@@ -90,7 +90,6 @@ export default function DeclarationsPage() {
   const currentMonth = new Date().getMonth() + 1
   for (const tax of paysFiscal.taxes_annuelles) {
     const diff = (tax.echeance_mois - currentMonth + 12) % 12
-    const daysUntil = diff * 30 + tax.echeance_jour
     declarations.push({
       code: tax.code,
       nom: tax.nom,

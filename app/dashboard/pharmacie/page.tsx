@@ -6,7 +6,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Pill, ShoppingCart, AlertTriangle, TrendingUp,
-  Plus, Search, X, Loader2, ChevronRight, Package, Clock,
+  Loader2, ChevronRight, Package, Clock,
 } from 'lucide-react'
 import Link from 'next/link'
 

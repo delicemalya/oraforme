@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Zap, Plus, Play, Pause, Trash2, Edit2, RefreshCw,
-  CheckCircle, XCircle, Clock, ChevronRight, Loader2,
-  List, Activity, Settings, Copy, MoreVertical,
+  Zap, Plus, Play, Pause, Trash2, RefreshCw,
+  CheckCircle, XCircle, ChevronRight, Loader2,
+  List, MoreVertical,
 } from 'lucide-react'
-import { WORKFLOW_PRESETS, getPresetsByCategory } from '@/lib/workflow/presets'
+import { WORKFLOW_PRESETS } from '@/lib/workflow/presets'
 import type { WorkflowDefinition, WorkflowPreset } from '@/lib/workflow/types'
 import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
 import PlanFeatureGate from '@/components/PlanFeatureGate'
@@ -25,10 +25,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   hotel: 'Hôtel', restaurant: 'Restaurant', stock: 'Stock', system: 'Système',
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  completed: '#16A34A', failed: '#DC2626', running: '#2563EB',
-  pending: '#D97706', skipped: '#94A3B8',
-}
 
 // ── Workflow card ─────────────────────────────────────────────────────────────
 function WorkflowCard({

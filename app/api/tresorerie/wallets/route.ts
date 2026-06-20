@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { tresoAuth } from '../_auth'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const auth = await tresoAuth()
   if (!auth) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 

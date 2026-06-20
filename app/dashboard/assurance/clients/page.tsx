@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
-import { Users, Search, RefreshCw, ChevronRight, Shield, FileText, Phone, Mail } from 'lucide-react'
+import { Users, Search, RefreshCw, ChevronRight, Shield, Phone, Mail } from 'lucide-react'
 
 interface ClientRecord {
   assure_nom: string

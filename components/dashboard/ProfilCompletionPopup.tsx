@@ -232,7 +232,7 @@ export default function ProfilCompletionPopup({ open, onClose }: Props) {
                     {logoUploading ? (
                       <Loader2 size={20} className="text-[#F59E0B] animate-spin" />
                     ) : (logoPreview || form.logo_url) ? (
-                      // eslint-disable-next-line @next/next/no-img-element
+                       
                       <img src={logoPreview ?? form.logo_url ?? ''} alt="Logo" className="w-full h-full object-contain p-1" />
                     ) : (
                       <span className="text-[10px] font-bold text-[#CBD5E1]">LOGO</span>
@@ -457,7 +457,7 @@ export default function ProfilCompletionPopup({ open, onClose }: Props) {
 // ── Section accordion ──────────────────────────────────────────────────────────
 
 function Section({
-  id, label, icon, open, onToggle, children,
+  id: _id, label, icon, open, onToggle, children,
 }: {
   id:       SectionId
   label:    string

@@ -172,11 +172,6 @@ function clearDraft()         { try { localStorage.removeItem(DRAFT_KEY)        
 
 const INPUT = 'w-full px-4 py-3 text-[13px] border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder-[#CBD5E1] outline-none focus:ring-2 bg-white transition-all'
 
-function inputStyle(step: Step) {
-  const color = STEP_ACCENT[step]
-  return INPUT + ` focus:border-[${color}]`
-}
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
@@ -300,7 +295,7 @@ export default function OnboardingPage() {
     if (result.error) { setError(result.error); setStep(fallback); return }
     clearDraft()
     window.location.href = '/dashboard'
-  }, [])
+  }, [pays])
 
   // ── Email sign-up ──────────────────────────────────────────────────────────
   async function handleEmailSignup() {
@@ -407,7 +402,7 @@ export default function OnboardingPage() {
       >
         {/* Logo + retour */}
         <div className="flex items-center justify-between">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img src="/logo-white.png" alt="Oraforme" className="h-8 w-auto"
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
           <Link href="/"

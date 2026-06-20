@@ -6,7 +6,7 @@ import {
   Home, ClipboardList, Users, FileText, CreditCard, FolderOpen,
   Bell, Send, MessageSquare, Download, Check, X, Clock,
   CheckCircle, XCircle, AlertCircle, ChevronRight,
-  Loader2, RefreshCw, Star, UserCheck, LogOut,
+  Loader2, RefreshCw, Star, UserCheck,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -197,7 +197,7 @@ function ClientPortalContent() {
       } catch { /* ignore */ }
     }, 30_000) // Poll every 30s
     return () => clearInterval(id)
-  }, [data, token]) // eslint-disable-line
+  }, [data, token])  
 
   async function handleCandidatAction(propositionId: string, action: 'accept_candidat' | 'decline_candidat', poste: string) {
     setActionId(propositionId)

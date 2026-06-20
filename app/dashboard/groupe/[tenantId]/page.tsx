@@ -195,7 +195,7 @@ export default function EntityDetailPage() {
     }
   }, [tenantId, tree])
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => { void loadData() }, [loadData])
 
   async function handleSwitchToEntity() {

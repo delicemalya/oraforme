@@ -10,7 +10,7 @@ import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const db = supabaseAdmin as any
 
 export const dynamic = 'force-dynamic'

@@ -51,7 +51,7 @@ export default function UrgencesPage() {
   const [showForm,   setShowForm]   = useState(false)
   const [form,       setForm]       = useState({ ...INIT_FORM })
   const [saving,     setSaving]     = useState(false)
-  const [activeOnly, setActiveOnly] = useState(true)
+  const [activeOnly] = useState(true)
 
   const load = useCallback(async () => {
     setLoading(true)

@@ -186,7 +186,7 @@ function EntityCard({ entity, children, onDrill }: {
           { label: 'Trésorerie',   value: formatMoney(entity.tresorerieNette), icon: Wallet },
           { label: 'Effectifs',    value: String(entity.nbEmployes),           icon: Users },
           { label: 'Candidats',    value: String(entity.nbCandidatsActifs),    icon: UserCheck },
-        ].map(({ label, value, icon: Ic }) => (
+        ].map(({ label, value }) => (
           <div key={label} className="flex flex-col items-center justify-center py-3 gap-0.5">
             <p className="text-[10px] text-[#94A3B8] font-medium">{label}</p>
             <p className="text-[15px] font-bold text-[#0F172A]">{value}</p>
@@ -451,8 +451,8 @@ export default function GroupeDashboardPage() {
                 const hasChildren   = filialesOfSoc.length > 0 || agencesOfSoc.length > 0
                 return (
                   <EntityCard key={soc.tenantId} entity={soc}
-                    onDrill={() => router.push(`/dashboard/groupe/${soc.tenantId}`)}
-                    children={hasChildren ? (
+                    onDrill={() => router.push(`/dashboard/groupe/${soc.tenantId}`)}>
+                    {hasChildren && (
                       <>
                         {filialesOfSoc.map(fil => {
                           const agencesOfFil = getChildren(fil.tenantId).filter(c => c.typeEntite === 'agence')
@@ -475,8 +475,8 @@ export default function GroupeDashboardPage() {
                             onDrill={() => router.push(`/dashboard/groupe/${ag.tenantId}`)} />
                         ))}
                       </>
-                    ) : undefined}
-                  />
+                    )}
+                  </EntityCard>
                 )
               })}
             </div>

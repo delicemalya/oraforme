@@ -7,8 +7,8 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   History, Search, Download, Loader2, ArrowUpCircle, ArrowDownCircle,
-  GitMerge, Filter, Calendar, Eye, X, ChevronLeft, ChevronRight,
-  Building2, Archive, Smartphone, Wallet2, Tag,
+  GitMerge, Filter, Eye, X, ChevronLeft, ChevronRight,
+  Tag,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────

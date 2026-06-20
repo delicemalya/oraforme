@@ -1,7 +1,7 @@
 'use client'
 
 import { useCabinetSwitch } from '@/lib/cabinet/switch-context'
-import { Building2, X, Loader2, ArrowLeft } from 'lucide-react'
+import { Building2, Loader2, ArrowLeft } from 'lucide-react'
 
 /**
  * Bannière persistante affichée quand le cabinet est dans le compte d'un client.

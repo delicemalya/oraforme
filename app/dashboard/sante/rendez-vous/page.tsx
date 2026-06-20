@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { Calendar, Plus, X, AlertTriangle, Loader2, ChevronLeft, Clock, User } from 'lucide-react'
+import { Calendar, Plus, X, AlertTriangle, Loader2, ChevronLeft, Clock } from 'lucide-react'
 import Link from 'next/link'
 
 interface RDV {
@@ -34,9 +34,6 @@ const STATUTS = [
 
 function getStatut(v: string) { return STATUTS.find(s => s.value === v) ?? STATUTS[0] }
 
-function fmtDT(iso: string) {
-  return new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-}
 
 export default function RendezVousPage() {
   const { tenantId, loading: tenantLoading } = useTenant()

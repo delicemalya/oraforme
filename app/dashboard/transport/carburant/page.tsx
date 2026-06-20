@@ -270,7 +270,7 @@ export default function TransportCarburantPage() {
             <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-5">
               <h3 className="text-[13px] font-black text-[#0F172A] mb-4">Top consommateurs</h3>
               <div className="space-y-3">
-                {topVehicules.map(([veh, cout], i) => (
+                {topVehicules.map(([veh, cout], _i) => (
                   <div key={veh}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[12px] font-semibold text-[#374151] truncate max-w-[65%]">{veh}</span>

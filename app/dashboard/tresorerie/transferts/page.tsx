@@ -9,7 +9,7 @@ import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   GitMerge, Plus, Search, Download, Check, X, Loader2,
   ArrowRight, Building2, Archive, Smartphone, Wallet2, Eye,
-  Calendar, AlertCircle, RefreshCw,
+  Calendar,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────

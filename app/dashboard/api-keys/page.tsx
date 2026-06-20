@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Key, Plus, Copy, Trash2, Eye, EyeOff, CheckCircle,
-  XCircle, RefreshCw, AlertTriangle, Loader2, Shield,
+  Key, Plus, Copy, Trash2, CheckCircle,
+  XCircle, AlertTriangle, Loader2, Shield,
   Clock, Activity,
 } from 'lucide-react'
 

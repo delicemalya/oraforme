@@ -508,7 +508,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
   const [uploadLoading, setUploadLoading] = useState(false)
 
   // Rapports
-  const [rapports,   setRapports]   = useState<{ type: string; contenu: string; created_at: string }[]>([])
+  const [rapports] = useState<{ type: string; contenu: string; created_at: string }[]>([])
   const [selRapport, setSelRapport] = useState<number | null>(null)
 
   // ── Academy ────────────────────────────────────────────────────────────────
@@ -533,13 +533,6 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
   useEffect(() => { acBottom.current?.scrollIntoView({ behavior: 'smooth' }) }, [acMessages])
 
   // Notifs
-  useEffect(() => { if (activeTab === 'alertes' && open) loadNotifications() }, [activeTab, open])
-  useEffect(() => {
-    if (open && tenantData?.tenant_id)
-      fetch(`/api/miaa/notifications?tenant_id=${tenantData.tenant_id}`)
-        .then(r => r.json()).then(d => setUnreadCount(d.count ?? 0)).catch(() => {})
-  }, [open, tenantData?.tenant_id])
-
   const loadNotifications = useCallback(async () => {
     if (!tenantData?.tenant_id) return
     setLoadNotifs(true)
@@ -550,6 +543,13 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
       setUnreadCount(d.count ?? 0)
     } finally { setLoadNotifs(false) }
   }, [tenantData?.tenant_id])
+
+  useEffect(() => { if (activeTab === 'alertes' && open) loadNotifications() }, [activeTab, open, loadNotifications])
+  useEffect(() => {
+    if (open && tenantData?.tenant_id)
+      fetch(`/api/miaa/notifications?tenant_id=${tenantData.tenant_id}`)
+        .then(r => r.json()).then(d => setUnreadCount(d.count ?? 0)).catch(() => {})
+  }, [open, tenantData?.tenant_id])
 
   // ── Commandes WhatsApp en langage naturel ─────────────────────────────────
   async function handleWhatsappCommand(msg: string): Promise<string | null> {
@@ -913,7 +913,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                 transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
                 style={{ background: 'radial-gradient(circle, #DC262660 0%, transparent 70%)' }}
               />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img src="/miaa-logo.png" alt="MIAA+"
                 className="relative z-10 rounded-full object-cover shadow-xl"
                 style={{ width: 64, height: 64, filter: 'drop-shadow(0 4px 14px rgba(220,38,38,0.65))' }}
@@ -942,7 +942,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
           {/* Header — vert dégradé */}
           <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ background: GGR }}>
             <div className="flex items-center gap-2.5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img src="/miaa-logo.png" alt="MIAA+" className="w-9 h-9 rounded-full object-cover shadow-md ring-2 ring-white/30" />
               <div>
                 <p className="text-white font-bold text-sm leading-none">MIAA+</p>
@@ -999,7 +999,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                   {messages.length === 0 && (
                     <div className="text-center py-6">
                       <div className="mx-auto mb-3 w-14 h-14 relative">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img src="/miaa-logo.png" alt="MIAA+" className="w-14 h-14 rounded-full object-cover shadow-lg" />
                         <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white" style={{ background: GC }} />
                       </div>
@@ -1034,7 +1034,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
                   ))}
                   {sending && (
                     <div className="flex justify-start items-end gap-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      { }
                       <img src="/miaa-logo.png" alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
                       <div className="flex items-center gap-1.5 px-3 py-2 rounded-2xl rounded-bl-sm border border-[var(--border)] bg-[var(--surface)]">
                         {[0,1,2].map(i => (

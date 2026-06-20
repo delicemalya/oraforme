@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Briefcase, Users, Calendar, CheckCircle, Star,
-  AlertTriangle, TrendingUp, Loader2, Plus,
+  AlertTriangle, Loader2, Plus,
 } from 'lucide-react'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
@@ -21,13 +21,6 @@ function scoreCls(s: number) {
   if (s >= 80) return 'bg-green-100 text-green-700'
   if (s >= 60) return 'bg-amber-100 text-amber-700'
   return 'bg-red-100 text-red-700'
-}
-function scoreCat(s: number) {
-  if (s >= 90) return 'Exceptionnel'
-  if (s >= 80) return 'Excellent'
-  if (s >= 70) return 'Bon'
-  if (s >= 60) return 'Moyen'
-  return 'Faible'
 }
 
 const STATUT_COLORS: Record<string, { bg: string; text: string; label: string }> = {
@@ -48,8 +41,6 @@ export default function RecrutementDashboard() {
   const [doublons, setDoublons]     = useState(0)
   const [nonAnalyses, setNonAnalyses] = useState(0)
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => { if (tenantId) void load() }, [tenantId])
 
   async function load() {
     if (!tenantId) return
@@ -87,6 +78,9 @@ export default function RecrutementDashboard() {
     })))
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tenantId) void load() }, [tenantId])
 
   if (tl || loading) return (
     <div className="flex justify-center py-24">

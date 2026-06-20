@@ -9,9 +9,9 @@ import { calculerTVACongo } from '@/lib/fiscalite-congo'
 import Link from 'next/link'
 import {
   ChefHat, Plus, ShoppingCart, Trash2, CheckCircle, X,
-  QrCode, Globe, ExternalLink, Copy, Check, Loader2,
+  ExternalLink, Copy, Check, Loader2,
   Table2, RefreshCw, Monitor, TrendingUp, BarChart2,
-  Clock, DollarSign, Users, AlertTriangle, BookOpen, Truck, Package, Ban,
+  Clock, DollarSign, AlertTriangle, BookOpen, Truck, Package, Ban,
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
@@ -155,7 +155,6 @@ export default function RestaurantPage() {
   const sousTotal = panier.reduce((s, x) => s + x.quantite * x.prix, 0)
 
   async function passerCommande() {
-  const { t } = useLocale()
     if (panier.length === 0) return
     setSavingCmd(true)
     try {
@@ -227,7 +226,6 @@ export default function RestaurantPage() {
   }
 
   async function saveAchat() {
-  const { t } = useLocale()
     if (!achatForm.fournisseur_nom.trim() || !achatForm.lignes.length) return
     setSavingAchat(true)
     try {
@@ -255,7 +253,6 @@ export default function RestaurantPage() {
   // ── ANNULATION COMMANDE ───────────────────────────────────────────────────────
 
   async function annulerCommande(id: string) {
-  const { t } = useLocale()
     await supabase.from('resto_commandes').update({ statut: 'annule' }).eq('id', id)
     setCommandes(c => c.map(x => x.id === id ? { ...x, statut: 'annule' as StatutCmd } : x))
     showToast(t('resto.cancelOrder'))
@@ -345,7 +342,6 @@ export default function RestaurantPage() {
   })
 
   async function cloturerCaisse() {
-  const { t } = useLocale()
     if (!tenantId) return
     const fiscal = calculerTVACongo(caDuJour)
     const esp = cmdsLivrees.filter(c => ['especes','Espèces'].includes(c.paiement??'')).reduce((s,c)=>s+c.total,0)
@@ -793,7 +789,7 @@ export default function RestaurantPage() {
                     </p>
                     <p className="text-xs text-[var(--text-secondary)] capitalize mb-4">{tb.statut} · {tb.capacite} {t('resto.places')}</p>
                     <div className="bg-white p-2 rounded-xl mx-auto w-fit mb-4">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      { }
                       <img src={qrUrl(tableUrl)} alt={`QR Table ${tb.numero}`} width={100} height={100} className="rounded" />
                     </div>
                     <div className="space-y-2">
@@ -1122,7 +1118,7 @@ export default function RestaurantPage() {
                   <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} width={40}
                     tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
                   <Tooltip contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
-                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                     
                     formatter={(v: any) => [fmtFCFA(Number(v ?? 0)), 'CA']} />
                   <Bar dataKey="total" fill="#DC2626" radius={[2, 2, 0, 0]} maxBarSize={20} />
                 </BarChart>
@@ -1140,7 +1136,7 @@ export default function RestaurantPage() {
                     <Pie data={chartPaie} dataKey="val" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={e => `${e.name}`}>
                       {chartPaie.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                     </Pie>
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    { }
                     <Tooltip formatter={(v: any) => [fmtFCFA(Number(v ?? 0))]}
                       contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }} />
                     <Legend wrapperStyle={{ fontSize: 11, color: '#64748B' }} />

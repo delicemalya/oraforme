@@ -142,7 +142,7 @@ export function usePermissions(): UsePermissionsResult {
 
     loadPerms()
     return () => { cancelled = true }
-  }, [tenant?.userId, tenant?.profileId, tenant?.tenantId, tenant?.role, tenantLoading])
+  }, [tenant, tenantLoading])
 
   const role      = tenant?.role      ?? null
   const profileId = tenant?.profileId ?? null

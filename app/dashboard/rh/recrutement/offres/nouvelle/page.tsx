@@ -231,7 +231,7 @@ export default function NouvelleOffrePage() {
                 </button>
                 {qrDataUrl ? (
                   <div className="flex justify-center p-3 bg-white rounded-lg border border-[#E2E8F0]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    { }
                     <img src={qrDataUrl} alt="QR Code" width={120} height={120} />
                   </div>
                 ) : (

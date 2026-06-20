@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { useFmt } from '@/lib/hooks/useFmt'
 
 export interface ExpenseCategory {

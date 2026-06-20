@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import {
   User, FileText, Briefcase, ClipboardList, Banknote, Star,
   GraduationCap, Bell, Send, MessageSquare, Download, Edit3,
-  Save, X, CheckCircle, AlertCircle, Clock, Loader2,
+  Save, X, CheckCircle, AlertCircle, Loader2,
   MapPin, Phone, Mail, Globe, Award, Calendar, TrendingUp,
   RefreshCw, ChevronRight, Building,
 } from 'lucide-react'

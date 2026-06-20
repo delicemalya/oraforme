@@ -8,7 +8,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, BookOpen, Scale, BarChart2, FileText,
+  LayoutDashboard, BookOpen, Scale, BarChart2,
   Users, Layers, Package, GitMerge, Percent,
   Lock, Download, ChevronRight, List, TrendingUp,
 } from 'lucide-react'

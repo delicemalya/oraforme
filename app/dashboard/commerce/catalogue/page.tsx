@@ -61,7 +61,6 @@ function ModalProduit({
     onSaved()
   }
 
-  const { fmt } = useFmt()
   const margeForm = form.prix && form.prix_achat
     ? ((parseFloat(form.prix) - parseFloat(form.prix_achat)) / parseFloat(form.prix) * 100).toFixed(1)
     : null

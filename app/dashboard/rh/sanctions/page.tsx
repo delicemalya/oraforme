@@ -10,8 +10,8 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import {
-  Shield, Plus, AlertTriangle, X, User,
-  ChevronDown, ChevronUp, FileText, Trash2,
+  Shield, Plus, X, User,
+  ChevronDown, ChevronUp, Trash2,
 } from 'lucide-react'
 
 /* ─── Types ─────────────────────────────────────────────── */

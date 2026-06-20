@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  Document, Page, Text, View, StyleSheet, Font,
+  Document, Page, Text, View, StyleSheet,
 } from '@react-pdf/renderer'
 
 // Use safe built-in fonts only

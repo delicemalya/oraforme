@@ -22,10 +22,10 @@ function logError(op: string, table: string, error: { message: string; code?: st
 /** INSERT avec retour d'erreur visible */
 export async function dbInsert(
   table: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   payload: Record<string, any>
 ): Promise<{ data: unknown; error: string | null }> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const { data, error } = await (supabase.from(table) as any).insert(payload).select().single()
   if (error) {
     logError('INSERT', table, error)
@@ -37,11 +37,11 @@ export async function dbInsert(
 /** UPDATE avec retour d'erreur visible */
 export async function dbUpdate(
   table: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   payload: Record<string, any>,
   match: Record<string, unknown>
 ): Promise<{ data: unknown; error: string | null }> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let query: any = (supabase.from(table) as any).update(payload)
   for (const [k, v] of Object.entries(match)) query = query.eq(k, v)
   const { data, error } = await query.select()
@@ -57,7 +57,7 @@ export async function dbDelete(
   table: string,
   match: Record<string, unknown>
 ): Promise<{ error: string | null }> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let query: any = (supabase.from(table) as any).delete()
   for (const [k, v] of Object.entries(match)) query = query.eq(k, v)
   const { error } = await query

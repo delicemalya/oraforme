@@ -14,7 +14,7 @@ import { requireTenant } from '@/lib/api/require-tenant'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const db = supabaseAdmin as any
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 

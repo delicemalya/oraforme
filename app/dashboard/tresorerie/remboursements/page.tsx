@@ -8,7 +8,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   RefreshCw, Plus, Search, Download, Check, X, Loader2, Eye,
-  Calendar, AlertCircle, Clock, CheckCircle2, Ban,
+  AlertCircle, Clock, CheckCircle2, Ban,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -80,9 +80,9 @@ export default function RemboursementsPage() {
   const [search, setSearch]       = useState('')
   const [filterType, setFilterType] = useState('all')
   const [filterStatut, setFilterStatut] = useState('all')
-  const [selected, setSelected]   = useState<Remboursement | null>(null)
-  const [remboursing, setRemboursing] = useState<string | null>(null)
-  const [montantPartiel, setMontantPartiel] = useState('')
+  const [selected, setSelected]       = useState<Remboursement | null>(null)
+  const [_remboursing, setRemboursing] = useState<Remboursement | null>(null)
+  const [_montantPartiel, setMontantPartiel] = useState('')
 
   const totalDemande   = rows.filter(r => r.statut !== 'rejeté').reduce((s, r) => s + r.montant, 0)
   const totalRembourse = rows.filter(r => r.statut === 'remboursé' || r.statut === 'partiel').reduce((s, r) => s + r.montant_rembourse, 0)

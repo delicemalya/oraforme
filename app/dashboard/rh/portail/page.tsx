@@ -12,7 +12,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
 import {
   User, FileText, Calendar, Clock, DollarSign,
-  Download, Bell, ChevronRight, Star, Shield,
+  Bell, ChevronRight, Shield,
   CheckCircle2, XCircle, AlertCircle, Inbox,
 } from 'lucide-react'
 

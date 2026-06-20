@@ -8,8 +8,8 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   ArrowDownCircle, Plus, Search, Download, Check, X, Loader2,
-  Building2, Archive, Smartphone, CreditCard, Wallet2, Eye,
-  Calendar, Tag, AlertCircle, FileText,
+  Eye,
+  Calendar, Tag,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ export default function DecaissementsPage() {
   const [filterCat, setFilterCat]   = useState('all')
   const [filterStatut, setFilterStatut] = useState('all')
   const [dateFrom, setDateFrom]     = useState('')
-  const [dateTo, setDateTo]         = useState('')
+  const [dateTo] = useState('')
   const [selected, setSelected]     = useState<Decaissement | null>(null)
 
   const totalMois = rows

@@ -291,7 +291,7 @@ export default function InvoicePreviewPage() {
                     {/* Left: Logo + Company */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
                       {config?.logo_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+                         
                         <img src={config.logo_url} alt="Logo" crossOrigin="anonymous"
                           style={{ width: 52, height: 52, objectFit: 'contain', borderRadius: 8, flexShrink: 0 }} />
                       ) : (

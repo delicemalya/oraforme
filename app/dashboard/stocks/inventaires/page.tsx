@@ -8,8 +8,8 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   ClipboardList, Plus, X, Save, Search, CheckCircle2,
-  AlertTriangle, Package, Warehouse, Calculator, FileText,
-  Play, CheckSquare, RefreshCw, ChevronDown, ChevronRight
+  AlertTriangle, Warehouse,
+  Play, CheckSquare, ChevronDown, ChevronRight
 } from 'lucide-react'
 
 interface Inventaire {
@@ -38,15 +38,6 @@ interface InventaireLigne {
   product_nom?: string
   product_sku?: string
   product_unite?: string
-}
-
-interface Product {
-  id: string
-  nom: string
-  sku: string
-  stock_actuel: number
-  prix_achat: number
-  unite: string
 }
 
 const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -109,7 +100,7 @@ export default function InventairesPage() {
       setInventaires(list)
     } catch { setInventaires([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

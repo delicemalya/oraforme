@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  TrendingUp, Users2, GraduationCap, AlertTriangle, Unlock,
+  TrendingUp, GraduationCap, AlertTriangle, Unlock,
   Calendar, Megaphone, Award, Handshake, Plus, Trash2, Check,
   Loader2, RefreshCw, DollarSign, Swords,
 } from 'lucide-react'
@@ -12,7 +12,7 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import {
   type Etudiant, type PaiementScolaire, type ClasseEcole, type Enseignant, type PlanningEcole,
-  type TypeEvent, TYPE_EVENT, fmt, generateCode, KpiCard, Avatar, FI,
+  type TypeEvent, TYPE_EVENT, generateCode, KpiCard, Avatar, FI,
 } from '../_lib/shared'
 import { SectionDiplomes, SectionSoutenances } from '../_lib/academic-sections'
 import { useLocale } from '@/lib/hooks/useLocale'
@@ -639,7 +639,6 @@ function SectionCommunication({ tenantId }: { tenantId: string }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DirectionPage() {
-  const { fmt: fmtCurrency } = useFmt()
   useRoleGuard(['DIRECTION_GENERALE'])
   const { tenantId, loading: tenantLoading } = useTenant()
   const { t } = useLocale()

@@ -253,7 +253,7 @@ export default function ERPPageLayout({
   kpis, tabs, activeTab, onTabChange,
   children, className = '',
 }: ERPPageLayoutProps) {
-  const { t } = useLocale()
+  const { t: _t } = useLocale()
   return (
     <div className={`space-y-5 ${className}`}>
 

@@ -73,6 +73,7 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  try {
   const supabase  = getSupabase()
   const now       = new Date()
   const jourMois  = now.getDate()
@@ -143,6 +144,10 @@ export async function POST(req: Request) {
   }
 
   return Response.json({ ...results, tenants_processed: tenants.length, actions_count: actions.length })
+  } catch (e) {
+    console.error('[agents/miaa-autonome]', e)
+    return Response.json({ error: 'Erreur serveur' }, { status: 500 })
+  }
 }
 
 // GET pour vérification du cron

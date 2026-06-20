@@ -1,10 +1,9 @@
 ﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Receipt, Download, CheckCircle2, AlertTriangle, Calendar,
-  RefreshCw, Loader2, Info, ChevronDown, ChevronUp, FileText,
+  Receipt, Download, Calendar,
+  RefreshCw, Loader2, Info, FileText,
 } from 'lucide-react'
 import { PAYS_LIST, getPaysConfig } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
@@ -44,7 +43,7 @@ export default function TVAFiscalPage() {
   const [declarations, setDeclarations] = useState<TvaMois[]>([])
   const [totaux, setTotaux] = useState<Totaux | null>(null)
   const [loading, setLoading] = useState(true)
-  const [expanded, setExpanded] = useState<number | null>(null)
+  const [expanded] = useState<number | null>(null)
   const [saving, setSaving] = useState<number | null>(null)
 
   const cfg = getPaysConfig(pays)

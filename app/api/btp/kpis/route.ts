@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
   const ctx = await requireTenant(req)
   if (!ctx.ok) return ctx.error
 
+  try {
   const [chantiers, devis] = await Promise.all([
     supabaseAdmin
       .from('btp_chantiers')
@@ -39,4 +40,8 @@ export async function GET(req: NextRequest) {
   }
 
   return Response.json(kpis)
+  } catch (e) {
+    console.error('[api/btp/kpis]', e)
+    return Response.json({ error: 'Erreur serveur' }, { status: 500 })
+  }
 }

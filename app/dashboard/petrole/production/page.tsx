@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
 import { Zap, Plus, RefreshCw, Loader2, X, CheckCircle, TrendingUp } from 'lucide-react'
 
@@ -109,7 +108,6 @@ function ModalProduction({ sites, prod, onClose, onSaved }: { sites: Site[]; pro
 }
 
 export default function PetroleProductionPage() {
-  const { fmt } = useFmt()
   const [sites,      setSites]      = useState<Site[]>([])
   const [records,    setRecords]    = useState<Production[]>([])
   const [loading,    setLoading]    = useState(true)

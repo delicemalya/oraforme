@@ -3,7 +3,7 @@ import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
 // GET /api/resto/formules
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const { ctx, error } = await requireTenant()
   if (error) return error
 

@@ -64,7 +64,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
   const { renderToBuffer } = await import('@react-pdf/renderer')
   const { FactureMedicalePDFDocument } = await import('@/components/sante/FactureMedicalePDF')
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const element = createElement(FactureMedicalePDFDocument, { data }) as any
   const buffer  = await renderToBuffer(element)
 

@@ -7,8 +7,8 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   ArrowLeftRight, ArrowUpCircle, ArrowDownCircle, RotateCcw,
-  Search, Filter, Download, RefreshCw, Package, Warehouse,
-  Calendar, Hash, TrendingUp, TrendingDown, ChevronLeft, ChevronRight
+  Search, Download, RefreshCw, Package,
+  TrendingUp, TrendingDown, ChevronLeft, ChevronRight
 } from 'lucide-react'
 
 interface Movement {
@@ -101,7 +101,7 @@ export default function MouvementsPage() {
 
     } catch { setMovements([]) }
     setLoading(false)
-  }, [tenantId, supabase, page, typeFilter, dateFrom, dateTo])
+  }, [tenantId, page, typeFilter, dateFrom, dateTo])
 
   useEffect(() => { load() }, [load])
 

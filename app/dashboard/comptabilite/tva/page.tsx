@@ -95,7 +95,7 @@ export default function TVAPage() {
         statut: solde_tva <= 0 ? 'declaree' : 'a_declarer',
       }
     })
-  }, [movements, year])
+  }, [movements, year, MONTHS_FR])
 
   /* Annual totals */
   const totals = useMemo(() => ({

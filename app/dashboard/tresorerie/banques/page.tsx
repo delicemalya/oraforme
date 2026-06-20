@@ -13,7 +13,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   Landmark, Plus, X, Save, FileText, Send, Download,
-  CheckCircle2, AlertTriangle, Clock, Ban, PenLine, Building,
+  CheckCircle2, Clock, Ban, PenLine,
 } from 'lucide-react'
 
 interface CompteBancaire {

@@ -16,8 +16,8 @@ import {
   Bell, FolderOpen, Building2,
   ChevronDown, Calendar, CheckSquare,
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
-  CreditCard, LineChart, Zap, Key, Landmark, Briefcase, ClipboardList,
-  MessageSquare, DollarSign, FlaskConical, Shield, Siren, BedDouble,
+  CreditCard, LineChart, Zap, Landmark, Briefcase, ClipboardList,
+  DollarSign, FlaskConical, Shield, Siren, BedDouble,
   Mail, Share2, Kanban, UserCog,
 } from 'lucide-react'
 import {
@@ -494,7 +494,7 @@ export default function Sidebar() {
   function toggleGroup(gid: string) {
     setOpenGroups(prev => {
       const next = new Set(prev)
-      next.has(gid) ? next.delete(gid) : next.add(gid)
+      if (next.has(gid)) next.delete(gid); else next.add(gid)
       return next
     })
   }
@@ -601,7 +601,7 @@ export default function Sidebar() {
     // ── Autres secteurs : permissions ou owner ────────────────────────────────
     if (isOwner) return true
     return permissions[id]?.can_view !== false
-  }, [isOwner, ecoleRole, secteur, sousType, taille, permissions, modulesActifs])
+  }, [isOwner, ecoleRole, secteur, sousType, taille, permissions, modulesActifs, role])
 
   const visibleGroups = useMemo((): NavGroup[] => {
     if (!loaded) return []
@@ -677,7 +677,7 @@ export default function Sidebar() {
     }
     if (!extraItems.length) return null
     return { id: 'metier', label: t('nav.metier'), icon: Store, items: extraItems }
-  }, [loaded, secteur, isOwner, ecoleRole, permissions, modulesActifs, t])
+  }, [loaded, secteur, isOwner, ecoleRole, permissions, modulesActifs, t, sousType, taille])
 
   const dashHref   = secteur === 'ecole' ? '/dashboard/ecole' : '/dashboard'
   const dashActive = isActive(dashHref, true)
@@ -824,7 +824,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid #E2E8F0' }}>
         <div className="flex items-center gap-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img src="/logo.png" alt="Oraforme" className="h-7 w-auto shrink-0" />
           {secteur && (
             <span

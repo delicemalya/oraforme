@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/api/require-tenant'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const db = supabaseAdmin as any
 
 function maskToken(token: string): string {

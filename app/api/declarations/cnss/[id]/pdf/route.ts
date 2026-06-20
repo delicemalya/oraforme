@@ -55,7 +55,7 @@ export async function GET(request: NextRequest, { params }: Ctx) {
   const declFull   = { ...decl, employes, recap }
   const entreprise = (tenant?.nom as string | undefined) ?? 'Entreprise'
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   type PdfEl = React.ReactElement<DocumentProps, any>
 
   let pdfEl: PdfEl

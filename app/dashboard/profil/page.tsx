@@ -135,7 +135,7 @@ export default function ProfilPage() {
               {/* Logo preview */}
               {form.logo_url && (
                 <div className="sm:col-span-2 flex items-center gap-4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img src={form.logo_url} alt="Logo" className="w-16 h-16 rounded-xl object-contain border border-[#E2E8F0] bg-[#F8FAFC] p-2" />
                   <div>
                     <p className="text-[13px] font-bold text-[#0F172A]">{form.nom_entreprise}</p>

@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const { createElement }  = await import('react')
     const { DeclarationGeneralePDFDocument } = await import('@/components/declarations/DeclarationGeneralePDF')
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const element = createElement(DeclarationGeneralePDFDocument, { data: body as any }) as any
     const buffer  = await renderToBuffer(element)
 

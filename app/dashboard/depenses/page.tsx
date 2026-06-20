@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Receipt, Plus, X, Loader2, TrendingDown, TrendingUp, BookOpen, Trash2 } from 'lucide-react'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { resolveAccounts, accountLabel } from '@/lib/accounting-engine'
+import { accountLabel } from '@/lib/accounting-engine'
 
 type Depense = {
   id: string
@@ -235,7 +235,7 @@ export default function DepensesPage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{ background: '#0f1e3d', border: '1px solid #30363D', borderRadius: 8, fontSize: 11 }}
-                  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                   
                   formatter={(v: any) => [fmtFCFA(Number(v ?? 0)), '']}
                 />
                 <Legend wrapperStyle={{ fontSize: 10, color: '#64748B' }} />

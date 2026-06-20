@@ -68,7 +68,7 @@ export function useEntityHierarchy(): UseEntityHierarchyResult {
     }
   }, [tenant?.tenantId, isHierarchical])
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => { loadTree() }, [loadTree])
 
   return { tree, loading, error, reload: loadTree }

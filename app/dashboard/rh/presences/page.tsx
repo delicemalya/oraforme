@@ -10,8 +10,8 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import {
-  Clock, Check, X, Plus, AlertTriangle,
-  CheckCircle, XCircle, Calendar, Users, Search,
+  Clock, Check, Plus, AlertTriangle,
+  CheckCircle, XCircle, Calendar, Search,
   ArrowLeft, ArrowRight, Download,
 } from 'lucide-react'
 
@@ -78,7 +78,7 @@ export default function PresencesPage() {
   const [showForm,  setShowForm]  = useState(false)
   const [saving,    setSaving]    = useState(false)
   const [search,    setSearch]    = useState('')
-  const [view,      setView]      = useState<'day' | 'week'>('day')
+  const [view]                    = useState<'day' | 'week'>('day')
   const [selDate,   setSelDate]   = useState(todayStr())
 
   const [form, setForm] = useState({

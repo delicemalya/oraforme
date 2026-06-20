@@ -19,7 +19,7 @@ import {
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { downloadDocument } from '@/lib/storage/storage-service'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const db = supabaseAdmin as any
 
 export const dynamic = 'force-dynamic'

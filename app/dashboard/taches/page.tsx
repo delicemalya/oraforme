@@ -380,7 +380,6 @@ function TaskDetailPanel({
 // ── Page principale ───────────────────────────────────────────────────────────
 
 export default function TachesPage() {
-  const { t } = useLocale()
   const { tenantId, loading: tenantLoading } = useTenant()
   const [tasks,   setTasks]   = useState<Task[]>([])
   const [members, setMembers] = useState<Member[]>([])

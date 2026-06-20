@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Trash2, X, Check, Search, BookOpen, CreditCard,
-  Users2, Unlock, Printer, Loader2, ChevronRight, RefreshCw,
+  Users2, Unlock, Printer, Loader2, RefreshCw,
   Calendar, School, ClipboardList, Phone, Mail,
   BookOpenCheck, CalendarRange, FlaskConical, ScrollText,
 } from 'lucide-react'
@@ -17,7 +17,7 @@ import {
   type Niveau, type Periode, type StatutEtu, type TypeEvent,
   STATUT_ETU, NIVEAUX, PERIODES, TYPE_EVENT, DEFAULT_FRAIS,
   fmt, generateCode, calcMoyenne, getMention, printBulletin, printReceipt,
-  StatutBadge, Avatar, FI, KpiCard,
+  Avatar, FI, KpiCard,
 } from '../_lib/shared'
 import {
   SectionMatieres, SectionSessions, SectionExamens, SectionAttestations,
@@ -32,7 +32,7 @@ type SubTab = 'inscriptions' | 'paiements' | 'notes' | 'classes' | 'planning' | 
 
 // -- Inscriptions --------------------------------------------------------------
 
-function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole }: {
+function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEcole }: {
   tenantId: string; etudiants: Etudiant[]; onRefresh: () => void; nomEcole: string
 }) {
   const { t } = useLocale()
@@ -695,7 +695,6 @@ function SectionClasses({ tenantId, classes, onRefresh }: {
   }
 
   async function del(id: string) {
-  const { t } = useLocale()
     await supabase.from('classes_ecole').delete().eq('id', id); onRefresh()
   }
 
@@ -782,7 +781,6 @@ function SectionPlanning({ tenantId, planning, onRefresh }: {
   }
 
   async function del(id: string) {
-  const { t } = useLocale()
     await supabase.from('planning_ecole').delete().eq('id', id); onRefresh()
   }
 

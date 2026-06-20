@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
-import { FileText, Download, BarChart2, TrendingUp, Scale, Receipt, BookOpen, Printer } from 'lucide-react'
+import { FileText, Download, BarChart2, TrendingUp, Scale, Receipt, Printer } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Movement {
@@ -20,16 +20,6 @@ interface Movement {
 
 const YEARS   = [2024, 2025, 2026, 2027]
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-
-/* ─── Utility: compute solde from movements by SYSCOHADA prefix ─── */
-function computeSolde(movements: Movement[], accounts: string[]): number {
-  let total = 0
-  for (const m of movements) {
-    if (accounts.includes(m.debit_account))  total += m.montant
-    if (accounts.includes(m.credit_account)) total -= m.montant
-  }
-  return total
-}
 
 // Filtre par préfixe(s) SYSCOHADA (codes 2-5 chiffres)
 function computeSoldeByPrefix(movements: Movement[], ...prefixes: string[]): number {

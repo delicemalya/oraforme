@@ -7,8 +7,7 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import {
   BedDouble, Plus, Search, RefreshCw, Loader2,
-  Wrench, CheckCircle, Clock, X, Edit3, Filter,
-  Wifi, Wind, Tv, Car, Coffee, Bath, ChevronRight,
+  Wrench, CheckCircle, Clock, X, Edit3,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -44,10 +43,6 @@ const STATUT_CFG: Record<Room['statut'], { label: string; color: string; bg: str
   nettoyage:    { label: 'Nettoyage',    color: '#D97706', bg: '#FFFBEB', dot: '#D97706' },
   maintenance:  { label: 'Maintenance',  color: '#64748B', bg: '#F1F5F9', dot: '#64748B' },
   hors_service: { label: 'Hors service', color: '#94A3B8', bg: '#F8FAFC', dot: '#94A3B8' },
-}
-
-const EQUIPEMENTS_ICONS: Record<string, React.ComponentType<{ size: number; className?: string }>> = {
-  wifi: Wifi, climatisation: Wind, tv: Tv, parking: Car, cafe: Coffee, baignoire: Bath,
 }
 
 // ── Modal Chambre ──────────────────────────────────────────────────────────────
@@ -176,7 +171,6 @@ export default function HotelChambresPage() {
   const [search,    setSearch]    = useState('')
   const [filterStatut, setFilterStatut] = useState<string>('tous')
   const [filterEtage,  setFilterEtage]  = useState<string>('tous')
-  const [editRoom,  setEditRoom]  = useState<Room | null | 'new'>('new' as unknown as null)
   const [showModal, setShowModal] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
 
@@ -199,12 +193,6 @@ export default function HotelChambresPage() {
     setRooms(prev => prev.map(r => r.id === id ? { ...r, statut } : r))
   }
 
-  async function supprimerChambre(id: string) {
-    if (!confirm('Supprimer cette chambre ?')) return
-    await supabase.from('htl_rooms').delete().eq('id', id).eq('tenant_id', tid)
-    load()
-  }
-
   const etages = [...new Set(rooms.map(r => r.etage))].sort((a, b) => a - b)
 
   const filtered = rooms.filter(r => {
@@ -220,7 +208,6 @@ export default function HotelChambresPage() {
   const disponibles = rooms.filter(r => r.statut === 'disponible').length
   const occupees    = rooms.filter(r => r.statut === 'occupee').length
   const nettoyage   = rooms.filter(r => r.statut === 'nettoyage').length
-  const maintenance = rooms.filter(r => r.statut === 'maintenance').length
   const tauxOcc     = total > 0 ? Math.round((occupees / total) * 100) : 0
 
   // Grouper par étage

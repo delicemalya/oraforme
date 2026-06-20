@@ -7,7 +7,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
   Warehouse, Plus, Edit2, Trash2, X, Save, Search,
-  MapPin, User, Phone, Package, TrendingUp, AlertTriangle,
+  MapPin, User, Phone, TrendingUp,
   ToggleLeft, ToggleRight, Building2, ArrowLeftRight
 } from 'lucide-react'
 
@@ -100,7 +100,7 @@ export default function EntrepotsPage() {
       setEntrepots(list)
     } catch { setEntrepots([]) }
     setLoading(false)
-  }, [tenantId, supabase])
+  }, [tenantId])
 
   useEffect(() => { load() }, [load])
 

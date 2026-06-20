@@ -6,8 +6,8 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   ShoppingCart, Plus, Search, Trash2, CheckCircle, Loader2,
-  RefreshCw, X, TrendingUp, TrendingDown, Receipt, Package,
-  Minus, BarChart2,
+  RefreshCw, X, Receipt, Package,
+  Minus,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ export default function CommercePage() {
     }).filter(l => l.qte > 0))
   }
 
-  async function handleConfirmVente(mode: string, rendu: number) {
+  async function handleConfirmVente(mode: string, _rendu: number) {
     if (panier.length === 0 || !tid) return
     setSaving(true)
     const { data: vente } = await supabase.from('ventes').insert({

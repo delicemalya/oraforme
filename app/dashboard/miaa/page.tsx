@@ -110,7 +110,7 @@ const FICHIERS_ACCEPTES: Record<string, string> = {
 
 function MIAALogo({ size = 38 }: { size?: number }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
+     
     <img
       src="/miaa-logo.png"
       alt="MIAA+"
@@ -406,7 +406,7 @@ export default function MIAAPage() {
   // Charger le contexte GED si un documentId est dans l'URL
   useEffect(() => {
     if (!gedDocumentId) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setUploadLoading(true)
     fetch(`/api/miaa/document-context?documentId=${gedDocumentId}`)
       .then(r => r.json())
@@ -853,7 +853,7 @@ export default function MIAAPage() {
                   <div className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} gap-2.5 items-end w-full`}>
                     {m.role === 'bot' && (
                       <div className="shrink-0 mb-0.5">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img src="/miaa-logo.png" alt="MIAA+" width={28} height={28} className="rounded-full object-contain" />
                       </div>
                     )}

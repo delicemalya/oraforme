@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   FileText, Plus, AlertTriangle, CheckCircle, Clock, X,
-  Download, Eye, RefreshCw, Ban, ChevronLeft, Loader2,
+  Download, Eye, RefreshCw, Ban, Loader2,
   User, Building2, MapPin, Calendar, DollarSign, Edit2,
 } from 'lucide-react'
 

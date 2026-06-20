@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import {
-  Users, Wallet, AlertTriangle, TrendingUp,
+  Users, Wallet, AlertTriangle,
   RefreshCw, Loader2, Activity, UserCheck, UserX,
 } from 'lucide-react'
 import { BiKpiCard } from '@/components/bi/BiKpiCard'

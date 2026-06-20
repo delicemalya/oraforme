@@ -361,7 +361,7 @@ export default function AiAssistant() {
             style={{ background: 'radial-gradient(circle, #DC262680 0%, transparent 70%)' }}
           />
           {/* Logo */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img
             src="/miaa-logo.png"
             alt="MIAA+"
@@ -520,7 +520,7 @@ export default function AiAssistant() {
                     className={`flex gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                   >
                     {m.role === 'bot'
-                      ? (/* eslint-disable-next-line @next/next/no-img-element */
+                      ? ( 
                          <img src="/miaa-logo.png" alt="MIAA+" className="w-8 h-8 rounded-full object-cover shrink-0 mt-auto" />)
                       : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 mt-auto" style={{ background: '#E5E7EB' }}>👤</div>
                     }
@@ -542,7 +542,7 @@ export default function AiAssistant() {
                 {/* Typing indicator */}
                 {loading && (
                   <div className="flex gap-2.5">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    { }
                     <img src="/miaa-logo.png" alt="MIAA+" className="w-8 h-8 rounded-full object-cover shrink-0" />
                     <div className="px-4 py-3 bg-white border border-[#E5E7EB] rounded-[18px] rounded-bl-[4px] shadow-sm">
                       <div className="flex gap-1 items-center">

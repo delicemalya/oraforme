@@ -11,8 +11,8 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
-  Archive, Plus, X, Save, ChevronDown, ChevronRight,
-  Lock, AlertTriangle, CheckCircle2, TrendingDown, TrendingUp, Download,
+  Archive, Plus, X, Save,
+  Lock, AlertTriangle, TrendingDown, TrendingUp, Download,
 } from 'lucide-react'
 
 interface Caisse { id: string; nom: string; numero_compte: string; solde: number; actif: boolean }

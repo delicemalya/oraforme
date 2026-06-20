@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
   const ctx = await requireTenant(req)
   if (!ctx.ok) return ctx.error
 
+  try {
   const now     = new Date()
   const annee   = now.getFullYear()
   const mois    = now.getMonth() + 1
@@ -185,4 +186,8 @@ export async function GET(req: NextRequest) {
       - (alertes.filter(a => a.gravite === 'critique').length * 10)
     )),
   })
+  } catch (e) {
+    console.error('[agents/commercial/analyse]', e)
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+  }
 }

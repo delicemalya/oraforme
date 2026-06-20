@@ -1,6 +1,6 @@
-import { useLocale } from '@/lib/hooks/useLocale'
-﻿'use client'
+'use client'
 
+import { useLocale } from '@/lib/hooks/useLocale'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Smartphone, Send, CheckCircle2, Copy, X, AlertCircle } from 'lucide-react'

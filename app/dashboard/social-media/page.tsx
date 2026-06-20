@@ -4,8 +4,8 @@ import { useState } from 'react'
 import {
   Plus, Send, Calendar, Image, BarChart2, Settings,
   ThumbsUp, MessageCircle, Share2, Eye, TrendingUp, TrendingDown,
-  Clock, CheckCircle2, AlertCircle, X, ChevronDown, Repeat2,
-  RefreshCw, Link as LinkIcon, Hash, AtSign,
+  Clock, CheckCircle2, AlertCircle, X, Repeat2,
+  Link as LinkIcon, Hash, AtSign,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -121,7 +121,6 @@ export default function SocialMediaPage() {
   const totalReach     = posts.filter((p) => p.status === 'published').reduce((s, p) => s + p.reach, 0)
   const totalLikes     = posts.filter((p) => p.status === 'published').reduce((s, p) => s + p.likes, 0)
   const publishedCount = posts.filter((p) => p.status === 'published').length
-  const scheduledCount = posts.filter((p) => p.status === 'scheduled').length
 
   function togglePlatform(p: Platform) {
     setCompose((c) => ({

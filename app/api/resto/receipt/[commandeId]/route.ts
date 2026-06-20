@@ -9,7 +9,6 @@ import type { ReactElement } from 'react'
 import { ReceiptPDF } from '@/components/resto/ReceiptPDF'
 import type { ReceiptData } from '@/components/resto/ReceiptPDF'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
-import { formatDateRecu, formatHeureRecu } from '@/lib/receipts'
 
 export async function GET(
   _req: NextRequest,

@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import {
   ChevronLeft, ChevronRight, Plus, X, Loader2,
-  Calendar, Clock, MapPin, Users,
+  Calendar, Clock, MapPin,
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -293,7 +293,7 @@ function EventDetailPanel({
 // ── CalendrierPage ────────────────────────────────────────────────────────────
 
 export default function CalendrierPage() {
-  const { t } = useLocale()
+  const { t: _t } = useLocale()
   const { tenantId } = useTenant()
 
   const today    = new Date()

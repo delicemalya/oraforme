@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
  * GET /api/recouvrement — liste factures impayées + métriques
  * POST /api/recouvrement — enregistrer une relance + recalcul score client
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
   const { ctx, error } = await requireTenant()
   if (error) return error
 

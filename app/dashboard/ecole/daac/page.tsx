@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Layers, RefreshCw, GraduationCap, BookOpen, FileText, Award, Swords, BookOpenCheck } from 'lucide-react'
+import { Layers, RefreshCw, GraduationCap, BookOpen, FileText, Swords, BookOpenCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'

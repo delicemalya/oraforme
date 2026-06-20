@@ -7,8 +7,8 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   Users, Plus, Search, Phone, Mail, Building2, TrendingUp,
   Target, Activity, ChevronRight, X, Edit3, Trash2,
-  DollarSign, AlertTriangle, CheckCircle, Clock, BarChart3,
-  ArrowRight, Star, MessageSquare, PhoneCall, Calendar,
+  DollarSign, AlertTriangle, Clock, BarChart3,
+  MessageSquare, PhoneCall, Calendar,
   FileText, Briefcase, ShieldAlert, Loader2, RefreshCw,
 } from 'lucide-react'
 import MIAAContextButton from '@/components/miaa/MIAAContextButton'

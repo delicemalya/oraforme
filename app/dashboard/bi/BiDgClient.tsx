@@ -6,14 +6,14 @@ import { useState, useCallback } from 'react'
 import {
   TrendingUp, TrendingDown, Wallet, Users, FileText,
   AlertTriangle, RefreshCw, Loader2, Activity,
-  BarChart2, Target, Building2, Download,
+  BarChart2, Target, Download,
 } from 'lucide-react'
 import { usePlanFeature } from '@/lib/hooks/usePlanFeature'
 import PlanFeatureGate from '@/components/PlanFeatureGate'
 import { BiKpiCard } from '@/components/bi/BiKpiCard'
 import { BiChartCard, BiSectionLabel, BiEmpty } from '@/components/bi/BiChartCard'
 import { BiAlerts } from '@/components/bi/BiAlerts'
-import { BiTrendChart, BiComposedChart, BiDonutChart } from '@/components/bi/BiCharts'
+import { BiComposedChart, BiDonutChart } from '@/components/bi/BiCharts'
 import { fmtPct, growthPct } from '@/lib/analytics/formatters'
 import { useFmt } from '@/lib/hooks/useFmt'
 import type { DgInsights } from '@/lib/analytics/types'

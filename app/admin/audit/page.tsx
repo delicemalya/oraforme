@@ -31,9 +31,9 @@ export default async function AuditPage() {
       icon:    Users,
     })),
     // Simulated owner actions
-    { type: 'owner_login' as const, entity: 'adjidongui@gmail.com', detail: 'Connexion /admin réussie', time: new Date(Date.now() - 3600000).toISOString(), severity: 'info' as const, icon: Shield },
-    { type: 'config_change' as const, entity: 'Plateforme', detail: 'Module prix modifié: tresorerie 7000→7500 FCFA', time: new Date(Date.now() - 86400000).toISOString(), severity: 'warn' as const, icon: Package },
-    { type: 'tenant_suspended' as const, entity: 'Exemple Corp', detail: 'Suspension manuelle par owner', time: new Date(Date.now() - 172800000).toISOString(), severity: 'warn' as const, icon: AlertTriangle },
+    { type: 'owner_login' as const, entity: 'adjidongui@gmail.com', detail: 'Connexion /admin réussie', time: new Date(now.getTime() - 3600000).toISOString(), severity: 'info' as const, icon: Shield },
+    { type: 'config_change' as const, entity: 'Plateforme', detail: 'Module prix modifié: tresorerie 7000→7500 FCFA', time: new Date(now.getTime() - 86400000).toISOString(), severity: 'warn' as const, icon: Package },
+    { type: 'tenant_suspended' as const, entity: 'Exemple Corp', detail: 'Suspension manuelle par owner', time: new Date(now.getTime() - 172800000).toISOString(), severity: 'warn' as const, icon: AlertTriangle },
   ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
 
   const SEVERITY = {
@@ -43,7 +43,7 @@ export default async function AuditPage() {
   }
 
   function timeAgo(d: string) {
-    const diff = Date.now() - new Date(d).getTime()
+    const diff = now.getTime() - new Date(d).getTime()
     const m = Math.floor(diff / 60000)
     const h = Math.floor(diff / 3600000)
     if (m < 60) return `il y a ${m} min`

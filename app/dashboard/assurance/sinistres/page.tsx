@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   AlertTriangle, Plus, Search, RefreshCw, X,
-  CheckCircle2, Clock, Shield, ChevronRight,
-  FileText, ArrowRight, Sparkles, AlertCircle,
+  CheckCircle2, Clock, ChevronRight,
+  ArrowRight, Sparkles, AlertCircle,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

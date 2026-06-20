@@ -6,9 +6,9 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import {
-  BarChart3, TrendingUp, TrendingDown, Package,
-  RefreshCw, Calendar, Download, DollarSign,
-  ArrowUpCircle, ArrowDownCircle, Warehouse, Users2
+  BarChart3, Package,
+  RefreshCw, DollarSign,
+  ArrowUpCircle, ArrowDownCircle, Users2
 } from 'lucide-react'
 
 interface MonthData {
@@ -188,12 +188,11 @@ export default function StocksAnalyticsPage() {
 
     } catch { setData([]) }
     setLoading(false)
-  }, [tenantId, supabase, period, getMonths])
+  }, [tenantId, period, getMonths])
 
   useEffect(() => { load() }, [load])
 
   const maxVal = Math.max(...data.map(d => Math.max(d.entrees_val, d.sorties_val)), 1)
-  const maxQty = Math.max(...data.map(d => Math.max(d.entrees_qty, d.sorties_qty)), 1)
 
   return (
     <div className="space-y-5">
@@ -290,7 +289,6 @@ export default function StocksAnalyticsPage() {
             </div>
             <div className="space-y-2">
               {data.map(d => {
-                const max = Math.max(d.achats, 1)
                 return (
                   <div key={d.mois} className="flex items-center gap-3">
                     <span className="w-14 text-[10px] text-[#94A3B8] text-right shrink-0">{d.label}</span>

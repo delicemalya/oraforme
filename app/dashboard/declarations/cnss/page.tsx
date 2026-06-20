@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Users, Download, Loader2, RefreshCw, FileText, CheckCircle,
   AlertTriangle, Plus, Trash2, Edit3, Save, BarChart3, Shield,
-  ChevronDown, X, FileSpreadsheet
+  X, FileSpreadsheet
 } from 'lucide-react'
 import {
   calculerCNSSEmploye, calculerDeclarationGlobale, fmtCNSS, MOIS_LABELS,

@@ -40,6 +40,7 @@ export default function NouveauRDVPage() {
   }, [tenantId])
 
   useEffect(() => { if (!tenantLoading) load() }, [tenantLoading, load])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (prePatient) set('patient_id', prePatient) }, [prePatient])
 
   async function handleSave() {

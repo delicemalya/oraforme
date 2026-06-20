@@ -7,7 +7,6 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import Link from 'next/link'
 import {
   BarChart2, RefreshCw, Loader2, TrendingUp, TrendingDown,
-  ShoppingCart, Package, DollarSign,
 } from 'lucide-react'
 
 const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']

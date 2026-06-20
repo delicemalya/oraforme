@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useFmt } from '@/lib/hooks/useFmt'
 import Link from 'next/link'
-import { ShoppingCart, Plus, Search, RefreshCw, Loader2, X, CheckCircle, Truck, Edit3 } from 'lucide-react'
+import { ShoppingCart, Plus, Search, RefreshCw, Loader2, X, CheckCircle, Edit3 } from 'lucide-react'
 
 interface Commande {
   id: string; client_nom: string; client_telephone: string | null

@@ -9,7 +9,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { Lock, CheckCircle2, AlertTriangle, Clock, ChevronRight, RefreshCw } from 'lucide-react'
+import { Lock, CheckCircle2, AlertTriangle, Clock, RefreshCw } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
 interface Movement {
@@ -54,8 +54,6 @@ export default function CloturePage() {
   const [stepsChecked, setStepsChecked] = useState<Set<number>>(new Set())
   const [processing, setProcessing] = useState<string | null>(null)
   const [notes, setNotes]           = useState('')
-  const [clotureAnnuelle, setClotureAnnuelle] = useState(false)
-
   useEffect(() => {
     if (!tenantId) return
     ;(async () => {
@@ -81,7 +79,6 @@ export default function CloturePage() {
     return MONTHS_FR.map((label, idx) => {
       const mois   = idx + 1
       const mvMois = movements.filter(m => new Date(m.date_operation).getMonth() + 1 === mois)
-      const td     = mvMois.reduce((s, m) => s + m.montant, 0)  // each mv has both sides so count once per side
       const totalDebit  = movements.filter(m => new Date(m.date_operation).getMonth() + 1 === mois && m.debit_account).reduce((s, m) => s + m.montant, 0)
       const totalCredit = movements.filter(m => new Date(m.date_operation).getMonth() + 1 === mois && m.credit_account).reduce((s, m) => s + m.montant, 0)
       const est_equilibree = Math.abs(totalDebit - totalCredit) < 1
@@ -144,7 +141,7 @@ export default function CloturePage() {
   function toggleStep(id: number) {
     setStepsChecked(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) next.delete(id); else next.add(id)
       return next
     })
   }
@@ -308,7 +305,7 @@ export default function CloturePage() {
             Checklist clôture annuelle {year}
           </h2>
           <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
-            {STEPS_CLOTURE.map((step, idx) => {
+            {STEPS_CLOTURE.map((step, _idx) => {
               const isDone = stepsChecked.has(step.id)
               return (
                 <div key={step.id}

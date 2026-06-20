@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { COMPTES_PLATS, TYPE_COLORS, CLASSES_NOMS, type CompteFlat, type TypeCompte } from '@/lib/syscohada/plan-comptable'
+import { COMPTES_PLATS, TYPE_COLORS, CLASSES_NOMS, type TypeCompte } from '@/lib/syscohada/plan-comptable'
 import { List, Search, Plus, Download, X, CheckCircle2, ToggleLeft, ToggleRight } from 'lucide-react'
 import { useLocale } from '@/lib/hooks/useLocale'
 
@@ -23,7 +23,7 @@ const EMPTY_FORM = {
 
 export default function PlanComptablePage() {
   const { tenantId } = useTenant()
-  const { t } = useLocale()
+  const { t: _t } = useLocale()
   const [customComptes, setCustomComptes] = useState<PlanCompte[]>([])
   const [loading, setLoading]             = useState(true)
   const [search, setSearch]               = useState('')

@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { Gift, Plus, X, Trash2, Users, DollarSign } from 'lucide-react'
+import { Gift, Plus, X, Users, DollarSign } from 'lucide-react'
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface Employe { id: string; nom: string; poste: string; departement: string | null }
