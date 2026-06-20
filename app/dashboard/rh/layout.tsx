@@ -10,22 +10,23 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, FileText, Clock,
   DollarSign, Star, GitBranch, Shield, Gift,
-  FolderOpen, User, BarChart2, Briefcase, ChevronRight,
+  FolderOpen, User, BarChart2, Briefcase, ChevronRight, Settings2,
 } from 'lucide-react'
 
 const RH_MODULES = [
-  { id: 'dashboard',    href: '/dashboard/rh',               label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
-  { id: 'recrutement',  href: '/dashboard/rh/recrutement',   label: 'Recrutement',     icon: Briefcase        },
-  { id: 'contrats',     href: '/dashboard/rh/contrats',      label: 'Contrats',     icon: FileText         },
-  { id: 'presences',    href: '/dashboard/rh/presences',     label: 'Présences',    icon: Clock            },
-  { id: 'paie',         href: '/dashboard/rh/paie',          label: 'Paie',         icon: DollarSign       },
-  { id: 'evaluations',  href: '/dashboard/rh/evaluations',   label: 'Évaluations',  icon: Star             },
-  { id: 'organigramme', href: '/dashboard/rh/organigramme',  label: 'Organigramme', icon: GitBranch        },
-  { id: 'sanctions',    href: '/dashboard/rh/sanctions',     label: 'Sanctions',    icon: Shield           },
-  { id: 'avantages',    href: '/dashboard/rh/avantages',     label: 'Avantages',    icon: Gift             },
-  { id: 'documents',    href: '/dashboard/rh/documents',     label: 'Documents',    icon: FolderOpen       },
-  { id: 'portail',      href: '/dashboard/rh/portail',       label: 'Portail',      icon: User             },
-  { id: 'analytics',    href: '/dashboard/rh/analytics',     label: 'Analytics',    icon: BarChart2        },
+  { id: 'dashboard',      href: '/dashboard/rh',                    label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
+  { id: 'recrutement',    href: '/dashboard/rh/recrutement',        label: 'Recrutement',     icon: Briefcase        },
+  { id: 'contrats',       href: '/dashboard/rh/contrats',           label: 'Contrats',        icon: FileText         },
+  { id: 'presences',      href: '/dashboard/rh/presences',          label: 'Présences',       icon: Clock            },
+  { id: 'paie',           href: '/dashboard/rh/paie',               label: 'Paie',            icon: DollarSign       },
+  { id: 'elements-paie',  href: '/dashboard/rh/elements-paie',      label: 'Éléments paie',   icon: Settings2        },
+  { id: 'evaluations',    href: '/dashboard/rh/evaluations',        label: 'Évaluations',     icon: Star             },
+  { id: 'organigramme',   href: '/dashboard/rh/organigramme',       label: 'Organigramme',    icon: GitBranch        },
+  { id: 'sanctions',      href: '/dashboard/rh/sanctions',          label: 'Sanctions',       icon: Shield           },
+  { id: 'avantages',      href: '/dashboard/rh/avantages',          label: 'Avantages',       icon: Gift             },
+  { id: 'documents',      href: '/dashboard/rh/documents',          label: 'Documents',       icon: FolderOpen       },
+  { id: 'portail',        href: '/dashboard/rh/portail',            label: 'Portail',         icon: User             },
+  { id: 'analytics',      href: '/dashboard/rh/analytics',          label: 'Analytics',       icon: BarChart2        },
 ]
 
 export default function RHLayout({ children }: { children: React.ReactNode }) {

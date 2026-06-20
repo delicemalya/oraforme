@@ -47,6 +47,10 @@ interface Employe {
   photo_url?: string | null
   situation_matrimoniale?: string | null
   nb_enfants?: number | null
+  prime_transport?: number | null
+  prime_logement?: number | null
+  prime_rendement?: number | null
+  prime_responsabilite?: number | null
   date_embauche: string | null
   date_naissance: string | null
   date_fin_contrat: string | null
@@ -275,6 +279,8 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
       contrat: emp.contrat, cnss: emp.cnss, departement: emp.departement ?? '',
       manager: emp.manager ?? '', notes: emp.notes,
       date_fin_contrat: emp.date_fin_contrat ?? '',
+      situation_matrimoniale: emp.situation_matrimoniale ?? 'celibataire',
+      nb_enfants: emp.nb_enfants ?? 0,
     })
     setShowEdit(true)
   }
@@ -292,8 +298,10 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
       cnss:            editForm.cnss,
       departement:     editForm.departement || null,
       manager:         editForm.manager    || null,
-      notes:           editForm.notes,
-      date_fin_contrat: editForm.date_fin_contrat || null,
+      notes:                  editForm.notes,
+      date_fin_contrat:       editForm.date_fin_contrat || null,
+      situation_matrimoniale: editForm.situation_matrimoniale || null,
+      nb_enfants:             editForm.nb_enfants ?? 0,
     }).eq('id', selected.id)
     setSaving(false)
     if (error) { alert('Erreur mise à jour : ' + error.message); return }
@@ -655,19 +663,73 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
                   </div>
                 </div>
 
+                {/* Situation familiale & quotient fiscal */}
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className={lCls}>Situation matrimoniale</label>
+                    <select value={editForm.situation_matrimoniale ?? 'celibataire'}
+                      onChange={e => setEditForm(p => ({...p, situation_matrimoniale: e.target.value}))}
+                      className={iCls}>
+                      <option value="celibataire">Célibataire</option>
+                      <option value="marie">Marié(e)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={lCls}>Enfants à charge</label>
+                    <input type="number" min="0" max="20"
+                      value={editForm.nb_enfants ?? 0}
+                      onChange={e => setEditForm(p => ({...p, nb_enfants: Number(e.target.value)}))}
+                      className={iCls} />
+                  </div>
+                </div>
+
+                {/* Primes */}
+                <div className="mt-3">
+                  <p className={`${lCls} mb-2`}>Primes & indemnités</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { key: 'prime_transport',    label: 'Transport',    color: '#10B981', tag: 'non-imp.' },
+                      { key: 'prime_logement',     label: 'Logement',     color: '#10B981', tag: 'non-imp.' },
+                      { key: 'prime_rendement',    label: 'Rendement',    color: '#F59E0B', tag: 'imposable' },
+                      { key: 'prime_responsabilite', label: 'Responsabilité', color: '#F59E0B', tag: 'imposable' },
+                    ].map(f => (
+                      <div key={f.key}>
+                        <label className="block mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: f.color }}>{f.label}</span>
+                          <span className="text-[9px] text-[#94A3B8] ml-1">({f.tag})</span>
+                        </label>
+                        <input type="number" min="0" placeholder="0 FCFA"
+                          value={(editForm as Record<string, number | null | undefined>)[f.key] ?? ''}
+                          onChange={e => setEditForm(p => ({ ...p, [f.key]: Number(e.target.value) || 0 }))}
+                          className={iCls} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="mt-3">
                   <label className={lCls}>Notes internes</label>
                   <textarea value={editForm.notes ?? ''} onChange={e => setEditForm(p => ({...p, notes: e.target.value}))}
                     rows={2} className={`${iCls} resize-none`} />
                 </div>
 
-                {/* Preview nouveau net */}
+                {/* Preview paie avec quotient familial et primes */}
                 {Number(editForm.salaire_base) > 0 && (() => {
-                  const { cnss, irpp, net } = calcNet(Number(editForm.salaire_base))
+                  const situ = toSituFiscale(editForm.situation_matrimoniale)
+                  const primes = {
+                    transport:      Number(editForm.prime_transport) || 0,
+                    logement:       Number(editForm.prime_logement) || 0,
+                    rendement:      Number(editForm.prime_rendement) || 0,
+                    responsabilite: Number(editForm.prime_responsabilite) || 0,
+                  }
+                  const { cnss, irpp, net, parts } = calcNet(Number(editForm.salaire_base), situ, editForm.nb_enfants ?? 0, primes)
                   return (
                     <div className="mt-3 bg-amber-50 border border-amber-100 rounded-xl p-3 text-[12px] space-y-1">
-                      <p className="font-bold text-amber-800 mb-1">Simulation nouveau salaire</p>
-                      <div className="flex justify-between"><span className="text-[#64748B]">CNSS (5,04%)</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-bold text-amber-800">Simulation nouveau salaire</p>
+                        <span className="text-[10px] bg-amber-100 text-amber-700 rounded-full px-2 py-0.5 font-bold">{parts} part{parts > 1 ? 's' : ''}</span>
+                      </div>
+                      <div className="flex justify-between"><span className="text-[#64748B]">CNSS (4%)</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
                       <div className="flex justify-between"><span className="text-[#64748B]">IRPP</span><span className="text-red-500">−{fmt(irpp)} F</span></div>
                       <div className="flex justify-between font-bold border-t border-amber-200 pt-1"><span>Net à payer</span><span className="text-[#10B981]">{fmt(net)} F</span></div>
                     </div>

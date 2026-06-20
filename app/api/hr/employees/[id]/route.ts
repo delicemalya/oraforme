@@ -16,6 +16,7 @@ export async function PUT(
     'cnss', 'date_embauche', 'date_naissance', 'date_fin_contrat', 'notes',
     'nationalite', 'adresse', 'departement_id', 'manager_id', 'agent_code',
     'solde_conges', 'date_retraite_prevue',
+    'situation_matrimoniale', 'nb_enfants', 'photo_url',
   ]
   const patch: Record<string, unknown> = {}
   for (const k of allowed) {
