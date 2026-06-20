@@ -49,11 +49,6 @@ function fixFile(relPath, { addImport, removeLocalFn, subComponents }) {
   // C) Add useFmt() to specific sub-components (by function name)
   if (subComponents && subComponents.length > 0) {
     for (const fnName of subComponents) {
-      // Match "function FnName({...}" or "function FnName(...)" followed by "{"
-      const re = new RegExp(
-        `(^function ${fnName}\\([^)]*\\)(?:\\s*:\\s*[^{]+)?\\s*\\{)`,
-        'm'
-      )
       // For "function Name({" (object destructuring — might have newlines)
       // Try simpler: find the line "function FnName(" and the next "{"
       if (!content.includes(`const { fmt: fmtFCFA } = useFmt()`)) {

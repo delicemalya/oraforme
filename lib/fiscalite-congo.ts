@@ -146,7 +146,7 @@ export const FISCALITE_CONGO_2026: FiscaliteCongoConfig = {
   // TUS inclus dans le barème CGI comme composante AT (AT+TUS = 5%)
   cnss: {
     smig_mensuel:              90_000,    // SMIG Congo (arrêté en vigueur)
-    plafond_mensuel_salarie:   540_000,   // 6 × SMIG = 6 × 90 000 = 540 000 FCFA
+    plafond_mensuel_salarie:   1_200_000, // LF 2026 — plafond VID salarié (CNSS)
     taux_salarie:              0.04,      // 4% (vieillesse + maladie)
 
     // Patronal
@@ -373,7 +373,7 @@ export function calculerIRPP(
  * // cnss = 540 000 × 4% = 21 600 FCFA
  * // salaireNet = 600 000 − 21 600 = 578 400 FCFA (avant IRPP)
  *
- * @source LF 2026 — CNSS salarié 4%, plafond 6 × SMIG (90 000) = 540 000 FCFA/mois
+ * @source LF 2026 — CNSS salarié 4%, plafond 1 200 000 FCFA/mois (VID)
  */
 export function calculerCotisationsSalariales(salaireBrut: number): {
   cnss:       number

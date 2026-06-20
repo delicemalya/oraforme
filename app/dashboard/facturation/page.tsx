@@ -13,7 +13,6 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { genererNumeroFacture } from '@/lib/fiscalite-congo'
 import { captureSupabaseError } from '@/lib/monitoring'
 import { usePays } from '@/lib/contexts/PaysContext'
 
@@ -366,7 +365,9 @@ export default function FacturationPage() {
   async function openNew() {
     if (!tenantId) return
     const { count } = await supabase.from('factures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId)
-    const num = genererNumeroFacture(config.prefixe_facture ?? 'FAC', count ?? 0)
+    const year = new Date().getFullYear()
+    const prefixe = config.prefixe_facture ?? 'FAC'
+    const num = `${prefixe}-${year}-${String((count ?? 0) + 1).padStart(4, '0')}`
     const defaultDue = new Date(Date.now() + (config.delai_paiement ?? 30) * 86400000).toISOString().split('T')[0]
     resetForm()
     setInvoiceNum(num)

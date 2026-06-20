@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { TRANCHES_IRPP } from '@/lib/paie/calcul-paie'
+// Barème IRPP Congo mensuel — LF n°42-2025 du 31/12/2025 (Art. 76 CGI)
+const TRANCHES_IRPP = [
+  { min: 0,          max: 464_000,   taux: 0,    label: '0 — 464 000' },
+  { min: 464_000,    max: 1_000_000, taux: 0.01, label: '464 000 — 1 000 000' },
+  { min: 1_000_000,  max: 3_000_000, taux: 0.10, label: '1 000 000 — 3 000 000' },
+  { min: 3_000_000,  max: 8_000_000, taux: 0.25, label: '3 000 000 — 8 000 000' },
+  { min: 8_000_000,  max: Infinity,  taux: 0.40, label: 'Au-delà de 8 000 000' },
+] as const
 
 export const dynamic = 'force-dynamic'
 

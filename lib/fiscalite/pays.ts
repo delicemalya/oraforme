@@ -18,7 +18,7 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
         { code: 'CA', nom: "Centime Additionnel (Contrib. d'Appui)", taux: 0.05, base: 'tva_collectee' },
       ],
       regime: 'mensuel',
-      seuil_assujettissement: 50_000_000,
+      seuil_assujettissement: 90_000_000,  // LF n°42-2025 du 31/12/2025 Art. 234 — relevé de 50M à 90M FCFA
       echeance_jour: 20,
       echeance_mois_suivant: true,
     },
@@ -35,12 +35,13 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
     },
     irpp: {
       nom: 'IRPP',
-      abattement_pct: 0.10,
+      abattement_pct: 0,  // barème mensuel bulletin de paie — pas d'abattement (LF 2026 Art. 76 CGI)
       tranches: [
-        { min: 0,         max: 464_000,   taux: 0 },
-        { min: 464_001,   max: 1_000_000, taux: 0.10 },
-        { min: 1_000_001, max: 3_000_000, taux: 0.25 },
-        { min: 3_000_001, max: Infinity,  taux: 0.40 },
+        { min: 0,          max: 464_000,   taux: 0    },  // exonéré
+        { min: 464_001,    max: 1_000_000, taux: 0.01 },  // 1%
+        { min: 1_000_001,  max: 3_000_000, taux: 0.10 },  // 10%
+        { min: 3_000_001,  max: 8_000_000, taux: 0.25 },  // 25%
+        { min: 8_000_001,  max: Infinity,  taux: 0.40 },  // 40%
       ],
       periodicite: 'mensuel',
       echeance_jour: 20,
@@ -110,10 +111,8 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
     devise: 'FCFA', symbole: '₣',
     systeme_comptable: 'SYSCOHADA', zone: 'CEMAC',
     tva: {
-      taux_normal: 0.175,    // TVA 17.5% — CAC 10% ajouté via taxes_additionnelles
-      taxes_additionnelles: [
-        { code: 'CAC', nom: 'Centimes Additionnels Communaux (10% sur TVA)', taux: 0.10, base: 'tva_collectee' },
-      ],
+      taux_normal: 0.1925,   // TVA 19,25% — taux officiel LF Cameroun (17,5% + CAC 10% sur TVA intégré)
+      taxes_additionnelles: [],
       regime: 'mensuel',
       seuil_assujettissement: 50_000_000,
       echeance_jour: 15,
@@ -122,8 +121,8 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
     cnss: {
       nom: 'Caisse Nationale de Prévoyance Sociale',
       acronyme: 'CNPS',
-      taux_salarie: 0.042,    // 4.2%
-      taux_patronal: 0.172,   // 17.2% (11.2% CNPS + 1.5% Crédit Foncier salarié + 1.5% patronal + 3% FNE)
+      taux_salarie: 0.042,    // 4,2% salarié (Vieillesse + AT + AF — plafonné 750k)
+      taux_patronal: 0.137,   // 11,2% CNPS patronal + 1,5% CFC + 1% FNE = 13,7% (source: Central Africa Tax Guide 2023)
       plafond_mensuel: 750_000,
       plafond_annuel: null,
       branches: ['Vieillesse', 'Accident du Travail', 'Allocations Familiales'],
@@ -133,12 +132,13 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
     irpp: {
       nom: 'IRPP',
       abattement_pct: 0.30,
+      // Source: fiscalite-cameroun.ts · Central Africa Tax Guide 2023 · CGI Cameroun Art. 17
+      // Tranches annuelles — CAC 10% intégré dans les taux (moteur engine.ts ne gère pas CAC séparément)
       tranches: [
-        { min: 0,          max: 2_000_000, taux: 0.10 },
-        { min: 2_000_001,  max: 3_000_000, taux: 0.155 },
-        { min: 3_000_001,  max: 5_000_000, taux: 0.205 },
-        { min: 5_000_001,  max: 10_000_000, taux: 0.30 },
-        { min: 10_000_001, max: Infinity,   taux: 0.385 },
+        { min: 0,          max: 2_000_000, taux: 0.11  },  // 10% × 1,10 CAC
+        { min: 2_000_001,  max: 3_000_000, taux: 0.165 },  // 15% × 1,10 CAC
+        { min: 3_000_001,  max: 5_000_000, taux: 0.275 },  // 25% × 1,10 CAC
+        { min: 5_000_001,  max: Infinity,  taux: 0.385 },  // 35% × 1,10 CAC
       ],
       periodicite: 'mensuel',
       echeance_jour: 15,
@@ -147,9 +147,10 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
       { code: 'PATENTE', nom: 'Droit de Patente', base: 'CA', echeance_mois: 1, echeance_jour: 31 },
     ],
     notes_importantes: [
-      'TVA 17.5% + CAC 10% sur TVA = 19.25% effectif sur HT — déclaration au 15 du mois suivant',
-      'CNPS plafond : 750 000 FCFA/mois',
-      'IS (Impôt sur les Sociétés) : 30% + CAC 10% = 33%',
+      'TVA 19,25% (taux officiel LF Cameroun = 17,5% base + CAC 10% sur TVA)',
+      'CNPS sal 4,2% + pat 11,2% · CFC sal 1% + pat 1,5% · FNE pat 1% · plafond 750 000 FCFA',
+      'IS 30% + CAC 10% sur IS = 33% effectif',
+      'IRPP 4 tranches annuelles 10→35% + abattement 30% + CAC 10% sur IRPP calculé',
     ],
   },
 
@@ -194,12 +195,12 @@ export const PAYS_CONFIGS: Record<string, PaysConfig> = {
       echeance_jour: 20,
     },
     taxes_annuelles: [
-      { code: 'IS', nom: 'Impôt sur les Sociétés (30%)', base: 'résultat', taux: 0.30, echeance_mois: 3, echeance_jour: 31 },
+      { code: 'IS', nom: 'Impôt sur les Sociétés (35%)', base: 'résultat', taux: 0.35, echeance_mois: 3, echeance_jour: 31 },
     ],
     notes_importantes: [
       'CNSS patronal 20.1% — un des plus élevés de la zone CEMAC',
       'SMIG : 150 000 FCFA/mois',
-      'Impôt forfaitaire sur les sociétés minimum : 1M FCFA',
+      'IS 35% minimum max(1,1% CA, 600 000 XAF) — Central Africa Tax Guide 2023',
     ],
   },
 

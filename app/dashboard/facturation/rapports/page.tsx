@@ -3,7 +3,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
-import { formaterMontant } from '@/lib/fiscalite-congo'
 import { TrendingUp, FileText, AlertTriangle, Users, DollarSign, BarChart2, PieChart, Download, Loader2, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
@@ -31,7 +30,7 @@ type PeriodFilter = 'mois' | '3mois' | '6mois' | 'annee' | 'tout'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const fmt = formaterMontant
+const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })

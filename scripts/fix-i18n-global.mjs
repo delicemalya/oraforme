@@ -1480,16 +1480,6 @@ function getAllTsxFiles(dir) {
   return results
 }
 
-function hasHardcoded(content) {
-  return Object.keys(STRING_TO_KEY).some(s =>
-    content.includes(`>${s}<`) ||
-    content.includes(`>${s}{`) ||
-    content.includes(`placeholder="${s}"`) ||
-    content.includes(`placeholder='${s}'`) ||
-    content.includes(`title="${s}"`) ||
-    content.includes(`title='${s}'`)
-  )
-}
 
 // ── Step 1: Inject new keys into lib/i18n.ts ─────────────────────────────────
 
@@ -1499,16 +1489,6 @@ const i18nPath = path.join(ROOT, 'lib', 'i18n.ts')
 let i18nContent = fs.readFileSync(i18nPath, 'utf8')
 
 // For each language, find the last 'common.' key and inject after it
-const langBlocks = {
-  fr: { anchor: null },
-  en: { anchor: null },
-  pt: { anchor: null },
-  es: { anchor: null },
-  ln: { anchor: null },
-  sw: { anchor: null },
-  de: { anchor: null },
-  kg: { anchor: null },
-}
 
 // Find the anchors for each language block
 // We insert new keys after the last 'common.results' or 'common.*' line in each block
@@ -1594,7 +1574,6 @@ const allFiles = [
   ...getAllTsxFiles(compDir),
 ]
 
-let totalFixed = 0
 let filesFixed = 0
 
 for (const filePath of allFiles) {
@@ -1665,7 +1644,6 @@ for (const filePath of allFiles) {
 
     fs.writeFileSync(filePath, content, 'utf8')
     filesFixed++
-    totalFixed++
   }
 }
 
