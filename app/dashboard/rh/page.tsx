@@ -16,7 +16,6 @@ import {
   GitBranch, BarChart2, User,
 } from 'lucide-react'
 import Link from 'next/link'
-import { FolderOpen } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
@@ -185,8 +184,8 @@ const QUICK_MODULES = [
 
 // ── Onglet Équipe (Tab content) ────────────────────────────────────────────────
 
-function TabEquipe({ tenantId, employes, onRefresh }: {
-  tenantId: string; employes: Employe[]; onRefresh: () => void
+function TabEquipe({ tenantId, employes, onRefresh, plan }: {
+  tenantId: string; employes: Employe[]; onRefresh: () => void; plan: 'tpe' | 'pme' | 'grande'
 }) {
   const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
@@ -367,20 +366,21 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        {plan === 'tpe' ? (
           <button
             onClick={() => setShowForm(true)}
             className="flex items-center gap-2 px-3 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold hover:bg-amber-600 transition-colors shadow-sm"
           >
             <Plus size={13} /> {t('rh.addEmployee')}
           </button>
+        ) : (
           <Link
             href="/dashboard/rh/employes/nouveau"
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-amber-300 text-amber-700 rounded-xl text-[12px] font-bold hover:bg-amber-50 transition-colors shadow-sm"
+            className="flex items-center gap-2 px-3 py-2 bg-[#F59E0B] text-white rounded-xl text-[12px] font-bold hover:bg-amber-600 transition-colors shadow-sm"
           >
-            <FolderOpen size={13} /> Dossier complet
+            <Plus size={13} /> Ajouter un employé premium
           </Link>
-        </div>
+        )}
       </div>
 
       {/* Employee table */}
@@ -388,9 +388,15 @@ function TabEquipe({ tenantId, employes, onRefresh }: {
         <div className="bg-white rounded-2xl border border-[#E2E8F0] py-14 text-center">
           <Users size={36} className="mx-auto mb-3 text-[#CBD5E1]" />
           <p className="text-sm text-[#64748B]">{t('rh.noEmployee')}</p>
-          <button onClick={() => setShowForm(true)} className="mt-3 text-[12px] text-[#F59E0B] font-semibold hover:underline">
-            + {t('rh.addFirstEmployee')}
-          </button>
+          {plan === 'tpe' ? (
+            <button onClick={() => setShowForm(true)} className="mt-3 text-[12px] text-[#F59E0B] font-semibold hover:underline">
+              + {t('rh.addFirstEmployee')}
+            </button>
+          ) : (
+            <Link href="/dashboard/rh/employes/nouveau" className="mt-3 inline-block text-[12px] text-[#F59E0B] font-semibold hover:underline">
+              + Ajouter un premier employé premium
+            </Link>
+          )}
         </div>
       ) : (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm">
@@ -1293,7 +1299,8 @@ const MAIN_TABS_DEF = [
 
 export default function RHPage() {
   const { fmt: fmtFCFA } = useFmt()
-  const { tenantId, loading: tenantLoading } = useTenant()
+  const { tenantId, taille, loading: tenantLoading } = useTenant()
+  const plan = (taille === 'pme' || taille === 'grande') ? taille : 'tpe' as 'tpe' | 'pme' | 'grande'
   const { t } = useLocale()
   const [activeTab,  setActiveTab]  = useState('equipe')
   const [employes,   setEmployes]   = useState<Employe[]>([])
@@ -1532,7 +1539,7 @@ export default function RHPage() {
       {/* Content onglets */}
       <AnimatePresence mode="wait">
         <motion.div key={activeTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}>
-          {activeTab === 'equipe'   && <TabEquipe   tenantId={tenantId!} employes={employes} onRefresh={load} />}
+          {activeTab === 'equipe'   && <TabEquipe   tenantId={tenantId!} employes={employes} onRefresh={load} plan={plan} />}
           {activeTab === 'conges'   && <TabConges   tenantId={tenantId!} employes={employes} conges={conges} onRefresh={load} />}
           {activeTab === 'alertes'  && <TabAlertes  employes={employes} />}
           {activeTab === 'rapports' && <TabRapports employes={employes} conges={conges} />}

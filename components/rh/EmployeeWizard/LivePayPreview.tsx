@@ -58,17 +58,17 @@ export function LivePayPreview({ codePays, salaire_base, situation, nb_enfants, 
 
   if (!salaire_base || salaire_base <= 0) {
     return (
-      <aside className="hidden xl:flex flex-col gap-3 w-72 shrink-0">
+      <div className="w-72">
         <div className="card p-4 text-center text-slate-400 text-sm">
           <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-30" />
           Saisissez un salaire pour voir l&apos;aperçu paie
         </div>
-      </aside>
+      </div>
     )
   }
 
   return (
-    <aside className="hidden xl:flex flex-col gap-3 w-72 shrink-0">
+    <div className="w-72">
       <div className="card p-4 space-y-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 border-b border-slate-100 pb-3">
           <TrendingUp className="w-4 h-4 text-amber-500" />
@@ -115,6 +115,6 @@ export function LivePayPreview({ codePays, salaire_base, situation, nb_enfants, 
           </div>
         </div>
       </div>
-    </aside>
+    </div>
   )
 }

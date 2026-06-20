@@ -18,8 +18,8 @@ import {
   type DossierEmploye,
   type AvantageNature,
 } from '@/components/rh/EmployeeWizard/types'
-import { WizardNav }      from '@/components/rh/EmployeeWizard/WizardNav'
-import type { WizardStep } from '@/components/rh/EmployeeWizard/WizardNav'
+import { WizardNavMobile, WizardNavDesktop } from '@/components/rh/EmployeeWizard/WizardNav'
+import type { WizardStep }                   from '@/components/rh/EmployeeWizard/WizardNav'
 import { LivePayPreview }  from '@/components/rh/EmployeeWizard/LivePayPreview'
 import { PrimesLibrary }   from '@/components/rh/EmployeeWizard/PrimesLibrary'
 import { MIAAScoring }     from '@/components/rh/EmployeeWizard/MIAAScoring'
@@ -862,21 +862,33 @@ export default function NouvelEmployePage() {
   // ─── Layout ───────────────────────────────────────────────────────────────
   // ═══════════════════════════════════════════════════════════════════════════
 
+  const navProps = { steps, currentStep, completedSteps, onGoTo: goTo }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
 
-      {/* ─── En-tête ────────────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-4 sticky top-0 z-10">
-        <Link href="/dashboard/rh" className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+      {/* ─── En-tête sticky ─────────────────────────────────────────────── */}
+      <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-20 shadow-sm">
+        <Link href="/dashboard/rh" className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0">
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1 min-w-0">
           <h1 className="text-sm font-bold text-slate-800 truncate">
-            Nouveau dossier employé — {cfg.nom_pays}
+            {plan === 'tpe' ? 'Ajouter un employé' : 'Ajouter un employé premium'}
+            <span className="hidden sm:inline text-slate-400 font-normal"> — {cfg.nom_pays}</span>
           </h1>
-          <p className="text-xs text-slate-400">{dossier.nom || 'Nom non renseigné'}</p>
+          <p className="text-xs text-slate-400 truncate">{dossier.nom || 'Nom non renseigné'}</p>
         </div>
-        <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-400">
+        {/* Plan badge */}
+        <span className={[
+          'hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase',
+          plan === 'tpe'    ? 'bg-slate-100 text-slate-500'
+          : plan === 'pme'  ? 'bg-blue-50 text-blue-600'
+          : 'bg-amber-50 text-amber-600',
+        ].join(' ')}>
+          {plan === 'tpe' ? 'Entrepreneur' : plan === 'pme' ? 'Business' : 'Compagnie'}
+        </span>
+        <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-400 shrink-0">
           <span>{cfg.devise}</span>
           <span>·</span>
           <span>{cfg.cnss.acronyme}</span>
@@ -884,56 +896,56 @@ export default function NouvelEmployePage() {
       </div>
 
       {/* ─── Corps ──────────────────────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-[1280px] mx-auto px-4 py-5">
 
-        {/* Mobile nav */}
-        <WizardNav
-          steps={steps}
-          currentStep={currentStep}
-          completedSteps={completedSteps}
-          onGoTo={goTo}
-        />
+        {/* ── Mobile/tablette : nav pastilles (caché sur lg+) ─────────── */}
+        <div className="lg:hidden mb-4">
+          <WizardNavMobile {...navProps} />
+        </div>
 
-        <div className="flex gap-6">
-          {/* Desktop sidebar nav */}
-          <div className="hidden lg:block">
-            <WizardNav
-              steps={steps}
-              currentStep={currentStep}
-              completedSteps={completedSteps}
-              onGoTo={goTo}
-            />
+        {/* ── Layout principal ─────────────────────────────────────────── */}
+        <div className="flex gap-5 items-start">
+
+          {/* Sidebar desktop (caché sur mobile) */}
+          <div className="hidden lg:block shrink-0 sticky top-[61px] self-start">
+            <WizardNavDesktop {...navProps} />
           </div>
 
-          {/* Form area */}
+          {/* Zone formulaire */}
           <div className="flex-1 min-w-0">
-            <div className="card p-5 md:p-7">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 md:p-8">
+
               {renderStep()}
 
-              {/* Error */}
-              {submitError && currentStep < 14 && (
-                <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3">
+              {/* Erreur submission */}
+              {submitError && (
+                <div className="mt-5 bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3">
                   <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                   <p className="text-sm text-red-700">{submitError}</p>
                 </div>
               )}
 
-              {/* Navigation buttons */}
+              {/* Barre de navigation Précédent / Suivant */}
               {!(currentStep === 14 && createdId) && (
-                <div className="flex items-center justify-between mt-8 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between mt-8 pt-5 border-t border-slate-100">
                   <button
                     onClick={prev}
                     disabled={isFirstStep}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-500 hover:text-slate-700 rounded-xl hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
-                    <ChevronLeft className="w-4 h-4" /> Précédent
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">Précédent</span>
                   </button>
+
+                  <div className="text-xs text-slate-400 hidden sm:block">
+                    {visibleSteps.findIndex(s => s.id === currentStep) + 1} / {visibleSteps.length}
+                  </div>
 
                   {isLastStep ? (
                     <button
                       onClick={handleSubmit}
                       disabled={submitting || !canProceed()}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                     >
                       {submitting ? (
                         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -946,38 +958,61 @@ export default function NouvelEmployePage() {
                     <button
                       onClick={next}
                       disabled={!canProceed()}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                     >
-                      Suivant <ChevronRight className="w-4 h-4" />
+                      <span className="hidden sm:inline">Suivant</span>
+                      <ChevronRight className="w-4 h-4" />
                     </button>
                   )}
                 </div>
               )}
 
-              {/* Success bar */}
+              {/* Bannière succès */}
               {createdId && currentStep < 14 && (
-                <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+                <div className="mt-5 bg-green-50 border border-green-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
                   <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-green-700">Dossier créé avec succès</p>
-                  </div>
-                  <Link href="/dashboard/rh?tab=equipe" className="text-xs text-green-600 font-semibold hover:underline">
-                    Voir la liste
+                  <p className="flex-1 text-sm font-semibold text-green-700">Dossier créé avec succès !</p>
+                  <Link href="/dashboard/rh?tab=equipe" className="text-xs text-green-600 font-semibold hover:underline whitespace-nowrap">
+                    Voir la liste →
                   </Link>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Live payroll preview panel */}
-          <LivePayPreview
-            codePays={codePays}
-            salaire_base={dossier.salaire_base}
-            situation={dossier.situation_matrimoniale === 'marie' ? 'marie' : 'celibataire'}
-            nb_enfants={dossier.nb_enfants}
-            primes={dossier.primes}
-          />
+          {/* Panneau aperçu paie — visible uniquement à xl+ */}
+          <div className="hidden xl:block shrink-0 sticky top-[61px] self-start">
+            <LivePayPreview
+              codePays={codePays}
+              salaire_base={dossier.salaire_base}
+              situation={dossier.situation_matrimoniale === 'marie' ? 'marie' : 'celibataire'}
+              nb_enfants={dossier.nb_enfants}
+              primes={dossier.primes}
+            />
+          </div>
+
         </div>
+
+        {/* Aperçu paie collapsible sur tablette (sm–lg) */}
+        {dossier.salaire_base > 0 && (
+          <div className="xl:hidden mt-4">
+            <details className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <summary className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-600 cursor-pointer select-none hover:bg-slate-50">
+                <span>💰</span> Aperçu paie — {dossier.salaire_base.toLocaleString('fr-FR')} {cfg.devise}
+              </summary>
+              <div className="px-4 pb-4">
+                <LivePayPreview
+                  codePays={codePays}
+                  salaire_base={dossier.salaire_base}
+                  situation={dossier.situation_matrimoniale === 'marie' ? 'marie' : 'celibataire'}
+                  nb_enfants={dossier.nb_enfants}
+                  primes={dossier.primes}
+                />
+              </div>
+            </details>
+          </div>
+        )}
+
       </div>
     </div>
   )
