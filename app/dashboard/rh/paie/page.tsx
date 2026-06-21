@@ -227,7 +227,10 @@ function NumInput({ value, onChange, disabled, placeholder, className }: {
 
 function printBulletin(row: BulletinRow, mois: number, annee: number, entreprise: string, cfg: CountryConfig) {
   const w = window.open('', '_blank', 'width=800,height=1000')
-  if (!w) return
+  if (!w) {
+    alert('Impression bloquée par votre navigateur. Autorisez les popups pour ce site (icône dans la barre d\'adresse) puis réessayez.')
+    return
+  }
   const irppRows = row.irpp_detail.map(d =>
     `<tr><td>${d.label}</td><td style="text-align:right">${fmt(d.base)}</td><td style="text-align:right">${d.taux}%</td><td style="text-align:right">${fmt(d.montant)}</td></tr>`
   ).join('')
@@ -875,6 +878,7 @@ export default function PaiePage() {
   const [entreprise,    setEntreprise]    = useState('Mon Entreprise')
   const [acomptesList,  setAcomptesList]  = useState<AcompteLine[]>([])
   const [showLancerModal, setShowLancerModal] = useState(false)
+  const [savingRowId,    setSavingRowId]    = useState<string | null>(null)
   const [detailRow,     setDetailRow]     = useState<BulletinRow | null>(null)
   const [aEmployeId,    setAEmployeId]    = useState('')
   const [aMontant,      setAMontant]      = useState(0)
@@ -1033,28 +1037,27 @@ export default function PaiePage() {
     if (!tenantId) return
     setSaving(true); setErreurSave(null)
 
-    // Upsert via API route (service_role) — contourne RLS multi-profil
-    let payload = buildUpsertPayload(rows, forceStatut)
-    let apiRes = await fetch('/api/paie/bulletins', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bulletins: payload }),
-    })
-    // Fallback automatique si colonnes étendues absentes
+    const doPost = (bulletins: Record<string, unknown>[]) =>
+      fetch('/api/paie/bulletins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bulletins }),
+      })
+
+    let apiRes = await doPost(buildUpsertPayload(rows, forceStatut))
+    let cachedErrMsg: string | null = null
     if (!apiRes.ok) {
       const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
-      if (isColumnError(errBody.error ?? '')) {
-        const minimal = buildMinimalPayload(rows, forceStatut)
-        apiRes = await fetch('/api/paie/bulletins', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bulletins: minimal }),
-        })
+      cachedErrMsg = errBody.error ?? null
+      if (isColumnError(cachedErrMsg ?? '')) {
+        cachedErrMsg = null
+        apiRes = await doPost(buildMinimalPayload(rows, forceStatut))
       }
     }
     if (!apiRes.ok) {
-      const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
-      const msg = errBody.error ?? 'Erreur serveur'
+      const msg = cachedErrMsg
+        ?? (await apiRes.json().catch(() => ({ error: apiRes.statusText }))).error
+        ?? 'Erreur serveur'
       captureSupabaseError('upsert bulletins_paie', { message: msg, details: '', code: '' }, { module: 'rh/paie', tenant_id: tenantId })
       setErreurSave(msg)
       setSaving(false)
@@ -1109,32 +1112,38 @@ export default function PaiePage() {
 
   async function genererBulletinUnique(row: BulletinRow) {
     if (!tenantId) return
-    let payload = buildUpsertPayload([row], 'generee')
-    let apiRes = await fetch('/api/paie/bulletins', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bulletins: payload }),
-    })
-    // Fallback si colonnes étendues absentes
+    setSavingRowId(row.employe_id)
+    setErreurSave(null)
+
+    const doPost = (bulletins: Record<string, unknown>[]) =>
+      fetch('/api/paie/bulletins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bulletins }),
+      })
+
+    let apiRes = await doPost(buildUpsertPayload([row], 'generee'))
+    let cachedErrMsg: string | null = null
+
     if (!apiRes.ok) {
       const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
-      if (isColumnError(errBody.error ?? '')) {
-        const minimal = buildMinimalPayload([row], 'generee')
-        apiRes = await fetch('/api/paie/bulletins', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bulletins: minimal }),
-        })
+      cachedErrMsg = errBody.error ?? null
+      if (isColumnError(cachedErrMsg ?? '')) {
+        cachedErrMsg = null
+        apiRes = await doPost(buildMinimalPayload([row], 'generee'))
       }
     }
+
     if (!apiRes.ok) {
-      const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
-      const msg = errBody.error ?? 'Erreur serveur'
+      const msg = cachedErrMsg
+        ?? (await apiRes.json().catch(() => ({ error: apiRes.statusText }))).error
+        ?? 'Erreur serveur'
       setErreurSave(msg)
       captureSupabaseError('upsert bulletin unique', { message: msg, details: '', code: '' }, { module: 'rh/paie', tenant_id: tenantId })
     } else {
       load()
     }
+    setSavingRowId(null)
   }
 
   // ── Acomptes ─────────────────────────────────────────────────────────────────
@@ -1398,9 +1407,13 @@ export default function PaiePage() {
                           <div className="flex items-center justify-center gap-1 flex-wrap">
                             {/* Générer individuellement */}
                             <button onClick={() => genererBulletinUnique(row)}
+                              disabled={savingRowId === row.employe_id}
                               title="Générer ce bulletin"
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[#DC2626]/10 hover:bg-[#DC2626]/20 text-[#DC2626] border border-[#DC2626]/20">
-                              <Play size={9} /> Générer
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[#DC2626]/10 hover:bg-[#DC2626]/20 text-[#DC2626] border border-[#DC2626]/20 disabled:opacity-60 disabled:cursor-wait">
+                              {savingRowId === row.employe_id
+                                ? <Loader2 size={9} className="animate-spin" />
+                                : <Play size={9} />}
+                              Générer
                             </button>
                             {plan !== 'tpe' && (
                               <button onClick={() => setDetailRow(row)}
