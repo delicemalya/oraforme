@@ -5,7 +5,7 @@
  * KPIs temps réel · Graphiques · Alertes · Accès rapide aux modules
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { resolveAccounts, type AccountCode } from '@/lib/accounting-engine'
@@ -59,7 +59,10 @@ export default function ComptabilitePage() {
 
   /* ─── Locale-aware month names ───────────────────────────── */
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es-ES' : locale === 'de' ? 'de-DE' : 'fr-FR'
-  const MONTHS_FR = Array.from({ length: 12 }, (_, i) => new Intl.DateTimeFormat(intlLocale, { month: 'short' }).format(new Date(2024, i, 1)))
+  const MONTHS_FR = useMemo(
+    () => Array.from({ length: 12 }, (_, i) => new Intl.DateTimeFormat(intlLocale, { month: 'short' }).format(new Date(2024, i, 1))),
+    [intlLocale]
+  )
 
   /* ─── Modules quick-access (inside component for i18n) ───── */
   const COMPTA_QUICK = [
@@ -139,8 +142,8 @@ export default function ComptabilitePage() {
 
     /* KPIs — journal_entries automatiques (factures, paie — absents de journal_comptable) */
     const autoJE  = allJE.filter(e => e.source && e.source !== 'manuel')
-    const recJE   = autoJE.filter(e => e.credit_account.startsWith('7')).reduce((s, e) => s + e.montant, 0)
-    const depJE   = autoJE.filter(e => e.debit_account.startsWith('6')).reduce((s, e) => s + e.montant, 0)
+    const recJE   = autoJE.filter(e => e.credit_account?.startsWith('7')).reduce((s, e) => s + e.montant, 0)
+    const depJE   = autoJE.filter(e => e.debit_account?.startsWith('6')).reduce((s, e) => s + e.montant, 0)
     const tvaJE   = autoJE.filter(e => ['4441', '443'].includes(e.credit_account)).reduce((s, e) => s + e.montant, 0)
 
     setRecettesTotal(recJC + recJE)
@@ -165,17 +168,17 @@ export default function ComptabilitePage() {
       }).reduce((s, e) => s + e.montant_ht, 0)
       const mrecJE = autoJE.filter(e => {
         const ed = new Date(e.date_operation)
-        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.credit_account.startsWith('7')
+        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.credit_account?.startsWith('7')
       }).reduce((s, e) => s + e.montant, 0)
       const mdepJE = autoJE.filter(e => {
         const ed = new Date(e.date_operation)
-        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.debit_account.startsWith('6')
+        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.debit_account?.startsWith('6')
       }).reduce((s, e) => s + e.montant, 0)
       monthly.push({ label: MONTHS_FR[m - 1], recettes: Math.round((mrec + mrecJE) / 1000), depenses: Math.round((mdep + mdepJE) / 1000) })
     }
     setMonthlyData(monthly)
     setLoading(false)
-  }, [tenantId, MONTHS_FR])
+  }, [tenantId, intlLocale])
 
   useEffect(() => { load() }, [load])
 
