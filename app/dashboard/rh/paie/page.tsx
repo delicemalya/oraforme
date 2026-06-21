@@ -1033,19 +1033,30 @@ export default function PaiePage() {
     if (!tenantId) return
     setSaving(true); setErreurSave(null)
 
-    let toUpsert = buildUpsertPayload(rows, forceStatut)
-    let res = await supabase.from('bulletins_paie').upsert(toUpsert, { onConflict: 'employe_id,mois,annee' })
-
-    // Fallback automatique si la migration 077_paie_v2 n'a pas encore été appliquée
-    if (res.error && isColumnError(res.error.message)) {
-      const minimal = buildMinimalPayload(rows, forceStatut)
-      res = await supabase.from('bulletins_paie').upsert(minimal as unknown as typeof toUpsert, { onConflict: 'employe_id,mois,annee' })
+    // Upsert via API route (service_role) — contourne RLS multi-profil
+    let payload = buildUpsertPayload(rows, forceStatut)
+    let apiRes = await fetch('/api/paie/bulletins', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bulletins: payload }),
+    })
+    // Fallback automatique si colonnes étendues absentes
+    if (!apiRes.ok) {
+      const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
+      if (isColumnError(errBody.error ?? '')) {
+        const minimal = buildMinimalPayload(rows, forceStatut)
+        apiRes = await fetch('/api/paie/bulletins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bulletins: minimal }),
+        })
+      }
     }
-
-    const { error } = res
-    if (error) {
-      captureSupabaseError('upsert bulletins_paie', error, { module: 'rh/paie', tenant_id: tenantId })
-      setErreurSave(error.message)
+    if (!apiRes.ok) {
+      const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
+      const msg = errBody.error ?? 'Erreur serveur'
+      captureSupabaseError('upsert bulletins_paie', { message: msg, details: '', code: '' }, { module: 'rh/paie', tenant_id: tenantId })
+      setErreurSave(msg)
       setSaving(false)
       return
     }
@@ -1099,15 +1110,28 @@ export default function PaiePage() {
   async function genererBulletinUnique(row: BulletinRow) {
     if (!tenantId) return
     let payload = buildUpsertPayload([row], 'generee')
-    let res = await supabase.from('bulletins_paie').upsert(payload, { onConflict: 'employe_id,mois,annee' })
+    let apiRes = await fetch('/api/paie/bulletins', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bulletins: payload }),
+    })
     // Fallback si colonnes étendues absentes
-    if (res.error && isColumnError(res.error.message)) {
-      const minimal = buildMinimalPayload([row], 'generee')
-      res = await supabase.from('bulletins_paie').upsert(minimal as unknown as typeof payload, { onConflict: 'employe_id,mois,annee' })
+    if (!apiRes.ok) {
+      const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
+      if (isColumnError(errBody.error ?? '')) {
+        const minimal = buildMinimalPayload([row], 'generee')
+        apiRes = await fetch('/api/paie/bulletins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bulletins: minimal }),
+        })
+      }
     }
-    if (res.error) {
-      setErreurSave(res.error.message)
-      captureSupabaseError('upsert bulletin unique', res.error, { module: 'rh/paie', tenant_id: tenantId })
+    if (!apiRes.ok) {
+      const errBody = await apiRes.json().catch(() => ({ error: apiRes.statusText }))
+      const msg = errBody.error ?? 'Erreur serveur'
+      setErreurSave(msg)
+      captureSupabaseError('upsert bulletin unique', { message: msg, details: '', code: '' }, { module: 'rh/paie', tenant_id: tenantId })
     } else {
       load()
     }
