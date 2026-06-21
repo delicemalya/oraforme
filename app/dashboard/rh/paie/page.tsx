@@ -1034,7 +1034,11 @@ export default function PaiePage() {
   // ── Sauvegarde globale ────────────────────────────────────────────────────────
 
   async function sauvegarderPaie(forceStatut?: BulletinRow['statut']) {
-    if (!tenantId) return
+    if (!tenantId) {
+      setErreurSave('Impossible d\'identifier votre entreprise. Rechargez la page ou reconnectez-vous.')
+      console.error('sauvegarderPaie: tenantId null — fetch tenant échoué ou session expirée')
+      return
+    }
     setSaving(true); setErreurSave(null)
 
     const doPost = (bulletins: Record<string, unknown>[]) =>
@@ -1111,7 +1115,11 @@ export default function PaiePage() {
   // ── Génération individuelle ──────────────────────────────────────────────────
 
   async function genererBulletinUnique(row: BulletinRow) {
-    if (!tenantId) return
+    if (!tenantId) {
+      setErreurSave('Impossible d\'identifier votre entreprise. Rechargez la page ou reconnectez-vous.')
+      console.error('genererBulletinUnique: tenantId null — fetch tenant échoué ou session expirée')
+      return
+    }
     setSavingRowId(row.employe_id)
     setErreurSave(null)
 
@@ -1218,6 +1226,21 @@ export default function PaiePage() {
   return (
     <div className="space-y-4 pb-8">
 
+      {/* ── Alerte tenantId null ──────────────────────────────────────────── */}
+      {!tenantId && !loadingTenant && (
+        <div className="flex items-center gap-3 bg-[#DC2626]/10 border border-[#DC2626]/30 rounded-xl px-4 py-3">
+          <AlertTriangle size={15} className="text-[#DC2626] shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-[#DC2626]">Entreprise introuvable — actions désactivées</p>
+            <p className="text-xs text-[#DC2626]/80 mt-0.5">La session n'a pas pu identifier votre entreprise. Rechargez la page ou reconnectez-vous.</p>
+          </div>
+          <button onClick={() => window.location.reload()}
+            className="text-[11px] font-semibold text-[#DC2626] border border-[#DC2626]/30 px-3 py-1.5 rounded-lg hover:bg-red-50 shrink-0">
+            Recharger
+          </button>
+        </div>
+      )}
+
       {/* ── Erreur sauvegarde ─────────────────────────────────────────────── */}
       <AnimatePresence>
         {erreurSave && (
@@ -1302,15 +1325,17 @@ export default function PaiePage() {
           {rows.filter(r => r.statut === 'payee').length} payé(s) · {rows.filter(r => r.statut === 'validee').length} validé(s) · {rows.filter(r => r.statut === 'generee').length} générée(s)
         </p>
         <div className="flex items-center gap-2">
-          <motion.button onClick={() => sauvegarderPaie()} disabled={saving || rows.length === 0}
+          <motion.button onClick={() => sauvegarderPaie()} disabled={saving || rows.length === 0 || !tenantId}
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-secondary)] hover:bg-gray-100 disabled:opacity-50 transition-all">
+            title={!tenantId ? 'Entreprise introuvable — rechargez la page' : undefined}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-secondary)] hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
             {saved ? <Check size={14} className="text-[#16A34A]" /> : <FileText size={14} />}
             {saved ? 'Sauvegardé !' : 'Sauvegarder'}
           </motion.button>
-          <motion.button onClick={() => setShowLancerModal(true)} disabled={rows.length === 0}
+          <motion.button onClick={() => setShowLancerModal(true)} disabled={rows.length === 0 || !tenantId}
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+            title={!tenantId ? 'Entreprise introuvable — rechargez la page' : undefined}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: '#DC2626', boxShadow: '0 0 20px #DC262630' }}>
             <Play size={14} />
             <span className="hidden sm:inline">Lancer la paie —</span> {t(MONTH_KEYS[mois])} {annee}
@@ -1407,9 +1432,9 @@ export default function PaiePage() {
                           <div className="flex items-center justify-center gap-1 flex-wrap">
                             {/* Générer individuellement */}
                             <button onClick={() => genererBulletinUnique(row)}
-                              disabled={savingRowId === row.employe_id}
-                              title="Générer ce bulletin"
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[#DC2626]/10 hover:bg-[#DC2626]/20 text-[#DC2626] border border-[#DC2626]/20 disabled:opacity-60 disabled:cursor-wait">
+                              disabled={savingRowId === row.employe_id || !tenantId}
+                              title={!tenantId ? 'Entreprise introuvable — rechargez la page' : 'Générer ce bulletin'}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[#DC2626]/10 hover:bg-[#DC2626]/20 text-[#DC2626] border border-[#DC2626]/20 disabled:opacity-60 disabled:cursor-not-allowed">
                               {savingRowId === row.employe_id
                                 ? <Loader2 size={9} className="animate-spin" />
                                 : <Play size={9} />}
