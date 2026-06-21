@@ -1229,10 +1229,10 @@ export default function PaiePage() {
       </div>
 
       {/* ── Banners mesures spéciales ─────────────────────────────────────── */}
-      {cfg.cnss.mesures_speciales && cfg.cnss.mesures_speciales.length > 0 && (
+      {cfg.cnss.mesures_speciales && cfg.cnss.mesures_speciales.some(m => m.actif) && (
         <div className="flex items-start gap-3 bg-[#2563EB]/8 border border-[#2563EB]/20 rounded-xl px-4 py-3">
           <Zap size={15} className="text-[#2563EB] shrink-0 mt-0.5" />
-          <p className="text-xs text-[#1D4ED8]"><strong>{cfg.cnss.source}</strong> — {cfg.cnss.mesures_speciales.map(m => m.description).join(' · ')}</p>
+          <p className="text-xs text-[#1D4ED8]"><strong>{cfg.cnss.source}</strong> — {cfg.cnss.mesures_speciales.filter(m => m.actif).map(m => m.description).join(' · ')}</p>
         </div>
       )}
 
@@ -1400,8 +1400,8 @@ export default function PaiePage() {
                     {plan !== 'tpe' && <td />}
                     <td className="px-3 py-3 text-right text-xs font-bold">{fmt(totalBrut)}</td>
                     <td className="px-3 py-3 text-right text-xs font-bold text-[#DC2626]">−{fmt(totalCnssEmp)}</td>
-                    <td className="px-3 py-3 text-right text-xs font-bold text-[#DC2626]">−{fmt(totalIRPP)}</td>
-                    <td className="px-3 py-3 text-right text-xs font-bold text-[#D97706]">−{fmt(rows.reduce((s, r) => s + r.acompte, 0))}</td>
+                    <td className="px-3 py-3 text-right text-xs font-bold text-[#DC2626]">{totalIRPP === 0 ? '—' : `−${fmt(totalIRPP)}`}</td>
+                    <td className="px-3 py-3 text-right text-xs font-bold text-[#D97706]">{rows.reduce((s, r) => s + r.acompte, 0) === 0 ? '—' : `−${fmt(rows.reduce((s, r) => s + r.acompte, 0))}`}</td>
                     <td className="px-3 py-3 text-right text-xs font-bold text-[#16A34A]">{fmt(totalNet)}</td>
                     <td colSpan={2} />
                   </tr>
