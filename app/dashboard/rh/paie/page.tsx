@@ -989,6 +989,7 @@ export default function PaiePage() {
 
   // ── Construction du payload ──────────────────────────────────────────────────
 
+  // Payload complet (après migration 077_paie_v2 appliquée)
   function buildUpsertPayload(targetRows: BulletinRow[], forceStatut?: BulletinRow['statut']) {
     return targetRows.map(r => ({
       tenant_id: tenantId!, employe_id: r.employe_id, mois, annee,
@@ -1008,17 +1009,40 @@ export default function PaiePage() {
     }))
   }
 
+  // Payload minimal (colonnes de base présentes dans toutes les versions de la table)
+  function buildMinimalPayload(targetRows: BulletinRow[], forceStatut?: BulletinRow['statut']) {
+    return targetRows.map(r => ({
+      tenant_id: tenantId!, employe_id: r.employe_id, mois, annee,
+      salaire_base: r.salaire_base, heures_sup: r.heures_sup, taux_horaire: r.taux_horaire,
+      prime_rendement: r.prime_rendement, prime_anciennete: r.prime_anciennete,
+      prime_transport: r.prime_transport, prime_logement: r.prime_logement,
+      brut: r.salaire_brut, cnss_salarie: r.cnss_employe, cnss_patronal: r.cnss_patronal,
+      irpp: r.irpp, net: r.salaire_net,
+      mutuelle: r.mutuelle, acompte: r.acompte,
+      statut: forceStatut ?? r.statut, genere_par: 'paie_module',
+    }))
+  }
+
+  function isColumnError(msg: string) {
+    return msg.includes('column') || msg.includes('schema cache') || msg.includes('relation')
+  }
+
   // ── Sauvegarde globale ────────────────────────────────────────────────────────
 
   async function sauvegarderPaie(forceStatut?: BulletinRow['statut']) {
     if (!tenantId) return
     setSaving(true); setErreurSave(null)
 
-    const toUpsert = buildUpsertPayload(rows, forceStatut)
+    let toUpsert = buildUpsertPayload(rows, forceStatut)
+    let res = await supabase.from('bulletins_paie').upsert(toUpsert, { onConflict: 'employe_id,mois,annee' })
 
-    const { error } = await supabase.from('bulletins_paie')
-      .upsert(toUpsert, { onConflict: 'employe_id,mois,annee' })
+    // Fallback automatique si la migration 077_paie_v2 n'a pas encore été appliquée
+    if (res.error && isColumnError(res.error.message)) {
+      const minimal = buildMinimalPayload(rows, forceStatut)
+      res = await supabase.from('bulletins_paie').upsert(minimal as unknown as typeof toUpsert, { onConflict: 'employe_id,mois,annee' })
+    }
 
+    const { error } = res
     if (error) {
       captureSupabaseError('upsert bulletins_paie', error, { module: 'rh/paie', tenant_id: tenantId })
       setErreurSave(error.message)
@@ -1067,12 +1091,16 @@ export default function PaiePage() {
 
   async function genererBulletinUnique(row: BulletinRow) {
     if (!tenantId) return
-    const payload = buildUpsertPayload([row], 'generee')
-    const { error } = await supabase.from('bulletins_paie')
-      .upsert(payload, { onConflict: 'employe_id,mois,annee' })
-    if (error) {
-      setErreurSave(error.message)
-      captureSupabaseError('upsert bulletin unique', error, { module: 'rh/paie', tenant_id: tenantId })
+    let payload = buildUpsertPayload([row], 'generee')
+    let res = await supabase.from('bulletins_paie').upsert(payload, { onConflict: 'employe_id,mois,annee' })
+    // Fallback si colonnes étendues absentes
+    if (res.error && isColumnError(res.error.message)) {
+      const minimal = buildMinimalPayload([row], 'generee')
+      res = await supabase.from('bulletins_paie').upsert(minimal as unknown as typeof payload, { onConflict: 'employe_id,mois,annee' })
+    }
+    if (res.error) {
+      setErreurSave(res.error.message)
+      captureSupabaseError('upsert bulletin unique', res.error, { module: 'rh/paie', tenant_id: tenantId })
     } else {
       load()
     }
