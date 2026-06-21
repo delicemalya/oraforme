@@ -1075,10 +1075,17 @@ export default function PaiePage() {
         const totalCnssP = payees.reduce((s, r) => s + r.cnss_patronal + r.tus_patronal, 0)
         const dateEcr    = new Date(annee, mois - 1, 28).toISOString().split('T')[0]
         const lib        = `Paie ${MOIS_LABELS[mois]} ${annee}`
-        await supabase.from('mouvements_comptables').upsert([
-          { tenant_id: tenantId, date: dateEcr, compte_debit: '661', compte_credit: '422', montant: totalNetP, libelle: lib, source: 'paie', source_id: `paie_661_${mois}_${annee}` },
-          { tenant_id: tenantId, date: dateEcr, compte_debit: '664', compte_credit: '431', montant: totalCnssP, libelle: `Charges patro. ${lib}`, source: 'paie', source_id: `paie_664_${mois}_${annee}` },
-        ], { onConflict: 'source_id' }).then(() => null, () => null)
+        // Supprimer les écritures paie existantes pour ce mois avant de réinsérer (déduplication)
+        await supabase.from('journal_entries')
+          .delete()
+          .eq('tenant_id', tenantId)
+          .eq('source', 'paie')
+          .eq('fiscal_year', annee)
+          .like('libelle', `%${MOIS_LABELS[mois]} ${annee}%`)
+        await supabase.from('journal_entries').insert([
+          { tenant_id: tenantId, date_operation: dateEcr, libelle: lib, debit_account: '661', credit_account: '422', montant: totalNetP, source: 'paie', fiscal_year: annee },
+          { tenant_id: tenantId, date_operation: dateEcr, libelle: `Charges patronales — ${lib}`, debit_account: '664', credit_account: '431', montant: totalCnssP, source: 'paie', fiscal_year: annee },
+        ]).then(() => null, () => null)
       }
     }
 

@@ -107,7 +107,8 @@ export default function ComptabilitePage() {
     const [jcR, deR] = await Promise.all([
       supabase.from('journal_comptable')
         .select('*').eq('tenant_id', tenantId)
-        .order('date', { ascending: false }).limit(200),
+        .gte('date', `${year}-01-01`).lte('date', `${year}-12-31`)
+        .order('date', { ascending: false }).limit(50000),
       supabase.from('journal_entries')
         .select('*').eq('tenant_id', tenantId)
         .order('date_operation', { ascending: false }).limit(10),
