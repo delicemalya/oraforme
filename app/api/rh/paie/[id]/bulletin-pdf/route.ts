@@ -23,12 +23,17 @@ export async function GET(
 
   const { id } = await params
 
-  const { data: bulletin } = await supabaseAdmin
+  const { data: bulletin, error: bulletinErr } = await supabaseAdmin
     .from('bulletins_paie')
-    .select('*, employes(nom, prenom, poste, matricule, cnss, date_embauche, departement)')
+    .select('*, employes(nom, prenom, poste, numero_cnss, date_recrutement, departement)')
     .eq('id', id)
     .eq('tenant_id', auth.tenantId)
     .maybeSingle()
+
+  if (bulletinErr) {
+    console.error('bulletin-pdf: erreur select bulletin', bulletinErr)
+    return NextResponse.json({ error: `Erreur DB: ${bulletinErr.message}` }, { status: 500 })
+  }
 
   if (!bulletin) return NextResponse.json({ error: 'Bulletin introuvable' }, { status: 404 })
 
@@ -47,8 +52,8 @@ export async function GET(
     .maybeSingle()
 
   const emp = bulletin.employes as {
-    nom: string; prenom: string; poste: string; matricule?: string
-    cnss?: string; date_embauche?: string; departement?: string
+    nom: string; prenom: string; poste: string
+    numero_cnss?: string; date_recrutement?: string; departement?: string
   } | null
 
   const moisLabel = MOIS_LABELS[bulletin.mois ?? 1] ?? 'Mois'
@@ -63,9 +68,9 @@ export async function GET(
     nom:              emp?.nom ?? '',
     prenom:           emp?.prenom ?? '',
     poste:            emp?.poste ?? '',
-    numero_employe:   emp?.matricule ?? undefined,
-    date_embauche:    emp?.date_embauche ?? undefined,
-    cnss_employe:     emp?.cnss ?? undefined,
+    date_embauche:    emp?.date_recrutement ?? undefined,
+    cnss_employe:     emp?.numero_cnss ?? undefined,
+    total_brut:       bulletin.brut ?? undefined,
     mois:             moisLabel,
     annee:            bulletin.annee ?? new Date().getFullYear(),
     salaire_base:     bulletin.salaire_base ?? 0,

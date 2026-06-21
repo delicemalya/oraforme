@@ -1,7 +1,6 @@
 import {
   Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
-import { calculerPaie, TAUX_CNSS_EMPLOYE } from '@/lib/paie/calcul-paie'
 
 export interface PayslipData {
   // Entreprise
@@ -27,11 +26,10 @@ export interface PayslipData {
   taux_heure_sup?: number
   primes?: { label: string; montant: number }[]
   retenues?: { label: string; montant: number }[]
-  // Calculés auto
-  cnss_part_employe?: number  // 5% du brut plafonné
-  irpp?: number               // calculé progressif
+  // Calculés (depuis bulletin sauvegardé)
   total_brut?: number
-  total_deductions?: number
+  cnss_part_employe?: number
+  irpp?: number
   net_a_payer?: number
   mode_paiement?: string
 }
@@ -99,22 +97,14 @@ export function PayslipPDF({ data }: { data: PayslipData }) {
   const retenues = data.retenues ?? []
   const totalRetenues = retenues.reduce((s, r) => s + r.montant, 0)
   const totalPrimesCustom = primes.reduce((s, p) => s + p.montant, 0)
+  const montantHeuresSup = Math.round((data.heures_sup ?? 0) * (data.taux_heure_sup ?? 0))
 
-  // Calcul via le moteur légal Congo (CNSS 5.04%, IRPP barème progressif art.76)
-  const calc = calculerPaie({
-    salaire_base: data.salaire_base,
-    heures_sup: data.heures_sup ?? 0,
-    taux_horaire: data.taux_heure_sup ?? 0,
-    autres_gains: totalPrimesCustom,
-    autres_retenues: totalRetenues,
-  })
-
-  const brut = calc.salaire_brut
-  const cnss = data.cnss_part_employe ?? calc.cnss_employe
-  const irpp = data.irpp ?? calc.irpp
-  const montantHeuresSup = calc.heures_sup_montant
+  // Utilise les valeurs calculées par le moteur universel et sauvegardées en DB
+  const brut = data.total_brut ?? (data.salaire_base + montantHeuresSup + totalPrimesCustom)
+  const cnss = data.cnss_part_employe ?? 0
+  const irpp = data.irpp ?? 0
   const totalDed = cnss + irpp + totalRetenues
-  const net = data.net_a_payer ?? calc.salaire_net
+  const net = data.net_a_payer ?? Math.max(0, brut - totalDed)
 
   return (
     <Document>
@@ -195,7 +185,7 @@ export function PayslipPDF({ data }: { data: PayslipData }) {
         {/* CNSS */}
         <View style={[s.tdRow, { backgroundColor: LGRAY }]}>
           <Text style={s.tdLabel}>Cotisation CNSS (part salarié)</Text>
-          <Text style={s.tdBase}>{(TAUX_CNSS_EMPLOYE * 100).toFixed(2)}% brut plafonné</Text>
+          <Text style={s.tdBase}>Cotisations réglementaires</Text>
           <Text style={s.tdMontantNeg}>- {fmt(cnss)}</Text>
         </View>
 

@@ -1182,7 +1182,11 @@ export default function PaiePage() {
   async function downloadPdf(row: BulletinRow) {
     if (!row.existingId) return
     const res = await fetch(`/api/rh/paie/${row.existingId}/bulletin-pdf`)
-    if (!res.ok) return
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({ error: `Erreur ${res.status}` }))
+      setErreurSave(`PDF — ${errBody.error ?? `Erreur ${res.status}`}`)
+      return
+    }
     const blob = await res.blob()
     const url  = URL.createObjectURL(blob)
     const a    = document.createElement('a')
