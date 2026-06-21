@@ -104,12 +104,12 @@ export async function POST(req: NextRequest) {
 
     // SYSCOHADA — 3 écritures automatiques (révisé 2017, comptes 2-3 chiffres)
     // 1. Vente HT  : débit 411 Clients / crédit 701 Ventes de marchandises
-    // 2. TVA 18%   : débit 411 Clients / crédit 443 TVA facturée
+    // 2. TVA       : débit 411 Clients / crédit 4441 État — TVA collectée (SYSCOHADA 4441)
     // 3. CA 5%     : débit 411 Clients / crédit 447 État — impôts retenus à la source
     const entries = [
-      { credit_account: '701', montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
-      { credit_account: '443', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA 18%` },
-      { credit_account: '447', montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
+      { credit_account: '701',  montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
+      { credit_account: '4441', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA` },
+      { credit_account: '447',  montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
     ].filter(e => e.montant > 0)
 
     await supabaseAdmin.from('journal_entries').insert(

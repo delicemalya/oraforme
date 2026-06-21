@@ -192,9 +192,9 @@ const ACCOUNT_MAP: Record<string, Record<string, [AccountCode, AccountCode]>> = 
     '__default':            ['521', '705'],
   },
   sortie: {
-    'Salaires':             ['661', '422'],
-    'Salaires & CNSS':      ['661', '422'],
-    'Rémunérations':        ['661', '422'],
+    'Salaires':             ['661', '421'],
+    'Salaires & CNSS':      ['661', '421'],
+    'Rémunérations':        ['661', '421'],
     'CNSS':                 ['664', '431'],
     'Charges sociales':     ['664', '431'],
     'Loyer':                ['622', '521'],

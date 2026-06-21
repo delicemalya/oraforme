@@ -1089,8 +1089,11 @@ export default function PaiePage() {
         if (toInsert.length > 0) {
           await supabase.from('transactions').insert(toInsert)
         }
-        const totalNetP  = payees.reduce((s, r) => s + r.salaire_net, 0)
-        const totalCnssP = payees.reduce((s, r) => s + r.cnss_patronal + r.tus_patronal, 0)
+        const totalBrutP    = payees.reduce((s, r) => s + r.salaire_brut, 0)
+        const totalNetP     = payees.reduce((s, r) => s + r.salaire_net, 0)
+        const totalCnssP    = payees.reduce((s, r) => s + r.cnss_patronal + r.tus_patronal, 0)
+        const totalCnssEmpP = payees.reduce((s, r) => s + r.cnss_employe, 0)
+        const totalIrppP    = payees.reduce((s, r) => s + r.irpp, 0)
         const dateEcr    = new Date(annee, mois - 1, 28).toISOString().split('T')[0]
         const lib        = `Paie ${MOIS_LABELS[mois]} ${annee}`
         // Supprimer les écritures paie existantes pour ce mois avant de réinsérer (déduplication)
@@ -1100,10 +1103,17 @@ export default function PaiePage() {
           .eq('source', 'paie')
           .eq('fiscal_year', annee)
           .like('libelle', `%${MOIS_LABELS[mois]} ${annee}%`)
-        await supabase.from('journal_entries').insert([
-          { tenant_id: tenantId, date_operation: dateEcr, libelle: lib, debit_account: '661', credit_account: '422', montant: totalNetP, source: 'paie', fiscal_year: annee },
-          { tenant_id: tenantId, date_operation: dateEcr, libelle: `Charges patronales — ${lib}`, debit_account: '664', credit_account: '431', montant: totalCnssP, source: 'paie', fiscal_year: annee },
-        ]).then(() => null, () => null)
+        // SYSCOHADA Révisé — 5 écritures paie : 661/421 brut, 664/431 patron, 421/431 CNSS emp, 421/447 IRPP, 421/521 net
+        const paieEntries = [
+          { debit_account: '661', credit_account: '421', montant: totalBrutP,    libelle: lib },
+          { debit_account: '664', credit_account: '431', montant: totalCnssP,    libelle: `Charges patronales — ${lib}` },
+          { debit_account: '421', credit_account: '431', montant: totalCnssEmpP, libelle: `CNSS salarié — ${lib}` },
+          { debit_account: '421', credit_account: '447', montant: totalIrppP,    libelle: `IRPP retenu — ${lib}` },
+          { debit_account: '421', credit_account: '521', montant: totalNetP,     libelle: `Virement salaires — ${lib}` },
+        ].filter(e => e.montant > 0)
+        await supabase.from('journal_entries').insert(
+          paieEntries.map(e => ({ tenant_id: tenantId, date_operation: dateEcr, source: 'paie', fiscal_year: annee, ...e }))
+        ).then(() => null, () => null)
       }
     }
 

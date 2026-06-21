@@ -23,6 +23,7 @@ export default function GrandLivrePage() {
   const { t, locale } = useLocale()
   const [movements, setMovements] = useState<Movement[]>([])
   const [loading, setLoading]     = useState(true)
+  const [loadErr, setLoadErr]     = useState<string | null>(null)
   const [search, setSearch]       = useState('')
   const [classe, setClasse]       = useState('all')
   const [year, setYear]           = useState(new Date().getFullYear())
@@ -44,13 +45,14 @@ export default function GrandLivrePage() {
   useEffect(() => {
     if (!tenantId) return
     ;(async () => {
-      setLoading(true)
-      const { data } = await supabase
+      setLoading(true); setLoadErr(null)
+      const { data, error: err } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('tenant_id', tenantId)
         .eq('fiscal_year', year)
         .order('date_operation')
+      if (err) { setLoadErr(err.message); setLoading(false); return }
       setMovements((data || []) as Movement[])
       setLoading(false)
     })()
@@ -119,13 +121,13 @@ export default function GrandLivrePage() {
   function exportCSV() {
     const rows = filtered.flatMap(a =>
       a.movements.map(m => ({
-        [t('compta.grandlivre.colCompte')]: a.number,
-        [t('compta.grandlivre.colLabel')]: a.name,
-        [t('compta.grandlivre.colDate')]: m.date_operation,
-        [t('compta.grandlivre.colLabel')]: m.libelle,
-        [t('compta.grandlivre.colDebit')]: m.debit_account === a.number ? m.montant : 0,
-        [t('compta.grandlivre.colCredit')]: m.credit_account === a.number ? m.montant : 0,
-        Source: m.source,
+        'N° Compte':  a.number,
+        'Intitulé':   a.name,
+        'Date':       m.date_operation,
+        'Libellé':    m.libelle,
+        'Débit':      m.debit_account === a.number ? m.montant : 0,
+        'Crédit':     m.credit_account === a.number ? m.montant : 0,
+        'Source':     m.source || '',
       }))
     )
     if (!rows.length) return
@@ -139,6 +141,12 @@ export default function GrandLivrePage() {
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
       {t('common.loading')}
+    </div>
+  )
+
+  if (loadErr) return (
+    <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded-xl p-6 text-[#DC2626] text-[13px]">
+      Erreur de chargement du Grand Livre : {loadErr}
     </div>
   )
 

@@ -268,6 +268,8 @@ export default function JournalPage() {
   const { t, locale } = useLocale()
 
   const [entries, setEntries]           = useState<JournalEntry[]>([])
+  const [total, setTotal]               = useState(0)
+  const [loadErr, setLoadErr]           = useState<string | null>(null)
   const [loading, setLoading]           = useState(true)
   const [search, setSearch]             = useState('')
   const [filterSource, setFilterSource] = useState('all')
@@ -315,8 +317,11 @@ export default function JournalPage() {
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
     if (filterSource !== 'all') query = query.eq('source', filterSource)
-    const { data, error } = await query
-    if (!error) setEntries(data || [])
+    const { data, error, count } = await query
+    if (error) { setLoadErr(error.message); setLoading(false); return }
+    setEntries(data || [])
+    setTotal(count ?? 0)
+    setLoadErr(null)
     setLoading(false)
   }, [tenantId, filterMonth, filterYear, filterSource, page])
 
@@ -466,6 +471,13 @@ export default function JournalPage() {
         </select>
       </div>
 
+      {/* Error banner */}
+      {loadErr && (
+        <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded-xl px-4 py-3 text-[#DC2626] text-[13px]">
+          Erreur de chargement : {loadErr}
+        </div>
+      )}
+
       {/* Journal Table */}
       <div className="rounded-2xl border overflow-x-auto" style={{ borderColor: 'var(--border)' }}>
         <table className="w-full text-sm min-w-[800px]">
@@ -539,16 +551,18 @@ export default function JournalPage() {
       </div>
 
       {/* Pagination */}
-      {filtered.length === PAGE_SIZE && (
+      {total > PAGE_SIZE && (
         <div className="flex items-center justify-center gap-4">
           <button disabled={page === 0} onClick={() => setPage(p => p - 1)}
             className="px-4 py-2 rounded-xl text-sm font-medium border disabled:opacity-30 hover:bg-gray-50"
             style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
             ← Précédent
           </button>
-          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Page {page + 1}</span>
-          <button onClick={() => setPage(p => p + 1)}
-            className="px-4 py-2 rounded-xl text-sm font-medium border hover:bg-gray-50"
+          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Page {page + 1} / {Math.ceil(total / PAGE_SIZE)} · {total} écriture{total > 1 ? 's' : ''}
+          </span>
+          <button disabled={page >= Math.ceil(total / PAGE_SIZE) - 1} onClick={() => setPage(p => p + 1)}
+            className="px-4 py-2 rounded-xl text-sm font-medium border disabled:opacity-30 hover:bg-gray-50"
             style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
             Suivant →
           </button>

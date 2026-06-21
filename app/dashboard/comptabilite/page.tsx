@@ -11,6 +11,8 @@ import { useTenant } from '@/lib/hooks/useTenant'
 import { resolveAccounts, type AccountCode } from '@/lib/accounting-engine'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { useFmt } from '@/lib/hooks/useFmt'
+import { getCountryConfig } from '@/lib/countries'
+import type { CodePays } from '@/lib/countries/types'
 import Link from 'next/link'
 import {
   TrendingUp, TrendingDown, Scale, AlertTriangle,
@@ -36,9 +38,13 @@ interface DoubleEntry {
 }
 
 /* ─── Helpers ────────────────────────────────────────────── */
-function calcTVACongo(ht: number) {
-  const tva = Math.round(ht * 0.18)
-  const ca  = Math.round(tva * 0.05)
+function calcTVA(ht: number, codePays: string | null) {
+  const cfg = codePays ? getCountryConfig(codePays as CodePays) : null
+  const tauxTVA = cfg?.tva?.taux_normal ?? 0.18
+  const taxeAdd = cfg?.tva?.taxes_additionnelles?.find(t => t.base === 'tva_collectee')
+  const tauxCA  = taxeAdd?.taux ?? 0
+  const tva = Math.round(ht * tauxTVA)
+  const ca  = Math.round(tva * tauxCA)
   return { tva, ca, ttc: ht + tva + ca }
 }
 
@@ -48,7 +54,7 @@ const CATS_DEPENSE = ['Salaires', 'CNSS', 'Achats / Fournisseur', 'Loyer', 'Imp�
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function ComptabilitePage() {
   const { fmt: fmtFCFA } = useFmt()
-  const { tenantId } = useTenant()
+  const { tenantId, pays } = useTenant()
   const { t, locale } = useLocale()
 
   /* ─── Locale-aware month names ───────────────────────────── */
@@ -82,6 +88,7 @@ export default function ComptabilitePage() {
   const [recentDouble,   setRecentDouble]   = useState<DoubleEntry[]>([])
   const [monthlyData,    setMonthlyData]    = useState<{ label: string; recettes: number; depenses: number }[]>([])
   const [loading,        setLoading]        = useState(true)
+  const [loadErr,        setLoadErr]        = useState<string | null>(null)
   const [showModal,      setShowModal]      = useState(false)
   const [saving,         setSaving]         = useState(false)
   const [saveOk,         setSaveOk]         = useState(false)
@@ -104,29 +111,43 @@ export default function ComptabilitePage() {
     const now   = new Date()
     const year  = now.getFullYear()
 
-    const [jcR, deR] = await Promise.all([
+    const [jcR, jeR] = await Promise.all([
       supabase.from('journal_comptable')
         .select('*').eq('tenant_id', tenantId)
         .gte('date', `${year}-01-01`).lte('date', `${year}-12-31`)
         .order('date', { ascending: false }).limit(50000),
       supabase.from('journal_entries')
         .select('*').eq('tenant_id', tenantId)
-        .order('date_operation', { ascending: false }).limit(10),
+        .gte('date_operation', `${year}-01-01`).lte('date_operation', `${year}-12-31`)
+        .order('date_operation', { ascending: false }).limit(50000),
     ])
 
-    const all = (jcR.data || []) as JournalEntry[]
+    if (jcR.error || jeR.error) {
+      setLoadErr((jcR.error ?? jeR.error)!.message)
+      setLoading(false)
+      return
+    }
 
-    /* KPIs année courante */
+    const all   = (jcR.data || []) as JournalEntry[]
+    const allJE = (jeR.data || []) as DoubleEntry[]
+
+    /* KPIs — journal_comptable (saisies manuelles directes) */
     const thisYear = all.filter(e => new Date(e.date).getFullYear() === year)
-    const rec  = thisYear.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ht, 0)
-    const dep  = thisYear.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ht, 0)
-    const tva  = thisYear.filter(e => e.type === 'recette').reduce((s, e) => s + (e.tva || 0), 0)
+    const recJC = thisYear.filter(e => e.type === 'recette').reduce((s, e) => s + e.montant_ht, 0)
+    const depJC = thisYear.filter(e => e.type === 'depense').reduce((s, e) => s + e.montant_ht, 0)
+    const tvaJC = thisYear.filter(e => e.type === 'recette').reduce((s, e) => s + (e.tva || 0), 0)
 
-    setRecettesTotal(rec)
-    setDepensesTotal(dep)
-    setTvaCollectee(tva)
+    /* KPIs — journal_entries automatiques (factures, paie — absents de journal_comptable) */
+    const autoJE  = allJE.filter(e => e.source && e.source !== 'manuel')
+    const recJE   = autoJE.filter(e => e.credit_account.startsWith('7')).reduce((s, e) => s + e.montant, 0)
+    const depJE   = autoJE.filter(e => e.debit_account.startsWith('6')).reduce((s, e) => s + e.montant, 0)
+    const tvaJE   = autoJE.filter(e => ['4441', '443'].includes(e.credit_account)).reduce((s, e) => s + e.montant, 0)
+
+    setRecettesTotal(recJC + recJE)
+    setDepensesTotal(depJC + depJE)
+    setTvaCollectee(tvaJC + tvaJE)
     setRecentEntries(all.slice(0, 10))
-    setRecentDouble((deR.data || []) as DoubleEntry[])
+    setRecentDouble(allJE.slice(0, 10))
 
     /* Monthly data for chart (6 months) */
     const monthly: { label: string; recettes: number; depenses: number }[] = []
@@ -142,7 +163,15 @@ export default function ComptabilitePage() {
         const ed = new Date(e.date)
         return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.type === 'depense'
       }).reduce((s, e) => s + e.montant_ht, 0)
-      monthly.push({ label: MONTHS_FR[m - 1], recettes: Math.round(mrec / 1000), depenses: Math.round(mdep / 1000) })
+      const mrecJE = autoJE.filter(e => {
+        const ed = new Date(e.date_operation)
+        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.credit_account.startsWith('7')
+      }).reduce((s, e) => s + e.montant, 0)
+      const mdepJE = autoJE.filter(e => {
+        const ed = new Date(e.date_operation)
+        return ed.getMonth() + 1 === m && ed.getFullYear() === y && e.debit_account.startsWith('6')
+      }).reduce((s, e) => s + e.montant, 0)
+      monthly.push({ label: MONTHS_FR[m - 1], recettes: Math.round((mrec + mrecJE) / 1000), depenses: Math.round((mdep + mdepJE) / 1000) })
     }
     setMonthlyData(monthly)
     setLoading(false)
@@ -166,7 +195,7 @@ export default function ComptabilitePage() {
     setSaving(true); setSaveErr(null)
 
     const ht  = Number(formMontant)
-    const { tva, ca, ttc } = calcTVACongo(ht)
+    const { tva, ca, ttc } = calcTVA(ht, pays)
 
     /* 1. journal_comptable */
     const { error: e1 } = await supabase.from('journal_comptable').insert({
@@ -232,6 +261,12 @@ export default function ComptabilitePage() {
     <div className="flex items-center justify-center py-24 text-[#94A3B8]">
       <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mr-2" />
       {t('common.loading')}
+    </div>
+  )
+
+  if (loadErr) return (
+    <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded-xl p-6 text-[#DC2626] text-[13px]">
+      <strong>Erreur de chargement comptabilité :</strong> {loadErr}
     </div>
   )
 
@@ -520,7 +555,7 @@ export default function ComptabilitePage() {
 
               {/* TVA preview */}
               {formMontant && Number(formMontant) > 0 && (() => {
-                const { tva, ca, ttc } = calcTVACongo(Number(formMontant))
+                const { tva, ca, ttc } = calcTVA(Number(formMontant), pays)
                 return (
                   <div className="bg-[#FEF3C7] rounded-lg p-3 text-[11px] grid grid-cols-3 gap-2">
                     <div className="text-center"><div className="font-bold text-[#D97706]">{fmtFCFA(tva)}</div><div className="text-[#94A3B8]">TVA 18%</div></div>
