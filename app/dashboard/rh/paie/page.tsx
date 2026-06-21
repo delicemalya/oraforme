@@ -146,7 +146,7 @@ function computeBulletin(
   const base_irpp = Math.max(0, salaire_brut - cnss_employe)
   let irpp = 0; let irpp_detail: DetailIRPP[] = []
   try {
-    const irppRes = calculerIRPP({ codePays, salaireBrut: base_irpp, situation, nombreEnfants: nb_enfants })
+    const irppRes = calculerIRPP({ codePays, salaireBrut: base_irpp, salaireBrutOriginal: salaire_brut, situation, nombreEnfants: nb_enfants })
     irpp = irppRes.irpp_net
     irpp_detail = irppRes.tranches
       .filter(t => t.impot_total > 0)

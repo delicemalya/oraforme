@@ -140,9 +140,10 @@ export interface ConfigAbattement {
 }
 
 export interface TrancheIRPP {
-  min:  number
-  max:  number    // Infinity pour la dernière tranche
-  taux: number
+  min:           number
+  max:           number    // Infinity pour la dernière tranche
+  taux:          number
+  montant_fixe?: number | null   // montant fixe/part/an au lieu de taux % (ex: T1 Congo 4 200 F/an)
 }
 
 export interface ConfigQuotientFamilial {
@@ -170,6 +171,8 @@ export interface ConfigIRPP {
   // Centimes additionnels sur IRPP calculé (ex: Cameroun CAC 10%)
   centimes_additionnels?: number
   mesures_speciales?: MesureSpecialeIRPP[]
+  /** Plancher d'IRPP annuel (en devise) applicable quand brut < SMIG (ex: 1 200 F/an Congo) */
+  minimum_annuel?: number
   periodicite:     'mensuel' | 'trimestriel'
   echeance_jour:   number
   source:          string

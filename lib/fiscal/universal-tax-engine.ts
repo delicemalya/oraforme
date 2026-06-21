@@ -63,6 +63,8 @@ export interface InputIRPP {
   codePays:                    CodePays
   /** Base IRPP mensuelle (brut imposable après déduction CNSS salarié) */
   salaireBrut:                 number
+  /** Salaire brut original avant CNSS — requis pour appliquer le plancher SMIG */
+  salaireBrutOriginal?:        number
   situation:                   SituationFamiliale
   nombreEnfants:               number
   /** Active les mesures spéciales marquées `actif: true` dans CountryConfig */
@@ -301,7 +303,7 @@ function appliquerBareme(
     if (baseParPart <= tMin) break
 
     const base = (tMax === Infinity ? baseParPart : Math.min(baseParPart, tMax)) - tMin
-    const impot = base * t.taux
+    const impot = (t.montant_fixe != null) ? t.montant_fixe / diviseur : base * t.taux
 
     detail.push({
       libelle:        `T${i + 1} (${(t.taux * 100).toFixed(0)}%) — ${fmt(Math.round(tMin))} → ${tMax === Infinity ? '∞' : fmt(Math.round(tMax))} F`,
@@ -382,7 +384,16 @@ export function calculerIRPP(input: InputIRPP): ResultatIRPP {
       }
     }
   }
-  const irppNet = Math.max(0, irppTotal - reduction)
+  let irppNet = Math.max(0, irppTotal - reduction)
+
+  // Plancher SMIG : si brut original < SMIG du pays, IRPP ≥ minimum_annuel/12
+  if (
+    input.salaireBrutOriginal !== undefined &&
+    cfg.irpp.minimum_annuel != null &&
+    input.salaireBrutOriginal < cfg.smig
+  ) {
+    irppNet = Math.max(irppNet, Math.round(cfg.irpp.minimum_annuel / 12))
+  }
 
   return {
     base_brut:                  input.salaireBrut,

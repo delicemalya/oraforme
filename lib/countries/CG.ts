@@ -10,9 +10,9 @@
  * data_confidence : 'verified'
  * Dernière mise à jour : 2026-06-20
  *
- * IRPP Congo : les seuils 464 000 / 1 000 000 / 3 000 000 / 8 000 000 FCFA sont des
- * SEUILS MENSUELS DIRECTS, confirmés par calcul-paie.ts en production (art. 76 CGI).
- * methode_base = 'mensuelle_directe' est la seule interprétation correcte.
+ * IRPP/ITS Congo : seuils ANNUELS 615 000 / 1 500 000 / 3 500 000 / 5 000 000 FCFA — Art. 114-116G CGI.
+ * T1 imposé au montant fixe 4 200 F/an/part. Abattement 20% sur (brut - CNSS).
+ * methode_base = 'annuelle_div12' — moteur divise seuils par 12 pour application mensuelle.
  */
 
 import type { CountryConfig } from './types'
@@ -80,14 +80,13 @@ export const CG: CountryConfig = {
   irpp: {
     nom: 'IRPP (Impôt sur le Revenu des Personnes Physiques)',
 
-    // Seuils mensuels appliqués directement — confirmé calcul-paie.ts production (Art. 76 CGI Congo)
-    methode_base: 'mensuelle_directe',
+    // Seuils ANNUELS → moteur divise par 12 pour application mensuelle (Art. 114-116G CGI)
+    methode_base: 'annuelle_div12',
 
-    // LF 2026 : abattement professionnel remplacé par quotient familial
-    // (fiscalite-congo.ts maintient 20% dans la config CGI classique — à trancher)
+    // Abattement professionnel 20% sur (brut - CNSS salarié) — Art. 116A CGI Congo
     abattement: {
-      type:   'aucun',
-      valeur: 0,
+      type:   'pct_net_cnss',
+      valeur: 0.20,
     },
 
     quotient_familial: {
@@ -97,15 +96,19 @@ export const CG: CountryConfig = {
       parts_par_enfant: 0.5,   // +0,5 par enfant à charge
     },
 
-    // Barème IRPP annuel — 5 tranches LF 2026 (Art. 76 CGI Congo)
-    // Les seuils sont ANNUELS. Le moteur divise par 12 avant application.
+    // Barème IRPP/ITS annuel — 5 tranches LF 2026 (Art. 114-116G CGI Congo)
+    // T1 : montant fixe 4 200 F/an/part (non une %) — Art. 116B CGI
+    // Seuils annuels ; le moteur divise par 12 avant application mensuelle.
     tranches: [
-      { min: 0,         max: 464_000,   taux: 0    },   // 0%
-      { min: 464_001,   max: 1_000_000, taux: 0.01 },   // 1%
-      { min: 1_000_001, max: 3_000_000, taux: 0.10 },   // 10%
-      { min: 3_000_001, max: 8_000_000, taux: 0.25 },   // 25%
-      { min: 8_000_001, max: Infinity,  taux: 0.40 },   // 40%
+      { min: 0,         max: 615_000,   taux: 0,    montant_fixe: 4_200 },  // fixe 4 200 F/an/part
+      { min: 615_001,   max: 1_500_000, taux: 0.10, montant_fixe: null  },  // 10%
+      { min: 1_500_001, max: 3_500_000, taux: 0.15, montant_fixe: null  },  // 15%
+      { min: 3_500_001, max: 5_000_000, taux: 0.20, montant_fixe: null  },  // 20%
+      { min: 5_000_001, max: Infinity,  taux: 0.30, montant_fixe: null  },  // 30%
     ],
+
+    // Plancher d'IRPP pour salariés gagnant moins du SMIG — Art. 116G CGI Congo
+    minimum_annuel: 1_200,   // 1 200 F/an = 100 F/mois quand brut < SMIG
 
     mesures_speciales: [
       {
@@ -119,7 +122,7 @@ export const CG: CountryConfig = {
 
     periodicite:   'mensuel',
     echeance_jour: 20,
-    source: 'LF 2026 confirmé — Art. 76 CGI Congo',
+    source: 'LF 2026 confirmé — Art. 114-116G CGI Congo',
   },
 
   // ── CNSS ───────────────────────────────────────────────────────────────────
@@ -256,11 +259,12 @@ export const CG: CountryConfig = {
     'SMIG 90 000 FCFA/mois (arrêté 2020)',
     'TVA 18% + Centime Additionnel 5% sur TVA = 18,9% effectif sur HT',
     'CNSS salarié 4% VID (plaf. 1 200 000) · patronal total 23,285% avec TUS déplafonné',
-    'IRPP 5 tranches annuelles 0→40% par part fiscale (quotient familial)',
+    'IRPP/ITS 5 tranches ANNUELLES [615k/1,5M/3,5M/5M/∞] — Art. 114-116G CGI — méthode annuelle_div12',
+    'T1 IRPP : montant fixe 4 200 F/an/part (non un taux %) — plancher 1 200 F/an si brut < SMIG',
+    'Abattement professionnel 20% sur (brut - CNSS salarié) — Art. 116A CGI Congo',
     'Mesure LF 2026 : État prend en charge IRPP + 50% patronal CNSS (25 000 premiers déclarants)',
     'TUS Fiscale 4,5% supprimée par LF 2026 — seul TUS CNSS 3% subsiste',
     '⚠️ Plafonds exonération transport/logement : non documentés — À confirmer DGI Congo',
     '⚠️ TOL 1 000 F : article CGI exact à confirmer',
-    'IRPP : seuils MENSUELS directs [464k/1M/3M/8M] — methode_base=mensuelle_directe confirmé calcul-paie.ts',
   ],
 }
