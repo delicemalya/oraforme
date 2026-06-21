@@ -21,6 +21,7 @@ export function useTenant() {
     sousType:        tenant?.sousType        ?? null,
     taille:          tenant?.taille          ?? null,
     secteur:         tenant?.secteur         ?? null,
+    pays:            tenant?.pays            ?? null,
     profilComplet:   tenant?.profilComplet   ?? false,
     companyDeadline: tenant?.companyDeadline ?? null,
   }
