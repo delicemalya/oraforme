@@ -1142,12 +1142,19 @@ export default function PaiePage() {
   async function ajouterAcompte() {
     if (!tenantId || !aEmployeId || aMontant <= 0) return
     setAddingAcompte(true)
-    const { error } = await supabase.from('acomptes_salaires').insert({
-      tenant_id: tenantId, employe_id: aEmployeId, montant: aMontant,
-      date_acompte: new Date().toISOString().split('T')[0],
-      mois_impute: mois, annee_imputee: annee, statut: 'en_attente', notes: aNotes || null,
+    const res = await fetch('/api/paie/acomptes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        employe_id: aEmployeId, montant: aMontant,
+        date_acompte: new Date().toISOString().split('T')[0],
+        mois_impute: mois, annee_imputee: annee, notes: aNotes || null,
+      }),
     })
-    if (error) captureSupabaseError('insert acompte', error, { module: 'rh/paie', tenant_id: tenantId })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }))
+      captureSupabaseError('insert acompte', { message: err.error ?? 'Erreur', details: '', code: '' }, { module: 'rh/paie', tenant_id: tenantId })
+    }
     setAddingAcompte(false)
     setAEmployeId(''); setAMontant(0); setANotes(''); setShowAcompteForm(false)
     load()
