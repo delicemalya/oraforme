@@ -98,21 +98,23 @@ const ALWAYS_VISIBLE = new Set([
 
 /**
  * Retourne true si un module est accessible pour ce plan.
- * Règle de sécurité : en cas de doute (taille null), on laisse passer
- * pour ne pas casser les tenants legacy.
+ * Sécurité : les tenants legacy sans taille_entreprise (null) sont traités
+ * comme TPE — accès minimal, jamais accès total (W2-C3).
  */
 export function canAccessByPlan(
   taille: TailleEntreprise | string | null | undefined,
   moduleId: string,
 ): boolean {
   if (ALWAYS_VISIBLE.has(moduleId)) return true
-  if (!taille) return true
+
+  // Legacy tenants sans taille → TPE par défaut (le plus restrictif)
+  const effectiveTaille = taille ?? 'tpe'
 
   // Compagnie (grande) → accès complet
-  if (taille === 'grande') return true
+  if (effectiveTaille === 'grande') return true
 
   // Business (pme) → bloque uniquement les modules Compagnie exclusifs
-  if (taille === 'pme') return !REQUIRES_COMPAGNIE.has(moduleId)
+  if (effectiveTaille === 'pme') return !REQUIRES_COMPAGNIE.has(moduleId)
 
   // Entrepreneur (tpe) → bloque Business, Compagnie et Compagnie-only
   return !REQUIRES_PME.has(moduleId) && !REQUIRES_GRANDE.has(moduleId) && !REQUIRES_COMPAGNIE.has(moduleId)

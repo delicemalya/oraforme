@@ -28,6 +28,23 @@ export async function createTenantAndProfile(data: {
 
   if (authError || !user) return { error: 'Non authentifié' }
 
+  // ── Server-side validation — never trust the client (W2-C2) ──────────────────
+  const VALID_TAILLES = new Set<string>(['tpe', 'pme', 'grande'])
+  if (!VALID_TAILLES.has(data.taille)) {
+    return { error: 'Plan invalide.' }
+  }
+
+  const VALID_SECTEURS = new Set<string>([
+    'commerce', 'restaurant', 'ecole', 'sante', 'btp',
+    'transport', 'hotel', 'agriculture', 'pharmacie', 'banque',
+    'ong', 'cabinet', 'boisson', 'petrole', 'supermarche',
+    'boutique', 'assurance', 'recrutement', 'autre',
+  ])
+  if (!VALID_SECTEURS.has(data.secteurActivite as string)) {
+    return { error: 'Secteur invalide.' }
+  }
+  // ── End validation ────────────────────────────────────────────────────────────
+
   // Idempotency: if user already has a profile, do not create a second tenant
   const { data: existingProfile } = await supabaseAdmin
     .from('profiles')
