@@ -12,7 +12,7 @@ interface PaysContextValue {
   paysGeo: PaysGeo
   paysFiscal: PaysConfig
   formaterMontant: (montant: number) => string
-  calculerTVA: (montantHT: number) => { tva: number; ttc: number; taux: number }
+  calculerTVA: (montantHT: number) => { tva: number; ca: number; ttc: number; taux: number }
   calculerSalaireNet: (brut: number) => { net: number; cnss_salarie: number; irpp: number; total_retenues: number }
   detected: boolean
   loading: boolean
@@ -49,7 +49,7 @@ export function PaysProvider({ children }: { children: ReactNode }) {
       taxes_add += ta.base === 'tva_collectee' ? tva * ta.taux : montantHT * ta.taux
     }
     const ttc = montantHT + tva + taxes_add
-    return { tva: Math.round(tva + taxes_add), ttc: Math.round(ttc), taux }
+    return { tva: Math.round(tva), ca: Math.round(taxes_add), ttc: Math.round(ttc), taux }
   }
 
   function calculerSalaireNet(brut: number) {

@@ -20,7 +20,8 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { useLocale } from '@/lib/hooks/useLocale'
-import { calculerBulletinPaie } from '@/lib/fiscal/congo-calculs'
+import { calculerIRPP, calculerChargesSociales, type SituationFamiliale } from '@/lib/fiscal/universal-tax-engine'
+import { getCountryConfig, type CodePays } from '@/lib/countries'
 import { EmployeePhotoUploader } from '@/components/rh/EmployeePhotoUploader'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -105,7 +106,6 @@ const STATUT_STYLES: Record<string, { label: string; color: string; bg: string }
 
 const MOIS_LABELS = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
-// Moteur fiscal LF 2026 avec quotient familial (barème mensuel par part, Art. 76 CGI Congo)
 type SituFiscale = 'celibataire' | 'marie'
 type PrimesInput = { transport?: number; logement?: number; rendement?: number; responsabilite?: number }
 
@@ -113,16 +113,44 @@ function toSituFiscale(s?: string | null): SituFiscale {
   return s === 'marie' ? 'marie' : 'celibataire'
 }
 
-function calcNet(brut: number, situation: SituFiscale = 'celibataire', nbEnfants = 0, primes: PrimesInput = {}) {
-  const r = calculerBulletinPaie({
-    salaire_base:          brut,
-    situation_familiale:   situation,
-    nombre_enfants:        nbEnfants,
-    prime_transport:       (primes.transport ?? 0) + (primes.logement ?? 0),  // non-imposables
-    prime_rendement:       primes.rendement,
-    prime_responsabilite:  primes.responsabilite,
+function calcNet(
+  codePays: CodePays,
+  brut: number,
+  situation: SituationFamiliale = 'celibataire',
+  nbEnfants = 0,
+  primes: PrimesInput = {},
+) {
+  const primesImposables = (primes.rendement ?? 0) + (primes.responsabilite ?? 0)
+  const primesNonImp     = (primes.transport  ?? 0) + (primes.logement      ?? 0)
+  const brutImposable    = brut + primesImposables
+
+  const charges = calculerChargesSociales({ codePays, salaireBrut: brutImposable })
+  const baseIRPP = Math.max(0, brutImposable - charges.total_salarie)
+  const irppRes = calculerIRPP({
+    codePays,
+    salaireBrut:         baseIRPP,
+    salaireBrutOriginal: brutImposable,
+    situation,
+    nombreEnfants:       nbEnfants,
   })
-  return { cnss: r.cnss_salarie, irpp: r.irpp, net: r.net_a_payer, patro: r.total_charges_patronales, parts: r.nombre_parts }
+
+  const cfg = getCountryConfig(codePays)
+  const taxesFixes = cfg.taxes_fixes.filter(t => t.actif && t.periodicite === 'mensuel')
+  const totalTaxesFixes = taxesFixes.reduce((s, t) => s + t.montant, 0)
+
+  const net = brut + primesImposables + primesNonImp
+    - charges.total_salarie
+    - irppRes.irpp_net
+    - totalTaxesFixes
+
+  return {
+    cnss:       charges.total_salarie,
+    irpp:       irppRes.irpp_net,
+    net,
+    patro:      charges.total_patronal_net,
+    parts:      irppRes.nombre_parts,
+    taxesFixes,
+  }
 }
 
 function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) }
@@ -189,6 +217,8 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
 }) {
   const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
+  const { pays: tenantPays } = useTenant()
+  const codePays = (tenantPays ?? 'CG') as CodePays
   const [showForm,      setShowForm]      = useState(false)
   const [showEdit,      setShowEdit]      = useState(false)
   const [saving,        setSaving]        = useState(false)
@@ -320,7 +350,7 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
           { label: t('rh.activeSalary'),    val: employes.filter(e=>e.statut==='actif').length,                   color: '#10B981', icon: Users },
           { label: t('rh.onLeaveOrSick'),   val: employes.filter(e=>['conge','malade'].includes(e.statut)).length, color: '#F59E0B', icon: Calendar },
           { label: t('rh.payrollMass'),     val: fmtFCFA(masseBrute),                                             color: '#3B82F6', icon: TrendingUp },
-          { label: t('rh.employerCharge'),  val: fmtFCFA(employes.filter(e=>e.statut==='actif').reduce((s,e)=>s+calcNet(e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).patro, 0)), color: '#8B5CF6', icon: AlertTriangle },
+          { label: t('rh.employerCharge'),  val: fmtFCFA(employes.filter(e=>e.statut==='actif').reduce((s,e)=>s+calcNet(codePays, e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).patro, 0)), color: '#8B5CF6', icon: AlertTriangle },
         ].map(k => {
           const Icon = k.icon
           return (
@@ -411,7 +441,7 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
               </thead>
               <tbody className="divide-y divide-[#E2E8F0]">
                 {displayed.map((e, i) => {
-                  const calc = calcNet(e.salaire_base)
+                  const calc = calcNet(codePays, e.salaire_base)
                   return (
                     <motion.tr
                       key={e.id}
@@ -553,7 +583,7 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
                   </div>
                   {(() => {
                     const situ = toSituFiscale(selected.situation_matrimoniale)
-                    const { cnss, irpp, net, patro, parts } = calcNet(selected.salaire_base, situ, selected.nb_enfants ?? 0)
+                    const { cnss, irpp, net, patro, parts } = calcNet(codePays, selected.salaire_base, situ, selected.nb_enfants ?? 0)
                     return (
                       <>
                         <div className="flex justify-between text-[12px]"><span className="text-[#64748B]">{t('rh.gross')}</span><span className="font-semibold text-[#0F172A]">{fmt(selected.salaire_base)} FCFA</span></div>
@@ -737,7 +767,7 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
                     rendement:      Number(editForm.prime_rendement) || 0,
                     responsabilite: Number(editForm.prime_responsabilite) || 0,
                   }
-                  const { cnss, irpp, net, parts } = calcNet(Number(editForm.salaire_base), situ, editForm.nb_enfants ?? 0, primes)
+                  const { cnss, irpp, net, parts } = calcNet(codePays, Number(editForm.salaire_base), situ, editForm.nb_enfants ?? 0, primes)
                   return (
                     <div className="mt-3 bg-amber-50 border border-amber-100 rounded-xl p-3 text-[12px] space-y-1">
                       <div className="flex items-center justify-between mb-1">
@@ -833,16 +863,7 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
                   </div>
                   <div>
                     <label className={lCls}>{t('rh.workCity')}</label>
-                    <select value={form.ville} onChange={e => setForm(p => ({...p, ville: e.target.value}))} className={iCls}>
-                      <option value="PNR">Pointe-Noire</option>
-                      <option value="BZV">Brazzaville</option>
-                      <option value="KIN">Kinshasa</option>
-                      <option value="LBV">Libreville</option>
-                      <option value="DLA">Douala</option>
-                      <option value="ABJ">Abidjan</option>
-                      <option value="DKR">Dakar</option>
-                      <option value="LOS">Lagos</option>
-                    </select>
+                    <input type="text" value={form.ville ?? ''} onChange={e => setForm(p => ({...p, ville: e.target.value}))} placeholder="Ville de travail" className={iCls} />
                   </div>
                   <div>
                     <label className={lCls}>{t('rh.startDate')}</label>
@@ -934,7 +955,7 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
                     rendement:     Number(form.prime_rendement) || 0,
                     responsabilite: Number(form.prime_responsabilite) || 0,
                   }
-                  const { cnss, irpp, net, parts } = calcNet(Number(form.salaire_base), form.situation_matrimoniale, Number(form.nb_enfants) || 0, primes)
+                  const { cnss, irpp, net, parts, taxesFixes } = calcNet(codePays, Number(form.salaire_base), form.situation_matrimoniale, Number(form.nb_enfants) || 0, primes)
                   const brut = Number(form.salaire_base)
                   const totalPrimesImposables = primes.rendement + primes.responsabilite
                   const totalPrimesNonImposables = primes.transport + primes.logement
@@ -950,9 +971,11 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
                       {totalPrimesImposables > 0 && <div className="flex justify-between"><span className="text-amber-600">Primes imposables</span><span className="text-amber-700">+{fmt(totalPrimesImposables)} F</span></div>}
                       {totalPrimesNonImposables > 0 && <div className="flex justify-between"><span className="text-[#10B981]">Indemnités (non-imp.)</span><span className="text-[#10B981]">+{fmt(totalPrimesNonImposables)} F</span></div>}
                       <div className="border-t border-[#E2E8F0] pt-1 space-y-1">
-                        <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.cnss')} (4%)</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
+                        <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.cnss')}</span><span className="text-red-500">−{fmt(cnss)} F</span></div>
                         <div className="flex justify-between"><span className="text-[#64748B]">{t('rh.irpp')}</span><span className="text-red-500">−{fmt(irpp)} F</span></div>
-                        <div className="flex justify-between"><span className="text-[#64748B]">TOL</span><span className="text-red-500">−1 000 F</span></div>
+                        {taxesFixes.map(tf => (
+                          <div key={tf.code} className="flex justify-between"><span className="text-[#64748B]">{tf.libelle}</span><span className="text-red-500">−{fmt(tf.montant)} F</span></div>
+                        ))}
                       </div>
                       <div className="flex justify-between font-bold border-t border-[#E2E8F0] pt-1 text-[13px]"><span>{t('rh.netToPay')}</span><span className="text-[#10B981]">{fmt(net)} F</span></div>
                     </div>
@@ -1219,10 +1242,12 @@ function TabAlertes({ employes }: { employes: Employe[] }) {
 function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[] }) {
   const { fmt: fmtFCFA } = useFmt()
   const { t } = useLocale()
+  const { pays: tenantPays } = useTenant()
+  const codePays = (tenantPays ?? 'CG') as CodePays
   const actifs      = employes.filter(e => e.statut === 'actif')
   const masseBrute  = actifs.reduce((s, e) => s + e.salaire_base, 0)
-  const massePatro  = actifs.reduce((s, e) => s + calcNet(e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).patro, 0)
-  const masseNette  = actifs.reduce((s, e) => s + calcNet(e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).net, 0)
+  const massePatro  = actifs.reduce((s, e) => s + calcNet(codePays, e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).patro, 0)
+  const masseNette  = actifs.reduce((s, e) => s + calcNet(codePays, e.salaire_base, toSituFiscale(e.situation_matrimoniale), e.nb_enfants ?? 0).net, 0)
   const congesApp   = conges.filter(c => c.statut === 'approuve')
   const totalJours  = congesApp.reduce((s, c) => s + c.nb_jours, 0)
 
@@ -1236,7 +1261,7 @@ function TabRapports({ employes, conges }: { employes: Employe[]; conges: Conge[
         {[
           { label: t('rh.grossMass'),        val: fmtFCFA(masseBrute),              color: '#0F172A', sub: t('rh.employees') },
           { label: t('rh.netMass'),          val: fmtFCFA(masseNette),              color: '#10B981', sub: `après ${t('rh.cnss')} + ${t('rh.irpp')}` },
-          { label: t('rh.employerCharges'),  val: fmtFCFA(massePatro),              color: '#EF4444', sub: '14,16% plafonné' },
+          { label: t('rh.employerCharges'),  val: fmtFCFA(massePatro),              color: '#EF4444', sub: `${getCountryConfig(codePays).cnss.acronyme} ${(getCountryConfig(codePays).cnss.branches.reduce((s, b) => s + b.taux_patronal, 0) * 100).toFixed(2)}%` },
           { label: t('rh.totalCost'),        val: fmtFCFA(masseBrute + massePatro), color: '#0F172A', sub: 'brut + charges' },
           { label: t('rh.grantedLeave'),     val: `${totalJours} jours`,             color: '#2563EB', sub: `${congesApp.length} demande(s)` },
           { label: t('rh.totalHeadcount'),   val: employes.length,                  color: '#0F172A', sub: `${actifs.length} ${t('common.active')}` },

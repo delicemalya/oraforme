@@ -12,6 +12,8 @@ import {
 import { PAYS_LIST } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 import MIAAContextButton from '@/components/miaa/MIAAContextButton'
+import { getCountryConfig } from '@/lib/countries'
+import type { CodePays } from '@/lib/countries/types'
 
 function fmtN(n: number, devise = 'FCFA') {
   if (n === 0) return `0 ${devise}`
@@ -27,28 +29,64 @@ interface EcheanceData {
   statut: 'retard' | 'urgent' | 'ok'; montant_estime?: number; href: string
 }
 
-const MODULES = [
-  { id: 'tva',              titre: 'TVA',                  desc: 'TVA 18% + CA 5%',             periode: 'Avant le 20',           icon: Receipt,       gradient: 'from-blue-500 to-blue-600',   ring: '#3B82F6', href: '/dashboard/fiscalite/tva'              },
-  { id: 'cnss',             titre: 'CNSS',                 desc: 'Salarié 4% VID · Patronal 23,28%', periode: 'Avant le 15',       icon: Users,         gradient: 'from-amber-500 to-orange-500', ring: '#F59E0B', href: '/dashboard/fiscalite/cnss'             },
-  { id: 'das',              titre: 'DAS',                  desc: 'Sommes versées à des tiers',   periode: 'Avant 31 mars N+1',     icon: FileText,      gradient: 'from-red-500 to-rose-600',     ring: '#EF4444', href: '/dashboard/fiscalite/das'              },
-  { id: 'patente',          titre: 'Patente 721M',         desc: 'Contribution de la Patente',   periode: 'Avant 31 janvier',      icon: Building2,     gradient: 'from-green-500 to-emerald-600',ring: '#10B981', href: '/dashboard/fiscalite/patente'          },
-  { id: 'is',               titre: 'Impôt Société',        desc: 'IS 30% · Minimum 1% CA HT',   periode: 'Solde 30 avril N+1',    icon: Landmark,      gradient: 'from-violet-500 to-purple-600',ring: '#7C3AED', href: '/dashboard/fiscalite/is'               },
-  { id: 'irpp',             titre: 'IRPP',                 desc: 'Retenue à la source',          periode: 'Reversement avant le 20',icon: TrendingUp,   gradient: 'from-indigo-500 to-blue-600',  ring: '#6366F1', href: '/dashboard/fiscalite/irpp'             },
-  { id: 'taxe-apprentissage', titre: 'Taxe Apprentissage', desc: 'TA 1,2% + FPC 1,2% masse sal.',periode: 'Avant 30 avril N+1',   icon: GraduationCap, gradient: 'from-teal-500 to-cyan-600',    ring: '#14B8A6', href: '/dashboard/fiscalite/taxe-apprentissage'},
-  { id: 'liasse-fiscale',   titre: 'Déclarations DGI',     desc: 'Liasse fiscale · Bilan · CR', periode: 'Exercice complet',       icon: ClipboardList, gradient: 'from-orange-400 to-amber-600', ring: '#F97316', href: '/dashboard/fiscalite/liasse-fiscale'   },
-  { id: 'historique',       titre: 'Historique',           desc: 'Archives & Audit trail',       periode: 'Toutes déclarations',   icon: History,       gradient: 'from-slate-400 to-slate-500',  ring: '#64748B', href: '/dashboard/fiscalite/historique'       },
-]
+function getModulesFiscaux(codePays: string) {
+  const cfg = getCountryConfig(codePays as CodePays)
+  const tvaRate = Math.round(cfg.tva.taux_normal * 100)
+  const caAdd = cfg.tva.taxes_additionnelles.find(t => t.base === 'tva_collectee')
+  const tvaDesc = caAdd
+    ? `TVA ${tvaRate}% + ${caAdd.libelle} ${Math.round(caAdd.taux * 100)}%`
+    : `TVA ${tvaRate}%`
 
-const LEGAL_ITEMS = [
-  { label: 'Patente 721M', detail: 'avant 31 jan · base CA HT N-1 · min 50 000 FCFA', color: '#10B981' },
-  { label: 'TVA 18% + CA 5%', detail: 'avant le 20 du mois suivant',              color: '#3B82F6' },
-  { label: 'CNSS', detail: 'salarié 4% VID + patronal 23,28% · avant le 15',       color: '#F59E0B' },
-  { label: 'IRPP', detail: 'retenue source · reversement avant le 20',             color: '#6366F1' },
-  { label: 'IS 30%', detail: 'min 1% CA HT (plancher 500 000 F) · 30 avril N+1',  color: '#7C3AED' },
-  { label: 'DAS', detail: '>100 000 FCFA versés à tiers · avant 31 mars N+1',      color: '#EF4444' },
-  { label: 'TA/FPC', detail: '1,2% + 1,2% masse salariale · avant 30 avril N+1', color: '#14B8A6' },
-  { label: 'SMIG 90 000 FCFA/mois', detail: 'Plafond CNSS : 1 200 000 FCFA/mois (VID)', color: '#64748B' },
-]
+  const salarieTotal  = cfg.cnss.branches.reduce((s, b) => s + b.taux_salarie,  0)
+  const patronalTotal = cfg.cnss.branches.reduce((s, b) => s + b.taux_patronal, 0)
+  const mainBranch = cfg.cnss.branches[0]
+  const cnssDesc = `Salarié ${Math.round(salarieTotal * 100)}%${mainBranch ? ' ' + mainBranch.code : ''} · Patronal ${(patronalTotal * 100).toFixed(2)}%`
+
+  const isRate = Math.round(cfg.is.taux_standard * 100)
+  const isDesc = cfg.is.taux_minimum_ca
+    ? `IS ${isRate}% · Minimum ${(cfg.is.taux_minimum_ca * 100).toFixed(0)}% CA HT`
+    : `IS ${isRate}%`
+
+  return [
+    { id: 'tva',              titre: 'TVA',                  desc: tvaDesc,                        periode: `Avant le ${cfg.tva.echeance_jour}`,          icon: Receipt,       gradient: 'from-blue-500 to-blue-600',   ring: '#3B82F6', href: '/dashboard/fiscalite/tva'              },
+    { id: 'cnss',             titre: cfg.cnss.acronyme,       desc: cnssDesc,                       periode: `Avant le ${cfg.cnss.echeance_jour}`,         icon: Users,         gradient: 'from-amber-500 to-orange-500', ring: '#F59E0B', href: '/dashboard/fiscalite/cnss'             },
+    { id: 'das',              titre: 'DAS',                  desc: 'Sommes versées à des tiers',    periode: 'Avant 31 mars N+1',                          icon: FileText,      gradient: 'from-red-500 to-rose-600',     ring: '#EF4444', href: '/dashboard/fiscalite/das'              },
+    { id: 'patente',          titre: 'Patente',              desc: 'Contribution de la Patente',    periode: 'Avant 31 janvier',                           icon: Building2,     gradient: 'from-green-500 to-emerald-600',ring: '#10B981', href: '/dashboard/fiscalite/patente'          },
+    { id: 'is',               titre: 'Impôt Société',        desc: isDesc,                          periode: 'Solde 30 avril N+1',                         icon: Landmark,      gradient: 'from-violet-500 to-purple-600',ring: '#7C3AED', href: '/dashboard/fiscalite/is'               },
+    { id: 'irpp',             titre: cfg.irpp.nom,            desc: 'Retenue à la source',          periode: `Reversement avant le ${cfg.irpp.echeance_jour}`, icon: TrendingUp, gradient: 'from-indigo-500 to-blue-600',  ring: '#6366F1', href: '/dashboard/fiscalite/irpp'             },
+    { id: 'taxe-apprentissage', titre: 'Taxe Apprentissage', desc: 'TA · FPC masse salariale',      periode: 'Avant 30 avril N+1',                         icon: GraduationCap, gradient: 'from-teal-500 to-cyan-600',    ring: '#14B8A6', href: '/dashboard/fiscalite/taxe-apprentissage'},
+    { id: 'liasse-fiscale',   titre: 'Déclarations DGI',     desc: 'Liasse fiscale · Bilan · CR',  periode: 'Exercice complet',                            icon: ClipboardList, gradient: 'from-orange-400 to-amber-600', ring: '#F97316', href: '/dashboard/fiscalite/liasse-fiscale'   },
+    { id: 'historique',       titre: 'Historique',           desc: 'Archives & Audit trail',       periode: 'Toutes déclarations',                         icon: History,       gradient: 'from-slate-400 to-slate-500',  ring: '#64748B', href: '/dashboard/fiscalite/historique'       },
+  ]
+}
+
+function getObligationsLegales(codePays: string) {
+  const cfg = getCountryConfig(codePays as CodePays)
+  const tvaRate = Math.round(cfg.tva.taux_normal * 100)
+  const caAdd = cfg.tva.taxes_additionnelles.find(t => t.base === 'tva_collectee')
+  const tvaLabel = caAdd
+    ? `TVA ${tvaRate}% + ${caAdd.libelle} ${Math.round(caAdd.taux * 100)}%`
+    : `TVA ${tvaRate}%`
+
+  const salarieTotal  = cfg.cnss.branches.reduce((s, b) => s + b.taux_salarie,  0)
+  const patronalTotal = cfg.cnss.branches.reduce((s, b) => s + b.taux_patronal, 0)
+  const mainBranch = cfg.cnss.branches[0]
+  const plafondStr = mainBranch?.plafond_mensuel
+    ? ` · Plafond ${new Intl.NumberFormat('fr-FR').format(mainBranch.plafond_mensuel)} ${cfg.devise}/mois (${mainBranch.code})`
+    : ''
+  const smigFmt = new Intl.NumberFormat('fr-FR').format(cfg.smig)
+
+  return [
+    { label: 'Patente',       detail: `avant 31 jan · base CA HT N-1 · min 50 000 ${cfg.devise}`,                                                    color: '#10B981' },
+    { label: tvaLabel,        detail: `avant le ${cfg.tva.echeance_jour} du mois suivant`,                                                            color: '#3B82F6' },
+    { label: cfg.cnss.acronyme, detail: `salarié ${Math.round(salarieTotal * 100)}% + patronal ${(patronalTotal * 100).toFixed(2)}%${plafondStr} · avant le ${cfg.cnss.echeance_jour}`, color: '#F59E0B' },
+    { label: cfg.irpp.nom,    detail: `retenue source · reversement avant le ${cfg.irpp.echeance_jour}`,                                              color: '#6366F1' },
+    { label: `IS ${Math.round(cfg.is.taux_standard * 100)}%`, detail: cfg.is.taux_minimum_ca ? `min ${(cfg.is.taux_minimum_ca * 100).toFixed(0)}% CA HT · 30 avril N+1` : '30 avril N+1', color: '#7C3AED' },
+    { label: 'DAS',           detail: `>100 000 ${cfg.devise} versés à tiers · avant 31 mars N+1`,                                                    color: '#EF4444' },
+    { label: 'TA/FPC',        detail: '1,2% + 1,2% masse salariale · avant 30 avril N+1',                                                             color: '#14B8A6' },
+    { label: `SMIG ${smigFmt} ${cfg.devise}/mois`, detail: mainBranch?.plafond_mensuel ? `Plafond ${cfg.cnss.acronyme} : ${new Intl.NumberFormat('fr-FR').format(mainBranch.plafond_mensuel)} ${cfg.devise}/mois (${mainBranch.code})` : 'SMIG légal', color: '#64748B' },
+  ]
+}
 
 export default function FiscalitePage() {
   const { pays: paysDétecté } = usePays()
@@ -134,7 +172,7 @@ export default function FiscalitePage() {
             Fiscalité &amp; Déclarations
           </h1>
           <p className="text-[12px] text-[#64748B] mt-0.5">
-            {paysConfig?.nom ?? 'Congo-Brazzaville'} · DGI · Exercice {annee}
+            {paysConfig?.nom ?? pays} · DGI · Exercice {annee}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -213,7 +251,7 @@ export default function FiscalitePage() {
             Modules fiscaux
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {MODULES.map(mod => {
+            {getModulesFiscaux(pays).map(mod => {
               const Icon = mod.icon
               return (
                 <Link key={mod.id} href={mod.href}
@@ -296,10 +334,10 @@ export default function FiscalitePage() {
                 <CheckCircle size={13} className="text-[#16A34A]" />
                 Obligations DGI / CNSS
               </h2>
-              <p className="text-[10px] text-[#94A3B8] mt-0.5">Congo-Brazzaville</p>
+              <p className="text-[10px] text-[#94A3B8] mt-0.5">{paysConfig?.nom ?? pays}</p>
             </div>
             <div className="p-3 space-y-1.5">
-              {LEGAL_ITEMS.map((item, i) => (
+              {getObligationsLegales(pays).map((item, i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: item.color }} />
                   <div>

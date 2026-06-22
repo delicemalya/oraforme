@@ -408,8 +408,7 @@ export default function FacturationPage() {
   // ── Computed totals ───────────────────────────────────────────────────────────
 
   const subtotalLive = lignes.reduce((s, l) => s + l.price * l.quantity, 0)
-  const { tva: tvaLive, ttc: ttcLive } = calculerTVA(subtotalLive)
-  const caLive = 0
+  const { tva: tvaLive, ca: caLive, ttc: ttcLive } = calculerTVA(subtotalLive)
 
   function updateLigne(i: number, key: keyof FactureLigne, val: string | number) {
     setLignes(prev => prev.map((l, idx) => {
@@ -427,8 +426,7 @@ export default function FacturationPage() {
     setSaving(true)
     const finalStatut = asStatut ?? statut
     const ht = subtotalLive
-    const { tva: tvaFinal, ttc } = calculerTVA(ht)
-    const caFinal = 0
+    const { tva: tvaFinal, ca: caFinal, ttc } = calculerTVA(ht)
 
     if (editId) {
       const { error: errUpd } = await supabase.from('factures').update({
@@ -713,7 +711,7 @@ export default function FacturationPage() {
               <tbody>
                 {displayed.map((f, i) => {
                   const ht = f.subtotal ?? f.montant_ht ?? 0
-                  const { tva, ttc } = calculerTVA(ht); const ca = 0
+                  const { tva, ca, ttc } = calculerTVA(ht)
                   return (
                     <motion.tr
                       key={f.id}
@@ -1022,12 +1020,12 @@ export default function FacturationPage() {
                   {/* Totals */}
                   {(() => {
                     const ht = viewedFac.subtotal ?? viewedFac.montant_ht ?? 0
-                    const { tva, ttc } = calculerTVA(ht); const ca = 0
+                    const { tva, ca, ttc } = calculerTVA(ht)
                     return (
                       <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 space-y-2">
                         <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.subtotal')}</span><span className="text-[#101729]">{fmt(ht)}</span></div>
                         <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.tva18')}</span><span className="text-[#101729]">{fmt(tva)}</span></div>
-                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">CA 5 %</span><span className="text-[#101729]">{fmt(ca)}</span></div>
+                        {ca > 0 && <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Taxes additionnelles</span><span className="text-[#101729]">{fmt(ca)}</span></div>}
                         <div className="border-t border-[var(--border)] pt-2 flex justify-between">
                           <span className="font-bold text-[#101729]">{t('invoice.totalTTC')}</span>
                           <span className="font-bold text-[#DC2626] text-lg">{fmt(ttc)}</span>

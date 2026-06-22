@@ -45,7 +45,7 @@ function calcTVA(ht: number, codePays: string | null) {
   const tauxCA  = taxeAdd?.taux ?? 0
   const tva = Math.round(ht * tauxTVA)
   const ca  = Math.round(tva * tauxCA)
-  return { tva, ca, ttc: ht + tva + ca }
+  return { tva, ca, ttc: ht + tva + ca, tauxTVA, tauxCA, libelleCA: taxeAdd?.libelle ?? null }
 }
 
 const CATS_RECETTE = ["Vente / Chiffre d'affaires", 'Frais de scolarité', 'Prestation de services', 'Virement reçu', 'Autre recette']
@@ -512,7 +512,7 @@ export default function ComptabilitePage() {
             <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
               <div>
                 <h2 className="font-bold text-[#0F172A] text-[15px]">{t('compta.overview.addEntry')}</h2>
-                <p className="text-[11px] text-[#94A3B8] mt-0.5">Double entrée OHADA · TVA Congo automatique</p>
+                <p className="text-[11px] text-[#94A3B8] mt-0.5">Double entrée OHADA · TVA {pays ? getCountryConfig(pays as CodePays).nom_pays : ''} automatique</p>
               </div>
               <button onClick={() => { setShowModal(false); resetForm() }}><X size={18} className="text-[#94A3B8]" /></button>
             </div>
@@ -558,11 +558,11 @@ export default function ComptabilitePage() {
 
               {/* TVA preview */}
               {formMontant && Number(formMontant) > 0 && (() => {
-                const { tva, ca, ttc } = calcTVA(Number(formMontant), pays)
+                const { tva, ca, ttc, tauxTVA, tauxCA, libelleCA } = calcTVA(Number(formMontant), pays)
                 return (
-                  <div className="bg-[#FEF3C7] rounded-lg p-3 text-[11px] grid grid-cols-3 gap-2">
-                    <div className="text-center"><div className="font-bold text-[#D97706]">{fmtFCFA(tva)}</div><div className="text-[#94A3B8]">TVA 18%</div></div>
-                    <div className="text-center"><div className="font-bold text-[#D97706]">{fmtFCFA(ca)}</div><div className="text-[#94A3B8]">CA 5%</div></div>
+                  <div className={`bg-[#FEF3C7] rounded-lg p-3 text-[11px] gap-2 ${ca > 0 ? 'grid grid-cols-3' : 'grid grid-cols-2'}`}>
+                    <div className="text-center"><div className="font-bold text-[#D97706]">{fmtFCFA(tva)}</div><div className="text-[#94A3B8]">TVA {Math.round(tauxTVA * 100)}%</div></div>
+                    {ca > 0 && <div className="text-center"><div className="font-bold text-[#D97706]">{fmtFCFA(ca)}</div><div className="text-[#94A3B8]">{libelleCA ?? 'Taxes add.'} {Math.round(tauxCA * 100)}%</div></div>}
                     <div className="text-center"><div className="font-bold text-[#0F172A]">{fmtFCFA(ttc)}</div><div className="text-[#94A3B8]">TTC</div></div>
                   </div>
                 )
