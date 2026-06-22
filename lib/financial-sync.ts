@@ -88,7 +88,7 @@ export async function recordFinancialOperation(input: FinancialOperationInput): 
       categorie:          input.categorie,
       montant:            input.montant,
       libelle:            input.libelle,
-      date_operation:     dateOp,
+      date:               dateOp,
       moyen_paiement:     input.moyenPaiement ?? 'especes',
       source:             input.source,
       source_id:          input.sourceId,

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
-import { calculerTVACongo } from '@/lib/fiscalite-congo'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,16 +66,12 @@ export async function PATCH(
 
   if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
 
-  // Si la facture passe à "payée" → écriture OHADA 521/411 + transaction trésorerie
+  // Si la facture passe à "payée" → enregistrer le paiement dans paiements_factures
+  // Les écritures OHADA (521/411) et transaction trésorerie sont gérées exclusivement
+  // par fn_facture_paid_to_journal (migration 046) via AFTER UPDATE OF statut
   if (statut === 'payee' && existing.statut !== 'payee') {
-    const ht    = existing.subtotal ?? existing.montant_ht ?? 0
-    const { ttc } = calculerTVACongo(ht)
     const today = new Date().toISOString().split('T')[0]
-    const fiscYear = new Date().getFullYear()
-    const pieceNum = existing.invoice_number ?? `FAC-${id.slice(0, 8).toUpperCase()}`
-    const clientName = existing.client_name ?? existing.client_nom ?? ''
 
-    // 1. Enregistrer paiement dans paiements_factures
     if (montant_paye) {
       await supabaseAdmin.from('paiements_factures').insert({
         tenant_id:     ctx.tenantId,
@@ -84,53 +79,6 @@ export async function PATCH(
         montant:       montant_paye,
         mode_paiement: mode_paiement ?? 'especes',
         date:          today,
-        reference:     reference ?? null,
-      })
-    }
-
-    // 2. Écriture OHADA : débit 521 Banque / crédit 411 Clients
-    const { count } = await supabaseAdmin
-      .from('journal_entries')
-      .select('id', { count: 'exact', head: true })
-      .eq('tenant_id', ctx.tenantId)
-      .eq('source', 'facture')
-      .eq('source_id', id)
-      .eq('debit_account', '521')
-
-    if ((count ?? 0) === 0) {
-      await supabaseAdmin.from('journal_entries').insert({
-        tenant_id:      ctx.tenantId,
-        date_operation: today,
-        libelle:        `Règlement facture ${pieceNum} — ${clientName}`,
-        debit_account:  '521',
-        credit_account: '411',
-        montant:        ttc || existing.total || 0,
-        source:         'facture',
-        source_id:      id,
-        fiscal_year:    fiscYear,
-        piece_number:   `REG-${pieceNum}`,
-      })
-    }
-
-    // 3. Transaction trésorerie
-    const { count: txCount } = await supabaseAdmin
-      .from('transactions')
-      .select('id', { count: 'exact', head: true })
-      .eq('tenant_id', ctx.tenantId)
-      .eq('source', 'facture')
-      .eq('source_id', id)
-
-    if ((txCount ?? 0) === 0) {
-      await supabaseAdmin.from('transactions').insert({
-        tenant_id:     ctx.tenantId,
-        type:          'entree',
-        categorie:     'Facture payée',
-        description:   `Facture ${pieceNum} — ${clientName}`,
-        montant:       ttc || existing.total || 0,
-        date:          today,
-        mode_paiement: mode_paiement ?? 'virement',
-        source:        'facture',
-        source_id:     id,
         reference:     reference ?? null,
       })
     }
