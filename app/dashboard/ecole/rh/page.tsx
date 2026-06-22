@@ -1761,7 +1761,7 @@ function SectionRecrutement({ tenantId }: { tenantId: string }) {
 
   async function toggleStatut(id: string, statut: string) {
     const next = statut === 'ouvert' ? 'ferme' : 'ouvert'
-    await supabase.from('recrutements_ecole').update({ statut: next }).eq('id', id)
+    await supabase.from('recrutements_ecole').update({ statut: next }).eq('id', id).eq('tenant_id', tenantId)
     setPostes(p => p.map(x => x.id === id ? { ...x, statut: next } : x))
   }
 

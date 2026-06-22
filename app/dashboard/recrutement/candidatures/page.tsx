@@ -68,7 +68,7 @@ function CandidaturesContent() {
   useEffect(() => { if (tenantId) void load() }, [tenantId, offreId])
 
   async function updateStatut(id: string, statut: string) {
-    await supabase.from('candidatures').update({ statut }).eq('id', id)
+    await supabase.from('candidatures').update({ statut }).eq('id', id).eq('tenant_id', tenantId)
     setCandidatures(prev => prev.map(c => c.id === id ? { ...c, statut } : c))
   }
 

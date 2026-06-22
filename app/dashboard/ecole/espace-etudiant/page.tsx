@@ -332,9 +332,9 @@ export default function EspaceEtudiantPage() {
     setSelected(etu)
     setLoadingData(true)
     const [{ data: n }, { data: p }, { data: a }, { data: notifData }] = await Promise.all([
-      supabase.from('notes_etudiants').select('*').eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(200),
-      supabase.from('paiements_scolaires').select('*').eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(200),
-      supabase.from('absences_etudiants').select('*').eq('etudiant_id', etu.id).order('date_absence', { ascending: false }).limit(200),
+      supabase.from('notes_etudiants').select('*').eq('tenant_id', tenantId).eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(200),
+      supabase.from('paiements_scolaires').select('*').eq('tenant_id', tenantId).eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(200),
+      supabase.from('absences_etudiants').select('*').eq('tenant_id', tenantId).eq('etudiant_id', etu.id).order('date_absence', { ascending: false }).limit(200),
       supabase.from('notifications').select('id,titre,message,read,created_at').eq('etudiant_id', etu.id).order('created_at', { ascending: false }).limit(20),
     ])
     setNotes((n ?? []) as Note[])
@@ -376,11 +376,11 @@ export default function EspaceEtudiantPage() {
     if (!selected || !tenantId) return
     setBlocking(true)
     if (selected.statut === 'suspendu') {
-      await supabase.from('etudiants').update({ statut: 'actif', code_deblocage: null }).eq('id', selected.id)
+      await supabase.from('etudiants').update({ statut: 'actif', code_deblocage: null }).eq('id', selected.id).eq('tenant_id', tenantId)
       setSelected(s => s ? { ...s, statut: 'actif', code_deblocage: null } : s)
     } else {
       const code = generateCode()
-      await supabase.from('etudiants').update({ statut: 'suspendu', code_deblocage: code }).eq('id', selected.id)
+      await supabase.from('etudiants').update({ statut: 'suspendu', code_deblocage: code }).eq('id', selected.id).eq('tenant_id', tenantId)
       setSelected(s => s ? { ...s, statut: 'suspendu', code_deblocage: code } : s)
     }
     setBlocking(false)

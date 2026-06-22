@@ -113,7 +113,7 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
       roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
       minSousType: 'college' },
 
-    // ─ À partir du Lycée (Business)
+    // ─ À partir du Lycée
     { id: 'ecole-comptabilite',
       href:        '/dashboard/ecole/comptabilite',
       label:       'Comptabilité',
@@ -121,7 +121,28 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
       roleFilter:  ['DIRECTION_GENERALE', 'RAF'],
       minSousType: 'lycee' },
 
-    // ─ Université uniquement (Entreprise+)
+    { id: 'ecole-series',
+      href:        '/dashboard/ecole/series',
+      label:       'Séries & Options',
+      sublabel:    'Séries, coefficients & baccalauréat',
+      roleFilter:  ['DIRECTION_GENERALE', 'SCOLARITE', 'DAAC'],
+      minSousType: 'lycee' },
+
+    // ─ Université uniquement
+    { id: 'ecole-ue',
+      href:        '/dashboard/ecole/unites-enseignement',
+      label:       'Unités d\'Enseignement',
+      sublabel:    'UE, crédits ECTS & parcours LMD',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'universite' },
+
+    { id: 'ecole-semestres',
+      href:        '/dashboard/ecole/semestres',
+      label:       'Semestres & Délibérations',
+      sublabel:    'Validation semestres, mentions, jurys',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'universite' },
+
     { id: 'parametres-academiques',
       href:        '/dashboard/ecole/parametres-academiques',
       label:       'Paramètres LMD',
@@ -145,6 +166,41 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
       label:       'Diplômes & Attestations',
       sublabel:    'Émission & registres',
       roleFilter:  ['DIRECTION_GENERALE', 'DAAC', 'SCOLARITE'],
+      minSousType: 'universite' },
+
+    { id: 'ecole-annees-academiques',
+      href:        '/dashboard/ecole/annees-academiques',
+      label:       'Années Académiques',
+      sublabel:    'Sessions, calendrier & statuts',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'universite' },
+
+    { id: 'ecole-deliberations',
+      href:        '/dashboard/ecole/deliberations',
+      label:       'Délibérations',
+      sublabel:    'Résultats annuels, admis & ajournés',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'universite' },
+
+    { id: 'ecole-facultes',
+      href:        '/dashboard/ecole/facultes',
+      label:       'Facultés',
+      sublabel:    'UFR, instituts & écoles',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'universite' },
+
+    { id: 'ecole-departements',
+      href:        '/dashboard/ecole/departements',
+      label:       'Départements',
+      sublabel:    'Départements académiques & responsables',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
+      minSousType: 'universite' },
+
+    { id: 'ecole-parcours',
+      href:        '/dashboard/ecole/parcours',
+      label:       'Parcours & Programmes',
+      sublabel:    'Licences, Masters, Doctorats',
+      roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
       minSousType: 'universite' },
   ],
   restaurant: [

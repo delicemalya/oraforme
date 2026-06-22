@@ -123,11 +123,11 @@ export default function AffairesPage() {
       const [affRes, audRes] = await Promise.all([
         supabase.from('cabinet_affaires')
           .select('*')
-          .eq('tenant_id', tenantId)
+          .eq('cabinet_tenant_id', tenantId)
           .order('created_at', { ascending: false }),
         supabase.from('cabinet_audiences')
           .select('*')
-          .eq('tenant_id', tenantId)
+          .eq('cabinet_tenant_id', tenantId)
           .gte('date_audience', new Date().toISOString().split('T')[0])
           .order('date_audience', { ascending: true })
           .limit(10),
@@ -150,7 +150,7 @@ export default function AffairesPage() {
     setSaving(true); setError('')
     const ref = `AFF-${Date.now().toString(36).toUpperCase()}`
     const { error: err } = await supabase.from('cabinet_affaires').insert({
-      tenant_id:           tenantId,
+      cabinet_tenant_id:   tenantId,
       reference:           ref,
       intitule:            form.intitule.trim(),
       type_affaire:        form.type_affaire,

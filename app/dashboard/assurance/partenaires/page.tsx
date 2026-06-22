@@ -71,8 +71,8 @@ export default function PartenairesPage() {
     setSaving(true); setError('')
     const payload = { ...form, tenant_id: tenantId }
     let err
-    if (editing) { const r = await supabase.from('ass_partenaires').update(payload).eq('id', editing.id); err = r.error }
-    else         { const r = await supabase.from('ass_partenaires').insert(payload);                       err = r.error }
+    if (editing) { const r = await supabase.from('ass_partenaires').update(payload).eq('id', editing.id).eq('tenant_id', tenantId); err = r.error }
+    else         { const r = await supabase.from('ass_partenaires').insert(payload);                                                  err = r.error }
     setSaving(false)
     if (err) { setError(err.message); return }
     setShowModal(false); load()
@@ -80,7 +80,7 @@ export default function PartenairesPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Supprimer ce partenaire ?')) return
-    await supabase.from('ass_partenaires').delete().eq('id', id)
+    await supabase.from('ass_partenaires').delete().eq('id', id).eq('tenant_id', tenantId)
     load()
   }
 

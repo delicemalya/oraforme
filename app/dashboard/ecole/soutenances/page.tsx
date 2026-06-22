@@ -3,26 +3,34 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { useTenant } from '@/lib/hooks/useTenant'
 import Link from 'next/link'
 import {
   Calendar, Plus, Search, RefreshCw, Loader2, X, CheckCircle, Edit3, Users,
 } from 'lucide-react'
 
 interface Soutenance {
-  id:             string
-  these_id:       string | null
-  etudiant_nom:   string
-  titre:          string
-  niveau:         string | null
-  date_soutenance:string | null
-  heure:          string | null
-  salle:          string | null
-  directeur_nom:  string | null
-  jury:           string[] | null
-  mention:        string | null
-  note:           number | null
-  statut:         'planifiee' | 'en_cours' | 'validee' | 'ajournee' | 'annulee'
-  observations:   string | null
+  id:                   string
+  these_id:             string | null
+  etudiant_nom:         string
+  titre:                string
+  niveau:               string | null
+  niveau_etude:         string | null
+  date_soutenance:      string | null
+  heure:                string | null
+  salle:                string | null
+  directeur_nom:        string | null
+  co_directeur_memoire: string | null
+  president_jury:       string | null
+  rapporteur:           string | null
+  examinateur_1:        string | null
+  examinateur_2:        string | null
+  jury:                 string[] | null
+  mention:              string | null
+  note:                 number | null
+  statut:               'planifiee' | 'en_cours' | 'validee' | 'ajournee' | 'annulee'
+  observations:         string | null
+  pv_pdf_url:           string | null
 }
 
 const STATUT_CFG: Record<Soutenance['statut'], { label: string; color: string; bg: string }> = {
@@ -40,18 +48,25 @@ function ModalSoutenance({
 }: { soutenance: Soutenance | null; onClose: () => void; onSaved: () => void }) {
   const { tenant } = useTenantContext()
   const [form, setForm] = useState({
-    etudiant_nom:    soutenance?.etudiant_nom    ?? '',
-    titre:           soutenance?.titre           ?? '',
-    niveau:          soutenance?.niveau          ?? 'Master 2',
-    date_soutenance: soutenance?.date_soutenance ?? '',
-    heure:           soutenance?.heure           ?? '09:00',
-    salle:           soutenance?.salle           ?? '',
-    directeur_nom:   soutenance?.directeur_nom   ?? '',
-    jury_txt:        (soutenance?.jury ?? []).join('\n'),
-    mention:         soutenance?.mention         ?? '',
-    note:            soutenance?.note?.toString() ?? '',
-    statut:          soutenance?.statut          ?? 'planifiee' as Soutenance['statut'],
-    observations:    soutenance?.observations    ?? '',
+    etudiant_nom:         soutenance?.etudiant_nom         ?? '',
+    titre:                soutenance?.titre                ?? '',
+    niveau:               soutenance?.niveau               ?? 'Master 2',
+    niveau_etude:         soutenance?.niveau_etude         ?? 'Master',
+    date_soutenance:      soutenance?.date_soutenance      ?? '',
+    heure:                soutenance?.heure                ?? '09:00',
+    salle:                soutenance?.salle                ?? '',
+    directeur_nom:        soutenance?.directeur_nom        ?? '',
+    co_directeur_memoire: soutenance?.co_directeur_memoire ?? '',
+    president_jury:       soutenance?.president_jury       ?? '',
+    rapporteur:           soutenance?.rapporteur           ?? '',
+    examinateur_1:        soutenance?.examinateur_1        ?? '',
+    examinateur_2:        soutenance?.examinateur_2        ?? '',
+    jury_txt:             (soutenance?.jury ?? []).join('\n'),
+    mention:              soutenance?.mention              ?? '',
+    note:                 soutenance?.note?.toString()     ?? '',
+    statut:               soutenance?.statut               ?? 'planifiee' as Soutenance['statut'],
+    observations:         soutenance?.observations         ?? '',
+    pv_pdf_url:           soutenance?.pv_pdf_url           ?? '',
   })
   const [saving, setSaving] = useState(false)
 
@@ -60,12 +75,25 @@ function ModalSoutenance({
     setSaving(true)
     const jury = form.jury_txt.split('\n').map(s => s.trim()).filter(Boolean)
     const data = {
-      etudiant_nom: form.etudiant_nom, titre: form.titre, niveau: form.niveau || null,
-      date_soutenance: form.date_soutenance || null, heure: form.heure || null,
-      salle: form.salle || null, directeur_nom: form.directeur_nom || null,
-      jury: jury.length > 0 ? jury : null,
-      mention: form.mention || null, note: form.note ? parseFloat(form.note) : null,
-      statut: form.statut, observations: form.observations || null,
+      etudiant_nom:         form.etudiant_nom,
+      titre:                form.titre,
+      niveau:               form.niveau || null,
+      niveau_etude:         form.niveau_etude || null,
+      date_soutenance:      form.date_soutenance || null,
+      heure:                form.heure || null,
+      salle:                form.salle || null,
+      directeur_nom:        form.directeur_nom || null,
+      co_directeur_memoire: form.co_directeur_memoire || null,
+      president_jury:       form.president_jury || null,
+      rapporteur:           form.rapporteur || null,
+      examinateur_1:        form.examinateur_1 || null,
+      examinateur_2:        form.examinateur_2 || null,
+      jury:                 jury.length > 0 ? jury : null,
+      mention:              form.mention || null,
+      note:                 form.note ? parseFloat(form.note) : null,
+      statut:               form.statut,
+      observations:         form.observations || null,
+      pv_pdf_url:           form.pv_pdf_url || null,
     }
     if (soutenance) {
       await supabase.from('ecole_soutenances').update(data).eq('id', soutenance.id).eq('tenant_id', tenant?.tenantId)
@@ -108,14 +136,42 @@ function ModalSoutenance({
               <input value={form.salle} onChange={e => setForm(f => ({ ...f, salle: e.target.value }))} className={I} placeholder="Amphi A" />
             </div>
           </div>
-          <div>
-            <label className="block text-[12px] font-bold mb-1.5">Directeur de thèse</label>
-            <input value={form.directeur_nom} onChange={e => setForm(f => ({ ...f, directeur_nom: e.target.value }))} className={I} placeholder="Prof. ..." />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[12px] font-bold mb-1.5">Directeur de thèse</label>
+              <input value={form.directeur_nom} onChange={e => setForm(f => ({ ...f, directeur_nom: e.target.value }))} className={I} placeholder="Prof. ..." />
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold mb-1.5">Co-directeur</label>
+              <input value={form.co_directeur_memoire} onChange={e => setForm(f => ({ ...f, co_directeur_memoire: e.target.value }))} className={I} placeholder="Dr. ..." />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[12px] font-bold mb-1.5">Président du jury</label>
+              <input value={form.president_jury} onChange={e => setForm(f => ({ ...f, president_jury: e.target.value }))} className={I} placeholder="Prof. ..." />
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold mb-1.5">Rapporteur</label>
+              <input value={form.rapporteur} onChange={e => setForm(f => ({ ...f, rapporteur: e.target.value }))} className={I} placeholder="Dr. ..." />
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold mb-1.5">Examinateur 1</label>
+              <input value={form.examinateur_1} onChange={e => setForm(f => ({ ...f, examinateur_1: e.target.value }))} className={I} placeholder="Dr. ..." />
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold mb-1.5">Examinateur 2</label>
+              <input value={form.examinateur_2} onChange={e => setForm(f => ({ ...f, examinateur_2: e.target.value }))} className={I} placeholder="Dr. ..." />
+            </div>
           </div>
           <div>
-            <label className="block text-[12px] font-bold mb-1.5">Membres du jury (un par ligne)</label>
-            <textarea value={form.jury_txt} onChange={e => setForm(f => ({ ...f, jury_txt: e.target.value }))} rows={3}
-              className={`${I} resize-none`} placeholder={"Dr. Dupont (Président)\nProf. Martin\nDr. Leroy"} />
+            <label className="block text-[12px] font-bold mb-1.5">Autres membres du jury (un par ligne)</label>
+            <textarea value={form.jury_txt} onChange={e => setForm(f => ({ ...f, jury_txt: e.target.value }))} rows={2}
+              className={`${I} resize-none`} placeholder="Membres supplémentaires…" />
+          </div>
+          <div>
+            <label className="block text-[12px] font-bold mb-1.5">PV / Lien document (URL)</label>
+            <input value={form.pv_pdf_url} onChange={e => setForm(f => ({ ...f, pv_pdf_url: e.target.value }))} className={I} placeholder="https://..." />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -153,6 +209,7 @@ function ModalSoutenance({
 
 export default function EcoleSoutenancesPage() {
   const { tenant } = useTenantContext()
+  const { sousType } = useTenant()
   const tid = tenant?.tenantId
 
   const [rows,    setRows]    = useState<Soutenance[]>([])
@@ -180,6 +237,17 @@ export default function EcoleSoutenancesPage() {
   })
 
   const upcoming = rows.filter(r => r.statut === 'planifiee' && r.date_soutenance && r.date_soutenance >= new Date().toISOString().split('T')[0])
+
+  if (sousType && sousType !== 'universite') {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <Calendar size={40} style={{ color: '#CBD5E1' }} />
+        <p style={{ color: '#64748B', fontSize: 14 }}>
+          Les soutenances sont réservées aux établissements de type Université.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-20">

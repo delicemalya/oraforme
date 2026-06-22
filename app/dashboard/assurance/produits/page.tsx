@@ -79,7 +79,7 @@ export default function ProduitsPage() {
     const payload = { ...form, tenant_id: tenantId }
     let err
     if (editing) {
-      const r = await supabase.from('ass_produits').update(payload).eq('id', editing.id)
+      const r = await supabase.from('ass_produits').update(payload).eq('id', editing.id).eq('tenant_id', tenantId)
       err = r.error
     } else {
       const r = await supabase.from('ass_produits').insert(payload)
@@ -91,7 +91,7 @@ export default function ProduitsPage() {
   }
 
   const toggleActif = async (id: string, actif: boolean) => {
-    await supabase.from('ass_produits').update({ actif: !actif }).eq('id', id)
+    await supabase.from('ass_produits').update({ actif: !actif }).eq('id', id).eq('tenant_id', tenantId)
     load()
   }
 

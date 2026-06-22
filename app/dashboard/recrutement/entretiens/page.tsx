@@ -77,7 +77,7 @@ export default function EntretiensPage() {
   }
 
   async function updateStatut(id: string, statut: string) {
-    await supabase.from('entretiens').update({ statut }).eq('id', id)
+    await supabase.from('entretiens').update({ statut }).eq('id', id).eq('tenant_id', tenantId)
     setEntretiens(prev => prev.map(e => e.id === id ? { ...e, statut } : e))
   }
 

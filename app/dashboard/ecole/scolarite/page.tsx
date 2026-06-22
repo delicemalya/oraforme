@@ -32,8 +32,31 @@ type SubTab = 'inscriptions' | 'paiements' | 'notes' | 'classes' | 'planning' | 
 
 // -- Inscriptions --------------------------------------------------------------
 
-function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEcole }: {
-  tenantId: string; etudiants: Etudiant[]; onRefresh: () => void; nomEcole: string
+// Retourne les niveaux disponibles selon le type d'établissement (MJ-03)
+function getNiveauxPourSousType(sousType: string | null): typeof NIVEAUX {
+  switch (sousType) {
+    case 'garderie':  return NIVEAUX.filter(n => n.value === 'primaire')
+    case 'primaire':  return NIVEAUX.filter(n => n.value === 'primaire')
+    case 'college':   return NIVEAUX.filter(n => n.value === 'college')
+    case 'lycee':     return NIVEAUX.filter(n => n.value === 'lycee')
+    case 'universite':return NIVEAUX.filter(n => ['licence', 'master', 'doctorat'].includes(n.value))
+    default:          return NIVEAUX
+  }
+}
+
+function getDefaultNiveau(sousType: string | null): Niveau {
+  switch (sousType) {
+    case 'garderie':  return 'primaire'
+    case 'primaire':  return 'primaire'
+    case 'college':   return 'college'
+    case 'lycee':     return 'lycee'
+    case 'universite':return 'licence'
+    default:          return 'lycee'
+  }
+}
+
+function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEcole, sousType }: {
+  tenantId: string; etudiants: Etudiant[]; onRefresh: () => void; nomEcole: string; sousType: string | null
 }) {
   const { t } = useLocale()
   const [filter,   setFilter]   = useState<'tous' | StatutEtu>('tous')
@@ -43,9 +66,12 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEco
   const [saving,   setSaving]   = useState(false)
   const [genCode,  setGenCode]  = useState(false)
 
+  const niveauxDisponibles = getNiveauxPourSousType(sousType)
+  const defaultNiveau      = getDefaultNiveau(sousType)
+
   const [form, setForm] = useState({
     prenom: '', nom: '', date_naissance: '', lieu_naissance: '', nationalite: 'Congolaise', adresse: '',
-    niveau: 'lycee' as Niveau, classe: '', statut: 'actif' as StatutEtu,
+    niveau: defaultNiveau as Niveau, classe: '', statut: 'actif' as StatutEtu,
     nom_pere: '', nom_mere: '', tel_parent: '', email_parent: '', profession_parent: '',
     nom_tuteur: '', tel_tuteur: '', lien_tuteur: '', annee_scolaire: '2024-2025', photo_url: '',
   })
@@ -65,17 +91,18 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEco
     const num  = `ETU-${year}-${String((count ?? 0) + 1).padStart(3, '0')}`
     const { error } = await supabase.from('etudiants').insert({
       tenant_id: tenantId, numero_id: num, ...form,
+      ecole_subtype: sousType || null,
       photo_url: form.photo_url || null, date_naissance: form.date_naissance || null,
     })
     if (!error) {
       onRefresh(); setShowForm(false)
-      setForm({ prenom: '', nom: '', date_naissance: '', lieu_naissance: '', nationalite: 'Congolaise', adresse: '', niveau: 'lycee', classe: '', statut: 'actif', nom_pere: '', nom_mere: '', tel_parent: '', email_parent: '', profession_parent: '', nom_tuteur: '', tel_tuteur: '', lien_tuteur: '', annee_scolaire: '2024-2025', photo_url: '' })
+      setForm({ prenom: '', nom: '', date_naissance: '', lieu_naissance: '', nationalite: 'Congolaise', adresse: '', niveau: defaultNiveau, classe: '', statut: 'actif', nom_pere: '', nom_mere: '', tel_parent: '', email_parent: '', profession_parent: '', nom_tuteur: '', tel_tuteur: '', lien_tuteur: '', annee_scolaire: '2024-2025', photo_url: '' })
     }
     setSaving(false)
   }
 
   async function changeStatut(id: string, statut: StatutEtu) {
-    await supabase.from('etudiants').update({ statut }).eq('id', id)
+    await supabase.from('etudiants').update({ statut }).eq('id', id).eq('tenant_id', tenantId)
     setSelected(s => s ? { ...s, statut } : s)
     onRefresh()
   }
@@ -83,13 +110,13 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEco
   async function handleGenCode(id: string) {
     setGenCode(true)
     const code = generateCode()
-    await supabase.from('etudiants').update({ code_deblocage: code }).eq('id', id)
+    await supabase.from('etudiants').update({ code_deblocage: code }).eq('id', id).eq('tenant_id', tenantId)
     setSelected(s => s ? { ...s, code_deblocage: code } : s)
     onRefresh(); setGenCode(false)
   }
 
   async function del(id: string) {
-    await supabase.from('etudiants').delete().eq('id', id)
+    await supabase.from('etudiants').delete().eq('id', id).eq('tenant_id', tenantId)
     setSelected(null); onRefresh()
   }
 
@@ -286,7 +313,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEco
                   <div>
                     <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Niveau</label>
                     <select value={form.niveau} onChange={e => sf('niveau', e.target.value)} className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[#101729] focus:outline-none focus:border-[#00b9a7]">
-                      {NIVEAUX.map(n => <option key={n.value} value={n.value} className="bg-[var(--card-bg)]">{n.label}</option>)}
+                      {niveauxDisponibles.map(n => <option key={n.value} value={n.value} className="bg-[var(--card-bg)]">{n.label}</option>)}
                     </select>
                   </div>
                   <FI label="Classe / Fili�re" value={form.classe} onChange={v => sf('classe', v)} placeholder="Terminale A, L3 Informatique�" />
@@ -549,10 +576,10 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
   const [form, setForm] = useState({ matiere: '', type_note: 'devoir', note: '', note_max: '20', coefficient: '1', annee_scolaire: '2024-2025' })
 
   useEffect(() => {
-    if (!selectedId) return
-    supabase.from('notes_etudiants').select('*').eq('etudiant_id', selectedId).limit(200)
+    if (!selectedId || !tenantId) return
+    supabase.from('notes_etudiants').select('*').eq('tenant_id', tenantId).eq('etudiant_id', selectedId).limit(200)
       .then(({ data }) => setNotes((data ?? []) as Note[]))
-  }, [selectedId])
+  }, [selectedId, tenantId])
 
   async function addNote() {
     if (!selectedId || !form.matiere || !form.note) return
@@ -567,7 +594,7 @@ function SectionNotes({ tenantId, etudiants, nomEcole }: {
   }
 
   async function delNote(id: string) {
-    await supabase.from('notes_etudiants').delete().eq('id', id)
+    await supabase.from('notes_etudiants').delete().eq('id', id).eq('tenant_id', tenantId)
     setNotes(p => p.filter(n => n.id !== id))
   }
 
@@ -1023,11 +1050,29 @@ function SectionAbsences({ tenantId, etudiants }: { tenantId: string; etudiants:
 
 // -- Main Page -----------------------------------------------------------------
 
+// Onglets visibles par type d'établissement (BLOC 2 — cloisonnement sidebar/UI)
+function getTabsForSousType(sousType: string | null, tabs: { id: SubTab; label: string; icon: React.ElementType }[]) {
+  const always: SubTab[] = ['inscriptions', 'paiements', 'absences']
+  const fromCollege: SubTab[] = ['notes', 'classes', 'planning', 'matieres']
+  const fromLycee: SubTab[] = ['sessions', 'examens']
+  const fromUniv: SubTab[] = ['attestations']
+
+  const allowed = new Set<SubTab>(always)
+  const niveau = sousType === 'garderie' ? 0 : sousType === 'primaire' ? 1 : sousType === 'college' ? 2 : sousType === 'lycee' ? 3 : 4
+
+  if (niveau >= 2) fromCollege.forEach(t => allowed.add(t))
+  if (niveau >= 3) fromLycee.forEach(t => allowed.add(t))
+  if (niveau >= 4) fromUniv.forEach(t => allowed.add(t))
+  if (!sousType)   tabs.forEach(t => allowed.add(t.id)) // sans filtrage si pas de sousType
+
+  return tabs.filter(t => allowed.has(t.id))
+}
+
 export default function ScolaritePage() {
-  const { tenantId, loading: tenantLoading } = useTenant()
+  const { tenantId, loading: tenantLoading, sousType } = useTenant()
   const { t } = useLocale()
 
-  const SUB_TABS: { id: SubTab; label: string; icon: React.ElementType }[] = [
+  const ALL_SUB_TABS: { id: SubTab; label: string; icon: React.ElementType }[] = [
     { id: 'inscriptions',  label: t('ecole.tab.inscriptions'), icon: Users2      },
     { id: 'paiements',     label: t('ecole.tab.paiements'),    icon: CreditCard  },
     { id: 'notes',         label: t('ecole.tab.notes'),        icon: BookOpen    },
@@ -1039,6 +1084,7 @@ export default function ScolaritePage() {
     { id: 'examens',       label: t('ecole.tab.examens'),      icon: FlaskConical },
     { id: 'attestations',  label: t('ecole.tab.attestations'), icon: ScrollText  },
   ]
+  const SUB_TABS = getTabsForSousType(sousType, ALL_SUB_TABS)
 
   const [subTab,      setSubTab]      = useState<SubTab>('inscriptions')
   const [etudiants,   setEtudiants]   = useState<Etudiant[]>([])
@@ -1103,7 +1149,7 @@ export default function ScolaritePage() {
 
       <AnimatePresence mode="wait">
         <motion.div key={subTab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}>
-          {subTab === 'inscriptions' && tenantId && <SectionInscriptions tenantId={tenantId} etudiants={etudiants} onRefresh={load} nomEcole={nomEcole} />}
+          {subTab === 'inscriptions' && tenantId && <SectionInscriptions tenantId={tenantId} etudiants={etudiants} onRefresh={load} nomEcole={nomEcole} sousType={sousType} />}
           {subTab === 'paiements'    && tenantId && <SectionPaiements    tenantId={tenantId} etudiants={etudiants} nomEcole={nomEcole} />}
           {subTab === 'notes'        && tenantId && <SectionNotes        tenantId={tenantId} etudiants={etudiants} nomEcole={nomEcole} />}
           {subTab === 'classes'      && tenantId && <SectionClasses      tenantId={tenantId} classes={classes} onRefresh={load} />}
