@@ -80,13 +80,13 @@ export const CG: CountryConfig = {
   irpp: {
     nom: 'IRPP (Impôt sur le Revenu des Personnes Physiques)',
 
-    // Seuils ANNUELS → moteur divise par 12 pour application mensuelle (Art. 114-116G CGI)
-    methode_base: 'annuelle_div12',
+    // Seuils mensuels appliqués directement (Art. 76 CGI LF 2026)
+    methode_base: 'mensuelle_directe',
 
-    // Abattement professionnel 20% sur (brut - CNSS salarié) — Art. 116A CGI Congo
+    // Pas d'abattement professionnel — Art. 76 CGI Congo
     abattement: {
-      type:   'pct_net_cnss',
-      valeur: 0.20,
+      type:   'aucun',
+      valeur: 0,
     },
 
     quotient_familial: {
@@ -96,15 +96,14 @@ export const CG: CountryConfig = {
       parts_par_enfant: 0.5,   // +0,5 par enfant à charge
     },
 
-    // Barème IRPP/ITS annuel — 5 tranches LF 2026 (Art. 114-116G CGI Congo)
-    // T1 : montant fixe 4 200 F/an/part (non une %) — Art. 116B CGI
-    // Seuils annuels ; le moteur divise par 12 avant application mensuelle.
+    // Barème IRPP mensuel — 5 tranches LF 2026 (Art. 76 CGI Congo)
+    // Seuils mensuels directs par part (quotient familial appliqué avant)
     tranches: [
-      { min: 0,         max: 615_000,   taux: 0,    montant_fixe: 4_200 },  // fixe 4 200 F/an/part
-      { min: 615_001,   max: 1_500_000, taux: 0.10, montant_fixe: null  },  // 10%
-      { min: 1_500_001, max: 3_500_000, taux: 0.15, montant_fixe: null  },  // 15%
-      { min: 3_500_001, max: 5_000_000, taux: 0.20, montant_fixe: null  },  // 20%
-      { min: 5_000_001, max: Infinity,  taux: 0.30, montant_fixe: null  },  // 30%
+      { min: 0,         max: 464_000,   taux: 0,    montant_fixe: null },  // 0%   exonéré
+      { min: 464_001,   max: 1_000_000, taux: 0.01, montant_fixe: null },  // 1%
+      { min: 1_000_001, max: 3_000_000, taux: 0.10, montant_fixe: null },  // 10%
+      { min: 3_000_001, max: 8_000_000, taux: 0.25, montant_fixe: null },  // 25%
+      { min: 8_000_001, max: Infinity,  taux: 0.40, montant_fixe: null },  // 40%
     ],
 
     // Plancher d'IRPP pour salariés gagnant moins du SMIG — Art. 116G CGI Congo
@@ -122,7 +121,7 @@ export const CG: CountryConfig = {
 
     periodicite:   'mensuel',
     echeance_jour: 20,
-    source: 'LF 2026 confirmé — Art. 114-116G CGI Congo',
+    source: 'LF 2026 confirmé — Art. 76 CGI Congo',
   },
 
   // ── CNSS ───────────────────────────────────────────────────────────────────
