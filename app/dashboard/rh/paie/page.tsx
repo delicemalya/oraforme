@@ -7,6 +7,7 @@ import {
   FileText, Calendar, X, ChevronLeft, ChevronRight, TrendingUp,
   Building2, Play, Plus, Printer, CreditCard, Eye, Lock,
   ChevronDown, ChevronUp, Download, BarChart3, Zap, Trash2,
+  Calculator, Pencil, Sparkles, PieChart, Award,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
@@ -16,6 +17,7 @@ import { calcPrimeAnciennete, fmtNum } from '@/lib/paie/calcul-paie'
 import {
   calculerIRPP, calculerChargesSociales,
   type SituationFamiliale,
+  type ResultatIRPP, type ResultatChargesSociales,
 } from '@/lib/fiscal/universal-tax-engine'
 import { getCountryConfig } from '@/lib/countries'
 import type { CountryConfig, CodePays } from '@/lib/countries/types'
@@ -670,6 +672,465 @@ function ModalDetailBulletin({
   )
 }
 
+// ── Helpers Modal Calcul Détaillé ─────────────────────────────────────────────
+
+function Section({ title, dot, children }: { title: string; dot: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full inline-block shrink-0" style={{ background: dot }} />
+        {title}
+      </p>
+      {children}
+    </div>
+  )
+}
+
+function BulRow({ label, value, devise, exo }: { label: string; value: number; devise: string; exo?: boolean }) {
+  const isNeg = value < 0
+  return (
+    <tr className="border-b border-[var(--border)]/40">
+      <td className="px-4 py-1.5 text-[var(--text-secondary)] text-[11px]">
+        {label}
+        {exo && <span className="ml-1 text-[9px] bg-green-100 text-green-700 px-1 rounded">Exo.</span>}
+      </td>
+      <td className={`px-4 py-1.5 text-right font-semibold text-[11px] ${isNeg ? 'text-[#DC2626]' : 'text-[#16A34A]'}`}>
+        {isNeg ? '−' : '+'}{fmt(Math.abs(value))} {devise}
+      </td>
+    </tr>
+  )
+}
+
+function InfoCard({ label, value, sub, color, devise }: { label: string; value: string; sub?: string; color: string; devise: string }) {
+  return (
+    <div className="bg-gray-50 rounded-xl p-3">
+      <p className="text-[10px] text-[var(--text-secondary)]">{label}</p>
+      <p className="text-sm font-bold mt-0.5" style={{ color }}>{value}{devise ? ` ${devise}` : ''}</p>
+      {sub && <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{sub}</p>}
+    </div>
+  )
+}
+
+// ── Modal Calcul Détaillé — Intelligence Fiscale & Sociale ─────────────────────
+
+function ModalCalculDetaille({
+  row, mois, annee, cfg, codePays, onClose, onOpenEdit,
+}: {
+  row: BulletinRow; mois: number; annee: number
+  cfg: CountryConfig; codePays: CodePays
+  onClose: () => void; onOpenEdit: () => void
+}) {
+  type TabId = 'synthese' | 'cnss' | 'irpp' | 'cout' | 'conformite'
+  const [tab, setTab] = useState<TabId>('synthese')
+
+  const cnssRes = useMemo<ResultatChargesSociales | null>(() => {
+    try { return calculerChargesSociales({ codePays, salaireBrut: row.salaire_brut }) }
+    catch { return null }
+  }, [codePays, row.salaire_brut])
+
+  const irppRes = useMemo<ResultatIRPP | null>(() => {
+    try {
+      return calculerIRPP({
+        codePays, salaireBrut: row.base_irpp,
+        salaireBrutOriginal: row.salaire_brut,
+        situation: row.situation, nombreEnfants: row.nb_enfants,
+      })
+    } catch { return null }
+  }, [codePays, row.base_irpp, row.salaire_brut, row.situation, row.nb_enfants])
+
+  const smigOk    = row.salaire_base >= cfg.smig
+  const smigEcart = row.salaire_base - cfg.smig
+  const provisionConges  = Math.round(row.salaire_brut / 12)
+  const coutMensuelTotal = row.cout_total_employeur + provisionConges
+
+  const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+    { id: 'synthese',   label: 'Synthèse',          icon: FileText    },
+    { id: 'cnss',       label: cfg.cnss.acronyme,    icon: Building2   },
+    { id: 'irpp',       label: cfg.irpp.nom.split(' ')[0], icon: Calculator },
+    { id: 'cout',       label: 'Coût Employeur',     icon: DollarSign  },
+    { id: 'conformite', label: 'Conformité',          icon: Award       },
+  ]
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 16 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col">
+
+        {/* Header */}
+        <div className="px-5 pt-5 pb-0 shrink-0">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-9 h-9 rounded-full text-[11px] font-bold text-white flex items-center justify-center shrink-0"
+                style={{ background: `hsl(${row.nom.charCodeAt(0) * 7 % 360}, 55%, 38%)` }}>
+                {(row.prenom?.[0] ?? row.nom[0]).toUpperCase()}{row.nom[0].toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[#101729] truncate">{row.prenom} {row.nom}</p>
+                <p className="text-[11px] text-[var(--text-secondary)]">{row.poste} · {MOIS_LABELS[mois]} {annee}</p>
+                <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                  <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${smigOk ? 'bg-[#16A34A]/10 text-[#16A34A] border-[#16A34A]/20' : 'bg-[#DC2626]/10 text-[#DC2626] border-[#DC2626]/20'}`}>
+                    {smigOk ? '✓ SMIG conforme' : '⚠ Sous SMIG'}
+                  </span>
+                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20">{cfg.nom_pays}</span>
+                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600">{row.annees_anciennete} ans ancienneté</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+              <button onClick={onOpenEdit}
+                className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-gray-50 flex items-center gap-1">
+                <Pencil size={10} /> Modifier
+              </button>
+              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-[var(--text-secondary)]">
+                <X size={15} />
+              </button>
+            </div>
+          </div>
+
+          {/* Net summary bar */}
+          <div className="flex items-center rounded-xl bg-[#101729] p-3 mb-3 gap-1">
+            <div className="flex-1 text-center">
+              <p className="text-[9px] text-white/50 uppercase tracking-wider">Brut</p>
+              <p className="text-xs font-bold text-white">{fmt(row.salaire_brut)}</p>
+            </div>
+            <ChevronRight size={13} className="text-white/20 shrink-0" />
+            <div className="flex-1 text-center">
+              <p className="text-[9px] text-white/50 uppercase tracking-wider">Retenues</p>
+              <p className="text-xs font-bold text-[#F87171]">−{fmt(row.total_retenues)}</p>
+            </div>
+            <ChevronRight size={13} className="text-white/20 shrink-0" />
+            <div className="flex-1 text-center">
+              <p className="text-[9px] text-[#4ADE80]/80 uppercase tracking-wider">Net</p>
+              <p className="text-sm font-extrabold text-[#4ADE80]">{fmt(row.salaire_net)} {cfg.devise}</p>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-0.5 border-b border-[var(--border)] overflow-x-auto">
+            {TABS.map(({ id, label, icon: Icon }) => (
+              <button key={id} onClick={() => setTab(id)}
+                className={`flex items-center gap-1 px-3 py-2 text-[10px] font-semibold border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                  tab === id ? 'border-[#F59E0B] text-[#D97706]' : 'border-transparent text-[var(--text-secondary)] hover:text-[#101729]'}`}>
+                <Icon size={11} />{label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab content */}
+        <div className="flex-1 overflow-y-auto">
+          <AnimatePresence mode="wait">
+            <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.13 }} className="p-5 space-y-4">
+
+              {/* ── SYNTHÈSE ── */}
+              {tab === 'synthese' && (<>
+                <Section title="Éléments de gains" dot="#16A34A">
+                  <table className="w-full">
+                    <tbody>
+                      <BulRow label="Salaire de base" value={row.salaire_base} devise={cfg.devise} />
+                      {row.prime_anciennete > 0 && <BulRow label={`Prime ancienneté (${row.annees_anciennete} ans)`} value={row.prime_anciennete} devise={cfg.devise} />}
+                      {row.heures_sup_montant > 0 && <BulRow label={`H. sup. (${row.heures_sup}h)`} value={row.heures_sup_montant} devise={cfg.devise} />}
+                      {row.prime_transport > 0 && <BulRow label="Prime transport" value={row.prime_transport} devise={cfg.devise} exo={cfg.exonerations?.transport?.actif} />}
+                      {row.prime_logement > 0 && <BulRow label="Prime logement" value={row.prime_logement} devise={cfg.devise} exo={cfg.exonerations?.logement?.actif} />}
+                      {row.prime_rendement > 0 && <BulRow label="Prime rendement" value={row.prime_rendement} devise={cfg.devise} />}
+                      {row.prime_risque > 0 && <BulRow label="Prime risque" value={row.prime_risque} devise={cfg.devise} />}
+                      {row.prime_responsabilite > 0 && <BulRow label="Prime responsabilité" value={row.prime_responsabilite} devise={cfg.devise} />}
+                      {row.indemnite_deplacement > 0 && <BulRow label="Indemnité déplacement" value={row.indemnite_deplacement} devise={cfg.devise} />}
+                      {row.avantages_nature > 0 && <BulRow label="Avantages en nature" value={row.avantages_nature} devise={cfg.devise} />}
+                      {row.autres_gains > 0 && <BulRow label="Autres gains" value={row.autres_gains} devise={cfg.devise} />}
+                    </tbody>
+                  </table>
+                  <div className="flex items-center justify-between px-4 py-2 bg-[#101729]/5 rounded-lg mt-2">
+                    <span className="text-xs font-bold text-[#101729]">SALAIRE BRUT</span>
+                    <span className="text-sm font-extrabold text-[#101729]">{fmt(row.salaire_brut)} {cfg.devise}</span>
+                  </div>
+                </Section>
+
+                <Section title="Retenues salariales" dot="#DC2626">
+                  <table className="w-full">
+                    <tbody>
+                      <BulRow label={`${cfg.cnss.acronyme} salarié`} value={-row.cnss_employe} devise={cfg.devise} />
+                      <BulRow label={cfg.irpp.nom} value={-row.irpp} devise={cfg.devise} />
+                      {row.mutuelle > 0 && <BulRow label="Mutuelle" value={-row.mutuelle} devise={cfg.devise} />}
+                      {row.acompte > 0 && <BulRow label="Acompte" value={-row.acompte} devise={cfg.devise} />}
+                      {row.opposition > 0 && <BulRow label="Opposition / saisie" value={-row.opposition} devise={cfg.devise} />}
+                      {row.autres_retenues > 0 && <BulRow label="Autres retenues" value={-row.autres_retenues} devise={cfg.devise} />}
+                    </tbody>
+                  </table>
+                  <div className="flex items-center justify-between px-4 py-2 bg-[#DC2626]/5 rounded-lg mt-2">
+                    <span className="text-xs font-bold text-[#DC2626]">TOTAL RETENUES</span>
+                    <span className="text-sm font-extrabold text-[#DC2626]">−{fmt(row.total_retenues)} {cfg.devise}</span>
+                  </div>
+                </Section>
+
+                {/* Formule visible */}
+                <div className="flex items-center gap-2 bg-[#16A34A]/5 border border-[#16A34A]/20 rounded-xl px-4 py-3 text-xs font-mono flex-wrap">
+                  <span className="font-bold text-[#101729]">{fmt(row.salaire_brut)}</span>
+                  <span className="text-gray-400">−</span>
+                  <span className="font-bold text-[#DC2626]">{fmt(row.total_retenues)}</span>
+                  <span className="text-gray-400">=</span>
+                  <span className="font-extrabold text-[#16A34A]">{fmt(row.salaire_net)} {cfg.devise}</span>
+                  <span className="text-[10px] text-gray-400 ml-auto font-sans">NET À PAYER</span>
+                </div>
+              </>)}
+
+              {/* ── CNSS ── */}
+              {tab === 'cnss' && (<>
+                {cnssRes ? (<>
+                  <div className="grid grid-cols-3 gap-2">
+                    <InfoCard label="Part salarié" value={fmt(cnssRes.total_salarie)} color="#DC2626" devise={cfg.devise} />
+                    <InfoCard label="Part patronal" value={fmt(cnssRes.total_patronal_net)} color="#D97706" devise={cfg.devise} />
+                    <InfoCard label="Total cotisations" value={fmt(cnssRes.cout_total)} color="#101729" devise={cfg.devise} />
+                  </div>
+                  <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+                    <table className="w-full text-[11px]">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-[var(--border)]">
+                          <th className="text-left px-3 py-2 text-[10px] text-[var(--text-secondary)] uppercase">Branche</th>
+                          <th className="text-right px-3 py-2 text-[10px] text-[var(--text-secondary)] uppercase">Base</th>
+                          <th className="text-right px-3 py-2 text-[10px] text-[var(--text-secondary)] uppercase">Salarié</th>
+                          <th className="text-right px-3 py-2 text-[10px] text-[var(--text-secondary)] uppercase">Patronal</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cnssRes.branches.map((b, i) => (
+                          <tr key={b.code} className={`border-b border-[var(--border)]/50 ${i % 2 === 0 ? '' : 'bg-gray-50/40'}`}>
+                            <td className="px-3 py-2">
+                              <p className="font-medium text-[#101729]">{b.libelle}</p>
+                              <p className="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                                {b.taux_salarie > 0 ? `Sal. ${(b.taux_salarie*100).toFixed(3)}%` : ''}
+                                {b.taux_salarie > 0 && b.taux_patronal > 0 ? ' · ' : ''}
+                                {b.taux_patronal > 0 ? `Patro. ${(b.taux_patronal*100).toFixed(3)}%` : ''}
+                                {b.plafond_applique != null ? ` · Plaf. ${fmt(b.plafond_applique)}` : ' · Déplafonné'}
+                              </p>
+                            </td>
+                            <td className="px-3 py-2 text-right text-[var(--text-secondary)]">{fmt(b.base_calcul)}</td>
+                            <td className="px-3 py-2 text-right font-semibold text-[#DC2626]">{b.montant_salarie > 0 ? `−${fmt(b.montant_salarie)}` : '—'}</td>
+                            <td className="px-3 py-2 text-right font-semibold text-[#D97706]">{b.montant_patronal > 0 ? fmt(b.montant_patronal) : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-gray-50 border-t-2 border-[var(--border)]">
+                          <td className="px-3 py-2 font-bold text-[#101729]">TOTAUX</td>
+                          <td />
+                          <td className="px-3 py-2 text-right font-bold text-[#DC2626]">−{fmt(cnssRes.total_salarie)}</td>
+                          <td className="px-3 py-2 text-right font-bold text-[#D97706]">{fmt(cnssRes.total_patronal_net)}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  {cnssRes.reduction_mesures_speciales > 0 && (
+                    <div className="flex items-start gap-2 bg-[#2563EB]/8 border border-[#2563EB]/20 rounded-xl p-3">
+                      <Zap size={13} className="text-[#2563EB] shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-[#1D4ED8]">Mesures spéciales actives — Réduction patronale : <strong>{fmt(cnssRes.reduction_mesures_speciales)} {cfg.devise}</strong></p>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-[var(--text-secondary)]">{cnssRes.source}</p>
+                </>) : <p className="text-sm text-center py-8 text-[var(--text-secondary)]">Calcul {cfg.cnss.acronyme} indisponible pour ce pays.</p>}
+              </>)}
+
+              {/* ── IRPP ── */}
+              {tab === 'irpp' && (<>
+                {irppRes ? (<>
+                  <div className="grid grid-cols-2 gap-2">
+                    <InfoCard label="Base brute (brut − CNSS)" value={fmt(irppRes.base_brut)} color="#101729" devise={cfg.devise} />
+                    <InfoCard label={`Abattement (${irppRes.abattement_type})`} value={`−${fmt(irppRes.abattement_montant)}`} color="#D97706" devise="" />
+                    <InfoCard label="Nombre de parts" value={irppRes.nombre_parts.toFixed(1)} sub={`${row.situation} · ${row.nb_enfants} enfant(s)`} color="#2563EB" devise="parts" />
+                    <InfoCard label="Base imposable / part" value={fmt(irppRes.base_par_part)} color="#7C3AED" devise={cfg.devise} />
+                  </div>
+                  <Section title={`${cfg.irpp.nom} — Méthode : ${irppRes.methode_base}`} dot="#DC2626">
+                    <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+                      <table className="w-full text-[11px]">
+                        <thead>
+                          <tr className="bg-gray-50 border-b border-[var(--border)]">
+                            <th className="text-left px-3 py-1.5 text-[10px] text-[var(--text-secondary)] uppercase">Tranche</th>
+                            <th className="text-right px-3 py-1.5 text-[10px] text-[var(--text-secondary)] uppercase">Base</th>
+                            <th className="text-right px-3 py-1.5 text-[10px] text-[var(--text-secondary)] uppercase">Taux</th>
+                            <th className="text-right px-3 py-1.5 text-[10px] text-[var(--text-secondary)] uppercase">/ part</th>
+                            <th className="text-right px-3 py-1.5 text-[10px] text-[var(--text-secondary)] uppercase">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {irppRes.tranches.map((t, i) => (
+                            <tr key={i} className={`border-b border-[var(--border)]/50 ${t.impot_total === 0 ? 'opacity-40' : ''}`}>
+                              <td className="px-3 py-1.5 text-[var(--text-secondary)]">{t.libelle}</td>
+                              <td className="px-3 py-1.5 text-right">{fmt(t.base)}</td>
+                              <td className="px-3 py-1.5 text-right">{(t.taux*100).toFixed(0)}%</td>
+                              <td className="px-3 py-1.5 text-right">{fmt(t.impot_par_part)}</td>
+                              <td className="px-3 py-1.5 text-right font-semibold text-[#DC2626]">{fmt(t.impot_total)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-gray-50 border-t border-[var(--border)]">
+                            <td className="px-3 py-2 font-bold text-[#101729]" colSpan={3}>
+                              {irppRes.centimes_additionnels > 0 ? 'Sous-total' : 'TOTAL IRPP'}
+                            </td>
+                            <td colSpan={2} className="px-3 py-2 text-right font-bold text-[#DC2626]">{fmt(irppRes.irpp_avant_centimes)}</td>
+                          </tr>
+                          {irppRes.centimes_additionnels > 0 && (<>
+                            <tr className="border-b border-[var(--border)]/50">
+                              <td className="px-3 py-1.5 text-[var(--text-secondary)]" colSpan={3}>Centimes additionnels</td>
+                              <td colSpan={2} className="px-3 py-1.5 text-right text-[#D97706]">+{fmt(irppRes.centimes_additionnels)}</td>
+                            </tr>
+                            <tr className="bg-[#DC2626]/5">
+                              <td className="px-3 py-2 font-bold text-[#DC2626]" colSpan={3}>IRPP NET</td>
+                              <td colSpan={2} className="px-3 py-2 text-right font-extrabold text-[#DC2626]">{fmt(irppRes.irpp_net)} {cfg.devise}</td>
+                            </tr>
+                          </>)}
+                          {irppRes.reduction_mesures_speciales > 0 && (
+                            <tr className="border-b border-[var(--border)]/50">
+                              <td className="px-3 py-1.5 text-[#16A34A]" colSpan={3}>Réduction mesures spéciales</td>
+                              <td colSpan={2} className="px-3 py-1.5 text-right text-[#16A34A]">−{fmt(irppRes.reduction_mesures_speciales)}</td>
+                            </tr>
+                          )}
+                        </tfoot>
+                      </table>
+                    </div>
+                  </Section>
+                  <p className="text-[10px] text-[var(--text-secondary)]">{irppRes.source}</p>
+                </>) : <p className="text-sm text-center py-8 text-[var(--text-secondary)]">Calcul {cfg.irpp.nom} indisponible pour ce pays.</p>}
+              </>)}
+
+              {/* ── COÛT EMPLOYEUR ── */}
+              {tab === 'cout' && (<>
+                <div className="grid grid-cols-2 gap-2">
+                  <InfoCard label="Salaire brut" value={fmt(row.salaire_brut)} color="#101729" devise={cfg.devise} />
+                  <InfoCard label="Charges patronales" value={fmt(row.cnss_patronal + row.tus_patronal)} color="#D97706" devise={cfg.devise} />
+                  <InfoCard label="Provision congés (est.)" value={fmt(provisionConges)} sub="30j/an ÷ 12" color="#2563EB" devise={cfg.devise} />
+                  <InfoCard label="Coût total mensuel" value={fmt(coutMensuelTotal)} color="#101729" devise={cfg.devise} />
+                </div>
+                <Section title="Décomposition coût employeur" dot="#D97706">
+                  <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+                    <table className="w-full text-xs">
+                      <tbody>
+                        <tr className="border-b border-[var(--border)]/50">
+                          <td className="px-4 py-2 text-[var(--text-secondary)]">Salaire brut</td>
+                          <td className="px-4 py-2 text-right font-semibold">{fmt(row.salaire_brut)} {cfg.devise}</td>
+                        </tr>
+                        {cnssRes && cnssRes.branches.filter(b => b.montant_patronal > 0).map(b => (
+                          <tr key={b.code} className="border-b border-[var(--border)]/50">
+                            <td className="px-4 py-2 text-[var(--text-secondary)]">
+                              {b.libelle} <span className="text-[10px] opacity-60">({(b.taux_patronal*100).toFixed(3)}%)</span>
+                            </td>
+                            <td className="px-4 py-2 text-right font-semibold text-[#D97706]">+{fmt(b.montant_patronal)} {cfg.devise}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-b border-[var(--border)]/50">
+                          <td className="px-4 py-2 text-[var(--text-secondary)]">Provision congés payés <span className="text-[10px] opacity-60">(30j/an)</span></td>
+                          <td className="px-4 py-2 text-right font-semibold text-[#2563EB]">+{fmt(provisionConges)} {cfg.devise}</td>
+                        </tr>
+                        <tr className="bg-[#101729]/5">
+                          <td className="px-4 py-2.5 font-bold text-[#101729]">COÛT TOTAL MENSUEL</td>
+                          <td className="px-4 py-2.5 text-right font-extrabold text-[#101729]">{fmt(coutMensuelTotal)} {cfg.devise}</td>
+                        </tr>
+                        <tr>
+                          <td className="px-4 py-2 text-[var(--text-secondary)] text-[11px]">Coût annuel estimé</td>
+                          <td className="px-4 py-2 text-right text-[var(--text-secondary)] font-semibold text-[11px]">{fmt(coutMensuelTotal * 12)} {cfg.devise}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </Section>
+                {/* Ratio */}
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <p className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Ratio Net / Coût total</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-[#16A34A] transition-all"
+                        style={{ width: `${Math.min(100, Math.round(row.salaire_net / coutMensuelTotal * 100))}%` }} />
+                    </div>
+                    <span className="text-xs font-bold text-[#16A34A] shrink-0">
+                      {Math.round(row.salaire_net / coutMensuelTotal * 100)}%
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-1">du coût total va en net au salarié</p>
+                </div>
+              </>)}
+
+              {/* ── CONFORMITÉ ── */}
+              {tab === 'conformite' && (<>
+                {/* SMIG */}
+                <div className={`rounded-xl border p-4 ${smigOk ? 'bg-[#16A34A]/5 border-[#16A34A]/20' : 'bg-[#DC2626]/5 border-[#DC2626]/20'}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    {smigOk ? <Check size={16} className="text-[#16A34A]" /> : <AlertTriangle size={16} className="text-[#DC2626]" />}
+                    <p className={`text-sm font-bold ${smigOk ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
+                      Conformité SMIG — {smigOk ? 'Conforme' : 'Non conforme'}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-[11px]">
+                    {[
+                      { label: 'Salaire de base', val: `${fmt(row.salaire_base)} ${cfg.devise}` },
+                      { label: `SMIG ${cfg.nom_pays}`, val: `${fmt(cfg.smig)} ${cfg.devise}` },
+                      { label: 'Écart', val: `${smigEcart >= 0 ? '+' : ''}${fmt(smigEcart)} ${cfg.devise}` },
+                    ].map(k => (
+                      <div key={k.label} className="bg-white/60 rounded-lg p-2">
+                        <p className="text-[9px] text-[var(--text-secondary)]">{k.label}</p>
+                        <p className="font-bold text-[#101729] mt-0.5">{k.val}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Analyse automatique */}
+                <Section title="Analyse automatique des calculs" dot="#F59E0B">
+                  <div className="rounded-xl border border-[var(--border)] divide-y divide-[var(--border)]/50">
+                    {[
+                      { ok: row.salaire_base >= cfg.smig,                  label: 'Salaire ≥ SMIG légal',              detail: `${fmt(cfg.smig)} ${cfg.devise}` },
+                      { ok: row.cnss_employe > 0,                          label: `${cfg.cnss.acronyme} salarié calculé`, detail: `${fmt(row.cnss_employe)} ${cfg.devise}` },
+                      { ok: row.irpp >= 0,                                 label: `${cfg.irpp.nom.split(' ')[0]} calculé`, detail: row.irpp === 0 ? 'Exonéré' : `${fmt(row.irpp)} ${cfg.devise}` },
+                      { ok: row.cnss_patronal + row.tus_patronal > 0,      label: 'Charges patronales calculées',       detail: `${fmt(row.cnss_patronal + row.tus_patronal)} ${cfg.devise}` },
+                      { ok: row.salaire_net > 0,                           label: 'Net positif',                        detail: `${fmt(row.salaire_net)} ${cfg.devise}` },
+                      { ok: row.cout_total_employeur > row.salaire_brut,   label: 'Coût employeur > brut (cohérent)',   detail: `${fmt(row.cout_total_employeur)} ${cfg.devise}` },
+                    ].map(({ ok, label, detail }) => (
+                      <div key={label} className="flex items-center justify-between px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          {ok ? <Check size={13} className="text-[#16A34A]" /> : <AlertTriangle size={13} className="text-[#DC2626]" />}
+                          <span className="text-xs text-[#101729]">{label}</span>
+                        </div>
+                        <span className="text-[11px] text-[var(--text-secondary)]">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+
+                {/* Convention */}
+                <div className="rounded-xl border border-[var(--border)] p-4">
+                  <p className="text-xs font-semibold text-[var(--text-secondary)] mb-1 flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-[#F59E0B]" /> Convention collective
+                  </p>
+                  <p className="text-[11px] text-[var(--text-secondary)]">
+                    La vérification conventionnelle (catégorie, échelon, coefficient) est disponible après enregistrement du secteur d&apos;activité de l&apos;employé.
+                  </p>
+                  {row.type_employe && (
+                    <p className="text-[11px] mt-2 text-[#101729]">Type contrat : <strong className="uppercase">{row.type_employe}</strong></p>
+                  )}
+                </div>
+              </>)}
+
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--border)] bg-gray-50 shrink-0 rounded-b-2xl">
+          <p className="text-[10px] text-[var(--text-secondary)]">
+            {cfg.systeme_comptable} · {cfg.data_confidence === 'verified' ? '✓ Données vérifiées' : '⚠ À vérifier'}
+          </p>
+          <button onClick={onClose} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-secondary)] hover:bg-gray-200 transition-colors">
+            Fermer
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 // ── Modal Lancer la paie ───────────────────────────────────────────────────────
 
 function ModalLancerPaie({
@@ -764,12 +1225,12 @@ function ModalLancerPaie({
 // ── Carte mobile ──────────────────────────────────────────────────────────────
 
 function EmployeeCard({
-  row, mois, annee, plan, cfg, codePays, onDetailOpen, onPrint, onDownloadPdf, onStatutChange, onGenerate,
+  row, mois, annee, plan, cfg, codePays, onDetailOpen, onPrint, onDownloadPdf, onStatutChange, onGenerate, onAnalyse,
 }: {
   row: BulletinRow; mois: number; annee: number; plan: Plan
   cfg: CountryConfig; codePays: CodePays
   onDetailOpen: () => void; onPrint: () => void; onDownloadPdf: () => void
-  onStatutChange: (s: BulletinRow['statut']) => void; onGenerate: () => void
+  onStatutChange: (s: BulletinRow['statut']) => void; onGenerate: () => void; onAnalyse: () => void
 }) {
   const [open, setOpen] = useState(false)
   void codePays
@@ -837,6 +1298,10 @@ function EmployeeCard({
                     <Eye size={11} /> Détail
                   </button>
                 )}
+                <button onClick={onAnalyse}
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20">
+                  <Calculator size={11} /> Analyse
+                </button>
                 {plan !== 'tpe' && row.existingId && (
                   <button onClick={onDownloadPdf}
                     className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] bg-red-50 text-red-600 border border-red-200">
@@ -886,6 +1351,8 @@ export default function PaiePage() {
   const [addingAcompte, setAddingAcompte] = useState(false)
   const [showAcompteForm, setShowAcompteForm] = useState(false)
   const [showCharges,   setShowCharges]   = useState(true)
+  const [analyseRow,    setAnalyseRow]    = useState<BulletinRow | null>(null)
+  const [showDashboard, setShowDashboard] = useState(false)
 
   // ── Chargement ───────────────────────────────────────────────────────────────
 
@@ -1379,7 +1846,8 @@ export default function PaiePage() {
                 onPrint={() => printBulletin(row, mois, annee, entreprise, cfg)}
                 onDownloadPdf={() => downloadPdf(row)}
                 onStatutChange={s => updateStatut(row.employe_id, s)}
-                onGenerate={() => genererBulletinUnique(row)} />
+                onGenerate={() => genererBulletinUnique(row)}
+                onAnalyse={() => setAnalyseRow(row)} />
             ))}
           </div>
 
@@ -1389,7 +1857,7 @@ export default function PaiePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border)] bg-gray-50">
-                    {['Employé', 'Base', ...(plan !== 'tpe' ? ['H.sup'] : []), 'Brut', cfg.cnss.acronyme, cfg.irpp.nom.split(' ')[0], 'Acompte', 'Net', 'Statut', 'Actions'].map(h => (
+                    {['Employé', 'Base', ...(plan !== 'tpe' ? ['H.sup'] : []), 'Brut', cfg.cnss.acronyme, cfg.irpp.nom.split(' ')[0], 'Acompte', 'Net', 'Coût Emp.', 'Statut', 'Actions'].map(h => (
                       <th key={h} className="px-3 py-3 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-left first:px-4 last:text-center whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -1430,6 +1898,7 @@ export default function PaiePage() {
                         </td>
                         <td className="px-3 py-3 text-right text-xs text-[#D97706] whitespace-nowrap">{row.acompte > 0 ? `−${fmt(row.acompte)}` : '—'}</td>
                         <td className="px-3 py-3 text-right text-xs font-bold text-[#16A34A] whitespace-nowrap">{fmt(row.salaire_net)}</td>
+                        <td className="px-3 py-3 text-right text-xs font-semibold text-[#7C3AED] whitespace-nowrap">{fmt(row.cout_total_employeur)}</td>
 
                         <td className="px-3 py-3 text-center">
                           <select value={row.statut} onChange={e => updateStatut(row.employe_id, e.target.value as BulletinRow['statut'])}
@@ -1460,6 +1929,10 @@ export default function PaiePage() {
                                 <Eye size={9} /> Détail
                               </button>
                             )}
+                            <button onClick={() => setAnalyseRow(row)}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] border border-[#2563EB]/20">
+                              <Calculator size={9} /> Analyse
+                            </button>
                             <button onClick={() => printBulletin(row, mois, annee, entreprise, cfg)}
                               className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[var(--surface)] hover:bg-gray-200 text-[var(--text-secondary)] border border-[var(--border)]">
                               <Printer size={9} /> Print
@@ -1486,6 +1959,7 @@ export default function PaiePage() {
                     <td className="px-3 py-3 text-right text-xs font-bold text-[#DC2626]">{totalIRPP === 0 ? '—' : `−${fmt(totalIRPP)}`}</td>
                     <td className="px-3 py-3 text-right text-xs font-bold text-[#D97706]">{rows.reduce((s, r) => s + r.acompte, 0) === 0 ? '—' : `−${fmt(rows.reduce((s, r) => s + r.acompte, 0))}`}</td>
                     <td className="px-3 py-3 text-right text-xs font-bold text-[#16A34A]">{fmt(totalNet)}</td>
+                    <td className="px-3 py-3 text-right text-xs font-bold text-[#7C3AED]">{fmt(totalCout)}</td>
                     <td colSpan={2} />
                   </tr>
                 </tfoot>
@@ -1590,6 +2064,102 @@ export default function PaiePage() {
         </div>
       )}
 
+      {/* ── Dashboard RH ─────────────────────────────────────────────────── */}
+      {rows.length > 0 && (
+        <div>
+          <button onClick={() => setShowDashboard(v => !v)}
+            className="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[#101729] mb-2">
+            {showDashboard ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            <PieChart size={13} /> Tableau de bord RH &amp; conformité
+          </button>
+          <AnimatePresence>
+            {showDashboard && (() => {
+              const sorted   = [...rows].sort((a, b) => b.salaire_brut - a.salaire_brut)
+              const maxBrut  = sorted[0]?.salaire_brut ?? 1
+              const conforme = rows.filter(r => r.salaire_base >= cfg.smig).length
+              return (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+
+                    {/* Top salaires */}
+                    <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+                      <div className="px-4 py-3 bg-gray-50 border-b border-[var(--border)] flex items-center gap-2">
+                        <Award size={13} className="text-[#F59E0B]" />
+                        <p className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+                          Répartition masse salariale (brut)
+                        </p>
+                      </div>
+                      <div className="p-4 space-y-2.5">
+                        {sorted.slice(0, 6).map(r => (
+                          <div key={r.employe_id}>
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-[11px] font-medium text-[#101729] truncate flex-1">{r.prenom} {r.nom}</p>
+                              <p className="text-[11px] font-semibold text-[var(--text-secondary)] ml-2 shrink-0">{fmt(r.salaire_brut)} {cfg.devise}</p>
+                            </div>
+                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${Math.round(r.salaire_brut / maxBrut * 100)}%` }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Conformité SMIG + Synthèse */}
+                    <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+                      <div className="px-4 py-3 bg-gray-50 border-b border-[var(--border)]">
+                        <p className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+                          Conformité SMIG · {cfg.nom_pays}
+                        </p>
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="text-center shrink-0">
+                            <p className="text-3xl font-extrabold text-[#16A34A]">{conforme}</p>
+                            <p className="text-[10px] text-[var(--text-secondary)]">Conformes</p>
+                          </div>
+                          {rows.length - conforme > 0 && (
+                            <div className="text-center shrink-0">
+                              <p className="text-3xl font-extrabold text-[#DC2626]">{rows.length - conforme}</p>
+                              <p className="text-[10px] text-[var(--text-secondary)]">Sous SMIG</p>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-[#16A34A] rounded-full"
+                                style={{ width: `${Math.round(conforme / rows.length * 100)}%` }} />
+                            </div>
+                            <p className="text-[10px] text-[var(--text-secondary)] mt-1">
+                              {Math.round(conforme / rows.length * 100)}% · SMIG {fmt(cfg.smig)} {cfg.devise}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          {[
+                            { label: 'Masse brute totale',        value: totalBrut,                                              color: '#101729' },
+                            { label: 'Net total à verser',         value: totalNet,                                               color: '#16A34A' },
+                            { label: `${cfg.cnss.acronyme} salarié`, value: totalCnssEmp,                                        color: '#DC2626' },
+                            { label: `${cfg.irpp.nom.split(' ')[0]} à reverser`, value: totalIRPP,                              color: '#DC2626' },
+                            { label: 'Coût total employeur',       value: totalCout,                                             color: '#7C3AED' },
+                            { label: 'Salaire moyen brut',         value: Math.round(totalBrut / rows.length),                   color: '#D97706' },
+                          ].map(k => (
+                            <div key={k.label} className="flex items-center justify-between text-[11px]">
+                              <span className="text-[var(--text-secondary)]">{k.label}</span>
+                              <span className="font-bold" style={{ color: k.color }}>{fmt(k.value)} {cfg.devise}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </motion.div>
+              )
+            })()}
+          </AnimatePresence>
+        </div>
+      )}
+
       {/* ── Acomptes ──────────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-[var(--border)] overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-[var(--border)]">
@@ -1679,6 +2249,11 @@ export default function PaiePage() {
           <ModalDetailBulletin row={detailRow} mois={mois} annee={annee} cfg={cfg} codePays={codePays}
             onClose={() => setDetailRow(null)}
             onSave={updates => { applyDetailUpdates(detailRow.employe_id, updates); setDetailRow(null) }} />
+        )}
+        {analyseRow && (
+          <ModalCalculDetaille row={analyseRow} mois={mois} annee={annee} cfg={cfg} codePays={codePays}
+            onClose={() => setAnalyseRow(null)}
+            onOpenEdit={() => { if (plan !== 'tpe') { setDetailRow(analyseRow); setAnalyseRow(null) } }} />
         )}
       </AnimatePresence>
 
