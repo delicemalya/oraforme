@@ -98,7 +98,6 @@ export async function POST(req: NextRequest) {
         tenant_id:       ctx.tenantId,
         patient_id,
         consultation_id: consultation.id,
-        medecin_id:      medecin_id || null,
         date_facture:    dateFacture,
         montant_total:   montant,
         montant_paye:    0,
@@ -108,24 +107,56 @@ export async function POST(req: NextRequest) {
       .select('id')
       .single()
 
-    if (!facErr && facture?.id) {
-      await supabaseAdmin.from('his_lignes_facture').insert({
-        tenant_id:     ctx.tenantId,
-        facture_id:    facture.id,
-        description:   `Consultation — ${motif.trim()}`,
-        quantite:      1,
-        prix_unitaire: montant,
-        montant_ligne: montant,
-        categorie:     'consultation',
+    if (facErr || !facture?.id) {
+      console.error('[POST /api/sante/consultations] his_factures INSERT failed', {
+        consultation_id: consultation.id,
+        tenant_id: ctx.tenantId,
+        error: facErr?.message,
       })
+      return NextResponse.json(
+        { error: `Consultation créée (id: ${consultation.id}) mais échec facturation : ${facErr?.message ?? 'résultat vide'}` },
+        { status: 500 },
+      )
+    }
 
-      // Paiement immédiat : UPDATE montant_paye → déclenche trg_his_facture_journal (OHADA)
-      if (statut_paiement === 'paye') {
-        await supabaseAdmin
-          .from('his_factures')
-          .update({ montant_paye: montant, statut: 'payee' })
-          .eq('id', facture.id)
-          .eq('tenant_id', ctx.tenantId)
+    const { error: ligneErr } = await supabaseAdmin.from('his_lignes_facture').insert({
+      tenant_id:     ctx.tenantId,
+      facture_id:    facture.id,
+      description:   `Consultation — ${motif.trim()}`,
+      quantite:      1,
+      prix_unitaire: montant,
+      montant_ligne: montant,
+      categorie:     'consultation',
+    })
+
+    if (ligneErr) {
+      console.error('[POST /api/sante/consultations] his_lignes_facture INSERT failed', {
+        facture_id: facture.id,
+        error: ligneErr.message,
+      })
+      return NextResponse.json(
+        { error: `Facture créée (id: ${facture.id}) mais échec ligne facturation : ${ligneErr.message}` },
+        { status: 500 },
+      )
+    }
+
+    // Paiement immédiat : UPDATE montant_paye → déclenche trg_his_facture_journal (OHADA)
+    if (statut_paiement === 'paye') {
+      const { error: payErr } = await supabaseAdmin
+        .from('his_factures')
+        .update({ montant_paye: montant, statut: 'payee' })
+        .eq('id', facture.id)
+        .eq('tenant_id', ctx.tenantId)
+
+      if (payErr) {
+        console.error('[POST /api/sante/consultations] his_factures UPDATE (paiement) failed', {
+          facture_id: facture.id,
+          error: payErr.message,
+        })
+        return NextResponse.json(
+          { error: `Facture créée (id: ${facture.id}) mais échec enregistrement paiement : ${payErr.message}` },
+          { status: 500 },
+        )
       }
     }
   }
