@@ -82,26 +82,34 @@ export default function ConsultationsPage() {
   useEffect(() => { if (!tenantLoading) load() }, [tenantLoading, load])
 
   async function handleSave() {
-    if (!tenantId || !form.patient_id || !form.motif.trim()) {
+    if (!form.patient_id || !form.motif.trim()) {
       setError('Patient et motif obligatoires'); return
     }
     setSaving(true); setError('')
-    await supabase.from('clinique_consultations').insert({
-      tenant_id:       tenantId,
-      patient_id:      form.patient_id,
-      medecin_id:      form.medecin_id || null,
-      motif:           form.motif.trim(),
-      examen:          form.examen || null,
-      diagnostic:      form.diagnostic || null,
-      traitement:      form.traitement || null,
-      ordonnance:      form.ordonnance || null,
-      pression_art:    form.pression_art || null,
-      temperature:     form.temperature ? parseFloat(form.temperature) : null,
-      poids:           form.poids ? parseFloat(form.poids) : null,
-      taille:          form.taille ? parseFloat(form.taille) : null,
-      montant:         parseFloat(form.montant) || 0,
-      statut_paiement: form.statut_paiement,
+    const res = await fetch('/api/sante/consultations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        patient_id:      form.patient_id,
+        medecin_id:      form.medecin_id || null,
+        motif:           form.motif.trim(),
+        examen:          form.examen || null,
+        diagnostic:      form.diagnostic || null,
+        traitement:      form.traitement || null,
+        ordonnance:      form.ordonnance || null,
+        pression_art:    form.pression_art || null,
+        temperature:     form.temperature ? parseFloat(form.temperature) : null,
+        poids:           form.poids ? parseFloat(form.poids) : null,
+        taille:          form.taille ? parseFloat(form.taille) : null,
+        montant:         parseFloat(form.montant) || 0,
+        statut_paiement: form.statut_paiement,
+      }),
     })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
+      setError((json as { error?: string }).error ?? 'Erreur lors de l\'enregistrement')
+      setSaving(false); return
+    }
     setSaving(false); setShowModal(false)
     setForm({ patient_id: '', medecin_id: '', motif: '', examen: '', diagnostic: '', traitement: '', ordonnance: '', pression_art: '', temperature: '', poids: '', taille: '', montant: '', statut_paiement: 'en_attente' })
     load()

@@ -37,14 +37,10 @@ export async function POST(req: NextRequest) {
   if (error) return error
 
   const body = await req.json()
-  if (!body.patient_id || !body.type_examen) {
-    return NextResponse.json({ error: 'patient_id et type_examen requis' }, { status: 400 })
-  }
-
   const action = body.action // 'prescription' | 'resultat'
 
   if (action === 'resultat') {
-    // Add results to an existing prescription
+    // Saisie de résultats : ne requiert pas patient_id ni type_examen
     const { examen_id, resultats } = body
     if (!examen_id || !resultats?.length) {
       return NextResponse.json({ error: 'examen_id et resultats requis' }, { status: 400 })
@@ -74,7 +70,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  // Create prescription
+  // Créer une prescription (action par défaut)
+  if (!body.patient_id || !body.type_examen) {
+    return NextResponse.json({ error: 'patient_id et type_examen requis' }, { status: 400 })
+  }
+
   const allowed = ['patient_id','consultation_id','sejour_id','medecin_id','type_examen','examens','urgence','notes']
   const payload: Record<string, unknown> = { tenant_id: ctx.tenantId }
   for (const k of allowed) { if (body[k] !== undefined) payload[k] = body[k] }

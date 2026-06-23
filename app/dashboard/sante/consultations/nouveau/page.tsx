@@ -120,30 +120,35 @@ export default function NouvelleConsultationPage() {
     }
     setSaving(true); setError('')
 
-    const { data: consult, error: consErr } = await supabase.from('clinique_consultations').insert({
-      tenant_id:      tenantId,
-      patient_id:     form.patient_id,
-      medecin_id:     form.medecin_id || null,
-      rdv_id:         form.rdv_id || null,
-      motif:          form.motif.trim(),
-      examen:         form.examen || null,
-      diagnostic:     form.diagnostic || null,
-      traitement:     form.traitement || null,
-      pression_art:   form.pression_art || null,
-      temperature:    form.temperature ? parseFloat(form.temperature) : null,
-      poids:          form.poids ? parseFloat(form.poids) : null,
-      taille:         form.taille ? parseFloat(form.taille) : null,
-      pouls:          form.pouls ? parseFloat(form.pouls) : null,
-      saturation_o2:  form.saturation_o2 ? parseFloat(form.saturation_o2) : null,
-      frequence_resp: form.frequence_resp ? parseFloat(form.frequence_resp) : null,
-      code_cim10:     form.code_cim10 || null,
-      montant:        parseFloat(form.montant) || 0,
-      statut_paiement: form.statut_paiement,
-    }).select('id').single()
-
-    if (consErr || !consult) {
-      setError(consErr?.message ?? 'Erreur lors de l\'enregistrement'); setSaving(false); return
+    const consultRes = await fetch('/api/sante/consultations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        patient_id:     form.patient_id,
+        medecin_id:     form.medecin_id || null,
+        rdv_id:         form.rdv_id || null,
+        motif:          form.motif.trim(),
+        examen:         form.examen || null,
+        diagnostic:     form.diagnostic || null,
+        traitement:     form.traitement || null,
+        pression_art:   form.pression_art || null,
+        temperature:    form.temperature ? parseFloat(form.temperature) : null,
+        poids:          form.poids ? parseFloat(form.poids) : null,
+        taille:         form.taille ? parseFloat(form.taille) : null,
+        pouls:          form.pouls ? parseFloat(form.pouls) : null,
+        saturation_o2:  form.saturation_o2 ? parseFloat(form.saturation_o2) : null,
+        frequence_resp: form.frequence_resp ? parseFloat(form.frequence_resp) : null,
+        code_cim10:     form.code_cim10 || null,
+        montant:        parseFloat(form.montant) || 0,
+        statut_paiement: form.statut_paiement,
+      }),
+    })
+    if (!consultRes.ok) {
+      const json = await consultRes.json().catch(() => ({}))
+      setError((json as { error?: string }).error ?? 'Erreur lors de l\'enregistrement')
+      setSaving(false); return
     }
+    const consult = await consultRes.json() as { id: string }
 
     // Marquer le RDV terminé si fourni
     if (form.rdv_id) {

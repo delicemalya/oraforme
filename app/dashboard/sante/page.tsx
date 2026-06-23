@@ -80,7 +80,7 @@ const NAV_MODULES = [
   { href: '/dashboard/sante/assurances',      label: 'Assurances',      icon: Shield,           color: '#7C3AED', bg: '#F5F3FF', desc: 'Dossiers & prises en charge' },
   { href: '/dashboard/sante/facturation',     label: 'Facturation',     icon: FileText,         color: '#DC2626', bg: '#FEF2F2', desc: 'Factures médicales' },
   { href: '/dashboard/sante/urgences',        label: 'Urgences',        icon: Siren,            color: '#DC2626', bg: '#FEF2F2', desc: 'Triage & prise en charge' },
-  { href: '/dashboard/sante/labo',            label: 'Imagerie',        icon: Activity,         color: '#0891B2', bg: '#ECFEFF', desc: 'Radio, écho, scanner' },
+  { href: '/dashboard/sante/imagerie',         label: 'Imagerie',        icon: Activity,         color: '#0891B2', bg: '#ECFEFF', desc: 'Radio, écho, scanner' },
   { href: '/dashboard/sante/medecins',        label: 'Médecins',        icon: BriefcaseMedical, color: '#64748B', bg: '#F1F5F9', desc: 'Personnel médical' },
   { href: '/dashboard/sante/miaa',            label: 'MIAA+ Médecin',   icon: Settings,         color: '#F59E0B', bg: '#FFFBEB', desc: 'Expert IA médical' },
 ]

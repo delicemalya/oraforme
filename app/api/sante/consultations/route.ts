@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
     patient_id, medecin_id, rdv_id, date_consult, motif,
     examen, diagnostic, traitement, ordonnance,
     pression_art, temperature, poids, taille,
+    pouls, saturation_o2, frequence_resp, code_cim10,
     montant = 0, statut_paiement = 'en_attente',
   } = body
 
@@ -57,14 +58,15 @@ export async function POST(req: NextRequest) {
 
   if (!patient) return NextResponse.json({ error: 'Patient introuvable' }, { status: 404 })
 
+  // ── 1. Créer la consultation ──────────────────────────────────────────────
   const { data: consultation, error: insErr } = await supabaseAdmin
     .from('clinique_consultations')
     .insert({
       tenant_id:       ctx.tenantId,
       patient_id,
-      medecin_id:      medecin_id   || null,
-      rdv_id:          rdv_id       || null,
-      date_consult:    date_consult ?? new Date().toISOString(),
+      medecin_id:      medecin_id    || null,
+      rdv_id:          rdv_id        || null,
+      date_consult:    date_consult  ?? new Date().toISOString(),
       motif:           motif.trim(),
       examen:          examen        || null,
       diagnostic:      diagnostic    || null,
@@ -74,6 +76,10 @@ export async function POST(req: NextRequest) {
       temperature:     temperature   ?? null,
       poids:           poids         ?? null,
       taille:          taille        ?? null,
+      pouls:           pouls         ?? null,
+      saturation_o2:   saturation_o2 ?? null,
+      frequence_resp:  frequence_resp ?? null,
+      code_cim10:      code_cim10    || null,
       montant,
       statut_paiement,
     })
@@ -82,35 +88,63 @@ export async function POST(req: NextRequest) {
 
   if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 })
 
-  // Si consultation payée → transaction trésorerie + écriture OHADA
-  if (statut_paiement === 'paye' && montant > 0) {
-    const today    = (date_consult ?? new Date().toISOString()).split('T')[0]
-    const fiscYear = new Date(today).getFullYear()
+  // ── 2. BUG-C03 : Créer his_factures + his_lignes_facture si montant > 0 ──
+  if (montant > 0) {
+    const dateFacture = (date_consult ?? new Date().toISOString()).split('T')[0]
 
-    await Promise.all([
-      supabaseAdmin.from('transactions').insert({
+    const { data: facture, error: facErr } = await supabaseAdmin
+      .from('his_factures')
+      .insert({
+        tenant_id:       ctx.tenantId,
+        patient_id,
+        consultation_id: consultation.id,
+        medecin_id:      medecin_id || null,
+        date_facture:    dateFacture,
+        montant_total:   montant,
+        montant_paye:    0,
+        mode_paiement:   'especes',
+        statut:          'en_attente',
+      })
+      .select('id')
+      .single()
+
+    if (!facErr && facture?.id) {
+      await supabaseAdmin.from('his_lignes_facture').insert({
         tenant_id:     ctx.tenantId,
-        type:          'entree',
-        categorie:     'Consultation médicale',
-        description:   `Consultation — ${patient.prenom} ${patient.nom}`,
-        montant,
-        date:          today,
-        mode_paiement: 'especes',
-        source:        'sante',
-        source_id:     consultation.id,
-      }),
-      supabaseAdmin.from('journal_entries').insert({
-        tenant_id:      ctx.tenantId,
-        date_operation: today,
-        libelle:        `Consultation — ${patient.prenom} ${patient.nom}`,
-        debit_account:  '571',
-        credit_account: '705',
-        montant,
-        source:         'sante',
-        source_id:      consultation.id,
-        fiscal_year:    fiscYear,
-      }),
-    ])
+        facture_id:    facture.id,
+        description:   `Consultation — ${motif.trim()}`,
+        quantite:      1,
+        prix_unitaire: montant,
+        montant_ligne: montant,
+        categorie:     'consultation',
+      })
+
+      // Paiement immédiat : UPDATE montant_paye → déclenche trg_his_facture_journal (OHADA)
+      if (statut_paiement === 'paye') {
+        await supabaseAdmin
+          .from('his_factures')
+          .update({ montant_paye: montant, statut: 'payee' })
+          .eq('id', facture.id)
+          .eq('tenant_id', ctx.tenantId)
+      }
+    }
+  }
+
+  // ── 3. Transaction trésorerie si paiement immédiat ────────────────────────
+  // (le trigger OHADA gère journal_entries ; transactions reste manuel)
+  if (statut_paiement === 'paye' && montant > 0) {
+    const today = (date_consult ?? new Date().toISOString()).split('T')[0]
+    await supabaseAdmin.from('transactions').insert({
+      tenant_id:     ctx.tenantId,
+      type:          'entree',
+      categorie:     'Consultation médicale',
+      description:   `Consultation — ${patient.prenom} ${patient.nom}`,
+      montant,
+      date:          today,
+      mode_paiement: 'especes',
+      source:        'sante',
+      source_id:     consultation.id,
+    })
   }
 
   return NextResponse.json({ id: consultation.id }, { status: 201 })
