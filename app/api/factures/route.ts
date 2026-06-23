@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
       subtotal:       ht,
       montant_ht:     ht,
       tva,
+      tva_montant:    tva,
       ca,
       total:          ttc,
       notes:          notes          || null,

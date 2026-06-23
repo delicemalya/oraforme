@@ -269,7 +269,7 @@ export default function DevisPage() {
           client_name: clientNom, client_nom: clientNom,
           client_address: clientAddress, client_phone: clientPhone, client_email: clientEmail,
           date: dateVal, date_validite: dateValidite || null,
-          subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
+          subtotal: ht, montant_ht: ht, tva: tvaFinal, tva_montant: tvaFinal, ca: caFinal, total: ttc,
           notes: notes || null, statut: asStatut, remise_pct: remisePct,
         }).eq('id', editId)
         if (errUpd) throw errUpd
@@ -285,7 +285,7 @@ export default function DevisPage() {
           client_name: clientNom, client_nom: clientNom,
           client_address: clientAddress, client_phone: clientPhone, client_email: clientEmail,
           date: dateVal, date_validite: dateValidite || null,
-          subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
+          subtotal: ht, montant_ht: ht, tva: tvaFinal, tva_montant: tvaFinal, ca: caFinal, total: ttc,
           notes: notes || null, statut: asStatut, remise_pct: remisePct,
           facture_id: null,
         }).select('id').single()
@@ -387,6 +387,7 @@ export default function DevisPage() {
         subtotal: d.subtotal,
         montant_ht: d.subtotal,
         tva: d.tva,
+        tva_montant: d.tva,
         ca: d.ca,
         total: d.total,
         notes: d.notes,
