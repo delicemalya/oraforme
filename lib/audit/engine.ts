@@ -3,6 +3,8 @@
  * Calcule les scores et détecte les anomalies depuis les données Supabase.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { getPaysConfig } from '@/lib/fiscalite/pays'
+import type { PaysFiscal } from '@/lib/fiscalite/types'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -266,9 +268,6 @@ export async function auditFinancier(supabase: SupabaseClient, tenantId: string)
 // AUDIT FISCAL
 // ══════════════════════════════════════════════════════════════════════════════
 
-// TVA implicite dans his_factures : 18.9% (taux CG hardcodé dans fn_his_facture_journal)
-const HIS_TVA_DIVISOR = 1.189
-
 export async function auditFiscal(supabase: SupabaseClient, tenantId: string): Promise<AuditScore> {
   const anomalies: AuditAnomalie[] = []
   const now = new Date()
@@ -278,7 +277,7 @@ export async function auditFiscal(supabase: SupabaseClient, tenantId: string): P
   const [factRes, hisFactRes, tenantRes] = await Promise.all([
     supabase.from('factures').select('total, tva, statut, created_at').eq('tenant_id', tenantId)
       .gte('created_at', daysAgo(90)),
-    // his_factures = facturation module Santé — TVA dérivée de montant_total (18.9%)
+    // his_factures = facturation module Santé — TVA dérivée de montant_total (BUG-S2-04)
     supabase.from('his_factures').select('montant_total, statut, created_at').eq('tenant_id', tenantId)
       .gte('created_at', daysAgo(90))
       .neq('statut', 'annulee'),
@@ -289,12 +288,17 @@ export async function auditFiscal(supabase: SupabaseClient, tenantId: string): P
   const hisFactures = hisFactRes.data ?? []
   const tenant      = tenantRes.data
 
-  // CA médical HT + TVA dérivée (mêmes calculs que le trigger fn_his_facture_journal)
+  // Diviseur TVA dynamique selon le pays du tenant (ex. CG: 1 + 0.18 + 0.18*0.05 = 1.189)
+  const paysCfg   = getPaysConfig((tenant?.pays ?? 'CG') as PaysFiscal)
+  const taxeCA    = paysCfg.tva.taxes_additionnelles.find(t => t.base === 'tva_collectee')
+  const hisDivisor = 1 + paysCfg.tva.taux_normal * (1 + (taxeCA?.taux ?? 0))
+
+  // CA médical HT + TVA dérivée (miroir du trigger fn_his_facture_journal — migration 131)
   const hisTvaTotal = hisFactures.reduce((s, f) => {
-    const ht = Math.round((f.montant_total ?? 0) / HIS_TVA_DIVISOR)
+    const ht = Math.round((f.montant_total ?? 0) / hisDivisor)
     return s + ((f.montant_total ?? 0) - ht)
   }, 0)
-  const hisCaHt = hisFactures.reduce((s, f) => s + Math.round((f.montant_total ?? 0) / HIS_TVA_DIVISOR), 0)
+  const hisCaHt = hisFactures.reduce((s, f) => s + Math.round((f.montant_total ?? 0) / hisDivisor), 0)
 
   // 1. NIU manquant
   if (!tenant?.niu) {
