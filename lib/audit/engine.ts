@@ -169,19 +169,25 @@ export async function auditFinancier(supabase: SupabaseClient, tenantId: string)
   const anomalies: AuditAnomalie[] = []
   const since30 = daysAgo(30)
 
-  const [txRes, factRes] = await Promise.all([
+  const [txRes, factRes, hisFactRes] = await Promise.all([
     supabase.from('transactions').select('type, montant, created_at').eq('tenant_id', tenantId).gte('created_at', since30),
     supabase.from('factures').select('statut, total, montant_paye, date_echeance').eq('tenant_id', tenantId).in('statut', ['envoyee', 'retard', 'payee']),
+    // his_factures = facturation module Santé (HIS Enterprise)
+    supabase.from('his_factures').select('statut, montant_total, montant_paye').eq('tenant_id', tenantId).in('statut', ['en_attente', 'partielle', 'payee']),
   ])
 
-  const tx       = txRes.data ?? []
-  const factures  = factRes.data ?? []
+  const tx          = txRes.data ?? []
+  const factures    = factRes.data ?? []
+  const hisFactures = hisFactRes.data ?? []
 
   const entrees  = tx.filter(t => t.type === 'entree').reduce((s, t) => s + (t.montant ?? 0), 0)
   const sorties  = tx.filter(t => t.type === 'sortie').reduce((s, t) => s + (t.montant ?? 0), 0)
   const solde    = entrees - sorties
 
-  const creances    = factures.filter(f => f.statut !== 'payee').reduce((s, f) => s + ((f.total ?? 0) - (f.montant_paye ?? 0)), 0)
+  // Créances classiques (factures) + créances médicales (his_factures)
+  const creancesClassiques = factures.filter(f => f.statut !== 'payee').reduce((s, f) => s + ((f.total ?? 0) - (f.montant_paye ?? 0)), 0)
+  const creancesMedicales  = hisFactures.filter(f => f.statut !== 'payee').reduce((s, f) => s + ((f.montant_total ?? 0) - (f.montant_paye ?? 0)), 0)
+  const creances           = creancesClassiques + creancesMedicales
 
   // Ratios
   const dso = entrees > 0 ? (creances / entrees) * 30 : 0 // jours
@@ -260,20 +266,35 @@ export async function auditFinancier(supabase: SupabaseClient, tenantId: string)
 // AUDIT FISCAL
 // ══════════════════════════════════════════════════════════════════════════════
 
+// TVA implicite dans his_factures : 18.9% (taux CG hardcodé dans fn_his_facture_journal)
+const HIS_TVA_DIVISOR = 1.189
+
 export async function auditFiscal(supabase: SupabaseClient, tenantId: string): Promise<AuditScore> {
   const anomalies: AuditAnomalie[] = []
   const now = new Date()
   const mois = now.getMonth() + 1
   const jour = now.getDate()
 
-  const [factRes, tenantRes] = await Promise.all([
+  const [factRes, hisFactRes, tenantRes] = await Promise.all([
     supabase.from('factures').select('total, tva, statut, created_at').eq('tenant_id', tenantId)
       .gte('created_at', daysAgo(90)),
+    // his_factures = facturation module Santé — TVA dérivée de montant_total (18.9%)
+    supabase.from('his_factures').select('montant_total, statut, created_at').eq('tenant_id', tenantId)
+      .gte('created_at', daysAgo(90))
+      .neq('statut', 'annulee'),
     supabase.from('tenants').select('pays, tva_numero, rccm, niu').eq('id', tenantId).maybeSingle(),
   ])
 
-  const factures = factRes.data ?? []
-  const tenant   = tenantRes.data
+  const factures    = factRes.data ?? []
+  const hisFactures = hisFactRes.data ?? []
+  const tenant      = tenantRes.data
+
+  // CA médical HT + TVA dérivée (mêmes calculs que le trigger fn_his_facture_journal)
+  const hisTvaTotal = hisFactures.reduce((s, f) => {
+    const ht = Math.round((f.montant_total ?? 0) / HIS_TVA_DIVISOR)
+    return s + ((f.montant_total ?? 0) - ht)
+  }, 0)
+  const hisCaHt = hisFactures.reduce((s, f) => s + Math.round((f.montant_total ?? 0) / HIS_TVA_DIVISOR), 0)
 
   // 1. NIU manquant
   if (!tenant?.niu) {
@@ -301,14 +322,14 @@ export async function auditFiscal(supabase: SupabaseClient, tenantId: string): P
     })
   }
 
-  // 3. TVA déclaration trimestrielle — Congo
+  // 3. TVA déclaration trimestrielle — Congo (factures classiques + santé)
   const moisTVA = [1, 4, 7, 10]
   if (moisTVA.includes(mois) && jour > 15) {
-    const tvaCollectee = factures.reduce((s, f) => s + (f.tva ?? 0), 0)
+    const tvaCollectee = factures.reduce((s, f) => s + (f.tva ?? 0), 0) + hisTvaTotal
     anomalies.push({
       id: uid('fisc'), domain: 'fiscal', code: 'T003',
       titre: 'Déclaration TVA trimestrielle potentiellement en retard',
-      description: `Nous sommes le ${jour}/${mois}. La déclaration TVA était due avant le 15. TVA collectée estimée : ${fmt(tvaCollectee)} FCFA.`,
+      description: `Nous sommes le ${jour}/${mois}. La déclaration TVA était due avant le 15. TVA collectée estimée : ${fmt(tvaCollectee)} FCFA (dont TVA médicale : ${fmt(hisTvaTotal)} FCFA).`,
       niveau: jour > 20 ? 'critical' : 'warning',
       impact: 'Pénalités de retard (10% + 2% par mois) si déclaration non déposée.',
       recommandation: 'Déposez immédiatement votre déclaration TVA trimestrielle à la DGI.',
@@ -316,7 +337,7 @@ export async function auditFiscal(supabase: SupabaseClient, tenantId: string): P
     })
   }
 
-  // 4. Factures sans TVA calculée
+  // 4. Factures classiques sans TVA calculée (his_factures exclues — TVA dérivée de montant_total)
   const sansTV = factures.filter(f => !f.tva && (f.total ?? 0) > 0)
   if (sansTV.length > 0) {
     anomalies.push({
@@ -331,12 +352,12 @@ export async function auditFiscal(supabase: SupabaseClient, tenantId: string): P
     })
   }
 
-  // 5. Aucune facture émise
-  if (factures.length === 0) {
+  // 5. Aucune facture émise (classiques ET médicales)
+  if (factures.length === 0 && hisFactures.length === 0) {
     anomalies.push({
       id: uid('fisc'), domain: 'fiscal', code: 'T005',
       titre: 'Aucune facture émise sur 90 jours',
-      description: 'Aucune activité de facturation enregistrée.',
+      description: 'Aucune activité de facturation enregistrée (modules classique et santé).',
       niveau: 'warning',
       impact: 'Absence de traçabilité pour les déclarations fiscales.',
       recommandation: 'Utilisez le module Facturation pour enregistrer toutes vos ventes.',

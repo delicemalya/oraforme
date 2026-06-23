@@ -8,8 +8,11 @@ import type { PaysFiscal } from '@/lib/fiscalite/types'
 export const dynamic = 'force-dynamic'
 
 // SYSCOHADA Révisé 2017 — TVA collectée 4441 · TVA récupérable 4446
-const TVA_COLLECTEE_ACCOUNTS  = ['4441', '4442']
-const TVA_DEDUCTIBLE_ACCOUNTS = ['4445', '4446']
+// Norme opérationnelle codebase : 6 chiffres (441000, 445600…)
+// Norme legacy : 4 chiffres (4441, 4442…) — conservée pour compatibilité anciennes écritures
+// Décision S2-P0 : les deux formats sont acceptés pour ne pas créer une troisième norme
+const TVA_COLLECTEE_ACCOUNTS  = ['441000', '4441', '4442']
+const TVA_DEDUCTIBLE_ACCOUNTS = ['445600', '445700', '4445', '4446']
 
 // GET /api/fiscalite/tva?annee=2026&mois=5&pays=CG
 export async function GET(req: NextRequest) {
