@@ -47,7 +47,7 @@ export async function PATCH(
   // Vérifier que la facture appartient au tenant
   const { data: existing } = await supabaseAdmin
     .from('factures')
-    .select('id, tenant_id, statut, subtotal, montant_ht, total, invoice_number, client_name, client_nom')
+    .select('id, tenant_id, statut, subtotal, montant_ht, tva_montant, ca, total, invoice_number, client_name, client_nom')
     .eq('id', id)
     .eq('tenant_id', ctx.tenantId)
     .maybeSingle()
@@ -66,22 +66,68 @@ export async function PATCH(
 
   if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
 
-  // Si la facture passe à "payée" → enregistrer le paiement dans paiements_factures
-  // Les écritures OHADA (521/411) et transaction trésorerie sont gérées exclusivement
-  // par fn_facture_paid_to_journal (migration 046) via AFTER UPDATE OF statut
-  if (statut === 'payee' && existing.statut !== 'payee') {
-    const today = new Date().toISOString().split('T')[0]
+  const today    = new Date().toISOString().split('T')[0]
+  const fiscYear = new Date(today).getFullYear()
+  const pieceNum = existing.invoice_number ?? `FAC-${id.slice(0, 8).toUpperCase()}`
+  const clientNom = existing.client_name ?? existing.client_nom ?? ''
 
+  // FAC-001 — Facture envoyée : émission comptable via moteur central (migration 139)
+  // Remplace le trigger trg_facture_issued supprimé dans migration 139.
+  if (statut === 'envoyee' && existing.statut !== 'envoyee') {
+    const ht  = Number(existing.montant_ht ?? existing.subtotal ?? 0)
+    const tva = Number(existing.tva_montant ?? 0)
+    const ca  = Number(existing.ca ?? 0)
+    const ttc = Number(existing.total ?? ht + tva + ca)
+
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_tenant_id:     ctx.tenantId,
+      p_event_type:    'FAC-001',
+      p_source_module: 'facturation',
+      p_source_table:  'factures',
+      p_source_id:     id,
+      p_montant_ht:    ht,
+      p_montant_tva:   tva,
+      p_montant_ttc:   ttc,
+      p_libelle:       `Facture ${pieceNum} — ${clientNom}`,
+      p_date_event:    today,
+      p_fiscal_year:   fiscYear,
+      p_metadata:      { piece_number: pieceNum, client_name: clientNom, ca, country_code: 'CG' },
+    })
+  }
+
+  // FAC-002 — Facture payée : règlement via moteur central (migration 139)
+  // Remplace le trigger trg_facture_paid supprimé dans migration 139.
+  if (statut === 'payee' && existing.statut !== 'payee') {
+    const ttc        = Number(existing.total ?? 0)
+    const modePaie   = mode_paiement ?? 'virement'
+
+    // Enregistrer le paiement
     if (montant_paye) {
       await supabaseAdmin.from('paiements_factures').insert({
         tenant_id:     ctx.tenantId,
         facture_id:    id,
         montant:       montant_paye,
-        mode_paiement: mode_paiement ?? 'especes',
+        mode_paiement: modePaie,
         date:          today,
         reference:     reference ?? null,
       })
     }
+
+    // Écriture comptable : Trésorerie (521/571x) / Clients (411)
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_tenant_id:     ctx.tenantId,
+      p_event_type:    'FAC-002',
+      p_source_module: 'facturation',
+      p_source_table:  'factures',
+      p_source_id:     id,
+      p_montant_ht:    0,
+      p_montant_tva:   0,
+      p_montant_ttc:   ttc,
+      p_libelle:       `Reglement facture ${pieceNum} — ${clientNom}`,
+      p_date_event:    today,
+      p_fiscal_year:   fiscYear,
+      p_metadata:      { piece_number: pieceNum, client_name: clientNom, mode_paiement: modePaie, country_code: 'CG' },
+    })
   }
 
   return NextResponse.json({ ok: true })

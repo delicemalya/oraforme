@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ data: data ?? [], total: count ?? 0, page, limit })
 }
 
-// POST /api/factures — créer une facture + écritures OHADA automatiques
+// POST /api/factures — créer une facture + émission d'événement comptable via moteur central
 export async function POST(req: NextRequest) {
   const { ctx, error } = await requireTenant()
   if (error) return error
@@ -97,36 +97,28 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Écritures OHADA — uniquement pour les factures émises (pas les brouillons)
-  if (facture?.id && statut !== 'brouillon' && type !== 'avoir') {
+  // Moteur comptable central (migration 139) — FAC-001 si facture émise directement
+  // Le trigger trg_facture_issued a été supprimé dans migration 139 — ce code le remplace.
+  // Les brouillons et avoirs ne génèrent pas d'écriture comptable à la création.
+  if (facture?.id && statut === 'envoyee' && type !== 'avoir') {
     const today    = date ?? new Date().toISOString().split('T')[0]
     const fiscYear = new Date(today).getFullYear()
     const pieceNum = invoice_number ?? `FAC-${facture.id.slice(0, 8).toUpperCase()}`
 
-    // SYSCOHADA — 3 écritures automatiques (révisé 2017, comptes 2-3 chiffres)
-    // 1. Vente HT  : débit 411 Clients / crédit 701 Ventes de marchandises
-    // 2. TVA       : débit 411 Clients / crédit 4441 État — TVA collectée (SYSCOHADA 4441)
-    // 3. CA 5%     : débit 411 Clients / crédit 447 État — impôts retenus à la source
-    const entries = [
-      { credit_account: '706',  montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
-      { credit_account: '4441', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA` },
-      { credit_account: '447',  montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
-    ].filter(e => e.montant > 0)
-
-    await supabaseAdmin.from('journal_entries').insert(
-      entries.map(e => ({
-        tenant_id:      ctx.tenantId,
-        date_operation: today,
-        libelle:        e.libelle,
-        debit_account:  '411',
-        credit_account: e.credit_account,
-        montant:        e.montant,
-        source:         'factures_emises',
-        source_id:      facture.id,
-        fiscal_year:    fiscYear,
-        piece_number:   pieceNum,
-      }))
-    )
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_tenant_id:     ctx.tenantId,
+      p_event_type:    'FAC-001',
+      p_source_module: 'facturation',
+      p_source_table:  'factures',
+      p_source_id:     facture.id,
+      p_montant_ht:    ht,
+      p_montant_tva:   tva,
+      p_montant_ttc:   ttc,
+      p_libelle:       `Facture ${pieceNum} — ${client_name}`,
+      p_date_event:    today,
+      p_fiscal_year:   fiscYear,
+      p_metadata:      { piece_number: pieceNum, client_name, ca, country_code: 'CG' },
+    })
   }
 
   // WhatsApp — notification automatique (non bloquant) si facture émise avec numéro client
