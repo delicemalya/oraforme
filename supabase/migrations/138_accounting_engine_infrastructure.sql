@@ -315,8 +315,12 @@ CREATE TABLE IF NOT EXISTS accounting_event_rules (
   CONSTRAINT chk_aer_conds_arr CHECK (jsonb_typeof(conditions) = 'array')
 );
 
+-- Index unicité pour les règles globales (country_codes IS NULL)
+-- Remplace l'index avec array_to_string() qui n'est pas IMMUTABLE sur toutes les versions PG.
+-- Les règles country-specific sont distinguées par l'application (pas de contrainte DB sur arrays).
 CREATE UNIQUE INDEX uidx_aer_version ON accounting_event_rules
-  (event_type, sequence, rule_version, COALESCE(array_to_string(country_codes, ','), 'ALL'));
+  (event_type, sequence, rule_version)
+  WHERE country_codes IS NULL;
 
 CREATE INDEX idx_aer_event_type ON accounting_event_rules (event_type, status, valid_from);
 CREATE INDEX idx_aer_active     ON accounting_event_rules (event_type, sequence) WHERE status = 'active';
