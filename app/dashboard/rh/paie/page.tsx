@@ -1535,55 +1535,6 @@ export default function PaiePage() {
       return
     }
 
-    // Sync trésorerie + OHADA (PME/Grande)
-    if (plan !== 'tpe') {
-      const payees = rows.filter(r => (forceStatut ?? r.statut) === 'payee')
-      if (payees.length > 0) {
-        const sourceIds = payees.map(r => `bulletin_${r.employe_id}_${mois}_${annee}`)
-        const { data: existing } = await supabase.from('transactions').select('source_id')
-          .eq('tenant_id', tenantId).eq('source', 'bulletin_paie').in('source_id', sourceIds)
-        const existingSet = new Set((existing ?? []).map((e: { source_id: string }) => e.source_id))
-        const toInsert = payees
-          .filter(r => !existingSet.has(`bulletin_${r.employe_id}_${mois}_${annee}`))
-          .map(r => ({
-            tenant_id: tenantId, type: 'sortie', categorie: 'Salaires & CNSS',
-            description: `Paie ${r.prenom} ${r.nom} — ${String(mois).padStart(2, '0')}/${annee}`,
-            montant: r.salaire_net,
-            date: new Date(annee, mois - 1, 28).toISOString().split('T')[0],
-            mode_paiement: 'virement', source: 'bulletin_paie',
-            source_id: `bulletin_${r.employe_id}_${mois}_${annee}`,
-          }))
-        if (toInsert.length > 0) {
-          await supabase.from('transactions').insert(toInsert)
-        }
-        const totalBrutP    = payees.reduce((s, r) => s + r.salaire_brut, 0)
-        const totalNetP     = payees.reduce((s, r) => s + r.salaire_net, 0)
-        const totalCnssP    = payees.reduce((s, r) => s + r.cnss_patronal + r.tus_patronal, 0)
-        const totalCnssEmpP = payees.reduce((s, r) => s + r.cnss_employe, 0)
-        const totalIrppP    = payees.reduce((s, r) => s + r.irpp, 0)
-        const dateEcr    = new Date(annee, mois - 1, 28).toISOString().split('T')[0]
-        const lib        = `Paie ${MOIS_LABELS[mois]} ${annee}`
-        // Supprimer les écritures paie existantes pour ce mois avant de réinsérer (déduplication)
-        await supabase.from('journal_entries')
-          .delete()
-          .eq('tenant_id', tenantId)
-          .eq('source', 'paie')
-          .eq('fiscal_year', annee)
-          .like('libelle', `%${MOIS_LABELS[mois]} ${annee}%`)
-        // SYSCOHADA Révisé — 5 écritures paie : 661/421 brut, 664/431 patron, 421/431 CNSS emp, 421/447 IRPP, 421/521 net
-        const paieEntries = [
-          { debit_account: '661', credit_account: '421', montant: totalBrutP,    libelle: lib },
-          { debit_account: '664', credit_account: '431', montant: totalCnssP,    libelle: `Charges patronales — ${lib}` },
-          { debit_account: '421', credit_account: '431', montant: totalCnssEmpP, libelle: `CNSS salarié — ${lib}` },
-          { debit_account: '421', credit_account: '447', montant: totalIrppP,    libelle: `IRPP retenu — ${lib}` },
-          { debit_account: '421', credit_account: '521', montant: totalNetP,     libelle: `Virement salaires — ${lib}` },
-        ].filter(e => e.montant > 0)
-        await supabase.from('journal_entries').insert(
-          paieEntries.map(e => ({ tenant_id: tenantId, date_operation: dateEcr, source: 'paie', fiscal_year: annee, ...e }))
-        ).then(() => null, () => null)
-      }
-    }
-
     setSaving(false); setSaved(true); setShowLancerModal(false)
     setTimeout(() => setSaved(false), 2500)
     load()
