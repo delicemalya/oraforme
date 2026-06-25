@@ -57,6 +57,61 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .from('bulletins_paie').update(updates).eq('id', id).eq('tenant_id', auth.tenantId)
     .select('*, employes(nom, poste)').single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  const MOIS_LABELS = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+  const moisLabel   = MOIS_LABELS[data.mois] ?? `M${data.mois}`
+  const employeNom  = (data.employes as { nom?: string } | null)?.nom ?? 'Employé'
+
+  // PAI-001 — Constatation salaire (moteur comptable central, migration 141)
+  // Remplace les 4 écritures de trg_bulletins_paie (supprimé migration 141)
+  if (statut === 'validee') {
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_tenant_id:     auth.tenantId,
+      p_event_type:    'PAI-001',
+      p_source_module: 'paie',
+      p_source_table:  'bulletins_paie',
+      p_source_id:     data.id,
+      p_montant_ht:    Number(data.brut)  || 0,
+      p_montant_tva:   0,
+      p_montant_ttc:   Number(data.net)   || 0,
+      p_montant_net:   Number(data.net)   || 0,
+      p_libelle:       `Bulletin paie ${moisLabel} ${data.annee} — ${employeNom} — constatation`,
+      p_date_event:    new Date().toISOString().slice(0, 10),
+      p_fiscal_year:   data.annee,
+      p_metadata: {
+        employe_nom:   employeNom,
+        mois:          data.mois,
+        annee:         data.annee,
+        cnss_patronal: Number(data.cnss_patronal) || 0,
+        cnss_salarie:  Number(data.cnss_salarie)  || 0,
+        irpp:          Number(data.irpp)           || 0,
+      },
+    })
+  }
+
+  // PAI-002 — Paiement net (moteur comptable central, migration 141)
+  if (statut === 'payee') {
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_tenant_id:     auth.tenantId,
+      p_event_type:    'PAI-002',
+      p_source_module: 'paie',
+      p_source_table:  'bulletins_paie',
+      p_source_id:     data.id,
+      p_montant_ht:    0,
+      p_montant_tva:   0,
+      p_montant_ttc:   Number(data.net)   || 0,
+      p_libelle:       `Paiement salaire ${moisLabel} ${data.annee} — ${employeNom}`,
+      p_date_event:    (updates.date_paiement as string) ?? new Date().toISOString().slice(0, 10),
+      p_fiscal_year:   data.annee,
+      p_metadata: {
+        employe_nom:   employeNom,
+        mois:          data.mois,
+        annee:         data.annee,
+        mode_paiement: (data.mode_paiement as string | null) ?? 'virement',
+      },
+    })
+  }
+
   return NextResponse.json({ success: true, data })
 }
 
