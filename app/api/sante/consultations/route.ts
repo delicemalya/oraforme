@@ -162,7 +162,8 @@ export async function POST(req: NextRequest) {
   }
 
   // ── 3. Transaction trésorerie si paiement immédiat ────────────────────────
-  // (le trigger OHADA gère journal_entries ; transactions reste manuel)
+  // IMPORTANT: aucun trigger SQL n'écrit dans journal_entries pour les consultations.
+  // Les écritures SYSCOHADA (706 Soins / 521 Banque) sont manquantes (AN-014 Plan Directeur Phase 4).
   if (statut_paiement === 'paye' && montant > 0) {
     const today = (date_consult ?? new Date().toISOString()).split('T')[0]
     await supabaseAdmin.from('transactions').insert({

@@ -108,9 +108,9 @@ export async function POST(req: NextRequest) {
     // 2. TVA       : débit 411 Clients / crédit 4441 État — TVA collectée (SYSCOHADA 4441)
     // 3. CA 5%     : débit 411 Clients / crédit 447 État — impôts retenus à la source
     const entries = [
-      { credit_account: '706000', montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
-      { credit_account: '441000', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA` },
-      { credit_account: '447000', montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
+      { credit_account: '706',  montant: ht,  libelle: `Facture ${pieceNum} — ${client_name} — HT` },
+      { credit_account: '4441', montant: tva, libelle: `Facture ${pieceNum} — ${client_name} — TVA` },
+      { credit_account: '447',  montant: ca,  libelle: `Facture ${pieceNum} — ${client_name} — CA 5%` },
     ].filter(e => e.montant > 0)
 
     await supabaseAdmin.from('journal_entries').insert(
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
         tenant_id:      ctx.tenantId,
         date_operation: today,
         libelle:        e.libelle,
-        debit_account:  '411000',
+        debit_account:  '411',
         credit_account: e.credit_account,
         montant:        e.montant,
         source:         'factures_emises',
