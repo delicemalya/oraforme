@@ -201,21 +201,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── 3. Transaction trésorerie si paiement immédiat ────────────────────────
-  if (statut_paiement === 'paye' && montant > 0) {
-    const today = (date_consult ?? new Date().toISOString()).split('T')[0]
-    await supabaseAdmin.from('transactions').insert({
-      tenant_id:     ctx.tenantId,
-      type:          'entree',
-      categorie:     'Consultation médicale',
-      description:   `Consultation — ${patient.prenom} ${patient.nom}`,
-      montant,
-      date:          today,
-      mode_paiement: 'especes',
-      source:        'sante',
-      source_id:     consultation.id,
-    })
-  }
-
   return NextResponse.json({ id: consultation.id }, { status: 201 })
 }
