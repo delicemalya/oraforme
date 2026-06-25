@@ -83,6 +83,30 @@ export async function POST(req: NextRequest) {
     if (lErr) return NextResponse.json({ error: lErr.message }, { status: 500 })
   }
 
+  // SAN-001 — Facture médicale émise (moteur comptable central, migration 140)
+  if (montant_total > 0) {
+    const today    = new Date().toISOString().split('T')[0]
+    const fiscYear = new Date(today).getFullYear()
+    const ht       = Math.round(montant_total / 1.189)
+    const tva      = montant_total - ht
+    const pieceNum = facture.numero_facture ?? `SAN-${facture.id.slice(0, 8).toUpperCase()}`
+
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_tenant_id:     ctx.tenantId,
+      p_event_type:    'SAN-001',
+      p_source_module: 'sante',
+      p_source_table:  'his_factures',
+      p_source_id:     facture.id,
+      p_montant_ht:    ht,
+      p_montant_tva:   tva,
+      p_montant_ttc:   montant_total,
+      p_libelle:       `Facture médicale ${pieceNum}`,
+      p_date_event:    today,
+      p_fiscal_year:   fiscYear,
+      p_metadata:      { piece_number: pieceNum },
+    })
+  }
+
   return NextResponse.json({ id: facture.id, numero_facture: facture.numero_facture }, { status: 201 })
 }
 
@@ -100,17 +124,19 @@ export async function PATCH(req: NextRequest) {
   if (rest.notes !== undefined)        update.notes         = rest.notes
   if (rest.statut)                     update.statut        = rest.statut
 
-  // Auto-set statut based on payment
-  if (rest.montant_paye !== undefined && !rest.statut) {
-    const { data: existing } = await supabaseAdmin
+  // Lire la facture existante si montant_paye change — nécessaire pour auto-statut et SAN-002
+  let existingFac: { montant_total: number; montant_paye: number | null; mode_paiement: string | null; numero_facture: string | null } | null = null
+  if (rest.montant_paye !== undefined) {
+    const { data } = await supabaseAdmin
       .from('his_factures')
-      .select('montant_total')
+      .select('montant_total, montant_paye, mode_paiement, numero_facture')
       .eq('id', id)
       .eq('tenant_id', ctx.tenantId)
       .maybeSingle()
+    existingFac = data
 
-    if (existing) {
-      const total = Number(existing.montant_total)
+    if (existingFac && !rest.statut) {
+      const total = Number(existingFac.montant_total)
       const paid  = Number(rest.montant_paye)
       update.statut = paid >= total ? 'payee' : paid > 0 ? 'partielle' : 'en_attente'
     }
@@ -123,5 +149,37 @@ export async function PATCH(req: NextRequest) {
     .eq('tenant_id', ctx.tenantId)
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+
+  // SAN-002 — Règlement facture médicale (moteur comptable central, migration 140)
+  // Remplace trg_his_facture_journal supprimé dans migration 140.
+  // Emit uniquement si montant_paye augmente (delta > 0).
+  // Limitation connue : paiements partiels multiples → seul le premier est comptabilisé
+  // (idempotence sur source_id=his_factures.id). Évolution future : table his_paiements_sante.
+  if (rest.montant_paye !== undefined && existingFac) {
+    const oldPaid = Number(existingFac.montant_paye ?? 0)
+    const newPaid = Number(rest.montant_paye)
+    const delta   = newPaid - oldPaid
+    if (delta > 0) {
+      const modePaie = rest.mode_paiement ?? existingFac.mode_paiement ?? 'especes'
+      const pieceNum = existingFac.numero_facture ?? `SAN-${id.slice(0, 8).toUpperCase()}`
+      const today    = new Date().toISOString().split('T')[0]
+
+      await supabaseAdmin.rpc('emit_accounting_event', {
+        p_tenant_id:     ctx.tenantId,
+        p_event_type:    'SAN-002',
+        p_source_module: 'sante',
+        p_source_table:  'his_factures',
+        p_source_id:     id,
+        p_montant_ht:    0,
+        p_montant_tva:   0,
+        p_montant_ttc:   delta,
+        p_libelle:       `Règlement ${pieceNum}`,
+        p_date_event:    today,
+        p_fiscal_year:   new Date(today).getFullYear(),
+        p_metadata:      { piece_number: pieceNum, mode_paiement: modePaie },
+      })
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }

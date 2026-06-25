@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
         mode_paiement:   'especes',
         statut:          'en_attente',
       })
-      .select('id')
+      .select('id, numero_facture')
       .single()
 
     if (facErr || !facture?.id) {
@@ -140,7 +140,31 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Paiement immédiat : UPDATE montant_paye → déclenche trg_his_facture_journal (OHADA)
+    // SAN-001 — Facture médicale émise (moteur comptable central, migration 140)
+    // Remplace les écritures manquantes signalées dans AN-014 Plan Directeur Phase 4.
+    const dateF    = dateFacture
+    const fiscYear = new Date(dateF).getFullYear()
+    const ht       = Math.round(montant / 1.189)
+    const tva      = montant - ht
+    const pieceNum = facture.numero_facture ?? `SAN-${facture.id.slice(0, 8).toUpperCase()}`
+    const patNom   = `${patient.prenom} ${patient.nom}`
+
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_tenant_id:     ctx.tenantId,
+      p_event_type:    'SAN-001',
+      p_source_module: 'sante',
+      p_source_table:  'his_factures',
+      p_source_id:     facture.id,
+      p_montant_ht:    ht,
+      p_montant_tva:   tva,
+      p_montant_ttc:   montant,
+      p_libelle:       `Consultation ${pieceNum} — ${patNom}`,
+      p_date_event:    dateF,
+      p_fiscal_year:   fiscYear,
+      p_metadata:      { piece_number: pieceNum, patient_nom: patNom, motif: motif.trim() },
+    })
+
+    // Paiement immédiat : mise à jour du montant_paye (trg_his_facture_journal supprimé mig. 140)
     if (statut_paiement === 'paye') {
       const { error: payErr } = await supabaseAdmin
         .from('his_factures')
@@ -158,12 +182,26 @@ export async function POST(req: NextRequest) {
           { status: 500 },
         )
       }
+
+      // SAN-002 — Règlement immédiat (moteur comptable central, migration 140)
+      await supabaseAdmin.rpc('emit_accounting_event', {
+        p_tenant_id:     ctx.tenantId,
+        p_event_type:    'SAN-002',
+        p_source_module: 'sante',
+        p_source_table:  'his_factures',
+        p_source_id:     facture.id,
+        p_montant_ht:    0,
+        p_montant_tva:   0,
+        p_montant_ttc:   montant,
+        p_libelle:       `Règlement consultation ${pieceNum} — ${patNom}`,
+        p_date_event:    dateF,
+        p_fiscal_year:   fiscYear,
+        p_metadata:      { piece_number: pieceNum, patient_nom: patNom, mode_paiement: 'especes' },
+      })
     }
   }
 
   // ── 3. Transaction trésorerie si paiement immédiat ────────────────────────
-  // IMPORTANT: aucun trigger SQL n'écrit dans journal_entries pour les consultations.
-  // Les écritures SYSCOHADA (706 Soins / 521 Banque) sont manquantes (AN-014 Plan Directeur Phase 4).
   if (statut_paiement === 'paye' && montant > 0) {
     const today = (date_consult ?? new Date().toISOString()).split('T')[0]
     await supabaseAdmin.from('transactions').insert({
