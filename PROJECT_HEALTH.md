@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **Migration 141 (Paie) — Certification définitive** — 2026-06-26
+> Dernière mise à jour : **Migration 142 (Restaurant) — Certification Argent conditionnel** — 2026-06-26
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -9,31 +9,31 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Architecture Health Index (AHI)** | **51 / 100** |
-| Moteur central déployé | ✅ v1.3.0 (mig. 138-141) |
+| **Architecture Health Index (AHI)** | **55 / 100** *(conditionnel — définitif après tests fonctionnels RES)* |
+| Moteur central déployé | ✅ v1.4.0 (mig. 138-142) |
 | Modules dans Oraforme | 14 identifiés |
-| Modules migrés vers moteur central | 3 / 14 (21%) |
+| Modules migrés vers moteur central | 4 / 14 (29%) |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | 0 |
+| Modules certifiés Argent (conditionnel) | **1 ⏳ (RES)** |
 | Modules certifiés Argent (définitif) | **3 ✅ (FAC, SAN, PAI)** |
 | Modules certifiés Or | 0 |
-| Triggers legacy comptables restants | ~18 |
+| Triggers legacy comptables restants | ~18 *(restaurant n'avait pas de trigger dédié — chemin legacy via transactions supprimé)* |
 | INSERT directs en routes API | 0 ✅ |
 | Chemins parallèles dashboard | 14 pages (lib/compta-sync-client.ts) |
 | Doubles écritures actives connues | 0 ✅ |
 | Régressions ouvertes | 0 ✅ |
-| Régressions corrigées (cycle actuel) | 2 (mini-cleanup SAN + lacune PAI-003) |
+| Régressions corrigées (cycle actuel) | 1 (dashboard direction migré vers accounting_events) |
 
 ### AHI — Décomposition
 
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
-| Couverture moteur central | 30% | 18/30 | 3 modules sur ~13 modules avec écritures |
-| Certifications obtenues | 25% | 13/25 | 3 × Argent définitif (×0.55 coeff) |
-| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, trigger supprimé confirmé |
+| Couverture moteur central | 30% | 21/30 | 4 modules sur ~13 modules avec écritures |
+| Certifications obtenues | 25% | 15/25 | 3 × Argent définitif + 1 × Argent conditionnel (×0.55 coeff) |
+| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, aucune régression détectée |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
-| Dette technique éliminée | 10% | 6/10 | financial-sync.ts supprimé, inserts inline → emit |
-| **TOTAL** | **100%** | **51/100** | |
+| Dette technique éliminée | 10% | 7/10 | 2 inserts transactions supprimés, dashboard décuplé de transactions |
+| **TOTAL** | **100%** | **55/100** *(→ 56 définitif après tests)* | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -84,9 +84,9 @@
 ### Accounting Engine (Moteur comptable central)
 | Statut | Version | Modules couverts | % |
 |---|---|---|---|
-| ✅ Actif en production | v1.3.0 | FAC, SAN, PAI | **23%** |
+| ✅ Actif en production | v1.4.0 | FAC, SAN, PAI, RES | **29%** |
 
-**Prochaines étapes :** RES (v1.4.0), École (v1.5.0), Hôtel (v1.6.0), ONG (v1.7.0), Boisson (v1.8.0) → cible v2.0.0 (tous modules)
+**Prochaines étapes :** École (v1.5.0), Hôtel (v1.6.0), ONG (v1.7.0), Boisson (v1.8.0) → cible v2.0.0 (tous modules)
 
 ---
 
@@ -175,7 +175,7 @@
 | **Facturation (FAC)** | ✅ Mig. 139 | 🥈 **Argent définitif** ✅ | Règles FAC-003/005/006 en draft | Archiver drafts → Or |
 | **Santé (SAN)** | ✅ Mig. 140 | 🥈 **Argent définitif** ✅ | Règles SAN-003/004/005 en draft | Archiver drafts → Or |
 | **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 **Argent définitif** ✅ | fn_bulletins_paie_to_journal, PAI-004/005 draft, dual namespace | Archiver drafts → Or |
-| **Restaurant (RES)** | ❌ Non migré | — | Triggers legacy actifs, inserts directs probables | Migration 142 |
+| **Restaurant (RES)** | ✅ Mig. 142 | 🥈 **Argent conditionnel** ⏳ | RES-003/004 en draft, resto_achats non en base, dashb. migré | Tests fonctionnels → définitif |
 | **École (ECO)** | ❌ Non migré | — | trg_paiement_scolaire actif (mig. 031) | Migration 143 |
 | **Hôtel (HOT)** | ❌ Non migré | — | htl_journal_entries, triggers hôtel | Migration 144 |
 | **ONG** | ❌ Non migré | — | À auditer | Migration 145 |
@@ -193,16 +193,16 @@
 
 | Indicateur | Valeur | Tendance |
 |---|---|---|
-| Triggers legacy comptables restants | ~18 | ↓ (était ~21 avant mig. 139-141) |
-| INSERT directs dans routes API | **0** ✅ | ↓↓ (était 2 avant mig. 141) |
+| Triggers legacy comptables restants | ~18 | → (restaurant n'avait pas de trigger dédié) |
+| INSERT directs dans routes API | **0** ✅ | ↓↓ (était 2 de plus avant mig. 142) |
 | Chemins parallèles dashboard (writeComptaEntry) | **14 pages** | → (stable, en attente LEC) |
-| Doubles écritures actives connues | **0** ✅ | ↓↓ (3 corrigées en mig. 139-141) |
+| Doubles écritures actives connues | **0** ✅ | → |
 | Régressions ouvertes | **0** ✅ | → |
-| Régressions corrigées cumulées | 5 | ↑ |
-| Fichiers dead code supprimés | 1 (financial-sync.ts) | ↑ |
-| Routes API avec emit_accounting_event | 8 routes | ↑ |
-| Règles comptables actives | 13 règles | ↑ |
-| Règles comptables en draft | 11 règles | → |
+| Régressions corrigées cumulées | 6 | ↑ |
+| Fichiers dead code supprimés | 1 (financial-sync.ts) | → |
+| Routes API avec emit_accounting_event | 10 routes | ↑ |
+| Règles comptables actives | 16 règles | ↑ |
+| Règles comptables en draft | 13 règles | ↑ |
 
 ### Détail triggers legacy restants
 
@@ -233,8 +233,8 @@
 
 | # | Migration | Module | Priorité | Raison | Complexité estimée |
 |---|---|---|---|---|---|
-| 1 | **Mig. 142** | Restaurant (RES-001/002) | 🔴 Haute | Module actif, patterns identiques à SAN — cycle court prévisible | Faible |
-| 2 | **Mig. 143** | École (ECO-001/002) | 🔴 Haute | trg_paiement_scolaire documenté, impact direct sur trésorerie école | Moyenne |
+| 1 | **Mig. 143** | École (ECO-001/002) | 🔴 Haute | trg_paiement_scolaire documenté, impact direct sur trésorerie école | Moyenne |
+| 2 | **Mig. 144** | Hôtel (HOT-001/002) | 🟠 Moyenne | htl_journal_entries séparé — audit préalable nécessaire | Moyenne |
 | 3 | **Mig. 144** | Hôtel (HOT-001/002) | 🟠 Moyenne | htl_journal_entries séparé — audit préalable nécessaire | Moyenne |
 | 4 | **Mig. 145** | ONG | 🟠 Moyenne | À auditer — probablement patterns FAC+SAN | Faible |
 | 5 | **Mig. 146** | Boisson | 🟠 Moyenne | À auditer | Faible |
@@ -259,6 +259,7 @@
 - Tout nouveau module DOIT utiliser emit_accounting_event() dès sa création — ne pas créer de triggers comptables
 
 ### ADRs publiés
+- **ADR-142** — Migration Restaurant vers moteur central (commits 7d29ded + 3600316)
 - **ADR-141** — Migration Paie vers moteur central (commits b483411 + c9677db)
 - ADR-139/140 — à formaliser lors de la prochaine session (Facturation, Santé)
 
