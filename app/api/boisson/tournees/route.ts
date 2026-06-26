@@ -70,20 +70,39 @@ export async function PATCH(req: NextRequest) {
   const payload: Record<string, unknown> = {}
   for (const k of allowed) if (k in updates) payload[k] = updates[k]
 
-  // Si tournée terminée → enregistrer dans trésorerie
-  if (updates.statut === 'terminee' && updates.montant_collecte > 0) {
-    const { data: t } = await supabaseAdmin.from('boisson_tournees').select('montant_collecte, date_tournee, chauffeur_nom').eq('id', id).eq('tenant_id', ctx.tenantId).maybeSingle()
-    if (t && updates.montant_collecte !== t.montant_collecte) {
-      await supabaseAdmin.from('transactions').insert({
-        tenant_id:     ctx.tenantId,
-        type:          'entree',
-        categorie:     'Ventes Boissons',
-        description:   `Tournée — ${updates.chauffeur_nom ?? t.chauffeur_nom}`,
-        montant:       updates.montant_collecte,
-        date:          updates.date_tournee ?? t.date_tournee,
-        mode_paiement: 'especes',
-        source:        'boisson',
-        source_id:     id,
+  // Emit BOI-001 uniquement lors de la première transition vers 'terminee' (fire-and-forget — P-003)
+  // Guard : current.statut !== 'terminee' évite le double-emit sur re-PATCH (ANOM-06).
+  // Congo: TTC = HT × 1.189 (TVA 18% + CA 5%/TVA). montant_collecte = TTC.
+  if (updates.statut === 'terminee' && Number(updates.montant_collecte) > 0) {
+    const { data: current } = await supabaseAdmin
+      .from('boisson_tournees')
+      .select('statut, date_tournee, chauffeur_nom, zone')
+      .eq('id', id)
+      .eq('tenant_id', ctx.tenantId)
+      .maybeSingle()
+
+    if (current && current.statut !== 'terminee') {
+      const montantTTC = Number(updates.montant_collecte)
+      const montantHT  = Math.round(montantTTC / 1.189)
+      const montantTVA = montantTTC - montantHT
+
+      await supabaseAdmin.rpc('emit_accounting_event', {
+        p_tenant_id:     ctx.tenantId,
+        p_event_type:    'BOI-001',
+        p_source_module: 'boisson',
+        p_source_table:  'boisson_tournees',
+        p_source_id:     id,
+        p_montant_ht:    montantHT,
+        p_montant_tva:   montantTVA,
+        p_montant_ttc:   montantTTC,
+        p_libelle:       `Tournée — ${updates.chauffeur_nom ?? current.chauffeur_nom}${current.zone ? ` — ${current.zone}` : ''}`,
+        p_date_event:    updates.date_tournee ?? current.date_tournee ?? new Date().toISOString().split('T')[0],
+        p_fiscal_year:   new Date().getFullYear(),
+        p_metadata:      {
+          mode_paiement: 'especes',
+          chauffeur_nom: updates.chauffeur_nom ?? current.chauffeur_nom,
+          zone:          current.zone ?? null,
+        },
       })
     }
   }
