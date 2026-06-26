@@ -61,11 +61,6 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'Table resto_commandes absente — migration 001 non appliquée.';
   END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.tables WHERE table_name = 'resto_achats'
-  ) THEN
-    RAISE EXCEPTION 'Table resto_achats absente — migration pack restaurant non appliquée.';
-  END IF;
 END $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
