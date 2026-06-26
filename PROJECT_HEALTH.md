@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **Migration 142 (Restaurant) — Certification Argent conditionnel** — 2026-06-26
+> Dernière mise à jour : **ATMC-01 + QW-01 — Audit Moteur Central + Correctif ec.config** — 2026-06-26
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -9,31 +9,32 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Architecture Health Index (AHI)** | **55 / 100** *(conditionnel — définitif après tests fonctionnels RES)* |
-| Moteur central déployé | ✅ v1.4.0 (mig. 138-142) |
+| **Architecture Health Index (AHI)** | **57 / 100** *(ATMC-01 complet + QW-01 validé + RES Argent définitif)* |
+| Moteur central déployé | ✅ v1.4.0 (mig. 138-142) + QW-01 (mig. 142.5) |
 | Modules dans Oraforme | 14 identifiés |
 | Modules migrés vers moteur central | 4 / 14 (29%) |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | **1 ⏳ (RES)** |
-| Modules certifiés Argent (définitif) | **3 ✅ (FAC, SAN, PAI)** |
+| Modules certifiés Argent (conditionnel) | **0** *(RES promu définitif après ATMC-01)* |
+| Modules certifiés Argent (définitif) | **4 ✅ (FAC, SAN, PAI, RES)** *(réserve DT-C01 pour FAC/SAN/PAI)* |
 | Modules certifiés Or | 0 |
+| Audit ATMC-01 | ✅ COMPLET — 9/9 points PASS — 2026-06-26 |
 | Triggers legacy comptables restants | ~18 *(restaurant n'avait pas de trigger dédié — chemin legacy via transactions supprimé)* |
 | INSERT directs en routes API | 0 ✅ |
 | Chemins parallèles dashboard | 14 pages (lib/compta-sync-client.ts) |
 | Doubles écritures actives connues | 0 ✅ |
 | Régressions ouvertes | 0 ✅ |
-| Régressions corrigées (cycle actuel) | 1 (dashboard direction migré vers accounting_events) |
+| Régressions corrigées (cycle actuel) | 2 (dashboard direction + QW-01 moteur central) |
 
 ### AHI — Décomposition
 
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
 | Couverture moteur central | 30% | 21/30 | 4 modules sur ~13 modules avec écritures |
-| Certifications obtenues | 25% | 15/25 | 3 × Argent définitif + 1 × Argent conditionnel (×0.55 coeff) |
-| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, aucune régression détectée |
+| Certifications obtenues | 25% | 17/25 | 4 × Argent définitif (×0.80 coeff, réserve DT-C01) |
+| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, ATMC-01 complet, aucune régression |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
-| Dette technique éliminée | 10% | 7/10 | 2 inserts transactions supprimés, dashboard décuplé de transactions |
-| **TOTAL** | **100%** | **55/100** *(→ 56 définitif après tests)* | |
+| Dette technique éliminée | 10% | 7/10 | 2 inserts transactions supprimés + QW-01 bug moteur central |
+| **TOTAL** | **100%** | **57/100** | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -43,7 +44,9 @@
 
 ### 🔴 Critique
 
-*Aucune dette critique identifiée.*
+| # | Description | Impact | Migration prévue | Statut |
+|---|---|---|---|---|
+| DT-C01 | **Rétroplay événements FAC/SAN/PAI** — Tous les `emit_accounting_event()` depuis mig.139-141 ont créé des événements `status='error'` (bug `ec.config`). Transactions réelles (factures, soins, bulletins) sans écritures comptables correspondantes. | Zéro `journal_entries` générées pour FAC/SAN/PAI depuis déploiement. Grand Livre vide. Certifications Argent définitif maintenues avec réserve. | **QW-02** (avant mig.144) | ⚠️ À mesurer et rejouer via `fn_ae_retry_errors() + fn_ae_process_pending()` |
 
 ---
 
@@ -172,10 +175,10 @@
 
 | Module | Migration | Certification | Dette restante | Prochaine étape |
 |---|---|---|---|---|
-| **Facturation (FAC)** | ✅ Mig. 139 | 🥈 **Argent définitif** ✅ | Règles FAC-003/005/006 en draft | Archiver drafts → Or |
-| **Santé (SAN)** | ✅ Mig. 140 | 🥈 **Argent définitif** ✅ | Règles SAN-003/004/005 en draft | Archiver drafts → Or |
-| **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 **Argent définitif** ✅ | fn_bulletins_paie_to_journal, PAI-004/005 draft, dual namespace | Archiver drafts → Or |
-| **Restaurant (RES)** | ✅ Mig. 142 | 🥈 **Argent conditionnel** ⏳ | RES-003/004 en draft, resto_achats non en base, dashb. migré | Tests fonctionnels → définitif |
+| **Facturation (FAC)** | ✅ Mig. 139 | 🥈 **Argent définitif** ✅ *(réserve DT-C01)* | Règles FAC-003/005/006 en draft, rétroplay QW-02 | QW-02 → Archiver drafts → Or |
+| **Santé (SAN)** | ✅ Mig. 140 | 🥈 **Argent définitif** ✅ *(réserve DT-C01)* | Règles SAN-003/004/005 en draft, rétroplay QW-02 | QW-02 → Archiver drafts → Or |
+| **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 **Argent définitif** ✅ *(réserve DT-C01)* | fn_bulletins_paie_to_journal, PAI-004/005 draft, rétroplay QW-02 | QW-02 → Archiver drafts → Or |
+| **Restaurant (RES)** | ✅ Mig. 142 + QW-01 | 🥈 **Argent définitif** ✅ | RES-003/004 en draft, resto_achats non en base | Archiver drafts → Or |
 | **École (ECO)** | ❌ Non migré | — | trg_paiement_scolaire actif (mig. 031) | Migration 143 |
 | **Hôtel (HOT)** | ❌ Non migré | — | htl_journal_entries, triggers hôtel | Migration 144 |
 | **ONG** | ❌ Non migré | — | À auditer | Migration 145 |
@@ -262,6 +265,15 @@
 - **ADR-142** — Migration Restaurant vers moteur central (commits 7d29ded + 3600316)
 - **ADR-141** — Migration Paie vers moteur central (commits b483411 + c9677db)
 - ADR-139/140 — à formaliser lors de la prochaine session (Facturation, Santé)
+
+### ATMC-01 — Résultats d'audit (2026-06-26)
+- Anomalie critique AT-03 : `ec.config` inexistant → corrigé par QW-01 (mig. 142.5)
+- Anomalie AT-05 : comptes 705/706 (SAN/FAC) — intentionnel, documenté
+- Anomalie AT-06 : traitement CA Congo — planifié Sprint Or
+- Anomalie AT-07 : `trg_facture_numero` — non-comptable, inoffensif
+- Certifications AT-01/02 : dashboards legacy → migration LEC
+- **Premier événement `processed` confirmé** : event `c1a5cc46-5484-41c4-b910-85da26939de5`, RES-001, is_balanced=true, duration=54ms
+- **Nouvelle dette critique** : DT-C01 — rétroplay FAC/SAN/PAI (Quick Win QW-02)
 
 ---
 
