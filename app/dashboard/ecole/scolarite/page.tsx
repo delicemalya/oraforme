@@ -391,20 +391,20 @@ function SectionPaiements({ tenantId, etudiants, nomEcole }: {
     const today   = new Date().toISOString().split('T')[0]
     const etu     = etudiants.find(e => e.id === selectedId)
     const desc    = `Scolarit� � ${paieForm.libelle}${etu ? ` � ${etu.prenom} ${etu.nom}` : ''}`
-    await supabase.from('paiements_scolaires').insert({
-      tenant_id: tenantId, etudiant_id: selectedId, frais_id: paieForm.frais_id || null,
-      libelle: paieForm.libelle, montant, annee: new Date().getFullYear(), statut: 'paye', methode: paieForm.methode,
+    const res = await fetch('/api/ecole/paiements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        etudiant_id: selectedId,
+        frais_id: paieForm.frais_id || null,
+        libelle: paieForm.libelle,
+        montant,
+        annee: new Date().getFullYear(),
+        methode: paieForm.methode,
+        etudiant_nom: etu ? `${etu.prenom} ${etu.nom}` : undefined,
+      }),
     })
-    await supabase.from('transactions').insert({
-      tenant_id: tenantId, type: 'entree', categorie: 'Scolarit�',
-      description: desc, montant, mode_paiement: paieForm.methode,
-      date: today, reference: etu?.numero_id ?? null, source: 'paiement_scolaire',
-    })
-    await supabase.from('journal_comptable').insert({
-      tenant_id: tenantId, date: today, libelle: desc,
-      type: 'recette', montant_ht: montant, tva: 0, ca: 0,
-      montant_ttc: montant, categorie: '701 � Prestations �ducatives',
-    })
+    if (!res.ok) { setSaving(false); return }
 
     // Notify parent + direction of payment received
     if (etu) {

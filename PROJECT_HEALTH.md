@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **ATMC-01 + QW-01 — Audit Moteur Central + Correctif ec.config** — 2026-06-26
+> Dernière mise à jour : **Migration 143 — École (ECO-001/002) + QW-03 + QW-04** — 2026-06-26
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -9,32 +9,32 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Architecture Health Index (AHI)** | **57 / 100** *(ATMC-01 complet + QW-01 validé + RES Argent définitif)* |
-| Moteur central déployé | ✅ v1.4.0 (mig. 138-142) + QW-01 (mig. 142.5) |
+| **Architecture Health Index (AHI)** | **62 / 100** *(mig.143 ECO + QW-03/04 + v1.5.0)* |
+| Moteur central déployé | ✅ v1.5.0 (mig. 138-143) + QW-01 (mig. 142.5) |
 | Modules dans Oraforme | 14 identifiés |
-| Modules migrés vers moteur central | 4 / 14 (29%) |
+| Modules migrés vers moteur central | 5 / 14 (36%) |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | **0** *(RES promu définitif après ATMC-01)* |
-| Modules certifiés Argent (définitif) | **4 ✅ (FAC, SAN, PAI, RES)** *(réserve DT-C01 pour FAC/SAN/PAI)* |
+| Modules certifiés Argent (conditionnel) | **1** *(ECO — conditionnel jusqu'à SQL exécuté + tests fonctionnels)* |
+| Modules certifiés Argent (définitif) | **4 ✅ (FAC, SAN, PAI, RES)** |
 | Modules certifiés Or | 0 |
 | Audit ATMC-01 | ✅ COMPLET — 9/9 points PASS — 2026-06-26 |
-| Triggers legacy comptables restants | ~18 *(restaurant n'avait pas de trigger dédié — chemin legacy via transactions supprimé)* |
+| Triggers legacy comptables restants | ~17 *(trg_paiement_scolaire supprimé mig.143)* |
 | INSERT directs en routes API | 0 ✅ |
 | Chemins parallèles dashboard | 14 pages (lib/compta-sync-client.ts) |
-| Doubles écritures actives connues | 0 ✅ |
+| Doubles écritures actives connues | 0 ✅ *(QW-03 : double write école supprimé mig.143)* |
 | Régressions ouvertes | 0 ✅ |
-| Régressions corrigées (cycle actuel) | 2 (dashboard direction + QW-01 moteur central) |
+| Régressions corrigées (cycle actuel) | 4 (direction QW-01 + QW-03 double write + QW-04 journal direct + moteur central) |
 
 ### AHI — Décomposition
 
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
-| Couverture moteur central | 30% | 21/30 | 4 modules sur ~13 modules avec écritures |
-| Certifications obtenues | 25% | 17/25 | 4 × Argent définitif (×0.80 coeff, réserve DT-C01) |
-| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, ATMC-01 complet, aucune régression |
+| Couverture moteur central | 30% | 24/30 | 5 modules sur ~13 modules avec écritures |
+| Certifications obtenues | 25% | 18/25 | 4 × Argent définitif + 1 × Argent conditionnel ECO (×0.80 coeff) |
+| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, ATMC-01 complet, aucune régression mig.143 |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
-| Dette technique éliminée | 10% | 7/10 | 2 inserts transactions supprimés + QW-01 bug moteur central |
-| **TOTAL** | **100%** | **57/100** | |
+| Dette technique éliminée | 10% | 8/10 | QW-01 bug moteur + QW-03 double write école + QW-04 journal direct |
+| **TOTAL** | **100%** | **62/100** | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -46,7 +46,7 @@
 
 | # | Description | Impact | Migration prévue | Statut |
 |---|---|---|---|---|
-| DT-C01 | **Rétroplay événements FAC/SAN/PAI** — Tous les `emit_accounting_event()` depuis mig.139-141 ont créé des événements `status='error'` (bug `ec.config`). Transactions réelles (factures, soins, bulletins) sans écritures comptables correspondantes. | Zéro `journal_entries` générées pour FAC/SAN/PAI depuis déploiement. Grand Livre vide. Certifications Argent définitif maintenues avec réserve. | **QW-02** (avant mig.144) | ⚠️ À mesurer et rejouer via `fn_ae_retry_errors() + fn_ae_process_pending()` |
+| DT-C01 | ~~Rétroplay événements FAC/SAN/PAI~~ — **FERMÉE** (2026-06-26). Audit QW-02 révèle zéro événements en erreur. La base ne contenait aucune transaction réelle pour FAC/SAN/PAI avant QW-01. Précaution préventive sans impact concret. | Aucun | — | ✅ Clôturé sans action |
 
 ---
 
@@ -87,9 +87,9 @@
 ### Accounting Engine (Moteur comptable central)
 | Statut | Version | Modules couverts | % |
 |---|---|---|---|
-| ✅ Actif en production | v1.4.0 | FAC, SAN, PAI, RES | **29%** |
+| ✅ Actif en production | v1.5.0 | FAC, SAN, PAI, RES, ECO | **36%** |
 
-**Prochaines étapes :** École (v1.5.0), Hôtel (v1.6.0), ONG (v1.7.0), Boisson (v1.8.0) → cible v2.0.0 (tous modules)
+**Prochaines étapes :** Hôtel (v1.6.0), ONG (v1.7.0), Boisson (v1.8.0), Stocks (v1.9.0) → cible v2.0.0 (tous modules)
 
 ---
 
@@ -175,11 +175,11 @@
 
 | Module | Migration | Certification | Dette restante | Prochaine étape |
 |---|---|---|---|---|
-| **Facturation (FAC)** | ✅ Mig. 139 | 🥈 **Argent définitif** ✅ *(réserve DT-C01)* | Règles FAC-003/005/006 en draft, rétroplay QW-02 | QW-02 → Archiver drafts → Or |
-| **Santé (SAN)** | ✅ Mig. 140 | 🥈 **Argent définitif** ✅ *(réserve DT-C01)* | Règles SAN-003/004/005 en draft, rétroplay QW-02 | QW-02 → Archiver drafts → Or |
-| **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 **Argent définitif** ✅ *(réserve DT-C01)* | fn_bulletins_paie_to_journal, PAI-004/005 draft, rétroplay QW-02 | QW-02 → Archiver drafts → Or |
+| **Facturation (FAC)** | ✅ Mig. 139 | 🥈 **Argent définitif** ✅ | Règles FAC-003/005/006 en draft | Archiver drafts → Or |
+| **Santé (SAN)** | ✅ Mig. 140 | 🥈 **Argent définitif** ✅ | Règles SAN-003/004/005 en draft | Archiver drafts → Or |
+| **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 **Argent définitif** ✅ | fn_bulletins_paie_to_journal, PAI-004/005 draft | Archiver drafts → Or |
 | **Restaurant (RES)** | ✅ Mig. 142 + QW-01 | 🥈 **Argent définitif** ✅ | RES-003/004 en draft, resto_achats non en base | Archiver drafts → Or |
-| **École (ECO)** | ❌ Non migré | — | trg_paiement_scolaire actif (mig. 031) | Migration 143 |
+| **École (ECO)** | ✅ Mig. 143 + QW-03/04 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | ECO-002 draft, fn_paiement_scolaire_to_transaction conservée (P-001) | SQL + tests → Argent définitif |
 | **Hôtel (HOT)** | ❌ Non migré | — | htl_journal_entries, triggers hôtel | Migration 144 |
 | **ONG** | ❌ Non migré | — | À auditer | Migration 145 |
 | **Boisson (BOI)** | ❌ Non migré | — | À auditer | Migration 146 |
@@ -196,16 +196,16 @@
 
 | Indicateur | Valeur | Tendance |
 |---|---|---|
-| Triggers legacy comptables restants | ~18 | → (restaurant n'avait pas de trigger dédié) |
-| INSERT directs dans routes API | **0** ✅ | ↓↓ (était 2 de plus avant mig. 142) |
+| Triggers legacy comptables restants | ~17 | ↓ (trg_paiement_scolaire supprimé mig.143) |
+| INSERT directs dans routes API | **0** ✅ | → |
 | Chemins parallèles dashboard (writeComptaEntry) | **14 pages** | → (stable, en attente LEC) |
-| Doubles écritures actives connues | **0** ✅ | → |
+| Doubles écritures actives connues | **0** ✅ | → (QW-03 école supprimé) |
 | Régressions ouvertes | **0** ✅ | → |
-| Régressions corrigées cumulées | 6 | ↑ |
+| Régressions corrigées cumulées | 8 | ↑ |
 | Fichiers dead code supprimés | 1 (financial-sync.ts) | → |
-| Routes API avec emit_accounting_event | 10 routes | ↑ |
-| Règles comptables actives | 16 règles | ↑ |
-| Règles comptables en draft | 13 règles | ↑ |
+| Routes API avec emit_accounting_event | 11 routes | ↑ (+POST /api/ecole/paiements) |
+| Règles comptables actives | 17 règles | ↑ (+ECO-001) |
+| Règles comptables en draft | 14 règles | ↑ (+ECO-002) |
 
 ### Détail triggers legacy restants
 
@@ -216,7 +216,7 @@
 | trg_auto_journal_entry | multiple | Generic | LEC |
 | trg_facture_to_transaction | factures | Facturation | LEC (redondant post-139) |
 | trg_paie_to_transaction | bulletins_paie | Paie | À vérifier (redondant post-141?) |
-| trg_paiement_scolaire | paiements scolaires | École | 143 |
+| ~~trg_paiement_scolaire~~ | ~~paiements_scolaires~~ | ~~École~~ | ✅ **SUPPRIMÉ mig.143** |
 | trg_wallet_movement_journal | wallets | Trésorerie | LEC |
 | trg_depense_to_transaction | depenses | Dépenses | LEC |
 | trg_achat_enregistrement | achats | Achats/Stocks | 147 |
@@ -236,9 +236,9 @@
 
 | # | Migration | Module | Priorité | Raison | Complexité estimée |
 |---|---|---|---|---|---|
-| 1 | **Mig. 143** | École (ECO-001/002) | 🔴 Haute | trg_paiement_scolaire documenté, impact direct sur trésorerie école | Moyenne |
-| 2 | **Mig. 144** | Hôtel (HOT-001/002) | 🟠 Moyenne | htl_journal_entries séparé — audit préalable nécessaire | Moyenne |
-| 3 | **Mig. 144** | Hôtel (HOT-001/002) | 🟠 Moyenne | htl_journal_entries séparé — audit préalable nécessaire | Moyenne |
+| 1 | ~~**Mig. 143**~~ | ~~École (ECO-001/002)~~ | ✅ **TERMINÉE** — SQL + API route + dashboard patch | — | — |
+| 2 | **Mig. 144** | Hôtel (HOT-001/002) | 🔴 Haute | htl_journal_entries séparé — audit préalable nécessaire | Moyenne |
+| 3 | **Mig. 145** | ONG | 🟠 Moyenne | À auditer — probablement patterns FAC+SAN | Faible |
 | 4 | **Mig. 145** | ONG | 🟠 Moyenne | À auditer — probablement patterns FAC+SAN | Faible |
 | 5 | **Mig. 146** | Boisson | 🟠 Moyenne | À auditer | Faible |
 | 6 | **Mig. 147** | Stocks + Achats | 🟠 Moyenne | 4 triggers legacy (stock_in/out, achat) — impact transversal | Haute |
@@ -262,6 +262,7 @@
 - Tout nouveau module DOIT utiliser emit_accounting_event() dès sa création — ne pas créer de triggers comptables
 
 ### ADRs publiés
+- **ADR-143** — Migration École vers moteur central. ECO-001 (frais scolaires, TVA=0, 521/706). DROP trg_paiement_scolaire (P-001 : fn conservée). QW-03 : double write transactions éliminé. QW-04 : INSERT journal_comptable direct supprimé. Nouveau chemin : POST /api/ecole/paiements → emit ECO-001.
 - **ADR-142** — Migration Restaurant vers moteur central (commits 7d29ded + 3600316)
 - **ADR-141** — Migration Paie vers moteur central (commits b483411 + c9677db)
 - ADR-139/140 — à formaliser lors de la prochaine session (Facturation, Santé)
