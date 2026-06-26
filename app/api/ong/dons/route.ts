@@ -47,17 +47,27 @@ export async function POST(req: NextRequest) {
 
   if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 })
 
-  // Écriture trésorerie automatique
-  await supabaseAdmin.from('transactions').insert({
-    tenant_id:     ctx.tenantId,
-    type:          'entree',
-    categorie:     'Don / Subvention',
-    description:   `Don — ${donateur.trim()}`,
-    montant,
-    date:          date_reception || new Date().toISOString().split('T')[0],
-    mode_paiement,
-    source:        'ong',
-    source_id:     data.id,
+  // Emit ONG-001 (fire-and-forget — P-003)
+  // Dons: TVA=0 (dons non soumis à TVA en droit CEMAC). montant_ht = montant_ttc.
+  const montantNum = Number(montant)
+
+  await supabaseAdmin.rpc('emit_accounting_event', {
+    p_tenant_id:     ctx.tenantId,
+    p_event_type:    'ONG-001',
+    p_source_module: 'ong',
+    p_source_table:  'ong_dons',
+    p_source_id:     data.id,
+    p_montant_ht:    montantNum,
+    p_montant_tva:   0,
+    p_montant_ttc:   montantNum,
+    p_libelle:       `Don — ${donateur.trim()}`,
+    p_date_event:    date_reception || new Date().toISOString().split('T')[0],
+    p_fiscal_year:   new Date().getFullYear(),
+    p_metadata:      {
+      mode_paiement: mode_paiement,
+      donateur:      donateur.trim(),
+      programme_id:  programme_id || null,
+    },
   })
 
   return NextResponse.json({ id: data.id }, { status: 201 })

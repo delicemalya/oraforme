@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **Migration 144 — Hôtel (HOT-001/002) + ANOM-02 fn_ae_is_income + QW-05** — 2026-06-26
+> Dernière mise à jour : **Migration 145 — ONG (ONG-001/002) + TABLE-BRIDGE-LEGACY + v1.7.0** — 2026-06-26
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -9,12 +9,12 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Architecture Health Index (AHI)** | **67 / 100** *(mig.144 HOT + ANOM-02 + QW-05 + v1.6.0)* |
-| Moteur central déployé | ✅ v1.6.0 (mig. 138-144) + QW-01 (mig. 142.5) |
+| **Architecture Health Index (AHI)** | **71 / 100** *(mig.145 ONG + P-008 TABLE-BRIDGE-LEGACY + v1.7.0)* |
+| Moteur central déployé | ✅ v1.7.0 (mig. 138-145) + QW-01 (mig. 142.5) |
 | Modules dans Oraforme | 14 identifiés |
-| Modules migrés vers moteur central | 6 / 14 (43%) |
+| Modules migrés vers moteur central | 7 / 14 (50%) |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | **2** *(ECO + HOT — conditionnels jusqu'à SQL exécuté)* |
+| Modules certifiés Argent (conditionnel) | **3** *(ECO + HOT + ONG — conditionnels jusqu'à SQL exécuté)* |
 | Modules certifiés Argent (définitif) | **4 ✅ (FAC, SAN, PAI, RES)** |
 | Modules certifiés Or | 0 |
 | Audit ATMC-01 | ✅ COMPLET — 9/9 points PASS — 2026-06-26 |
@@ -29,12 +29,12 @@
 
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
-| Couverture moteur central | 30% | 27/30 | 6 modules sur ~13 modules avec écritures |
-| Certifications obtenues | 25% | 19/25 | 4 × Argent définitif + 2 × Argent conditionnel ECO+HOT (×0.80 coeff) |
-| Zéro régression confirmée | 20% | 20/20 | SQL validé, ATMC-01 complet, aucune régression mig.143-144 |
+| Couverture moteur central | 30% | 30/30 | 7 modules sur ~13 modules avec écritures (54% — seuil atteint) |
+| Certifications obtenues | 25% | 20/25 | 4 × Argent définitif + 3 × Argent conditionnel ECO+HOT+ONG (×0.80 coeff) |
+| Zéro régression confirmée | 20% | 20/20 | SQL validé, ATMC-01 complet, aucune régression mig.143-145 |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
-| Dette technique éliminée | 10% | 9/10 | QW-01/03/04/05 + ANOM-02 fn_ae_is_income HOT-001 |
-| **TOTAL** | **100%** | **67/100** | |
+| Dette technique éliminée | 10% | 9/10 | QW-01/03/04/05 + ANOM-02 + TABLE-BRIDGE-LEGACY ONG (P-008 appliqué) |
+| **TOTAL** | **100%** | **71/100** | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -87,9 +87,9 @@
 ### Accounting Engine (Moteur comptable central)
 | Statut | Version | Modules couverts | % |
 |---|---|---|---|
-| ✅ Actif en production | v1.6.0 | FAC, SAN, PAI, RES, ECO, HOT | **43%** |
+| ✅ Actif en production | v1.7.0 | FAC, SAN, PAI, RES, ECO, HOT, ONG | **50%** |
 
-**Prochaines étapes :** ONG (v1.7.0), Boisson (v1.8.0), Stocks (v1.9.0) → cible v2.0.0 (tous modules)
+**Prochaines étapes :** Boisson (v1.8.0), Stocks (v1.9.0) → cible v2.0.0 (tous modules)
 
 ---
 
@@ -181,7 +181,7 @@
 | **Restaurant (RES)** | ✅ Mig. 142 + QW-01 | 🥈 **Argent définitif** ✅ | RES-003/004 en draft, resto_achats non en base | Archiver drafts → Or |
 | **École (ECO)** | ✅ Mig. 143 + QW-03/04 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | ECO-002 draft, fn_paiement_scolaire_to_transaction conservée (P-001) | SQL + tests → Argent définitif |
 | **Hôtel (HOT)** | ✅ Mig. 144 + ANOM-02 + QW-05 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | HOT-002 draft, htl_journal_entries conservée (historique), hotel_* mig.052 à auditer | SQL + tests → Argent définitif |
-| **ONG** | ❌ Non migré | — | À auditer | Migration 145 |
+| **ONG** | ✅ Mig. 145 + P-008 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | ONG-002 draft (QWT-03), fn_ae_is_income ONG-002 à corriger lors activation | SQL + tests → Argent définitif |
 | **Boisson (BOI)** | ❌ Non migré | — | À auditer | Migration 146 |
 | **Stocks** | ❌ Non migré | — | trg_stock_in/out_to_journal actifs | Migration 147 |
 | **BTP** | ❌ Non migré | — | À auditer | Migration 148 |
@@ -203,9 +203,9 @@
 | Régressions ouvertes | **0** ✅ | → |
 | Régressions corrigées cumulées | 10 | ↑ (+ANOM-02 HOT is_income + QW-05) |
 | Fichiers dead code supprimés | 1 (financial-sync.ts) | → |
-| Routes API avec emit_accounting_event | 12 routes | ↑ (+POST /api/hotel/payments) |
-| Règles comptables actives | 19 règles | ↑ (+HOT-001 ×2 séquences) |
-| Règles comptables en draft | 15 règles | ↑ (+HOT-002) |
+| Routes API avec emit_accounting_event | 13 routes | ↑ (+POST /api/ong/dons) |
+| Règles comptables actives | 20 règles | ↑ (+ONG-001 ×1 séquence) |
+| Règles comptables en draft | 16 règles | ↑ (+ONG-002) |
 
 ### Détail triggers legacy restants
 
@@ -238,12 +238,13 @@
 |---|---|---|---|---|---|
 | 1 | ~~**Mig. 143**~~ | ~~École (ECO-001/002)~~ | ✅ **TERMINÉE** — SQL + API route + dashboard patch | — | — |
 | 2 | ~~**Mig. 144**~~ | ~~Hôtel (HOT-001/002)~~ | ✅ **TERMINÉE** — ANOM-02 + QW-05 + emit HOT-001 | — | — |
-| 3 | **Mig. 145** | ONG | 🟠 Moyenne | À auditer — probablement patterns FAC+SAN | Faible |
-| 4 | **Mig. 145** | ONG | 🟠 Moyenne | À auditer — probablement patterns FAC+SAN | Faible |
-| 5 | **Mig. 146** | Boisson | 🟠 Moyenne | À auditer | Faible |
+| 3 | ~~**Mig. 145**~~ | ~~ONG (ONG-001/002)~~ | ✅ **TERMINÉE** — P-008 + emit ONG-001 + v1.7.0 | — | — |
+| 4 | **Mig. 146** | Boisson | 🟠 Moyenne | À auditer | Faible |
+| 5 | **Mig. 147** | Stocks + Achats | 🟠 Moyenne | 4 triggers legacy (stock_in/out, achat) | Haute |
 | 6 | **Mig. 147** | Stocks + Achats | 🟠 Moyenne | 4 triggers legacy (stock_in/out, achat) — impact transversal | Haute |
 | 7 | **Mig. 148** | BTP + Agriculture | 🟢 Faible | Modules moins utilisés, patterns probablement simples | Faible |
 | 8 | **Mig. 149** | Banque + Cabinet | 🟢 Faible | Modules spécialisés — audit requis | Haute |
+| — | **ATMC-02** | Audit Transversal Moteur Central | 🟠 Moyenne | Due après mig.146 (4 migrations depuis ATMC-01 : 143/144/145/146) | Faible |
 | 9 | **Mig. LEC** | Legacy Engine Consolidation | 🔴 Haute | Supprime lib/compta-sync-client.ts, lib/accounting-engine.ts. 14 pages dashboard à migrer. Débloquer le Grand Livre unifié. | Très haute |
 | 10 | **Sprint Or** | Certifications Or (FAC, SAN, PAI) | 🟠 Moyenne | Archiver rules draft, ajouter tests, valider DoD 35/35 | Moyenne |
 
@@ -262,6 +263,7 @@
 - Tout nouveau module DOIT utiliser emit_accounting_event() dès sa création — ne pas créer de triggers comptables
 
 ### ADRs publiés
+- **ADR-145** — Migration ONG vers moteur central. ONG-001 (don reçu, 5xx/741, TVA=0, 1 séquence). Pattern P-008 TABLE-BRIDGE-LEGACY : suppression INSERT transactions dans POST /api/ong/dons. Compte 741 (Subventions d'exploitation) pour dons — différent de 706 des modules commerciaux. fn_ae_is_income non modifiée (ONG-001/002 pré-déclarés mig.138). QWT-01/02/03 documentés (règles DRAFT — impact nul). ATMC-02 planifié après mig.146.
 - **ADR-144** — Migration Hôtel vers moteur central. HOT-001 (encaissement chambre, 2 séq, TVA décomposée 706+4441, CG TTC÷1.189). UPDATE fn_ae_is_income : HOT-001 ajouté (absent depuis mig.138). QW-05 : htl_journal_entries/htl_journal_lines path supprimé (compte 7011 non-SYSCOHADA). Nouveau chemin : POST /api/hotel/payments → emit HOT-001. hotel_* tables (mig.052) — audit LEC planifié.
 - **ADR-143** — Migration École vers moteur central. ECO-001 (frais scolaires, TVA=0, 521/706). DROP trg_paiement_scolaire (P-001 : fn conservée). QW-03 : double write transactions éliminé. QW-04 : INSERT journal_comptable direct supprimé. Nouveau chemin : POST /api/ecole/paiements → emit ECO-001.
 - **ADR-142** — Migration Restaurant vers moteur central (commits 7d29ded + 3600316)
