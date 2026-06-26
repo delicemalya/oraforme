@@ -64,24 +64,30 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Écriture comptable automatique SYSCOHADA (compte 512 Banque / 7011 Chambre)
-  const libelle = `Encaissement ${mode_paiement ?? 'especes'} — Hôtel`
-  const { data: entry } = await supabaseAdmin
-    .from('htl_journal_entries')
-    .insert({
-      hotel_id: ctx.tenantId,
-      numero_piece: `ENC-${Date.now()}`,
-      libelle, source: 'encaissement', source_id: data.id,
-      total_debit: Number(montant), total_credit: Number(montant),
-    })
-    .select('id').single()
+  // Emit HOT-001 (fire-and-forget — P-003)
+  // Congo: TTC = HT × 1.189 (TVA 18% + CA 5%/TVA). montant collecté = TTC.
+  const montantTTC = Number(montant)
+  const montantHT  = Math.round(montantTTC / 1.189)
+  const montantTVA = montantTTC - montantHT
 
-  if (entry) {
-    await supabaseAdmin.from('htl_journal_lines').insert([
-      { hotel_id: ctx.tenantId, entry_id: entry.id, compte_pcg: mode_paiement === 'virement' || mode_paiement === 'carte' ? '512' : '571', libelle, debit: Number(montant), credit: 0 },
-      { hotel_id: ctx.tenantId, entry_id: entry.id, compte_pcg: '7011', libelle: 'Produit hébergement', debit: 0, credit: Number(montant) },
-    ])
-  }
+  await supabaseAdmin.rpc('emit_accounting_event', {
+    p_tenant_id:     ctx.tenantId,
+    p_event_type:    'HOT-001',
+    p_source_module: 'hotel',
+    p_source_table:  'htl_payments',
+    p_source_id:     data.id,
+    p_montant_ht:    montantHT,
+    p_montant_tva:   montantTVA,
+    p_montant_ttc:   montantTTC,
+    p_libelle:       `Encaissement ${mode_paiement ?? 'especes'} — Hôtel`,
+    p_date_event:    new Date().toISOString().split('T')[0],
+    p_fiscal_year:   new Date().getFullYear(),
+    p_metadata:      {
+      mode_paiement:  mode_paiement ?? 'especes',
+      invoice_id:     invoice_id  ?? null,
+      reservation_id: reservation_id ?? null,
+    },
+  })
 
   return NextResponse.json({ id: data.id }, { status: 201 })
 }

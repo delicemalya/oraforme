@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **Migration 143 — École (ECO-001/002) + QW-03 + QW-04** — 2026-06-26
+> Dernière mise à jour : **Migration 144 — Hôtel (HOT-001/002) + ANOM-02 fn_ae_is_income + QW-05** — 2026-06-26
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -9,12 +9,12 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Architecture Health Index (AHI)** | **62 / 100** *(mig.143 ECO + QW-03/04 + v1.5.0)* |
-| Moteur central déployé | ✅ v1.5.0 (mig. 138-143) + QW-01 (mig. 142.5) |
+| **Architecture Health Index (AHI)** | **67 / 100** *(mig.144 HOT + ANOM-02 + QW-05 + v1.6.0)* |
+| Moteur central déployé | ✅ v1.6.0 (mig. 138-144) + QW-01 (mig. 142.5) |
 | Modules dans Oraforme | 14 identifiés |
-| Modules migrés vers moteur central | 5 / 14 (36%) |
+| Modules migrés vers moteur central | 6 / 14 (43%) |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | **1** *(ECO — conditionnel jusqu'à SQL exécuté + tests fonctionnels)* |
+| Modules certifiés Argent (conditionnel) | **2** *(ECO + HOT — conditionnels jusqu'à SQL exécuté)* |
 | Modules certifiés Argent (définitif) | **4 ✅ (FAC, SAN, PAI, RES)** |
 | Modules certifiés Or | 0 |
 | Audit ATMC-01 | ✅ COMPLET — 9/9 points PASS — 2026-06-26 |
@@ -29,12 +29,12 @@
 
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
-| Couverture moteur central | 30% | 24/30 | 5 modules sur ~13 modules avec écritures |
-| Certifications obtenues | 25% | 18/25 | 4 × Argent définitif + 1 × Argent conditionnel ECO (×0.80 coeff) |
-| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, ATMC-01 complet, aucune régression mig.143 |
+| Couverture moteur central | 30% | 27/30 | 6 modules sur ~13 modules avec écritures |
+| Certifications obtenues | 25% | 19/25 | 4 × Argent définitif + 2 × Argent conditionnel ECO+HOT (×0.80 coeff) |
+| Zéro régression confirmée | 20% | 20/20 | SQL validé, ATMC-01 complet, aucune régression mig.143-144 |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
-| Dette technique éliminée | 10% | 8/10 | QW-01 bug moteur + QW-03 double write école + QW-04 journal direct |
-| **TOTAL** | **100%** | **62/100** | |
+| Dette technique éliminée | 10% | 9/10 | QW-01/03/04/05 + ANOM-02 fn_ae_is_income HOT-001 |
+| **TOTAL** | **100%** | **67/100** | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -87,9 +87,9 @@
 ### Accounting Engine (Moteur comptable central)
 | Statut | Version | Modules couverts | % |
 |---|---|---|---|
-| ✅ Actif en production | v1.5.0 | FAC, SAN, PAI, RES, ECO | **36%** |
+| ✅ Actif en production | v1.6.0 | FAC, SAN, PAI, RES, ECO, HOT | **43%** |
 
-**Prochaines étapes :** Hôtel (v1.6.0), ONG (v1.7.0), Boisson (v1.8.0), Stocks (v1.9.0) → cible v2.0.0 (tous modules)
+**Prochaines étapes :** ONG (v1.7.0), Boisson (v1.8.0), Stocks (v1.9.0) → cible v2.0.0 (tous modules)
 
 ---
 
@@ -180,7 +180,7 @@
 | **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 **Argent définitif** ✅ | fn_bulletins_paie_to_journal, PAI-004/005 draft | Archiver drafts → Or |
 | **Restaurant (RES)** | ✅ Mig. 142 + QW-01 | 🥈 **Argent définitif** ✅ | RES-003/004 en draft, resto_achats non en base | Archiver drafts → Or |
 | **École (ECO)** | ✅ Mig. 143 + QW-03/04 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | ECO-002 draft, fn_paiement_scolaire_to_transaction conservée (P-001) | SQL + tests → Argent définitif |
-| **Hôtel (HOT)** | ❌ Non migré | — | htl_journal_entries, triggers hôtel | Migration 144 |
+| **Hôtel (HOT)** | ✅ Mig. 144 + ANOM-02 + QW-05 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | HOT-002 draft, htl_journal_entries conservée (historique), hotel_* mig.052 à auditer | SQL + tests → Argent définitif |
 | **ONG** | ❌ Non migré | — | À auditer | Migration 145 |
 | **Boisson (BOI)** | ❌ Non migré | — | À auditer | Migration 146 |
 | **Stocks** | ❌ Non migré | — | trg_stock_in/out_to_journal actifs | Migration 147 |
@@ -196,16 +196,16 @@
 
 | Indicateur | Valeur | Tendance |
 |---|---|---|
-| Triggers legacy comptables restants | ~17 | ↓ (trg_paiement_scolaire supprimé mig.143) |
-| INSERT directs dans routes API | **0** ✅ | → |
+| Triggers legacy comptables restants | ~17 | → (hôtel n'avait pas de trigger comptable dédié) |
+| INSERT directs dans routes API | **0** ✅ | → (htl_journal_entries path supprimé QW-05) |
 | Chemins parallèles dashboard (writeComptaEntry) | **14 pages** | → (stable, en attente LEC) |
-| Doubles écritures actives connues | **0** ✅ | → (QW-03 école supprimé) |
+| Doubles écritures actives connues | **0** ✅ | → |
 | Régressions ouvertes | **0** ✅ | → |
-| Régressions corrigées cumulées | 8 | ↑ |
+| Régressions corrigées cumulées | 10 | ↑ (+ANOM-02 HOT is_income + QW-05) |
 | Fichiers dead code supprimés | 1 (financial-sync.ts) | → |
-| Routes API avec emit_accounting_event | 11 routes | ↑ (+POST /api/ecole/paiements) |
-| Règles comptables actives | 17 règles | ↑ (+ECO-001) |
-| Règles comptables en draft | 14 règles | ↑ (+ECO-002) |
+| Routes API avec emit_accounting_event | 12 routes | ↑ (+POST /api/hotel/payments) |
+| Règles comptables actives | 19 règles | ↑ (+HOT-001 ×2 séquences) |
+| Règles comptables en draft | 15 règles | ↑ (+HOT-002) |
 
 ### Détail triggers legacy restants
 
@@ -237,7 +237,7 @@
 | # | Migration | Module | Priorité | Raison | Complexité estimée |
 |---|---|---|---|---|---|
 | 1 | ~~**Mig. 143**~~ | ~~École (ECO-001/002)~~ | ✅ **TERMINÉE** — SQL + API route + dashboard patch | — | — |
-| 2 | **Mig. 144** | Hôtel (HOT-001/002) | 🔴 Haute | htl_journal_entries séparé — audit préalable nécessaire | Moyenne |
+| 2 | ~~**Mig. 144**~~ | ~~Hôtel (HOT-001/002)~~ | ✅ **TERMINÉE** — ANOM-02 + QW-05 + emit HOT-001 | — | — |
 | 3 | **Mig. 145** | ONG | 🟠 Moyenne | À auditer — probablement patterns FAC+SAN | Faible |
 | 4 | **Mig. 145** | ONG | 🟠 Moyenne | À auditer — probablement patterns FAC+SAN | Faible |
 | 5 | **Mig. 146** | Boisson | 🟠 Moyenne | À auditer | Faible |
@@ -262,6 +262,7 @@
 - Tout nouveau module DOIT utiliser emit_accounting_event() dès sa création — ne pas créer de triggers comptables
 
 ### ADRs publiés
+- **ADR-144** — Migration Hôtel vers moteur central. HOT-001 (encaissement chambre, 2 séq, TVA décomposée 706+4441, CG TTC÷1.189). UPDATE fn_ae_is_income : HOT-001 ajouté (absent depuis mig.138). QW-05 : htl_journal_entries/htl_journal_lines path supprimé (compte 7011 non-SYSCOHADA). Nouveau chemin : POST /api/hotel/payments → emit HOT-001. hotel_* tables (mig.052) — audit LEC planifié.
 - **ADR-143** — Migration École vers moteur central. ECO-001 (frais scolaires, TVA=0, 521/706). DROP trg_paiement_scolaire (P-001 : fn conservée). QW-03 : double write transactions éliminé. QW-04 : INSERT journal_comptable direct supprimé. Nouveau chemin : POST /api/ecole/paiements → emit ECO-001.
 - **ADR-142** — Migration Restaurant vers moteur central (commits 7d29ded + 3600316)
 - **ADR-141** — Migration Paie vers moteur central (commits b483411 + c9677db)
