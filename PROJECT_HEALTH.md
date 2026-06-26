@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **Migration 141 (Paie)** — 2026-06-26
+> Dernière mise à jour : **Migration 141 (Paie) — Certification définitive** — 2026-06-26
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -9,13 +9,13 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Architecture Health Index (AHI)** | **47 / 100** *(conditionnel — SQL mig.141 en attente)* |
+| **Architecture Health Index (AHI)** | **51 / 100** |
 | Moteur central déployé | ✅ v1.3.0 (mig. 138-141) |
 | Modules dans Oraforme | 14 identifiés |
 | Modules migrés vers moteur central | 3 / 14 (21%) |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | 3 (FAC, SAN, PAI) |
-| Modules certifiés Argent (définitif) | 0 *(en attente SQL + tests)* |
+| Modules certifiés Argent (conditionnel) | 0 |
+| Modules certifiés Argent (définitif) | **3 ✅ (FAC, SAN, PAI)** |
 | Modules certifiés Or | 0 |
 | Triggers legacy comptables restants | ~18 |
 | INSERT directs en routes API | 0 ✅ |
@@ -29,11 +29,11 @@
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
 | Couverture moteur central | 30% | 18/30 | 3 modules sur ~13 modules avec écritures |
-| Certifications obtenues | 25% | 8/25 | 3 × Argent conditionnel (×0.33 coeff) |
-| Zéro régression confirmée | 20% | 19/20 | 1 pt retenu (SQL non encore validé) |
+| Certifications obtenues | 25% | 13/25 | 3 × Argent définitif (×0.55 coeff) |
+| Zéro régression confirmée | 20% | 20/20 | SQL validé en base, trigger supprimé confirmé |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
 | Dette technique éliminée | 10% | 6/10 | financial-sync.ts supprimé, inserts inline → emit |
-| **TOTAL** | **100%** | **47/100** | |
+| **TOTAL** | **100%** | **51/100** | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -172,9 +172,9 @@
 
 | Module | Migration | Certification | Dette restante | Prochaine étape |
 |---|---|---|---|---|
-| **Facturation (FAC)** | ✅ Mig. 139 | 🥈 Argent conditionnel | Règles FAC-003/005/006 en draft | SQL Supabase → Argent définitif → archiver drafts → Or |
-| **Santé (SAN)** | ✅ Mig. 140 | 🥈 Argent conditionnel | Règles SAN-003/004/005 en draft | SQL Supabase → Argent définitif → archiver drafts → Or |
-| **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 Argent conditionnel | fn_bulletins_paie_to_journal, PAI-004/005 draft, dual namespace | SQL Supabase → Argent définitif |
+| **Facturation (FAC)** | ✅ Mig. 139 | 🥈 **Argent définitif** ✅ | Règles FAC-003/005/006 en draft | Archiver drafts → Or |
+| **Santé (SAN)** | ✅ Mig. 140 | 🥈 **Argent définitif** ✅ | Règles SAN-003/004/005 en draft | Archiver drafts → Or |
+| **Paie/RH (PAI)** | ✅ Mig. 141 | 🥈 **Argent définitif** ✅ | fn_bulletins_paie_to_journal, PAI-004/005 draft, dual namespace | Archiver drafts → Or |
 | **Restaurant (RES)** | ❌ Non migré | — | Triggers legacy actifs, inserts directs probables | Migration 142 |
 | **École (ECO)** | ❌ Non migré | — | trg_paiement_scolaire actif (mig. 031) | Migration 143 |
 | **Hôtel (HOT)** | ❌ Non migré | — | htl_journal_entries, triggers hôtel | Migration 144 |
