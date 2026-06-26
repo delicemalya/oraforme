@@ -83,18 +83,27 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Créer une transaction en trésorerie
-  await supabaseAdmin.from('transactions').insert({
-    tenant_id:     tenantId,
-    type:          'entree',
-    categorie:     'Vente restaurant',
-    description:   `Commande ${numeroRecu}${table_num ? ` — Table ${table_num}` : ''}`,
-    montant:       fiscal.ttc,
-    mode_paiement: mode_paiement || 'especes',
-    source:        'pos',
-    source_id:     commande.id,
-    date:          new Date().toISOString().split('T')[0],
-    reference:     reference || null,
+  // RES-001 — Vente POS restaurant (moteur comptable central, migration 142)
+  await supabaseAdmin.rpc('emit_accounting_event', {
+    p_tenant_id:     tenantId,
+    p_event_type:    'RES-001',
+    p_source_module: 'restaurant',
+    p_source_table:  'resto_commandes',
+    p_source_id:     commande.id,
+    p_montant_ht:    fiscal.ht,
+    p_montant_tva:   fiscal.tva + fiscal.ca,
+    p_montant_ttc:   fiscal.ttc,
+    p_libelle:       `Vente POS ${numeroRecu}${table_num ? ` — Table ${table_num}` : ''}`,
+    p_date_event:    new Date().toISOString().split('T')[0],
+    p_fiscal_year:   new Date().getFullYear(),
+    p_metadata: {
+      numero_recu:   numeroRecu,
+      table_num:     table_num || null,
+      mode:          mode || 'sur_place',
+      mode_paiement: mode_paiement || 'especes',
+      tva:           fiscal.tva,
+      ca:            fiscal.ca,
+    },
   })
 
   return NextResponse.json({ commandeId: commande.id, numeroRecu, fiscal })

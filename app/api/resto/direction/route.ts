@@ -28,16 +28,16 @@ export async function GET(req: NextRequest) {
     { data: plats },
     { data: cmdMoisAll },
   ] = await Promise.all([
-    supabaseAdmin.from('transactions').select('montant')
-      .eq('tenant_id', tenantId).eq('type', 'entree').eq('source', 'pos').eq('date', today),
-    supabaseAdmin.from('transactions').select('montant')
-      .eq('tenant_id', tenantId).eq('type', 'entree').eq('source', 'pos').gte('date', debutSemaine),
-    supabaseAdmin.from('transactions').select('montant')
-      .eq('tenant_id', tenantId).eq('type', 'entree').eq('source', 'pos')
-      .gte('date', dDebut).lte('date', dFin),
-    supabaseAdmin.from('transactions').select('montant')
-      .eq('tenant_id', tenantId).eq('type', 'sortie').eq('source', 'achat_resto')
-      .gte('date', dDebut).lte('date', dFin),
+    supabaseAdmin.from('accounting_events').select('montant_ttc')
+      .eq('tenant_id', tenantId).eq('event_type', 'RES-001').eq('date_event', today),
+    supabaseAdmin.from('accounting_events').select('montant_ttc')
+      .eq('tenant_id', tenantId).eq('event_type', 'RES-001').gte('date_event', debutSemaine),
+    supabaseAdmin.from('accounting_events').select('montant_ttc')
+      .eq('tenant_id', tenantId).eq('event_type', 'RES-001')
+      .gte('date_event', dDebut).lte('date_event', dFin),
+    supabaseAdmin.from('accounting_events').select('montant_ttc')
+      .eq('tenant_id', tenantId).eq('event_type', 'RES-002')
+      .gte('date_event', dDebut).lte('date_event', dFin),
     supabaseAdmin.from('stock_articles').select('nom, quantite, seuil_alerte')
       .eq('tenant_id', tenantId).eq('categorie', 'cuisine'),
     supabaseAdmin.from('resto_reservations').select('statut')
@@ -50,8 +50,8 @@ export async function GET(req: NextRequest) {
       .gte('created_at', dDebut + 'T00:00:00').lte('created_at', dFin + 'T23:59:59'),
   ])
 
-  const sum = (arr: { montant: number }[] | null) =>
-    (arr ?? []).reduce((s, r) => s + (r.montant ?? 0), 0)
+  const sum = (arr: { montant_ttc: number }[] | null) =>
+    (arr ?? []).reduce((s, r) => s + (Number(r.montant_ttc) || 0), 0)
   const sumTotal = (arr: { total: number }[] | null) =>
     (arr ?? []).reduce((s, r) => s + (r.total ?? 0), 0)
 
@@ -92,10 +92,10 @@ export async function GET(req: NextRequest) {
       const a = m > mois ? annee - 1 : annee
       const d1 = `${a}-${String(m).padStart(2, '0')}-01`
       const d2 = new Date(a, m, 0).toISOString().split('T')[0]
-      const { data } = await supabaseAdmin.from('transactions').select('montant')
-        .eq('tenant_id', tenantId).eq('type', 'entree').eq('source', 'pos')
-        .gte('date', d1).lte('date', d2)
-      return { mois: m, annee: a, ca: (data ?? []).reduce((s, r) => s + r.montant, 0) }
+      const { data } = await supabaseAdmin.from('accounting_events').select('montant_ttc')
+        .eq('tenant_id', tenantId).eq('event_type', 'RES-001')
+        .gte('date_event', d1).lte('date_event', d2)
+      return { mois: m, annee: a, ca: (data ?? []).reduce((s, r) => s + (Number(r.montant_ttc) || 0), 0) }
     })
   )
 

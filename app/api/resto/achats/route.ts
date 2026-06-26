@@ -89,17 +89,24 @@ export async function POST(req: NextRequest) {
       .eq('tenant_id', auth.tenantId)
   }
 
-  // Créer une écriture en trésorerie (sortie = dépense)
-  await supabaseAdmin.from('transactions').insert({
-    tenant_id:     auth.tenantId,
-    type:          'sortie',
-    categorie:     'Achat restaurant',
-    description:   `Achat — ${fournisseur_nom.trim()}${note ? ` — ${note}` : ''}`,
-    montant:       total,
-    mode_paiement: mode_paiement || 'especes',
-    source:        'achat_resto',
-    source_id:     achat.id,
-    date:          dateAchat,
+  // RES-002 — Achat matières restaurant (moteur comptable central, migration 142)
+  await supabaseAdmin.rpc('emit_accounting_event', {
+    p_tenant_id:     auth.tenantId,
+    p_event_type:    'RES-002',
+    p_source_module: 'restaurant',
+    p_source_table:  'resto_achats',
+    p_source_id:     achat.id,
+    p_montant_ht:    total,
+    p_montant_tva:   0,
+    p_montant_ttc:   total,
+    p_libelle:       `Achat matières — ${fournisseur_nom.trim()}${note ? ` — ${note}` : ''}`,
+    p_date_event:    dateAchat,
+    p_fiscal_year:   new Date(dateAchat).getFullYear(),
+    p_metadata: {
+      fournisseur_nom: fournisseur_nom.trim(),
+      mode_paiement:   mode_paiement || 'especes',
+      nb_lignes:       validLignes.length,
+    },
   })
 
   return NextResponse.json({ success: true, data: { id: achat.id, total } }, { status: 201 })
