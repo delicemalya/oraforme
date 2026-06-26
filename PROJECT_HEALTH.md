@@ -14,8 +14,8 @@
 | Modules dans Oraforme | 14 identifiés |
 | Modules migrés vers moteur central | 7 / 14 (50%) |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | **3** *(ECO + HOT + ONG — conditionnels jusqu'à SQL exécuté)* |
-| Modules certifiés Argent (définitif) | **4 ✅ (FAC, SAN, PAI, RES)** |
+| Modules certifiés Argent (conditionnel) | **2** *(ECO + HOT — SQL exécuté, tests UI à confirmer)* |
+| Modules certifiés Argent (définitif) | **5 ✅ (FAC, SAN, PAI, RES, ONG)** |
 | Modules certifiés Or | 0 |
 | Audit ATMC-01 | ✅ COMPLET — 9/9 points PASS — 2026-06-26 |
 | Triggers legacy comptables restants | ~17 *(trg_paiement_scolaire supprimé mig.143)* |
@@ -30,11 +30,11 @@
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
 | Couverture moteur central | 30% | 30/30 | 7 modules sur ~13 modules avec écritures (54% — seuil atteint) |
-| Certifications obtenues | 25% | 20/25 | 4 × Argent définitif + 3 × Argent conditionnel ECO+HOT+ONG (×0.80 coeff) |
+| Certifications obtenues | 25% | 21/25 | 5 × Argent définitif + 2 × Argent conditionnel ECO+HOT (×0.80 coeff) |
 | Zéro régression confirmée | 20% | 20/20 | SQL validé, ATMC-01 complet, aucune régression mig.143-145 |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
 | Dette technique éliminée | 10% | 9/10 | QW-01/03/04/05 + ANOM-02 + TABLE-BRIDGE-LEGACY ONG (P-008 appliqué) |
-| **TOTAL** | **100%** | **71/100** | |
+| **TOTAL** | **100%** | **72/100** | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -181,7 +181,7 @@
 | **Restaurant (RES)** | ✅ Mig. 142 + QW-01 | 🥈 **Argent définitif** ✅ | RES-003/004 en draft, resto_achats non en base | Archiver drafts → Or |
 | **École (ECO)** | ✅ Mig. 143 + QW-03/04 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | ECO-002 draft, fn_paiement_scolaire_to_transaction conservée (P-001) | SQL + tests → Argent définitif |
 | **Hôtel (HOT)** | ✅ Mig. 144 + ANOM-02 + QW-05 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | HOT-002 draft, htl_journal_entries conservée (historique), hotel_* mig.052 à auditer | SQL + tests → Argent définitif |
-| **ONG** | ✅ Mig. 145 + P-008 | 🥈 **Argent conditionnel** *(SQL à exécuter)* | ONG-002 draft (QWT-03), fn_ae_is_income ONG-002 à corriger lors activation | SQL + tests → Argent définitif |
+| **ONG** | ✅ Mig. 145 + P-008 | 🥈 **Argent définitif** ✅ | ONG-002 draft (QWT-03), fn_ae_is_income ONG-002 à corriger lors activation | Archiver draft → Or |
 | **Boisson (BOI)** | ❌ Non migré | — | À auditer | Migration 146 |
 | **Stocks** | ❌ Non migré | — | trg_stock_in/out_to_journal actifs | Migration 147 |
 | **BTP** | ❌ Non migré | — | À auditer | Migration 148 |
