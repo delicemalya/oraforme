@@ -5,13 +5,14 @@
  * Totaux débit/crédit/solde par compte pour une période
  */
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { BarChart2, Download, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { DataSourceBadge, SourceExplainBanner } from '@/components/ui/DataSourceBadge'
 
 interface Movement { id: string; date_operation: string; libelle: string; debit_account: string; credit_account: string; montant: number }
 
@@ -33,26 +34,41 @@ export default function BalancePage() {
   const [periode, setPeriode]     = useState<'annee' | number>('annee')
   const [filterClasse, setFilterClasse] = useState('all')
   const [showZero, setShowZero]   = useState(false)
+  const [isRealtime, setIsRealtime] = useState(false)
+  const [lastSync, setLastSync]     = useState<Date | null>(null)
 
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
   const MONTHS = Array.from({ length: 12 }, (_, i) =>
     new Intl.DateTimeFormat(intlLocale, { month: 'long' }).format(new Date(2024, i, 1))
   )
 
+  const loadBalance = useCallback(async () => {
+    if (!tenantId) return
+    setLoading(true)
+    const { data } = await supabase
+      .from('journal_entries')
+      .select('id,date_operation,libelle,debit_account,credit_account,montant')
+      .eq('tenant_id', tenantId)
+      .eq('fiscal_year', year)
+      .order('date_operation')
+    setMovements((data || []) as Movement[])
+    setLastSync(new Date())
+    setLoading(false)
+  }, [tenantId, year])
+
+  useEffect(() => { loadBalance() }, [loadBalance])
+
   useEffect(() => {
     if (!tenantId) return
-    ;(async () => {
-      setLoading(true)
-      const { data } = await supabase
-        .from('journal_entries')
-        .select('id, date_operation, libelle, debit_account, credit_account, montant')
-        .eq('tenant_id', tenantId)
-        .eq('fiscal_year', year)
-        .order('date_operation')
-      setMovements((data || []) as Movement[])
-      setLoading(false)
-    })()
-  }, [tenantId, year])
+    const channel = supabase
+      .channel(`balance-${tenantId}-${year}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'journal_entries',
+        filter: `tenant_id=eq.${tenantId}`,
+      }, () => { loadBalance() })
+      .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
+    return () => { supabase.removeChannel(channel) }
+  }, [tenantId, year, loadBalance])
 
   /* Filter by month if needed */
   const filtered = useMemo(() => {
@@ -140,6 +156,13 @@ export default function BalancePage() {
           <p className="text-[13px] text-[#64748B] mt-0.5">
             {t('compta.balance.subtitle')}
           </p>
+          <DataSourceBadge
+            tables={['journal_entries']}
+            realtime={isRealtime}
+            lastSync={lastSync}
+            amounts="comptable"
+            explanation="Totaux débit/crédit/solde par compte SYSCOHADA. Total débit = Total crédit (partie double). Différent de la trésorerie (flux réels de caisse)."
+          />
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}

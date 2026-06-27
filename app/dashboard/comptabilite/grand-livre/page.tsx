@@ -4,13 +4,14 @@
  * Grand Livre SYSCOHADA — Soldes par compte avec détail des mouvements
  */
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { Scale, Search, Download, ChevronDown, ChevronRight } from 'lucide-react'
+import { DataSourceBadge, SourceExplainBanner } from '@/components/ui/DataSourceBadge'
 
 interface Movement { id: string; date_operation: string; libelle: string; debit_account: string; credit_account: string; montant: number; source: string }
 interface AccountSummary { number: string; name: string; classe: number; type: string; total_debit: number; total_credit: number; solde: number; movements: Movement[] }
@@ -28,6 +29,8 @@ export default function GrandLivrePage() {
   const [classe, setClasse]       = useState('all')
   const [year, setYear]           = useState(new Date().getFullYear())
   const [expanded, setExpanded]   = useState<string | null>(null)
+  const [isRealtime, setIsRealtime] = useState(false)
+  const [lastSync, setLastSync]     = useState<Date | null>(null)
 
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
 
@@ -42,21 +45,35 @@ export default function GrandLivrePage() {
     { id: '7', label: 'Cl. 7 — Produits' },
   ]
 
+  const loadMovements = useCallback(async () => {
+    if (!tenantId) return
+    setLoading(true); setLoadErr(null)
+    const { data, error: err } = await supabase
+      .from('journal_entries')
+      .select('id,date_operation,libelle,debit_account,credit_account,montant,source')
+      .eq('tenant_id', tenantId)
+      .eq('fiscal_year', year)
+      .order('date_operation')
+    if (err) { setLoadErr(err.message); setLoading(false); return }
+    setMovements((data || []) as Movement[])
+    setLastSync(new Date())
+    setLoading(false)
+  }, [tenantId, year])
+
+  useEffect(() => { loadMovements() }, [loadMovements])
+
+  // Realtime — journalentries changes auto-refresh
   useEffect(() => {
     if (!tenantId) return
-    ;(async () => {
-      setLoading(true); setLoadErr(null)
-      const { data, error: err } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .eq('tenant_id', tenantId)
-        .eq('fiscal_year', year)
-        .order('date_operation')
-      if (err) { setLoadErr(err.message); setLoading(false); return }
-      setMovements((data || []) as Movement[])
-      setLoading(false)
-    })()
-  }, [tenantId, year])
+    const channel = supabase
+      .channel(`gl-${tenantId}-${year}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'journal_entries',
+        filter: `tenant_id=eq.${tenantId}`,
+      }, () => { loadMovements() })
+      .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
+    return () => { supabase.removeChannel(channel) }
+  }, [tenantId, year, loadMovements])
 
   /* Build account summaries */
   const accounts = useMemo<AccountSummary[]>(() => {
@@ -163,6 +180,13 @@ export default function GrandLivrePage() {
           <p className="text-[13px] text-[#64748B] mt-0.5">
             {t('compta.grandlivre.subtitle')} · {year}
           </p>
+          <DataSourceBadge
+            tables={['journal_entries']}
+            realtime={isRealtime}
+            lastSync={lastSync}
+            amounts="comptable"
+            explanation="Ce Grand Livre consolide journal_entries de tous les modules migrés. Montants = soldes comptables SYSCOHADA (partie double), pas des montants HT/TTC."
+          />
         </div>
         <div className="flex items-center gap-2">
           <select value={year} onChange={e => setYear(Number(e.target.value))}
@@ -195,6 +219,8 @@ export default function GrandLivrePage() {
           </div>
         ))}
       </div>
+
+      <SourceExplainBanner screen="grand-livre" />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-2">

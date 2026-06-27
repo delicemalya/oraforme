@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { rechercherCompte, getSoldeNormal, type CompteFlat } from '@/lib/syscohada/plan-comptable'
+import { DataSourceBadge } from '@/components/ui/DataSourceBadge'
 
 interface JournalEntry {
   id: string
@@ -277,6 +278,8 @@ export default function JournalPage() {
   const [filterYear, setFilterYear]     = useState(new Date().getFullYear())
   const [page, setPage]                 = useState(0)
   const [showSaisie, setShowSaisie]     = useState(false)
+  const [isRealtime, setIsRealtime]     = useState(false)
+  const [lastSync, setLastSync]         = useState<Date | null>(null)
   const PAGE_SIZE = 50
 
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-PT' : locale === 'es' ? 'es-ES' : 'fr-FR'
@@ -322,10 +325,23 @@ export default function JournalPage() {
     setEntries(data || [])
     setTotal(count ?? 0)
     setLoadErr(null)
+    setLastSync(new Date())
     setLoading(false)
   }, [tenantId, filterMonth, filterYear, filterSource, page])
 
   useEffect(() => { if (!tenantLoading) load() }, [tenantLoading, load])
+
+  useEffect(() => {
+    if (!tenantId) return
+    const channel = supabase
+      .channel(`journal-${tenantId}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'journal_entries',
+        filter: `tenant_id=eq.${tenantId}`,
+      }, () => { load() })
+      .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
+    return () => { supabase.removeChannel(channel) }
+  }, [tenantId, load])
 
   const filtered = entries.filter(e => {
     if (!search) return true
@@ -394,6 +410,14 @@ export default function JournalPage() {
           <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
             SYSCOHADA · {t('compta.journal.subtitle')}
           </p>
+          <DataSourceBadge
+            tables={['journal_entries']}
+            realtime={isRealtime}
+            lastSync={lastSync}
+            amounts="comptable"
+            explanation="Écritures en partie double SYSCOHADA. Inclut : factures, paie, stocks, achats, ONG, saisies manuelles. Montants = paires débit/crédit équilibrées."
+            className="mt-1"
+          />
         </div>
         <button onClick={() => setShowSaisie(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white">

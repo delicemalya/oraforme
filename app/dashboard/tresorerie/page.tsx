@@ -13,6 +13,7 @@ import { useFmt } from '@/lib/hooks/useFmt'
 import { captureSupabaseError } from '@/lib/monitoring'
 import { resolveAccounts } from '@/lib/accounting-engine'
 import { writeComptaEntry } from '@/lib/compta-sync-client'
+import { DataSourceBadge, SourceExplainBanner } from '@/components/ui/DataSourceBadge'
 import Link from 'next/link'
 import {
   PiggyBank, TrendingUp, TrendingDown, ArrowUpCircle, ArrowDownCircle,
@@ -61,6 +62,8 @@ export default function TresorerieDashboard() {
   const [modal,        setModal]        = useState<'enc' | 'dec' | null>(null)
   const [saving,       setSaving]       = useState(false)
   const [toast,        setToast]        = useState<{ msg: string; ok: boolean } | null>(null)
+  const [isRealtime,   setIsRealtime]   = useState(false)
+  const [lastSync,     setLastSync]     = useState<Date | null>(null)
 
   const [fEnc, setFEnc] = useState({ categorie: CATS_ENTREE[0], description: '', montant: '', date: today(), mode: 'especes' })
   const [fDec, setFDec] = useState({ categorie: CATS_SORTIE[0], description: '', montant: '', date: today(), mode: 'especes' })
@@ -89,10 +92,23 @@ export default function TresorerieDashboard() {
     setCaisses((cR.data || []) as Caisse[])
     setBanques((bR.data || []) as CompteBancaire[])
     if (wR.error?.code !== '42P01') setWallets((wR.data || []) as Wallet[])
+    setLastSync(new Date())
     setLoading(false)
   }, [tenantId])
 
   useEffect(() => { if (!tLoading && tenantId) load() }, [tLoading, tenantId, load])
+
+  useEffect(() => {
+    if (!tenantId) return
+    const channel = supabase
+      .channel(`treso-${tenantId}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'transactions',
+        filter: `tenant_id=eq.${tenantId}`,
+      }, () => { load() })
+      .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
+    return () => { supabase.removeChannel(channel) }
+  }, [tenantId, load])
 
   /* ── KPIs ── */
   const now = new Date()
@@ -214,6 +230,14 @@ export default function TresorerieDashboard() {
           <p className="text-[13px] text-[#64748B] mt-0.5">
             {t('treso.subtitle')}
           </p>
+          <DataSourceBadge
+            tables={['transactions', 'caisses', 'comptes_bancaires']}
+            realtime={isRealtime}
+            lastSync={lastSync}
+            amounts="trésorerie"
+            explanation="Flux réels de trésorerie (entrées/sorties de caisse). Différent du CA comptable (HT) et du Grand Livre (partie double SYSCOHADA)."
+            className="mt-1"
+          />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <MIAAContextButton module="tresorerie" />
@@ -230,6 +254,8 @@ export default function TresorerieDashboard() {
           </button>
         </div>
       </div>
+
+      <SourceExplainBanner screen="tresorerie" />
 
       {/* Hero KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
