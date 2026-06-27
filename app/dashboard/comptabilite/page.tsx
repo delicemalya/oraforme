@@ -303,18 +303,18 @@ export default function ComptabilitePage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           {
-            label: t('compta.overview.kpi.ca'),
+            label: `${t('compta.overview.kpi.ca')} (HT)`,
             value: fmtFCFA(recettesTotal),
             icon: ArrowUpRight, color: '#16A34A',
             trend: recettesTotal > depensesTotal ? '▲ Excédent' : undefined,
           },
           {
-            label: t('compta.overview.kpi.charges'),
+            label: `${t('compta.overview.kpi.charges')} (HT)`,
             value: fmtFCFA(depensesTotal),
             icon: ArrowDownRight, color: '#DC2626',
           },
           {
-            label: t('compta.overview.kpi.solde'),
+            label: `${t('compta.overview.kpi.solde')} (HT)`,
             value: fmtFCFA(Math.abs(resultat)),
             icon: resultat >= 0 ? TrendingUp : TrendingDown,
             color: resultat >= 0 ? '#2563EB' : '#DC2626',
@@ -366,10 +366,10 @@ export default function ComptabilitePage() {
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col gap-3">
           <p className="text-[13px] font-bold text-[#0F172A]">Résumé financier</p>
           {[
-            { label: t('compta.overview.kpi.ca'),        value: recettesTotal,         color: '#16A34A' },
-            { label: t('compta.overview.kpi.tva'),       value: tvaCollectee,          color: '#D97706' },
-            { label: t('compta.overview.kpi.charges'),   value: depensesTotal,         color: '#DC2626' },
-            { label: t('compta.overview.kpi.solde'),     value: Math.abs(resultat),    color: resultat >= 0 ? '#2563EB' : '#DC2626' },
+            { label: `${t('compta.overview.kpi.ca')} (HT)`,       value: recettesTotal,         color: '#16A34A' },
+            { label: t('compta.overview.kpi.tva'),                  value: tvaCollectee,          color: '#D97706' },
+            { label: `${t('compta.overview.kpi.charges')} (HT)`,   value: depensesTotal,         color: '#DC2626' },
+            { label: `${t('compta.overview.kpi.solde')} (HT)`,     value: Math.abs(resultat),    color: resultat >= 0 ? '#2563EB' : '#DC2626' },
           ].map(r => (
             <div key={r.label} className="flex justify-between items-center py-1.5 border-b border-[#F1F5F9] last:border-0">
               <span className="text-[12px] text-[#64748B]">{r.label}</span>
@@ -518,6 +518,14 @@ export default function ComptabilitePage() {
             </div>
 
             <div className="p-5 space-y-4">
+
+              {/* Écriture manuelle hors moteur — QW-BCI-02 */}
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-[#FEF3C7] border border-[#FDE68A]">
+                <AlertTriangle size={13} className="text-[#D97706] shrink-0 mt-0.5" />
+                <p className="text-[11px] text-[#D97706]">
+                  <strong>Écriture manuelle ·</strong> Apparaît dans le Grand Livre et la Balance, mais non tracée dans le moteur d&apos;audit central. Pour une traçabilité complète, utilisez le module métier concerné (Facturation, Paie...).
+                </p>
+              </div>
 
               {/* Type toggle */}
               <div className="flex rounded-xl border border-[#E2E8F0] overflow-hidden">

@@ -40,6 +40,33 @@
 
 ---
 
+### BCI — Business Consistency Index
+
+> Nouveau KPI ajouté 2026-06-26. Mesure la cohérence des données visibles dans toute l'application.
+> Progresse à chaque migration comme l'AHI. Matrice 15 dimensions obligatoire après chaque migration.
+
+| Écran | Score | Notes |
+|---|---|---|
+| Direction | — | À mesurer mig.147+ |
+| Finance | — | À mesurer mig.147+ |
+| Comptabilité | — | À mesurer mig.147+ |
+| Grand Livre | — | À mesurer mig.147+ |
+| Balance | — | À mesurer mig.147+ |
+| Journal | — | À mesurer mig.147+ |
+| Audit | — | À mesurer mig.147+ |
+| Reporting | — | À mesurer mig.147+ |
+| BI | — | À mesurer mig.147+ |
+| MIAA | — | À mesurer mig.147+ |
+| Workflow | — | À mesurer mig.147+ |
+| Notifications | — | À mesurer mig.147+ |
+| API publiques | — | À mesurer mig.147+ |
+| Exports | — | À mesurer mig.147+ |
+| États financiers | — | Structurellement incomplet jusqu'à LEC |
+
+> **BCI Global : en cours d'initialisation** (mesure effective à partir de mig.147)
+
+---
+
 ## 2. DETTE TECHNIQUE
 
 ### 🔴 Critique
