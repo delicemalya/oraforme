@@ -225,22 +225,22 @@ export default function FinancePage() {
     // Transactions récentes (direct — pas dans RPC pour garder la flexibilité)
     const { data: txData } = await supabase
       .from('transactions')
-      .select('id, date_operation, libelle, montant, type, categorie, moyen_paiement, source')
+      .select('id, date as date_operation, libelle, montant, type, categorie, mode_paiement as moyen_paiement, source')
       .eq('tenant_id', tenantId)
-      .order('date_operation', { ascending: false })
+      .order('date', { ascending: false })
       .limit(15)
     setRecentTx((txData as RecentTx[] | null) ?? [])
 
     // Top clients par CA facturé
     const { data: factData } = await supabase
       .from('factures')
-      .select('client_name, client_nom, total')
+      .select('client_nom, total')
       .eq('tenant_id', tenantId)
       .limit(500)
     if (factData) {
       const byClient: Record<string, { total: number; nb: number }> = {}
-      for (const f of factData as { client_name?: string; client_nom?: string; total?: number }[]) {
-        const k = f.client_name ?? f.client_nom ?? 'Client inconnu'
+      for (const f of factData as { client_nom?: string; total?: number }[]) {
+        const k = f.client_nom ?? 'Client inconnu'
         byClient[k] ??= { total: 0, nb: 0 }
         byClient[k].total += f.total ?? 0
         byClient[k].nb++
@@ -262,12 +262,12 @@ export default function FinancePage() {
     if (!tenantId) return
     setLTreso(true)
     const [{ data: bq }, { data: ca }, { data: mo }] = await Promise.all([
-      supabase.from('comptes_bancaires')    .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+      supabase.from('comptes_bancaires')    .select('intitule, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
       supabase.from('caisses')              .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
       supabase.from('mobile_money_wallets') .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
     ])
     const items: TresoItem[] = [
-      ...((bq ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'banque',  nom: r.nom, solde: r.solde ?? 0 })),
+      ...((bq ?? []) as { intitule: string; solde: number }[]).map(r => ({ type_compte: 'banque',  nom: r.intitule, solde: r.solde ?? 0 })),
       ...((ca ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'caisse',  nom: r.nom, solde: r.solde ?? 0 })),
       ...((mo ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'mobile',  nom: r.nom, solde: r.solde ?? 0 })),
     ]

@@ -4,6 +4,11 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
   serverExternalPackages: ['pdf-parse', 'mammoth', '@react-pdf/renderer', 'tesseract.js'],
 
+  // Désactivé en dev : évite le double-mount React Strict Mode qui cause des
+  // NavigatorLockAcquireTimeoutError sur l'auth Supabase (IndexedDB lock race).
+  // Production n'est pas affectée (pas de double-mount en prod).
+  reactStrictMode: false,
+
   experimental: {
     optimizePackageImports: ['recharts', 'lucide-react', 'framer-motion'],
   },

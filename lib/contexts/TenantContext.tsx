@@ -168,9 +168,10 @@ function writeCache(state: TenantState | null): void {
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 export function TenantProvider({ children }: { children: ReactNode }) {
-  // Initialize from cache — renders immediately without spinner on page nav
-  const [tenant,  setTenant]  = useState<TenantState | null>(() => readCache())
-  const [loading, setLoading] = useState<boolean>(() => readCache() === null)
+  // Always start null so server and client render the same initial HTML (no hydration mismatch).
+  // Cache is applied in useEffect after hydration completes.
+  const [tenant,  setTenant]  = useState<TenantState | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
   // Tracks which userId we are currently loading for — prevents stale responses
   // from overwriting newer data when two fetches race.
@@ -197,6 +198,13 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   }, [loadForUser])
 
   useEffect(() => {
+    // ── Instant cache restore (client-only, after hydration) ──────────────
+    // SSR always starts with null so server/client HTML matches.
+    // On mount, restore from cache immediately for instant paint, then
+    // validate with getUser() in the background.
+    const cached = readCache()
+    if (cached) { setTenant(cached); setLoading(false) }
+
     // ── Initial load ──────────────────────────────────────────────────────
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) loadForUser(user.id, user.email ?? '')

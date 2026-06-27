@@ -114,19 +114,23 @@ export default function ComptabilitePage() {
     const now   = new Date()
     const year  = now.getFullYear()
 
-    const [jcR, jeR] = await Promise.all([
-      supabase.from('journal_comptable')
-        .select('*').eq('tenant_id', tenantId)
-        .gte('date', `${year}-01-01`).lte('date', `${year}-12-31`)
-        .order('date', { ascending: false }).limit(50000),
-      supabase.from('journal_entries')
-        .select('*').eq('tenant_id', tenantId)
-        .gte('date_operation', `${year}-01-01`).lte('date_operation', `${year}-12-31`)
-        .order('date_operation', { ascending: false }).limit(50000),
-    ])
+    const jcR = await supabase.from('journal_comptable')
+      .select('*').eq('tenant_id', tenantId)
+      .gte('date', `${year}-01-01`).lte('date', `${year}-12-31`)
+      .order('date', { ascending: false }).limit(50000)
+
+    const jeR = await supabase.from('journal_entries')
+      .select('*').eq('tenant_id', tenantId)
+      .gte('date_operation', `${year}-01-01`).lte('date_operation', `${year}-12-31`)
+      .order('date_operation', { ascending: false }).limit(50000)
 
     if (jcR.error || jeR.error) {
-      setLoadErr((jcR.error ?? jeR.error)!.message)
+      const msg = ((jcR.error ?? jeR.error)?.message ?? '')
+      if (msg.includes('steal') || msg.includes('AbortError') || msg.includes('Lock')) {
+        setTimeout(load, 400)
+        return
+      }
+      setLoadErr(msg)
       setLoading(false)
       return
     }

@@ -501,6 +501,7 @@ export default function Sidebar() {
   const typeEntite   = tenant?.typeEntite ?? 'standalone'
   const isGroupeUser = typeEntite !== 'standalone'
 
+  const [mounted,       setMounted]       = useState(false)
   const [mobileOpen,    setMobileOpen]    = useState(false)
   const [modulesActifs, setModulesActifs] = useState<string[]>([])
   const [permissions,   setPermissions]   = useState<Record<string, ModulePermission>>({})
@@ -517,6 +518,8 @@ export default function Sidebar() {
       return next
     })
   }
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     if (!tenant) {
@@ -842,10 +845,10 @@ export default function Sidebar() {
 
       {/* Logo */}
       <div className="shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid #E2E8F0' }}>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5" suppressHydrationWarning>
           { }
           <img src="/logo.png" alt="Oraforme" className="h-7 w-auto shrink-0" />
-          {secteur && (
+          {mounted && secteur && (
             <span
               className="ml-auto shrink-0 text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
               style={{ background: 'rgba(220,38,38,0.08)', color: '#DC2626', border: '1px solid rgba(220,38,38,0.15)' }}
