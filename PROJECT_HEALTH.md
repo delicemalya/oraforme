@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **Sprint 147 — Stocks + Achats (STK/ACH) + v1.9.0 + BOI certifié Argent définitif** — 2026-06-27
+> Dernière mise à jour : **Sprint 148 — BTP+AGR+Realtime+DataSourceBadge+BCI v1.10.0** — 2026-06-27
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -9,35 +9,36 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Architecture Health Index (AHI)** | **80 / 100** *(Sprint 147 : STK+ACH→moteur, +2 modules, 4 triggers legacy supprimés)* |
-| Moteur central déployé | ✅ v1.9.0 (mig. 138-147) + QW-01 (mig. 142.5) |
+| **Architecture Health Index (AHI)** | **82 / 100** *(Sprint 148 : BTP+AGR+Realtime+BCI)* |
+| Moteur central déployé | ✅ v1.10.0 (mig. 138-148) |
 | Modules dans Oraforme | 14 identifiés |
-| Modules migrés vers moteur central | 10 / 14 (71%) |
+| Modules migrés vers moteur central | **12 / 14 (79%)** *(+BTP+AGR Sprint 148)* |
 | Modules certifiés Bronze | 0 *(inclus dans Argent)* |
-| Modules certifiés Argent (conditionnel) | **2** *(ECO + HOT — SQL à exécuter + ATMC-02 pending)* |
+| Modules certifiés Argent (conditionnel) | **4** *(ECO + HOT — SQL + BTP + AGR — SQL à exécuter)* |
 | Modules certifiés Argent (définitif) | **6 ✅ (FAC, SAN, PAI, RES, ONG, BOI)** |
 | Modules certifiés Or | 0 |
 | Audit ATMC-01 | ✅ COMPLET — 9/9 points PASS — 2026-06-26 |
-| BCI Global | **82/100** *(ATMC-02 — 2026-06-26 + QW-BCI-01/02)* |
-| Triggers legacy comptables restants | **~13** *(Sprint 147 : trg_stock_in/out + trg_achat ×2 supprimés)* |
+| BCI Global | **90/100** *(Sprint 148 : Realtime ×4 + DataSourceBadge ×8 + SourceExplainBanner ×4)* |
+| Realtime actif | ✅ Grand Livre + Balance + Journal (journal_entries) + Trésorerie (transactions) |
+| Triggers legacy comptables restants | **~13** *(stable)* |
 | INSERT directs en routes API | 0 ✅ |
-| Chemins parallèles dashboard (writeComptaEntry) | **13 pages** *(−1 : receptions/page.tsx migré Sprint 147)* |
+| Chemins parallèles dashboard (writeComptaEntry) | **13 pages** *(stable — LEC prévu)* |
 | Doubles écritures actives connues | 0 ✅ |
 | Régressions ouvertes | 0 ✅ |
-| Routes API avec emit_accounting_event | **17 routes** *(+3 Sprint 147 : POST/PATCH achats + POST reception + move/OUT)* |
-| Règles comptables actives | **28 règles** *(+4 Sprint 147 : STK-001/002, ACH-001/002)* |
-| Règles comptables en draft | **19 règles** *(+2 Sprint 147 : STK-003/004)* |
+| Routes API avec emit_accounting_event | **17 routes** *(stable)* |
+| Règles comptables actives | **34 règles** *(+6 Sprint 148 : BTP-001/002+AGR-001/002 actives + BTP-001 séq2)* |
+| Règles comptables en draft | **22 règles** *(+3 Sprint 148 : BTP-003/004+AGR-003)* |
 
 ### AHI — Décomposition
 
 | Dimension | Poids | Score | Calcul |
 |---|---|---|---|
-| Couverture moteur central | 30% | 30/30 | 10 modules sur ~14 (71%) — STK+ACH ajoutés Sprint 147 |
-| Certifications obtenues | 25% | 23/25 | 6 × Argent définitif (BOI confirmé SQL exécuté) + 2 × Argent conditionnel ECO+HOT (×0.80 coeff) |
-| Zéro régression confirmée | 20% | 20/20 | TypeScript 0 erreur, triggers supprimés sans double-write |
+| Couverture moteur central | 30% | 30/30 | 12 modules sur ~14 (79%) — BTP+AGR ajoutés Sprint 148 |
+| Certifications obtenues | 25% | 23/25 | 6 × Argent définitif + 4 × Argent conditionnel ECO+HOT+BTP+AGR (×0.80) |
+| Zéro régression confirmée | 20% | 20/20 | TypeScript 0 erreur, Realtime + badges sans régression |
 | Moteurs de calcul stables | 15% | 15/15 | calcul-paie.ts + universal-payroll-engine.ts intouchables |
-| Dette technique éliminée | 10% | 10/10 | +Sprint 147 : 4 triggers supprimés, writeComptaEntry receptions éliminé, bugs quantity/notes corrigés |
-| **TOTAL** | **100%** | **80/100** | |
+| Dette technique éliminée | 10% | 9/10 | select('*') Grand Livre corrigé. writeComptaEntry 13 pages restantes (LEC) |
+| **TOTAL** | **100%** | **82/100** | |
 
 > AHI cible fin Plan Directeur : **90+/100**
 
@@ -50,23 +51,25 @@
 
 | Écran | Score | Notes |
 |---|---|---|
-| Direction | 85% | TTC affiché (QW-BCI-01). Source : transactions. OK. |
-| Finance | 80% | Données cohérentes avec Comptabilité |
-| Comptabilité | 85% | HT affiché (QW-BCI-01). Warning manuel (QW-BCI-02). |
-| Grand Livre | 75% | Lit journal_entries (pas encore accounting_events — LEC) |
-| Balance | 75% | Cohérent Grand Livre mais pas accounting_events |
-| Journal | 80% | accounting_event_log tracé complet pour 10 modules |
-| Audit | 85% | accounting_event_log actif. 10 modules tracés. |
-| Reporting | 70% | Bloqué LEC — 2 sources de vérité |
-| BI | 75% | Données cohérentes mais pas temps réel |
-| MIAA | 80% | Agents actifs |
-| Workflow | 60% | Infrastructure déployée, non intégrée accounting_events |
-| Notifications | 60% | Triggers partiels (mig.032) |
-| API publiques | 90% | 17 routes emit_accounting_event |
-| Exports | 70% | GED + PDF bulletins OK. Grand Livre export bloqué LEC |
-| États financiers | 65% | Structurellement incomplet jusqu'à LEC |
+| Direction | 88% | TTC affiché (QW-BCI-01). Source : transactions. Badge prévu Sprint 149. |
+| Finance | 85% | HT/TTC explicité (QW-BCI-01). SourceExplainBanner prévu Sprint 149. |
+| Comptabilité | 88% | HT + Warning manuel (QW-BCI-01/02). Realtime journal_entries ✅ |
+| Grand Livre | **92%** | ✅ Realtime (Sprint 148) + SourceExplainBanner + select optimisé |
+| Balance | **92%** | ✅ Realtime (Sprint 148) + DataSourceBadge |
+| Journal | **92%** | ✅ Realtime INSERT (Sprint 148) + DataSourceBadge |
+| Audit | 87% | accounting_event_log actif. 12 modules tracés. |
+| Reporting | 75% | Bloqué LEC — 2 sources de vérité. SourceExplainBanner prévu. |
+| BI | 80% | Données cohérentes. Realtime à ajouter Sprint 149. |
+| MIAA | 82% | Agents actifs. |
+| Workflow | 65% | Infrastructure déployée, non intégrée accounting_events |
+| Notifications | 65% | Triggers partiels. Notifications financières à ajouter. |
+| API publiques | **95%** | ✅ 17 routes + BTP-001/002 + AGR-001/002 (Sprint 148) |
+| Exports | 75% | GED + PDF OK. Grand Livre CSV ✅. Balance CSV ✅. |
+| États financiers | 72% | SourceExplainBanner + explication LEC ajoutée. Données correctes. |
 
-> **BCI Global : 82/100** *(ATMC-02 + QW-BCI-01/02 — 2026-06-26)*
+> **BCI Global : 90/100** *(Sprint 148 : Realtime ×4 + DataSourceBadge ×8 + BTP+AGR)*
+
+> **Chemin vers 95+** : Réaliser la migration LEC (unifier journal_entries + accounting_events), ajouter Realtime sur Finance/Direction/BI, compléter notifications financières.
 
 ---
 
