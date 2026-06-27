@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Users, Download, Loader2, RefreshCw, Info, FileText, CheckCircle, ExternalLink } from 'lucide-react'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+} from 'recharts'
 import { PAYS_LIST, getPaysConfig } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 
@@ -174,6 +177,36 @@ export default function CNSSPage() {
               <div style={{ fontSize: 10, color: MUTED, marginTop: 3, fontWeight: 600, textTransform: 'uppercase' }}>{k.label}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Chart CNSS mensuel */}
+      {!loading && declarations.some(d => d.cnss_salarie > 0 || d.cnss_patronal > 0) && (
+        <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px', marginBottom: 20 }}>
+          <h2 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 700, color: TEXT }}>Charges sociales mensuelles — {annee}</h2>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={declarations.map(d => ({
+              mois: MOIS_FR[d.mois - 1],
+              salarie: d.cnss_salarie,
+              patronal: d.cnss_patronal,
+              irpp: d.irpp_total,
+            }))} margin={{ top: 4, right: 12, left: 0, bottom: 0 }} barGap={2}>
+              <CartesianGrid strokeDasharray="3 3" stroke={BORDER} />
+              <XAxis dataKey="mois" tick={{ fontSize: 10, fill: MUTED }} />
+              <YAxis tick={{ fontSize: 10, fill: MUTED }} width={72}
+                tickFormatter={v => v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `${Math.round(v/1000)}k` : String(v)} />
+              <Tooltip
+                formatter={(v: unknown, name: unknown) => [fmtN(Number(v ?? 0), devise),
+                  name === 'salarie' ? `${cfg.cnss.acronyme} salarié` : name === 'patronal' ? `${cfg.cnss.acronyme} patronal` : 'IRPP']}
+                contentStyle={{ fontSize: 11, borderRadius: 8, border: `1px solid ${BORDER}` }}
+              />
+              <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }}
+                formatter={v => v === 'salarie' ? `${cfg.cnss.acronyme} salarié` : v === 'patronal' ? `${cfg.cnss.acronyme} patronal` : 'IRPP'} />
+              <Bar dataKey="salarie"  fill={PURPLE}  radius={[4,4,0,0]} maxBarSize={18} />
+              <Bar dataKey="patronal" fill="#9333EA" radius={[4,4,0,0]} maxBarSize={18} />
+              <Bar dataKey="irpp"     fill="#F59E0B" radius={[4,4,0,0]} maxBarSize={18} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
 

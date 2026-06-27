@@ -21,6 +21,8 @@ import GeoDetectionBanner from '@/components/ui/GeoDetectionBanner'
 import { getTenantBrandColor } from '@/lib/utils'
 import { BannerTicker } from '@/components/dashboard/BannerTicker'
 import { useTheme } from '@/lib/contexts/ThemeContext'
+import { supabase } from '@/lib/supabase'
+import { DataSourceBadge } from '@/components/ui/DataSourceBadge'
 
 export interface DashboardData {
   tenant: { nom_entreprise: string; modules_actifs: string[]; plan: string }
@@ -545,10 +547,23 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
   const ecoleFinancials = data.ecoleFinancials ?? null
 
   const [greetingKey, setGreetingKey] = useState('dash.greetingMorning')
+  const [isRealtime,  setIsRealtime]  = useState(false)
+
   useEffect(() => {
     const h = new Date().getHours()
     setGreetingKey(h < 12 ? 'dash.greetingMorning' : h < 18 ? 'dash.greetingAfternoon' : 'dash.greetingEvening')
   }, [])
+
+  // Realtime : auto-refresh quand une facture est créée/modifiée
+  useEffect(() => {
+    if (!tenantId) return
+    const ch = supabase
+      .channel(`dashboard-${tenantId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'factures', filter: `tenant_id=eq.${tenantId}` },
+        () => { router.refresh() })
+      .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
+    return () => { supabase.removeChannel(ch) }
+  }, [tenantId, router])
 
   const displayName      = userName || tenant.nom_entreprise || 'vous'
   const soldeTresorerie  = kpis.revenuMois - alerts.pendingAmount * 0.3
@@ -590,6 +605,17 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     <div className="space-y-6 pb-6">
 
       <GeoDetectionBanner />
+
+      {/* ── DataSource badge ────────────────────────────────────────────── */}
+      <div className="flex justify-end">
+        <DataSourceBadge
+          tables={['factures', 'transactions', 'comptes_bancaires', 'paie_bulletins']}
+          realtime={isRealtime}
+          lastSync={null}
+          amounts="mixte"
+          explanation="Tableau de bord Direction : CA = factures du mois · Trésorerie = soldes comptes bancaires + caisses · Alertes = factures en attente + ruptures stock. Mise à jour automatique à chaque nouvelle facture."
+        />
+      </div>
 
       {/* ── Role badge ──────────────────────────────────────────────────── */}
       {secteur === 'ecole' && ecoleRole && ecoleRole !== 'DIRECTION_GENERALE' && (() => {

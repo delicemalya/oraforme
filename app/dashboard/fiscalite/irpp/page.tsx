@@ -2,6 +2,9 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { TrendingUp, Calculator, Info, Loader2, RefreshCw } from 'lucide-react'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from 'recharts'
 import { PAYS_LIST, getPaysConfig } from '@/lib/fiscalite/pays'
 import { calculerIRPP, calculerCNSS, fmtMontantPays } from '@/lib/fiscalite/engine'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
@@ -166,6 +169,46 @@ export default function IRPPPage() {
           </div>
         </div>
       </div>
+
+      {/* KPIs annuels IRPP */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10, marginBottom: 20 }}>
+        {[
+          { label: 'Masse salariale', value: totaux.revenu_brut, color: TEXT },
+          { label: `${cfg.cnss.acronyme} salarié`, value: totaux.cnss_salarie, color: '#7C3AED' },
+          { label: cfg.irpp.nom, value: totaux.irpp_total, color: AMBER },
+          { label: 'Net total versé', value: totaux.revenu_brut - totaux.irpp_total - totaux.cnss_salarie, color: GREEN },
+        ].map(k => (
+          <div key={k.label} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '14px 16px' }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: k.color }}>{fmtMontantPays(k.value, pays)}</div>
+            <div style={{ fontSize: 10, color: MUTED, marginTop: 3, fontWeight: 600, textTransform: 'uppercase' }}>{k.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Chart IRPP mensuel */}
+      {!loading && declarations.some(d => d.irpp_total > 0) && (
+        <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px', marginBottom: 20 }}>
+          <h2 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 700, color: TEXT }}>{cfg.irpp.nom} et {cfg.cnss.acronyme} retenus — {annee}</h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={declarations.map(d => ({
+              mois: MOIS_FR[d.mois - 1],
+              irpp: d.irpp_total,
+              cnss: d.cnss_salarie,
+            }))} margin={{ top: 4, right: 12, left: 0, bottom: 0 }} barGap={2}>
+              <CartesianGrid strokeDasharray="3 3" stroke={BORDER} />
+              <XAxis dataKey="mois" tick={{ fontSize: 10, fill: MUTED }} />
+              <YAxis tick={{ fontSize: 10, fill: MUTED }} width={72}
+                tickFormatter={v => v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `${Math.round(v/1000)}k` : String(v)} />
+              <Tooltip
+                formatter={(v: unknown, name: unknown) => [fmtMontantPays(Number(v ?? 0), pays), name === 'irpp' ? cfg.irpp.nom : `${cfg.cnss.acronyme} salarié`]}
+                contentStyle={{ fontSize: 11, borderRadius: 8, border: `1px solid ${BORDER}` }}
+              />
+              <Bar dataKey="irpp" fill={AMBER}    radius={[4,4,0,0]} maxBarSize={20} name="irpp" />
+              <Bar dataKey="cnss" fill="#7C3AED"  radius={[4,4,0,0]} maxBarSize={20} name="cnss" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Monthly IRPP table */}
       {loading ? (

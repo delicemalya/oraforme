@@ -193,8 +193,9 @@ export default function FinancePage() {
   const [prevs,     setPrevs]     = useState<Prevision[]>([])
   const [loading,   setLoading]   = useState(true)
   const [lTreso,    setLTreso]    = useState(true)
-  const [isRealtime, setIsRealtime] = useState(false)
-  const [lastSync,   setLastSync]   = useState<Date | null>(null)
+  const [isRealtime,  setIsRealtime]  = useState(false)
+  const [lastSync,    setLastSync]    = useState<Date | null>(null)
+  const [topClients,  setTopClients]  = useState<{ nom: string; total: number; nb: number }[]>([])
 
   const currentYear  = new Date().getFullYear()
   const currentMonth = new Date().getMonth()
@@ -229,6 +230,28 @@ export default function FinancePage() {
       .order('date_operation', { ascending: false })
       .limit(15)
     setRecentTx((txData as RecentTx[] | null) ?? [])
+
+    // Top clients par CA facturé
+    const { data: factData } = await supabase
+      .from('factures')
+      .select('client_name, client_nom, total')
+      .eq('tenant_id', tenantId)
+      .limit(500)
+    if (factData) {
+      const byClient: Record<string, { total: number; nb: number }> = {}
+      for (const f of factData as { client_name?: string; client_nom?: string; total?: number }[]) {
+        const k = f.client_name ?? f.client_nom ?? 'Client inconnu'
+        byClient[k] ??= { total: 0, nb: 0 }
+        byClient[k].total += f.total ?? 0
+        byClient[k].nb++
+      }
+      setTopClients(
+        Object.entries(byClient)
+          .sort(([, a], [, b]) => b.total - a.total)
+          .slice(0, 5)
+          .map(([nom, v]) => ({ nom, ...v }))
+      )
+    }
 
     setLastSync(new Date())
     setLoading(false)
@@ -543,6 +566,117 @@ export default function FinancePage() {
               </div>
             </div>
           )}
+
+          {/* EBITDA + Top clients + Top dépenses */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+            {/* EBE / EBITDA */}
+            <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-[#F3E8FF] flex items-center justify-center">
+                  <BarChart2 size={16} className="text-[#8B5CF6]" />
+                </div>
+                <h3 className="text-[13px] font-semibold text-[#111827]">EBE / EBITDA</h3>
+              </div>
+              <p className="text-[11px] text-[#9CA3AF] mb-4">Excédent brut d'exploitation estimé</p>
+              {loading ? (
+                <div className="space-y-2">
+                  <div className="h-8 bg-[#F3F4F6] rounded animate-pulse" />
+                  <div className="h-5 bg-[#F3F4F6] rounded animate-pulse w-2/3" />
+                </div>
+              ) : (
+                <>
+                  <div className="text-[26px] font-black text-[#8B5CF6]">
+                    {fmtShort((kpi?.ca_annee ?? 0) - (kpi?.dep_annee ?? 0))}
+                  </div>
+                  <div className="flex gap-5 mt-4">
+                    <div>
+                      <div className="text-[10px] text-[#9CA3AF] uppercase font-semibold">Marge EBITDA</div>
+                      <div className="text-[18px] font-bold text-[#8B5CF6]">{kpi?.marge_nette_pct ?? 0}%</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-[#9CA3AF] uppercase font-semibold">Ratio salaires</div>
+                      <div className="text-[18px] font-bold text-[#7C3AED]">{kpi?.ratio_salaires_pct ?? 0}%</div>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-[#9CA3AF] mt-3 italic">Estimation · Hors amortissements et IS</p>
+                </>
+              )}
+            </div>
+
+            {/* Top 5 clients */}
+            <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#F3F4F6]">
+                <h3 className="text-[13px] font-semibold text-[#111827]">Top 5 clients</h3>
+                <p className="text-[11px] text-[#9CA3AF] mt-0.5">Par chiffre d'affaires facturé</p>
+              </div>
+              <div className="divide-y divide-[#F3F4F6]">
+                {loading ? [...Array(5)].map((_, i) => (
+                  <div key={i} className="px-5 py-3 flex items-center gap-3">
+                    <div className="h-4 bg-[#F3F4F6] rounded animate-pulse flex-1" />
+                    <div className="h-4 bg-[#F3F4F6] rounded animate-pulse w-16" />
+                  </div>
+                )) : topClients.length === 0 ? (
+                  <p className="text-center py-8 text-[12px] text-[#9CA3AF]">Aucune facturation enregistrée</p>
+                ) : topClients.map((c, i) => {
+                  const maxT = topClients[0]?.total ?? 1
+                  return (
+                    <div key={c.nom} className="px-5 py-2.5">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-[10px] font-bold text-[#9CA3AF] shrink-0">#{i + 1}</span>
+                          <span className="text-[12px] font-medium text-[#111827] truncate">{c.nom}</span>
+                          <span className="text-[10px] text-[#9CA3AF] shrink-0">{c.nb} fact.</span>
+                        </div>
+                        <span className="text-[12px] font-bold text-[#10B981] shrink-0 ml-2">{fmtShort(c.total)}</span>
+                      </div>
+                      <div className="h-1 bg-[#F3F4F6] rounded-full">
+                        <div className="h-full rounded-full bg-[#10B981]" style={{ width: `${Math.round((c.total / maxT) * 100)}%` }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Top 5 dépenses par source */}
+            <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#F3F4F6]">
+                <h3 className="text-[13px] font-semibold text-[#111827]">Top dépenses</h3>
+                <p className="text-[11px] text-[#9CA3AF] mt-0.5">Charges cumulées par module</p>
+              </div>
+              <div className="divide-y divide-[#F3F4F6]">
+                {loading ? [...Array(5)].map((_, i) => (
+                  <div key={i} className="px-5 py-3 flex items-center gap-3">
+                    <div className="h-4 bg-[#F3F4F6] rounded animate-pulse flex-1" />
+                    <div className="h-4 bg-[#F3F4F6] rounded animate-pulse w-16" />
+                  </div>
+                )) : expenseSources.length === 0 ? (
+                  <p className="text-center py-8 text-[12px] text-[#9CA3AF]">Aucune dépense enregistrée</p>
+                ) : expenseSources.slice(0, 5).map((src, i) => {
+                  const maxT = expenseSources[0]?.total ?? 1
+                  const color = SOURCE_COLORS[src.module_source] ?? '#94A3B8'
+                  return (
+                    <div key={src.module_source} className="px-5 py-2.5">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-[10px] font-bold text-[#9CA3AF] shrink-0">#{i + 1}</span>
+                          <div className="w-5 h-5 rounded flex items-center justify-center shrink-0" style={{ background: color + '18', color }}>
+                            {SOURCE_ICONS[src.module_source] ?? <DollarSign size={12} />}
+                          </div>
+                          <span className="text-[12px] font-medium text-[#111827] truncate">{src.module_source}</span>
+                        </div>
+                        <span className="text-[12px] font-bold text-[#EF4444] shrink-0 ml-2">{fmtShort(src.total)}</span>
+                      </div>
+                      <div className="h-1 bg-[#F3F4F6] rounded-full">
+                        <div className="h-full rounded-full" style={{ width: `${Math.round((src.total / maxT) * 100)}%`, background: color }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
 
           {/* Transactions récentes */}
           <SectionCard title="Dernières opérations" sub={`Toutes sources — ${recentTx.length} opérations`}

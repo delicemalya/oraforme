@@ -5,6 +5,9 @@ import {
   Receipt, Download, Calendar,
   RefreshCw, Loader2, Info, FileText,
 } from 'lucide-react'
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+} from 'recharts'
 import { PAYS_LIST, getPaysConfig } from '@/lib/fiscalite/pays'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 
@@ -157,6 +160,50 @@ export default function TVAFiscalPage() {
               <div style={{ fontSize: 10, color: MUTED, marginTop: 3, fontWeight: 600, textTransform: 'uppercase' }}>{k.label}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Chart TVA 12 mois */}
+      {!loading && declarations.some(d => d.tva_collectee > 0 || d.tva_deductible > 0) && (
+        <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px', marginBottom: 20 }}>
+          <h2 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 700, color: TEXT }}>Évolution mensuelle TVA — {annee}</h2>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={declarations.map(d => ({
+              mois: MOIS_FR[d.mois - 1],
+              collectee: d.tva_collectee,
+              deductible: d.tva_deductible,
+              nette: Math.abs(d.tva_nette),
+            }))} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="tvac" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={BLUE} stopOpacity={0.15} />
+                  <stop offset="95%" stopColor={BLUE} stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="tvad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={GREEN} stopOpacity={0.15} />
+                  <stop offset="95%" stopColor={GREEN} stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="tvan" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={RED} stopOpacity={0.12} />
+                  <stop offset="95%" stopColor={RED} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={BORDER} />
+              <XAxis dataKey="mois" tick={{ fontSize: 10, fill: MUTED }} />
+              <YAxis tick={{ fontSize: 10, fill: MUTED }} width={72}
+                tickFormatter={v => v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `${Math.round(v/1000)}k` : String(v)} />
+              <Tooltip
+                formatter={(v: unknown, name: unknown) => [fmtN(Number(v ?? 0), devise),
+                  name === 'collectee' ? 'TVA collectée' : name === 'deductible' ? 'TVA déductible' : 'TVA nette']}
+                contentStyle={{ fontSize: 11, borderRadius: 8, border: `1px solid ${BORDER}` }}
+              />
+              <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }}
+                formatter={v => v === 'collectee' ? 'TVA collectée' : v === 'deductible' ? 'TVA déductible' : 'TVA nette'} />
+              <Area type="monotone" dataKey="collectee" stroke={BLUE}  fill="url(#tvac)" strokeWidth={2} dot={false} />
+              <Area type="monotone" dataKey="deductible" stroke={GREEN} fill="url(#tvad)" strokeWidth={2} dot={false} />
+              <Area type="monotone" dataKey="nette"      stroke={RED}   fill="url(#tvan)" strokeWidth={2} dot={false} />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       )}
 
