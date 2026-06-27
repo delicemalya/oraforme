@@ -264,12 +264,12 @@ export default function FinancePage() {
     const [{ data: bq }, { data: ca }, { data: mo }] = await Promise.all([
       supabase.from('comptes_bancaires')    .select('intitule, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
       supabase.from('caisses')              .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
-      supabase.from('mobile_money_wallets') .select('nom, solde').eq('tenant_id', tenantId).eq('actif', true).limit(200),
+      supabase.from('mobile_money_wallets') .select('nom_titulaire, solde_actuel').eq('tenant_id', tenantId).eq('actif', true).limit(200),
     ])
     const items: TresoItem[] = [
       ...((bq ?? []) as { intitule: string; solde: number }[]).map(r => ({ type_compte: 'banque',  nom: r.intitule, solde: r.solde ?? 0 })),
       ...((ca ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'caisse',  nom: r.nom, solde: r.solde ?? 0 })),
-      ...((mo ?? []) as { nom: string; solde: number }[]).map(r => ({ type_compte: 'mobile',  nom: r.nom, solde: r.solde ?? 0 })),
+      ...((mo ?? []) as { nom_titulaire: string; solde_actuel: number }[]).map(r => ({ type_compte: 'mobile', nom: r.nom_titulaire ?? 'Mobile Money', solde: r.solde_actuel ?? 0 })),
     ]
     setTreso(items)
     setLTreso(false)
@@ -279,10 +279,10 @@ export default function FinancePage() {
   const loadPrevs = useCallback(async () => {
     if (!tenantId) return
     const { data } = await supabase.from('previsions_tresorerie')
-      .select('id, libelle, montant, type, date_prevue, probabilite, statut')
+      .select('id, libelle, montant_prevu as montant, type, periode as date_prevue, probabilite, statut')
       .eq('tenant_id', tenantId)
-      .gte('date_prevue', new Date().toISOString().split('T')[0])
-      .order('date_prevue')
+      .gte('periode', new Date().toISOString().slice(0, 7))
+      .order('periode')
       .limit(30)
     setPrevs((data as Prevision[] | null) ?? [])
   }, [tenantId])
