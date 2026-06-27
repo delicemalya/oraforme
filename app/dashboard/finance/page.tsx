@@ -26,6 +26,7 @@ import {
   Activity, Target, BarChart2, Layers,
   AlertTriangle,
 } from 'lucide-react'
+import { DataSourceBadge, SourceExplainBanner } from '@/components/ui/DataSourceBadge'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -192,6 +193,8 @@ export default function FinancePage() {
   const [prevs,     setPrevs]     = useState<Prevision[]>([])
   const [loading,   setLoading]   = useState(true)
   const [lTreso,    setLTreso]    = useState(true)
+  const [isRealtime, setIsRealtime] = useState(false)
+  const [lastSync,   setLastSync]   = useState<Date | null>(null)
 
   const currentYear  = new Date().getFullYear()
   const currentMonth = new Date().getMonth()
@@ -227,6 +230,7 @@ export default function FinancePage() {
       .limit(15)
     setRecentTx((txData as RecentTx[] | null) ?? [])
 
+    setLastSync(new Date())
     setLoading(false)
   }, [tenantId])
 
@@ -262,6 +266,16 @@ export default function FinancePage() {
 
   useEffect(() => { load(); loadTreso() }, [load, loadTreso])
   useEffect(() => { if (tab === 'previsions') loadPrevs() }, [tab, loadPrevs])
+
+  // ── Realtime : transactions → refresh KPIs auto ────────────────────────────
+  useEffect(() => {
+    if (!tenantId) return
+    const channel = supabase
+      .channel(`finance-${tenantId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions', filter: `tenant_id=eq.${tenantId}` }, () => { load() })
+      .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
+    return () => { supabase.removeChannel(channel) }
+  }, [tenantId, load])
 
   // ── Données dérivées ───────────────────────────────────────────────────────
   const caEvol  = getDiff(kpi?.ca_mois  ?? 0, kpi?.ca_prev  ?? 0)
@@ -311,6 +325,13 @@ export default function FinancePage() {
             <p className="text-[11px] text-[#6B7280]">
               Moteur financier central · Exercice {currentYear} · {MONTH_LABELS[currentMonth]}
             </p>
+            <DataSourceBadge
+              tables={['transactions', 'comptes_bancaires', 'caisses', 'factures']}
+              realtime={isRealtime}
+              lastSync={lastSync}
+              amounts="mixte"
+              explanation="CA = factures payées (HT) · Trésorerie = soldes bancaires + caisses (TTC) · TVA = collectée sur factures. Ces sources se complètent et ne doivent pas être additionnées."
+            />
           </div>
           {/* Score santé */}
           {score && !loading && (
@@ -336,6 +357,9 @@ export default function FinancePage() {
           </button>
         </div>
       </div>
+
+      {/* ── Explication sources ─────────────────────────────────────────── */}
+      <SourceExplainBanner screen="finance" />
 
       {/* ── Tabs ────────────────────────────────────────────────────────── */}
       <div className="flex gap-1 bg-[#F3F4F6] rounded-xl p-1 w-fit overflow-x-auto">

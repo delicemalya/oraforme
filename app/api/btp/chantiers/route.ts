@@ -54,6 +54,27 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 })
+
+  // Émettre BTP-001 : 411 Clients / 722 Travaux exécutés (devis initial = travaux planifiés)
+  if (budget && budget > 0) {
+    const montantHT  = Number(budget)
+    const montantTVA = Math.round(montantHT * 0.189 * 100) / 100
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_event_type:    'BTP-001',
+      p_tenant_id:     ctx.tenantId,
+      p_montant_ht:    montantHT,
+      p_montant_tva:   montantTVA,
+      p_montant_ttc:   Math.round((montantHT + montantTVA) * 100) / 100,
+      p_date_event:    date_debut || new Date().toISOString().split('T')[0],
+      p_fiscal_year:   new Date().getFullYear(),
+      p_libelle:       `Chantier BTP : ${nom}`,
+      p_source_module: 'btp',
+      p_source_table:  'btp_chantiers',
+      p_source_id:     data.id,
+      p_metadata:      JSON.stringify({ client_nom: client_nom || null, chef_projet: chef_projet || null }),
+    })
+  }
+
   return NextResponse.json({ id: data.id }, { status: 201 })
 }
 
@@ -76,6 +97,36 @@ export async function PATCH(req: NextRequest) {
     .eq('tenant_id', ctx.tenantId)
 
   if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
+
+  // Émettre BTP-002 : encaissement règlement client quand chantier terminé
+  if (updates.statut === 'termine') {
+    const { data: chantier } = await supabaseAdmin
+      .from('btp_chantiers')
+      .select('budget, nom, client_nom')
+      .eq('id', id)
+      .eq('tenant_id', ctx.tenantId)
+      .maybeSingle()
+    const budget = chantier?.budget ?? 0
+    if (budget > 0) {
+      const montantHT  = Number(budget)
+      const montantTTC = Math.round(montantHT * 1.189 * 100) / 100
+      await supabaseAdmin.rpc('emit_accounting_event', {
+        p_event_type:    'BTP-002',
+        p_tenant_id:     ctx.tenantId,
+        p_montant_ht:    montantHT,
+        p_montant_tva:   Math.round((montantTTC - montantHT) * 100) / 100,
+        p_montant_ttc:   montantTTC,
+        p_date_event:    new Date().toISOString().split('T')[0],
+        p_fiscal_year:   new Date().getFullYear(),
+        p_libelle:       `Règlement chantier : ${chantier?.nom ?? id}`,
+        p_source_module: 'btp',
+        p_source_table:  'btp_chantiers',
+        p_source_id:     id,
+        p_metadata:      JSON.stringify({ client_nom: chantier?.client_nom || null, mode_paiement: updates.mode_paiement || 'virement' }),
+      })
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }
 

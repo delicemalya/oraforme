@@ -10,6 +10,7 @@ import {
   Award, ChevronRight, Loader2, Download, Bot,
 } from 'lucide-react'
 import Link from 'next/link'
+import { DataSourceBadge } from '@/components/ui/DataSourceBadge'
 
 // ── Score Ring ─────────────────────────────────────────────────────────────────
 
@@ -124,6 +125,13 @@ export default function AuditDashboard() {
             <p className="text-sm text-[var(--text-secondary)] mt-0.5">
               {nomEntreprise} · Diagnostic OHADA complet {lastRun && `· Dernière analyse : ${lastRun}`}
             </p>
+            <DataSourceBadge
+              tables={['audit_scores', 'journal_entries', 'transactions', 'factures', 'paie_bulletins']}
+              realtime={false}
+              lastSync={lastRun ? new Date() : null}
+              amounts="mixte"
+              explanation="Scores calculés par le moteur d'audit OHADA. Source : journal_entries (comptable), transactions (trésorerie), factures (commercial), paie_bulletins (RH). Pas de Realtime — audit déclenché manuellement."
+            />
           </div>
         </div>
         <div className="flex items-center gap-2">

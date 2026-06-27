@@ -181,6 +181,9 @@ export default function BalancePage() {
         </div>
       </div>
 
+      {/* Explication sources */}
+      <SourceExplainBanner screen="balance" />
+
       {/* Équilibre banner */}
       <div className={`flex items-center gap-2 px-4 py-3 rounded-xl border ${
         isBalanced

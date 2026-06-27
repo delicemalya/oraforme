@@ -60,5 +60,25 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 })
+
+  // Émettre AGR-001 : 411 Clients / 714 Ventes agricoles — exonéré TVA (Art.140 CGI Congo)
+  if (destination === 'vente' && prix_unitaire > 0) {
+    const montantHT = Math.round(Number(quantite_kg) * Number(prix_unitaire) * 100) / 100
+    await supabaseAdmin.rpc('emit_accounting_event', {
+      p_event_type:    'AGR-001',
+      p_tenant_id:     ctx.tenantId,
+      p_montant_ht:    montantHT,
+      p_montant_tva:   0,
+      p_montant_ttc:   montantHT,
+      p_date_event:    date_recolte || new Date().toISOString().split('T')[0],
+      p_fiscal_year:   new Date().getFullYear(),
+      p_libelle:       `Récolte ${culture} — ${quantite_kg} kg`,
+      p_source_module: 'agriculture',
+      p_source_table:  'agriculture_recoltes',
+      p_source_id:     data.id,
+      p_metadata:      JSON.stringify({ culture, quantite_kg, prix_unitaire, parcelle_id: parcelle_id || null }),
+    })
+  }
+
   return NextResponse.json({ id: data.id }, { status: 201 })
 }
