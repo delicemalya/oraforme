@@ -43,5 +43,33 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 })
+
+  // Emit STK-002 — Sortie stock consommation (601/311 HT) — fire-and-forget P-003
+  if (type === 'OUT') {
+    const { data: prod } = await supabaseAdmin
+      .from('products')
+      .select('prix_achat')
+      .eq('id', product_id)
+      .single()
+
+    const montantHT = (prod?.prix_achat ?? 0) * Number(quantite)
+    if (montantHT > 0) {
+      await supabaseAdmin.rpc('emit_accounting_event', {
+        p_tenant_id:     ctx.tenantId,
+        p_event_type:    'STK-002',
+        p_source_module: 'stocks',
+        p_source_table:  'stock_movements',
+        p_source_id:     data.id,
+        p_montant_ht:    montantHT,
+        p_montant_tva:   0,
+        p_montant_ttc:   montantHT,
+        p_libelle:       `Sortie stock — ${reference ?? data.id}`,
+        p_date_event:    new Date().toISOString().split('T')[0],
+        p_fiscal_year:   new Date().getFullYear(),
+        p_metadata:      { product_id, warehouse_id: warehouse_id ?? null, quantite: Number(quantite), reference: reference ?? null },
+      })
+    }
+  }
+
   return NextResponse.json({ success: true, data })
 }

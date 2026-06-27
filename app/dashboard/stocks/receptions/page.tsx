@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   Truck, Plus, X, Save, Search,
   Warehouse, Calendar, Building2,
@@ -161,73 +160,19 @@ export default function ReceptionsPage() {
     setSaving(true)
     setCreateError('')
     try {
-      const numero = `REC-${new Date().getFullYear()}-${String(receptions.length + 1).padStart(4, '0')}`
-
-      const { data: rec, error: e } = await supabase
-        .from('stock_receptions')
-        .insert({
-          tenant_id: tenantId,
-          numero,
+      const res = await fetch('/api/stock/reception', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
           purchase_order_id: form.purchase_order_id || null,
-          supplier_id: form.supplier_id || null,
-          warehouse_id: form.warehouse_id || null,
-          date_reception: form.date_reception,
-          statut: 'validé',
-          notes: form.notes.trim() || null,
-        })
-        .select().single()
-      if (e) throw e
-
-      const validLines = form.lines.filter(l => l.product_id)
-
-      // Insert reception items
-      await supabase.from('stock_reception_items').insert(
-        validLines.map(l => ({
-          reception_id: rec.id,
-          product_id: l.product_id,
-          quantite_attendue: l.quantite_attendue,
-          quantite_recue: l.quantite_recue,
-          prix_unitaire: l.prix_unitaire,
-          conformite: l.conformite,
-        }))
-      )
-
-      // Update stocks + movements
-      for (const l of validLines) {
-        if (l.quantite_recue <= 0) continue
-        const { data: prod } = await supabase.from('products').select('stock_actuel').eq('id', l.product_id).single()
-        if (prod) {
-          await supabase.from('products').update({ stock_actuel: (prod.stock_actuel || 0) + l.quantite_recue }).eq('id', l.product_id)
-        }
-        await supabase.from('stock_movements').insert({
-          tenant_id: tenantId,
-          product_id: l.product_id,
-          warehouse_id: form.warehouse_id || null,
-          type: 'reception',
-          quantity: l.quantite_recue,
-          unit_cost: l.prix_unitaire,
-          reference: numero,
-          notes: `Réception ${numero}`,
-        })
-      }
-
-      // OHADA entry: Entrée stock → débit 310000, crédit 401000
-      const today = form.date_reception
-      const totalAmt = validLines.reduce((s, l) => s + l.quantite_recue * l.prix_unitaire, 0)
-      if (totalAmt > 0) {
-        await writeComptaEntry({
-          tenantId,
-          date: today,
-          libelle: `Réception marchandises ${numero}`,
-          type: 'depense',
-          montant: totalAmt,
-          categorie: 'achats',
-          debitAccount: '311',
-          creditAccount: '401',
-          source: 'reception',
-          sourceId: rec.id,
-        })
-      }
+          supplier_id:       form.supplier_id       || null,
+          warehouse_id:      form.warehouse_id      || null,
+          date_reception:    form.date_reception,
+          notes:             form.notes.trim()      || null,
+          lines:             form.lines.filter(l => l.product_id),
+        }),
+      })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Erreur serveur') }
 
       setShowCreate(false)
       setForm({ purchase_order_id: '', supplier_id: '', warehouse_id: '', date_reception: new Date().toISOString().split('T')[0], notes: '', lines: [{ product_id: '', quantite_attendue: 1, quantite_recue: 1, prix_unitaire: 0, conformite: 'conforme' }] })

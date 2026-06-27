@@ -66,44 +66,30 @@ export default function AchatsPage() {
   async function saveAchat() {
     if (!aForm.description || !aForm.montant || !tenantId) return
     setSaving(true)
-    const { error } = await supabase.from('achats').insert({
-      tenant_id:      tenantId,
-      fournisseur_id: aForm.fournisseur_id || null,
-      description:    aForm.description,
-      montant:        parseInt(aForm.montant),
-      statut:         'impaye',
-      date:           aForm.date,
-      cost_center_id: aForm.cost_center_id || null,
+    const res = await fetch('/api/achats', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        fournisseur_id: aForm.fournisseur_id || null,
+        description:    aForm.description,
+        montant:        parseInt(aForm.montant),
+        date:           aForm.date,
+        cost_center_id: aForm.cost_center_id || null,
+      }),
     })
     setSaving(false)
-    if (error) { alert('Erreur: ' + error.message); console.error('[achats insert]', error); return }
+    if (!res.ok) { const d = await res.json(); alert('Erreur: ' + d.error); return }
     setModal(null)
     setAForm({ fournisseur_id: '', description: '', montant: '', date: new Date().toISOString().split('T')[0], cost_center_id: '' })
     load()
   }
 
   async function payerAchat(id: string) {
-    const achat = achats.find(a => a.id === id)
-    await supabase.from('achats').update({ statut: 'paye', date_paiement: new Date().toISOString().split('T')[0] }).eq('id', id)
-    if (achat && tenantId) {
-      const f = fournisseurs.find(fz => fz.id === achat.fournisseur_id)
-      const { data: { user } } = await supabase.auth.getUser()
-      // D 401000 Fournisseurs / C 571000 Caisse (règlement fournisseur)
-      await supabase.from('transactions').insert({
-        tenant_id:      tenantId,
-        type:           'sortie',
-        categorie:      'Achats fournisseurs',
-        description:    `Paiement — ${achat.description}${f ? ` (${f.nom})` : ''}`,
-        montant:        achat.montant,
-        date:           new Date().toISOString().split('T')[0],
-        mode_paiement:  'especes',
-        source:         'achat',
-        source_id:      id,
-        debit_account:  '401',
-        credit_account: '571',
-        created_by:     user?.id,
-      })
-    }
+    await fetch('/api/achats', {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ id, mode_paiement: 'especes' }),
+    })
     load()
   }
 
