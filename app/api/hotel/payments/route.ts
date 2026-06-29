@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { aggregatePaymentsByMode } from '@/lib/erp-core/compute/payments'
 
 export async function GET(req: NextRequest) {
   const { ctx, error } = await requireTenant()
@@ -20,13 +21,16 @@ export async function GET(req: NextRequest) {
   if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 })
 
   const rows = data ?? []
-  const total_especes      = rows.filter(p => p.mode_paiement === 'especes').reduce((s, p) => s + p.montant, 0)
-  const total_mobile       = rows.filter(p => p.mode_paiement === 'mobile_money').reduce((s, p) => s + p.montant, 0)
-  const total_carte        = rows.filter(p => p.mode_paiement === 'carte').reduce((s, p) => s + p.montant, 0)
-  const total_virement     = rows.filter(p => p.mode_paiement === 'virement').reduce((s, p) => s + p.montant, 0)
-  const total_jour         = rows.reduce((s, p) => s + p.montant, 0)
+  const agg  = aggregatePaymentsByMode(rows)
 
-  return NextResponse.json({ payments: rows, stats: { total_especes, total_mobile, total_carte, total_virement, total_jour } })
+  return NextResponse.json({ payments: rows, stats: {
+    total_especes:  agg.especes,
+    total_mobile:   agg.mobile_money,
+    total_carte:    agg.carte,
+    total_virement: agg.virement,
+    total_jour:     agg.total,
+    breakdown:      agg.breakdown,
+  } })
 }
 
 export async function POST(req: NextRequest) {

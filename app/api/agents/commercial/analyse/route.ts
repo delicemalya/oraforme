@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { computeCollectionStatus } from '@/lib/erp-core/compute/payments'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,8 +60,9 @@ export async function GET(req: NextRequest) {
   // ── Impayés ──────────────────────────────────────────────────────────────
 
   const today = now.toISOString().split('T')[0]
-  const facImpayes = facs.filter(f => ['envoyee', 'retard'].includes(f.statut))
-  const totalImpaye = facImpayes.reduce((s, f) => s + (f.total ?? 0), 0)
+  const collection = computeCollectionStatus(facs, today)
+  const totalImpaye = collection.total_impaye
+  const facImpayes  = facs.filter(f => !['payee', 'annulee'].includes(f.statut ?? ''))
   const impayes30j  = facImpayes.filter(f => {
     if (!f.due_date) return false
     const j = Math.ceil((new Date(today).getTime() - new Date(f.due_date).getTime()) / 86400000)

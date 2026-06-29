@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
+import { computePayrollSummary, BULLETIN_SELECT } from '@/lib/erp-core/compute/payroll'
 
 // GET /api/analytics/summary?year=2026&months=6
 export async function GET(req: NextRequest) {
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
     supabaseAdmin.from('transactions').select('montant,type,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
     supabaseAdmin.from('factures').select('total,montant_ht,statut,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
     supabaseAdmin.from('employes').select('statut,salaire_base,departement_id').eq('tenant_id', tid),
-    supabaseAdmin.from('bulletins_paie').select('net,statut,periode_mois').eq('tenant_id', tid),
+    supabaseAdmin.from('bulletins_paie').select(BULLETIN_SELECT).eq('tenant_id', tid).eq('annee', year),
     supabaseAdmin.from('absences_etudiants').select('id,date_absence').eq('tenant_id', tid).gte('date_absence', yearStart).lte('date_absence', yearEnd),
     supabaseAdmin.from('stock_articles').select('nom,quantite,quantite_min,prix_unitaire').eq('tenant_id', tid),
     supabaseAdmin.from('paiements_scolaires').select('montant,date_paiement').eq('tenant_id', tid).gte('date_paiement', yearStart).lte('date_paiement', yearEnd),
@@ -89,8 +90,8 @@ export async function GET(req: NextRequest) {
   // ── HR summary ────────────────────────────────────────────────
   const nbActifs   = employes.filter(e => e.statut === 'actif').length
   const nbConges   = employes.filter(e => e.statut === 'conge').length
-  const masseSal   = bulletins.filter(b => b.statut === 'payee').reduce((s, b) => s + b.net, 0)
-    || employes.filter(e => e.statut === 'actif').reduce((s, e) => s + (e.salaire_base ?? 0), 0)
+  const _payroll   = computePayrollSummary(bulletins.filter(b => b.statut === 'payee'), year)
+  const masseSal   = _payroll.net || employes.filter(e => e.statut === 'actif').reduce((s, e) => s + (e.salaire_base ?? 0), 0)
 
   const contratsExpirant30 = contrats.filter(c => {
     if (!c.date_fin) return false
@@ -101,12 +102,7 @@ export async function GET(req: NextRequest) {
   }).length
 
   // Payroll trend by month
-  const masseSalMensuelle = monthKeys.map(mk => {
-    const mo = mk.slice(0, 7)
-    const val = bulletins.filter(b => b.periode_mois?.startsWith(mo)).reduce((s, b) => s + b.net, 0)
-    const label = new Date(mk + '-01').toLocaleDateString('fr-FR', { month: 'short' })
-    return { month: label, masse: val }
-  })
+  const masseSalMensuelle = _payroll.mensuel.map(m => ({ month: m.month, masse: m.net }))
 
   // ── Academic summary ──────────────────────────────────────────
   const nbAbsences    = absences.length

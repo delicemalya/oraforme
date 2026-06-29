@@ -196,7 +196,7 @@ export default function FinancePage() {
   const [isRealtime,  setIsRealtime]  = useState(false)
   const [lastSync,    setLastSync]    = useState<Date | null>(null)
   const [topClients,  setTopClients]  = useState<{ nom: string; total: number; nb: number }[]>([])
-  const [anneeFiltre, setAnneeFiltre] = useState<number>(new Date().getFullYear() - 1)
+  const [anneeFiltre, setAnneeFiltre] = useState<number>(new Date().getFullYear())
 
   const currentYear  = anneeFiltre
   const currentMonth = new Date().getMonth()

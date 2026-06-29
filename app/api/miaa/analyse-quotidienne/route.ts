@@ -14,6 +14,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { chargerMemoireMIAA } from '@/lib/miaa/memory'
 import { runAgentAnalysis } from '@/lib/miaa/autonomous-engine'
+import { computeCollectionStatus, sumAmount } from '@/lib/erp-core/compute/payments'
 
 export const runtime  = 'nodejs'
 export const maxDuration = 60
@@ -34,25 +35,24 @@ const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
 async function analyserFactures(supabase: ReturnType<typeof db>, tenantId: string) {
   const { data } = await supabase
     .from('factures')
-    .select('id,numero,montant_ttc,statut,client_nom,echeance,created_at')
+    .select('id,total,statut,due_date,date')
     .eq('tenant_id', tenantId)
-    .in('statut', ['envoyee', 'partiellement_payee'])
-    .order('echeance', { ascending: true })
-    .limit(50)
+    .order('due_date', { ascending: true })
+    .limit(200)
 
   if (!data?.length) return { impayees: 0, montant_total: 0, en_retard: 0, alertes: [] }
 
-  const now = new Date()
-  const en_retard = data.filter(f => f.echeance && new Date(f.echeance) < now)
-  const montant_total = data.reduce((s, f) => s + (f.montant_ttc ?? 0), 0)
+  const today = new Date().toISOString().split('T')[0]
+  const collection = computeCollectionStatus(data, today)
+  const en_retard_list = (data ?? []).filter(f => !['payee', 'annulee'].includes(f.statut ?? '') && f.due_date && f.due_date < today)
 
   const alertes: string[] = []
-  if (en_retard.length > 0)
-    alertes.push(`${en_retard.length} facture(s) en retard — ${fmt(en_retard.reduce((s, f) => s + (f.montant_ttc ?? 0), 0))} FCFA`)
-  if (data.length > 10)
-    alertes.push(`${data.length} factures impayées au total — ${fmt(montant_total)} FCFA`)
+  if (collection.nb_retard > 0)
+    alertes.push(`${collection.nb_retard} facture(s) en retard — ${fmt(collection.total_retard)} FCFA`)
+  if (collection.nb_ouvertes > 10)
+    alertes.push(`${collection.nb_ouvertes} factures impayées au total — ${fmt(collection.total_impaye)} FCFA`)
 
-  return { impayees: data.length, montant_total, en_retard: en_retard.length, alertes }
+  return { impayees: collection.nb_ouvertes, montant_total: collection.total_impaye, en_retard: collection.nb_retard, alertes }
 }
 
 async function analyserStock(supabase: ReturnType<typeof db>, tenantId: string) {
@@ -155,8 +155,8 @@ async function analyserTresorerie(supabase: ReturnType<typeof db>, tenantId: str
   const alertes: string[] = []
   if (!mvts?.length) return alertes
 
-  const entrees  = mvts.filter(m => m.type === 'entree').reduce((s, m) => s + (m.montant ?? 0), 0)
-  const sorties  = mvts.filter(m => m.type === 'sortie').reduce((s, m) => s + (m.montant ?? 0), 0)
+  const entrees  = sumAmount(mvts.filter(m => m.type === 'entree'))
+  const sorties  = sumAmount(mvts.filter(m => m.type === 'sortie'))
   const solde    = entrees - sorties
 
   if (solde < 0)

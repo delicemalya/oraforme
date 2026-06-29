@@ -4,15 +4,14 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/api/rate-limit'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { calculerTVA } from '@/lib/fiscalite/engine'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
+import {
+  computeTVAFromJournal,
+  BALANCE_SELECT,
+  TVA_COLLECTEE_ACCOUNTS,
+  TVA_DEDUCTIBLE_ACCOUNTS,
+} from '@/lib/erp-core/compute/accounting'
 
 export const dynamic = 'force-dynamic'
-
-// SYSCOHADA Révisé 2017 — TVA collectée 4441 · TVA récupérable 4446
-// Norme codebase : 4 chiffres (4441, 4442…) après migration 119+131.
-// '441' = filet de sécurité pour sante_facture antérieures à migration 131.
-// '441000' = filet de sécurité pour écritures échappant au trigger de normalisation.
-const TVA_COLLECTEE_ACCOUNTS  = ['4441', '4442', '441', '441000']
-const TVA_DEDUCTIBLE_ACCOUNTS = ['4445', '4446', '445600', '445700']
 
 // GET /api/fiscalite/tva?annee=2026&mois=5&pays=CG
 export async function GET(req: NextRequest) {
@@ -29,7 +28,7 @@ export async function GET(req: NextRequest) {
 
   let q = supabaseAdmin
     .from('journal_entries')
-    .select('id, date_operation, libelle, debit_account, credit_account, montant')
+    .select(BALANCE_SELECT)
     .eq('tenant_id', ctx.tid)
     .eq('fiscal_year', annee)
 
@@ -42,35 +41,31 @@ export async function GET(req: NextRequest) {
   const { data: entries, error } = await q
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Build monthly declarations
-  const months = mois ? [mois] : Array.from({ length: 12 }, (_, i) => i + 1)
-  const declarations = months.map(m => {
-    const mvs = (entries ?? []).filter(e => new Date(e.date_operation).getMonth() + 1 === m)
+  const allEntries = entries ?? []
 
-    const tva_collectee = mvs
-      .filter(e => TVA_COLLECTEE_ACCOUNTS.includes(e.credit_account))
-      .reduce((s, e) => s + e.montant, 0)
+  // Agrégation ERP Core (source unique)
+  const summary = computeTVAFromJournal(allEntries, annee)
+  const monthPoints = mois ? summary.mensuel.filter(mp => mp.mois === mois) : summary.mensuel
 
-    const tva_deductible = mvs
-      .filter(e => TVA_DEDUCTIBLE_ACCOUNTS.includes(e.debit_account))
-      .reduce((s, e) => s + e.montant, 0)
+  // Enrichissement pays (calculerTVA ajoute ca_ht, taxes_additionnelles)
+  const declarations = monthPoints.map(mp => {
+    const mvs = allEntries.filter(e => new Date(e.date_operation).getMonth() + 1 === mp.mois)
+    // Compter les mouvements TVA uniquement (pas toutes les écritures du mois)
+    const mouvements_count = mvs.filter(e =>
+      TVA_COLLECTEE_ACCOUNTS.includes(e.credit_account ?? '') ||
+      TVA_DEDUCTIBLE_ACCOUNTS.includes(e.debit_account ?? ''),
+    ).length
 
-    const resultat = calculerTVA(tva_collectee, tva_deductible, pays)
-
-    return {
-      mois: m,
-      annee,
-      ...resultat,
-      mouvements_count: mvs.length,
-    }
+    const resultat = calculerTVA(mp.tva_collectee, mp.tva_deductible, pays)
+    return { mois: mp.mois, annee, ...resultat, mouvements_count }
   })
 
   const totaux = {
-    tva_collectee: declarations.reduce((s, d) => s + d.tva_collectee, 0),
-    tva_deductible: declarations.reduce((s, d) => s + d.tva_deductible, 0),
-    total_a_payer: declarations.reduce((s, d) => s + d.total_a_payer, 0),
-    credit_tva: declarations.reduce((s, d) => s + d.credit_tva, 0),
-    ca_ht: declarations.reduce((s, d) => s + d.ca_ht, 0),
+    tva_collectee:  summary.total_collectee,
+    tva_deductible: summary.total_deductible,
+    total_a_payer:  summary.total_a_payer,
+    credit_tva:     summary.total_credit,
+    ca_ht:          declarations.reduce((s, d) => s + d.ca_ht, 0),
   }
 
   return NextResponse.json({ declarations, totaux, pays, annee })

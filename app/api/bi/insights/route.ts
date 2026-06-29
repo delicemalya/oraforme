@@ -4,6 +4,8 @@ import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { buildDgAlerts, buildRhAlerts, buildEcoleAlerts, buildHotelAlerts } from '@/lib/analytics/alerts-engine'
 import { growthPct } from '@/lib/analytics/formatters'
 import type { DgKpis, RhKpis, EcoleKpis, HotelKpis, RestoKpis } from '@/lib/analytics/types'
+import { computePayrollSummary, BULLETIN_SELECT } from '@/lib/erp-core/compute/payroll'
+import { computeCA } from '@/lib/erp-core/compute/ca'
 
 /**
  * GET /api/bi/insights?module=dg|rh|ecole|hotel|resto&year=2026
@@ -60,13 +62,13 @@ export async function GET(req: NextRequest) {
       supabaseAdmin.from('transactions').select('montant,type,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
       supabaseAdmin.from('transactions').select('montant,type').eq('tenant_id', tid).gte('date', monthStart),
       supabaseAdmin.from('transactions').select('montant,type').eq('tenant_id', tid).gte('date', prevStart).lte('date', prevEnd),
-      supabaseAdmin.from('factures').select('montant_ttc,statut,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
+      supabaseAdmin.from('factures').select('total,statut,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
       supabaseAdmin.from('employes').select('statut,salaire_base').eq('tenant_id', tid),
-      supabaseAdmin.from('bulletins_paie').select('net,statut').eq('tenant_id', tid).gte('created_at', yearStart).lte('created_at', yearEnd),
+      supabaseAdmin.from('bulletins_paie').select(BULLETIN_SELECT).eq('tenant_id', tid).eq('annee', year),
       supabaseAdmin.from('contrats_employes').select('date_fin').eq('tenant_id', tid).eq('statut', 'actif'),
       supabaseAdmin.from('comptes_bancaires').select('solde').eq('tenant_id', tid).eq('actif', true),
       supabaseAdmin.from('caisses').select('solde').eq('tenant_id', tid).eq('actif', true),
-      supabaseAdmin.from('mobile_money_wallets').select('solde').eq('tenant_id', tid).eq('actif', true),
+      supabaseAdmin.from('mobile_money_wallets').select('solde_actuel').eq('tenant_id', tid).eq('actif', true),
     ])
 
     const tx         = txAll ?? []
@@ -77,28 +79,28 @@ export async function GET(req: NextRequest) {
     const buls       = bulletins ?? []
     const cons       = contrats ?? []
 
-    const caAnnee   = tx.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-    const depAnnee  = tx.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
-    const caMois    = txM.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
-    const depMois   = txM.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
+    const _ca        = computeCA(tx, facs, year)
+    const caAnnee    = _ca.ca_encaisse
+    const depAnnee   = _ca.dep_encaisse
+    const caMois     = txM.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
+    const depMois    = txM.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
     const caPrevMois  = txP.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0)
     const depPrevMois = txP.filter(t => t.type === 'sortie').reduce((s, t) => s + t.montant, 0)
 
-    const resultatNet  = caAnnee - depAnnee
+    const resultatNet  = _ca.solde_treso
     const margeNetPct  = caAnnee > 0 ? Math.round((resultatNet / caAnnee) * 100) : 0
 
     const tresoB = (comptesBanque ?? []).reduce((s: number, c: { solde: number }) => s + (c.solde ?? 0), 0)
     const tresoC = (caisses ?? []).reduce((s: number, c: { solde: number }) => s + (c.solde ?? 0), 0)
-    const tresoW = (wallets ?? []).reduce((s: number, c: { solde: number }) => s + (c.solde ?? 0), 0)
+    const tresoW = (wallets ?? []).reduce((s: number, c: { solde_actuel: number }) => s + (c.solde_actuel ?? 0), 0)
     const tresoTotale = tresoB + tresoC + tresoW
 
-    const facsOuvertes = facs.filter(f => !['payee', 'annulee'].includes(f.statut ?? ''))
-    const creancesClients = facsOuvertes.reduce((s, f) => s + (f.montant_ttc ?? 0), 0)
-    const nbFacturesOuvertes = facsOuvertes.length
+    const creancesClients    = _ca.creances
+    const nbFacturesOuvertes = facs.filter(f => !['payee', 'annulee'].includes(f.statut ?? '')).length
     const nbFacturesRetard   = facs.filter(f => f.statut === 'en_retard' || f.statut === 'envoyee').length
 
-    const salairesAnnee = buls.filter(b => b.statut === 'payee').reduce((s, b) => s + b.net, 0)
-      || emps.filter(e => e.statut === 'actif').reduce((s, e) => s + (e.salaire_base ?? 0), 0) * 12
+    const _payrollDG    = computePayrollSummary(buls.filter(b => b.statut === 'payee'), year)
+    const salairesAnnee = _payrollDG.net || emps.filter(e => e.statut === 'actif').reduce((s, e) => s + (e.salaire_base ?? 0), 0) * 12
 
     const effectifActif = emps.filter(e => e.statut === 'actif').length
     const effectifTotal = emps.length
@@ -116,16 +118,10 @@ export async function GET(req: NextRequest) {
       effectifActif, effectifTotal, contratsExpirant30,
     }
 
-    const monthlyTrend = monthKeys.map(mk => {
-      const mo = mk.slice(0, 7)
-      const entrees = tx.filter(t => t.type === 'entree' && t.date?.startsWith(mo)).reduce((s, t) => s + t.montant, 0)
-      const sorties = tx.filter(t => t.type === 'sortie' && t.date?.startsWith(mo)).reduce((s, t) => s + t.montant, 0)
-      const label   = new Date(mk + '-01').toLocaleDateString('fr-FR', { month: 'short' })
-      return { month: label, entrees, sorties, net: entrees - sorties }
-    })
+    const monthlyTrend = _ca.mensuel.map(m => ({ month: m.month, entrees: m.entrees, sorties: m.sorties, net: m.net }))
 
     const revenueBySource = [
-      { name: 'Facturation', value: facs.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.montant_ttc ?? 0), 0), color: '#DC2626' },
+      { name: 'Facturation', value: _ca.ca_facture, color: '#DC2626' },
       { name: 'Trésorerie',  value: tx.filter(t => t.type === 'entree').reduce((s, t) => s + t.montant, 0), color: '#0F172A' },
     ].filter(s => s.value > 0)
 
@@ -152,7 +148,7 @@ export async function GET(req: NextRequest) {
       { data: recrut },
     ] = await Promise.all([
       supabaseAdmin.from('employes').select('statut,salaire_base').eq('tenant_id', tid),
-      supabaseAdmin.from('bulletins_paie').select('net,statut,periode_mois').eq('tenant_id', tid),
+      supabaseAdmin.from('bulletins_paie').select(BULLETIN_SELECT).eq('tenant_id', tid).eq('annee', year),
       supabaseAdmin.from('contrats_employes').select('date_fin,statut').eq('tenant_id', tid).eq('statut', 'actif'),
       supabaseAdmin.from('presences').select('statut,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
       supabaseAdmin.from('recrutements').select('statut,created_at').eq('tenant_id', tid).gte('created_at', yearStart).lte('created_at', yearEnd),
@@ -168,9 +164,9 @@ export async function GET(req: NextRequest) {
     const effectifTotal = employees.length
     const nbConges      = employees.filter(e => e.statut === 'conge').length
 
-    const masseSalMois  = bulletins.filter(b => b.statut === 'payee' && b.periode_mois?.startsWith(monthStart.slice(0, 7))).reduce((s, b) => s + b.net, 0)
-    const masseSalAnnee = bulletins.filter(b => b.statut === 'payee').reduce((s, b) => s + b.net, 0)
-      || employees.filter(e => e.statut === 'actif').reduce((s, e) => s + (e.salaire_base ?? 0), 0) * 12
+    const _payrollRH    = computePayrollSummary(bulletins.filter(b => b.statut === 'payee'), year)
+    const masseSalMois  = _payrollRH.mensuel[now.getMonth()].net
+    const masseSalAnnee = _payrollRH.net || employees.filter(e => e.statut === 'actif').reduce((s, e) => s + (e.salaire_base ?? 0), 0) * 12
 
     const nbRecrutements = recrutements.filter(r => r.statut === 'embauche').length
     const nbDemissions   = recrutements.filter(r => r.statut === 'demission').length
@@ -192,11 +188,7 @@ export async function GET(req: NextRequest) {
       nbRecrutements, nbDemissions, tauxPresence, contratsExpirant30, nbAbsencesTotal,
     }
 
-    const masseSalMensuelle = monthKeys.map(mk => {
-      const mo = mk.slice(0, 7)
-      const val = bulletins.filter(b => b.periode_mois?.startsWith(mo)).reduce((s, b) => s + b.net, 0)
-      return { month: new Date(mk + '-01').toLocaleDateString('fr-FR', { month: 'short' }), masse: val }
-    })
+    const masseSalMensuelle = _payrollRH.mensuel.map(m => ({ month: m.month, masse: m.net }))
 
     const absencesParMois = monthKeys.map(mk => {
       const mo = mk.slice(0, 7)

@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 import { calculerCNSSAggrege } from '@/lib/fiscalite/engine'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 import { getPaysConfig } from '@/lib/fiscalite/pays'
+import { computeCNSSSummary, BULLETIN_FISCAL_SELECT } from '@/lib/erp-core/compute/fiscal'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   let q = supabaseAdmin
     .from('bulletins_paie')
-    .select('id, mois, annee, salaire_brut, cnss_salarie, cnss_patronal, irpp, salaire_net')
+    .select(BULLETIN_FISCAL_SELECT)
     .eq('tenant_id', ctx.tid)
     .eq('annee', annee)
 
@@ -32,40 +33,48 @@ export async function GET(req: NextRequest) {
   const { data: bulletins, error } = await q
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const cfg = getPaysConfig(pays)
+  const cfg     = getPaysConfig(pays)
+  const items   = bulletins ?? []
 
-  // Build monthly CNSS data
+  // ERP Core — agrégation depuis valeurs stockées (précision maximale)
+  const summary = computeCNSSSummary(items, annee, mois)
+
   const months = mois ? [mois] : Array.from({ length: 12 }, (_, i) => i + 1)
   const declarations = months.map(m => {
-    const mvsMois = (bulletins ?? []).filter(b => b.mois === m)
-    const result = calculerCNSSAggrege(
-      mvsMois.map(b => ({ salaire_brut: b.salaire_brut })),
-      pays,
-    )
+    const mp = summary.mensuel.find(p => p.mois === m)
+    if (!mp || mp.nb_employes === 0) return null
 
-    // Use stored values for accuracy
-    const cnss_salarie_stored  = mvsMois.reduce((s, b) => s + (b.cnss_salarie ?? 0), 0)
-    const cnss_patronal_stored = mvsMois.reduce((s, b) => s + (b.cnss_patronal ?? 0), 0)
-    const irpp_stored          = mvsMois.reduce((s, b) => s + (b.irpp ?? 0), 0)
+    // Pour pays autres que CG : recalcul CNSS selon barème national
+    if (pays !== 'CG') {
+      const mvsMois = items.filter(b => b.mois === m)
+      const result  = calculerCNSSAggrege(mvsMois.map(b => ({ salaire_brut: b.brut })), pays)
+      return {
+        mois: m, annee, nb_employes: mp.nb_employes,
+        salaire_brut_total: result.salaire_brut_total,
+        cnss_salarie:   result.cotisation_salarie,
+        cnss_patronal:  result.cotisation_patronale,
+        irpp_total:     mp.brut_total, // irpp non agrégé ici pour non-CG
+        total_cnss:     result.total_cnss,
+      }
+    }
 
     return {
-      mois: m,
-      annee,
-      nb_employes: mvsMois.length,
-      salaire_brut_total: result.salaire_brut_total,
-      cnss_salarie:   pays === 'CG' ? cnss_salarie_stored : result.cotisation_salarie,
-      cnss_patronal:  pays === 'CG' ? cnss_patronal_stored : result.cotisation_patronale,
-      irpp_total:     irpp_stored,
-      total_cnss:     pays === 'CG' ? (cnss_salarie_stored + cnss_patronal_stored) : result.total_cnss,
+      mois: m, annee,
+      nb_employes:        mp.nb_employes,
+      salaire_brut_total: mp.brut_total,
+      cnss_salarie:       mp.cnss_salarie,
+      cnss_patronal:      mp.cnss_patronal,
+      irpp_total:         items.filter(b => b.mois === m && b.statut !== 'annule').reduce((s, b) => s + (b.irpp ?? 0), 0),
+      total_cnss:         mp.total_cnss,
     }
-  })
+  }).filter(Boolean)
 
   const totaux = {
-    salaire_brut:  declarations.reduce((s, d) => s + d.salaire_brut_total, 0),
-    cnss_salarie:  declarations.reduce((s, d) => s + d.cnss_salarie, 0),
-    cnss_patronal: declarations.reduce((s, d) => s + d.cnss_patronal, 0),
-    irpp_total:    declarations.reduce((s, d) => s + d.irpp_total, 0),
-    total_cnss:    declarations.reduce((s, d) => s + d.total_cnss, 0),
+    salaire_brut:  summary.totaux.brut_total,
+    cnss_salarie:  summary.totaux.cnss_salarie,
+    cnss_patronal: summary.totaux.cnss_patronal,
+    irpp_total:    items.filter(b => b.statut !== 'annule').reduce((s, b) => s + (b.irpp ?? 0), 0),
+    total_cnss:    summary.totaux.total_cnss,
   }
 
   return NextResponse.json({
@@ -74,11 +83,11 @@ export async function GET(req: NextRequest) {
     pays,
     annee,
     config: {
-      nom: cfg.cnss.nom,
-      acronyme: cfg.cnss.acronyme,
+      nom:          cfg.cnss.nom,
+      acronyme:     cfg.cnss.acronyme,
       taux_salarie: cfg.cnss.taux_salarie,
       taux_patronal: cfg.cnss.taux_patronal,
-      plafond: cfg.cnss.plafond_mensuel,
+      plafond:      cfg.cnss.plafond_mensuel,
     },
   })
 }
