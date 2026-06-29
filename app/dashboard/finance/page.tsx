@@ -196,8 +196,9 @@ export default function FinancePage() {
   const [isRealtime,  setIsRealtime]  = useState(false)
   const [lastSync,    setLastSync]    = useState<Date | null>(null)
   const [topClients,  setTopClients]  = useState<{ nom: string; total: number; nb: number }[]>([])
+  const [anneeFiltre, setAnneeFiltre] = useState<number>(new Date().getFullYear() - 1)
 
-  const currentYear  = new Date().getFullYear()
+  const currentYear  = anneeFiltre
   const currentMonth = new Date().getMonth()
 
   // ── Chargement principal via RPCs serveur ──────────────────────────────────
@@ -211,9 +212,9 @@ export default function FinancePage() {
       { data: sourceData },
       { data: scoreData },
     ] = await Promise.all([
-      supabase.rpc('fn_finance_kpis',       { p_tenant_id: tenantId }),
-      supabase.rpc('fn_cashflow_monthly',    { p_tenant_id: tenantId }),
-      supabase.rpc('fn_source_breakdown',    { p_tenant_id: tenantId }),
+      supabase.rpc('fn_finance_kpis',       { p_tenant_id: tenantId, p_annee: anneeFiltre }),
+      supabase.rpc('fn_cashflow_monthly',    { p_tenant_id: tenantId, p_annee: anneeFiltre }),
+      supabase.rpc('fn_source_breakdown',    { p_tenant_id: tenantId, p_annee: anneeFiltre }),
       supabase.rpc('fn_financial_score',     { p_tenant_id: tenantId }),
     ])
 
@@ -287,7 +288,7 @@ export default function FinancePage() {
     setPrevs((data as Prevision[] | null) ?? [])
   }, [tenantId])
 
-  useEffect(() => { load(); loadTreso() }, [load, loadTreso])
+  useEffect(() => { load(); loadTreso() }, [load, loadTreso, anneeFiltre])
   useEffect(() => { if (tab === 'previsions') loadPrevs() }, [tab, loadPrevs])
 
   // ── Realtime : transactions → refresh KPIs auto ────────────────────────────
@@ -370,6 +371,16 @@ export default function FinancePage() {
             <Calendar size={12} />
             {new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
           </span>
+          {/* Sélecteur exercice */}
+          <select
+            value={anneeFiltre}
+            onChange={e => setAnneeFiltre(Number(e.target.value))}
+            className="text-[11px] font-medium px-2 py-1.5 rounded-lg bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] transition-colors cursor-pointer"
+          >
+            {[new Date().getFullYear() - 2, new Date().getFullYear() - 1, new Date().getFullYear()].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
           <button onClick={() => { load(); loadTreso() }} disabled={loading}
             className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50">
             <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
