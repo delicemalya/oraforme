@@ -12,7 +12,7 @@
 -- ── 1. Fix v_treso_summary ───────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW v_treso_summary AS
-  SELECT tenant_id, 'banque' AS type_compte, nom,
+  SELECT tenant_id, 'banque' AS type_compte, intitule AS nom,
          COALESCE(solde, 0) AS solde
   FROM comptes_bancaires WHERE actif = true
   UNION ALL
