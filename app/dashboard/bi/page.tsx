@@ -48,13 +48,13 @@ export default async function BiDgPage() {
     supabaseAdmin.from('transactions').select('montant,type,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
     supabaseAdmin.from('transactions').select('montant,type').eq('tenant_id', tid).gte('date', monthStart),
     supabaseAdmin.from('transactions').select('montant,type').eq('tenant_id', tid).gte('date', prevStart).lte('date', prevEnd),
-    supabaseAdmin.from('factures').select('montant_ttc,statut,date').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd),
+    supabaseAdmin.from('factures').select('total,statut,created_at').eq('tenant_id', tid).gte('created_at', yearStart).lte('created_at', yearEnd),
     supabaseAdmin.from('employes').select('statut,salaire_base').eq('tenant_id', tid),
     supabaseAdmin.from('bulletins_paie').select('net,statut').eq('tenant_id', tid).gte('created_at', yearStart).lte('created_at', yearEnd),
     supabaseAdmin.from('contrats_employes').select('date_fin').eq('tenant_id', tid).eq('statut', 'actif'),
     supabaseAdmin.from('comptes_bancaires').select('solde').eq('tenant_id', tid).eq('actif', true),
     supabaseAdmin.from('caisses').select('solde').eq('tenant_id', tid).eq('actif', true),
-    supabaseAdmin.from('mobile_money_wallets').select('solde').eq('tenant_id', tid).eq('actif', true),
+    supabaseAdmin.from('mobile_money_wallets').select('solde_actuel').eq('tenant_id', tid).eq('actif', true),
   ])
 
   const tx  = txAll ?? []
@@ -76,11 +76,11 @@ export default async function BiDgPage() {
 
   const tresoB = (comptesBanque ?? []).reduce((s: number, c: { solde: number }) => s + (c.solde ?? 0), 0)
   const tresoC = (caisses ?? []).reduce((s: number, c: { solde: number }) => s + (c.solde ?? 0), 0)
-  const tresoW = (wallets ?? []).reduce((s: number, c: { solde: number }) => s + (c.solde ?? 0), 0)
+  const tresoW = (wallets ?? []).reduce((s: number, c: { solde_actuel: number }) => s + (c.solde_actuel ?? 0), 0)
   const tresoTotale = tresoB + tresoC + tresoW
 
   const facsOuvertes = facs.filter(f => !['payee', 'annulee'].includes(f.statut ?? ''))
-  const creancesClients = facsOuvertes.reduce((s, f) => s + (f.montant_ttc ?? 0), 0)
+  const creancesClients = facsOuvertes.reduce((s, f) => s + (f.total ?? 0), 0)
   const nbFacturesOuvertes = facsOuvertes.length
   const nbFacturesRetard   = facs.filter(f => f.statut === 'en_retard' || f.statut === 'envoyee').length
 
@@ -111,7 +111,7 @@ export default async function BiDgPage() {
   })
 
   const revenueBySource = [
-    { name: 'Facturation', value: facs.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.montant_ttc ?? 0), 0), color: '#DC2626' },
+    { name: 'Facturation', value: facs.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0), color: '#DC2626' },
     { name: 'Trésorerie',  value: caAnnee, color: '#0F172A' },
   ].filter(s => s.value > 0)
 
