@@ -1387,7 +1387,7 @@ export default function RHPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: t('rh.employees'),           val: employes.filter(e=>e.statut==='actif').length,    color: '#10B981', icon: Users,         sub: `${employes.length} total` },
-          { label: t('rh.payrollMass'),         val: fmtFCFA(masseSalariale),                          color: '#F59E0B', icon: DollarSign,    sub: 'mensuelle brute' },
+          { label: t('rh.payrollMass'),         val: fmtFCFA(masseSalariale),                          color: '#F59E0B', icon: DollarSign,    sub: 'mensuelle de base' },
           { label: t('rh.leave'),               val: pendingConges,                                    color: '#2563EB', icon: Calendar,      sub: t('rh.toValidate') },
           { label: t('rh.expiringContracts'),   val: expiring,                                         color: expiring > 0 ? '#EF4444' : '#64748B', icon: AlertTriangle, sub: t('rh.in30days') },
         ].map(k => {
