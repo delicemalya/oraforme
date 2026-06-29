@@ -17,6 +17,12 @@
 -- NOTE : journal_entries utilise bien date_operation → NE PAS CHANGER.
 -- ============================================================
 
+-- ── 0. DROP fonctions existantes (signature changée) ─────────────────────────
+DROP FUNCTION IF EXISTS fn_finance_kpis(UUID, INT);
+DROP FUNCTION IF EXISTS fn_cashflow_monthly(UUID, INT);
+DROP FUNCTION IF EXISTS fn_source_breakdown(UUID, INT);
+DROP FUNCTION IF EXISTS fn_financial_score(UUID);
+
 -- ── 1. fn_finance_kpis ────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION fn_finance_kpis(
