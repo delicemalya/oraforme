@@ -63,8 +63,8 @@ BEGIN
     SELECT 1 FROM factures
     WHERE tenant_id = v_tid AND client_nom = 'SUNU Assurances Congo' AND montant_ht = 3500000
   ) THEN
-    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut, date, due_date)
-    VALUES (v_tid, 'SUNU Assurances Congo', 3500000, 18, 4161500, 'payee', '2026-01-10', '2026-02-10')
+    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut)
+    VALUES (v_tid, 'SUNU Assurances Congo', 3500000, 18, 4161500, 'payee')
     RETURNING id INTO v_fac_id;
     RAISE NOTICE 'Facture 1 créée (payée — SUNU) : %', v_fac_id;
   END IF;
@@ -75,8 +75,8 @@ BEGIN
     SELECT 1 FROM factures
     WHERE tenant_id = v_tid AND client_nom = 'BGFI Bank Congo' AND montant_ht = 2000000
   ) THEN
-    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut, date, due_date)
-    VALUES (v_tid, 'BGFI Bank Congo', 2000000, 18, 2378000, 'payee', '2026-02-15', '2026-03-15')
+    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut)
+    VALUES (v_tid, 'BGFI Bank Congo', 2000000, 18, 2378000, 'payee')
     RETURNING id INTO v_fac_id;
     RAISE NOTICE 'Facture 2 créée (payée — BGFI) : %', v_fac_id;
   END IF;
@@ -87,8 +87,8 @@ BEGIN
     SELECT 1 FROM factures
     WHERE tenant_id = v_tid AND client_nom = 'Ministere des Finances CG' AND montant_ht = 4500000
   ) THEN
-    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut, date, due_date)
-    VALUES (v_tid, 'Ministere des Finances CG', 4500000, 18, 5350500, 'payee', '2026-03-05', '2026-04-05')
+    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut)
+    VALUES (v_tid, 'Ministere des Finances CG', 4500000, 18, 5350500, 'payee')
     RETURNING id INTO v_fac_id;
     RAISE NOTICE 'Facture 3 créée (payée — Min.Finances) : %', v_fac_id;
   END IF;
@@ -99,8 +99,8 @@ BEGIN
     SELECT 1 FROM factures
     WHERE tenant_id = v_tid AND client_nom = 'LCB Congo' AND montant_ht = 1500000
   ) THEN
-    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut, date, due_date)
-    VALUES (v_tid, 'LCB Congo', 1500000, 18, 1783500, 'payee', '2026-04-12', '2026-05-12')
+    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut)
+    VALUES (v_tid, 'LCB Congo', 1500000, 18, 1783500, 'payee')
     RETURNING id INTO v_fac_id;
     RAISE NOTICE 'Facture 4 créée (payée — LCB) : %', v_fac_id;
   END IF;
@@ -111,8 +111,8 @@ BEGIN
     SELECT 1 FROM factures
     WHERE tenant_id = v_tid AND client_nom = 'CNSS Congo' AND montant_ht = 2500000
   ) THEN
-    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut, date, due_date)
-    VALUES (v_tid, 'CNSS Congo', 2500000, 18, 2972500, 'envoyee', '2026-05-20', '2026-06-20');
+    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut)
+    VALUES (v_tid, 'CNSS Congo', 2500000, 18, 2972500, 'envoyee');
     RAISE NOTICE 'Facture 5 créée (envoyée — CNSS)';
   END IF;
 
@@ -122,8 +122,8 @@ BEGIN
     SELECT 1 FROM factures
     WHERE tenant_id = v_tid AND client_nom = 'Bollore Logistics Congo' AND montant_ht = 3000000
   ) THEN
-    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut, date, due_date)
-    VALUES (v_tid, 'Bollore Logistics Congo', 3000000, 18, 3567000, 'envoyee', '2026-06-10', '2026-07-10');
+    INSERT INTO factures (tenant_id, client_nom, montant_ht, tva, total, statut)
+    VALUES (v_tid, 'Bollore Logistics Congo', 3000000, 18, 3567000, 'envoyee');
     RAISE NOTICE 'Facture 6 créée (envoyée — Bollore)';
   END IF;
 

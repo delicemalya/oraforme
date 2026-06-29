@@ -1,20 +1,17 @@
 -- ============================================================
 -- Migration 150 — Finance KPIs : corrections colonnes + fallback CA
 --
--- BUG RACINE IDENTIFIÉ (migration 063 confirme) :
---   La table `transactions` utilise la colonne `date` (pas `date_operation`).
---   Les fonctions de migration 149 utilisaient `date_operation` → elles
---   échouaient silencieusement → fn_finance_kpis retournait NULL → la page
---   Finance affichait 0 partout.
+-- BUG RACINE (confirmé par audit migrations) :
+--   • transactions : colonne `date` (migration 014), PAS `date_operation`
+--   • factures     : colonnes migration 001 seulement (migration 010 non appliquée)
+--                    → PAS de colonne `date` ni `due_date` → utiliser `created_at`
 --
 -- CORRECTIONS :
---   1. fn_finance_kpis   — date_operation → date (transactions)
---   2. fn_cashflow_monthly — date_operation → date (transactions)
---   3. fn_source_breakdown — date_operation → date (transactions)
---   4. Fallback CA : si 0 factures payées → utiliser transactions.type='entree'
---   5. Champs supplémentaires : ca_source, flux_entrants_tx
---
--- NOTE : journal_entries utilise bien date_operation → NE PAS CHANGER.
+--   1. Toutes requêtes sur transactions : date_operation → date
+--   2. Toutes requêtes sur factures     : date → created_at::DATE
+--                                          due_date supprimée (inexistante)
+--   3. Fallback CA : si 0 factures payées → SUM transactions.type='entree' hors paie
+--   4. Nouveaux champs JSON : ca_source, flux_entrants_tx
 -- ============================================================
 
 -- ── 0. DROP fonctions existantes (signature changée) ─────────────────────────
@@ -23,7 +20,7 @@ DROP FUNCTION IF EXISTS fn_cashflow_monthly(UUID, INT);
 DROP FUNCTION IF EXISTS fn_source_breakdown(UUID, INT);
 DROP FUNCTION IF EXISTS fn_financial_score(UUID);
 
--- ── 1. fn_finance_kpis ────────────────────────────────────────────────────────
+-- ── 1. fn_finance_kpis ───────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION fn_finance_kpis(
   p_tenant_id  UUID,
@@ -80,24 +77,24 @@ BEGIN
     v_end_prev   := make_date(v_year - 1, 12, 31);
   END IF;
 
-  -- ── CA depuis factures payées ──────────────────────────────────────────────
+  -- ── CA depuis factures payées (created_at car colonne date absente) ──────
   SELECT COALESCE(SUM(total), 0) INTO v_ca_annee
   FROM factures
   WHERE tenant_id = p_tenant_id AND statut = 'payee'
-    AND date BETWEEN v_start_year AND v_end_year;
+    AND created_at::DATE BETWEEN v_start_year AND v_end_year;
 
   SELECT COALESCE(SUM(total), 0) INTO v_ca_mois
   FROM factures
   WHERE tenant_id = p_tenant_id AND statut = 'payee'
-    AND date BETWEEN v_start_month AND v_end_month;
+    AND created_at::DATE BETWEEN v_start_month AND v_end_month;
 
   SELECT COALESCE(SUM(total), 0) INTO v_ca_prev
   FROM factures
   WHERE tenant_id = p_tenant_id AND statut = 'payee'
-    AND date BETWEEN v_start_prev AND v_end_prev;
+    AND created_at::DATE BETWEEN v_start_prev AND v_end_prev;
 
-  -- ── Transactions entrees hors paie (fallback + info) ──────────────────────
-  -- CORRECTION BUG : colonne `date` (pas `date_operation`) sur transactions
+  -- ── Transactions entrees hors paie (fallback CA + info) ──────────────────
+  -- transactions.date est la colonne réelle (migration 014)
   SELECT
     COALESCE(SUM(CASE WHEN date BETWEEN v_start_year  AND v_end_year  THEN montant ELSE 0 END), 0),
     COALESCE(SUM(CASE WHEN date BETWEEN v_start_month AND v_end_month THEN montant ELSE 0 END), 0),
@@ -119,7 +116,7 @@ BEGIN
     v_ca_source := 'transactions';
   END IF;
 
-  -- ── Dépenses (colonne `date` sur transactions) ──────────────────────────
+  -- ── Dépenses depuis transactions (colonne date réelle) ───────────────────
   SELECT
     COALESCE(SUM(CASE WHEN date BETWEEN v_start_year  AND v_end_year  THEN montant ELSE 0 END), 0),
     COALESCE(SUM(CASE WHEN date BETWEEN v_start_month AND v_end_month THEN montant ELSE 0 END), 0),
@@ -133,14 +130,12 @@ BEGIN
   SELECT COALESCE(SUM(solde), 0)        INTO v_solde_caisse FROM caisses              WHERE tenant_id = p_tenant_id AND actif = true;
   SELECT COALESCE(SUM(solde_actuel), 0) INTO v_solde_mobile FROM mobile_money_wallets WHERE tenant_id = p_tenant_id AND actif = true;
 
-  -- ── Créances clients ───────────────────────────────────────────────────────
-  SELECT
-    COALESCE(SUM(total), 0),
-    COUNT(*)::INT,
-    COUNT(*) FILTER (WHERE due_date IS NOT NULL AND due_date < CURRENT_DATE)::INT
-  INTO v_creances, v_nb_factures, v_nb_retard
+  -- ── Créances clients (due_date absent → nb_retard = 0) ───────────────────
+  SELECT COALESCE(SUM(total), 0), COUNT(*)::INT
+  INTO v_creances, v_nb_factures
   FROM factures
   WHERE tenant_id = p_tenant_id AND statut NOT IN ('payee','annulee','brouillon');
+  v_nb_retard := 0; -- due_date non disponible sans migration 010
 
   -- ── Dettes fournisseurs ────────────────────────────────────────────────────
   SELECT COALESCE(SUM(montant_total), 0) INTO v_dettes
@@ -159,7 +154,7 @@ BEGIN
     v_tva_ded := ROUND(v_dep_annee * 0.18, 0);
   END IF;
 
-  -- ── Charges salariales (colonne `date` sur transactions) ──────────────────
+  -- ── Charges salariales (transactions.date) ────────────────────────────────
   SELECT COALESCE(SUM(montant), 0) INTO v_salaires
   FROM transactions
   WHERE tenant_id = p_tenant_id AND type = 'sortie'
@@ -180,7 +175,7 @@ BEGIN
     AND statut IN ('planifie','planifié','partiel')
     AND date_prevue BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '90 days';
 
-  -- ── Ventilation CA par source (colonne `date` sur transactions) ───────────
+  -- ── Ventilation CA par source (transactions.date) ─────────────────────────
   SELECT
     COALESCE(SUM(CASE WHEN COALESCE(source,'') IN ('paiement_scolaire','scolarite','ecole') THEN montant ELSE 0 END), 0),
     COALESCE(SUM(CASE WHEN COALESCE(source,'') IN ('facture','facture_vente')               THEN montant ELSE 0 END), 0)
@@ -231,8 +226,7 @@ BEGIN
 END;
 $$;
 
--- ── 2. fn_cashflow_monthly ────────────────────────────────────────────────────
--- CORRECTION BUG : colonne `date` (pas `date_operation`) sur transactions
+-- ── 2. fn_cashflow_monthly ───────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION fn_cashflow_monthly(
   p_tenant_id  UUID,
@@ -258,6 +252,7 @@ BEGIN
 
   RETURN QUERY
   WITH monthly_tx AS (
+    -- transactions.date est la colonne réelle
     SELECT
       EXTRACT(MONTH FROM date)::INT AS m,
       COALESCE(SUM(CASE WHEN type='entree' THEN montant ELSE 0 END), 0) AS ent_tx,
@@ -268,12 +263,13 @@ BEGIN
     GROUP BY 1
   ),
   monthly_fac AS (
+    -- factures : created_at car colonne date absente (migration 010 non appliquée)
     SELECT
-      EXTRACT(MONTH FROM date)::INT AS m,
+      EXTRACT(MONTH FROM created_at)::INT AS m,
       COALESCE(SUM(total), 0) AS ent_fac
     FROM factures
     WHERE tenant_id = p_tenant_id AND statut = 'payee'
-      AND date BETWEEN make_date(v_year, 1, 1) AND make_date(v_year, 12, 31)
+      AND created_at::DATE BETWEEN make_date(v_year, 1, 1) AND make_date(v_year, 12, 31)
     GROUP BY 1
   ),
   all_months AS (SELECT generate_series(1, 12) AS m),
@@ -304,7 +300,6 @@ END;
 $$;
 
 -- ── 3. fn_source_breakdown ───────────────────────────────────────────────────
--- CORRECTION BUG : colonne `date` (pas `date_operation`) sur transactions
 
 CREATE OR REPLACE FUNCTION fn_source_breakdown(
   p_tenant_id  UUID,
@@ -328,6 +323,7 @@ BEGIN
 
   RETURN QUERY
   WITH all_flows AS (
+    -- Transactions (transactions.date)
     SELECT
       CASE COALESCE(t.source, '')
         WHEN 'facture'           THEN 'Facturation'
@@ -358,14 +354,14 @@ BEGIN
 
     UNION ALL
 
-    -- CA depuis factures payées (pas de trigger facture→transaction en prod)
+    -- CA depuis factures payées (factures.created_at car date absente)
     SELECT
       'Facturation' AS module_source,
       'entree'      AS type_flux,
       f.total       AS montant
     FROM factures f
     WHERE f.tenant_id = p_tenant_id AND f.statut = 'payee'
-      AND f.date BETWEEN make_date(v_year, 1, 1) AND make_date(v_year, 12, 31)
+      AND f.created_at::DATE BETWEEN make_date(v_year, 1, 1) AND make_date(v_year, 12, 31)
       AND NOT EXISTS (
         SELECT 1 FROM transactions t2
         WHERE t2.tenant_id = p_tenant_id
@@ -387,7 +383,6 @@ END;
 $$;
 
 -- ── 4. fn_financial_score ────────────────────────────────────────────────────
--- CORRECTION BUG : colonne `date` (pas `date_operation`) sur transactions
 
 CREATE OR REPLACE FUNCTION fn_financial_score(p_tenant_id UUID)
 RETURNS JSON
@@ -414,12 +409,13 @@ BEGIN
     RAISE EXCEPTION 'Access denied';
   END IF;
 
+  -- CA 90 derniers jours depuis factures (created_at car date absente)
   SELECT COALESCE(SUM(total), 0) INTO v_ca
   FROM factures
   WHERE tenant_id = p_tenant_id AND statut = 'payee'
-    AND date >= CURRENT_DATE - INTERVAL '90 days';
+    AND created_at::DATE >= CURRENT_DATE - INTERVAL '90 days';
 
-  -- CORRECTION BUG : colonne `date` sur transactions
+  -- Dépenses 90 derniers jours (transactions.date)
   SELECT COALESCE(SUM(montant), 0) INTO v_dep
   FROM transactions
   WHERE tenant_id = p_tenant_id AND type = 'sortie'
@@ -490,6 +486,6 @@ END;
 $$;
 
 -- ── FIN Migration 150 ────────────────────────────────────────────────────────
--- BUG RACINE CORRIGÉ : transactions.date (pas date_operation)
--- Fonctions mises à jour : fn_finance_kpis, fn_cashflow_monthly,
---                          fn_source_breakdown, fn_financial_score
+-- RÈGLE DÉFINITIVE :
+--   transactions.date       ← colonne réelle (migration 014)
+--   factures.created_at     ← proxy date (migration 010 non appliquée en prod)
