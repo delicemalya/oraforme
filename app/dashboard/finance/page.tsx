@@ -226,7 +226,7 @@ export default function FinancePage() {
     // Transactions récentes (direct — pas dans RPC pour garder la flexibilité)
     const { data: txData } = await supabase
       .from('transactions')
-      .select('id, date:date_operation, libelle, montant, type, categorie, mode_paiement:moyen_paiement, source')
+      .select('id, date_operation:date, libelle, montant, type, categorie, moyen_paiement:mode_paiement, source')
       .eq('tenant_id', tenantId)
       .order('date', { ascending: false })
       .limit(15)
