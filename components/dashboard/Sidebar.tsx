@@ -526,12 +526,10 @@ export default function Sidebar() {
       setModulesActifs([]); setPermissions({}); setPermsLoaded(true); return
     }
     if (tenant.role === 'owner') {
-      // Use modules_actifs from DB (computed from plan+sector at onboarding).
-      // Fall back to ALL_MODULE_IDS only for legacy tenants with no modules_actifs.
-      const ownerModules = tenant.modulesActifs && tenant.modulesActifs.length > 0
-        ? tenant.modulesActifs
-        : ALL_MODULE_IDS
-      setModulesActifs(ownerModules); setPermissions({}); setPermsLoaded(true); return
+      // Modules depuis TenantContext, qui lit exclusivement depuis tenant_modules.
+      // Pas de fallback vers ALL_MODULE_IDS : si tenant_modules est vide,
+      // la migration 156 doit être exécutée pour peupler la table.
+      setModulesActifs(tenant.modulesActifs); setPermissions({}); setPermsLoaded(true); return
     }
     let cancelled = false
     async function loadPerms() {
@@ -541,11 +539,8 @@ export default function Sidebar() {
           .from('tenant_modules').select('module_key')
           .eq('tenant_id', tenant!.tenantId).eq('enabled', true)
         if (!cancelled) {
-          setModulesActifs(
-            tmRows && tmRows.length > 0
-              ? tmRows.map((r: { module_key: string }) => r.module_key)
-              : tenant!.modulesActifs,
-          )
+          // tenant_modules est la seule source — pas de fallback vers modules_actifs
+          setModulesActifs((tmRows ?? []).map((r: { module_key: string }) => r.module_key))
         }
       }
       const { data: perms } = await supabase
@@ -614,7 +609,7 @@ export default function Sidebar() {
       return permissions[id]?.can_view !== false
     }
 
-    // ── Sans secteur : vérifier modules_actifs + permissions ─────────────────
+    // ── Sans secteur : vérifier modulesActifs (depuis tenant_modules via TenantContext) ──
     if (!secteur) {
       if (!modulesActifs.includes(id)) return false
       return permissions[id]?.can_view !== false

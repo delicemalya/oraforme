@@ -12,10 +12,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'action must be activate or deactivate' }, { status: 400 })
   }
 
-  // CRITICAL FIX: deterministic tenant resolution for multi-tenant users
+  // CRITICAL FIX: deterministic tenant resolution pour utilisateurs multi-tenant
   const { data: profile } = await supabase
     .from('profiles')
-    .select('tenant_id, role, tenants(modules_actifs)')
+    .select('tenant_id, role')
     .eq('user_id', user.id)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -27,8 +27,15 @@ export async function POST(req: Request) {
   }
 
   const tenantId = profile.tenant_id as string
-  const tenant = profile.tenants as unknown as { modules_actifs: string[] } | null
-  const current: string[] = tenant?.modules_actifs ?? []
+
+  // Lire la liste actuelle depuis tenant_modules (source unique — jamais modules_actifs)
+  const { data: currentRows } = await supabase
+    .from('tenant_modules')
+    .select('module_key')
+    .eq('tenant_id', tenantId)
+    .eq('enabled', true)
+
+  const current: string[] = (currentRows ?? []).map(r => (r as { module_key: string }).module_key)
 
   const updated: string[] = action === 'activate'
     ? (current.includes(moduleId) ? current : [...current, moduleId])

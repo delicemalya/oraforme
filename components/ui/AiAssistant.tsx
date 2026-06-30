@@ -188,20 +188,25 @@ export default function AiAssistant() {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  // Load tenant info
+  // Load tenant info — modules depuis tenant_modules (source unique, jamais modules_actifs)
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
-      const { data } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
-        .select('tenants(nom_entreprise, modules_actifs)')
+        .select('tenant_id, tenants(nom_entreprise)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle()
-      const t = (data?.tenants as { nom_entreprise?: string; modules_actifs?: string[] } | null)
+      const t = (profile?.tenants as { nom_entreprise?: string } | null)
       setEntreprise(t?.nom_entreprise ?? '')
-      setModules(t?.modules_actifs ?? [])
+      if (profile?.tenant_id) {
+        const { data: tmRows } = await supabase
+          .from('tenant_modules').select('module_key')
+          .eq('tenant_id', profile.tenant_id as string).eq('enabled', true)
+        setModules((tmRows ?? []).map(r => (r as { module_key: string }).module_key))
+      }
     })
   }, [])
 

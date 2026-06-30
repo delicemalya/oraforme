@@ -384,20 +384,25 @@ export default function MIAAPage() {
     },
   ]
 
+  // Modules depuis tenant_modules (source unique — jamais modules_actifs)
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
-      const { data } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
-        .select('tenants(nom_entreprise, modules_actifs)')
+        .select('tenant_id, tenants(nom_entreprise)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle()
-      const tenant = (data?.tenants as { nom_entreprise?: string; modules_actifs?: string[] } | null)
-      const nom = tenant?.nom_entreprise ?? ''
+      const nom = (profile?.tenants as { nom_entreprise?: string } | null)?.nom_entreprise ?? ''
       setEntreprise(nom)
-      setModulesActifs(tenant?.modules_actifs ?? [])
+      if (profile?.tenant_id) {
+        const { data: tmRows } = await supabase
+          .from('tenant_modules').select('module_key')
+          .eq('tenant_id', profile.tenant_id as string).eq('enabled', true)
+        setModulesActifs((tmRows ?? []).map(r => (r as { module_key: string }).module_key))
+      }
       setMessages([{ role: 'bot', text: buildGreeting(nom), ts: Date.now() }])
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps

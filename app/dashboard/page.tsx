@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   // multiple tenants. Prevents "wrong company on refresh" regression.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, tenants(nom_entreprise, modules_actifs, plan, secteur_activite), dynamic_role_id, ecole_role_name')
+    .select('*, tenants(nom_entreprise, plan, secteur_activite), dynamic_role_id, ecole_role_name')
     .eq('user_id', user.id)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
   if (!profile || !profile.tenant_id) redirect('/onboarding')
 
   const tenant = profile.tenants as {
-    nom_entreprise: string; modules_actifs: string[]
+    nom_entreprise: string
     plan: string; secteur_activite: string | null
   } | null
 
@@ -77,10 +77,8 @@ export default async function DashboardPage() {
     .eq('enabled', true)
     .limit(200)
 
-  const modulesActifs: string[] =
-    (tmRows && tmRows.length > 0)
-      ? tmRows.map((r: { module_key: string }) => r.module_key)
-      : (tenant?.modules_actifs ?? [])
+  // tenant_modules est la seule source de vérité — pas de fallback vers modules_actifs
+  const modulesActifs: string[] = (tmRows ?? []).map((r: { module_key: string }) => r.module_key)
 
   const now          = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)

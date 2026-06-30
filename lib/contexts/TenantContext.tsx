@@ -92,9 +92,10 @@ async function fetchTenantForUser(
   // Fix: order by created_at ASC so the oldest (primary) profile always wins,
   // then limit to 1.  When we add a tenant-switcher UI the stored tenant_id
   // from localStorage will override this default instead of breaking isolation.
+  // QUERY 1 — profile + tenant metadata (sans modules_actifs — on ne lit plus jamais cette colonne)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, modules_actifs, secteur_activite, sous_type, plan, taille_entreprise, pays, langue, profil_complet, company_deadline, type_entite, parent_tenant_id, code_groupe, allow_consolidation)')
+    .select('id, role, tenant_id, ecole_role_name, prenom, nom, tenants(nom_entreprise, secteur_activite, sous_type, plan, taille_entreprise, pays, langue, profil_complet, company_deadline, type_entite, parent_tenant_id, code_groupe, allow_consolidation)')
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -102,9 +103,19 @@ async function fetchTenantForUser(
 
   if (!profile) return null
 
+  // QUERY 2 — modules depuis tenant_modules (SEULE SOURCE DE VÉRITÉ — jamais modules_actifs)
+  // tenant_modules est la table normalisée. modules_actifs dans tenants est un cache
+  // en écriture uniquement conservé pour compatibilité admin. On ne le lit plus ici.
+  const { data: tmRows } = await supabase
+    .from('tenant_modules')
+    .select('module_key')
+    .eq('tenant_id', profile.tenant_id as string)
+    .eq('enabled', true)
+
+  const modulesActifs: string[] = (tmRows ?? []).map(r => (r as { module_key: string }).module_key)
+
   const t = profile.tenants as unknown as {
     nom_entreprise:      string
-    modules_actifs:      string[]
     secteur_activite:    string | null
     sous_type?:          string | null
     plan?:               string | null
@@ -132,7 +143,7 @@ async function fetchTenantForUser(
     role:               profile.role as UserRole,
     ecoleRole:          (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null,
     isSuperAdmin:       SUPER_ADMIN_EMAILS.includes(email),
-    modulesActifs:      t?.modules_actifs ?? [],
+    modulesActifs,
     userId,
     userEmail:          email,
     prenom:             (profile as { prenom?: string | null }).prenom ?? null,
