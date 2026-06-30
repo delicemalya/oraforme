@@ -9,7 +9,7 @@ import DashboardShell from '@/components/dashboard/DashboardShell'
 import CompletionLayer from '@/components/dashboard/CompletionLayer'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  // Server-side auth guard — defense-in-depth (proxy.ts is the primary guard)
+  // Server-side auth guard — defense-in-depth (middleware.ts is the primary guard)
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')

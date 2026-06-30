@@ -36,15 +36,20 @@ export async function POST(req: NextRequest) {
   }
 
   // Step 2 — Create tenant
+  // taille_entreprise est obligatoire : détermine les modules accessibles via planGuard.
+  // Sans lui, lib/plan-access.ts tombe en mode TPE (le plus restrictif) pour ce tenant.
+  const taille = (['tpe', 'pme', 'grande'].includes(company.taille_entreprise ?? ''))
+    ? company.taille_entreprise as 'tpe' | 'pme' | 'grande'
+    : 'tpe'
+
   const { data: tenant, error: tenantError } = await supabaseAdmin
     .from('tenants')
     .insert({
-      nom_entreprise:  company.nom_entreprise,
-      plan:            company.plan ?? 'starter',
-      modules_actifs:  modules ?? [],
-      status:          'active',
-      // Additional info stored as json in metadata if table supports it
-      // (secteur, pays, ville, telephone, email_contact, devise, logo_url)
+      nom_entreprise:    company.nom_entreprise,
+      plan:              taille,
+      taille_entreprise: taille,
+      modules_actifs:    modules ?? [],
+      status:            'active',
     })
     .select()
     .single()
