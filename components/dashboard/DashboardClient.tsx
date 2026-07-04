@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, startTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import {
@@ -25,7 +25,7 @@ import { supabase } from '@/lib/supabase'
 import { DataSourceBadge } from '@/components/ui/DataSourceBadge'
 
 export interface DashboardData {
-  tenant: { nom_entreprise: string; modules_actifs: string[]; plan: string }
+  tenant: { nom_entreprise: string; modulesActifs: string[]; plan: string }
   tenantId: string
   kpis: { revenuMois: number; nbEmployes: number; nbArticles: number; nbAlertes: number }
   alerts: { pendingCount: number; pendingAmount: number; lowStockCount: number }
@@ -560,7 +560,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     const ch = supabase
       .channel(`dashboard-${tenantId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'factures', filter: `tenant_id=eq.${tenantId}` },
-        () => { router.refresh() })
+        () => { startTransition(() => { router.refresh() }) })
       .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
     return () => { supabase.removeChannel(ch) }
   }, [tenantId, router])
@@ -677,7 +677,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
               <span style={{ color: '#FFFFFF', fontWeight: 600 }}>{tenant.nom_entreprise}</span>
               {' · '}{t('dash.plan')} <span style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
-              {' · '}{tenant.modules_actifs.length} {t('dash.activeModules').toLowerCase()}
+              {' · '}{tenant.modulesActifs.length} {t('dash.activeModules').toLowerCase()}
             </p>
           </div>
 
@@ -751,7 +751,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             />
           )}
           <TopModulesCard data={chartData.moduleBreakdown} />
-          <QuickLinksCard secteur={secteur} modules={tenant.modules_actifs} />
+          <QuickLinksCard secteur={secteur} modules={tenant.modulesActifs} />
         </div>
       </div>
 
