@@ -3,21 +3,28 @@ import AdminClientsTable from '@/components/admin/AdminClientsTable'
 import { Building2 } from 'lucide-react'
 
 export default async function AdminClientsPage() {
-  const [tenantsRes, profilesRes, facturesRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, modules_actifs, created_at, status').order('created_at', { ascending: false }),
+  const [tenantsRes, profilesRes, facturesRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, created_at, status').order('created_at', { ascending: false }),
     supabaseAdmin.from('profiles').select('id, tenant_id'),
     supabaseAdmin.from('factures').select('id, tenant_id, total, statut'),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants  = tenantsRes.data  ?? []
   const profiles = profilesRes.data ?? []
   const factures = facturesRes.data ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
 
   const tenantRows = tenants.map(t => ({
     id: t.id,
     nom_entreprise: t.nom_entreprise,
     plan: t.plan,
-    modules_actifs: t.modules_actifs ?? [],
+    modules_actifs: tmByTenant.get(t.id) ?? [],
     nb_users:    profiles.filter(p => p.tenant_id === t.id).length,
     nb_factures: factures.filter(f => f.tenant_id === t.id).length,
     ca_genere:   factures.filter(f => f.tenant_id === t.id && f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0),

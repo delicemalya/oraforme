@@ -5,13 +5,21 @@ export default async function NotificationsPage() {
   const now = new Date()
   const startMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-  const [tenantsRes, profilesRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, nom_entreprise, created_at, status, modules_actifs').order('created_at', { ascending: false }).limit(20),
+  const [tenantsRes, profilesRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, created_at, status').order('created_at', { ascending: false }).limit(20),
     supabaseAdmin.from('profiles').select('id, created_at').order('created_at', { ascending: false }).limit(20),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants  = tenantsRes.data  ?? []
   const profiles = profilesRes.data ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
 
   // Generate real-time notifications from actual data
   const notifications = [
@@ -21,7 +29,7 @@ export default async function NotificationsPage() {
       type:     'new_client' as const,
       icon:     Building2,
       title:    'Nouveau client',
-      message:  `${t.nom_entreprise} vient de s'inscrire avec ${(t.modules_actifs ?? []).length} module(s)`,
+      message:  `${t.nom_entreprise} vient de s'inscrire avec ${mods(t.id).length} module(s)`,
       time:     t.created_at,
       read:     false,
       priority: 'info' as const,
@@ -63,7 +71,7 @@ export default async function NotificationsPage() {
       type:     'ai' as const,
       icon:     Bot,
       title:    'MIAA+ actif',
-      message:  `${tenants.filter(t => (t.modules_actifs ?? []).includes('bizbot')).length} entreprises utilisent l'assistant IA`,
+      message:  `${tenants.filter(t => mods(t.id).includes('bizbot')).length} entreprises utilisent l'assistant IA`,
       time:     new Date(now.getTime() -3600000).toISOString(),
       read:     true,
       priority: 'info' as const,

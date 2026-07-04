@@ -33,10 +33,10 @@ export default async function AdminActivitePage() {
   const startOfWeek = new Date(now.getTime() - 7 * 86_400_000).toISOString()
 
   // ── Fetch data in parallel ─────────────────────────────────────────────
-  const [tenantsRes, recentTxRes, txActivityRes, todayTxRes, weekTxRes] = await Promise.all([
+  const [tenantsRes, recentTxRes, txActivityRes, todayTxRes, weekTxRes, tmRes] = await Promise.all([
     supabaseAdmin
       .from('tenants')
-      .select('id, nom_entreprise, plan, modules_actifs')
+      .select('id, nom_entreprise, plan')
       .order('nom_entreprise'),
     // Last 40 transactions — the live activity feed
     supabaseAdmin
@@ -60,9 +60,17 @@ export default async function AdminActivitePage() {
       .from('transactions')
       .select('id, type, montant')
       .gte('created_at', startOfWeek),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants    = tenantsRes.data   ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
   const recentTx   = recentTxRes.data  ?? []
   const txActivity = txActivityRes.data ?? []
   const todayTx    = todayTxRes.data   ?? []
@@ -281,7 +289,7 @@ export default async function AdminActivitePage() {
                   <tr key={t.id} className="hover:bg-white/5/30 transition-colors">
                     <td className="py-2.5 px-3 font-medium text-[var(--text)] truncate max-w-[160px]">{t.nom_entreprise}</td>
                     <td className="py-2.5 px-3 text-[var(--text-secondary)] capitalize">{t.plan ?? '—'}</td>
-                    <td className="py-2.5 px-3 text-right text-[var(--text)]">{(t.modules_actifs ?? []).length}</td>
+                    <td className="py-2.5 px-3 text-right text-[var(--text)]">{mods(t.id).length}</td>
                     <td className="py-2.5 px-3 text-right font-medium text-[var(--text)]">{t.txCount}</td>
                     <td className="py-2.5 px-3 text-[var(--text-secondary)] text-xs">
                       {t.lastDate

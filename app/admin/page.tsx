@@ -15,14 +15,22 @@ export default async function AdminPage() {
   const lastMonth    = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
 
   // ── Parallel fetches ──────────────────────────────────────────────────────────
-  const [tenantsRes, profilesRes, facturesRes, transactionsRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, modules_actifs, created_at, status, deleted_at').order('created_at', { ascending: false }),
+  const [tenantsRes, profilesRes, facturesRes, transactionsRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, created_at, status, deleted_at').order('created_at', { ascending: false }),
     supabaseAdmin.from('profiles').select('id, tenant_id, created_at'),
     supabaseAdmin.from('factures').select('id, tenant_id, total, statut, created_at'),
     supabaseAdmin.from('transactions').select('id, tenant_id, type, montant, date, created_at').order('created_at', { ascending: false }).limit(500),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants      = (tenantsRes.data ?? []).filter(t => !t.deleted_at)
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
   const profiles     = profilesRes.data    ?? []
   const factures     = facturesRes.data    ?? []
   const transactions = transactionsRes.data ?? []
@@ -39,7 +47,7 @@ export default async function AdminPage() {
 
   // ── Revenue KPIs ──────────────────────────────────────────────────────────────
   const moduleRevData = Object.entries(MODULE_PRICES).map(([id, price]) => {
-    const clients = tenants.filter(t => (t.modules_actifs ?? []).includes(id)).length
+    const clients = tenants.filter(t => mods(t.id).includes(id)).length
     return {
       module:  (MODULE_LABELS[id] ?? id).split(' ')[0],
       clients,
@@ -49,7 +57,7 @@ export default async function AdminPage() {
 
   const totalMRR = moduleRevData.reduce((s, m) => s + m.mrr, 0)
   const totalARR = totalMRR * 12
-  const totalModulesSold = tenants.reduce((s, t) => s + (t.modules_actifs?.length ?? 0), 0)
+  const totalModulesSold = tenants.reduce((s, t) => s + mods(t.id).length, 0)
 
   const caTotal = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0)
   const caMonth = factures.filter(f => f.statut === 'payee' && f.created_at >= startOfMonth).reduce((s, f) => s + (f.total ?? 0), 0)
@@ -76,7 +84,7 @@ export default async function AdminPage() {
     id:             t.id,
     nom_entreprise: t.nom_entreprise,
     plan:           t.plan,
-    modules_actifs: t.modules_actifs ?? [],
+    modules_actifs: mods(t.id),
     nb_users:       profiles.filter(p => p.tenant_id === t.id).length,
     nb_factures:    factures.filter(f => f.tenant_id === t.id).length,
     ca_genere:      factures.filter(f => f.tenant_id === t.id && f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0),
@@ -366,7 +374,7 @@ export default async function AdminPage() {
               { label: 'ARR Plateforme',       value: fmtFCFA(totalARR),       icon: '💰', color: '#F59E0B' },
               { label: 'Nouveaux ce mois',     value: newThisMonth.toString(),  icon: '✨', color: '#8B5CF6' },
               { label: 'Factures traitées',    value: factures.length.toString(), icon: '📄', color: '#06B6D4' },
-              { label: 'MIAA+ users',          value: `${tenants.filter(t => (t.modules_actifs ?? []).includes('bizbot')).length * 2}`, icon: '🤖', color: '#F59E0B' },
+              { label: 'MIAA+ users',          value: `${tenants.filter(t => mods(t.id).includes('bizbot')).length * 2}`, icon: '🤖', color: '#F59E0B' },
             ].map((stat, i) => (
               <div key={i} className="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
                 <div className="text-2xl mb-2">{stat.icon}</div>

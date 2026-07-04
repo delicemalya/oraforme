@@ -13,12 +13,13 @@ export default async function FinanceDashboardPage() {
   const endPrev     = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59).toISOString()
   const startYear   = new Date(now.getFullYear(), 0, 1).toISOString()
 
-  const [tenantsRes, facturesRes, txRes, txPrevRes, txYearRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, modules_actifs, status, created_at').eq('status', 'active'),
+  const [tenantsRes, facturesRes, txRes, txPrevRes, txYearRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, status, created_at').eq('status', 'active'),
     supabaseAdmin.from('factures').select('id, tenant_id, total, statut, created_at').gte('created_at', startYear),
     supabaseAdmin.from('transactions').select('id, tenant_id, amount, type, created_at').gte('created_at', startMonth),
     supabaseAdmin.from('transactions').select('id, amount, type').gte('created_at', startPrev).lte('created_at', endPrev),
     supabaseAdmin.from('transactions').select('id, amount, type, created_at').gte('created_at', startYear),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants  = tenantsRes.data  ?? []
@@ -26,12 +27,18 @@ export default async function FinanceDashboardPage() {
   const txMonth  = txRes.data       ?? []
   const txPrev   = txPrevRes.data   ?? []
   const txYear   = txYearRes.data   ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const getTenantMods = (tid: string) => tmByTenant.get(tid) ?? []
 
   // MRR = sum of active tenants' module prices
-  const mrr = tenants.reduce((sum, t) => {
-    const mods = (t.modules_actifs ?? []) as string[]
-    return sum + mods.reduce((s, m) => s + (MODULE_PRICES[m] ?? 0), 0)
-  }, 0)
+  const mrr = tenants.reduce((sum, t) =>
+    sum + getTenantMods(t.id).reduce((s, m) => s + (MODULE_PRICES[m] ?? 0), 0)
+  , 0)
   const arr = mrr * 12
 
   // Revenue collected this year (paid factures)
@@ -61,8 +68,7 @@ export default async function FinanceDashboardPage() {
   // Top tenants by MRR
   const topTenants = tenants
     .map(t => {
-      const mods = (t.modules_actifs ?? []) as string[]
-      const tenantMrr = mods.reduce((s, m) => s + (MODULE_PRICES[m] ?? 0), 0)
+      const tenantMrr = getTenantMods(t.id).reduce((s, m) => s + (MODULE_PRICES[m] ?? 0), 0)
       const tenantCa  = factures.filter(f => f.tenant_id === t.id && f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0)
       return { ...t, tenantMrr, tenantCa }
     })
@@ -73,7 +79,7 @@ export default async function FinanceDashboardPage() {
   // Module revenue breakdown
   const modulesBreakdown = Object.entries(MODULE_PRICES)
     .map(([id, price]) => {
-      const count = tenants.filter(t => ((t.modules_actifs ?? []) as string[]).includes(id)).length
+      const count = tenants.filter(t => getTenantMods(t.id).includes(id)).length
       return { id, label: MODULE_LABELS[id] ?? id, price, count, rev: price * count }
     })
     .filter(m => m.count > 0)
@@ -256,7 +262,7 @@ export default async function FinanceDashboardPage() {
                       {t.nom_entreprise}
                     </Link>
                   </td>
-                  <td className="px-5 py-3 text-[12px] text-gray-500">{((t.modules_actifs ?? []) as string[]).length} module(s)</td>
+                  <td className="px-5 py-3 text-[12px] text-gray-500">{getTenantMods(t.id).length} module(s)</td>
                   <td className="px-5 py-3">
                     <span className="text-[13px] font-bold text-amber-700">{fmtFCFA(t.tenantMrr)}</span>
                   </td>

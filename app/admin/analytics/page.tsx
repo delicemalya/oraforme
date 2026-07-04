@@ -6,14 +6,22 @@ import { TrendingUp, Users, Globe, Zap } from 'lucide-react'
 export default async function AnalyticsPage() {
   const now = new Date()
 
-  const [tenantsRes, profilesRes, facturesRes, txRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, modules_actifs, plan, created_at, status').order('created_at'),
+  const [tenantsRes, profilesRes, facturesRes, txRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, plan, created_at, status').order('created_at'),
     supabaseAdmin.from('profiles').select('id, tenant_id, created_at').order('created_at'),
     supabaseAdmin.from('factures').select('total, statut, created_at'),
     supabaseAdmin.from('transactions').select('type, montant, date'),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants  = tenantsRes.data  ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
   const profiles = profilesRes.data ?? []
   const factures = facturesRes.data ?? []
   const txAll    = txRes.data       ?? []
@@ -42,15 +50,15 @@ export default async function AnalyticsPage() {
 
   // Module chart
   const moduleData = Object.entries(MODULE_PRICES).map(([id, price]) => {
-    const clients = tenants.filter(t => (t.modules_actifs ?? []).includes(id)).length
+    const clients = tenants.filter(t => mods(t.id).includes(id)).length
     return { module: id.slice(0, 8), clients, mrr: clients * price }
   }).sort((a, b) => b.mrr - a.mrr).slice(0, 8)
 
   // Key stats
   const totalMRR = Object.entries(MODULE_PRICES).reduce((s, [id, price]) =>
-    s + tenants.filter(t => (t.modules_actifs ?? []).includes(id)).length * price, 0)
+    s + tenants.filter(t => mods(t.id).includes(id)).length * price, 0)
   const avgModulesPerClient = tenants.length > 0
-    ? tenants.reduce((s, t) => s + (t.modules_actifs?.length ?? 0), 0) / tenants.length
+    ? tenants.reduce((s, t) => s + mods(t.id).length, 0) / tenants.length
     : 0
   const caTotal = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0)
 

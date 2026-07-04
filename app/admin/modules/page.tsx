@@ -3,15 +3,19 @@ import { MODULE_LABELS, MODULE_PRICES, MODULE_ICONS, fmtFCFA } from '@/lib/admin
 import { Package } from 'lucide-react'
 
 export default async function AdminModulesPage() {
-  const { data: tenants } = await supabaseAdmin
-    .from('tenants')
-    .select('id, modules_actifs')
-
-  const allTenants = tenants ?? []
+  const [tenantsRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id'),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
+  ])
+  const allTenants = tenantsRes.data ?? []
   const nbTenants = allTenants.length
+  const tmByModule = new Map<string, number>()
+  for (const r of (tmRes.data ?? [])) {
+    tmByModule.set(r.module_key, (tmByModule.get(r.module_key) ?? 0) + 1)
+  }
 
   const moduleStats = Object.keys(MODULE_LABELS).map(id => {
-    const clientsAvec = allTenants.filter(t => (t.modules_actifs ?? []).includes(id)).length
+    const clientsAvec = tmByModule.get(id) ?? 0
     const mrr = clientsAvec * (MODULE_PRICES[id] ?? 0)
     const penetration = nbTenants > 0 ? Math.round((clientsAvec / nbTenants) * 100) : 0
     return { id, clientsAvec, mrr, penetration }

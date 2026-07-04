@@ -1,14 +1,8 @@
 'use server'
 
-import { createClient } from '@supabase/supabase-js'
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
+import { supabaseAdmin } from '@/lib/supabase-server'
 import { computeModules, type TailleEntreprise, type SecteurId } from '@/lib/plans'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
 
 export async function createTenantAndProfile(data: {
   nomEntreprise:   string
@@ -102,7 +96,6 @@ export async function createTenantAndProfile(data: {
     niu:               data.niu || null,
     plan:              planLegacy,
     secteur_activite:  data.secteurActivite,
-    modules_actifs:    modules,
     taille_entreprise: data.taille,
     sous_type:         data.sousType || null,
     pays:              data.pays || 'CG',
@@ -150,7 +143,7 @@ export async function createTenantAndProfile(data: {
 
   if (moduleErr) {
     console.error('[onboarding] tenant_modules error:', moduleErr)
-    // Non-fatal: modules_actifs is the fallback
+    return { error: `Erreur initialisation modules : ${moduleErr.message}` }
   }
 
   return { success: true }

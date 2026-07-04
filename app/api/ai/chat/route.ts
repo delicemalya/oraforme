@@ -1,21 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getMIAASystemPrompt } from '@/lib/miaa-prompt'
+import { requireTenant } from '@/lib/api/require-tenant'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + tenant isolation — modules NEVER trusted from client
+    const ctx = await requireTenant(req)
+    if (!ctx.ok) return ctx.error
+
     const body = await req.json() as {
       message: string
       entreprise?: string
       module?: string
-      modules_actifs?: string[]
       user_role?: string
       history?: { role: 'user' | 'assistant'; content: string }[]
     }
 
-    const { message, entreprise, module: mod, modules_actifs, user_role, history } = body
+    const { message, entreprise, module: mod, user_role, history } = body
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
@@ -24,10 +29,19 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Load actual modules from DB — client-provided list is ignored (security)
+    const { data: moduleRows } = await supabaseAdmin
+      .from('tenant_modules')
+      .select('module_key')
+      .eq('tenant_id', ctx.tid)
+      .eq('enabled', true)
+
+    const modules_actifs = (moduleRows ?? []).map(r => r.module_key)
+
     const systemPrompt = getMIAASystemPrompt({
       module:          mod            ?? 'dashboard',
       entreprise:      entreprise     ?? 'PME africaine',
-      modules_actifs:  modules_actifs ?? [],
+      modules_actifs,
       user_role:       user_role      ?? 'gestionnaire',
     })
 

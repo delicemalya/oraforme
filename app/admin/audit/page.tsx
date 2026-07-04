@@ -4,20 +4,28 @@ import { FileSearch, Clock, Shield, Building2, Users, Package, AlertTriangle } f
 export default async function AuditPage() {
   const now = new Date()
 
-  const [tenantsRes, profilesRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, nom_entreprise, created_at, status, modules_actifs').order('created_at', { ascending: false }).limit(30),
+  const [tenantsRes, profilesRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, created_at, status').order('created_at', { ascending: false }).limit(30),
     supabaseAdmin.from('profiles').select('id, user_id, tenant_id, role, created_at').order('created_at', { ascending: false }).limit(30),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants  = tenantsRes.data  ?? []
   const profiles = profilesRes.data ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
 
   // Reconstruct audit log from real data
   const auditEvents = [
     ...tenants.slice(0, 8).map(t => ({
       type:    'tenant_created' as const,
       entity:  t.nom_entreprise,
-      detail:  `Nouvelle entreprise inscrite — ${(t.modules_actifs ?? []).length} module(s)`,
+      detail:  `Nouvelle entreprise inscrite — ${mods(t.id).length} module(s)`,
       time:    t.created_at,
       severity: 'info' as const,
       icon:    Building2,

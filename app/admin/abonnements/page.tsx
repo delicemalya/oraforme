@@ -3,16 +3,22 @@ import { MODULE_PRICES, MODULE_LABELS, MODULE_ICONS, MODULE_DESCS, fmtFCFA } fro
 import { Package, TrendingUp, DollarSign, Building2 } from 'lucide-react'
 
 export default async function AbonnementsPage() {
-  const { data: tenants } = await supabaseAdmin
-    .from('tenants')
-    .select('id, nom_entreprise, plan, modules_actifs, created_at, status')
-    .order('created_at', { ascending: false })
-
-  const allTenants = tenants ?? []
+  const [tenantsRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, created_at, status').order('created_at', { ascending: false }),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
+  ])
+  const allTenants = tenantsRes.data ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
 
   // Per-module stats
   const moduleStats = Object.entries(MODULE_PRICES).map(([id, price]) => {
-    const clients = allTenants.filter(t => (t.modules_actifs ?? []).includes(id))
+    const clients = allTenants.filter(t => mods(t.id).includes(id))
     return {
       id,
       label:   MODULE_LABELS[id]  ?? id,
@@ -34,7 +40,7 @@ export default async function AbonnementsPage() {
     plan,
     count: allTenants.filter(t => t.plan === plan).length,
     mrr:   allTenants.filter(t => t.plan === plan).reduce((s, t) =>
-      s + (t.modules_actifs ?? []).reduce((ms: number, m: string) => ms + (MODULE_PRICES[m] ?? 0), 0), 0),
+      s + mods(t.id).reduce((ms: number, m: string) => ms + (MODULE_PRICES[m] ?? 0), 0), 0),
   }))
 
   return (

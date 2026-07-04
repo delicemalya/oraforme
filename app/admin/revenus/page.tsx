@@ -4,19 +4,27 @@ import { TrendingUp } from 'lucide-react'
 import { ModuleRevenueChart, GrowthChart } from '@/components/admin/AdminChartsClient'
 
 export default async function AdminRevenusPage() {
-  const [tenantsRes, facturesRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, modules_actifs, plan, created_at'),
+  const [tenantsRes, facturesRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, plan, created_at'),
     supabaseAdmin.from('factures').select('total, statut, created_at'),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const tenants = tenantsRes.data ?? []
   const factures = facturesRes.data ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
 
   // ── MRR par module ──
   const moduleRevData = Object.entries(MODULE_PRICES).map(([id, price]) => ({
     module: (MODULE_LABELS[id] ?? id).split(' ')[0],
-    clients: tenants.filter(t => (t.modules_actifs ?? []).includes(id)).length,
-    mrr: tenants.filter(t => (t.modules_actifs ?? []).includes(id)).length * price,
+    clients: tenants.filter(t => mods(t.id).includes(id)).length,
+    mrr: tenants.filter(t => mods(t.id).includes(id)).length * price,
   })).sort((a, b) => b.mrr - a.mrr)
 
   const totalMRR = moduleRevData.reduce((s, m) => s + m.mrr, 0)
@@ -28,7 +36,7 @@ export default async function AdminRevenusPage() {
   // ── MRR par plan ──
   const mrrByPlan = { starter: 0, business: 0, premium: 0 } as Record<string, number>
   tenants.forEach(t => {
-    const planMrr = (t.modules_actifs ?? []).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
+    const planMrr = mods(t.id).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
     mrrByPlan[t.plan] = (mrrByPlan[t.plan] ?? 0) + planMrr
   })
 

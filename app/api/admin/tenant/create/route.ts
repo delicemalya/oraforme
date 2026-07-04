@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
       nom_entreprise:    company.nom_entreprise,
       plan:              taille,
       taille_entreprise: taille,
-      modules_actifs:    modules ?? [],
       status:            'active',
     })
     .select()
@@ -90,7 +89,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: profileError.message }, { status: 500 })
   }
 
-  // Step 5 — Try to send invitation email via Resend (non-blocking)
+  // Step 5 — Populate tenant_modules (source of truth for TenantContext/Dashboard)
+  const moduleList = (modules ?? []) as string[]
+  if (moduleList.length > 0) {
+    const { error: moduleErr } = await supabaseAdmin
+      .from('tenant_modules')
+      .insert(moduleList.map(key => ({ tenant_id: tenant.id, module_key: key, enabled: true })))
+
+    if (moduleErr) {
+      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id)
+      await supabaseAdmin.from('tenants').delete().eq('id', tenant.id)
+      return NextResponse.json({ error: `Erreur initialisation modules : ${moduleErr.message}` }, { status: 500 })
+    }
+  }
+
+  // Step 6 — Try to send invitation email via Resend (non-blocking)
   try {
     const emailBody = {
       from:    'Oraforme <noreply@oraforms.com>',

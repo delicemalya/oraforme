@@ -9,12 +9,19 @@ const USD_TO_FCFA = 600
 
 export default async function AdminMIAAPage() {
   // Count tenants with bizbot module active
-  const { data: tenants } = await supabaseAdmin
-    .from('tenants')
-    .select('id, nom_entreprise, modules_actifs')
-
-  const allTenants = tenants ?? []
-  const tenantsWithMIAA = allTenants.filter(t => (t.modules_actifs ?? []).includes('bizbot'))
+  const [tenantsRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise'),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
+  ])
+  const allTenants = tenantsRes.data ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const mods = (tid: string) => tmByTenant.get(tid) ?? []
+  const tenantsWithMIAA = allTenants.filter(t => mods(t.id).includes('bizbot'))
   const nbTenantsWithMIAA = tenantsWithMIAA.length
 
   // Estimated usage metrics (no conversation logging table yet)
@@ -152,7 +159,7 @@ export default async function AdminMIAAPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--text)] truncate">{t.nom_entreprise}</p>
-                  <p className="text-xs text-[var(--text-secondary)]">{(t.modules_actifs ?? []).length} modules</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{mods(t.id).length} modules</p>
                 </div>
               </div>
             ))}

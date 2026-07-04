@@ -9,24 +9,31 @@ export default async function FinanceAnalyticsPage() {
   const startPrev  = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
   const endPrev    = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59).toISOString()
 
-  const [tenantsRes, facturesRes, txYearRes] = await Promise.all([
-    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, modules_actifs, status, created_at'),
+  const [tenantsRes, facturesRes, txYearRes, tmRes] = await Promise.all([
+    supabaseAdmin.from('tenants').select('id, nom_entreprise, plan, status, created_at'),
     supabaseAdmin.from('factures').select('id, tenant_id, total, statut, created_at').gte('created_at', startYear),
     supabaseAdmin.from('transactions').select('id, amount, type, created_at').gte('created_at', startYear),
+    supabaseAdmin.from('tenant_modules').select('tenant_id, module_key').eq('enabled', true),
   ])
 
   const allTenants = tenantsRes.data ?? []
   const factures   = facturesRes.data ?? []
   const txYear     = txYearRes.data   ?? []
+  const tmByTenant = new Map<string, string[]>()
+  for (const r of (tmRes.data ?? [])) {
+    const a = tmByTenant.get(r.tenant_id) ?? []
+    a.push(r.module_key)
+    tmByTenant.set(r.tenant_id, a)
+  }
+  const getTenantMods = (tid: string) => tmByTenant.get(tid) ?? []
 
   const activeTenants    = allTenants.filter(t => t.status !== 'suspended')
   const suspendedTenants = allTenants.filter(t => t.status === 'suspended')
 
   // MRR calculation
-  const mrr = activeTenants.reduce((sum, t) => {
-    const mods = (t.modules_actifs ?? []) as string[]
-    return sum + mods.reduce((s, m) => s + (MODULE_PRICES[m] ?? 0), 0)
-  }, 0)
+  const mrr = activeTenants.reduce((sum, t) =>
+    sum + getTenantMods(t.id).reduce((s, m) => s + (MODULE_PRICES[m] ?? 0), 0)
+  , 0)
   const arr = mrr * 12
 
   // Revenue trend (12 months)
@@ -69,7 +76,7 @@ export default async function FinanceAnalyticsPage() {
   // Module distribution
   const moduleStats = Object.entries(MODULE_PRICES)
     .map(([id, price]) => {
-      const clients = activeTenants.filter(t => ((t.modules_actifs ?? []) as string[]).includes(id)).length
+      const clients = activeTenants.filter(t => getTenantMods(t.id).includes(id)).length
       return { id, label: MODULE_LABELS[id] ?? id, price, clients, rev: price * clients }
     })
     .filter(m => m.clients > 0)
@@ -261,10 +268,9 @@ export default async function FinanceAnalyticsPage() {
               }
               const estMrr = activeTenants
                 .filter(t => t.plan === p.plan)
-                .reduce((s, t) => {
-                  const mods = (t.modules_actifs ?? []) as string[]
-                  return s + mods.reduce((ms, m) => ms + (MODULE_PRICES[m] ?? 0), 0)
-                }, 0)
+                .reduce((s, t) =>
+                  s + getTenantMods(t.id).reduce((ms, m) => ms + (MODULE_PRICES[m] ?? 0), 0)
+                , 0)
               return (
                 <div key={p.plan}>
                   <div className="flex items-center justify-between mb-1.5">
@@ -307,7 +313,7 @@ export default async function FinanceAnalyticsPage() {
               <p className="text-[11px] text-gray-400">Modules / client</p>
               <p className="text-[18px] font-bold text-blue-700">
                 {activeTenants.length > 0
-                  ? (activeTenants.reduce((s, t) => s + ((t.modules_actifs ?? []) as string[]).length, 0) / activeTenants.length).toFixed(1)
+                  ? (activeTenants.reduce((s, t) => s + getTenantMods(t.id).length, 0) / activeTenants.length).toFixed(1)
                   : '0'}
               </p>
             </div>

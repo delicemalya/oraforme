@@ -10,20 +10,22 @@ import {
 export default async function AdminClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const [tenantRes, profilesRes, facturesRes] = await Promise.all([
+  const [tenantRes, profilesRes, facturesRes, tmRes] = await Promise.all([
     supabaseAdmin.from('tenants').select('*').eq('id', id).maybeSingle(),
     supabaseAdmin.from('profiles').select('*').eq('tenant_id', id),
     supabaseAdmin.from('factures').select('*').eq('tenant_id', id).order('created_at', { ascending: false }).limit(20),
+    supabaseAdmin.from('tenant_modules').select('module_key').eq('tenant_id', id).eq('enabled', true),
   ])
 
   const tenant = tenantRes.data
   if (!tenant) notFound()
 
-  const profiles = profilesRes.data ?? []
-  const factures = facturesRes.data ?? []
+  const profiles    = profilesRes.data ?? []
+  const factures    = facturesRes.data ?? []
+  const moduleKeys  = (tmRes.data ?? []).map(r => r.module_key)
 
   const caGenere = factures.filter(f => f.statut === 'payee').reduce((s, f) => s + (f.total ?? 0), 0)
-  const mrr = (tenant.modules_actifs ?? []).reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
+  const mrr = moduleKeys.reduce((s: number, m: string) => s + (MODULE_PRICES[m] ?? 0), 0)
 
   const STATUT_COLORS: Record<string, string> = {
     payee: 'text-[#DC2626] bg-[var(--surface)]/10 border-[#0F172A]/30',
@@ -57,7 +59,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: Building2, label: 'Plan', value: tenant.plan ?? '—', color: '#DC2626' },
-          { icon: Package, label: 'Modules actifs', value: `${(tenant.modules_actifs ?? []).length}`, color: '#DC2626' },
+          { icon: Package, label: 'Modules actifs', value: `${moduleKeys.length}`, color: '#DC2626' },
           { icon: FileText, label: 'CA généré', value: fmtFCFA(caGenere), color: '#0F172A' },
           { icon: Users, label: 'MRR estimé', value: fmtFCFA(mrr), color: '#DC2626' },
         ].map(c => (
@@ -80,13 +82,13 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
             Modules actifs
           </h2>
           <div className="space-y-2">
-            {(tenant.modules_actifs ?? []).map((m: string) => (
+            {moduleKeys.map((m: string) => (
               <div key={m} className="flex items-center justify-between px-3 py-2 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
                 <span className="text-sm text-[var(--text)]">{MODULE_LABELS[m] ?? m}</span>
                 <span className="text-xs text-[#DC2626] font-medium">{fmtFCFA(MODULE_PRICES[m] ?? 0)}/mois</span>
               </div>
             ))}
-            {(tenant.modules_actifs ?? []).length === 0 && (
+            {moduleKeys.length === 0 && (
               <p className="text-sm text-[var(--text-secondary)] text-center py-4">Aucun module actif</p>
             )}
           </div>

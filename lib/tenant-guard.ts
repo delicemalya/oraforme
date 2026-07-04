@@ -1,10 +1,15 @@
 /**
- * tenant-guard.ts — Server-side tenant isolation helper
+ * @deprecated Use `lib/api/require-tenant.ts` instead.
+ * That module provides the same guard with a richer API (role enforcement,
+ * API-key auth, plan access checks) and a consistent TenantResult type.
  *
- * Usage in any API route:
- *   const { ctx, error } = await requireTenant()
- *   if (error) return error
- *   // ctx.tenantId is verified and safe to use
+ * C-002 DEBT D-009 (tracked): 75+ routes still import from this file.
+ * Full migration deferred to C-003 due to breaking API change:
+ *   OLD: const { ctx, error } = await requireTenant()  → ctx.tenantId, ctx.userId
+ *   NEW: const ctx = await requireTenant(req)          → ctx.tid, ctx.userId
+ *
+ * DO NOT add new imports of this file. New routes must use require-tenant.ts.
+ * See: lib/api/require-tenant.ts
  */
 
 import { supabaseAdmin } from '@/lib/supabase-server'
