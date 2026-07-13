@@ -2,7 +2,8 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { computeModules, type TailleEntreprise, type SecteurId } from '@/lib/plans'
+import { buildTenantProfile } from '@/lib/tenant/TenantProfileFactory'
+import type { TailleEntreprise, SecteurId } from '@/lib/plans'
 
 export async function createTenantAndProfile(data: {
   nomEntreprise:   string
@@ -22,7 +23,7 @@ export async function createTenantAndProfile(data: {
 
   if (authError || !user) return { error: 'Non authentifié' }
 
-  // ── Server-side validation — never trust the client (W2-C2) ──────────────────
+  // ── Server-side validation ────────────────────────────────────────────────────
   const VALID_TAILLES = new Set<string>(['tpe', 'pme', 'grande'])
   if (!VALID_TAILLES.has(data.taille)) {
     return { error: 'Plan invalide.' }
@@ -81,31 +82,37 @@ export async function createTenantAndProfile(data: {
     }
   }
 
-  // ── Compute modules from plan + sector ─────────────────────────────────────
-  const modules = computeModules(
-    data.taille,
-    data.secteurActivite as SecteurId
-  )
+  // ── Build complete tenant profile (single source of truth) ───────────────────
+  const profile = buildTenantProfile({
+    nomEntreprise: data.nomEntreprise,
+    taille:        data.taille,
+    secteur:       data.secteurActivite,
+    pays:          data.pays || 'CG',
+    langue:        data.langue || 'fr',
+    telephone:     data.telephone,
+    adresse:       data.adresse,
+    sousType:      data.sousType,
+    niu:           data.niu,
+  })
 
-  // Map taille → legacy plan field (for backward compat)
-  const planLegacy = data.taille === 'tpe' ? 'starter' : data.taille === 'pme' ? 'pro' : 'enterprise'
-
-  // ── Create tenant ──────────────────────────────────────────────────────────
+  // ── Create tenant — no field is NULL by construction ──────────────────────────
   const tenantInsert: Record<string, unknown> = {
-    nom_entreprise:    data.nomEntreprise,
-    niu:               data.niu || null,
-    plan:              planLegacy,
-    secteur_activite:  data.secteurActivite,
-    taille_entreprise: data.taille,
-    sous_type:         data.sousType || null,
-    pays:              data.pays || 'CG',
-    langue:            data.langue || 'fr',
-    // Profil completion tracking
-    profil_complet:    false,
-    company_deadline:  new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+    nom_entreprise:      data.nomEntreprise,
+    niu:                 data.niu || null,
+    plan:                profile.plan,
+    secteur_activite:    data.secteurActivite,
+    taille_entreprise:   profile.taille_entreprise,
+    type_entite:         profile.type_entite,
+    allow_consolidation: profile.allow_consolidation,
+    code_groupe:         profile.code_groupe,
+    niveau_hierarchie:   profile.niveau_hierarchie,
+    sous_type:           data.sousType || null,
+    pays:                data.pays || 'CG',
+    langue:              data.langue || 'fr',
+    profil_complet:      false,
+    company_deadline:    new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
   }
 
-  // Optional columns (may not exist in older deployments — handled gracefully)
   if (data.telephone) tenantInsert.telephone = data.telephone
   if (data.adresse)   tenantInsert.adresse   = data.adresse
 
@@ -136,10 +143,10 @@ export async function createTenantAndProfile(data: {
     return { error: `Erreur profil : ${profileErr.message}` }
   }
 
-  // ── Populate tenant_modules ────────────────────────────────────────────────
+  // ── Populate tenant_modules (source of truth for runtime access) ──────────────
   const { error: moduleErr } = await supabaseAdmin
     .from('tenant_modules')
-    .insert(modules.map(key => ({ tenant_id: tenant.id, module_key: key, enabled: true })))
+    .insert(profile.modules.map(key => ({ tenant_id: tenant.id, module_key: key, enabled: true })))
 
   if (moduleErr) {
     console.error('[onboarding] tenant_modules error:', moduleErr)

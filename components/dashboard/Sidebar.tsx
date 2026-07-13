@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { logAuthClient } from '@/lib/identity/log-client'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   LayoutDashboard, FileText, Package, Users,
@@ -700,6 +701,7 @@ export default function Sidebar() {
   const dashActive = isActive(dashHref, true)
 
   async function handleLogout() {
+    logAuthClient({ event_type: 'LOGOUT' })
     await supabase.auth.signOut()
     window.location.href = '/login'
   }

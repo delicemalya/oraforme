@@ -32,20 +32,26 @@ const PME_EXTRA = [
   'audit-plans', 'audit-rapports',
 ]
 
-const GRANDE_EXTRA = [
+// N3 — Intelligence Entreprise (EXCLUSIVE Compagnie — nouveaux comptes)
+// Les comptes Business existants conservent ces modules via Grandfather Policy (tenant_modules)
+const COMPAGNIE_INTEL = [
   'bi', 'bi-dg', 'direction', 'finance', 'analytics',
   'audit', 'api-keys', 'abonnement',
 ]
 
-const COMPAGNIE_EXTRA = [
+// N4 — Architecture Multi-Entités (EXCLUSIF Compagnie)
+const COMPAGNIE_MULTI = [
   'groupe', 'groupe-vue', 'entity-switcher',
-  'email-management', 'social-media',
+  'consolidation', 'intercompany', 'budget-groupe',
+  'tresorerie-groupe', 'direction-groupe', 'rapports-groupe',
+  'bi-groupe', 'gouvernance', 'email-management', 'social-media',
+  'validation-hierarchique', 'audit-groupe',
 ]
 
 export const PLAN_MODULES: Record<TailleEntreprise, string[]> = {
-  tpe:    TPE_MODULES,
-  pme:    [...TPE_MODULES, ...PME_EXTRA, ...GRANDE_EXTRA],
-  grande: [...TPE_MODULES, ...PME_EXTRA, ...GRANDE_EXTRA, ...COMPAGNIE_EXTRA],
+  tpe:    TPE_MODULES,                                                            // N1 — 13 modules
+  pme:    [...TPE_MODULES, ...PME_EXTRA],                                        // N1+N2 — 32 modules
+  grande: [...TPE_MODULES, ...PME_EXTRA, ...COMPAGNIE_INTEL, ...COMPAGNIE_MULTI], // N1+N2+N3+N4 — 55 modules
 }
 
 // ── Modules spécifiques au secteur (ajoutés quel que soit le plan) ─────────────
@@ -136,12 +142,12 @@ export const PLAN_CONFIG: Record<TailleEntreprise, {
     miaa:       'MIAA+ Premium',
     features: [
       'Tout Entrepreneur inclus',
-      'Comptabilité OHADA & Fiscalité',
+      'Comptabilité OHADA complète & Fiscalité',
       'Stock, Achats & Workflows',
-      'Analytics & Business Intelligence',
-      'Audit & Conformité',
+      'Audit & Conformité OHADA',
       'MIAA+ Premium (IA avancée)',
       'GED & Documents',
+      'Modules sectoriels (Restaurant, École, Santé…)',
       '25 utilisateurs inclus',
     ],
   },

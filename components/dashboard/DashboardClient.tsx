@@ -2,6 +2,7 @@
 
 import { useState, useEffect, startTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useRefresh } from '@/lib/refresh/RefreshOrchestrator'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import {
   TrendingUp, Users, Package, AlertTriangle, Download,
@@ -534,6 +535,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
   const { fmt: fmtCurrency } = useFmt()
   const { t } = useLocale()
   const router = useRouter()
+  const { refreshRoute } = useRefresh()
   const { theme, isExplicit } = useTheme()
   const { tenant, tenantId, kpis, alerts, recentActivity, chartData } = data
   // Si l'utilisateur a choisi une couleur explicitement → override le brandColor du banner
@@ -560,7 +562,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
     const ch = supabase
       .channel(`dashboard-${tenantId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'factures', filter: `tenant_id=eq.${tenantId}` },
-        () => { startTransition(() => { router.refresh() }) })
+        () => { refreshRoute('realtime') })
       .subscribe(status => { setIsRealtime(status === 'SUBSCRIBED') })
     return () => { supabase.removeChannel(ch) }
   }, [tenantId, router])
@@ -676,7 +678,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
             </h1>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
               <span style={{ color: '#FFFFFF', fontWeight: 600 }}>{tenant.nom_entreprise}</span>
-              {' · '}{t('dash.plan')} <span style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700 }}>{tenant.plan.toUpperCase()}</span>
+              {' · '}<span style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 700 }}>{ { starter: 'Entrepreneur', pro: 'Business', enterprise: 'Compagnie' }[tenant.plan ?? ''] ?? tenant.plan?.toUpperCase() }</span>
               {' · '}{tenant.modulesActifs.length} {t('dash.activeModules').toLowerCase()}
             </p>
           </div>
@@ -692,7 +694,7 @@ export default function DashboardClient({ data, userName }: { data: DashboardDat
               <Download size={12} /> Export
             </Link>
             <button
-              onClick={() => router.refresh()}
+              onClick={() => refreshRoute('user-action')}
               style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', padding: '8px 10px', borderRadius: 10 }}
               title={t('dash.refresh')}
             >

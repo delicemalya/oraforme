@@ -1,0 +1,125 @@
+# .semgrep.yml — Oraforme
+# Mode open-source uniquement — sans Semgrep Pro engine.
+# Règles communautaires appliquées via le script scripts/semgrep.sh
+# ou via le workflow CI .github/workflows/semgrep.yml
+#
+# Pour lancer manuellement :
+#   npm run semgrep
+#
+# Règles communautaires utilisées (p/...) :
+#   p/typescript      — bonnes pratiques TypeScript
+#   p/javascript      — sécurité JavaScript
+#   p/react           — sécurité et patterns React
+#   p/nextjs          — règles spécifiques Next.js
+#   p/security-audit  — audit de sécurité général
+#   p/owasp-top-ten   — OWASP Top 10
+#   p/jwt             — gestion des JWT
+#   p/secrets         — détection de secrets / clés exposées
+
+rules:
+
+  # ── Sécurité : pas de dangerouslySetInnerHTML sans commentaire explicite ──────
+  - id: no-unreviewed-dangerouslySetInnerHTML
+    patterns:
+      - pattern: dangerouslySetInnerHTML={{ __html: $X }}
+      - pattern-not-inside: |
+          // xss-safe
+          dangerouslySetInnerHTML={{ __html: $X }}
+    message: |
+      dangerouslySetInnerHTML expose l'application aux attaques XSS.
+      Ajouter le commentaire `// xss-safe` au-dessus si le contenu est bien assaini.
+    languages: [typescript, javascript]
+    severity: ERROR
+    paths:
+      include:
+        - "app/**"
+        - "components/**"
+
+  # ── Sécurité : console.log interdit en production (pas dans les scripts) ──────
+  - id: no-console-log-production
+    pattern: console.log(...)
+    message: "Supprimer console.log avant de merger en production."
+    languages: [typescript, javascript]
+    severity: WARNING
+    paths:
+      include:
+        - "app/**"
+        - "components/**"
+        - "lib/**"
+      exclude:
+        - "scripts/**"
+        - "**/*.test.*"
+        - "**/*.spec.*"
+
+  # ── Sécurité : variables d'env côté client exposées ─────────────────────────
+  - id: no-secret-in-next-public
+    pattern: process.env.NEXT_PUBLIC_$KEY
+    message: |
+      NEXT_PUBLIC_* est exposé côté client dans le bundle JS.
+      Ne jamais y mettre de clé secrète (SUPABASE_SERVICE_ROLE, JWT_SECRET, etc.).
+      Utiliser uniquement les variables sans préfixe NEXT_PUBLIC_ pour les secrets.
+    languages: [typescript, javascript]
+    severity: INFO
+    metadata:
+      category: security
+      cwe: "CWE-200: Exposure of Sensitive Information"
+
+  # ── Sécurité : supabaseAdmin jamais importé côté client ────────────────────
+  - id: no-supabase-admin-in-client
+    patterns:
+      - pattern: import { supabaseAdmin } from $PATH
+      - pattern-not-inside: |
+          'use server'
+          ...
+    message: |
+      supabaseAdmin (SERVICE_ROLE) ne doit jamais être utilisé dans un composant client.
+      Il doit rester exclusivement dans les Server Actions ('use server') et les API routes.
+    languages: [typescript]
+    severity: ERROR
+    paths:
+      include:
+        - "components/**"
+        - "app/**/page.tsx"
+
+  # ── Sécurité : SQL dynamique sans paramètres liés ──────────────────────────
+  - id: no-raw-sql-interpolation
+    patterns:
+      - pattern: |
+          .from($TABLE).select(`...$X...`)
+      - pattern: |
+          .from($TABLE).filter(`...$X...`)
+    message: |
+      Éviter l'interpolation de variables dans les requêtes Supabase.
+      Utiliser les paramètres liés (.eq(), .in(), .filter()) pour prévenir les injections.
+    languages: [typescript, javascript]
+    severity: WARNING
+
+  # ── Qualité : await manquant sur une promesse Supabase ──────────────────────
+  - id: missing-await-supabase
+    patterns:
+      - pattern: |
+          const { data: $D } = supabase.from($T).$METHOD(...)
+      - pattern-not: |
+          const { data: $D } = await supabase.from($T).$METHOD(...)
+    message: "Appel Supabase sans await — les données seront toujours undefined."
+    languages: [typescript, javascript]
+    severity: ERROR
+
+  # ── Qualité : Server Action sans 'use server' ────────────────────────────────
+  - id: server-action-missing-directive
+    patterns:
+      - pattern: |
+          export async function $FN(...) { ... }
+      - pattern-inside: |
+          // @server-action
+          ...
+      - pattern-not-inside: |
+          'use server'
+          ...
+    message: "Les Server Actions doivent commencer par 'use server'."
+    languages: [typescript]
+    severity: WARNING
+    paths:
+      include:
+        - "app/**/actions.ts"
+        - "app/**/actions.tsx"

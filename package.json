@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "semgrep": "bash scripts/semgrep.sh",
+    "semgrep:json": "bash scripts/semgrep.sh --json"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",

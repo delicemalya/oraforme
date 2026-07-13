@@ -34,9 +34,15 @@ const REQUIRES_GRANDE = new Set([
 ])
 
 // ── Modules exclusifs Compagnie (grande) — bloqués pour tpe ET pme ────────────
+// N4 — Architecture Multi-Entités (toujours exclusif, jamais accordé par Grandfather Policy)
 const REQUIRES_COMPAGNIE = new Set([
+  // Existants
   'groupe', 'groupe-vue', 'entity-switcher',
   'email-management', 'social-media',
+  // Nouveaux N4 — jamais présents dans tenant_modules des anciens PME
+  'consolidation', 'intercompany', 'budget-groupe',
+  'tresorerie-groupe', 'direction-groupe', 'rapports-groupe',
+  'bi-groupe', 'gouvernance', 'validation-hierarchique', 'audit-groupe',
 ])
 
 // ── Modules TOUJOURS visibles (peu importe le plan) ───────────────────────────

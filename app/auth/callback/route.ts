@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { logAuthEvent } from '@/lib/identity/auth-logger'
+import { buildTrace } from '@/lib/identity/auth-trace'
+import {
+  buildPolicyEvent,
+  buildPolicyContext,
+  evaluatePolicies,
+  executeAction,
+  writePolicyDecision,
+} from '@/lib/identity/policy'
 
 /**
  * Auth Callback Handler
@@ -52,10 +61,17 @@ export async function GET(request: NextRequest) {
   )
 
   // Exchange the one-time code for a persistent session
+  const t0 = Date.now()
   const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
   if (exchangeError) {
     console.error('[auth/callback] exchangeCodeForSession failed:', exchangeError.message)
+    const trace = buildTrace(request)
+    void logAuthEvent('LOGIN_FAILED', {
+      trace,
+      errorCode:    exchangeError.name,
+      errorMessage: exchangeError.message,
+    })
     return NextResponse.redirect(`${origin}/login?error=confirmation_failed`)
   }
 
@@ -66,8 +82,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=session_failed`)
   }
 
-  // Password reset: always redirect to the reset page, skip profile check
+  // Password reset: log and redirect
   if (next === '/reset-password') {
+    const trace = buildTrace(request, { userId: user.id })
+    void logAuthEvent('EMAIL_VERIFIED', { trace, provider: 'email' })
     return NextResponse.redirect(`${origin}/reset-password`)
   }
 
@@ -81,7 +99,46 @@ export async function GET(request: NextRequest) {
     .maybeSingle()
 
   if (profile?.tenant_id) {
-    // Returning user — go to their dashboard
+    // Returning user — run policy pipeline before admitting
+    const provider = (user.identities ?? []).some(i => i.provider !== 'email') ? 'google' : 'email'
+    const trace    = buildTrace(request, { userId: user.id, tenantId: profile.tenant_id })
+
+    const policyEvent = buildPolicyEvent({
+      type:       'LOGIN_SUCCESS',
+      userId:     user.id,
+      tenantId:   profile.tenant_id,
+      ip:         trace.ip,
+      device:     trace.device,
+      browser:    trace.browser,
+      provider,
+      durationMs: Date.now() - t0,
+      requestId:  trace.requestId,
+    })
+
+    const policyContext = await buildPolicyContext(policyEvent, profile.tenant_id)
+    const policyResult  = evaluatePolicies(policyContext, { stopOnFirstDeny: true })
+
+    // Fire-and-forget: execute actions + persist history
+    void Promise.all(
+      policyResult.decisions.map(async (decision) => {
+        const actionResult = await executeAction(decision)
+        void writePolicyDecision(decision, actionResult.success)
+      })
+    ).catch(err => console.error('[auth/callback] policy pipeline error:', err))
+
+    if (policyResult.denyDecision) {
+      const deny = policyResult.denyDecision
+      await supabase.auth.signOut()
+      return NextResponse.redirect(
+        `${origin}/login?error=policy_denied&reason=${encodeURIComponent(deny.reason)}`
+      )
+    }
+
+    void logAuthEvent('LOGIN_SUCCESS', {
+      trace,
+      provider,
+      durationMs: Date.now() - t0,
+    })
     return NextResponse.redirect(`${origin}/dashboard`)
   }
 
@@ -100,6 +157,13 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // New user — complete onboarding
+  // New user — log email verified and redirect to onboarding
+  const isOAuthUser = (user.identities ?? []).some(i => i.provider !== 'email')
+  const trace = buildTrace(request, { userId: user.id })
+  void logAuthEvent('EMAIL_VERIFIED', {
+    trace,
+    provider: isOAuthUser ? 'google' : 'email',
+    durationMs: Date.now() - t0,
+  })
   return NextResponse.redirect(`${origin}${next}`)
 }

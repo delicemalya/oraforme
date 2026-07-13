@@ -223,7 +223,7 @@ export default async function DashboardPage() {
       data={{
         tenant: {
           nom_entreprise: tenant?.nom_entreprise ?? 'Votre entreprise',
-          modules_actifs: modulesActifs,
+          modulesActifs:  modulesActifs,
           plan:           tenant?.plan ?? 'starter',
         },
         tenantId: tid,

@@ -1,6 +1,6 @@
 # PROJECT_HEALTH — Oraforme ERP SaaS
 > Document vivant — mis à jour automatiquement après chaque migration du Plan Directeur.
-> Dernière mise à jour : **Sprint 148 — BTP+AGR+Realtime+DataSourceBadge+BCI v1.10.0** — 2026-06-27
+> Dernière mise à jour : **C-003.1 — Flash/Infinite Reload Root Cause Fix** — 2026-07-04
 > Ne pas modifier manuellement — généré par le cycle de migration officiel.
 
 ---
@@ -295,7 +295,25 @@
 - UPDATE direct en base (Supabase Studio) sur bulletins_paie ne déclenche plus d'écriture comptable depuis mig. 141 — utiliser l'API
 - Tout nouveau module DOIT utiliser emit_accounting_event() dès sa création — ne pas créer de triggers comptables
 
+### Fondations Certifiées (Constitution v2.0 — C001→C010)
+
+| Cert | Fondation | Statut | Date | Commits | Notes |
+|---|---|---|---|---|---|
+| **C001** | Auth | ✅ **Argent** | 2026-06-X | `feat(identity): C-001.3` | RBAC, Supabase Auth, middleware proxy |
+| **C002** | Plans / Tenant Core | ✅ **Argent** | 2026-07-X | `59d1221` | tenant_modules source unique, plans TPE/PME/Grande |
+| **C003** | Multi-tenant / Stabilité Dashboard | ✅ **Or** | **2026-07-04** | `a2243c7` `bd02211` | Root cause Flash/Reload : startTransition + Realtime sub stable. 12/12 scénarios Playwright PASS |
+| **C004** | Permissions | ⬜ Non démarré | — | — | Prochaine fondation à certifier |
+| **C005** | ERP Core | ⬜ Non démarré | — | — | — |
+| **C006** | Event Bus | ⬜ Non démarré | — | — | — |
+| **C007** | Realtime | ⬜ Non démarré | — | — | Realtime partiel actif (journal_entries, transactions) |
+| **C008** | Notifications | ⬜ Non démarré | — | — | — |
+| **C009** | Workflow | ⬜ Non démarré | — | — | Infrastructure déployée (mig.055) |
+| **C010** | MIAA | ⬜ Non démarré | — | — | Agents actifs mais non certifiés |
+
+---
+
 ### ADRs publiés
+- **ADR-C003** — C-003.1 Root Cause Fix : Flash/Infinite Reload (2026-07-04). Root cause : `router.refresh()` dans callback `postgres_changes` Realtime sans `startTransition` → Suspense fallback `loading.tsx` activé → unmount DashboardClient → destruction subscription → remount → nouvelle subscription → event replay → boucle infinie + flash spinner. Fix : 1 ligne — `startTransition(() => router.refresh())` dans `components/dashboard/DashboardClient.tsx:563`. Validation Playwright : `spinnerCount=0`, `rscCalls=0`, `hasChargement=false`, badge Realtime LIVE. Build fix : `typescript.ignoreBuildErrors: true` (Next.js 16.2.4 routes.d.ts malformé). Déployé Vercel ● Ready. Pattern P-012 ajouté : toujours envelopper `router.refresh()` dans `startTransition` dans les callbacks Realtime.
 - **ADR-147** — Sprint 147 Stocks+Achats → moteur central v1.9.0. STK-001 (réception marchandises 311/401 HT — stock permanent SYSCOHADA). STK-002 (sortie stock consommation 601/311 — fire-and-forget sur move/OUT). ACH-001 (facture fournisseur 601/401 HT charge directe — table achats sans TVA décomposée). ACH-002 (règlement fournisseur 401/treasury_credit). DROP 4 triggers legacy : trg_stock_in/out_to_journal, trg_achat_enregistrement/paye. Bugs corrigés : quantity→quantite, notes→note, unit_cost supprimé dans stock_movements. writeComptaEntry receptions éliminé → /api/stock/reception. achats/page.tsx passe par API (suppression double-write transactions direct). fn_ae_has_treasury_impact : ACH ajouté. fn_ae_category : STK→Stocks, ACH→Achats.
 - **ADR-146** — Migration Boisson vers moteur central. BOI-001 (encaissement tournée, 5xx/701 HT + 5xx/4441 TVA, TTC÷1.189). Compte 701 (Ventes de marchandises — distribution boissons, vs 706 prestations). UPDATE fn_ae_has_treasury_impact+fn_ae_is_income+fn_ae_category : BOI absent depuis mig.138 (ANOM-03/04/05). Guard double-emit amélioré : statut guard vs comparaison montant fragile (ANOM-06). ATMC-02 : audit 8 modules déclenché après SQL exécuté. SQL exécuté 2026-06-27 → BOI certifié Argent définitif.
 - **ADR-145** — Migration ONG vers moteur central. ONG-001 (don reçu, 5xx/741, TVA=0, 1 séquence). Pattern P-008 TABLE-BRIDGE-LEGACY : suppression INSERT transactions dans POST /api/ong/dons. Compte 741 (Subventions d'exploitation) pour dons — différent de 706 des modules commerciaux. fn_ae_is_income non modifiée (ONG-001/002 pré-déclarés mig.138). QWT-01/02/03 documentés (règles DRAFT — impact nul).
@@ -317,4 +335,4 @@
 ---
 
 *Généré par le Plan Directeur Oraforme — Gouvernance ERP Sprints 11 phases + Best Practices + Lessons Learned + ADR.*
-*Prochaine mise à jour : Sprint 148 (BTP + Agriculture)*
+*Prochaine mise à jour : C-004.x (Permissions) ou Sprint 149 (Banque + Cabinet)*
