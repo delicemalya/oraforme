@@ -80,6 +80,19 @@ export const SECTOR_EXTRA_MODULES: Partial<Record<SecteurId, string[]>> = {
     'recrutement-mad', 'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
     'recrutement-miaa',
   ],
+  supermarche: [
+    'commerce', 'commerce-catalogue', 'commerce-clients', 'commerce-analytics',
+    'stock', 'achats',
+  ],
+  boutique: [
+    'commerce', 'commerce-catalogue', 'commerce-clients', 'commerce-analytics',
+    'stock',
+  ],
+  assurance: [
+    'assurance-direction', 'assurance-polices', 'assurance-sinistres',
+    'assurance-clients', 'assurance-produits', 'assurance-partenaires',
+    'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
+  ],
 }
 
 /** Calcule la liste finale des modules pour un tenant */

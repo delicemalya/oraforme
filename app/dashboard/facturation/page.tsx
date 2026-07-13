@@ -410,6 +410,10 @@ export default function FacturationPage() {
   const subtotalLive = lignes.reduce((s, l) => s + l.price * l.quantity, 0)
   const { tva: tvaLive, ca: caLive, ttc: ttcLive } = calculerTVA(subtotalLive)
 
+  const tvaLabel  = `TVA ${parseFloat((paysFiscal.tva.taux_normal * 100).toFixed(2))}%`
+  const caAddTax  = paysFiscal.tva.taxes_additionnelles?.[0]
+  const caLabel   = caAddTax ? `${caAddTax.code ?? 'CA'} ${parseFloat((caAddTax.taux * 100).toFixed(0))}%` : ''
+
   function updateLigne(i: number, key: keyof FactureLigne, val: string | number) {
     setLignes(prev => prev.map((l, idx) => {
       if (idx !== i) return l
@@ -417,6 +421,43 @@ export default function FacturationPage() {
       if (key === 'price' || key === 'quantity') next.total = next.price * next.quantity
       return next
     }))
+  }
+
+  // ── Journal SYSCOHADA — pont facture → comptabilité ──────────────────────────
+
+  async function postFactureToJournal(
+    facId: string, invoiceNo: string, dateOp: string,
+    ht: number, tvaAmt: number, caAmt: number,
+  ) {
+    if (!tenantId || ht <= 0) return
+    const year = new Date(dateOp).getFullYear()
+    await supabase.from('journal_entries').delete()
+      .eq('tenant_id', tenantId).eq('source', 'facture').eq('source_id', facId)
+    const base = { tenant_id: tenantId, date_operation: dateOp, source: 'facture',
+      source_id: facId, fiscal_year: year, piece_number: invoiceNo, reference_piece: invoiceNo }
+    const entries: object[] = [
+      { ...base, debit_account: '411', credit_account: '701',  montant: ht,     libelle: `Vente — ${invoiceNo}` },
+      { ...base, debit_account: '411', credit_account: '4441', montant: tvaAmt, libelle: `TVA facturée — ${invoiceNo}` },
+    ]
+    if (caAmt > 0)
+      entries.push({ ...base, debit_account: '411', credit_account: '4442', montant: caAmt, libelle: `CA additionnel — ${invoiceNo}` })
+    await supabase.from('journal_entries').insert(entries)
+  }
+
+  async function postPaiementToJournal(
+    facId: string, invoiceNo: string, ttc: number, dateOp: string,
+  ) {
+    if (!tenantId || ttc <= 0) return
+    const { count } = await supabase.from('journal_entries')
+      .select('*', { count: 'exact', head: true })
+      .eq('tenant_id', tenantId).eq('source', 'paiement_facture').eq('source_id', facId)
+    if ((count ?? 0) > 0) return
+    await supabase.from('journal_entries').insert({
+      tenant_id: tenantId, date_operation: dateOp,
+      debit_account: '521', credit_account: '411', montant: ttc,
+      libelle: `Règlement — ${invoiceNo}`, source: 'paiement_facture', source_id: facId,
+      fiscal_year: new Date(dateOp).getFullYear(), piece_number: invoiceNo, reference_piece: invoiceNo,
+    })
   }
 
   // ── Save ─────────────────────────────────────────────────────────────────────
@@ -441,6 +482,8 @@ export default function FacturationPage() {
       if (errDel) { showToast('Erreur suppression lignes : ' + errDel.message); setSaving(false); return }
       const { error: errIns } = await supabase.from('facture_lignes').insert(lignes.filter(l => l.description).map(l => ({ invoice_id: editId, description: l.description, price: l.price, quantity: l.quantity, total: l.total })))
       if (errIns) { showToast('Erreur insertion lignes : ' + errIns.message); setSaving(false); return }
+      if (finalStatut === 'envoyee' || finalStatut === 'payee')
+        await postFactureToJournal(editId, invoiceNum, dateVal, ht, tvaFinal, caFinal)
       showToast('Facture mise à jour !')
     } else {
       const { data: fac, error: errCreate } = await supabase.from('factures').insert({
@@ -456,6 +499,8 @@ export default function FacturationPage() {
         const { error: errLignes } = await supabase.from('facture_lignes').insert(lignesValides.map(l => ({ invoice_id: fac.id, description: l.description, price: l.price, quantity: l.quantity, total: l.total })))
         if (errLignes) { showToast('Facture créée, erreur lignes : ' + errLignes.message); setSaving(false); setShowForm(false); resetForm(); load(); return }
       }
+      if (finalStatut === 'envoyee' || finalStatut === 'payee')
+        await postFactureToJournal(fac.id, invoiceNum, dateVal, ht, tvaFinal, caFinal)
       showToast('Facture créée !')
     }
     setSaving(false)
@@ -467,6 +512,9 @@ export default function FacturationPage() {
   // ── Delete / Statut ───────────────────────────────────────────────────────────
 
   async function del(id: string) {
+    if (tenantId) await supabase.from('journal_entries').delete()
+      .eq('tenant_id', tenantId).eq('source_id', id)
+      .in('source', ['facture', 'paiement_facture'])
     const { error } = await supabase.from('factures').delete().eq('id', id)
     if (error) { showToast('Erreur suppression : ' + error.message); return }
     setFactures(f => f.filter(x => x.id !== id))
@@ -484,6 +532,13 @@ export default function FacturationPage() {
     const fac = factures.find(f => f.id === confirmStatut.id)
     await updateStatut(confirmStatut.id, confirmStatut.next)
     if (confirmStatut.next === 'payee' && confirmStatut.current !== 'payee' && fac && tenantId) {
+      const ht  = fac.subtotal ?? fac.montant_ht ?? 0
+      const { tva: tvaAmt, ca: caAmt, ttc } = calculerTVA(ht)
+      const dateOp = new Date().toISOString().split('T')[0]
+      const invoiceNo = fac.invoice_number ?? ''
+      const facDate   = fac.date ?? dateOp
+      await postFactureToJournal(confirmStatut.id, invoiceNo, facDate, ht, tvaAmt, caAmt)
+      await postPaiementToJournal(confirmStatut.id, invoiceNo, ttc || fac.total || 0, dateOp)
       const { count } = await supabase
         .from('transactions')
         .select('*', { count: 'exact', head: true })
@@ -491,14 +546,13 @@ export default function FacturationPage() {
         .eq('source', 'facture')
         .eq('source_id', confirmStatut.id)
       if ((count ?? 0) === 0) {
-        const ttc = calculerTVA(fac.subtotal ?? fac.montant_ht ?? 0).ttc
         const { error: errTx } = await supabase.from('transactions').insert({
           tenant_id:     tenantId,
           type:          'entree',
           categorie:     'Facture payée',
-          description:   `Facture ${fac.invoice_number ?? fac.id.slice(0, 8)} — ${fac.client_name ?? fac.client_nom ?? ''}`,
+          description:   `Facture ${invoiceNo || fac.id.slice(0, 8)} — ${fac.client_name ?? fac.client_nom ?? ''}`,
           montant:       ttc || fac.total || 0,
-          date:          new Date().toISOString().split('T')[0],
+          date:          dateOp,
           mode_paiement: 'virement',
           source:        'facture',
           source_id:     confirmStatut.id,
@@ -888,8 +942,8 @@ export default function FacturationPage() {
                     </div>
                     <div className="p-4 space-y-2">
                       <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.subtotal')}</span><span className="text-[#101729] font-medium">{fmt(subtotalLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.tva18')}</span><span className="text-[#101729]">{fmt(tvaLive)}</span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.ca5')}</span><span className="text-[#101729]">{fmt(caLive)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{tvaLabel}</span><span className="text-[#101729]">{fmt(tvaLive)}</span></div>
+                      {caLive > 0 && <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{caLabel}</span><span className="text-[#101729]">{fmt(caLive)}</span></div>}
                       <div className="border-t border-[var(--border)] pt-3 flex justify-between">
                         <span className="text-base font-bold text-[#101729]">{t('invoice.totalTTC')}</span>
                         <span className="text-xl font-bold text-[#DC2626]">{fmt(ttcLive)}</span>
@@ -1024,8 +1078,8 @@ export default function FacturationPage() {
                     return (
                       <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 space-y-2">
                         <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.subtotal')}</span><span className="text-[#101729]">{fmt(ht)}</span></div>
-                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{t('invoice.tva18')}</span><span className="text-[#101729]">{fmt(tva)}</span></div>
-                        {ca > 0 && <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">Taxes additionnelles</span><span className="text-[#101729]">{fmt(ca)}</span></div>}
+                        <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{tvaLabel}</span><span className="text-[#101729]">{fmt(tva)}</span></div>
+                        {ca > 0 && <div className="flex justify-between text-sm"><span className="text-[var(--text-secondary)]">{caLabel}</span><span className="text-[#101729]">{fmt(ca)}</span></div>}
                         <div className="border-t border-[var(--border)] pt-2 flex justify-between">
                           <span className="font-bold text-[#101729]">{t('invoice.totalTTC')}</span>
                           <span className="font-bold text-[#DC2626] text-lg">{fmt(ttc)}</span>
