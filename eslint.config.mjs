@@ -62,6 +62,151 @@ const loiKPlugin = {
   },
 };
 
+// ── LOI-L inline plugin — Unique Fiscal Calculator (C-004.3) ─────────────────
+const loiLPlugin = {
+  rules: {
+    "unique-fiscal-calculator": {
+      meta: {
+        type: "problem",
+        messages: {
+          hardcodedFiscalRate:
+            "[LOI-L] Taux fiscal codé en dur interdit. Utiliser calculerTVA() de usePays() (UI) ou lib/fiscal/universal-tax-engine.ts (serveur). Voir docs/LOI-L-FISCAL-CALCULATOR.md",
+        },
+      },
+      create(context) {
+        // TVA rates in CEMAC zone — any multiplication by these in app code is a violation
+        const FISCAL_RATES = new Set([0.18, 0.175, 0.19, 0.16, 0.15]);
+        return {
+          BinaryExpression(node) {
+            if (node.operator !== "*") return;
+            const checkLiteral = (lit) => {
+              if (lit.type === "Literal" && typeof lit.value === "number" && FISCAL_RATES.has(lit.value)) {
+                context.report({ node, messageId: "hardcodedFiscalRate" });
+              }
+            };
+            checkLiteral(node.right);
+            checkLiteral(node.left);
+          },
+        };
+      },
+    },
+  },
+};
+
+// ── LOI-M inline plugin — Unique Tenant Creator (C-004.3) ────────────────────
+const loiMPlugin = {
+  rules: {
+    "unique-tenant-creator": {
+      meta: {
+        type: "problem",
+        messages: {
+          tenantWrite:
+            "[LOI-M] Écriture directe dans tenants interdite depuis les composants. Utiliser app/onboarding ou app/api/admin. Voir docs/LOI-M-TENANT-CREATOR.md",
+        },
+      },
+      create(context) {
+        function extractTableMethod(node) {
+          if (node.type !== "CallExpression") return null;
+          const { callee } = node;
+          if (callee.type !== "MemberExpression") return null;
+          const obj = callee.object;
+          const method = callee.property.name;
+          if (
+            obj.type === "CallExpression" &&
+            obj.callee.type === "MemberExpression" &&
+            obj.callee.property.name === "from" &&
+            obj.arguments.length > 0 &&
+            obj.arguments[0].type === "Literal" &&
+            typeof obj.arguments[0].value === "string"
+          ) {
+            return { table: obj.arguments[0].value, method };
+          }
+          return null;
+        }
+        return {
+          CallExpression(node) {
+            const info = extractTableMethod(node);
+            if (!info) return;
+            if (info.table === "tenants" && ["insert", "update", "upsert"].includes(info.method)) {
+              context.report({ node, messageId: "tenantWrite" });
+            }
+          },
+        };
+      },
+    },
+  },
+};
+
+// ── LOI-N inline plugin — Unique Permission Engine (C-004.3) ─────────────────
+const loiNPlugin = {
+  rules: {
+    "unique-permission-engine": {
+      meta: {
+        type: "problem",
+        messages: {
+          rawRoleCheck:
+            "[LOI-N] Comparaison de rôle directe interdite. Utiliser usePermissions().isOwner, isAdmin, ou can(). Voir docs/LOI-N-PERMISSION-ENGINE.md",
+        },
+      },
+      create(context) {
+        // Permission roles — not AI message roles ('user', 'assistant', 'bot', 'system')
+        const PERMISSION_ROLES = new Set([
+          "owner", "admin", "manager", "accountant",
+          "finance", "membre", "staff", "directeur",
+        ]);
+        return {
+          BinaryExpression(node) {
+            if (node.operator !== "===" && node.operator !== "!==") return;
+            const checkSide = (side, other) => {
+              if (
+                side.type === "MemberExpression" &&
+                side.property.type === "Identifier" &&
+                side.property.name === "role" &&
+                other.type === "Literal" &&
+                typeof other.value === "string" &&
+                PERMISSION_ROLES.has(other.value)
+              ) {
+                context.report({ node, messageId: "rawRoleCheck" });
+              }
+            };
+            checkSide(node.left, node.right);
+            checkSide(node.right, node.left);
+          },
+        };
+      },
+    },
+  },
+};
+
+// ── LOI-O inline plugin — Unique Realtime Manager (C-004.3) ──────────────────
+const loiOPlugin = {
+  rules: {
+    "unique-realtime-manager": {
+      meta: {
+        type: "suggestion",
+        messages: {
+          directChannel:
+            "[LOI-O] Subscription Realtime directe — enregistrer ce fichier dans KNOWN_REALTIME_CHANNELS (loi-o-realtime-manager.test.ts) et planifier la migration vers RealtimeOrchestrator. Voir docs/LOI-O-REALTIME-MANAGER.md",
+        },
+      },
+      create(context) {
+        return {
+          CallExpression(node) {
+            const { callee } = node;
+            if (
+              callee.type === "MemberExpression" &&
+              callee.property.type === "Identifier" &&
+              callee.property.name === "channel"
+            ) {
+              context.report({ node, messageId: "directChannel" });
+            }
+          },
+        };
+      },
+    },
+  },
+};
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -94,6 +239,91 @@ const eslintConfig = defineConfig([
     plugins: { "loi-k": loiKPlugin },
     rules: {
       "loi-k/unique-writer": "error",
+    },
+  },
+  // ── LOI-L — Unique Fiscal Calculator (C-004.3) ──────────────────────────────
+  // Interdit les calculs TVA/IS/CNSS avec taux hardcodés dans les composants.
+  // Chemin autorisé : calculerTVA() de usePays() ou lib/fiscal/universal-tax-engine.ts
+  // Voir docs/LOI-L-FISCAL-CALCULATOR.md
+  {
+    files: [
+      "app/dashboard/**/*.{ts,tsx}",
+      "app/api/**/*.{ts,tsx}",
+      "components/**/*.{ts,tsx}",
+    ],
+    ignores: [
+      "lib/fiscal/**",
+      "lib/fiscalite/**",
+      "lib/countries/**",
+      "lib/contexts/PaysContext.tsx",
+      "lib/architecture/**",
+    ],
+    plugins: { "loi-l": loiLPlugin },
+    rules: {
+      "loi-l/unique-fiscal-calculator": "error",
+    },
+  },
+  // ── LOI-M — Unique Tenant Creator (C-004.3) ──────────────────────────────────
+  // Interdit l'écriture directe dans tenants depuis les composants dashboard.
+  // Chemins autorisés : app/onboarding, app/api/admin
+  // Voir docs/LOI-M-TENANT-CREATOR.md
+  {
+    files: [
+      "app/dashboard/**/*.{ts,tsx}",
+      "components/dashboard/**/*.{ts,tsx}",
+    ],
+    ignores: [
+      // DET-M-001 : Group management — à migrer vers app/api/admin/groupe
+      "app/dashboard/groupe/**",
+      "lib/architecture/**",
+    ],
+    plugins: { "loi-m": loiMPlugin },
+    rules: {
+      "loi-m/unique-tenant-creator": "error",
+    },
+  },
+  // ── LOI-N — Unique Permission Engine (C-004.3) ───────────────────────────────
+  // Interdit les comparaisons profile.role === 'owner' hors du Permission Core.
+  // Chemin autorisé : const { isOwner, isAdmin } = usePermissions()
+  // Voir docs/LOI-N-PERMISSION-ENGINE.md
+  {
+    files: [
+      "app/dashboard/**/*.{ts,tsx}",
+      "components/dashboard/**/*.{ts,tsx}",
+    ],
+    ignores: [
+      // Pages admin — affichent les rôles bruts pour monitoring
+      "app/admin/**",
+      // Gestion d'équipe — gère les rôles des membres
+      "app/dashboard/equipe/**",
+      // DET-N-001 : dashboard root page — fallback isFinancial
+      "app/dashboard/page.tsx",
+      // DET-N-002/003 : ecole pages — ecoleRole mapping
+      "app/dashboard/ecole/**",
+      "lib/architecture/**",
+    ],
+    plugins: { "loi-n": loiNPlugin },
+    rules: {
+      "loi-n/unique-permission-engine": "error",
+    },
+  },
+  // ── LOI-O — Unique Realtime Manager (C-004.3) ────────────────────────────────
+  // Avertit dès qu'un nouveau canal Realtime est créé sans être enregistré.
+  // Règle "warn" car les 9 canaux existants sont des dettes DET-O-001 à DET-O-009.
+  // Voir docs/LOI-O-REALTIME-MANAGER.md
+  {
+    files: [
+      "app/dashboard/**/*.{ts,tsx}",
+      "app/api/**/*.{ts,tsx}",
+      "components/**/*.{ts,tsx}",
+    ],
+    ignores: [
+      "lib/architecture/**",
+    ],
+    plugins: { "loi-o": loiOPlugin },
+    rules: {
+      // "warn" car les 9 canaux existants sont connus — CI gate via Vitest LOI-O
+      "loi-o/unique-realtime-manager": "warn",
     },
   },
   // ── CACHE READ FORBIDDEN — F-003 Architecture Rule ──────────────────────────
