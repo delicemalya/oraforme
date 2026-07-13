@@ -423,41 +423,51 @@ export default function FacturationPage() {
     }))
   }
 
-  // ── Journal SYSCOHADA — pont facture → comptabilité ──────────────────────────
+  // ── Pont comptable — délègue au moteur central emit_accounting_event (migration 138/139) ──
+  // Ne jamais écrire directement dans journal_entries : une seule autorité d'écriture.
 
-  async function postFactureToJournal(
-    facId: string, invoiceNo: string, dateOp: string,
-    ht: number, tvaAmt: number, caAmt: number,
-  ) {
-    if (!tenantId || ht <= 0) return
-    const year = new Date(dateOp).getFullYear()
-    await supabase.from('journal_entries').delete()
-      .eq('tenant_id', tenantId).eq('source', 'facture').eq('source_id', facId)
-    const base = { tenant_id: tenantId, date_operation: dateOp, source: 'facture',
-      source_id: facId, fiscal_year: year, piece_number: invoiceNo, reference_piece: invoiceNo }
-    const entries: object[] = [
-      { ...base, debit_account: '411', credit_account: '701',  montant: ht,     libelle: `Vente — ${invoiceNo}` },
-      { ...base, debit_account: '411', credit_account: '4441', montant: tvaAmt, libelle: `TVA facturée — ${invoiceNo}` },
-    ]
-    if (caAmt > 0)
-      entries.push({ ...base, debit_account: '411', credit_account: '4442', montant: caAmt, libelle: `CA additionnel — ${invoiceNo}` })
-    await supabase.from('journal_entries').insert(entries)
+  async function emitFactureEvent(params: {
+    eventType: 'FAC-001' | 'FAC-002'
+    facId: string; invoiceNo: string; clientName: string; dateOp: string
+    ht: number; tva: number; ttc: number; ca: number; modePaiement?: string
+  }) {
+    if (!tenantId) return
+    const { eventType, facId, invoiceNo, clientName, dateOp, ht, tva, ttc, ca, modePaiement = 'virement' } = params
+    await supabase.rpc('emit_accounting_event', {
+      p_tenant_id:     tenantId,
+      p_event_type:    eventType,
+      p_source_module: 'facturation',
+      p_source_table:  'factures',
+      p_source_id:     facId,
+      p_montant_ht:    eventType === 'FAC-001' ? ht  : 0,
+      p_montant_tva:   eventType === 'FAC-001' ? tva : 0,
+      p_montant_ttc:   ttc,
+      p_libelle:       eventType === 'FAC-001'
+        ? `Facture ${invoiceNo} — ${clientName}`
+        : `Règlement ${invoiceNo} — ${clientName}`,
+      p_date_event:    dateOp,
+      p_fiscal_year:   new Date(dateOp).getFullYear(),
+      p_metadata:      { piece_number: invoiceNo, client_name: clientName, ca, country_code: paysGeo?.code ?? 'CG', mode_paiement: modePaiement },
+    })
   }
 
-  async function postPaiementToJournal(
-    facId: string, invoiceNo: string, ttc: number, dateOp: string,
-  ) {
-    if (!tenantId || ttc <= 0) return
-    const { count } = await supabase.from('journal_entries')
-      .select('*', { count: 'exact', head: true })
-      .eq('tenant_id', tenantId).eq('source', 'paiement_facture').eq('source_id', facId)
-    if ((count ?? 0) > 0) return
-    await supabase.from('journal_entries').insert({
-      tenant_id: tenantId, date_operation: dateOp,
-      debit_account: '521', credit_account: '411', montant: ttc,
-      libelle: `Règlement — ${invoiceNo}`, source: 'paiement_facture', source_id: facId,
-      fiscal_year: new Date(dateOp).getFullYear(), piece_number: invoiceNo, reference_piece: invoiceNo,
-    })
+  async function reverseFactureEvents(facId: string) {
+    if (!tenantId) return
+    const { data: events } = await supabase
+      .from('accounting_events')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .eq('source_table', 'factures')
+      .eq('source_id', facId)
+      .eq('status', 'processed')
+      .in('event_type', ['FAC-001', 'FAC-002'])
+    for (const ev of events ?? []) {
+      await supabase.rpc('fn_reverse_accounting_event', {
+        p_event_id:   ev.id,
+        p_reason:     'Facture supprimée',
+        p_created_by: null,
+      })
+    }
   }
 
   // ── Save ─────────────────────────────────────────────────────────────────────
@@ -483,7 +493,9 @@ export default function FacturationPage() {
       const { error: errIns } = await supabase.from('facture_lignes').insert(lignes.filter(l => l.description).map(l => ({ invoice_id: editId, description: l.description, price: l.price, quantity: l.quantity, total: l.total })))
       if (errIns) { showToast('Erreur insertion lignes : ' + errIns.message); setSaving(false); return }
       if (finalStatut === 'envoyee' || finalStatut === 'payee')
-        await postFactureToJournal(editId, invoiceNum, dateVal, ht, tvaFinal, caFinal)
+        await emitFactureEvent({ eventType: 'FAC-001', facId: editId, invoiceNo: invoiceNum, clientName: clientNom, dateOp: dateVal, ht, tva: tvaFinal, ttc, ca: caFinal })
+      if (finalStatut === 'payee')
+        await emitFactureEvent({ eventType: 'FAC-002', facId: editId, invoiceNo: invoiceNum, clientName: clientNom, dateOp: dateVal, ht: 0, tva: 0, ttc, ca: 0 })
       showToast('Facture mise à jour !')
     } else {
       const { data: fac, error: errCreate } = await supabase.from('factures').insert({
@@ -500,7 +512,9 @@ export default function FacturationPage() {
         if (errLignes) { showToast('Facture créée, erreur lignes : ' + errLignes.message); setSaving(false); setShowForm(false); resetForm(); load(); return }
       }
       if (finalStatut === 'envoyee' || finalStatut === 'payee')
-        await postFactureToJournal(fac.id, invoiceNum, dateVal, ht, tvaFinal, caFinal)
+        await emitFactureEvent({ eventType: 'FAC-001', facId: fac.id, invoiceNo: invoiceNum, clientName: clientNom, dateOp: dateVal, ht, tva: tvaFinal, ttc, ca: caFinal })
+      if (finalStatut === 'payee')
+        await emitFactureEvent({ eventType: 'FAC-002', facId: fac.id, invoiceNo: invoiceNum, clientName: clientNom, dateOp: dateVal, ht: 0, tva: 0, ttc, ca: 0 })
       showToast('Facture créée !')
     }
     setSaving(false)
@@ -512,9 +526,7 @@ export default function FacturationPage() {
   // ── Delete / Statut ───────────────────────────────────────────────────────────
 
   async function del(id: string) {
-    if (tenantId) await supabase.from('journal_entries').delete()
-      .eq('tenant_id', tenantId).eq('source_id', id)
-      .in('source', ['facture', 'paiement_facture'])
+    await reverseFactureEvents(id)
     const { error } = await supabase.from('factures').delete().eq('id', id)
     if (error) { showToast('Erreur suppression : ' + error.message); return }
     setFactures(f => f.filter(x => x.id !== id))
@@ -531,34 +543,16 @@ export default function FacturationPage() {
     if (!confirmStatut) return
     const fac = factures.find(f => f.id === confirmStatut.id)
     await updateStatut(confirmStatut.id, confirmStatut.next)
-    if (confirmStatut.next === 'payee' && confirmStatut.current !== 'payee' && fac && tenantId) {
-      const ht  = fac.subtotal ?? fac.montant_ht ?? 0
+    if (confirmStatut.next === 'payee' && confirmStatut.current !== 'payee' && fac) {
+      const ht       = fac.subtotal ?? fac.montant_ht ?? 0
       const { tva: tvaAmt, ca: caAmt, ttc } = calculerTVA(ht)
-      const dateOp = new Date().toISOString().split('T')[0]
+      const dateOp   = new Date().toISOString().split('T')[0]
       const invoiceNo = fac.invoice_number ?? ''
       const facDate   = fac.date ?? dateOp
-      await postFactureToJournal(confirmStatut.id, invoiceNo, facDate, ht, tvaAmt, caAmt)
-      await postPaiementToJournal(confirmStatut.id, invoiceNo, ttc || fac.total || 0, dateOp)
-      const { count } = await supabase
-        .from('transactions')
-        .select('*', { count: 'exact', head: true })
-        .eq('tenant_id', tenantId)
-        .eq('source', 'facture')
-        .eq('source_id', confirmStatut.id)
-      if ((count ?? 0) === 0) {
-        const { error: errTx } = await supabase.from('transactions').insert({
-          tenant_id:     tenantId,
-          type:          'entree',
-          categorie:     'Facture payée',
-          description:   `Facture ${invoiceNo || fac.id.slice(0, 8)} — ${fac.client_name ?? fac.client_nom ?? ''}`,
-          montant:       ttc || fac.total || 0,
-          date:          dateOp,
-          mode_paiement: 'virement',
-          source:        'facture',
-          source_id:     confirmStatut.id,
-        })
-        if (errTx) captureSupabaseError('insert transaction facture', errTx, { module: 'facturation', tenant_id: tenantId })
-      }
+      const clientName = fac.client_name ?? fac.client_nom ?? ''
+      // FAC-001 : idempotent (no-op si déjà émis), FAC-002 : paiement
+      await emitFactureEvent({ eventType: 'FAC-001', facId: confirmStatut.id, invoiceNo, clientName, dateOp: facDate, ht, tva: tvaAmt, ttc: ttc || fac.total || 0, ca: caAmt })
+      await emitFactureEvent({ eventType: 'FAC-002', facId: confirmStatut.id, invoiceNo, clientName, dateOp, ht: 0, tva: 0, ttc: ttc || fac.total || 0, ca: 0 })
     }
     showToast(`Statut → ${t(sKey(confirmStatut.next))}`)
     setConfirmStatut(null)
