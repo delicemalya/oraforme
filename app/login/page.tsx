@@ -3,6 +3,8 @@ import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { logAuthClient } from '@/lib/identity/log-client'
+import { evaluateAuthClient } from '@/lib/identity/evaluate-client'
 import { Eye, EyeOff, CheckCircle2, ArrowRight, ArrowLeft, Mail, Phone as PhoneIcon, Lock, Info } from 'lucide-react'
 
 type AuthMode  = 'email' | 'phone'
@@ -95,20 +97,35 @@ function LoginPageInner() {
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault(); setError(''); setLoading(true)
+    const t0 = Date.now()
     const { error: err } = await supabase.auth.signInWithPassword({ email, password })
-    if (err) { setError('Email ou mot de passe incorrect.'); setLoading(false); return }
+    if (err) {
+      logAuthClient({ event_type: 'LOGIN_FAILED', provider: 'email', error_code: err.name, error_message: err.message, duration_ms: Date.now() - t0 })
+      setError('Email ou mot de passe incorrect.'); setLoading(false); return
+    }
+    logAuthClient({ event_type: 'LOGIN_SUCCESS', provider: 'email', duration_ms: Date.now() - t0 })
+    const verdict = await evaluateAuthClient('LOGIN_SUCCESS', { provider: 'email', durationMs: Date.now() - t0 })
+    if (verdict.denied) {
+      await supabase.auth.signOut()
+      setError(verdict.reason ?? 'Acces refuse par politique de securite.')
+      setLoading(false)
+      return
+    }
     window.location.href = '/dashboard'
   }
 
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault(); setError('')
     if (!phone.trim()) { setError('Entrez votre numéro de téléphone.'); return }
+    // D-008 (C-001 debt): +242 is hardcoded — OTP only works for Congo-Brazzaville.
+    // Multi-country prefix selection is required for CM/GA/TD/RCA/GQ/CD support.
     const normalized = phone.startsWith('+') ? phone : `+242${phone.replace(/^0/, '')}`
     setLoading(true)
     const { error: err } = await supabase.auth.signInWithOtp({
       phone: normalized, options: { shouldCreateUser: false },
     })
     if (err) {
+      logAuthClient({ event_type: 'LOGIN_FAILED', provider: 'phone', error_code: err.name, error_message: err.message })
       setError(err.message === 'Signups not allowed for otp'
         ? 'Aucun compte trouvé pour ce numéro.' : err.message)
       setLoading(false); return
@@ -118,11 +135,25 @@ function LoginPageInner() {
 
   async function handleVerifyOtp(e: React.FormEvent) {
     e.preventDefault(); setError(''); setLoading(true)
+    const t0 = Date.now()
     const { data, error: err } = await supabase.auth.verifyOtp({
       phone, token: otp.trim(), type: 'sms',
     })
-    if (err) { setError('Code incorrect ou expiré. Réessayez.'); setLoading(false); return }
-    if (data.session) window.location.href = '/dashboard'
+    if (err) {
+      logAuthClient({ event_type: 'LOGIN_FAILED', provider: 'phone', error_code: err.name, error_message: err.message, duration_ms: Date.now() - t0 })
+      setError('Code incorrect ou expiré. Réessayez.'); setLoading(false); return
+    }
+    if (data.session) {
+      logAuthClient({ event_type: 'LOGIN_SUCCESS', provider: 'phone', duration_ms: Date.now() - t0 })
+      const verdict = await evaluateAuthClient('LOGIN_SUCCESS', { provider: 'phone', durationMs: Date.now() - t0 })
+      if (verdict.denied) {
+        await supabase.auth.signOut()
+        setError(verdict.reason ?? 'Acces refuse par politique de securite.')
+        setLoading(false)
+        return
+      }
+      window.location.href = '/dashboard'
+    }
   }
 
   function switchMode(m: AuthMode) { setMode(m); setError(''); setPhoneStep('enter'); setOtp('') }

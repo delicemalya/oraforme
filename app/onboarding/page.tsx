@@ -214,8 +214,8 @@ export default function OnboardingPage() {
 
   // ── Init: detect OAuth return vs fresh visit ───────────────────────────────
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session?.user) {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) {
         const draft = loadDraft()
         if (draft?.plan)          setPlan(draft.plan)
         if (draft?.nomEntreprise) setNomEntreprise(draft.nomEntreprise)
@@ -233,14 +233,14 @@ export default function OnboardingPage() {
       const { data: profile } = await supabase
         .from('profiles')
         .select('tenant_id')
-        .eq('user_id', session.user.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle()
 
       if (profile?.tenant_id) { window.location.href = '/dashboard'; return }
 
-      const provider = (session.user.app_metadata?.provider as string | undefined) ?? 'email'
+      const provider = (user.app_metadata?.provider as string | undefined) ?? 'email'
       const draft    = loadDraft()
 
       if (provider !== 'email') {

@@ -8,6 +8,7 @@ import {
   Calendar, User, Settings, CreditCard, Zap, Key,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { logAuthClient } from '@/lib/identity/log-client'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import { useLocale } from '@/lib/hooks/useLocale'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
@@ -89,6 +90,7 @@ export default function Header() {
   }, [tenant?.userId])
 
   async function handleLogout() {
+    logAuthClient({ event_type: 'LOGOUT' })
     await supabase.auth.signOut()
     window.location.href = '/login'
   }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { logAuthClient } from '@/lib/identity/log-client'
 import {
   LayoutDashboard, Building2, Package, TrendingUp, Bot,
   LogOut, Menu, X, Activity, Users, CreditCard, Bell,
@@ -89,6 +90,7 @@ export default function AdminSidebar() {
   }
 
   async function handleLogout() {
+    logAuthClient({ event_type: 'LOGOUT' })
     await supabase.auth.signOut()
     router.push('/login')
   }

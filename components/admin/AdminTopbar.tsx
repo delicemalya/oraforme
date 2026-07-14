@@ -5,6 +5,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useRouter } from 'next/navigation'
 import { Bell, Settings, LogOut, ChevronDown, ExternalLink, Shield, User, Search, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { logAuthClient } from '@/lib/identity/log-client'
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 
@@ -53,6 +54,7 @@ export default function AdminTopbar({ email, timeStr, dateStr }: Props) {
   }, [searchOpen])
 
   async function handleLogout() {
+    logAuthClient({ event_type: 'LOGOUT' })
     await supabase.auth.signOut()
     router.push('/login')
   }

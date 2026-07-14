@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { logAuthClient } from '@/lib/identity/log-client'
 import { Eye, EyeOff, CheckCircle2, Lock, ShieldCheck } from 'lucide-react'
 
 export default function ResetPasswordPage() {
@@ -32,6 +33,7 @@ export default function ResetPasswordPage() {
     setLoading(true)
     const { error: err } = await supabase.auth.updateUser({ password })
     if (err) { setError(err.message); setLoading(false); return }
+    logAuthClient({ event_type: 'PASSWORD_RESET', provider: 'email' })
     setDone(true)
     setTimeout(() => router.push('/dashboard'), 2500)
   }

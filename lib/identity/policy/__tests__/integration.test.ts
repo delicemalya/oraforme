@@ -164,6 +164,7 @@ describe('C-001.3 Integration — buildPolicyContext', () => {
       order: vi.fn().mockReturnThis(),
       limit: vi.fn().mockResolvedValue({ data: [], error: null }),
       single: mockSingle,
+      head: false,
     })
     mockCount.mockResolvedValue({ count: 2, error: null })
   })
@@ -260,7 +261,11 @@ describe('C-001.3 Integration — action engine + history (full pipeline)', () =
     // Restore select mock for history queries
     mockSelect.mockReturnValue({
       eq: vi.fn().mockReturnThis(),
+      gte: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue({ data: [], error: null }),
       single: mockSingle,
+      head: false,
     })
   })
 

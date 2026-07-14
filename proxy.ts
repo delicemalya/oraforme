@@ -2,10 +2,30 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// ── Public routes — never require a session ───────────────────────────────────
+const PUBLIC_PAGES = new Set([
+  '/',
+  '/login',
+  '/register',
+  '/onboarding',
+  '/pricing',
+  '/forgot-password',
+  '/reset-password',
+  '/sentry-example-page',
+])
+
+// API prefixes with their own auth mechanism — bypass session enforcement
+const PUBLIC_API_PREFIXES = [
+  '/api/auth/',       // Supabase OAuth callbacks
+  '/api/v1/',         // External REST API — uses API key auth
+  '/api/resto/',      // Public menu + order endpoints (QR code, no session)
+  '/api/webhooks/',   // External webhook receivers
+  '/api/monitoring/', // Error/performance logging from error boundaries
+]
+
 const SUPER_ADMIN_EMAILS = ['adjidongui@gmail.com', 'adjigordon@gmail.com']
 
-// École routes that require specific roles (beyond basic authentication)
-// Key = route segment, Value = allowed ecole_role_name values
+// École routes that require specific roles
 const ECOLE_ROUTE_ROLES: Record<string, string[]> = {
   'direction':              ['DIRECTION_GENERALE'],
   'comptabilite':           ['DIRECTION_GENERALE', 'RAF'],
@@ -20,8 +40,11 @@ const ECOLE_ROUTE_ROLES: Record<string, string[]> = {
 }
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
   // Build a mutable response so Supabase can rotate session cookies
   let supabaseResponse = NextResponse.next({ request })
+  let tokenWasRefreshed = false
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,35 +62,43 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
+          // setAll is only called when Supabase actually issues a new token
+          if (cookiesToSet.some(c => c.name.includes('access-token') || c.name.includes('sb-'))) {
+            tokenWasRefreshed = true
+          }
         },
       },
     }
   )
 
-  // IMPORTANT: getUser() validates the JWT server-side. Never use getSession() here.
+  // CRITICAL: always call getUser() — it refreshes expired tokens via setAll().
+  // Skipping this causes silent session expiry bugs.
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { pathname } = request.nextUrl
+  // ── Session guard ─────────────────────────────────────────────────────────
+  const isPublicPage = PUBLIC_PAGES.has(pathname) || pathname.startsWith('/auth/')
+  const isPublicApi  = PUBLIC_API_PREFIXES.some(p => pathname.startsWith(p))
 
-  // ── PROTECTED ROUTES ─────────────────────────────────────────────────────
-  if (!user && pathname.startsWith('/dashboard')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirectTo', pathname)
-    return NextResponse.redirect(url)
+  if (!isPublicPage && !isPublicApi && !user) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: 'Unauthorized', code: 'AUTH_REQUIRED' },
+        { status: 401 },
+      )
+    }
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('next', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
-  // ── AUTH ROUTES ───────────────────────────────────────────────────────────
-  // Passe par /api/set-tenant-cookie pour poser le cookie avant /dashboard.
-  // Couvre le cas login email+password qui ne passe pas par /auth/callback.
+  // ── Redirect authenticated users away from login/register ─────────────────
   if (user && (pathname === '/login' || pathname === '/register')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/api/set-tenant-cookie'
-    url.searchParams.set('redirect', '/dashboard')
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 
-  // ── ADMIN ROUTES ──────────────────────────────────────────────────────────
+  // ── Admin routes — super admin only ───────────────────────────────────────
   if (pathname.startsWith('/admin')) {
     if (!user || !SUPER_ADMIN_EMAILS.includes(user.email ?? '')) {
       const url = request.nextUrl.clone()
@@ -76,15 +107,11 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ── ÉCOLE ROLE-BASED ROUTE PROTECTION ────────────────────────────────────
-  // For /dashboard/ecole/<segment> routes, validate the user's ecole role.
-  // Owners bypass this check — they always have full access.
+  // ── École role-based route protection ─────────────────────────────────────
   if (user && pathname.startsWith('/dashboard/ecole/')) {
-    // Extract the route segment after /dashboard/ecole/
     const segment = pathname.replace('/dashboard/ecole/', '').split('/')[0]
     const allowedRoles = ECOLE_ROUTE_ROLES[segment]
 
-    // Only enforce role check for explicitly restricted routes
     if (allowedRoles && allowedRoles.length > 0) {
       const { data: profile } = await supabase
         .from('profiles')
@@ -94,12 +121,9 @@ export async function proxy(request: NextRequest) {
         .limit(1)
         .maybeSingle()
 
-      // Owners always pass
       if (profile && profile.role !== 'owner') {
         const ecoleRole = profile.ecole_role_name as string | null
         if (!ecoleRole || !allowedRoles.includes(ecoleRole)) {
-          // Redirect to école dashboard with access denied signal
-          // École users land on /dashboard/ecole (not /dashboard) to avoid double-redirect
           const url = request.nextUrl.clone()
           url.pathname = '/dashboard/ecole'
           url.searchParams.set('access_denied', segment)
@@ -109,19 +133,24 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // ── TOKEN_REFRESH logging (fire-and-forget, for P-005 ABNORMAL_REFRESH) ───
+  if (tokenWasRefreshed && user) {
+    void fetch(new URL('/api/auth/log', request.url).toString(), {
+      method:  'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': request.headers.get('cookie') ?? '',
+      },
+      body: JSON.stringify({ event_type: 'TOKEN_REFRESH' }),
+    }).catch(() => {/* silent — logging never blocks requests */})
+  }
+
   return supabaseResponse
 }
 
 export const config = {
   matcher: [
-    /*
-     * Run on all routes EXCEPT:
-     * - Next.js internals (_next/static, _next/image)
-     * - Static assets (svg, png, ico)
-     * - API routes — they handle their own auth
-     * - Public restaurant pages (/resto/) — customer-facing, intentionally public
-     * - Auth callback (/auth/) — must be accessible without a session
-     */
-    '/((?!_next/static|_next/image|favicon\\.ico|.*\\.svg$|.*\\.png$|api/|resto/|auth/).*)',
+    // Match all routes except Next.js internals and static assets
+    '/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }
