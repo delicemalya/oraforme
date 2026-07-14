@@ -535,14 +535,14 @@ export default function Sidebar() {
     let cancelled = false
     async function loadPerms() {
       setPermsLoaded(false)
-      if (!tenant!.secteur) {
-        const { data: tmRows } = await supabase
-          .from('tenant_modules').select('module_key')
-          .eq('tenant_id', tenant!.tenantId).eq('enabled', true)
-        if (!cancelled) {
-          // tenant_modules est la seule source — pas de fallback vers modules_actifs
-          setModulesActifs((tmRows ?? []).map((r: { module_key: string }) => r.module_key))
-        }
+      // Charger tenant_modules pour TOUS les non-owners (secteur ou non).
+      // Avant: chargement seulement si !secteur → les membres de secteurs
+      // voyaient TOUS les modules ERP core sans restriction (ANO-M02).
+      const { data: tmRows } = await supabase
+        .from('tenant_modules').select('module_key')
+        .eq('tenant_id', tenant!.tenantId).eq('enabled', true)
+      if (!cancelled) {
+        setModulesActifs((tmRows ?? []).map((r: { module_key: string }) => r.module_key))
       }
       const { data: perms } = await supabase
         .from('user_permissions')
@@ -616,8 +616,9 @@ export default function Sidebar() {
       return permissions[id]?.can_view !== false
     }
 
-    // ── Autres secteurs : permissions ou owner ────────────────────────────────
+    // ── Autres secteurs : vérifier modulesActifs + permissions ───────────────
     if (isOwner) return true
+    if (!modulesActifs.includes(id)) return false
     return permissions[id]?.can_view !== false
   }, [isOwner, ecoleRole, secteur, sousType, taille, permissions, modulesActifs, role])
 

@@ -160,19 +160,35 @@ async function fetchTenantForUser(
 // ── localStorage cache — instant render on page navigation ───────────────────
 
 const CACHE_KEY = 'oraforme_tenant_v2'
+// TTL 5 min : un admin qui modifie les modules d'un tenant voit le changement
+// reflété dès le prochain chargement de page après l'expiration (ANO-M03).
+const CACHE_TTL_MS = 5 * 60 * 1000
+
+interface CacheEntry { state: TenantState; cachedAt: number }
 
 function readCache(): TenantState | null {
   if (typeof window === 'undefined') return null
   try {
     const raw = localStorage.getItem(CACHE_KEY)
-    return raw ? JSON.parse(raw) as TenantState : null
+    if (!raw) return null
+    const entry = JSON.parse(raw) as CacheEntry
+    // Support ancien format (sans cachedAt) → expirer immédiatement
+    if (!entry.cachedAt || Date.now() - entry.cachedAt > CACHE_TTL_MS) {
+      localStorage.removeItem(CACHE_KEY)
+      return null
+    }
+    return entry.state
   } catch { return null }
 }
 
 function writeCache(state: TenantState | null): void {
   try {
-    if (state) localStorage.setItem(CACHE_KEY, JSON.stringify(state))
-    else localStorage.removeItem(CACHE_KEY)
+    if (state) {
+      const entry: CacheEntry = { state, cachedAt: Date.now() }
+      localStorage.setItem(CACHE_KEY, JSON.stringify(entry))
+    } else {
+      localStorage.removeItem(CACHE_KEY)
+    }
   } catch {}
 }
 
