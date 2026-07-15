@@ -6,8 +6,10 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
+import { useTenantContext } from '@/lib/contexts/TenantContext'
 import { resolveAccounts, type AccountCode } from '@/lib/accounting-engine'
 import { COMPTES_PLATS } from '@/lib/syscohada/plan-comptable'
 import { useFmt } from '@/lib/hooks/useFmt'
@@ -53,9 +55,18 @@ const CATS_DEPENSE = ['Salaires', 'CNSS', 'Achats / Fournisseur', 'Loyer', 'Imp�
 
 /* ─── Main Page ──────────────────────────────────────────── */
 export default function ComptabilitePage() {
+  const router = useRouter()
+  const { tenant: tenantCtx, loading: tenantCtxLoading } = useTenantContext()
   const { fmt: fmtFCFA } = useFmt()
   const { tenantId, pays } = useTenant()
   const { t, locale } = useLocale()
+
+  // Plan gate — redirect non-PME/Grande tenants who navigate directly to this URL
+  useEffect(() => {
+    if (!tenantCtxLoading && tenantCtx !== null && !tenantCtx.modulesActifs.includes('comptabilite')) {
+      router.replace('/dashboard')
+    }
+  }, [tenantCtxLoading, tenantCtx, router])
 
   /* ─── Locale-aware month names ───────────────────────────── */
   const intlLocale = locale === 'fr' ? 'fr-FR' : locale === 'en' ? 'en-GB' : locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es-ES' : locale === 'de' ? 'de-DE' : 'fr-FR'
