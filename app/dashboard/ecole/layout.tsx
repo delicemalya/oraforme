@@ -37,11 +37,11 @@ export default async function EcoleLayout({ children }: { children: React.ReactN
   if (profile.tenant_id) {
     const { data: tenant } = await supabaseAdmin
       .from('tenants')
-      .select('secteur')
+      .select('secteur_activite')
       .eq('id', profile.tenant_id)
       .maybeSingle()
 
-    if (tenant?.secteur === 'ecole') {
+    if (tenant?.secteur_activite === 'ecole') {
       return <>{children}</>
     }
   }

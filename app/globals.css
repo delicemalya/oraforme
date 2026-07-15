@@ -375,3 +375,20 @@ input:-webkit-autofill:focus {
   width: max-content;
 }
 .flags-track:hover { animation-play-state: paused; }
+
+/* ── École Dashboard — grids responsive ──────────────────────────────────── */
+@media (max-width: 1280px) {
+  .kpi-grid-ecole { grid-template-columns: repeat(3, 1fr) !important; }
+  .row2-ecole     { grid-template-columns: 1fr 1fr !important; }
+  .row3-ecole     { grid-template-columns: 1fr 1fr !important; }
+  .row4-ecole     { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 768px) {
+  .kpi-grid-ecole { grid-template-columns: repeat(2, 1fr) !important; }
+  .row2-ecole     { grid-template-columns: 1fr !important; }
+  .row3-ecole     { grid-template-columns: 1fr !important; }
+  .row4-ecole     { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 480px) {
+  .kpi-grid-ecole { grid-template-columns: 1fr !important; }
+}
