@@ -34,7 +34,7 @@ const RUN_ID  = Date.now().toString(36).toUpperCase()
 
 const SUPABASE_URL = 'https://mrzixapnaqsbqmagivvf.supabase.co'
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY
-  ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeml4YXBuYXFzYnFtYWdpdnZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ2NDI2NCwiZXhwIjoyMDkzMDQwMjY0fQ.G9IZuEPEMqE9maWkzS0biE0kdmdAd-CqbqYjXs9xwtA'
+if (!SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY manquant — requis pour la certification C-005')
 const SB_HEADERS   = {
   'apikey': SERVICE_KEY, 'Authorization': `Bearer ${SERVICE_KEY}`,
   'Content-Type': 'application/json', 'Prefer': 'return=representation',
@@ -106,11 +106,11 @@ async function getJournalEntries(tenantId: string, source: string): Promise<Jour
 }
 
 async function insertFacture(tenantId: string): Promise<{ id: string; total: number }> {
-  // tva colonne est numeric(5,2) — max 999.99 FCFA. On utilise un montant réduit.
-  // ANO-DB01 : bug schéma (tva trop petit pour de vraies factures — devrait être numeric(14,2))
-  const montantHT = 500   // 500 FCFA HT
-  const tva       = 90    // 18% de 500 — tient dans numeric(5,2)
-  const total     = 590   // TTC
+  // ANO-DB01 corrigé (migration 160) : factures.tva élargie à numeric(14,2).
+  // Montant réaliste, plus limité à 999.99 FCFA.
+  const montantHT = 500000  // 500 000 FCFA HT
+  const tva       = 90000   // 18% de 500 000
+  const total     = 590000  // TTC
   const rows = await sbPost<Array<{ id: string }>>('/rest/v1/factures', {
     tenant_id:   tenantId,
     client_nom:  'Client Test QA-001',

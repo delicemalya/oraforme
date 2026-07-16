@@ -7,7 +7,7 @@
 
 const SUPABASE_URL     = 'https://mrzixapnaqsbqmagivvf.supabase.co'
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-  ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeml4YXBuYXFzYnFtYWdpdnZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ2NDI2NCwiZXhwIjoyMDkzMDQwMjY0fQ.G9IZuEPEMqE9maWkzS0biE0kdmdAd-CqbqYjXs9xwtA'
+if (!SERVICE_ROLE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY manquant — requis pour les helpers de certification')
 
 const HEADERS = {
   'apikey':        SERVICE_ROLE_KEY,

@@ -7,14 +7,17 @@
  *   npx playwright test --config=playwright-qa.config.ts
  *   npx playwright test --config=playwright-qa.config.ts tests/certifications/c002-tenant-core.spec.ts
  *
- * Prérequis :
+ * Prérequis (chargés automatiquement depuis .env.local) :
  *   PLAYWRIGHT_BASE_URL=http://localhost:3001   (dev server running)
- *   SUPABASE_SERVICE_ROLE_KEY=<service_role>    (optionnel — fallback inclus)
+ *   SUPABASE_SERVICE_ROLE_KEY=<service_role>    (requis — aucun fallback)
  *   GIT_COMMIT=<sha>                            (optionnel — pour le rapport)
  */
 
 import { defineConfig, devices } from '@playwright/test'
 import * as path from 'node:path'
+import * as dotenv from 'dotenv'
+
+dotenv.config({ path: path.join(__dirname, '.env.local') })
 
 export default defineConfig({
   testDir: './tests/certifications',

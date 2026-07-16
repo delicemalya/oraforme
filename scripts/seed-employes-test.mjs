@@ -13,9 +13,14 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import * as dotenv from 'dotenv'
+import * as path from 'node:path'
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 
 const SUPABASE_URL = 'https://mrzixapnaqsbqmagivvf.supabase.co'
-const SERVICE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeml4YXBuYXFzYnFtYWdpdnZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ2NDI2NCwiZXhwIjoyMDkzMDQwMjY0fQ.G9IZuEPEMqE9maWkzS0biE0kdmdAd-CqbqYjXs9xwtA'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY
+if (!SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY manquant — requis pour seed-employes-test')
 const TENANT_ID    = '64c244e5-02fd-4cf7-a56f-b0bdd48fdc09'
 
 const sb = createClient(SUPABASE_URL, SERVICE_KEY, {

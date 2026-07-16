@@ -77,7 +77,7 @@ async function detectSpinnerFlash(page: Page, durationMs: number): Promise<boole
 /** Inject a factures change via Supabase REST to trigger Realtime event */
 async function injectFactureEvent(tenantId: string): Promise<void> {
   const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-    ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeml4YXBuYXFzYnFtYWdpdnZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ2NDI2NCwiZXhwIjoyMDkzMDQwMjY0fQ.G9IZuEPEMqE9maWkzS0biE0kdmdAd-CqbqYjXs9xwtA'
+  if (!SERVICE_ROLE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY manquant — requis pour injectFactureEvent')
   const headers = {
     'apikey':        SERVICE_ROLE_KEY,
     'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
