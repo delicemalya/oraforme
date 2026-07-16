@@ -23,6 +23,28 @@ const PUBLIC_API_PREFIXES = [
   '/api/monitoring/', // Error/performance logging from error boundaries
 ]
 
+// Exact-path automation endpoints — invoked by Vercel Cron (vercel.json) or
+// Supabase pg_cron (migration 167), never by a logged-in browser session.
+// Each of these validates its own secret (CRON_SECRET / x-automation-secret)
+// internally — this only lets the request reach the route handler.
+const AUTOMATION_PATHS = new Set([
+  '/api/agents/securite/attaques',
+  '/api/agents/securite/performance',
+  '/api/agents/securite/backup',
+  '/api/agents/stock/verifier',
+  '/api/agents/comptable/relances',
+  '/api/agents/superviseur/rapport',
+  '/api/agents/rh/bulletins',
+  '/api/agents/ecole/impayes',
+  '/api/agents/restaurant/cloture',
+  '/api/agents/miaa-autonome',
+  '/api/miaa/proactif',
+  '/api/miaa/notifications',
+  '/api/miaa/analyse-quotidienne',
+  '/api/cron/run',
+  '/api/profil/reminders',
+])
+
 const SUPER_ADMIN_EMAILS = ['adjidongui@gmail.com', 'adjigordon@gmail.com']
 
 // École routes that require specific roles
@@ -77,7 +99,7 @@ export async function proxy(request: NextRequest) {
 
   // ── Session guard ─────────────────────────────────────────────────────────
   const isPublicPage = PUBLIC_PAGES.has(pathname) || pathname.startsWith('/auth/')
-  const isPublicApi  = PUBLIC_API_PREFIXES.some(p => pathname.startsWith(p))
+  const isPublicApi  = PUBLIC_API_PREFIXES.some(p => pathname.startsWith(p)) || AUTOMATION_PATHS.has(pathname)
 
   if (!isPublicPage && !isPublicApi && !user) {
     if (pathname.startsWith('/api/')) {

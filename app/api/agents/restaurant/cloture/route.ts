@@ -23,9 +23,9 @@ export async function GET() {
     // Récupérer les tenants actifs avec secteur restaurant
     const { data: tenants, error: tenantsErr } = await supabase
       .from('tenants')
-      .select('id, nom')
-      .eq('secteur', 'restaurant')
-      .eq('statut', 'actif')
+      .select('id, nom_entreprise')
+      .eq('secteur_activite', 'restaurant')
+      .eq('status', 'active')
 
     if (tenantsErr) throw tenantsErr
     if (!tenants?.length) return NextResponse.json({ ok: true, clotured: 0, message: 'Aucun tenant restaurant actif' })
@@ -77,7 +77,7 @@ export async function GET() {
           await supabase.from('admin_alerts').insert({
             type: 'restaurant_cloture',
             severity: 'info',
-            message: `🍽️ Clôture ${today} — ${tenant.nom} : ${nb_commandes} commandes · CA ${Math.round(ca_total).toLocaleString('fr-FR')} FCFA`,
+            message: `🍽️ Clôture ${today} — ${tenant.nom_entreprise} : ${nb_commandes} commandes · CA ${Math.round(ca_total).toLocaleString('fr-FR')} FCFA`,
             action_prise: JSON.stringify({ ca_total, nb_commandes, par_paiement, tables_ouvertes: ouvertes?.length ?? 0 }),
           })
         }
@@ -87,16 +87,16 @@ export async function GET() {
           await supabase.from('admin_alerts').insert({
             type: 'restaurant_cloture',
             severity: 'haute',
-            message: `⚠️ ${ouvertes!.length} table(s) non clôturée(s) chez ${tenant.nom} — vérification requise`,
+            message: `⚠️ ${ouvertes!.length} table(s) non clôturée(s) chez ${tenant.nom_entreprise} — vérification requise`,
             action_prise: `Tables: ${ouvertes!.map(o => o.table_num ?? 'N/A').join(', ')}`,
           })
         }
 
-        resultats.push({ tenant_id: tenant.id, nom: tenant.nom, ca_total, nb_commandes, tables_ouvertes: ouvertes?.length ?? 0, stock_bas: stockBas?.length ?? 0 })
+        resultats.push({ tenant_id: tenant.id, nom: tenant.nom_entreprise, ca_total, nb_commandes, tables_ouvertes: ouvertes?.length ?? 0, stock_bas: stockBas?.length ?? 0 })
         clotured++
       } catch (err) {
         console.error(`[cloture] Erreur tenant ${tenant.id}:`, err)
-        resultats.push({ tenant_id: tenant.id, nom: tenant.nom, error: String(err) })
+        resultats.push({ tenant_id: tenant.id, nom: tenant.nom_entreprise, error: String(err) })
       }
     }
 

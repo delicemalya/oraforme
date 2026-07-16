@@ -50,10 +50,10 @@ export async function GET(request: NextRequest, { params }: Ctx) {
   const recap = calculerDeclarationGlobale(employes)
 
   const { data: tenant } = await supabaseAdmin
-    .from('tenants').select('nom').eq('id', ctx.tenantId).single()
+    .from('tenants').select('nom_entreprise').eq('id', ctx.tenantId).single()
 
   const declFull   = { ...decl, employes, recap }
-  const entreprise = (tenant?.nom as string | undefined) ?? 'Entreprise'
+  const entreprise = (tenant?.nom_entreprise as string | undefined) ?? 'Entreprise'
 
    
   type PdfEl = React.ReactElement<DocumentProps, any>

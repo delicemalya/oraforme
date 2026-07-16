@@ -21,8 +21,8 @@ export async function GET(req: NextRequest) {
   let entrepriseNom = 'Entreprise'
   if (offre?.tenant_id) {
     const { data: tenant } = await supabaseAdmin
-      .from('tenants').select('nom').eq('id', offre.tenant_id).maybeSingle()
-    entrepriseNom = tenant?.nom ?? 'Entreprise'
+      .from('tenants').select('nom_entreprise').eq('id', offre.tenant_id).maybeSingle()
+    entrepriseNom = tenant?.nom_entreprise ?? 'Entreprise'
   }
 
   return NextResponse.json({

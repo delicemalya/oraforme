@@ -64,8 +64,8 @@ export default function NouvelleOffrePage() {
   // Fetch tenant name on mount
   useEffect(() => {
     if (!tenantId) return
-    supabase.from('tenants').select('nom').eq('id', tenantId).maybeSingle().then(({ data }) => {
-      if (data?.nom) setTenantNom(data.nom)
+    supabase.from('tenants').select('nom_entreprise').eq('id', tenantId).maybeSingle().then(({ data }) => {
+      if (data?.nom_entreprise) setTenantNom(data.nom_entreprise)
     })
   }, [tenantId])
 

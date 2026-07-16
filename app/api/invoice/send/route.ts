@@ -28,9 +28,9 @@ export async function POST(req: NextRequest) {
     if (fetchErr || !facture) return NextResponse.json({ error: 'Facture introuvable' }, { status: 404 })
 
     const { data: tenant } = await supabaseAdmin
-      .from('tenants').select('nom').eq('id', callerProfile.tenant_id).maybeSingle()
+      .from('tenants').select('nom_entreprise').eq('id', callerProfile.tenant_id).maybeSingle()
 
-    const tenantName = tenant?.nom ?? 'oraforme'
+    const tenantName = tenant?.nom_entreprise ?? 'oraforme'
     const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(n) + ' FCFA'
 
     let emailSent = false

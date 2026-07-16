@@ -83,11 +83,11 @@ export async function POST(req: NextRequest) {
 
     const { data: tenant } = await supabaseAdmin
       .from('tenants')
-      .select('nom')
+      .select('nom_entreprise')
       .eq('id', offre.tenant_id)
       .maybeSingle()
 
-    const entrepriseNom = tenant?.nom ?? 'Entreprise'
+    const entrepriseNom = tenant?.nom_entreprise ?? 'Entreprise'
 
     // Upload CV to Supabase Storage
     let cvUrl: string | null = null

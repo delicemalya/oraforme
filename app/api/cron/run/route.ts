@@ -86,7 +86,7 @@ async function fireScheduled(
   const { data: tenants } = await supabaseAdmin
     .from('tenants')
     .select('id')
-    .eq('is_active', true)
+    .eq('status', 'active')
 
   let count = 0
   for (const t of tenants ?? []) {
@@ -408,7 +408,7 @@ async function runMIAADailyAnalysis(): Promise<number> {
   const { data: tenants } = await supabaseAdmin
     .from('tenants')
     .select('id')
-    .eq('is_active', true)
+    .eq('status', 'active')
     .limit(100)
 
   if (!tenants?.length) return 0

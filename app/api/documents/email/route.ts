@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
     if (!type || !id) return NextResponse.json({ error: 'type et id requis' }, { status: 400 })
 
     const { data: tenant } = await supabaseAdmin
-      .from('tenants').select('nom').eq('id', profile.tenant_id).maybeSingle()
-    const tenantName = tenant?.nom ?? 'oraforme'
+      .from('tenants').select('nom_entreprise').eq('id', profile.tenant_id).maybeSingle()
+    const tenantName = tenant?.nom_entreprise ?? 'oraforme'
 
     const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://oraforms.com'
 

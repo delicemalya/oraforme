@@ -700,9 +700,9 @@ export async function auditSYSCOHADA(supabase: SupabaseClient, tenantId: string)
       .eq('fiscal_year', year)
       .limit(2000),
     supabase.from('fiscal_declarations')
-      .select('type, mois, annee, statut, created_at')
+      .select('type, periode_mois, periode_annee, statut, created_at')
       .eq('tenant_id', tenantId)
-      .eq('annee', year)
+      .eq('periode_annee', year)
       .in('type', ['cnss', 'tva', 'das']),
   ])
 
@@ -823,7 +823,7 @@ export async function auditSYSCOHADA(supabase: SupabaseClient, tenantId: string)
 
   // 7. Déclarations sociales manquantes (CNSS)
   const moisActuel = new Date().getMonth() + 1
-  const cnssDeclarees = declas.filter(d => d.type === 'cnss' && d.annee === year)
+  const cnssDeclarees = declas.filter(d => d.type === 'cnss' && d.periode_annee === year)
   if (cnssDeclarees.length < moisActuel - 1) {
     const manquantes = (moisActuel - 1) - cnssDeclarees.length
     anomalies.push({

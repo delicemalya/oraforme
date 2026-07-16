@@ -84,7 +84,7 @@ export async function POST(req: Request) {
   const { data: tenants } = await supabase
     .from('tenants')
     .select('id, nom_entreprise, secteur_activite')
-    .eq('statut', 'actif')
+    .eq('status', 'active')
     .limit(100)
 
   if (!tenants?.length) {
