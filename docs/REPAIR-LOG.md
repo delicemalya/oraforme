@@ -306,3 +306,191 @@ ORDER  BY m.mois;
 
 La première requête doit renvoyer `piece_number` et `reference_piece`, et
 seulement elles. La seconde doit renvoyer cinq lignes sans erreur 22008.
+
+---
+
+## P0-03 — CHAÎNE PAIE → COMPTABILITÉ ROMPUE
+
+**Statut :** CODE PASS — non déployé, non vérifié en production
+**Date :** 2026-09-02
+**Anomalie couverte :** §6.2 de `docs/RESTART-AUDIT-AZ.md` (classée P0 en §27)
+
+### Anomalie
+
+Depuis la migration 141, générer une paie depuis l'interface ne produit aucune
+écriture comptable. `PROJECT_HEALTH.md:213` certifie pourtant « Paie — Argent
+définitif ✅ ».
+
+| Chemin | Constat |
+|---|---|
+| `POST /api/paie/bulletins` | Seule route appelée par `app/dashboard/rh/paie/page.tsx` (l.1512, l.1555). Upsert de `bulletins_paie`, **aucun appel à `emit_accounting_event`** |
+| `PATCH /api/rh/paie/[id]` | Émetteur désigné par la migration 141. **Aucun appelant.** Passait le **net en `montant_ttc` sur PAI-001** |
+| `POST /api/rh/paie` | Émettait PAI-001 **à la création**, statut `generee`, avant toute validation. **Aucun appelant.** En-tête : « écritures gérées par T9 (migration 136) », trigger supprimé depuis |
+| Trigger `trg_bulletins_paie` | Supprimé par `141:262` ; sa recréation n'apparaît que dans le bloc de rollback commenté (`141:333`) |
+
+### Cause racine
+
+**La migration 141 a déplacé la responsabilité comptable du trigger vers les
+routes, et a désigné une route que personne n'appelle.** L'interface, elle,
+avait sa propre route d'écriture, créée pour contourner un problème RLS
+multi-profils, qui ne connaissait pas le moteur.
+
+Trois routes traduisaient chacune à leur manière un bulletin en événement.
+Deux étaient fausses par rapport au contrat de la migration :
+
+- **PAI-001 avec `montant_ttc = net`** (`[id]/route.ts:76`). Le module PAI est
+  déclaré à impact de trésorerie (`fn_ae_has_treasury_impact`, `138:585`,
+  reconduit en `148:75`). Tout événement PAI dont `montant_ttc > 0` crée une
+  ligne `transactions` sous `UNIQUE (tenant_id, source, source_id)`
+  (`023:82`). La validation consommait donc l'unicité, et le paiement PAI-002
+  échouait ensuite en 23505. C'est la signature d'une partie des erreurs
+  `transactions_source_unique` relevées en ANO-C08.
+- **PAI-001 à la création** (`rh/paie/route.ts:118`). Un bulletin `generee` est
+  modifiable ; le constater en charge avant validation fige des montants qui
+  peuvent encore changer.
+
+### Consommateurs identifiés
+
+| Consommateur | Chemin | Effet |
+|---|---|---|
+| Page Paie (bouton « Enregistrer », génération unitaire, modal « Lancer la paie ») | `POST /api/paie/bulletins` | Bulletins écrits, **0 écriture comptable** |
+| Balance, Grand Livre, Bilan, Journal | `journal_entries` | Aucune charge de personnel (661/664), aucune dette 421/431/447, aucune sortie 5xx pour la paie |
+| Déclarations CNSS / IRPP | `bulletins_paie` | Non affectées : lisent les bulletins, pas la comptabilité |
+| Admin APIs (`app/admin/apis/page.tsx:11-12`) | liste `/api/rh/paie` en `status: 'ok'` | Documentation, pas d'appel |
+
+### Dépendances
+
+- Migration 141 déjà appliquée : règles PAI-001 (4 séquences) et PAI-002
+  (1 séquence) actives, trigger supprimé. Aucune migration nouvelle.
+- `emit_accounting_event` est idempotent par `(tenant_id, event_type,
+  source_table, source_id)` sur les statuts `pending/processing/processed`
+  (`138:890`). Réémettre est sans effet ; un événement en `error` est réémis
+  et retraité.
+- D3 (moteur IRPP) reste **BLOCKED** (`docs/R001-FOUNDATION-DECISIONS.md`
+  §D3.6). Ce ticket transporte les montants du bulletin tels qu'ils sont ; il
+  ne recalcule rien.
+
+### Correction
+
+**Un contrat, trois routes, zéro paramètre en dur.**
+
+`lib/paie/evenements-comptables.ts` (nouveau, fonctions pures) :
+
+- `evenementsComptablesBulletin(tenantId, bulletin, datePaiement)` renvoie les
+  événements dus dans le statut courant : `brouillon`/`generee`/`annule` →
+  aucun ; `validee` → PAI-001 ; `payee` → PAI-001 puis PAI-002. Un bulletin
+  payé réémet la constatation : si la validation n'était jamais passée par le
+  moteur, le paiement la rattrape, et le moteur dédoublonne.
+- PAI-001 : `montant_ht = brut`, **`montant_ttc = 0`**, `montant_net = net`,
+  `metadata = {cnss_patronal, cnss_salarie, irpp, employe_nom, mois, annee}`,
+  daté du **dernier jour du mois de paie** (charge rattachée au mois, pas au
+  jour du clic).
+- PAI-002 : `montant_ttc = net`, `metadata.mode_paiement` (défaut `virement`,
+  comme la colonne), daté de `date_paiement` si le bulletin la porte, sinon de
+  la date fournie par l'appelant. Le module ne lit pas l'horloge.
+- `BULLETIN_COMPTABLE_SELECT` : sélecteur à passer après upsert/update, avec
+  jointure `employes(nom)`. `depuisLignePostgrest()` aplatit la ligne.
+- Brut ou net négatif, mois invalide, bulletin sans id : `RangeError`. Les
+  statuts non comptables ne valident rien.
+
+| Fichier | Avant | Après |
+|---|---|---|
+| `app/api/paie/bulletins/route.ts` | upsert / update, `{ ok: true }` | upsert / update `.select(BULLETIN_COMPTABLE_SELECT)`, puis émission par ligne ; un échec d'émission renvoie **500** « Bulletins enregistrés, écritures comptables non émises » plutôt que `ok: true` |
+| `app/api/rh/paie/[id]/route.ts:65-113` | deux blocs `rpc` avec paramètres en dur, net en `montant_ttc` sur PAI-001 | contrat unique ; erreur rpc renvoyée en 500 au lieu d'être ignorée |
+| `app/api/rh/paie/route.ts:116-141` | PAI-001 émis à la création | plus aucune émission ; en-tête corrigé |
+| `lib/architecture/loi-k-unique-writer.test.ts:62` | `rh/paie/route.ts` émetteur autorisé | remplacé par `paie/bulletins/route.ts` |
+| `docs/LOI-K-UNIQUE-WRITER.md` | PAI-001 décrit « D661/C421 (salaire net) · D646/C431 » | PAI-001 et PAI-002 décrits selon la migration 141 ; émetteurs paie mis à jour |
+
+La garde tenant par ligne (403), le contournement RLS par `service_role` et le
+double payload de la page (complet, puis minimal sur erreur de colonne) sont
+inchangés. Aucune table créée, aucun trigger rétabli, aucune écriture directe
+dans `journal_entries` ni `accounting_events`.
+
+### Tests
+
+| Fichier | Cas |
+|---|---|
+| `lib/paie/evenements-comptables.test.ts` | 47 — dernier jour des 12 mois, bissextile 2028 / non bissextile 2100, mois hors bornes ; statuts sans événement (6) ; PAI-001 : identité de source, `montant_ht = brut`, `montant_ttc = 0`, metadata des séquences 2-4, date de fin de mois, libellé, cas chiffré de la migration 141 (solde 421 = 954 640) ; PAI-002 : ordre, `montant_ttc = net`, `mode_paiement` et son défaut, priorité de `date_paiement`, même `source_id` ; NUMERIC en chaîne, nuls → 0, négatifs → erreur, id/tenant/mois/date invalides, jointure `employes` en objet, tableau ou absente |
+| `lib/architecture/chaine-paie-comptabilite.test.ts` | 32 — chaque colonne du sélecteur existe dans `bulletins_paie` (relevé 007/046/077/118) ; la page n'écrit que par `/api/paie/bulletins` ; cette route appelle le moteur, relit avec le sélecteur après upsert **et** après update, ne renvoie pas `ok:true` sur échec, garde le 403 tenant, n'écrit ni `journal_entries` ni `accounting_events`, est déclarée dans LOI-K ; `[id]` sans paramètres en dur ; `rh/paie` sans émission ; `p_source_table: 'bulletins_paie'` écrit à un seul endroit ; le contrat reproduit les champs lus par les 5 séquences actives de la migration 141 ; PAI-001 sans `montant_ttc` ; trigger supprimé hors rollback |
+
+### Résultats
+
+```
+tsc --noEmit      0 erreur
+eslint            0 erreur, 111 avertissements (préexistants)
+vitest            707 tests, 707 passés, 30 fichiers
+next build        exit 0
+```
+
+Suite avant P0-03 : 628 tests. Après : 707, soit 79 nouveaux.
+
+### Régressions
+
+Aucune. Les 628 tests antérieurs passent. `loi-k-unique-writer.test.ts`
+continue de passer avec la liste d'émetteurs mise à jour. Aucun test modifié
+pour obtenir un succès.
+
+### Non couvert, et pourquoi
+
+- **IRPP et CNSS restent calculés dans le navigateur** (`page.tsx:17-21`,
+  aggravant relevé en §6.2). D3 est BLOCKED : désigner un moteur serveur
+  reviendrait à trancher la question de droit que `R001` refuse de trancher.
+  Ce ticket comptabilise ce que le bulletin porte.
+- **Annulation d'un bulletin validé** : PAI-005 (extourne) est en `draft`
+  dans la migration 141. Un passage `validee → brouillon` par le sélecteur de
+  la page ne produit aucune extourne. Signalé, hors périmètre.
+- **Acompte non déduit de PAI-001** : PAI-003 est émis à la création de
+  l'acompte ; le bulletin retient l'acompte dans `net` mais la dette 421 n'est
+  pas ajustée par une séquence dédiée. Question de règle comptable, pas de
+  branchement.
+- **Rétroplay des bulletins déjà validés/payés sans événement** : ANO-C08,
+  ticket distinct. Réenregistrer une paie depuis la page émet désormais ce qui
+  manque, mais aucune campagne n'a été lancée.
+- **Playwright non exécuté** : `c005-erp-certification.spec.ts` écrit dans la
+  base pointée par `.env.local`, qui est la production. Son scénario ERP-2
+  insère d'ailleurs ses écritures de paie **en direct** dans `journal_entries`
+  (l.809-830) : il ne teste pas cette chaîne.
+- **Production non vérifiable dans cette session** : le serveur MCP Postgres
+  répond `ENOTFOUND` sur `postgres.mrzixapnaqsbqmagivvf`, les serveurs MCP
+  Supabase ne se connectent pas.
+
+### Production
+
+Non vérifié. Aucune migration : rien à exécuter pour déployer. Requête de
+contrôle après mise en ligne, à exécuter dans Supabase, pour mesurer l'écart
+entre bulletins validés/payés et événements comptables, puis confirmer que les
+nouveaux bulletins produisent bien 4 + 1 écritures.
+
+```sql
+-- 1. Bulletins validés ou payés sans aucun événement comptable (dette héritée)
+SELECT b.statut, count(*) AS bulletins, coalesce(sum(b.net), 0) AS net_total
+FROM   bulletins_paie b
+WHERE  b.statut IN ('validee', 'payee')
+  AND  NOT EXISTS (
+         SELECT 1 FROM accounting_events e
+         WHERE  e.source_table = 'bulletins_paie' AND e.source_id = b.id
+       )
+GROUP  BY b.statut;
+
+-- 2. Événements PAI émis après la mise en ligne, par type et statut moteur
+SELECT event_type, status, count(*), coalesce(sum(montant_ht), 0) AS ht, coalesce(sum(montant_ttc), 0) AS ttc
+FROM   accounting_events
+WHERE  event_type IN ('PAI-001', 'PAI-002')
+  AND  created_at >= CURRENT_DATE
+GROUP  BY event_type, status
+ORDER  BY event_type, status;
+
+-- 3. Pour chaque PAI-001 traité aujourd'hui : 4 écritures attendues au plus,
+--    aucune ligne transactions (montant_ttc = 0)
+SELECT e.id, e.libelle, l.entries_count, l.transaction_id
+FROM   accounting_events e
+JOIN   accounting_event_log l ON l.event_id = e.id
+WHERE  e.event_type = 'PAI-001' AND e.created_at >= CURRENT_DATE
+ORDER  BY e.created_at DESC
+LIMIT  20;
+```
+
+La première requête chiffre la dette héritée (bulletins jamais comptabilisés
+depuis la migration 141). La deuxième doit montrer les nouveaux événements en
+`processed`. La troisième doit renvoyer `transaction_id` NULL sur tous les
+PAI-001 : la sortie de trésorerie n'apparaît que sur PAI-002.
