@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { computeBalance, BALANCE_SELECT } from '@/lib/erp-core/compute/accounting'
+import { computeBalance, periodeMensuelle, BALANCE_SELECT } from '@/lib/erp-core/compute/accounting'
 
 export { type BalanceLine, type BalanceSummary as BalanceResult } from '@/lib/erp-core/compute/accounting'
 
@@ -31,11 +31,22 @@ export async function GET(req: NextRequest) {
     .eq('tenant_id', ctx.tid)
     .eq('fiscal_year', year)
 
-  if (mois) {
-    const monthStr = String(mois).padStart(2, '0')
+  if (mois !== undefined) {
+    // Intervalle semi-ouvert : début inclus, premier jour du mois suivant exclu.
+    // L'ancienne borne haute collait « -31 » au mois, ce qui produisait des
+    // dates inexistantes en février, avril, juin, septembre et novembre.
+    let periode: { debut: string; fin_exclusive: string }
+    try {
+      periode = periodeMensuelle(year, mois)
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : 'Période invalide' },
+        { status: 400 },
+      )
+    }
     q = q
-      .gte('date_operation', `${year}-${monthStr}-01`)
-      .lte('date_operation', `${year}-${monthStr}-31`)
+      .gte('date_operation', periode.debut)
+      .lt('date_operation', periode.fin_exclusive)
   }
 
   const { data: entries, error } = await q

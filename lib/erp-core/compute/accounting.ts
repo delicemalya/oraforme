@@ -12,7 +12,7 @@
  *
  * COLONNES réelles journal_entries :
  *   id, tenant_id, debit_account, credit_account, montant,
- *   date_operation, libelle, fiscal_year, reference, source, journal_type
+ *   date_operation, libelle, fiscal_year, piece_number, source
  */
 
 import { COMPTES_PLATS, type CompteFlat } from '@/lib/syscohada/plan-comptable'
@@ -26,9 +26,18 @@ export interface JournalLedgerRow {
   montant:        number | null
   date_operation: string | null
   libelle?:       string | null
-  reference?:     string | null
+  /**
+   * Référence de pièce. La colonne est `piece_number`, ajoutée par la
+   * migration 065 et renseignée par emit_accounting_event (migration 138:735),
+   * seul writer de journal_entries. Le contrat nommait `reference`, colonne
+   * qui n'existe dans aucune migration : la requête partait en 400 et le Grand
+   * Livre était injoignable.
+   *
+   * `reference_piece` (migration 027) existe aussi mais n'est écrite par
+   * personne : la retenir aurait rendu une colonne vide au lieu d'une erreur.
+   */
+  piece_number?:  string | null
   source?:        string | null
-  journal_type?:  string | null
 }
 
 // Sélecteur minimal pour computeBalance (pas besoin de libellé/id)
@@ -94,7 +103,43 @@ export const BALANCE_SELECT = 'debit_account, credit_account, montant, date_oper
 
 /** Colonnes pour computeGrandLivre */
 export const GRAND_LIVRE_SELECT =
-  'id, date_operation, libelle, debit_account, credit_account, montant, reference, source, journal_type' as const
+  'id, date_operation, libelle, debit_account, credit_account, montant, piece_number, source' as const
+
+// ── Période ───────────────────────────────────────────────────────────────────
+
+/**
+ * Bornes d'un mois, en intervalle semi-ouvert : début inclus, fin exclue.
+ *
+ * Le code construisait la borne haute en collant « -31 » au mois. Février,
+ * avril, juin, septembre et novembre n'ont pas de 31 : PostgreSQL rejetait la
+ * requête avec 22008, « date/time field value out of range ». La Balance
+ * échouait donc cinq mois sur douze, et personne ne le voyait puisque la route
+ * n'avait aucun appelant.
+ *
+ * Un intervalle semi-ouvert n'a jamais besoin de connaître le dernier jour d'un
+ * mois : il s'arrête au premier jour du suivant. Aucun objet Date n'est
+ * construit, donc aucun décalage de fuseau possible.
+ */
+export function periodeMensuelle(annee: number, mois: number): {
+  debut: string
+  fin_exclusive: string
+} {
+  if (!Number.isInteger(annee) || annee < 1900 || annee > 9999) {
+    throw new RangeError(`Année invalide : ${annee}`)
+  }
+  if (!Number.isInteger(mois) || mois < 1 || mois > 12) {
+    throw new RangeError(`Mois invalide : ${mois}`)
+  }
+
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const anneeSuivante = mois === 12 ? annee + 1 : annee
+  const moisSuivant   = mois === 12 ? 1 : mois + 1
+
+  return {
+    debut:         `${annee}-${pad(mois)}-01`,
+    fin_exclusive: `${anneeSuivante}-${pad(moisSuivant)}-01`,
+  }
+}
 
 // ── Comptes TVA SYSCOHADA (Congo/CEMAC) ──────────────────────────────────────
 // Source : LF n°42-2025 Congo, Art. 4441/4446 du CGI + migrations 119+131

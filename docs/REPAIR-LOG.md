@@ -149,3 +149,160 @@ volontairement est celui qui produisait les montants faux.
 - **Vérification en base et en production.** La correction est du calcul, sans
   migration. Le contrôle en conditions réelles suppose la mise en ligne de la
   branche, qui n'est pas faite.
+
+---
+
+## P0-02 — GRAND LIVRE ET BALANCE (ERP Core comptabilité)
+
+**Statut :** CODE PASS — non déployé, non vérifié en production
+**Date :** 2026-09-02
+**Anomalie couverte :** ANO-C09 de `docs/RESTART-AUDIT-AZ.md`
+
+### Anomalie
+
+Deux routes ERP Core injoignables en production.
+
+```
+GET /api/comptabilite/grand-livre   400    column journal_entries.reference does not exist
+GET /api/comptabilite/balance       22008  date/time field value out of range
+```
+
+### Cause racine
+
+**Bug 1 — Grand Livre.** Le contrat ERP Core nommait deux colonnes qui n'existent
+dans aucune des 174 migrations : `reference` et `journal_type`.
+
+La colonne réelle n'est pas non plus `reference_piece`. Trois candidates
+existaient, la preuve départage :
+
+| Colonne | Origine | Écrite par |
+|---|---|---|
+| `reference` | aucune migration | personne — n'existe pas |
+| `reference_piece` | migration 027 | **personne** — colonne vide |
+| `piece_number` | migration 065 | `emit_accounting_event` (138:735), writer unique |
+
+`emit_accounting_event` est le seul writer de `journal_entries` sous LOI-K, et il
+renseigne `piece_number`, y compris pour les extournes (138:951). L'écran Journal,
+qui fonctionne, écrit la même colonne. Remplacer mécaniquement `reference` par
+`reference_piece` aurait transformé une erreur 400 en colonne vide, c'est-à-dire
+un défaut silencieux.
+
+**Bug 2 — Balance.** La borne haute de période était construite en collant `-31`
+au mois :
+
+```ts
+.lte('date_operation', `${year}-${monthStr}-31`)
+```
+
+Février, avril, juin, septembre et novembre n'ont pas de 31 : PostgreSQL rejette
+la date. La Balance échouait donc **cinq mois sur douze**.
+
+**Pourquoi c'est resté invisible.** Les deux routes n'ont aucun appelant. Les
+pages `comptabilite/balance` et `comptabilite/grand-livre` lisent
+`journal_entries` en direct et réimplémentent le calcul. Rien n'exerçait les
+routes, et le `const db = supabaseAdmin as any` supprimait toute vérification de
+colonne à la compilation (ANO-M28).
+
+### Fichiers et lignes
+
+| Fichier | Avant | Après |
+|---|---|---|
+| `lib/erp-core/compute/accounting.ts:29,31` | `reference`, `journal_type` dans `JournalLedgerRow` | `piece_number`, `journal_type` retirée |
+| `lib/erp-core/compute/accounting.ts:97` | `GRAND_LIVRE_SELECT` avec 2 colonnes fantômes | sélecteur aligné sur le schéma réel |
+| `lib/erp-core/compute/accounting.ts` | — | `periodeMensuelle()` ajoutée |
+| `app/api/comptabilite/balance/route.ts:35-40` | `.lte(..., '-31')` | intervalle semi-ouvert `gte` / `lt` |
+
+Aucune modification de `app/api/comptabilite/grand-livre/route.ts` : la route
+était correcte, c'est le contrat qu'elle consomme qui nommait de fausses colonnes.
+
+### Modification
+
+`periodeMensuelle(annee, mois)` retourne `{ debut, fin_exclusive }`. Un
+intervalle semi-ouvert n'a jamais besoin de connaître le dernier jour d'un mois :
+il s'arrête au premier jour du suivant. Décembre bascule sur l'année suivante.
+Aucun objet `Date` n'est construit, donc aucun décalage de fuseau. Un mois hors
+bornes lève une `RangeError` que la route traduit en 400, au lieu de laisser
+partir une requête invalide.
+
+Aucune table créée, aucun calcul parallèle, aucun repli sur une ancienne logique,
+aucune source comptable nouvelle. Les deux routes lisent `journal_entries` et
+délèguent à ERP Core.
+
+### Tests
+
+| Fichier | Cas |
+|---|---|
+| `lib/erp-core/compute/accounting.test.ts` | 39 — période sur les 12 mois, bissextile, bascule de décembre, mois invalide ; Balance : comptes, débit, crédit, solde, équilibre, filtre de classe, mois vide, mois peuplé ; Grand Livre : regroupement, tri, référence de pièce, anomalies SYSCOHADA, filtres |
+| `lib/architecture/erp-core-comptabilite.test.ts` | 27 — chaque colonne des deux sélecteurs existe dans `journal_entries`, `reference` et `journal_type` ne peuvent pas revenir, aucune borne `-31`, filtre tenant présent, session exigée, lecture seule, table unique, calcul délégué à ERP Core |
+
+Les mois à 28, 29, 30 et 31 jours sont testés explicitement, ainsi que les cinq
+mois qui échouaient.
+
+Le test d'architecture rétablit une vérification là où le `as any` l'avait
+supprimée : la liste des colonnes de `journal_entries` y est relevée migration par
+migration.
+
+### Résultats
+
+```
+tsc --noEmit      0 erreur
+eslint            0 erreur, 111 avertissements (préexistants)
+vitest            628 tests, 628 passés, 28 fichiers
+next build        exit 0
+```
+
+Suite avant P0-02 : 562 tests. Après : 628, soit 66 nouveaux.
+
+### Régressions
+
+Aucune. Les 562 tests antérieurs passent. Aucun test n'a été modifié pour
+obtenir un succès.
+
+### Limites
+
+- **Les deux routes n'ont toujours aucun appelant.** Réparer la cible était le
+  préalable ; brancher les deux pages dessus est l'étape C3/C4 de
+  `docs/MIGRATION-MAP-AZ.md`, explicitement ordonnée après celle-ci. La faire
+  dans le même ticket reviendrait à modifier deux domaines à la fois.
+- **Playwright non exécuté.** `tests/certifications/c005-erp-certification.spec.ts`
+  exige `SUPABASE_SERVICE_ROLE_KEY` (ligne 37) et écrit dans la base pointée par
+  `.env.local`, qui est la production. Il n'existe pas d'environnement de recette
+  (point 0.3 du plan). Exécuter ces tests aurait modifié des données réelles.
+  Contrainte non contournée.
+- **Même défaut de date ailleurs.** `app/api/fiscalite/tva/route.ts:36-38`
+  construit la même borne `-31`. La route appartient au domaine fiscal, hors
+  périmètre de ce ticket. Signalée, non corrigée.
+- **`reference_piece` conservée.** Colonne réelle mais jamais écrite. Son sort
+  relève du nettoyage de schéma, pas de cette réparation.
+
+### Production
+
+Non vérifié. La correction est du code, sans migration : rien à exécuter dans
+Supabase. Le contrôle réel suppose la mise en ligne de la branche.
+
+Requête de contrôle, à exécuter dans Supabase pour confirmer les deux corrections
+contre les données réelles. Elle reproduit exactement ce que fait la Balance,
+sur les cinq mois qui échouaient, et lit la colonne de référence du Grand Livre.
+
+```sql
+-- 1. Les deux colonnes du contrat existent, les deux fantômes non
+SELECT column_name
+FROM   information_schema.columns
+WHERE  table_schema = 'public' AND table_name = 'journal_entries'
+  AND  column_name IN ('piece_number', 'reference_piece', 'reference', 'journal_type')
+ORDER  BY column_name;
+
+-- 2. La période semi-ouverte fonctionne sur les cinq mois qui échouaient
+SELECT m.mois,
+       count(*)                        AS ecritures,
+       coalesce(sum(je.montant), 0)    AS total
+FROM   (VALUES (2),(4),(6),(9),(11)) AS m(mois)
+LEFT JOIN journal_entries je
+       ON je.date_operation >= make_date(2026, m.mois, 1)
+      AND je.date_operation <  make_date(2026, m.mois, 1) + INTERVAL '1 month'
+GROUP  BY m.mois
+ORDER  BY m.mois;
+```
+
+La première requête doit renvoyer `piece_number` et `reference_piece`, et
+seulement elles. La seconde doit renvoyer cinq lignes sans erreur 22008.
