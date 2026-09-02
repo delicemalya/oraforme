@@ -58,7 +58,7 @@ export default function ValorisationPage() {
     setLoading(true)
     try {
       const { data: prods, error: e1 } = await supabase
-        .from('products')
+        .from('v_products_stock')
         .select('id, nom, sku, categorie, unite, stock_actuel, prix_achat, prix_vente, seuil_alerte, stock_max')
         .eq('tenant_id', tenantId)
         .order('nom')
@@ -68,7 +68,7 @@ export default function ValorisationPage() {
       // Load movements for CMP calculation
       const { data: movements } = await supabase
         .from('stock_movements')
-        .select('product_id, type, quantity, unit_cost')
+        .select('product_id, type, quantite, unit_cost')
         .eq('tenant_id', tenantId)
         .in('type', ['entree', 'reception'])
 
@@ -76,7 +76,7 @@ export default function ValorisationPage() {
       const thisYear = new Date().getFullYear()
       const { data: sorties } = await supabase
         .from('stock_movements')
-        .select('product_id, quantity')
+        .select('product_id, quantite')
         .eq('tenant_id', tenantId)
         .eq('type', 'sortie')
         .gte('created_at', `${thisYear}-01-01`)
@@ -84,8 +84,8 @@ export default function ValorisationPage() {
       const list: ProductValuation[] = (prods || []).map((p: any) => {
         // CMP = Σ(qty * cost) / Σ(qty) from all inbound movements
         const inboundMovs = (movements || []).filter((m: any) => m.product_id === p.id)
-        const totalQtyIn = inboundMovs.reduce((s: number, m: any) => s + (m.quantity || 0), 0)
-        const totalCostIn = inboundMovs.reduce((s: number, m: any) => s + (m.quantity || 0) * (m.unit_cost || 0), 0)
+        const totalQtyIn = inboundMovs.reduce((s: number, m: any) => s + (m.quantite || 0), 0)
+        const totalCostIn = inboundMovs.reduce((s: number, m: any) => s + (m.quantite || 0) * (m.unit_cost || 0), 0)
         const cmp = totalQtyIn > 0 ? totalCostIn / totalQtyIn : p.prix_achat
 
         const valeur_stock = (p.stock_actuel || 0) * cmp
@@ -93,7 +93,7 @@ export default function ValorisationPage() {
         const pct_marge = cmp > 0 ? (marge_brute / p.prix_vente) * 100 : 0
 
         // Rotation = qty sortie annuelle / stock moyen
-        const qtySortie = (sorties || []).filter((s: any) => s.product_id === p.id).reduce((acc: number, s: any) => acc + (s.quantity || 0), 0)
+        const qtySortie = (sorties || []).filter((s: any) => s.product_id === p.id).reduce((acc: number, s: any) => acc + (s.quantite || 0), 0)
         const rotation = (p.stock_actuel || 0) > 0 ? qtySortie / (p.stock_actuel || 1) : 0
 
         // Statut

@@ -78,7 +78,7 @@ export default function ProduitsPage() {
     setLoading(true)
     try {
       const [{ data: prods }, { data: cats }, { data: supps }] = await Promise.all([
-        supabase.from('products').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
+        supabase.from('v_products_stock').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
         supabase.from('product_categories').select('id,nom,code').eq('tenant_id', tenantId).order('nom').limit(200),
         supabase.from('suppliers').select('id,nom').eq('tenant_id', tenantId).order('nom').limit(200),
       ])
@@ -145,7 +145,8 @@ export default function ProduitsPage() {
         const { error } = await supabase.from('products').update(payload).eq('id', editItem.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('products').insert({ ...payload, stock_actuel: 0 })
+        // Pas de stock_actuel : un produit neuf a zéro mouvement, donc zéro stock.
+        const { error } = await supabase.from('products').insert(payload)
         if (error) throw error
       }
       setShowModal(false)

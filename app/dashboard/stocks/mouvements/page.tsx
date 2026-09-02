@@ -17,7 +17,7 @@ interface Movement {
   product_id: string
   warehouse_id: string | null
   type: string
-  quantity: number
+  quantite: number
   unit_cost: number | null
   reference: string | null
   notes: string | null
@@ -89,14 +89,14 @@ export default function MouvementsPage() {
       // stats (all, no pagination)
       const { data: allMov } = await supabase
         .from('stock_movements')
-        .select('type, quantity, unit_cost')
+        .select('type, quantite, unit_cost')
         .eq('tenant_id', tenantId)
         .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString())
 
-      const entrees = (allMov || []).filter((m: any) => ['entree', 'reception', 'retour'].includes(m.type)).reduce((s: number, m: any) => s + (m.quantity || 0), 0)
-      const sorties = (allMov || []).filter((m: any) => m.type === 'sortie').reduce((s: number, m: any) => s + (m.quantity || 0), 0)
+      const entrees = (allMov || []).filter((m: any) => ['entree', 'reception', 'retour'].includes(m.type)).reduce((s: number, m: any) => s + (m.quantite || 0), 0)
+      const sorties = (allMov || []).filter((m: any) => m.type === 'sortie').reduce((s: number, m: any) => s + (m.quantite || 0), 0)
       const ajustements = (allMov || []).filter((m: any) => m.type === 'ajustement').length
-      const valeur_mouvement = (allMov || []).reduce((s: number, m: any) => s + (m.quantity || 0) * (m.unit_cost || 0), 0)
+      const valeur_mouvement = (allMov || []).reduce((s: number, m: any) => s + (m.quantite || 0) * (m.unit_cost || 0), 0)
       setStats({ entrees, sorties, ajustements, valeur_mouvement })
 
     } catch { setMovements([]) }
@@ -121,7 +121,7 @@ export default function MouvementsPage() {
       m.product_nom || '',
       m.product_sku || '',
       m.warehouse_nom || '',
-      m.quantity,
+      m.quantite,
       m.unit_cost || '',
       m.reference || '',
       m.notes || ''
@@ -223,7 +223,7 @@ export default function MouvementsPage() {
                 const cfg = TYPE_CONFIG[m.type] || TYPE_CONFIG.entree
                 const Icon = cfg.icon
                 const sign = cfg.sign
-                const valeur = (m.quantity || 0) * (m.unit_cost || 0)
+                const valeur = (m.quantite || 0) * (m.unit_cost || 0)
                 return (
                   <tr key={m.id} className="border-b border-[#F8FAFC] hover:bg-[#FAFAFA] transition-colors">
                     <td className="px-4 py-3 text-[11px] text-[#64748B] whitespace-nowrap">
@@ -252,7 +252,7 @@ export default function MouvementsPage() {
                       <span className={`text-sm font-bold ${
                         sign === '+' ? 'text-[#16A34A]' : sign === '-' ? 'text-[#DC2626]' : 'text-[#D97706]'
                       }`}>
-                        {sign}{m.quantity.toLocaleString()}
+                        {sign}{m.quantite.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right text-[11px] text-[#64748B]">

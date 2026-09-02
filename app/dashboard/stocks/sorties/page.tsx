@@ -95,7 +95,7 @@ export default function SortiesPage() {
       if (e1?.code === '42P01') { setSorties([]); setLoading(false); return }
 
       const { data: wares } = await supabase.from('warehouses').select('id, nom').eq('tenant_id', tenantId).eq('actif', true).limit(200)
-      const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_vente, prix_achat, unite, stock_actuel').eq('tenant_id', tenantId).limit(200)
+      const { data: prods } = await supabase.from('v_products_stock').select('id, nom, sku, prix_vente, prix_achat, unite, stock_actuel').eq('tenant_id', tenantId).limit(200)
 
       setWarehouses(wares || [])
       setProducts(prods || [])
@@ -200,21 +200,21 @@ export default function SortiesPage() {
         }))
       )
 
+      // La quantite en stock est la somme des mouvements : plus de
+      // lecture-modification-ecriture sur products, et le controle anti-negatif
+      // se fait sous verrou cote base (migration 173).
       for (const l of validLines) {
-        const { data: prod } = await supabase.from('products').select('stock_actuel').eq('id', l.product_id).single()
-        if (prod) {
-          await supabase.from('products').update({ stock_actuel: Math.max(0, (prod.stock_actuel || 0) - l.quantite) }).eq('id', l.product_id)
-        }
-        await supabase.from('stock_movements').insert({
-          tenant_id: tenantId,
-          product_id: l.product_id,
-          warehouse_id: form.warehouse_id || null,
-          type: 'sortie',
-          quantity: l.quantite,
-          unit_cost: l.prix_unitaire,
-          reference: numero,
-          notes: `Sortie ${form.type_sortie}: ${numero}`,
+        const { error: errMvt } = await supabase.rpc('fn_stock_move', {
+          p_tenant_id:    tenantId,
+          p_product_id:   l.product_id,
+          p_type:         'sortie',
+          p_quantite:     l.quantite,
+          p_warehouse_id: form.warehouse_id || null,
+          p_unit_cost:    l.prix_unitaire,
+          p_reference:    numero,
+          p_notes:        `Sortie ${form.type_sortie}: ${numero}`,
         })
+        if (errMvt) throw errMvt
       }
 
       // OHADA entry

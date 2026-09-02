@@ -68,7 +68,7 @@ export default function AlertesStocksPage() {
   const generateAlertes = useCallback(async () => {
     if (!tenantId) return []
     const { data: prods } = await supabase
-      .from('products')
+      .from('v_products_stock')
       .select('id, nom, sku, unite, stock_actuel, seuil_alerte, stock_max, prix_achat')
       .eq('tenant_id', tenantId)
 

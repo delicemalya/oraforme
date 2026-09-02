@@ -49,13 +49,31 @@ function ModalProduit({
       nom: form.nom, description: form.description || null,
       prix_vente: parseFloat(form.prix) || 0, prix_achat: form.prix_achat ? parseFloat(form.prix_achat) : null,
       code_barre: form.code_barre || null, categorie: form.categorie || null,
-      stock_actuel: parseInt(form.stock) || 0, seuil_alerte: form.stock_min ? parseInt(form.stock_min) : null,
+      seuil_alerte: form.stock_min ? parseInt(form.stock_min) : null,
       unite: form.unite, statut: form.statut,
     }
     if (produit) {
+      // Le stock ne se modifie pas depuis la fiche produit : il est la somme
+      // des mouvements. Le champ reste affiché en lecture.
       await supabase.from('products').update(data).eq('id', produit.id).eq('tenant_id', tenant?.tenantId)
     } else {
-      await supabase.from('products').insert({ ...data, tenant_id: tenant?.tenantId })
+      const { data: created } = await supabase.from('products')
+        .insert({ ...data, tenant_id: tenant?.tenantId })
+        .select('id').single()
+
+      // Stock initial : un mouvement d'entrée, pas une colonne.
+      const stockInitial = parseInt(form.stock) || 0
+      if (created?.id && stockInitial > 0) {
+        await supabase.rpc('fn_stock_move', {
+          p_tenant_id:  tenant?.tenantId,
+          p_product_id: created.id,
+          p_type:       'entree',
+          p_quantite:   stockInitial,
+          p_unit_cost:  form.prix_achat ? parseFloat(form.prix_achat) : 0,
+          p_reference:  'STOCK-INITIAL',
+          p_notes:      'Stock initial à la création du produit',
+        })
+      }
     }
     setSaving(false)
     onSaved()
@@ -159,7 +177,7 @@ export default function CommerceCataloguePage() {
   const load = useCallback(async () => {
     if (!tid) return
     setLoading(true)
-    const { data } = await supabase.from('products').select('*').eq('tenant_id', tid).order('nom')
+    const { data } = await supabase.from('v_products_stock').select('*').eq('tenant_id', tid).order('nom')
     setProduits((data ?? []) as Produit[])
     setLoading(false)
   }, [tid])

@@ -190,21 +190,19 @@ export default function AchatsPage() {
       // On reception: update stocks
       if (newStatut === 'reçu') {
         const { data: pItems } = await supabase.from('purchase_items').select('*').eq('purchase_id', p.id)
+        // purchase_items porte quantite et prix (migration 016), pas quantity
+        // ni unit_price.
         for (const item of (pItems || [])) {
-          const { data: prod } = await supabase.from('products').select('stock_actuel').eq('id', item.product_id).single()
-          if (prod) {
-            await supabase.from('products').update({ stock_actuel: (prod.stock_actuel || 0) + item.quantity })
-              .eq('id', item.product_id)
-          }
-          await supabase.from('stock_movements').insert({
-            tenant_id: tenantId,
-            product_id: item.product_id,
-            type: 'reception',
-            quantity: item.quantity,
-            unit_cost: item.unit_price,
-            reference: p.reference,
-            notes: `Réception achat ${p.reference}`,
+          const { error: errMvt } = await supabase.rpc('fn_stock_move', {
+            p_tenant_id:  tenantId,
+            p_product_id: item.product_id,
+            p_type:       'reception',
+            p_quantite:   item.quantite,
+            p_unit_cost:  item.prix,
+            p_reference:  p.reference,
+            p_notes:      `Reception achat ${p.reference}`,
           })
+          if (errMvt) throw errMvt
         }
       }
 

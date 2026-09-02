@@ -127,13 +127,14 @@ export default function CommercePage() {
   const [showPay,   setShowPay]   = useState(false)
   const [saving,    setSaving]    = useState(false)
   const [tab,       setTab]       = useState<'pos' | 'ventes'>('pos')
+  const [stockError, setStockError] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 
   const load = useCallback(async () => {
     if (!tid) return
     setLoading(true)
     const [{ data: p }, { data: v }] = await Promise.all([
-      supabase.from('products').select('id, nom, prix_vente, code_barre, categorie, stock_actuel, unite')
+      supabase.from('v_products_stock').select('id, nom, prix_vente, code_barre, categorie, stock_actuel, unite')
         .eq('tenant_id', tid).eq('statut', 'actif').order('nom').limit(200),
       supabase.from('ventes').select('id, created_at, total, mode_paiement, caissier_nom, nb_articles, statut')
         .eq('tenant_id', tid).order('created_at', { ascending: false }).limit(50),
@@ -176,6 +177,7 @@ export default function CommercePage() {
   async function handleConfirmVente(mode: string, _rendu: number) {
     if (panier.length === 0 || !tid) return
     setSaving(true)
+    setStockError(null)
     const { data: vente } = await supabase.from('ventes').insert({
       tenant_id: tid, total, mode_paiement: mode, nb_articles: nbArticles, statut: 'validee',
     }).select().single()
@@ -183,6 +185,21 @@ export default function CommercePage() {
       await supabase.from('vente_lignes').insert(
         panier.map(l => ({ vente_id: vente.id, produit_id: l.produit.id, produit_nom: l.produit.nom, qte: l.qte, prix: l.produit.prix_vente, sous_total: l.sous_total }))
       )
+
+      // Le point de vente n'a jamais décrémenté le stock : la vente s'arrêtait
+      // aux lignes. Chaque ligne devient une sortie de stock.
+      for (const l of panier) {
+        const { error: errMvt } = await supabase.rpc('fn_stock_move', {
+          p_tenant_id:  tid,
+          p_product_id: l.produit.id,
+          p_type:       'sortie',
+          p_quantite:   l.qte,
+          p_unit_cost:  l.produit.prix_vente,
+          p_reference:  `VTE-${vente.id.slice(0, 8).toUpperCase()}`,
+          p_notes:      'Vente au comptoir',
+        })
+        if (errMvt) setStockError(`${l.produit.nom} : ${errMvt.message}`)
+      }
     }
     setSaving(false)
     setPanier([])
@@ -199,6 +216,13 @@ export default function CommercePage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+
+      {/* Sortie de stock refusée : la vente est enregistrée, le stock non */}
+      {stockError && (
+        <div className="bg-red-50 border-b border-red-200 px-4 sm:px-6 py-2 text-[12px] text-red-700">
+          Stock non décrémenté — {stockError}
+        </div>
+      )}
 
       {/* Header */}
       <div className="bg-white border-b border-[#E2E8F0] px-4 sm:px-6 py-4 sticky top-0 z-10">

@@ -148,7 +148,7 @@ export default function InventairesPage() {
       if (e) throw e
 
       // Load products for this warehouse and create lines
-      let prodsQuery = supabase.from('products').select('id, stock_actuel, prix_achat').eq('tenant_id', tenantId)
+      let prodsQuery = supabase.from('v_products_stock').select('id, stock_actuel, prix_achat').eq('tenant_id', tenantId)
       if (createForm.warehouse_id) prodsQuery = prodsQuery.eq('warehouse_id', createForm.warehouse_id)
       const { data: prods } = await prodsQuery
 
@@ -206,29 +206,17 @@ export default function InventairesPage() {
         for (const ligne of (lines || [])) {
           if (!ligne.ecart || ligne.ecart === 0) continue
 
-          // Update product stock (fallback manual update)
-          try {
-            const { data: p } = await supabase.from('products')
-              .select('stock_actuel')
-              .eq('id', ligne.product_id)
-              .single()
-            if (p) {
-              await supabase.from('products')
-                .update({ stock_actuel: (p.stock_actuel || 0) + ligne.ecart })
-                .eq('id', ligne.product_id)
-            }
-          } catch {}
-
-          // Insert movement
-          await supabase.from('stock_movements').insert({
-            tenant_id: tenantId,
-            product_id: ligne.product_id,
-            warehouse_id: inv.warehouse_id,
-            type: 'ajustement',
-            quantity: Math.abs(ligne.ecart),
-            unit_cost: ligne.unit_cost,
-            reference: `INV-${inv.id.slice(0, 8)}`,
-            notes: `Ajustement inventaire: ${inv.nom}`,
+          // L'ecart porte son signe : un ajustement negatif diminue le stock.
+          // Plus de recalcul manuel sur products, la quantite est derivee.
+          await supabase.rpc('fn_stock_move', {
+            p_tenant_id:    tenantId,
+            p_product_id:   ligne.product_id,
+            p_type:         'ajustement',
+            p_quantite:     ligne.ecart,
+            p_warehouse_id: inv.warehouse_id,
+            p_unit_cost:    ligne.unit_cost,
+            p_reference:    `INV-${inv.id.slice(0, 8)}`,
+            p_notes:        `Ajustement inventaire: ${inv.nom}`,
           })
 
           // OHADA entry for significant adjustments

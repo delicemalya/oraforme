@@ -88,30 +88,17 @@ export async function POST(req: NextRequest) {
 
   // 3. Mettre à jour le stock + créer les mouvements pour chaque ligne
   for (const l of validLines) {
-    const { data: prod } = await supabaseAdmin
-      .from('products')
-      .select('stock_actuel')
-      .eq('id', l.product_id)
-      .eq('tenant_id', ctx.tenantId)
-      .single()
-
-    if (prod) {
-      await supabaseAdmin
-        .from('products')
-        .update({ stock_actuel: (prod.stock_actuel || 0) + l.quantite_recue })
-        .eq('id', l.product_id)
-    }
-
-    // Colonnes correctes : quantite (non quantity) + note (non notes)
-    await supabaseAdmin.from('stock_movements').insert({
-      tenant_id:    ctx.tenantId,
-      product_id:   l.product_id,
-      warehouse_id: warehouse_id || null,
-      type:         'reception',
-      quantite:     l.quantite_recue,
-      reference:    numero,
-      note:         `Réception ${numero}`,
+    const { error: mvtErr } = await supabaseAdmin.rpc('fn_stock_move', {
+      p_tenant_id:    ctx.tenantId,
+      p_product_id:   l.product_id,
+      p_type:         'reception',
+      p_quantite:     l.quantite_recue,
+      p_warehouse_id: warehouse_id || null,
+      p_unit_cost:    l.prix_unitaire ?? 0,
+      p_reference:    numero,
+      p_notes:        `Réception ${numero}`,
     })
+    if (mvtErr) return NextResponse.json({ error: mvtErr.message }, { status: 500 })
   }
 
   // 4. Émettre STK-001 — Entrée stock (311/401 HT) — fire-and-forget P-003
