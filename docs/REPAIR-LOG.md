@@ -677,3 +677,16 @@ Présence en production à confirmer (`pg_trigger`). Le bloc 176 s'interrompt
 tant que ces triggers existent ; leur neutralisation fera l'objet de la
 migration 177 (garde : ignorer toute ligne `transactions` dont le couple
 `(source, source_id)` correspond à un `accounting_events`).
+
+### Diagnostic complémentaire (2026-09-02) — triggers et doublons
+
+| Question | Réponse |
+|---|---|
+| Triggers sur `transactions` en production | **Seul `trg_update_account_balance` est actif.** `trg_auto_journal_entry` et `trg_transaction_to_journal` (migrations 023/027) n'existent pas en production ; aucune écriture `journal_entries` n'a `transactions.id` pour `source_id`. Le dépôt et la production divergent (ANO-P04) : la migration 177 alignera le dépôt en supprimant ces deux triggers, sans effet en production |
+| Registre legacy `journal_comptable` | 4 lignes |
+| Écritures d'AMD FINANCE par source | FAC-001 : 192 × (emises, tva, ca), une seule fois. **PAI-001 : 192 par séquence, pas 384 — pas de doublon** : les originaux ont été traités avant les règles 141, donc sans écriture. **ACH-001 : 48 `achats_enregistrement` + 48 `achats_fournisseurs`, 25 086 000 F chacun — doublon confirmé**, sous deux libellés de règle (les libellés en production ne sont pas ceux de la migration 147) |
+
+Le bloc 176 a été resserré : une écriture d'origine n'est retirée que si sa
+ré-émission a produit la sienne, intacte (table temporaire `tmp_originaux`) ;
+garde supplémentaire : chaque original doit avoir une ré-émission traitée.
+Attendu : 192 lignes de caisse et 48 écritures archivées, 96 FAC-002 traités.

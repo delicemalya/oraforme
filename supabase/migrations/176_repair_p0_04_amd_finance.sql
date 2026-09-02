@@ -13,7 +13,8 @@
 --       (628 344 885 F) pour des factures seulement émises ;
 --     - les 96 règlements FAC-002 ont été rejetés (23505) par ces lignes ;
 --     - 192 PAI-001 et 48 ACH-001 ont été traités, basculés à la main en
---       error, puis ré-émis : leurs écritures existent deux fois.
+--       error, puis ré-émis ; les 48 ACH-001 ont leurs écritures en double,
+--       les PAI-001 d'origine n'en avaient pas (traités avant les règles 141).
 --
 -- RÉPARATION, dans une seule transaction, avec garde-fous sur les comptes
 -- attendus et archivage de chaque ligne supprimée dans repair_archive.
@@ -54,6 +55,16 @@ BEGIN
   SELECT count(*) INTO n FROM accounting_events
   WHERE tenant_id = t AND status = 'error' AND event_type = 'FAC-002';
   IF n <> 96 THEN RAISE EXCEPTION 'Attendu 96 FAC-002 en erreur, trouvé %', n; END IF;
+
+  -- Chaque original basculé doit avoir une ré-émission traitée
+  SELECT count(*) INTO n FROM accounting_events e
+  WHERE e.tenant_id = t AND e.status = 'error' AND e.error_message IS NULL
+    AND NOT EXISTS (
+      SELECT 1 FROM accounting_events r
+      WHERE r.tenant_id = e.tenant_id AND r.event_type = e.event_type
+        AND r.source_table = e.source_table AND r.source_id = e.source_id
+        AND r.status = 'processed' AND r.id <> e.id);
+  IF n <> 0 THEN RAISE EXCEPTION '% originaux sans ré-émission traitée : ne pas remplacer', n; END IF;
 
   -- Les triggers hérités (023, 026, 027) écrivent journal_entries / journal_comptable
   -- à chaque INSERT dans transactions : rejouer FAC-002 avec eux doublerait la caisse.
@@ -100,25 +111,41 @@ WHERE  e.id = l.event_id
   AND  e.tenant_id = 'b93b7c3d-815b-4336-bbb2-ac24cda0edb2'
   AND  e.event_type = 'FAC-001';
 
--- 3. Écritures en double des 240 originaux basculés à la main
-INSERT INTO repair_archive (repair, table_name, row_id, row_data)
-SELECT 'P0-04', 'journal_entries', je.id, to_jsonb(je)
+-- 3. Écritures des 240 originaux basculés à la main.
+--    Diagnostic du 2026-09-02 : la paie n'est PAS en double (192 écritures par
+--    séquence, les originaux PAI-001 ont été traités avant l'existence des
+--    règles, donc sans écriture) ; les 48 ACH-001 le sont (25 086 000 F × 2).
+--    On ne retire l'écriture d'un original que si sa ré-émission a produit la
+--    sienne, intacte : jamais de suppression qui laisserait un fait sans écriture.
+CREATE TEMP TABLE tmp_originaux ON COMMIT DROP AS
+SELECT e.id AS event_id, l.journal_entry_ids
 FROM   accounting_events e
 JOIN   accounting_event_log l ON l.event_id = e.id
-JOIN   journal_entries je     ON je.id = ANY (l.journal_entry_ids)
 WHERE  e.tenant_id = 'b93b7c3d-815b-4336-bbb2-ac24cda0edb2'
-  AND  e.status = 'error' AND e.error_message IS NULL;
+  AND  e.status = 'error' AND e.error_message IS NULL
+  AND  EXISTS (
+         SELECT 1
+         FROM   accounting_events r
+         JOIN   accounting_event_log lr ON lr.event_id = r.id
+         WHERE  r.tenant_id = e.tenant_id AND r.event_type = e.event_type
+           AND  r.source_table = e.source_table AND r.source_id = e.source_id
+           AND  r.status = 'processed' AND r.id <> e.id
+           AND  lr.entries_count > 0
+           AND  lr.entries_count = (SELECT count(*) FROM journal_entries je WHERE je.id = ANY (lr.journal_entry_ids))
+       );
+
+INSERT INTO repair_archive (repair, table_name, row_id, row_data)
+SELECT 'P0-04', 'journal_entries', je.id, to_jsonb(je)
+FROM   tmp_originaux o
+JOIN   journal_entries je ON je.id = ANY (o.journal_entry_ids);
 
 DELETE FROM journal_entries je
-USING  accounting_events e
-JOIN   accounting_event_log l ON l.event_id = e.id
-WHERE  je.id = ANY (l.journal_entry_ids)
-  AND  e.tenant_id = 'b93b7c3d-815b-4336-bbb2-ac24cda0edb2'
-  AND  e.status = 'error' AND e.error_message IS NULL;
+USING  tmp_originaux o
+WHERE  je.id = ANY (o.journal_entry_ids);
 
 UPDATE accounting_events
 SET    status        = 'superseded',
-       error_message = 'P0-04 : original traité puis basculé à la main le 2026-06-27, remplacé par sa ré-émission ; écritures archivées dans repair_archive'
+       error_message = 'P0-04 : original traité puis basculé à la main le 2026-06-27, remplacé par sa ré-émission ; écritures éventuelles archivées dans repair_archive'
 WHERE  tenant_id = 'b93b7c3d-815b-4336-bbb2-ac24cda0edb2'
   AND  status = 'error' AND error_message IS NULL;
 
@@ -164,7 +191,7 @@ SELECT * FROM (
 --   1_evenements  FAC-002 · processed = 96, aucune ligne « · error », PAI-001/ACH-001 · superseded = 192/48
 --   2_caisse      plus aucune ligne « sortie · facturation » ; 96 lignes « entree · facturation »
 --   3_doublons    0
---   4_archive     transactions = 192 ; journal_entries = écritures des 240 originaux (jusqu'à 4 par PAI-001, 1 par ACH-001)
+--   4_archive     transactions = 192 ; journal_entries = 48 (les doublons ACH-001 ; la paie n'était pas en double)
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- ⛔ RETOUR ARRIÈRE (ne pas exécuter sauf besoin) : réinsérer depuis repair_archive
