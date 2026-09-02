@@ -646,3 +646,34 @@ Conséquences :
   puis rejeu des 96 FAC-002 après application de 175. Décision préalable de
   l'utilisateur : AMD FINANCE est-il un client réel ou un tenant de
   démonstration ?
+
+### Décision de l'utilisateur et découverte supplémentaire (2026-09-02)
+
+**AMD FINANCE est un client réel** (maison mère d'Oraforme), utilisé aussi pour
+les tests, propriétaire des comptes super-admin. L'espace `/admin` est réservé
+par liste d'e-mails (`proxy.ts:49`), pas par tenant : le tenant se comporte
+comme tout autre, aucun code à changer. La réparation est donc chirurgicale et
+réversible : `supabase/migrations/176_repair_p0_04_amd_finance.sql` archive
+chaque ligne supprimée dans `repair_archive`, ne touche ni factures, ni
+bulletins, ni achats, ni saisies directes, et refuse de s'exécuter si l'état
+diffère du diagnostic.
+
+**Nouvelle anomalie, hors audit — triggers hérités sur `transactions`.** Trois
+triggers `AFTER INSERT ON transactions` n'ont jamais été supprimés :
+`trg_auto_journal_entry` (`027:136`, fonction `fn_auto_journal_entry` sans
+aucune garde) écrit une écriture `journal_entries` avec des comptes devinés par
+mot-clé de catégorie (`571000/709000` par défaut) ; `trg_transaction_to_journal`
+(`023:156`) écrit dans le registre legacy `journal_comptable` ;
+`trg_update_account_balance` (`023:179`) touche `accounts`. Depuis la migration
+138, le moteur insère lui-même dans `transactions` pour chaque mouvement de
+caisse : **chaque règlement FAC-002, PAI-002, RES-001, ECO-001… produit alors
+une seconde écriture de trésorerie**, et les soldes 521/571 recalculés depuis
+`journal_entries` sont doublés. Cinq pages (`tresorerie/*`, `ecole/rh`)
+insèrent dans `transactions` **et** appellent `writeComptaEntry` : trois
+écritures pour une opération. Deux pages (`transport`, `ecole/comptabilite`)
+n'ont que le trigger comme chemin comptable.
+
+Présence en production à confirmer (`pg_trigger`). Le bloc 176 s'interrompt
+tant que ces triggers existent ; leur neutralisation fera l'objet de la
+migration 177 (garde : ignorer toute ligne `transactions` dont le couple
+`(source, source_id)` correspond à un `accounting_events`).
