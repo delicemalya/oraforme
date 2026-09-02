@@ -85,7 +85,7 @@ export default function StocksAnalyticsPage() {
       // Purchases
       const { data: purch } = await supabase
         .from('purchases')
-        .select('total_amount, date')
+        .select('montant_total, date')
         .eq('tenant_id', tenantId)
         .gte('date', fromDate)
 
@@ -132,7 +132,7 @@ export default function StocksAnalyticsPage() {
       for (const p of (purch || [])) {
         const d = new Date(p.date)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-        if (monthMap[key]) monthMap[key].achats += p.total_amount || 0
+        if (monthMap[key]) monthMap[key].achats += p.montant_total || 0
       }
 
       setData(Object.values(monthMap))
@@ -172,7 +172,7 @@ export default function StocksAnalyticsPage() {
 
       // Summary
       const valeur_stock = (prods || []).reduce((s: number, p: any) => s + (p.stock_actuel || 0) * (p.prix_achat || 0), 0)
-      const total_achats = (purch || []).reduce((s: number, p: any) => s + (p.total_amount || 0), 0)
+      const total_achats = (purch || []).reduce((s: number, p: any) => s + (p.montant_total || 0), 0)
       const total_sorties_val = Object.values(monthMap).reduce((s, m) => s + m.sorties_val, 0)
       const avgStock = (prods || []).reduce((s: number, p: any) => s + (p.stock_actuel || 0), 0) / Math.max((prods || []).length, 1)
       const rotation_moy = avgStock > 0 ? (total_sorties_val / Math.max(valeur_stock, 1)) : 0

@@ -20,7 +20,7 @@ interface Purchase {
   reference: string | null
   date: string
   statut: string
-  total_amount: number
+  montant_total: number
   notes: string | null
   created_at: string
   supplier_nom?: string
@@ -31,9 +31,8 @@ interface PurchaseItem {
   id: string
   purchase_id: string
   product_id: string
-  quantity: number
-  unit_price: number
-  total: number
+  quantite: number
+  prix: number
   product_nom?: string
   product_sku?: string
 }
@@ -71,7 +70,7 @@ export default function AchatsPage() {
     reference: '',
     date: new Date().toISOString().split('T')[0],
     notes: '',
-    lines: [{ product_id: '', quantity: 1, unit_price: 0 }],
+    lines: [{ product_id: '', quantite: 1, prix: 0 }],
   })
   const [createError, setCreateError] = useState('')
 
@@ -122,7 +121,7 @@ export default function AchatsPage() {
     await loadItems(id)
   }
 
-  const addLine = () => setForm(f => ({ ...f, lines: [...f.lines, { product_id: '', quantity: 1, unit_price: 0 }] }))
+  const addLine = () => setForm(f => ({ ...f, lines: [...f.lines, { product_id: '', quantite: 1, prix: 0 }] }))
   const removeLine = (i: number) => setForm(f => ({ ...f, lines: f.lines.filter((_, idx) => idx !== i) }))
   const updateLine = (i: number, field: keyof PurchaseItem | string, val: string | number) => {
     setForm(f => {
@@ -130,13 +129,13 @@ export default function AchatsPage() {
       lines[i] = { ...lines[i], [field]: val }
       if (field === 'product_id') {
         const prod = products.find(p => p.id === val)
-        if (prod) lines[i].unit_price = prod.prix_achat
+        if (prod) lines[i].prix = prod.prix_achat
       }
       return { ...f, lines }
     })
   }
 
-  const totalForm = form.lines.reduce((s, l) => s + (l.quantity || 0) * (l.unit_price || 0), 0)
+  const totalForm = form.lines.reduce((s, l) => s + (l.quantite || 0) * (l.prix || 0), 0)
 
   const handleCreate = async () => {
     if (!tenantId || !form.lines.some(l => l.product_id)) {
@@ -154,7 +153,7 @@ export default function AchatsPage() {
           reference: form.reference.trim() || `ACH-${Date.now()}`,
           date: form.date,
           statut: 'brouillon',
-          total_amount: totalForm,
+          montant_total: totalForm,
           notes: form.notes.trim() || null,
         })
         .select().single()
@@ -166,16 +165,15 @@ export default function AchatsPage() {
           validLines.map(l => ({
             purchase_id: purch.id,
             product_id: l.product_id,
-            quantity: l.quantity,
-            unit_price: l.unit_price,
-            total: l.quantity * l.unit_price,
+            quantite: l.quantite,
+            prix: l.prix,
           }))
         )
         if (e2) throw e2
       }
 
       setShowCreate(false)
-      setForm({ supplier_id: '', reference: '', date: new Date().toISOString().split('T')[0], notes: '', lines: [{ product_id: '', quantity: 1, unit_price: 0 }] })
+      setForm({ supplier_id: '', reference: '', date: new Date().toISOString().split('T')[0], notes: '', lines: [{ product_id: '', quantite: 1, prix: 0 }] })
       await load()
     } catch (e: any) { setCreateError(e.message || 'Erreur') }
     setSaving(false)
@@ -214,7 +212,7 @@ export default function AchatsPage() {
           date: today,
           libelle: `Paiement achat ${p.reference || p.id.slice(0, 8)} — ${p.supplier_nom || 'Fournisseur'}`,
           type: 'depense',
-          montant: p.total_amount,
+          montant: p.montant_total,
           categorie: 'achats',
           debitAccount: '401',
           creditAccount: '521',
@@ -236,7 +234,7 @@ export default function AchatsPage() {
 
   const totalMois = purchases
     .filter(p => p.date >= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0])
-    .reduce((s, p) => s + (p.total_amount || 0), 0)
+    .reduce((s, p) => s + (p.montant_total || 0), 0)
 
   return (
     <div className="space-y-5">
@@ -334,7 +332,7 @@ export default function AchatsPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-sm font-bold text-[#0F172A]">{fmtFCFA(p.total_amount)}</p>
+                    <p className="text-sm font-bold text-[#0F172A]">{fmtFCFA(p.montant_total)}</p>
                     <p className="text-[10px] text-[#94A3B8]">Total achat</p>
                   </div>
 
@@ -377,14 +375,14 @@ export default function AchatsPage() {
                                 <p className="text-xs font-semibold text-[#0F172A]">{item.product_nom}</p>
                                 <span className="text-[10px] font-mono text-[#94A3B8]">{item.product_sku}</span>
                               </td>
-                              <td className="px-4 py-2.5 text-right text-xs text-[#64748B]">{item.quantity}</td>
-                              <td className="px-4 py-2.5 text-right text-xs text-[#64748B]">{fmtFCFA(item.unit_price)}</td>
-                              <td className="px-4 py-2.5 text-right text-xs font-bold text-[#0F172A]">{fmtFCFA(item.total)}</td>
+                              <td className="px-4 py-2.5 text-right text-xs text-[#64748B]">{item.quantite}</td>
+                              <td className="px-4 py-2.5 text-right text-xs text-[#64748B]">{fmtFCFA(item.prix)}</td>
+                              <td className="px-4 py-2.5 text-right text-xs font-bold text-[#0F172A]">{fmtFCFA(item.quantite * item.prix)}</td>
                             </tr>
                           ))}
                           <tr className="border-t border-[#E2E8F0] bg-[#F8FAFC]">
                             <td colSpan={3} className="px-4 py-2.5 text-xs font-bold text-right text-[#374151]">{t('common.total')}</td>
-                            <td className="px-4 py-2.5 text-right text-sm font-bold text-[#0F172A]">{fmtFCFA(p.total_amount)}</td>
+                            <td className="px-4 py-2.5 text-right text-sm font-bold text-[#0F172A]">{fmtFCFA(p.montant_total)}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -461,17 +459,17 @@ export default function AchatsPage() {
                             </select>
                           </td>
                           <td className="px-3 py-2">
-                            <input type="number" min={1} value={line.quantity}
-                              onChange={e => updateLine(i, 'quantity', Number(e.target.value))}
+                            <input type="number" min={1} value={line.quantite}
+                              onChange={e => updateLine(i, 'quantite', Number(e.target.value))}
                               className="w-20 text-right px-2 py-1 text-xs border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#16A34A]/40" />
                           </td>
                           <td className="px-3 py-2">
-                            <input type="number" min={0} value={line.unit_price}
-                              onChange={e => updateLine(i, 'unit_price', Number(e.target.value))}
+                            <input type="number" min={0} value={line.prix}
+                              onChange={e => updateLine(i, 'prix', Number(e.target.value))}
                               className="w-28 text-right px-2 py-1 text-xs border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#16A34A]/40" />
                           </td>
                           <td className="px-3 py-2 text-right text-xs font-bold text-[#0F172A]">
-                            {fmtFCFA(line.quantity * line.unit_price)}
+                            {fmtFCFA(line.quantite * line.prix)}
                           </td>
                           <td className="px-3 py-2">
                             {form.lines.length > 1 && (
