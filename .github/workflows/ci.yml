@@ -1,0 +1,91 @@
+name: CI
+
+# Garde de pull request. Rien de ce que le dépôt affirme ne tient sans elle :
+# 526 tests existent, dont cinq lois d'architecture, et rien ne les exécutait.
+# Les anomalies ANO-C02 et ANO-C03 ont vécu quatre mois en production parce
+# qu'aucune vérification automatique ne comparait le code au schéma réel.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Une seule exécution par branche : les poussées successives annulent la précédente.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Types, lint et tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Dépendances
+        run: npm ci
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      # eslint-suppressions.json consigne les 11 violations des lois L, M et N
+      # antérieures à cette garde. Toute NOUVELLE violation fait échouer l'étape.
+      - name: ESLint
+        run: npm run lint
+
+      - name: Tests unitaires et lois d'architecture
+        run: npm run test
+
+      # Informatif : combien de violations héritées restent à résorber.
+      - name: Dette ESLint restante
+        if: always()
+        run: |
+          node -e "
+            const d = require('./eslint-suppressions.json');
+            let n = 0;
+            for (const file of Object.keys(d))
+              for (const rule of Object.keys(d[file])) n += d[file][rule].count;
+            console.log('Violations héritées encore suppressées : ' + n);
+            for (const file of Object.keys(d))
+              for (const rule of Object.keys(d[file]))
+                console.log('  ' + file + ' — ' + rule + ' × ' + d[file][rule].count);
+          "
+
+  build:
+    name: Build de production
+    runs-on: ubuntu-latest
+    needs: quality
+
+    # Valeurs de remplacement : le build ne doit joindre aucun service. Vérifié
+    # localement, les 440 pages se génèrent avec ces valeurs.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key
+      ANTHROPIC_API_KEY: placeholder
+      MISTRAL_API_KEY: placeholder
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Dépendances
+        run: npm ci
+
+      - name: Build
+        run: npm run build

@@ -1,0 +1,112 @@
+name: Semgrep Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Scan hebdomadaire le lundi à 08h00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  semgrep:
+    name: Semgrep OSS Scan
+    runs-on: ubuntu-latest
+    container:
+      # Image officielle Semgrep — open-source uniquement
+      image: semgrep/semgrep
+
+    # Pas de SEMGREP_APP_TOKEN → mode offline, pas de Pro engine
+    # Pas de --pro flag → moteur OSS garanti
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep — règles communautaires open-source
+        run: |
+          semgrep \
+            --config .semgrep.yml \
+            --config p/typescript \
+            --config p/javascript \
+            --config p/react \
+            --config p/nextjs \
+            --config p/security-audit \
+            --config p/owasp-top-ten \
+            --config p/jwt \
+            --config p/secrets \
+            --exclude "node_modules" \
+            --exclude ".next" \
+            --exclude "coverage" \
+            --exclude "**/*.test.ts" \
+            --exclude "**/*.spec.ts" \
+            --exclude "**/*.test.tsx" \
+            --exclude "**/*.spec.tsx" \
+            --exclude "supabase/migrations" \
+            --error \
+            --json \
+            --output semgrep-results.json \
+            . || true
+
+      - name: Display results summary
+        if: always()
+        run: |
+          if [ -f semgrep-results.json ]; then
+            echo "=== Semgrep Results ==="
+            python3 -c "
+          import json, sys
+          with open('semgrep-results.json') as f:
+              data = json.load(f)
+          results = data.get('results', [])
+          errors = [r for r in results if r.get('extra', {}).get('severity') == 'ERROR']
+          warnings = [r for r in results if r.get('extra', {}).get('severity') == 'WARNING']
+          print(f'Total findings: {len(results)}')
+          print(f'  Errors:   {len(errors)}')
+          print(f'  Warnings: {len(warnings)}')
+          if errors:
+              print()
+              print('ERROR findings:')
+              for r in errors:
+                  print(f'  [{r[\"check_id\"]}] {r[\"path\"]}:{r[\"start\"][\"line\"]}')
+                  print(f'    {r[\"extra\"][\"message\"][:120]}')
+          sys.exit(1 if errors else 0)
+          "
+          fi
+
+      - name: Upload SARIF to GitHub Security tab
+        if: always()
+        run: |
+          semgrep \
+            --config .semgrep.yml \
+            --config p/typescript \
+            --config p/javascript \
+            --config p/react \
+            --config p/nextjs \
+            --config p/security-audit \
+            --config p/owasp-top-ten \
+            --config p/jwt \
+            --config p/secrets \
+            --exclude "node_modules" \
+            --exclude ".next" \
+            --exclude "coverage" \
+            --sarif \
+            --output semgrep.sarif \
+            . || true
+
+      - name: Upload SARIF artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif
+          path: semgrep.sarif
+          retention-days: 30
+
+      - name: Upload findings artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 30

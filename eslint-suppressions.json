@@ -1,0 +1,42 @@
+{
+  "app/api/agents/commercial/analyse/route.ts": {
+    "loi-l/unique-fiscal-calculator": {
+      "count": 1
+    }
+  },
+  "app/api/cabinet/clients/[id]/factures/route.ts": {
+    "loi-l/unique-fiscal-calculator": {
+      "count": 1
+    }
+  },
+  "app/dashboard/cabinet/clients/[id]/page.tsx": {
+    "loi-l/unique-fiscal-calculator": {
+      "count": 2
+    }
+  },
+  "app/dashboard/finance/page.tsx": {
+    "loi-l/unique-fiscal-calculator": {
+      "count": 3
+    }
+  },
+  "app/dashboard/profil/actions.ts": {
+    "loi-m/unique-tenant-creator": {
+      "count": 1
+    }
+  },
+  "app/dashboard/profil/page.tsx": {
+    "loi-m/unique-tenant-creator": {
+      "count": 1
+    }
+  },
+  "components/dashboard/Sidebar.tsx": {
+    "loi-n/unique-permission-engine": {
+      "count": 1
+    }
+  },
+  "components/onboarding/Step1.tsx": {
+    "loi-l/unique-fiscal-calculator": {
+      "count": 1
+    }
+  }
+}
