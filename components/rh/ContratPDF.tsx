@@ -1,6 +1,7 @@
 import {
   Document, Page, Text, View, StyleSheet,
 } from '@react-pdf/renderer'
+import { calculerChargesSociales, type CodePays } from '@/lib/fiscal/universal-tax-engine'
 
 const AMBER = '#F59E0B'
 const DARK  = '#0F172A'
@@ -64,6 +65,8 @@ export interface ContratPDFData {
     adresse: string
     ville:   string
   }
+  /** Pays du contrat — détermine le barème de cotisations. Congo par défaut. */
+  code_pays?: CodePays
 }
 
 const LABELS: Record<TypeContrat, string> = {
@@ -84,11 +87,25 @@ function fmt(n: number) {
   return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' FCFA'
 }
 
-function cnssEmploye(brut: number) { return Math.round(brut * 0.0504) }
-function netEstime(brut: number)   { return brut - cnssEmploye(brut) }
-function coutPatronal(brut: number){ return Math.round(brut * 1.1416) }
+// Le contrat est opposable au salarié : ses montants doivent être ceux du
+// moteur fiscal, pas un taux moyen recopié. La version précédente retenait
+// 5,04 % sur la totalité du brut et chiffrait le coût employeur à 14,16 %,
+// deux valeurs qui ne correspondent à aucune branche de cotisation et qui
+// ignoraient les plafonds.
+function chargesContrat(brut: number, codePays: CodePays) {
+  const c = calculerChargesSociales({ codePays, salaireBrut: brut, appliquerMesuresSpeciales: false })
+  return {
+    cnssEmploye:  c.total_salarie,
+    netEstime:    brut - c.total_salarie,
+    coutPatronal: c.cout_total,
+    tauxSalarie:  brut > 0 ? c.total_salarie / brut : 0,
+  }
+}
 
 export function ContratPDF({ data }: { data: ContratPDFData }) {
+  const codePays   = data.code_pays ?? 'CG'
+  const charges    = chargesContrat(data.salaire_base, codePays)
+  const pctSalarie = `${(charges.tauxSalarie * 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} % effectif`
   const { employe, type_contrat, date_debut, date_fin, salaire_base, primes,
           periode_essai, lieu_travail, signe_le, avantages } = data
 
@@ -237,9 +254,9 @@ export function ContratPDF({ data }: { data: ContratPDFData }) {
           <View style={s.recap}>
             {[
               ['Salaire brut mensuel',           fmt(salaire_base)],
-              ['CNSS salarié (5,04%)',            `- ${fmt(cnssEmploye(salaire_base))}`],
-              ['Salaire net estimé',              fmt(netEstime(salaire_base))],
-              ['Coût total employeur (CNSS 14,16%)', fmt(coutPatronal(salaire_base))],
+              [`Cotisations salariales (${pctSalarie})`, `- ${fmt(charges.cnssEmploye)}`],
+              ['Salaire net estimé',              fmt(charges.netEstime)],
+              ['Coût total employeur',            fmt(charges.coutPatronal)],
             ].map(([k, v]) => (
               <View key={k} style={s.recapRow}>
                 <Text style={s.recapKey}>{k}</Text>

@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 import { calculerCNSSAggrege } from '@/lib/fiscalite/engine'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 import { getPaysConfig } from '@/lib/fiscalite/pays'
+import { supporteDeclarationsCNSS, type CodePays } from '@/lib/fiscal/universal-tax-engine'
 import { computeCNSSSummary, BULLETIN_FISCAL_SELECT } from '@/lib/erp-core/compute/fiscal'
 
 export const dynamic = 'force-dynamic'
@@ -21,6 +22,22 @@ export async function GET(req: NextRequest) {
   const annee = Number(searchParams.get('annee') ?? new Date().getFullYear())
   const mois  = searchParams.get('mois') ? Number(searchParams.get('mois')) : null
   const pays  = (searchParams.get('pays') ?? 'CG') as PaysFiscal
+
+  // Le drapeau support_declarations_cnss existe dans chaque configuration pays
+  // et n'était lu nulle part : la déclaration se générait pour le Tchad, la
+  // Centrafrique et la Guinée équatoriale, où il vaut false. Un document CNSS
+  // ne doit pas exister pour un pays dont le régime n'est pas implémenté.
+  if (!supporteDeclarationsCNSS(pays as CodePays)) {
+    return NextResponse.json(
+      {
+        error:  "Déclaration CNSS non disponible pour ce pays",
+        code:   'NOT_CONFIGURED',
+        pays,
+        detail: "Le régime de sécurité sociale de ce pays n'est pas implémenté. Aucun document ne peut être produit sans barème vérifié.",
+      },
+      { status: 422 },
+    )
+  }
 
   let q = supabaseAdmin
     .from('bulletins_paie')

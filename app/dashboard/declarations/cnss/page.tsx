@@ -8,7 +8,7 @@ import {
   X, FileSpreadsheet
 } from 'lucide-react'
 import {
-  calculerCNSSEmploye, calculerDeclarationGlobale, fmtCNSS, MOIS_LABELS,
+  calculerCNSSEmploye, calculerDeclarationGlobale, fmtCNSS, fmtTaux, fmtPlafond, MOIS_LABELS,
   type EmployeDeclaration, type EmployeInput, type DeclarationCNSS,
 } from '@/lib/declarations/cnss-congo'
 
@@ -105,6 +105,28 @@ export default function CNSSDeclarationPage() {
     })
   )
   const recap = calculerDeclarationGlobale(computedEmployes)
+
+  // ── Lignes de cotisation — issues du moteur fiscal, aucun taux réécrit ────
+  // L'écran affichait « 10.03% » sur une base plafonnée à 600 000 F, alors que
+  // les allocations familiales ont leur propre plafond de 1 200 000 F.
+  const lignesCotisations = recap.branches
+    .filter(b => b.montant_salarie > 0 || b.montant_patronal > 0)
+    .flatMap(b => {
+      const rows: Array<{ nature: string; base: number; taux: string; montant: number; qui: string; color: string }> = []
+      if (b.taux_salarie > 0) {
+        rows.push({ nature: `${b.libelle} — part salarié`, base: b.base_totale, taux: fmtTaux(b.taux_salarie), montant: b.montant_salarie, qui: 'Employé', color: C.purple })
+      }
+      if (b.taux_patronal > 0) {
+        rows.push({ nature: `${b.libelle} — part patronale`, base: b.base_totale, taux: fmtTaux(b.taux_patronal), montant: b.montant_patronal, qui: 'Patronal', color: C.blue })
+      }
+      return rows
+    })
+
+  const plafondsAFAT = recap.branches
+    .filter(b => b.code === 'AF' || b.code === 'AT')
+    .map(b => `${b.code} ${fmtPlafond(b.plafond_mensuel)}`)
+    .join(' · ')
+
 
   // ── Chargement ───────────────────────────────────────────────────────────────
 
@@ -328,10 +350,12 @@ export default function CNSSDeclarationPage() {
         <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 16px', marginBottom: 18, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
           <Shield size={14} color={C.primary} style={{ flexShrink: 0, marginTop: 1 }} />
           <div style={{ fontSize: 11, color: '#92400E', lineHeight: 1.7 }}>
-            <strong>Taux CNSS Congo officiels 2024 :</strong>
-            &nbsp; Vieillesse : <strong>4% salarié + 8% patronal</strong> (plaf. 1 200 000 FCFA/agent)
-            &nbsp;·&nbsp; Allocations Familiales : <strong>10.03%</strong> + AT-Maladie : <strong>2.25%</strong> (plaf. 600 000 FCFA/agent)
-            &nbsp;·&nbsp; TUS : <strong>3%</strong> déplafonné
+            <strong>Barème appliqué :</strong>
+            {recap.branches.map(b => (
+              <span key={b.code}>
+                &nbsp;·&nbsp;{b.libelle} : <strong>{fmtTaux(b.taux_salarie + b.taux_patronal)}</strong> ({fmtPlafond(b.plafond_mensuel)})
+              </span>
+            ))}
           </div>
         </div>
 
@@ -340,7 +364,7 @@ export default function CNSSDeclarationPage() {
           {kpi('Masse salariale', fmtCNSS(recap.masse_salariale), C.text, `${recap.nb_employes} employé(s)`)}
           {kpi('Part salarié (4%)', fmtCNSS(recap.cotisation_vieillesse_employe), C.purple, 'Vieillesse retenue')}
           {kpi('VID Patronal (8%)', fmtCNSS(recap.cotisation_vieillesse_patronal), C.blue, 'Vieillesse patronal')}
-          {kpi('AF + AT (12.28%)', fmtCNSS(recap.cotisation_at_mp_pf_total), '#0891B2', 'Plafonné 600 000')}
+          {kpi('Allocations familiales + accidents du travail', fmtCNSS(recap.cotisation_at_mp_pf_total), '#0891B2', plafondsAFAT)}
           {kpi('TUS (3%)', fmtCNSS(recap.cotisation_tus_total), C.primary, 'Déplafonné')}
           {kpi('TOTAL À VERSER', fmtCNSS(recap.total_a_verser), C.red, 'Part salarié + patronal')}
         </div>
@@ -389,11 +413,7 @@ export default function CNSSDeclarationPage() {
                     </thead>
                     <tbody>
                       {[
-                        { nature: 'Vieillesse — Part salarié',     base: recap.base_vieillesse_total,   taux: '4%',     montant: recap.cotisation_vieillesse_employe,  qui: 'Employé', color: C.purple },
-                        { nature: 'Vieillesse — Part patronale (VID)', base: recap.base_vieillesse_total, taux: '8%',  montant: recap.cotisation_vieillesse_patronal, qui: 'Patronal', color: C.blue },
-                        { nature: 'Allocations Familiales (AF)',    base: recap.base_at_mp_pf_total,     taux: '10.03%', montant: recap.allocations_familiales_total,   qui: 'Patronal', color: '#0891B2' },
-                        { nature: 'Accidents du Travail (AT)',      base: recap.base_at_mp_pf_total,     taux: '2.25%',  montant: recap.accidents_travail_total,        qui: 'Patronal', color: '#0891B2' },
-                        { nature: 'Taxe Unique sur Salaires (TUS)', base: recap.masse_salariale,         taux: '3%',     montant: recap.cotisation_tus_total,           qui: 'Patronal', color: C.primary },
+                        ...lignesCotisations,
                       ].map((row, i) => (
                         <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? C.card : '#FAFAFA' }}>
                           <td style={{ padding: '11px 16px', fontWeight: 600, color: C.text }}>{row.nature}</td>
@@ -478,7 +498,7 @@ export default function CNSSDeclarationPage() {
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                       <thead>
                         <tr style={{ background: C.text, color: '#fff' }}>
-                          {['N°','Nom Prénom','N° CNSS','Sal. Brut','Part Agent 4%','VID 8%','AF 10.03%','AT 2.25%','TUS 3%','Total à Verser','Actions'].map(h => (
+                          {['N°','Nom Prénom','N° CNSS','Sal. Brut','Part agent','VID patronal','Alloc. familiales','Accidents travail','TUS','Total à Verser','Actions'].map(h => (
                             <th key={h} style={{ padding: '9px 10px', textAlign: h === 'N°' || h === 'Nom Prénom' || h === 'Actions' ? 'left' : 'right', fontSize: 10, fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
                           ))}
                         </tr>

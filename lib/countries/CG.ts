@@ -222,6 +222,51 @@ export const CG: CountryConfig = {
     },
   ],
 
+  // ── Patente ────────────────────────────────────────────────────────────────
+  // Barème déplacé depuis lib/declarations/patente.ts, valeur pour valeur.
+  // Un module de déclaration ne doit pas détenir un barème : il le lit.
+  //
+  // ⚠️ Une seconde table, contradictoire, subsiste dans lib/fiscalite-congo.ts
+  // (8 tranches, minimum de perception 97 500 F, annoncée « inchangée LF 2026 »).
+  // Elle n'alimente aucun document et n'est donc pas la source retenue ici. Son
+  // retrait relève de l'arbitrage des moteurs concurrents, pas de ce ticket.
+  patente: {
+    tranches: [
+      { seuil_max:                1_000_000, type: 'forfait', montant: 10_000 },
+      { seuil_min:     1_000_001, seuil_max:      20_000_000, taux: 0.0975  },
+      { seuil_min:    20_000_001, seuil_max:      40_000_000, taux: 0.0065  },
+      { seuil_min:    40_000_001, seuil_max:     100_000_000, taux: 0.0045  },
+      { seuil_min:   100_000_001, seuil_max:     300_000_000, taux: 0.0020  },
+      { seuil_min:   300_000_001, seuil_max:     500_000_000, taux: 0.0045  },
+      { seuil_min:   500_000_001, seuil_max:   1_000_000_000, taux: 0.0014  },
+      { seuil_min: 1_000_000_001, seuil_max:   3_000_000_000, taux: 0.00135 },
+      { seuil_min: 3_000_000_001, seuil_max:  20_000_000_000, taux: 0.00125 },
+      { seuil_min: 20_000_000_001,                            taux: 0.00045 },
+    ],
+    minimum_perception:         10_000,
+    taux_centimes_additionnels: 0.05,
+    taux_camu:                  0.005,
+    taux_reduction_petroliere:  0.50,
+    echeance:                   'avant le 31 mars de chaque année',
+    source:                     'LF 2026 (loi n°42-2025 du 31 décembre 2025) — Art. 122 CGI Congo',
+  },
+
+  // ── Taxes abrogées ─────────────────────────────────────────────────────────
+  // La TUS fiscale (4,5 % des salaires bruts, ligne 9 de la déclaration DGI)
+  // est supprimée par la LF 2026. Seul subsiste le TUS CNSS de 3 %, déclaré à
+  // la CNSS et non à la DGI — voir la branche 'TUS' ci-dessus.
+  // Conservée datée pour qu'une déclaration portant sur 2025 reste exacte.
+  taxes_abrogees: [
+    {
+      code:                  'TUS_FISCALE',
+      libelle:               'Taxe Unique sur les Salaires — part fiscale (DGI)',
+      base:                  'salaires_bruts',
+      taux_avant_abrogation: 0.045,
+      abrogee_le:            '2026-01-01',
+      base_legale:           'LF 2026 (loi n°42-2025 du 31 décembre 2025) — suppression de la TUS fiscale',
+    },
+  ],
+
   // ── Conventions collectives ─────────────────────────────────────────────────
   conventions: {
     actif: false,

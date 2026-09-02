@@ -2,6 +2,7 @@
 // Direction Générale des Impôts et des Domaines — République du Congo
 // Rendu via @react-pdf/renderer (server-side)
 
+import { getBaremePatente } from '@/lib/fiscal/universal-tax-engine'
 import {
   Document, Page, View, Text, StyleSheet,
 } from '@react-pdf/renderer'
@@ -147,12 +148,20 @@ function fmtDate(d?: string): string {
   try { return new Date(d).toLocaleDateString('fr-FR') } catch { return d }
 }
 
+// Taux cités dans les notes de bas de page — lus dans le barème du pays.
+const BAREME = getBaremePatente('CG')
+const pctBareme = (t: number | undefined) =>
+  t === undefined ? '—' : `${(t * 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} %`
+const pctCentimes = pctBareme(BAREME?.taux_centimes_additionnels)
+const pctCamu     = pctBareme(BAREME?.taux_camu)
+const pctReduc    = pctBareme(BAREME?.taux_reduction_petroliere)
+
 const NOTES = [
   '(a) Indiquer les chiffres d\'affaires de l\'exercice précédent celui au titre duquel la contribution est souscrite.',
   '(b) Ne comprend pas les importations en franchise de droits ou les exportations bénéficiant de régime fiscal particulier.',
-  '(c) Le centime additionnel est calculé à 5% sur la patente globale liquidée.',
-  '(d) La CAMU est calculée à 0,5% sur la patente globale liquidée.',
-  '(e) La réduction de 50% ne s\'applique qu\'aux sociétés pétrolières (Art. 314 CGI tome 1).',
+  `(c) Le centime additionnel est calculé à ${pctCentimes} sur la patente globale liquidée.`,
+  `(d) La CAMU est calculée à ${pctCamu} sur la patente globale liquidée.`,
+  `(e) La réduction de ${pctReduc} ne s'applique qu'aux sociétés pétrolières (Art. 314 CGI tome 1).`,
   '(f) Le crédit de l\'année N-1 est déduit du montant net à payer.',
   '(g) La répartition par collectivité locale doit totaliser 100% du CA imposable.',
   '(h) En cas de pluralité d\'établissements, déclarer séparément chaque entité.',
@@ -182,10 +191,10 @@ export function PatentePDFDocument({ data }: { data: PatentePDFData }) {
     { n: '14', label: 'Patente brute (ligne 12 × ligne 13)',         valeur: `${fmt(data.patente_brute)} FCFA` },
     { n: '15', label: 'Minimum de perception',                       valeur: '50 000 FCFA' },
     { n: '16', label: 'Patente globale liquidée (max. lignes 14/15)',valeur: `${fmt(data.patente_liquidee)} FCFA`, bold: true, highlight: true },
-    { n: '17', label: 'Centimes additionnels (ligne 16 × 5%) (c)',   valeur: `${fmt(data.centimes_additionnels)} FCFA` },
-    { n: '18', label: 'CAMU (ligne 16 × 0,5%) (d)',                  valeur: `${fmt(data.camu)} FCFA` },
+    { n: '17', label: `Centimes additionnels (ligne 16 × ${pctCentimes}) (c)`, valeur: `${fmt(data.centimes_additionnels)} FCFA` },
+    { n: '18', label: `CAMU (ligne 16 × ${pctCamu}) (d)`,             valeur: `${fmt(data.camu)} FCFA` },
     { n: '19', label: 'Taxe départementale',                         valeur: '0 FCFA' },
-    { n: '20', label: 'Patente après réduction 50% (e)',             valeur: `${fmt(data.patente_apres_reduction)} FCFA` },
+    { n: '20', label: `Patente après réduction ${pctReduc} (e)`,     valeur: `${fmt(data.patente_apres_reduction)} FCFA` },
     { n: '21', label: 'Crédit N-1 à déduire (f)',                    valeur: `${fmt(data.credit_n1)} FCFA` },
     { n: '22', label: 'PATENTE GLOBALE NETTE À PAYER (g)',           valeur: `${fmt(data.patente_nette)} FCFA`, bold: true, big: true },
   ]

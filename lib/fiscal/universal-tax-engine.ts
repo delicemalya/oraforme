@@ -41,6 +41,7 @@
 
 import {
   getCountryConfig,
+  isCountryAvailable,
   type CountryConfig,
   type CodePays,
   type DataConfidence,
@@ -809,6 +810,107 @@ export function isAssujettieTVA(codePays: CodePays, chiffreAffairesAnnuelHT: num
 export function getSMIG(codePays: CodePays): { montant: number; devise: string; source: string } {
   const cfg = getCountryConfig(codePays)
   return { montant: cfg.smig, devise: cfg.devise, source: cfg.smig_source }
+}
+
+/**
+ * Taux applicable d'une taxe abrogée, pour une période donnée.
+ *
+ * Une déclaration est toujours liquidée au droit de sa période : une
+ * déclaration de novembre 2025 doit encore porter la taxe, celle de janvier
+ * 2026 doit porter zéro. Le taux ne peut donc pas être une constante dans le
+ * document, il dépend de la date.
+ *
+ * @param periodeDebut premier jour de la période déclarée, au format ISO
+ * @returns null si le pays ne connaît pas ce code de taxe
+ */
+export function getTaxeAbrogee(
+  codePays: CodePays,
+  code: string,
+  periodeDebut: string,
+): {
+  code: string
+  libelle: string
+  taux: number
+  abrogee: boolean
+  abrogee_le: string
+  base_legale: string
+} | null {
+  const cfg   = getCountryConfig(codePays)
+  const taxe  = (cfg.taxes_abrogees ?? []).find(t => t.code === code)
+  if (!taxe) return null
+
+  const abrogee = periodeDebut >= taxe.abrogee_le
+
+  return {
+    code:        taxe.code,
+    libelle:     taxe.libelle,
+    taux:        abrogee ? 0 : taxe.taux_avant_abrogation,
+    abrogee,
+    abrogee_le:  taxe.abrogee_le,
+    base_legale: taxe.base_legale,
+  }
+}
+
+/**
+ * Taxes additionnelles assises sur la TVA collectée, à partir du montant de
+ * TVA déjà connu.
+ *
+ * calculerTVA() part d'un montant HT. Une déclaration part de la TVA collectée
+ * agrégée sur les factures de la période : il faut la même règle, prise à
+ * l'autre bout. Congo : Centime Additionnel à 5 % de la TVA collectée.
+ */
+export function calculerTaxesAdditionnellesSurTVA(
+  codePays: CodePays,
+  tvaCollectee: number,
+): {
+  total: number
+  detail: Array<{ code: string; libelle: string; taux: number; montant: number }>
+} {
+  const cfg = getCountryConfig(codePays)
+  const detail = (cfg.tva.taxes_additionnelles ?? [])
+    .filter(t => t.base === 'tva_collectee')
+    .map(t => ({
+      code:    t.code,
+      libelle: t.libelle,
+      taux:    t.taux,
+      montant: Math.round(tvaCollectee * t.taux),
+    }))
+
+  return { total: detail.reduce((s, t) => s + t.montant, 0), detail }
+}
+
+/**
+ * Barème de la patente du pays, ou null s'il n'est pas implémenté.
+ *
+ * Un module de déclaration ne détient pas de barème : il le lit ici. S'il
+ * n'existe pas, aucun document ne doit être produit.
+ */
+export function getBaremePatente(codePays: CodePays) {
+  if (!isCountryAvailable(codePays)) return null
+  return getCountryConfig(codePays).patente ?? null
+}
+
+/**
+ * Le pays a-t-il une configuration fiscale réellement implémentée ?
+ *
+ * getCountryConfig() replie sur le Congo pour les pays non migrés. Un document
+ * officiel ne doit jamais être produit sur ce repli : il porterait des taux
+ * congolais sous l'en-tête d'un autre pays.
+ */
+export function isPaysConfigure(codePays: CodePays): boolean {
+  return isCountryAvailable(codePays)
+}
+
+/**
+ * Le pays autorise-t-il la génération d'une déclaration CNSS ?
+ *
+ * Le drapeau existe dans chaque CountryConfig depuis l'origine et n'était lu
+ * nulle part : la déclaration se générait pour le Tchad, la Centrafrique et la
+ * Guinée équatoriale, où il vaut false.
+ */
+export function supporteDeclarationsCNSS(codePays: CodePays): boolean {
+  if (!isCountryAvailable(codePays)) return false
+  return getCountryConfig(codePays).features.support_declarations_cnss === true
 }
 
 /**

@@ -6,6 +6,8 @@ import {
   Download, Eye, RefreshCw, Ban, Loader2,
   User, Building2, MapPin, Calendar, DollarSign, Edit2,
 } from 'lucide-react'
+import { useTenant } from '@/lib/hooks/useTenant'
+import { calculerChargesSociales, isPaysConfigure, type CodePays } from '@/lib/fiscal/universal-tax-engine'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -131,6 +133,17 @@ export default function ContratsPage() {
   const [loading,      setLoading]      = useState(true)
   const [filter,       setFilter]       = useState('tous')
   const [detail,       setDetail]       = useState<Contrat | null>(null)
+
+  // Pays du contrat. Le barème de cotisations en dépend, il vient donc du
+  // tenant et non d'une constante. Repli sur le Congo uniquement quand le
+  // tenant n'a pas de pays configuré, et seulement parce que c'est le pays
+  // d'origine du produit — un pays inconnu du moteur ne doit jamais servir.
+  const { pays: paysTenant } = useTenant()
+  const codePaysContrat: CodePays =
+    paysTenant && isPaysConfigure(paysTenant as CodePays) ? (paysTenant as CodePays) : 'CG'
+
+  const chargesDetail = (salaireBrut: number) =>
+    calculerChargesSociales({ codePays: codePaysContrat, salaireBrut, appliquerMesuresSpeciales: false })
   const [showNew,      setShowNew]      = useState(false)
   const [showRenew,    setShowRenew]    = useState<Contrat | null>(null)
   const [showTerminate,setShowTerminate]= useState<Contrat | null>(null)
@@ -298,10 +311,20 @@ export default function ContratsPage() {
 
   // ── Net estimé (récap en temps réel) ─────────────────────────────────────
 
-  const brut     = Number(form.salaire_base) || 0
-  const cnssEmp  = Math.round(brut * 0.0504)
-  const netEst   = brut - cnssEmp
-  const coutPat  = Math.round(brut * 1.1416)
+  // Cotisations issues du moteur fiscal canonique : chaque branche avec son
+  // propre plafond. La version précédente retenait 5,04 % sur la totalité du
+  // brut et chiffrait le coût employeur à 14,16 %, deux valeurs qui ne
+  // correspondent à aucune branche et ignoraient les plafonds. Un contrat de
+  // travail est opposable au salarié : il ne peut pas porter un ordre de
+  // grandeur.
+  const brut       = Number(form.salaire_base) || 0
+  const chargesRec = calculerChargesSociales({ codePays: codePaysContrat, salaireBrut: brut, appliquerMesuresSpeciales: false })
+  const cnssEmp    = chargesRec.total_salarie
+  const netEst     = brut - cnssEmp
+  const coutPat    = chargesRec.cout_total
+  const pctSalarieForm = brut > 0
+    ? `${((cnssEmp / brut) * 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} % effectif`
+    : 'taux effectif'
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -641,9 +664,9 @@ export default function ContratsPage() {
                 <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-2">Récapitulatif financier</p>
                 {[
                   ['Salaire brut',           `${fmt(detail.salaire_base)} FCFA`],
-                  ['CNSS salarié (5,04%)',   `- ${fmt(Math.round(detail.salaire_base * 0.0504))} FCFA`],
-                  ['Net estimé',             `${fmt(Math.round(detail.salaire_base * 0.9496))} FCFA`],
-                  ['Coût employeur total',   `${fmt(Math.round(detail.salaire_base * 1.1416))} FCFA`],
+                  ['Cotisations salariales', `- ${fmt(chargesDetail(detail.salaire_base).total_salarie)} FCFA`],
+                  ['Net estimé',             `${fmt(detail.salaire_base - chargesDetail(detail.salaire_base).total_salarie)} FCFA`],
+                  ['Coût employeur total',   `${fmt(chargesDetail(detail.salaire_base).cout_total)} FCFA`],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between py-1 text-[11px] border-b border-[#E2E8F0] last:border-0">
                     <span className="text-[#64748B]">{k}</span>
@@ -945,7 +968,7 @@ export default function ContratsPage() {
                     <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
                       {[
                         { label: 'Salaire brut',        val: brut > 0 ? `${fmt(brut)} FCFA` : '—',         bold: false },
-                        { label: 'CNSS salarié (5,04%)',val: brut > 0 ? `- ${fmt(cnssEmp)} FCFA` : '—',   bold: false },
+                        { label: `Cotisations salariales (${pctSalarieForm})`, val: brut > 0 ? `- ${fmt(cnssEmp)} FCFA` : '—', bold: false },
                         { label: 'Net estimé',          val: brut > 0 ? `${fmt(netEst)} FCFA` : '—',      bold: true  },
                         { label: 'Coût employeur',      val: brut > 0 ? `${fmt(coutPat)} FCFA` : '—',     bold: false },
                       ].map(({ label, val, bold }, i) => (

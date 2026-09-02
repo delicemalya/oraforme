@@ -3,7 +3,7 @@
  * Rendu serveur via @react-pdf/renderer renderToBuffer()
  */
 import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
-import type { DeclarationCNSS } from '@/lib/declarations/cnss-congo'
+import { fmtTaux, fmtPlafond, type DeclarationCNSS } from '@/lib/declarations/cnss-congo'
 import { periodeLabel, dateAujourdhuiFr, CNSS_CONGO, BRAND } from '@/lib/declarations/branding'
 
 const fmtN = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
@@ -48,13 +48,39 @@ export function DeclarationGlobaleCNSS({ decl, entreprise, numero_cnss_employeur
   const r = decl.recap
   const periode = periodeLabel(decl.mois, decl.annee)
 
-  const lignes = [
-    { label: 'Vieillesse — Part salarié (4%)', base: fmtN(r.base_vieillesse_total),    taux: '4%',     montant: r.cotisation_vieillesse_employe },
-    { label: 'Vieillesse — Part patronale (8%)', base: fmtN(r.base_vieillesse_total),  taux: '8%',     montant: r.cotisation_vieillesse_patronal },
-    { label: 'Allocations Familiales (AF)', base: fmtN(r.base_at_mp_pf_total),         taux: '10.03%', montant: r.allocations_familiales_total },
-    { label: 'Accidents du Travail / Maladie (AT)', base: fmtN(r.base_at_mp_pf_total), taux: '2.25%',  montant: r.accidents_travail_total },
-    { label: 'Taxe Unique sur les Salaires (TUS)', base: fmtN(r.masse_salariale),       taux: '3%',     montant: r.cotisation_tus_total },
-  ]
+  // Plafonds imprimés : lus sur les branches, jamais réécrits.
+  const plafondDe = (code: string) =>
+    fmtPlafond(r.branches.find(b => b.code === code)?.plafond_mensuel ?? null)
+  const plafondVieillesse = plafondDe('VID_PAT')
+  const plafondAF         = plafondDe('AF')
+  const plafondAT         = plafondDe('AT')
+
+  // Une ligne par branche cotisée, telle que le moteur fiscal la fournit.
+  // Aucun taux ni plafond n'est écrit ici : le document imprimait 10,03 % sur
+  // une base plafonnée à 600 000 F alors que les allocations familiales ont
+  // leur propre plafond de 1 200 000 F.
+  const lignes = r.branches
+    .filter(b => b.montant_salarie > 0 || b.montant_patronal > 0)
+    .flatMap(b => {
+      const out: Array<{ label: string; base: string; taux: string; montant: number }> = []
+      if (b.taux_salarie > 0) {
+        out.push({
+          label:   `${b.libelle} — part salarié`,
+          base:    fmtN(b.base_totale),
+          taux:    fmtTaux(b.taux_salarie),
+          montant: b.montant_salarie,
+        })
+      }
+      if (b.taux_patronal > 0) {
+        out.push({
+          label:   `${b.libelle} — part patronale`,
+          base:    fmtN(b.base_totale),
+          taux:    fmtTaux(b.taux_patronal),
+          montant: b.montant_patronal,
+        })
+      }
+      return out
+    })
 
   return (
     <Document title={`Déclaration CNSS — ${periode}`} author="Oraforme ERP">
@@ -102,11 +128,15 @@ export function DeclarationGlobaleCNSS({ decl, entreprise, numero_cnss_employeur
             <Text style={[s.infoValue, { fontSize: 13 }]}>{fmtN(r.masse_salariale)} FCFA</Text>
           </View>
           <View style={[s.infoBlock, { flex: 1 }]}>
-            <Text style={s.infoLabel}>Base cotisation vieillesse (plaf. 1 200 000/agent)</Text>
+            <Text style={s.infoLabel}>Base vieillesse (plaf. {plafondVieillesse}/agent)</Text>
             <Text style={s.infoValue}>{fmtN(r.base_vieillesse_total)} FCFA</Text>
           </View>
           <View style={[s.infoBlock, { flex: 1 }]}>
-            <Text style={s.infoLabel}>Base cotisation AT/AF/MP (plaf. 600 000/agent)</Text>
+            <Text style={s.infoLabel}>Base allocations familiales (plaf. {plafondAF}/agent)</Text>
+            <Text style={s.infoValue}>{fmtN(r.base_allocations_familiales_total)} FCFA</Text>
+          </View>
+          <View style={[s.infoBlock, { flex: 1 }]}>
+            <Text style={s.infoLabel}>Base accidents du travail (plaf. {plafondAT}/agent)</Text>
             <Text style={s.infoValue}>{fmtN(r.base_at_mp_pf_total)} FCFA</Text>
           </View>
         </View>

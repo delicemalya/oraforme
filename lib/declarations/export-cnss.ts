@@ -40,10 +40,10 @@ function buildSheet(
     'Base Vieillesse',
     'Part Agent (4%)',
     'VID Patronal (8%)',
-    'Alloc. Familiales (10.03%)',
-    'AT-Maladie (2.25%)',
+    'Alloc. Familiales',
+    'AT-Maladie',
   ]
-  if (includeTUS) headers.push('TUS (3%)')
+  if (includeTUS) headers.push('TUS')
   headers.push('TOTAL PATRONAL')
 
   rows.push(headers)

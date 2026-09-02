@@ -205,6 +205,49 @@ export interface TaxeFixe {
   base_legale: string
 }
 
+// ─── Patente (contribution des patentes) ─────────────────────────────────────
+
+/**
+ * Une tranche du barème de la patente : soit un forfait, soit un taux sur le
+ * chiffre d'affaires imposable.
+ */
+export interface TranchePatente {
+  seuil_min?: number
+  seuil_max?: number
+  type?:      'forfait'
+  montant?:   number
+  taux?:      number
+}
+
+export interface ConfigPatente {
+  tranches:                   TranchePatente[]
+  minimum_perception:         number
+  taux_centimes_additionnels: number
+  taux_camu:                  number
+  taux_reduction_petroliere:  number
+  echeance:                   string
+  source:                     string
+}
+
+// ─── Taxes abrogées ──────────────────────────────────────────────────────────
+
+/**
+ * Taxe supprimée par une loi de finances, conservée pour deux raisons :
+ * recalculer une période antérieure à l'abrogation, et donner au code une
+ * source datée plutôt qu'un taux effacé en silence.
+ *
+ * Une déclaration portant sur une période postérieure à `abrogee_le` doit
+ * liquider 0. Voir getTaxeAbrogee() dans lib/fiscal/universal-tax-engine.ts.
+ */
+export interface TaxeAbrogee {
+  code:                  string   // 'TUS_FISCALE'
+  libelle:               string
+  base:                  'salaires_bruts' | 'ca_ht' | 'tva_collectee'
+  taux_avant_abrogation: number
+  abrogee_le:            string   // ISO date — premier jour où le taux vaut 0
+  base_legale:           string
+}
+
 // ─── Conventions collectives (fondation, non encore implémentée) ──────────────
 
 export interface EchelonConvention {
@@ -282,6 +325,12 @@ export interface CountryConfig {
   cnss:          ConfigCNSS
   exonerations:  ConfigExonerations
   taxes_fixes:   TaxeFixe[]
+
+  // ── Taxes abrogées (optionnel — absent signifie « aucune connue ») ─────────
+  taxes_abrogees?: TaxeAbrogee[]
+
+  // ── Patente (optionnel — absent signifie « barème non implémenté ») ────────
+  patente?: ConfigPatente
 
   // ── Conventions (fondation) ───────────────────────────────────────────────
   conventions:   ConfigConventions
