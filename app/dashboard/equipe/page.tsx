@@ -137,6 +137,7 @@ export default function EquipePage() {
   const [inviteRole,   setInviteRole]   = useState<'admin' | 'membre'>('membre')
   const [inviting,     setInviting]     = useState(false)
   const [inviteMsg,    setInviteMsg]    = useState<{ ok: boolean; text: string } | null>(null)
+  const [actionMsg,    setActionMsg]    = useState<{ ok: boolean; text: string } | null>(null)
 
   const isOwner = myRole === 'owner'
 
@@ -211,23 +212,31 @@ export default function EquipePage() {
     }))
 
     // Supprimer les anciennes et réinsérer
-    await supabase.from('user_permissions').delete().eq('profile_id', selected.id)
-    if (rows.length > 0) {
-      await supabase.from('user_permissions').insert(rows)
-    }
+    setActionMsg(null)
+    const { error: delErr } = await supabase.from('user_permissions').delete().eq('profile_id', selected.id)
+    const { error: insErr } = rows.length > 0
+      ? await supabase.from('user_permissions').insert(rows)
+      : { error: null }
+
+    const err = delErr ?? insErr
+    if (err) setActionMsg({ ok: false, text: `${t('common.error')} : ${err.message}` })
     setSaving(false)
   }
 
   // ── Changer le rôle d'un membre ───────────────────────────────────────────
   async function changeRole(member: Member, newRole: 'admin' | 'membre') {
-    await supabase.from('profiles').update({ role: newRole }).eq('id', member.id)
+    setActionMsg(null)
+    const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', member.id)
+    if (error) { setActionMsg({ ok: false, text: `${t('common.error')} : ${error.message}` }); return }
     setMembers(prev => prev.map(m => m.id === member.id ? { ...m, role: newRole } : m))
     if (selected?.id === member.id) setSelected(prev => prev ? { ...prev, role: newRole } : null)
   }
 
   // ── Assigner un rôle dynamique ────────────────────────────────────────────
   async function assignDynamicRole(member: Member, roleId: string | null) {
-    await supabase.from('profiles').update({ dynamic_role_id: roleId }).eq('id', member.id)
+    setActionMsg(null)
+    const { error } = await supabase.from('profiles').update({ dynamic_role_id: roleId }).eq('id', member.id)
+    if (error) { setActionMsg({ ok: false, text: `${t('common.error')} : ${error.message}` }); return }
     setMembers(prev => prev.map(m => m.id === member.id ? { ...m, dynamic_role_id: roleId } : m))
     if (selected?.id === member.id) setSelected(prev => prev ? { ...prev, dynamic_role_id: roleId } : null)
   }
@@ -235,8 +244,20 @@ export default function EquipePage() {
   // ── Retirer un membre ─────────────────────────────────────────────────────
   async function removeMember(member: Member) {
     if (!confirm(t('equipe.removeConfirm').replace('{name}', `${member.prenom} ${member.nom}`))) return
+    setActionMsg(null)
+
+    // tenant_id est immuable : les triggers trg_no_tenant_change (039) et
+    // trg_immutable_tenant_id_profiles (040) lèvent une exception sur tout
+    // UPDATE qui le modifie. L'ancien « update({ tenant_id: null }) » échouait
+    // donc systématiquement, sans contrôle d'erreur : la ligne disparaissait de
+    // l'écran alors que le membre gardait son accès.
+    // Le retrait passe par la policy prévue pour cela, « profiles: owner remove
+    // member » (039:58), qui autorise l'owner à supprimer un profil de son
+    // tenant sauf le sien.
     await supabase.from('user_permissions').delete().eq('profile_id', member.id)
-    await supabase.from('profiles').update({ tenant_id: null }).eq('id', member.id)
+    const { error } = await supabase.from('profiles').delete().eq('id', member.id)
+    if (error) { setActionMsg({ ok: false, text: `${t('common.error')} : ${error.message}` }); return }
+
     setMembers(prev => prev.filter(m => m.id !== member.id))
     if (selected?.id === member.id) setSelected(null)
   }
@@ -330,6 +351,16 @@ export default function EquipePage() {
           {t('equipe.inviteMember')}
         </button>
       </div>
+
+      {/* Retour des actions sur un membre — même bandeau que l'invitation */}
+      {actionMsg && (
+        <div className={`flex items-center gap-2 text-sm rounded-lg px-3 py-2 ${
+          actionMsg.ok ? 'bg-[var(--surface)]/10 text-[#A8C4E4]' : 'bg-red-500/10 text-red-400'
+        }`}>
+          {actionMsg.ok ? <Check size={14} /> : <X size={14} />}
+          {actionMsg.text}
+        </div>
+      )}
 
       {/* Modal invitation */}
       <AnimatePresence>
