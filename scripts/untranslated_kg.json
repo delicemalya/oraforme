@@ -1,0 +1,4126 @@
+[
+  {
+    "k": "nav.params",
+    "v": "Paramètres"
+  },
+  {
+    "k": "nav.tresorerie",
+    "v": "Trésorerie"
+  },
+  {
+    "k": "nav.comptabilite",
+    "v": "Comptabilité"
+  },
+  {
+    "k": "nav.parametres",
+    "v": "Paramètres"
+  },
+  {
+    "k": "auth.password",
+    "v": "Mot de passe"
+  },
+  {
+    "k": "miaa.agent.hotel",
+    "v": "Hôtel"
+  },
+  {
+    "k": "nav.bi_dg",
+    "v": "Analytics général"
+  },
+  {
+    "k": "nav.bi_hotel",
+    "v": "Analytics Hôtel"
+  },
+  {
+    "k": "nav.metier",
+    "v": "Métier"
+  },
+  {
+    "k": "nav.api_keys",
+    "v": "Clés API"
+  },
+  {
+    "k": "nav.direction",
+    "v": "Direction Générale"
+  },
+  {
+    "k": "nav.audit",
+    "v": "Audit & Conformité"
+  },
+  {
+    "k": "nav.declarations_cnss",
+    "v": "Déclarations CNSS"
+  },
+  {
+    "k": "nav.hotel",
+    "v": "Hôtel"
+  },
+  {
+    "k": "nav.taches",
+    "v": "Tâches"
+  },
+  {
+    "k": "nav.sante_medecins",
+    "v": "Médecins"
+  },
+  {
+    "k": "nav.pharmacie_meds",
+    "v": "Médicaments"
+  },
+  {
+    "k": "nav.miaa",
+    "v": "IA Académique"
+  },
+  {
+    "k": "common.seeDetails",
+    "v": "Voir détails"
+  },
+  {
+    "k": "common.reset",
+    "v": "Réinitialiser"
+  },
+  {
+    "k": "common.generate",
+    "v": "Générer"
+  },
+  {
+    "k": "common.sent",
+    "v": "Envoyé"
+  },
+  {
+    "k": "common.approved",
+    "v": "Approuvé"
+  },
+  {
+    "k": "common.rejected",
+    "v": "Rejeté"
+  },
+  {
+    "k": "common.overdue",
+    "v": "En retard"
+  },
+  {
+    "k": "common.reference",
+    "v": "Référence"
+  },
+  {
+    "k": "common.label",
+    "v": "Libellé"
+  },
+  {
+    "k": "common.method",
+    "v": "Méthode"
+  },
+  {
+    "k": "dash.recentActivity",
+    "v": "Activité récente"
+  },
+  {
+    "k": "dash.direction",
+    "v": "Direction Générale"
+  },
+  {
+    "k": "dash.expenses",
+    "v": "Répartition dépenses"
+  },
+  {
+    "k": "dash.forecast",
+    "v": "Prévisions 30 jours"
+  },
+  {
+    "k": "dash.lastTransactions",
+    "v": "Dernières Transactions"
+  },
+  {
+    "k": "dash.invoiceBreakdown",
+    "v": "Répartition factures"
+  },
+  {
+    "k": "dash.quickLinks",
+    "v": "Accès rapide"
+  },
+  {
+    "k": "dash.deficit",
+    "v": "Déficit"
+  },
+  {
+    "k": "dash.monthCumul",
+    "v": "Cumul du mois"
+  },
+  {
+    "k": "dash.restricted",
+    "v": "Accès restreint"
+  },
+  {
+    "k": "dash.kpiTitle",
+    "v": "Indicateurs clés"
+  },
+  {
+    "k": "finance.profit",
+    "v": "Bénéfice net"
+  },
+  {
+    "k": "finance.cashflow",
+    "v": "Flux de trésorerie"
+  },
+  {
+    "k": "finance.receivables",
+    "v": "Créances clients"
+  },
+  {
+    "k": "finance.vatCollected",
+    "v": "TVA collectée"
+  },
+  {
+    "k": "finance.vatDeductible",
+    "v": "TVA déductible"
+  },
+  {
+    "k": "finance.vatNet",
+    "v": "TVA nette à payer"
+  },
+  {
+    "k": "finance.preview",
+    "v": "Prévisions"
+  },
+  {
+    "k": "finance.overview",
+    "v": "Aperçu financier"
+  },
+  {
+    "k": "finance.sources",
+    "v": "Sources de revenus"
+  },
+  {
+    "k": "finance.apercu",
+    "v": "Aperçu"
+  },
+  {
+    "k": "finance.tabs.previsions",
+    "v": "Prévisions"
+  },
+  {
+    "k": "invoice.number",
+    "v": "Numéro"
+  },
+  {
+    "k": "invoice.dueDate",
+    "v": "Échéance"
+  },
+  {
+    "k": "invoice.status.paid",
+    "v": "Payée"
+  },
+  {
+    "k": "invoice.status.overdue",
+    "v": "En retard"
+  },
+  {
+    "k": "invoice.markPaid",
+    "v": "Marquer payée"
+  },
+  {
+    "k": "treso.deposit",
+    "v": "Dépôt"
+  },
+  {
+    "k": "wf.myRequests",
+    "v": "Mes demandes"
+  },
+  {
+    "k": "wf.all",
+    "v": "Tous"
+  },
+  {
+    "k": "wf.type.conge",
+    "v": "Congé"
+  },
+  {
+    "k": "wf.status.approuve",
+    "v": "Approuvé"
+  },
+  {
+    "k": "wf.status.rejete",
+    "v": "Rejeté"
+  },
+  {
+    "k": "wf.status.cloture",
+    "v": "Clôturé"
+  },
+  {
+    "k": "wf.pendingCount",
+    "v": "{{count}} en attente"
+  },
+  {
+    "k": "wf.sla",
+    "v": "Délai SLA"
+  },
+  {
+    "k": "wf.overdue",
+    "v": "En retard"
+  },
+  {
+    "k": "rh.payslip",
+    "v": "Fiche de paie"
+  },
+  {
+    "k": "rh.leave",
+    "v": "Congés"
+  },
+  {
+    "k": "rh.department",
+    "v": "Département"
+  },
+  {
+    "k": "stock.outOfStock",
+    "v": "Rupture de stock"
+  },
+  {
+    "k": "stock.reorder",
+    "v": "Seuil de réappro."
+  },
+  {
+    "k": "achats.order",
+    "v": "Bon de commande"
+  },
+  {
+    "k": "achats.received",
+    "v": "Réceptionné"
+  },
+  {
+    "k": "crm.opportunity",
+    "v": "Opportunité"
+  },
+  {
+    "k": "crm.activity",
+    "v": "Activité"
+  },
+  {
+    "k": "school.schedule",
+    "v": "Emploi du temps"
+  },
+  {
+    "k": "school.academic",
+    "v": "Académique"
+  },
+  {
+    "k": "school.enrolled",
+    "v": "Inscrits (année en cours)"
+  },
+  {
+    "k": "school.cashflowAnalysis",
+    "v": "Analyse des Flux Financiers"
+  },
+  {
+    "k": "school.recentTransactions",
+    "v": "Transactions Récentes"
+  },
+  {
+    "k": "school.onTrack",
+    "v": "En bonne voie"
+  },
+  {
+    "k": "school.dashSubtitle",
+    "v": "Gérez votre établissement, vos équipes et vos finances en un seul endroit."
+  },
+  {
+    "k": "ohada.balance",
+    "v": "Balance de vérification"
+  },
+  {
+    "k": "ohada.resultat",
+    "v": "Compte de résultat"
+  },
+  {
+    "k": "ohada.tva",
+    "v": "Déclaration TVA"
+  },
+  {
+    "k": "ohada.debit",
+    "v": "Débit"
+  },
+  {
+    "k": "ohada.credit",
+    "v": "Crédit"
+  },
+  {
+    "k": "roles.cloneRole",
+    "v": "Dupliquer le rôle"
+  },
+  {
+    "k": "roles.assignRole",
+    "v": "Assigner un rôle"
+  },
+  {
+    "k": "auth.phone",
+    "v": "Téléphone"
+  },
+  {
+    "k": "auth.noAccount",
+    "v": "Pas encore de compte ?"
+  },
+  {
+    "k": "auth.resetPassword",
+    "v": "Réinitialiser"
+  },
+  {
+    "k": "auth.sendCode",
+    "v": "Envoyer le code"
+  },
+  {
+    "k": "auth.verifyCode",
+    "v": "Vérifier le code"
+  },
+  {
+    "k": "notif.invoice_paid",
+    "v": "Facture payée"
+  },
+  {
+    "k": "notif.wf_approved",
+    "v": "Workflow approuvé"
+  },
+  {
+    "k": "notif.wf_rejected",
+    "v": "Workflow refusé"
+  },
+  {
+    "k": "pdf.invoiceTo",
+    "v": "Facturer à"
+  },
+  {
+    "k": "pdf.dueDate",
+    "v": "Échéance"
+  },
+  {
+    "k": "pdf.terms",
+    "v": "Conditions & Mentions légales"
+  },
+  {
+    "k": "pdf.payment",
+    "v": "Mode de paiement"
+  },
+  {
+    "k": "pdf.bulletin",
+    "v": "BULLETIN DE NOTES"
+  },
+  {
+    "k": "pdf.subject",
+    "v": "Matière"
+  },
+  {
+    "k": "pdf.payslip",
+    "v": "FICHE DE PAIE"
+  },
+  {
+    "k": "import.drop",
+    "v": "Glissez-déposez votre fichier Excel ici"
+  },
+  {
+    "k": "import.success",
+    "v": "Importation réussie"
+  },
+  {
+    "k": "import.rows",
+    "v": "lignes importées"
+  },
+  {
+    "k": "import.errors",
+    "v": "erreurs détectées"
+  },
+  {
+    "k": "mm.send",
+    "v": "Envoyer un lien de paiement"
+  },
+  {
+    "k": "mm.operator",
+    "v": "Opérateur"
+  },
+  {
+    "k": "mm.number",
+    "v": "Numéro Mobile Money"
+  },
+  {
+    "k": "ai.forecast",
+    "v": "Prévisions IA"
+  },
+  {
+    "k": "ai.asking",
+    "v": "Analyse en cours..."
+  },
+  {
+    "k": "ai.based",
+    "v": "Basé sur vos 90 derniers jours"
+  },
+  {
+    "k": "error.unauthorized",
+    "v": "Accès non autorisé"
+  },
+  {
+    "k": "error.sessionExpired",
+    "v": "Session expirée — reconnectez-vous"
+  },
+  {
+    "k": "rh.newEmployee",
+    "v": "Nouvel employé"
+  },
+  {
+    "k": "rh.contractType",
+    "v": "Type de contrat"
+  },
+  {
+    "k": "rh.endDate",
+    "v": "Fin de contrat"
+  },
+  {
+    "k": "rh.changeStatus",
+    "v": "Changer le statut"
+  },
+  {
+    "k": "rh.payPreview",
+    "v": "Aperçu calcul paie"
+  },
+  {
+    "k": "rh.generateSlip",
+    "v": "Générer bulletin"
+  },
+  {
+    "k": "rh.presences",
+    "v": "Présences"
+  },
+  {
+    "k": "rh.leaveRequest",
+    "v": "Demande de congé"
+  },
+  {
+    "k": "rh.leaveType",
+    "v": "Type de congé"
+  },
+  {
+    "k": "rh.onLeaveOrSick",
+    "v": "En congé / Malade"
+  },
+  {
+    "k": "rh.lastEmployees",
+    "v": "Derniers employés"
+  },
+  {
+    "k": "rh.lastPayslips",
+    "v": "Derniers bulletins de paie"
+  },
+  {
+    "k": "rh.payManage",
+    "v": "Gérer"
+  },
+  {
+    "k": "rh.netToPay",
+    "v": "Net à payer"
+  },
+  {
+    "k": "rh.autoMatricule",
+    "v": "Matricule généré automatiquement"
+  },
+  {
+    "k": "rh.workCity",
+    "v": "Ville de travail"
+  },
+  {
+    "k": "rh.pendingLeave",
+    "v": "en attente"
+  },
+  {
+    "k": "rh.in30days",
+    "v": "dans 30 jours"
+  },
+  {
+    "k": "rh.toValidate",
+    "v": "à valider"
+  },
+  {
+    "k": "rh.totalCost",
+    "v": "Coût total employeur"
+  },
+  {
+    "k": "rh.grantedLeave",
+    "v": "Congés accordés"
+  },
+  {
+    "k": "rh.contractBreakdown",
+    "v": "Répartition par type de contrat"
+  },
+  {
+    "k": "rh.payProcessing",
+    "v": "Traitement de la paie"
+  },
+  {
+    "k": "rh.generateSlips",
+    "v": "Générer les bulletins"
+  },
+  {
+    "k": "rh.advancedStats",
+    "v": "Statistiques avancées"
+  },
+  {
+    "k": "rh.contrats.subtitle",
+    "v": "employés · contrats expirant"
+  },
+  {
+    "k": "rh.contrats.expired",
+    "v": "expiré(s) — Régulariser immédiatement"
+  },
+  {
+    "k": "rh.contrats.expiringSoon",
+    "v": "expire(nt) dans moins de 30 jours"
+  },
+  {
+    "k": "rh.contrats.filterAll",
+    "v": "Tous"
+  },
+  {
+    "k": "rh.contrats.filterExpired",
+    "v": "Expirés"
+  },
+  {
+    "k": "rh.contrats.colStart",
+    "v": "Début"
+  },
+  {
+    "k": "rh.contrats.colEnd",
+    "v": "Fin / Échéance"
+  },
+  {
+    "k": "rh.contrats.statusExpired",
+    "v": "Expiré"
+  },
+  {
+    "k": "rh.contrats.statusExpireSoon",
+    "v": "Expire bientôt"
+  },
+  {
+    "k": "rh.contrats.expiredSince",
+    "v": "Expiré depuis"
+  },
+  {
+    "k": "rh.contrats.inDays",
+    "v": "Dans"
+  },
+  {
+    "k": "rh.contrats.terminate",
+    "v": "Résilier le contrat"
+  },
+  {
+    "k": "rh.contrats.detailStart",
+    "v": "Début"
+  },
+  {
+    "k": "rh.contrats.expiredDays",
+    "v": "Contrat expiré depuis"
+  },
+  {
+    "k": "rh.contrats.expireInDays",
+    "v": "Expire dans"
+  },
+  {
+    "k": "rh.contrats.undetermined",
+    "v": "Indéterminé"
+  },
+  {
+    "k": "rh.contrats.confirmTerminate",
+    "v": "Résilier le contrat de"
+  },
+  {
+    "k": "rh.contrats.printTitle",
+    "v": "CONTRAT DE TRAVAIL"
+  },
+  {
+    "k": "rh.contrats.printContractType",
+    "v": "Type de contrat"
+  },
+  {
+    "k": "rh.contrats.generated",
+    "v": "Généré le"
+  },
+  {
+    "k": "rh.evals.subtitle",
+    "v": "évaluations · Moyenne :"
+  },
+  {
+    "k": "rh.evals.newEval",
+    "v": "Nouvelle évaluation"
+  },
+  {
+    "k": "rh.evals.toImprove",
+    "v": "À améliorer"
+  },
+  {
+    "k": "rh.evals.modalTitle",
+    "v": "Nouvelle évaluation"
+  },
+  {
+    "k": "rh.evals.selectEmployee",
+    "v": "Sélectionner…"
+  },
+  {
+    "k": "rh.evals.qualityWork",
+    "v": "Qualité du travail"
+  },
+  {
+    "k": "rh.evals.punctuality",
+    "v": "Ponctualité & présence"
+  },
+  {
+    "k": "rh.evals.teamwork",
+    "v": "Travail en équipe"
+  },
+  {
+    "k": "rh.evals.initiative",
+    "v": "Initiative & proactivité"
+  },
+  {
+    "k": "rh.evals.calculatedAvg",
+    "v": "Moyenne calculée"
+  },
+  {
+    "k": "rh.evals.nextObjectives",
+    "v": "Objectifs prochaine période"
+  },
+  {
+    "k": "rh.evals.objectivesPlaceholder",
+    "v": "Objectifs à atteindre…"
+  },
+  {
+    "k": "rh.evals.evaluatorPlaceholder",
+    "v": "Nom du responsable"
+  },
+  {
+    "k": "rh.evals.evaluatedBy",
+    "v": "Évalué par :"
+  },
+  {
+    "k": "rh.evals.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "rh.evals.labelQuality",
+    "v": "Qualité travail"
+  },
+  {
+    "k": "rh.evals.labelPunctuality",
+    "v": "Ponctualité"
+  },
+  {
+    "k": "rh.evals.labelTeamwork",
+    "v": "Travail équipe"
+  },
+  {
+    "k": "rh.evals.objectivesLabel",
+    "v": "Objectifs prochaine période"
+  },
+  {
+    "k": "rh.org.viewDept",
+    "v": "Départements"
+  },
+  {
+    "k": "rh.org.viewTree",
+    "v": "Hiérarchie"
+  },
+  {
+    "k": "rh.org.kpiDepts",
+    "v": "Départements"
+  },
+  {
+    "k": "rh.org.kpiWithHierarchy",
+    "v": "Avec hiérarchie"
+  },
+  {
+    "k": "rh.org.collapseTip",
+    "v": "pour réduire/développer les branches"
+  },
+  {
+    "k": "rh.org.legend",
+    "v": "Légende des couleurs"
+  },
+  {
+    "k": "rh.presences.title",
+    "v": "Présences & Pointage"
+  },
+  {
+    "k": "rh.presences.subtitle",
+    "v": "employés actifs"
+  },
+  {
+    "k": "rh.presences.presents",
+    "v": "Présents"
+  },
+  {
+    "k": "rh.presences.detailedTitle",
+    "v": "Pointages détaillés"
+  },
+  {
+    "k": "rh.presences.colArrival",
+    "v": "Arrivée"
+  },
+  {
+    "k": "rh.presences.colDeparture",
+    "v": "Départ"
+  },
+  {
+    "k": "rh.presences.modalTitle",
+    "v": "Enregistrer une présence"
+  },
+  {
+    "k": "rh.presences.selectEmployee",
+    "v": "Sélectionner…"
+  },
+  {
+    "k": "rh.sanctions.subtitle",
+    "v": "Gestion des mesures disciplinaires"
+  },
+  {
+    "k": "rh.sanctions.selectEmployee",
+    "v": "— Sélectionner —"
+  },
+  {
+    "k": "rh.sanctions.motifPlaceholder",
+    "v": "Décrire les faits reprochés…"
+  },
+  {
+    "k": "rh.sanctions.observations",
+    "v": "Observations / Suite donnée"
+  },
+  {
+    "k": "rh.sanctions.obsPlaceholder",
+    "v": "Décision RH, remarques complémentaires…"
+  },
+  {
+    "k": "rh.sanctions.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "rh.sanctions.filterAll",
+    "v": "Tous"
+  },
+  {
+    "k": "rh.sanctions.noDataHint",
+    "v": "Cliquez sur \"Nouvelle sanction\" pour commencer"
+  },
+  {
+    "k": "rh.sanctions.close",
+    "v": "Clôturer"
+  },
+  {
+    "k": "rh.avantages.title",
+    "v": "Avantages & Bénéfices"
+  },
+  {
+    "k": "rh.avantages.subtitle",
+    "v": "Gestion des avantages en nature et bénéfices employés"
+  },
+  {
+    "k": "rh.avantages.kpiBeneficiaries",
+    "v": "Bénéficiaires"
+  },
+  {
+    "k": "rh.avantages.employeeHint",
+    "v": "(laisser vide = avantage global pour tous)"
+  },
+  {
+    "k": "rh.avantages.allEmployees",
+    "v": "— Tous les employés (global) —"
+  },
+  {
+    "k": "rh.avantages.periodicity",
+    "v": "Périodicité"
+  },
+  {
+    "k": "rh.avantages.label",
+    "v": "Libellé *"
+  },
+  {
+    "k": "rh.avantages.labelPlaceholder",
+    "v": "ex: Indemnité transport"
+  },
+  {
+    "k": "rh.avantages.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "rh.avantages.filterAll",
+    "v": "Tous"
+  },
+  {
+    "k": "rh.avantages.noDataHint",
+    "v": "Ajoutez des avantages pour vos employés"
+  },
+  {
+    "k": "rh.avantages.globalBadge",
+    "v": "Global — tous les employés"
+  },
+  {
+    "k": "rh.avantages.disable",
+    "v": "Désactiver"
+  },
+  {
+    "k": "rh.avantages.errRequired",
+    "v": "Libellé obligatoire"
+  },
+  {
+    "k": "invoice.items",
+    "v": "Lignes de facture"
+  },
+  {
+    "k": "invoice.designation",
+    "v": "Désignation"
+  },
+  {
+    "k": "invoice.fiscalSummary",
+    "v": "Récapitulatif fiscal · Congo-Brazzaville"
+  },
+  {
+    "k": "invoice.ca5",
+    "v": "CA (5 % de la TVA)"
+  },
+  {
+    "k": "invoice.saveDraft",
+    "v": "Enregistrer brouillon"
+  },
+  {
+    "k": "invoice.emit",
+    "v": "Émettre la facture"
+  },
+  {
+    "k": "invoice.collected",
+    "v": "Encaissé"
+  },
+  {
+    "k": "invoice.late",
+    "v": "En retard"
+  },
+  {
+    "k": "invoice.preview",
+    "v": "Aperçu"
+  },
+  {
+    "k": "invoice.issuedOn",
+    "v": "Émise le"
+  },
+  {
+    "k": "invoice.dueOn",
+    "v": "Échéance"
+  },
+  {
+    "k": "invoice.all",
+    "v": "Toutes"
+  },
+  {
+    "k": "invoice.sent",
+    "v": "Envoyées"
+  },
+  {
+    "k": "invoice.paid2",
+    "v": "Payées"
+  },
+  {
+    "k": "invoice.sentSuccess",
+    "v": "Envoyée !"
+  },
+  {
+    "k": "invoice.markedSent",
+    "v": "Facture marquée comme envoyée !"
+  },
+  {
+    "k": "treso.subtitle",
+    "v": "Flux financiers temps réel · Multi-comptes · OHADA"
+  },
+  {
+    "k": "treso.deficitMonth",
+    "v": "Déficit ce mois"
+  },
+  {
+    "k": "treso.fundsBreakdown",
+    "v": "Répartition des fonds"
+  },
+  {
+    "k": "treso.quickAccess",
+    "v": "Accès rapides"
+  },
+  {
+    "k": "treso.lastTransactions",
+    "v": "Dernières transactions"
+  },
+  {
+    "k": "treso.negativeCashflow",
+    "v": "Cashflow négatif ce mois"
+  },
+  {
+    "k": "treso.paymentMode",
+    "v": "Mode de paiement"
+  },
+  {
+    "k": "treso.register",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "treso.opsCount",
+    "v": "opérations ce mois"
+  },
+  {
+    "k": "treso.decaisser",
+    "v": "Décaisser"
+  },
+  {
+    "k": "treso.cheques",
+    "v": "Chèques"
+  },
+  {
+    "k": "treso.chequesSubtitle",
+    "v": "Suivi des chèques émis et reçus"
+  },
+  {
+    "k": "treso.newCheque",
+    "v": "Nouveau chèque"
+  },
+  {
+    "k": "treso.registerCheque",
+    "v": "Enregistrer un chèque"
+  },
+  {
+    "k": "treso.chequeNum",
+    "v": "N° Chèque"
+  },
+  {
+    "k": "treso.beneficiaire",
+    "v": "Bénéficiaire"
+  },
+  {
+    "k": "treso.echeance",
+    "v": "Échéance"
+  },
+  {
+    "k": "treso.encaisse",
+    "v": "Encaissé"
+  },
+  {
+    "k": "treso.rejete",
+    "v": "Rejeté"
+  },
+  {
+    "k": "treso.chequeEncaisse",
+    "v": "Chèque encaissé ✓"
+  },
+  {
+    "k": "treso.chequeRejete",
+    "v": "Chèque marqué rejeté"
+  },
+  {
+    "k": "treso.chequeEnregistre",
+    "v": "Chèque enregistré ✓"
+  },
+  {
+    "k": "treso.confirmEncaisser",
+    "v": "Marquer ce chèque comme encaissé ?"
+  },
+  {
+    "k": "treso.confirmRejeter",
+    "v": "Marquer ce chèque comme rejeté ?"
+  },
+  {
+    "k": "treso.chequePlaceholder",
+    "v": "N° chèque, bénéficiaire…"
+  },
+  {
+    "k": "treso.tousStatuts",
+    "v": "Tous statuts"
+  },
+  {
+    "k": "treso.motifPlaceholder",
+    "v": "Objet du paiement (optionnel)"
+  },
+  {
+    "k": "treso.chequesSingular",
+    "v": "chèque(s)"
+  },
+  {
+    "k": "treso.chequesEnRetard",
+    "v": "chèque(s) en retard"
+  },
+  {
+    "k": "treso.chequesRejetes",
+    "v": "chèque(s) rejeté(s)"
+  },
+  {
+    "k": "treso.historique",
+    "v": "Historique des transactions"
+  },
+  {
+    "k": "treso.historiqueOpsCount",
+    "v": "opérations enregistrées"
+  },
+  {
+    "k": "treso.tousTypes",
+    "v": "Tous types"
+  },
+  {
+    "k": "treso.toutesSources",
+    "v": "Toutes sources"
+  },
+  {
+    "k": "treso.reinitialiserFiltres",
+    "v": "Réinitialiser filtres"
+  },
+  {
+    "k": "treso.libellePlaceholder",
+    "v": "Libellé…"
+  },
+  {
+    "k": "treso.libelle",
+    "v": "Libellé"
+  },
+  {
+    "k": "treso.detailTransaction",
+    "v": "Détail transaction"
+  },
+  {
+    "k": "treso.refPrefix",
+    "v": "Réf:"
+  },
+  {
+    "k": "treso.debut",
+    "v": "Début"
+  },
+  {
+    "k": "treso.rapprochementsSubtitle",
+    "v": "Vérification soldes comptables vs relevés bancaires"
+  },
+  {
+    "k": "treso.etatRapprochement",
+    "v": "État du rapprochement"
+  },
+  {
+    "k": "treso.saisirSolde",
+    "v": "Saisir solde relevé"
+  },
+  {
+    "k": "treso.rapproche",
+    "v": "Rapproché"
+  },
+  {
+    "k": "treso.lignesRapprocher",
+    "v": "ligne(s) à rapprocher"
+  },
+  {
+    "k": "treso.lignesRapprochees",
+    "v": "ligne(s) rapprochée(s)"
+  },
+  {
+    "k": "treso.totauxRapproches",
+    "v": "Totaux rapprochés"
+  },
+  {
+    "k": "treso.debit",
+    "v": "Débit"
+  },
+  {
+    "k": "treso.credit",
+    "v": "Crédit"
+  },
+  {
+    "k": "treso.debitSortie",
+    "v": "Débit (sortie)"
+  },
+  {
+    "k": "treso.creditEntree",
+    "v": "Crédit (entrée)"
+  },
+  {
+    "k": "treso.reference",
+    "v": "Référence"
+  },
+  {
+    "k": "treso.remboursementsSubtitle",
+    "v": "Gestion des remboursements clients, fournisseurs et salariés"
+  },
+  {
+    "k": "treso.rembourse",
+    "v": "Remboursé"
+  },
+  {
+    "k": "treso.detailRemboursement",
+    "v": "Détail remboursement"
+  },
+  {
+    "k": "treso.modePaiement",
+    "v": "Mode de paiement"
+  },
+  {
+    "k": "treso.nouvelleDemandeTitre",
+    "v": "Nouvelle demande de remboursement"
+  },
+  {
+    "k": "treso.tiersPlaceholder",
+    "v": "Nom du tiers"
+  },
+  {
+    "k": "treso.especes",
+    "v": "Espèces"
+  },
+  {
+    "k": "treso.chequeOption",
+    "v": "Chèque"
+  },
+  {
+    "k": "treso.validationsSubtitle",
+    "v": "Circuit de validation : Demande → RAF → DG → Comptable → Exécution"
+  },
+  {
+    "k": "treso.demandeCree",
+    "v": "Demande créée"
+  },
+  {
+    "k": "treso.nouvelleDemandePayment",
+    "v": "Nouvelle demande de paiement"
+  },
+  {
+    "k": "treso.beneficiaireField",
+    "v": "Bénéficiaire *"
+  },
+  {
+    "k": "treso.tresUrgente",
+    "v": "Très urgente"
+  },
+  {
+    "k": "treso.refFacture",
+    "v": "Réf. Facture"
+  },
+  {
+    "k": "treso.rejeterAction",
+    "v": "Rejeter la demande"
+  },
+  {
+    "k": "treso.motifDecision",
+    "v": "Motif de la décision (optionnel)"
+  },
+  {
+    "k": "treso.detailDemande",
+    "v": "Détail de la demande"
+  },
+  {
+    "k": "treso.virementsSubtitle",
+    "v": "Ordres de virement bancaire"
+  },
+  {
+    "k": "treso.virementCree",
+    "v": "Virement créé ✓"
+  },
+  {
+    "k": "treso.virementExecute",
+    "v": "Virement exécuté ✓"
+  },
+  {
+    "k": "treso.virementRejete",
+    "v": "Virement rejeté"
+  },
+  {
+    "k": "treso.confirmExecuter",
+    "v": "Exécuter ce virement ?"
+  },
+  {
+    "k": "treso.execute",
+    "v": "Exécuté"
+  },
+  {
+    "k": "treso.refBancaire",
+    "v": "Référence bancaire"
+  },
+  {
+    "k": "treso.executerAction",
+    "v": "Exécuter"
+  },
+  {
+    "k": "treso.mesWallets",
+    "v": "MES WALLETS"
+  },
+  {
+    "k": "treso.selectionnerWallet",
+    "v": "Sélectionner un wallet"
+  },
+  {
+    "k": "treso.pourVoirOps",
+    "v": "pour voir ses opérations"
+  },
+  {
+    "k": "treso.operateur",
+    "v": "Opérateur *"
+  },
+  {
+    "k": "treso.numero",
+    "v": "Numéro *"
+  },
+  {
+    "k": "treso.intitule",
+    "v": "Intitulé (nom)"
+  },
+  {
+    "k": "treso.walletAjoute",
+    "v": "Wallet ajouté ✓"
+  },
+  {
+    "k": "treso.operationEnregistree",
+    "v": "Opération enregistrée ✓"
+  },
+  {
+    "k": "act.brouillon",
+    "v": "créé un brouillon"
+  },
+  {
+    "k": "act.envoyee",
+    "v": "envoyé une facture"
+  },
+  {
+    "k": "act.payee",
+    "v": "reçu un paiement"
+  },
+  {
+    "k": "act.annulee",
+    "v": "annulé une facture"
+  },
+  {
+    "k": "dash.greetingAfternoon",
+    "v": "Bon après-midi"
+  },
+  {
+    "k": "dash.bannerFinancial",
+    "v": "Gérez vos ventes, finances et équipes en un seul endroit."
+  },
+  {
+    "k": "dash.bannerSpace",
+    "v": "Consultez les informations de votre espace."
+  },
+  {
+    "k": "dash.toutEnOrdre",
+    "v": "Tout est en ordre"
+  },
+  {
+    "k": "dash.refresh",
+    "v": "Rafraîchir"
+  },
+  {
+    "k": "dash.connectedAs",
+    "v": "Connecté en tant que :"
+  },
+  {
+    "k": "dash.sessionsEnCours",
+    "v": "Sessions en cours"
+  },
+  {
+    "k": "dash.inscritsActifs",
+    "v": "Inscrits et actifs"
+  },
+  {
+    "k": "dash.personnelPoste",
+    "v": "Personnel en poste"
+  },
+  {
+    "k": "dash.enConge",
+    "v": "En congé"
+  },
+  {
+    "k": "dash.tousStatuts",
+    "v": "Tous statuts confondus"
+  },
+  {
+    "k": "dash.rupturesStock",
+    "v": "Ruptures de stock"
+  },
+  {
+    "k": "dash.dansEquipe",
+    "v": "Dans votre équipe"
+  },
+  {
+    "k": "dash.refsInventoriees",
+    "v": "Références inventoriées"
+  },
+  {
+    "k": "dash.enAttentePmt",
+    "v": "FCFA en attente"
+  },
+  {
+    "k": "dash.articleEpuise",
+    "v": "article épuisé"
+  },
+  {
+    "k": "dash.articlesEpuises",
+    "v": "articles épuisés"
+  },
+  {
+    "k": "dash.lastFactures",
+    "v": "dernières factures"
+  },
+  {
+    "k": "dash.academicView",
+    "v": "Vue académique — accès financier restreint"
+  },
+  {
+    "k": "dash.actionsFrequentes",
+    "v": "Actions fréquentes"
+  },
+  {
+    "k": "roles.daac_full",
+    "v": "Direction des Affaires Académiques"
+  },
+  {
+    "k": "nav.scolarite",
+    "v": "Scolarité"
+  },
+  {
+    "k": "sc.rhMedical",
+    "v": "RH médical"
+  },
+  {
+    "k": "sc.comptaOhada",
+    "v": "Comptabilité OHADA"
+  },
+  {
+    "k": "sc.matieres",
+    "v": "Matières"
+  },
+  {
+    "k": "sc.mesCours",
+    "v": "Mes cours"
+  },
+  {
+    "k": "sc.presences",
+    "v": "Présences"
+  },
+  {
+    "k": "sc.mesNotes",
+    "v": "Mes notes"
+  },
+  {
+    "k": "sc.resultats",
+    "v": "Résultats"
+  },
+  {
+    "k": "sc.departements",
+    "v": "Départements"
+  },
+  {
+    "k": "sc.d.newEnrollment",
+    "v": "Inscrire un étudiant"
+  },
+  {
+    "k": "sc.d.rhPaie",
+    "v": "Gestion du personnel"
+  },
+  {
+    "k": "sc.d.cashierPOS",
+    "v": "Ouvrir la caisse"
+  },
+  {
+    "k": "sc.d.tresoSuivi",
+    "v": "Suivi des finances"
+  },
+  {
+    "k": "sc.d.fleet",
+    "v": "Véhicules & courses"
+  },
+  {
+    "k": "sc.d.pharmacie",
+    "v": "Médicaments"
+  },
+  {
+    "k": "sc.d.soutenances",
+    "v": "Planifiées"
+  },
+  {
+    "k": "sc.d.parametresAcad",
+    "v": "Règles LMD"
+  },
+  {
+    "k": "sc.d.budgets",
+    "v": "Suivi budgétaire"
+  },
+  {
+    "k": "sc.d.paie",
+    "v": "Bulletins de paie"
+  },
+  {
+    "k": "sc.d.employes",
+    "v": "Gestion du personnel"
+  },
+  {
+    "k": "sc.d.absencesConges",
+    "v": "Congés & absences"
+  },
+  {
+    "k": "sc.d.etudiants",
+    "v": "Gestion des étudiants"
+  },
+  {
+    "k": "sc.d.paiementsScol",
+    "v": "Frais de scolarité"
+  },
+  {
+    "k": "sc.d.classes",
+    "v": "Gestion des classes"
+  },
+  {
+    "k": "sc.d.mesCours",
+    "v": "Modules enseignés"
+  },
+  {
+    "k": "sc.d.notes",
+    "v": "Saisie des notes"
+  },
+  {
+    "k": "sc.d.mesClasses",
+    "v": "Mes classes"
+  },
+  {
+    "k": "sc.d.deliberations",
+    "v": "Délibérations"
+  },
+  {
+    "k": "sc.d.mesNotes",
+    "v": "Résultats & moyennes"
+  },
+  {
+    "k": "sc.d.bulletins",
+    "v": "Bulletins de note"
+  },
+  {
+    "k": "sc.d.mesAbsences",
+    "v": "Mes absences"
+  },
+  {
+    "k": "sc.d.planning",
+    "v": "Emploi du temps"
+  },
+  {
+    "k": "sc.d.fraisScolarite",
+    "v": "Frais de scolarité"
+  },
+  {
+    "k": "crm.caGenerated",
+    "v": "CA généré"
+  },
+  {
+    "k": "crm.allClients",
+    "v": "Tous les clients"
+  },
+  {
+    "k": "clients.subtitle",
+    "v": "clients enregistrés"
+  },
+  {
+    "k": "clients.inBase",
+    "v": "Dans votre base"
+  },
+  {
+    "k": "clients.withEmail",
+    "v": "Avec email"
+  },
+  {
+    "k": "clients.addFirst",
+    "v": "Ajoutez votre premier client pour commencer."
+  },
+  {
+    "k": "clients.deleteWarning",
+    "v": "Cette action est irréversible."
+  },
+  {
+    "k": "clients.addressPlaceholder",
+    "v": "Adresse complète"
+  },
+  {
+    "k": "roles.subtitle",
+    "v": "RBAC Enterprise — 6 actions : voir · modifier · supprimer · exporter · valider · approuver"
+  },
+  {
+    "k": "roles.newRole",
+    "v": "Nouveau rôle"
+  },
+  {
+    "k": "roles.selectRole",
+    "v": "Sélectionnez un rôle pour voir sa matrice"
+  },
+  {
+    "k": "roles.financialAccess",
+    "v": "Accès aux données financières"
+  },
+  {
+    "k": "equipe.subtitle",
+    "v": "Gérez les accès et permissions de chaque membre."
+  },
+  {
+    "k": "equipe.inviteMember",
+    "v": "Inviter un membre"
+  },
+  {
+    "k": "equipe.selectMember",
+    "v": "Sélectionnez un membre pour gérer ses permissions."
+  },
+  {
+    "k": "equipe.ownerAccess",
+    "v": "Le propriétaire a accès à tous les modules."
+  },
+  {
+    "k": "equipe.moduleAccess",
+    "v": "Accès aux modules"
+  },
+  {
+    "k": "equipe.savePerms",
+    "v": "Enregistrer les permissions"
+  },
+  {
+    "k": "equipe.inviteModal",
+    "v": "Inviter un membre"
+  },
+  {
+    "k": "stock.updatedAt",
+    "v": "Mis à jour"
+  },
+  {
+    "k": "stock.immediateAction",
+    "v": "Action immédiate recommandée"
+  },
+  {
+    "k": "stock.seeAlerts",
+    "v": "Voir les alertes →"
+  },
+  {
+    "k": "stock.warehouses",
+    "v": "Entrepôts"
+  },
+  {
+    "k": "stock.quickAccess",
+    "v": "Accès rapide"
+  },
+  {
+    "k": "params.saved",
+    "v": "Enregistré !"
+  },
+  {
+    "k": "params.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "params.saveParams",
+    "v": "Enregistrer les paramètres"
+  },
+  {
+    "k": "params.yourCompany",
+    "v": "Votre entreprise"
+  },
+  {
+    "k": "params.uploadLogo",
+    "v": "Uploader un logo"
+  },
+  {
+    "k": "params.changeLogo",
+    "v": "Changer le logo"
+  },
+  {
+    "k": "params.uploading",
+    "v": "Upload en cours…"
+  },
+  {
+    "k": "params.phone",
+    "v": "Téléphone"
+  },
+  {
+    "k": "params.legal",
+    "v": "Pied de page facture — Informations légales"
+  },
+  {
+    "k": "params.rib",
+    "v": "RIB / Coordonnées bancaires (Payment Method)"
+  },
+  {
+    "k": "params.thankMsg",
+    "v": "Message \"Merci\" affiché en bas de chaque facture"
+  },
+  {
+    "k": "params.billingPrefs",
+    "v": "Préférences facturation"
+  },
+  {
+    "k": "params.invoicePrefix",
+    "v": "Préfixe N° facture"
+  },
+  {
+    "k": "params.paymentDelay",
+    "v": "Délai de paiement"
+  },
+  {
+    "k": "params.costCenters",
+    "v": "Centres de coûts"
+  },
+  {
+    "k": "params.centerName",
+    "v": "Nom du centre"
+  },
+  {
+    "k": "params.cc.direction",
+    "v": "Direction générale"
+  },
+  {
+    "k": "params.cc.scolarite",
+    "v": "Scolarité"
+  },
+  {
+    "k": "params.scien",
+    "v": "Numéro SCIEN"
+  },
+  {
+    "k": "params.uploadFailed",
+    "v": "Upload échoué :"
+  },
+  {
+    "k": "params.logoSavedError",
+    "v": "Logo uploadé mais non sauvegardé :"
+  },
+  {
+    "k": "params.tenantNotLoaded",
+    "v": "Tenant non chargé"
+  },
+  {
+    "k": "profil.subtitle",
+    "v": "Informations, marque et coordonnées"
+  },
+  {
+    "k": "profil.descPlaceholder",
+    "v": "Décrivez votre activité en quelques mots…"
+  },
+  {
+    "k": "profil.contact",
+    "v": "Coordonnées"
+  },
+  {
+    "k": "profil.telephone",
+    "v": "Téléphone"
+  },
+  {
+    "k": "profil.updated",
+    "v": "Profil mis à jour"
+  },
+  {
+    "k": "dir.title",
+    "v": "Direction Générale"
+  },
+  {
+    "k": "dir.subtitle",
+    "v": "Pilotage stratégique & tableaux de bord"
+  },
+  {
+    "k": "dir.kpi.collected",
+    "v": "Collecté"
+  },
+  {
+    "k": "dir.kpi.charges",
+    "v": "Charges du mois"
+  },
+  {
+    "k": "dir.alerts.unpaidFact",
+    "v": "facture(s) impayée(s)"
+  },
+  {
+    "k": "dir.quickAccess",
+    "v": "Accès rapide"
+  },
+  {
+    "k": "dir.financialSummary",
+    "v": "Résumé financier du mois"
+  },
+  {
+    "k": "dir.caCollecte",
+    "v": "CA collecté"
+  },
+  {
+    "k": "dir.prevMonth",
+    "v": "mois préc."
+  },
+  {
+    "k": "dir.ofCA",
+    "v": "% du CA"
+  },
+  {
+    "k": "dir.link.compta",
+    "v": "Comptabilité"
+  },
+  {
+    "k": "analytics.subtitle",
+    "v": "Intelligence économique · Exercice"
+  },
+  {
+    "k": "analytics.kpi.onLeave",
+    "v": "en congé"
+  },
+  {
+    "k": "analytics.kpi.creances",
+    "v": "Créances"
+  },
+  {
+    "k": "analytics.kpi.recettesScol",
+    "v": "Recettes scolarité"
+  },
+  {
+    "k": "analytics.kpi.tasksDone",
+    "v": "Tâches terminées"
+  },
+  {
+    "k": "analytics.chart.cashflow",
+    "v": "Flux de trésorerie mensuel"
+  },
+  {
+    "k": "analytics.chart.invoiceStatus2",
+    "v": "Statut des factures"
+  },
+  {
+    "k": "analytics.chart.kpi",
+    "v": "Indicateurs clés"
+  },
+  {
+    "k": "analytics.chart.rhRep",
+    "v": "Répartition effectif"
+  },
+  {
+    "k": "analytics.chart.scolMonth",
+    "v": "Recettes scolarité par mois"
+  },
+  {
+    "k": "analytics.chart.stockHealth",
+    "v": "Santé du stock"
+  },
+  {
+    "k": "analytics.chart.automTasks",
+    "v": "État des tâches planifiées"
+  },
+  {
+    "k": "analytics.auto.running",
+    "v": "Vérification en cours…"
+  },
+  {
+    "k": "analytics.auto.runShort",
+    "v": "Lancer les vérifications"
+  },
+  {
+    "k": "analytics.auto.runningShort",
+    "v": "Vérification…"
+  },
+  {
+    "k": "analytics.sub.dans30j",
+    "v": "dans 30 jours"
+  },
+  {
+    "k": "analytics.sub.artEpuises",
+    "v": "articles épuisés"
+  },
+  {
+    "k": "analytics.sub.sousSeuil",
+    "v": "sous le seuil min"
+  },
+  {
+    "k": "analytics.sub.stockSuffisant",
+    "v": "en stock suffisant"
+  },
+  {
+    "k": "analytics.sub.aTraiter",
+    "v": "à traiter"
+  },
+  {
+    "k": "analytics.sub.tasksFailed",
+    "v": "tâches échouées"
+  },
+  {
+    "k": "analytics.sub.paiementsRecus",
+    "v": "paiements reçus"
+  },
+  {
+    "k": "analytics.sub.unites",
+    "v": "unités"
+  },
+  {
+    "k": "analytics.alert.contratsExp",
+    "v": "contrat(s) expirant dans 30 jours"
+  },
+  {
+    "k": "analytics.alert.rupture",
+    "v": "article(s) en rupture de stock"
+  },
+  {
+    "k": "analytics.alert.critique",
+    "v": "article(s) en stock critique"
+  },
+  {
+    "k": "analytics.alert.creances",
+    "v": "Créances clients"
+  },
+  {
+    "k": "analytics.lbl.enConge",
+    "v": "En congé"
+  },
+  {
+    "k": "analytics.lbl.enStock",
+    "v": "En stock"
+  },
+  {
+    "k": "analytics.lbl.txPaiement",
+    "v": "Taux de paiement"
+  },
+  {
+    "k": "analytics.lbl.recettesScol",
+    "v": "Recettes scolarité"
+  },
+  {
+    "k": "analytics.lbl.nonPayees",
+    "v": "non payées"
+  },
+  {
+    "k": "analytics.lbl.areapprouv",
+    "v": "à réapprovisionner"
+  },
+  {
+    "k": "analytics.verif.done",
+    "v": "Vérifications terminées"
+  },
+  {
+    "k": "analytics.verif.contracts",
+    "v": "contrat(s) alerté(s)"
+  },
+  {
+    "k": "analytics.verif.invoices",
+    "v": "facture(s) en retard traitée(s)"
+  },
+  {
+    "k": "dep.subtitle",
+    "v": "Suivi de toutes vos dépenses par catégorie"
+  },
+  {
+    "k": "dep.kpi.biggest",
+    "v": "Plus grosse dépense"
+  },
+  {
+    "k": "dep.kpi.vsPrev",
+    "v": "Vs période préc."
+  },
+  {
+    "k": "dep.chart.byCat",
+    "v": "Répartition par catégorie"
+  },
+  {
+    "k": "dep.chart.topCat",
+    "v": "Top catégories"
+  },
+  {
+    "k": "dep.list.title",
+    "v": "Liste des dépenses"
+  },
+  {
+    "k": "dep.list.count",
+    "v": "dépense"
+  },
+  {
+    "k": "dep.list.countPl",
+    "v": "dépenses"
+  },
+  {
+    "k": "dep.modal.title",
+    "v": "Nouvelle dépense"
+  },
+  {
+    "k": "dep.modal.descPlaceholder",
+    "v": "Description de la dépense..."
+  },
+  {
+    "k": "dep.modal.payMode",
+    "v": "Mode de paiement"
+  },
+  {
+    "k": "dep.modal.costCenter",
+    "v": "Centre de coût (facultatif)"
+  },
+  {
+    "k": "dep.modal.refPiece",
+    "v": "Réf. pièce (facultatif)"
+  },
+  {
+    "k": "dep.modal.ohadaTitle",
+    "v": "Écriture OHADA (auto-calculée)"
+  },
+  {
+    "k": "dep.modal.debit",
+    "v": "Débit"
+  },
+  {
+    "k": "dep.modal.credit",
+    "v": "Crédit"
+  },
+  {
+    "k": "dep.modal.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "achats.achatsJour",
+    "v": "Tous vos achats sont à jour"
+  },
+  {
+    "k": "achats.impayeSg",
+    "v": "impayé"
+  },
+  {
+    "k": "achats.impayePl",
+    "v": "impayés"
+  },
+  {
+    "k": "achats.telephoneLabel",
+    "v": "Téléphone"
+  },
+  {
+    "k": "achats.nomPlaceholder",
+    "v": "Nom du fournisseur"
+  },
+  {
+    "k": "achats.contactPlaceholder",
+    "v": "Personne de contact"
+  },
+  {
+    "k": "achats.centreCout",
+    "v": "Centre de coût (facultatif)"
+  },
+  {
+    "k": "achats.statut.paye",
+    "v": "Payé"
+  },
+  {
+    "k": "audit.title",
+    "v": "Audit & Logs Système"
+  },
+  {
+    "k": "audit.subtitle",
+    "v": "Traçabilité complète de toutes les opérations"
+  },
+  {
+    "k": "audit.kpi.week",
+    "v": "Cette semaine"
+  },
+  {
+    "k": "audit.filterAll",
+    "v": "Tous"
+  },
+  {
+    "k": "audit.entries",
+    "v": "entrées"
+  },
+  {
+    "k": "audit.colDetails",
+    "v": "Détails"
+  },
+  {
+    "k": "audit.colEntite",
+    "v": "Entité"
+  },
+  {
+    "k": "audit.nouveau",
+    "v": "Après"
+  },
+  {
+    "k": "audit.expand",
+    "v": "Voir détails"
+  },
+  {
+    "k": "audit.collapse",
+    "v": "Réduire"
+  },
+  {
+    "k": "acad.subtitle",
+    "v": "Règles LMD, mentions, compensation & rattrapage"
+  },
+  {
+    "k": "acad.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "acad.saveParams",
+    "v": "Enregistrer les paramètres"
+  },
+  {
+    "k": "acad.tabGeneral",
+    "v": "Général"
+  },
+  {
+    "k": "acad.tabLMD",
+    "v": "Règles LMD"
+  },
+  {
+    "k": "acad.sysLabel",
+    "v": "Système pédagogique"
+  },
+  {
+    "k": "acad.sysLMDDesc",
+    "v": "Licence–Master–Doctorat avec crédits ECTS et UE"
+  },
+  {
+    "k": "acad.sysHybrideDesc",
+    "v": "Mélange classique + LMD selon le niveau des étudiants"
+  },
+  {
+    "k": "acad.bareme",
+    "v": "Barème de notation"
+  },
+  {
+    "k": "acad.sur",
+    "v": "Sur"
+  },
+  {
+    "k": "acad.baremeDesc100",
+    "v": "Les notes sont saisies sur 100. Les moyennes sont converties sur 20 pour les rapports."
+  },
+  {
+    "k": "acad.baremeDesc20",
+    "v": "Notation standard sur 20 points."
+  },
+  {
+    "k": "acad.apercu",
+    "v": "Aperçu (ordre appliqué)"
+  },
+  {
+    "k": "acad.validationAvg",
+    "v": "Moyennes de validation"
+  },
+  {
+    "k": "acad.validSemestreSub",
+    "v": "Moyenne minimale pour valider le semestre"
+  },
+  {
+    "k": "acad.validAnnee",
+    "v": "Validation année"
+  },
+  {
+    "k": "acad.validAnneeSub",
+    "v": "Moyenne annuelle requise pour passer en année supérieure"
+  },
+  {
+    "k": "acad.creditsECTS",
+    "v": "Crédits ECTS"
+  },
+  {
+    "k": "acad.creditsSemestre",
+    "v": "Crédits par semestre"
+  },
+  {
+    "k": "acad.creditsSemestreSub",
+    "v": "Standard LMD : 30 crédits par semestre"
+  },
+  {
+    "k": "acad.creditsAnnee",
+    "v": "Crédits par année"
+  },
+  {
+    "k": "acad.creditsAnneeSub",
+    "v": "Standard LMD : 60 crédits par année"
+  },
+  {
+    "k": "acad.compMatieres",
+    "v": "Compensation entre matières"
+  },
+  {
+    "k": "acad.compMatieresSub",
+    "v": "Une bonne note dans une matière peut compenser une note insuffisante dans une autre"
+  },
+  {
+    "k": "acad.compSemestreSub",
+    "v": "Le S2 peut compenser un S1 insuffisant si la moyenne globale est atteinte"
+  },
+  {
+    "k": "acad.seuilComp",
+    "v": "Seuil de compensation"
+  },
+  {
+    "k": "acad.rattrapage",
+    "v": "Session de rattrapage"
+  },
+  {
+    "k": "acad.seuilRattrapageSub",
+    "v": "Moyenne minimale pour être admis à une session de rattrapage"
+  },
+  {
+    "k": "acad.maxMatieres",
+    "v": "Nb max matières en rattrapage"
+  },
+  {
+    "k": "acad.conserverNote",
+    "v": "Conserver la meilleure note"
+  },
+  {
+    "k": "acad.colorChange",
+    "v": "Changer la couleur"
+  },
+  {
+    "k": "ged.subtitle",
+    "v": "Gestion électronique des documents"
+  },
+  {
+    "k": "ged.noDocumentDesc",
+    "v": "Ajoutez vos contrats, factures, documents RH et plus encore."
+  },
+  {
+    "k": "ged.nomLabel",
+    "v": "Nom du document *"
+  },
+  {
+    "k": "ged.urlLabel",
+    "v": "URL du fichier *"
+  },
+  {
+    "k": "miaa.subtitle",
+    "v": "oraforme ERP · Spécialisé Congo-Brazzaville"
+  },
+  {
+    "k": "miaa.capabilities",
+    "v": "Capacités MIAA+"
+  },
+  {
+    "k": "miaa.configModel",
+    "v": "Modèle IA"
+  },
+  {
+    "k": "miaa.configLangValue",
+    "v": "Français 🇫🇷"
+  },
+  {
+    "k": "miaa.greetAfternoon",
+    "v": "Bonne après-midi"
+  },
+  {
+    "k": "miaa.greetEvening",
+    "v": "Bonne soirée"
+  },
+  {
+    "k": "miaa.newConvWithCompany",
+    "v": "Nouvelle conversation démarrée. Comment puis-je vous aider chez **{entreprise}** ?"
+  },
+  {
+    "k": "miaa.cap.analyse",
+    "v": "Analyse de données"
+  },
+  {
+    "k": "miaa.cap.docs",
+    "v": "Génération documents"
+  },
+  {
+    "k": "miaa.cap.multiDesc",
+    "v": "Français, English, Lingala"
+  },
+  {
+    "k": "miaa.uploadAnalyzing",
+    "v": "Analyse du fichier en cours…"
+  },
+  {
+    "k": "rapports.tab.resultat",
+    "v": "Compte de résultat"
+  },
+  {
+    "k": "rapports.tab.flux",
+    "v": "Flux de trésorerie"
+  },
+  {
+    "k": "rapports.kpi.chargesSub",
+    "v": "Toutes dépenses"
+  },
+  {
+    "k": "rapports.kpi.resultat",
+    "v": "Résultat net"
+  },
+  {
+    "k": "rapports.kpi.tauxPaiement",
+    "v": "Taux de paiement"
+  },
+  {
+    "k": "rapports.detail.title",
+    "v": "Détail financier — {annee}"
+  },
+  {
+    "k": "rapports.detail.resultat",
+    "v": "Résultat net"
+  },
+  {
+    "k": "rapports.resto.tva",
+    "v": "TVA collectée (18%)"
+  },
+  {
+    "k": "rapports.cr.resultatRow",
+    "v": "Résultat"
+  },
+  {
+    "k": "rapports.bilan.subtitle",
+    "v": "Bilan simplifié au 31/12/{annee} — OHADA"
+  },
+  {
+    "k": "rapports.bilan.creances",
+    "v": "Créances clients (à recevoir)"
+  },
+  {
+    "k": "rapports.bilan.report",
+    "v": "Report à nouveau (N-1)"
+  },
+  {
+    "k": "rapports.bilan.tvaReverser",
+    "v": "TVA collectée à reverser"
+  },
+  {
+    "k": "rapports.bilan.equilibre",
+    "v": "Vérification équilibre"
+  },
+  {
+    "k": "rapports.bilan.simplified",
+    "v": "(bilan simplifié — hors immobilisations)"
+  },
+  {
+    "k": "rapports.flux.subtitle",
+    "v": "Flux de trésorerie — Exercice {annee}"
+  },
+  {
+    "k": "rapports.flux.finTitle",
+    "v": "FLUX DE FINANCEMENT"
+  },
+  {
+    "k": "rapports.tva.collected",
+    "v": "TVA COLLECTÉE — Sur factures"
+  },
+  {
+    "k": "rapports.tva.tva18",
+    "v": "TVA 18% collectée"
+  },
+  {
+    "k": "rapports.tva.dgiTitle",
+    "v": "Déclaration DGI — {annee}"
+  },
+  {
+    "k": "rapports.tva.ventes",
+    "v": "TVA collectée sur ventes"
+  },
+  {
+    "k": "rapports.tva.deductible",
+    "v": "TVA déductible sur achats"
+  },
+  {
+    "k": "rapports.tva.nette",
+    "v": "TVA nette à reverser"
+  },
+  {
+    "k": "rapports.tva.totalDgi",
+    "v": "TOTAL À PAYER À LA DGI"
+  },
+  {
+    "k": "rapports.miaa.generate",
+    "v": "Générer"
+  },
+  {
+    "k": "rapports.miaa.regenerate",
+    "v": "Régénérer"
+  },
+  {
+    "k": "rapports.miaa.analyzing",
+    "v": "MIAA+ rédige votre analyse financière complète…"
+  },
+  {
+    "k": "rapports.miaa.emptyTitle",
+    "v": "MIAA+ analyse vos données et génère une analyse financière complète"
+  },
+  {
+    "k": "notif.all",
+    "v": "Toutes"
+  },
+  {
+    "k": "notif.upToDate",
+    "v": "Vous êtes à jour !"
+  },
+  {
+    "k": "notif.markRead",
+    "v": "Marquer comme lu"
+  },
+  {
+    "k": "modules.deactivate",
+    "v": "Désactiver"
+  },
+  {
+    "k": "modules.confirmActivate",
+    "v": "Ce module sera immédiatement accessible dans votre sidebar."
+  },
+  {
+    "k": "modules.confirmDeactivate",
+    "v": "Le module sera retiré de votre sidebar. Vos données sont conservées."
+  },
+  {
+    "k": "hotel.title",
+    "v": "Gestion Hôtelière"
+  },
+  {
+    "k": "hotel.newReservation",
+    "v": "Nouvelle réservation"
+  },
+  {
+    "k": "hotel.colArrival",
+    "v": "Arrivée"
+  },
+  {
+    "k": "hotel.colDeparture",
+    "v": "Départ"
+  },
+  {
+    "k": "hotel.formRoomNumber",
+    "v": "Numéro *"
+  },
+  {
+    "k": "hotel.formCapacity",
+    "v": "Capacité (pers.)"
+  },
+  {
+    "k": "hotel.formClientName",
+    "v": "Nom du client *"
+  },
+  {
+    "k": "hotel.formPhone",
+    "v": "Téléphone"
+  },
+  {
+    "k": "hotel.formArrival",
+    "v": "Arrivée *"
+  },
+  {
+    "k": "hotel.formDeparture",
+    "v": "Départ *"
+  },
+  {
+    "k": "hotel.formNoRoom",
+    "v": "Sans chambre attribuée"
+  },
+  {
+    "k": "hotel.errorNumAndPrice",
+    "v": "Numéro et prix requis"
+  },
+  {
+    "k": "hotel.statusOccupied",
+    "v": "Occupée"
+  },
+  {
+    "k": "hotel.statusReserved",
+    "v": "Réservée"
+  },
+  {
+    "k": "hotel.resaConfirmed",
+    "v": "Confirmée"
+  },
+  {
+    "k": "hotel.resaArrived",
+    "v": "Arrivée"
+  },
+  {
+    "k": "hotel.resaDeparted",
+    "v": "Départ"
+  },
+  {
+    "k": "transport.subtitle",
+    "v": "Gestion de flotte, courses et chauffeurs"
+  },
+  {
+    "k": "transport.allCourses",
+    "v": "Toutes"
+  },
+  {
+    "k": "transport.start",
+    "v": "Démarrer"
+  },
+  {
+    "k": "transport.disable",
+    "v": "Désactiver"
+  },
+  {
+    "k": "transport.selectDriver",
+    "v": "Sélectionner un chauffeur"
+  },
+  {
+    "k": "transport.clientPhone",
+    "v": "Téléphone"
+  },
+  {
+    "k": "transport.departure",
+    "v": "Point de départ *"
+  },
+  {
+    "k": "transport.driverLicense",
+    "v": "N° de permis"
+  },
+  {
+    "k": "transport.vehicleModel",
+    "v": "Modèle véhicule"
+  },
+  {
+    "k": "transport.statsSuccessRate",
+    "v": "Taux de réussite"
+  },
+  {
+    "k": "transport.statsPending",
+    "v": "Courses en attente"
+  },
+  {
+    "k": "transport.statsCancelled",
+    "v": "Courses annulées"
+  },
+  {
+    "k": "resto.caToday",
+    "v": "CA du jour"
+  },
+  {
+    "k": "resto.waiting",
+    "v": "en attente"
+  },
+  {
+    "k": "resto.tabRapport",
+    "v": "📊 Rapport du jour"
+  },
+  {
+    "k": "resto.allCategories",
+    "v": "Tous"
+  },
+  {
+    "k": "resto.selectDishes",
+    "v": "Sélectionnez des plats"
+  },
+  {
+    "k": "resto.recentOrders",
+    "v": "commande(s) récentes"
+  },
+  {
+    "k": "resto.inPrep",
+    "v": "En préparation"
+  },
+  {
+    "k": "resto.readyToServe",
+    "v": "Prêt à servir"
+  },
+  {
+    "k": "resto.delivered",
+    "v": "Livré"
+  },
+  {
+    "k": "resto.markReady",
+    "v": "Marquer prêt"
+  },
+  {
+    "k": "resto.markDelivered",
+    "v": "Marquer livré"
+  },
+  {
+    "k": "resto.dishNameLabel",
+    "v": "Nom du plat *"
+  },
+  {
+    "k": "resto.tableCapacity",
+    "v": "Capacité"
+  },
+  {
+    "k": "resto.copied",
+    "v": "Copié !"
+  },
+  {
+    "k": "resto.recipesTitle",
+    "v": "Recettes — ingrédients par plat"
+  },
+  {
+    "k": "resto.recipesDesc",
+    "v": "Liez les ingrédients (stock) à chaque plat. Le stock se décrémente automatiquement à chaque vente."
+  },
+  {
+    "k": "resto.selectDish",
+    "v": "Sélectionner un plat"
+  },
+  {
+    "k": "resto.selectDishOption",
+    "v": "— Choisir un plat du menu —"
+  },
+  {
+    "k": "resto.currentIngredients",
+    "v": "Ingrédients actuels"
+  },
+  {
+    "k": "resto.colIngredient",
+    "v": "Ingrédient"
+  },
+  {
+    "k": "resto.colQtyPortion",
+    "v": "Qté / portion"
+  },
+  {
+    "k": "resto.colUnit",
+    "v": "Unité"
+  },
+  {
+    "k": "resto.fromStock",
+    "v": "Depuis le stock"
+  },
+  {
+    "k": "resto.ingredientName",
+    "v": "Nom ingrédient"
+  },
+  {
+    "k": "resto.qty",
+    "v": "Qté"
+  },
+  {
+    "k": "resto.unit",
+    "v": "Unité"
+  },
+  {
+    "k": "resto.selectDishPrompt",
+    "v": "Sélectionnez un plat pour gérer sa recette"
+  },
+  {
+    "k": "resto.recentPurchases",
+    "v": "achat(s) récent(s)"
+  },
+  {
+    "k": "resto.purchaseTitle",
+    "v": "Enregistrer un achat fournisseur"
+  },
+  {
+    "k": "resto.supplierName",
+    "v": "Nom du fournisseur"
+  },
+  {
+    "k": "resto.paymentMode",
+    "v": "Mode de paiement"
+  },
+  {
+    "k": "resto.articleName",
+    "v": "Ingrédient / article"
+  },
+  {
+    "k": "resto.purchaseQty",
+    "v": "Qté"
+  },
+  {
+    "k": "resto.noPurchaseDesc",
+    "v": "Enregistrez vos achats fournisseurs pour mettre à jour le stock"
+  },
+  {
+    "k": "resto.rapportTVA",
+    "v": "TVA collectée"
+  },
+  {
+    "k": "resto.paymentBreakdown",
+    "v": "Répartition paiements"
+  },
+  {
+    "k": "resto.top5Dishes",
+    "v": "Top 5 plats du jour"
+  },
+  {
+    "k": "resto.closeCaisse",
+    "v": "Clôture de caisse"
+  },
+  {
+    "k": "resto.closeCaisseDesc",
+    "v": "La clôture enregistre le rapport journalier dans Supabase et lie les données à la trésorerie."
+  },
+  {
+    "k": "resto.closeCaisseBtn",
+    "v": "Clôturer la caisse du jour"
+  },
+  {
+    "k": "resto.orderSaved",
+    "v": "Commande enregistrée !"
+  },
+  {
+    "k": "resto.receiptNum",
+    "v": "Reçu N°"
+  },
+  {
+    "k": "resto.cancelOrder",
+    "v": "Commande annulée"
+  },
+  {
+    "k": "resto.cashierClosed",
+    "v": "Caisse clôturée avec succès !"
+  },
+  {
+    "k": "resto.cuisine.subtitle",
+    "v": "commande(s) active(s) · Mise à jour auto toutes les 10s"
+  },
+  {
+    "k": "resto.cuisine.markDelivered",
+    "v": "Marquer livré"
+  },
+  {
+    "k": "ged.cat.all",
+    "v": "Tous"
+  },
+  {
+    "k": "ged.cat.compta",
+    "v": "Comptabilité"
+  },
+  {
+    "k": "ged.folder.all",
+    "v": "Tous les documents"
+  },
+  {
+    "k": "ged.folder.newPlh",
+    "v": "Nom du dossier"
+  },
+  {
+    "k": "ged.favoriteOn",
+    "v": "Marquer comme favori"
+  },
+  {
+    "k": "ged.favoriteOff",
+    "v": "Retirer des favoris"
+  },
+  {
+    "k": "ged.doc.expiringSoon",
+    "v": "Expire bientôt"
+  },
+  {
+    "k": "ged.doc.expired",
+    "v": "Expiré"
+  },
+  {
+    "k": "ged.sig.title",
+    "v": "Signature électronique"
+  },
+  {
+    "k": "ged.sig.draw",
+    "v": "Signez dans le cadre ci-dessous"
+  },
+  {
+    "k": "ged.sig.name",
+    "v": "Votre nom *"
+  },
+  {
+    "k": "ged.sig.role",
+    "v": "Votre rôle"
+  },
+  {
+    "k": "ged.sig.success",
+    "v": "Signature enregistrée"
+  },
+  {
+    "k": "cal.subtitle",
+    "v": "Événements, réunions, deadlines"
+  },
+  {
+    "k": "cal.newEvent",
+    "v": "Nouvel événement"
+  },
+  {
+    "k": "cal.reunions",
+    "v": "Réunions"
+  },
+  {
+    "k": "cal.type.event",
+    "v": "Événement"
+  },
+  {
+    "k": "cal.type.reunion",
+    "v": "Réunion"
+  },
+  {
+    "k": "cal.type.conge",
+    "v": "Congé"
+  },
+  {
+    "k": "cal.type.tache",
+    "v": "Tâche"
+  },
+  {
+    "k": "cal.statut.planifie",
+    "v": "Planifié"
+  },
+  {
+    "k": "cal.statut.confirme",
+    "v": "Confirmé"
+  },
+  {
+    "k": "cal.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "tasks.title",
+    "v": "Tâches & Collaboration"
+  },
+  {
+    "k": "tasks.subtitle",
+    "v": "Kanban board · Suivi temps réel"
+  },
+  {
+    "k": "tasks.due",
+    "v": "Échéance"
+  },
+  {
+    "k": "tasks.assignedTo",
+    "v": "Assigné à"
+  },
+  {
+    "k": "tasks.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "tasks.overdue",
+    "v": "En retard"
+  },
+  {
+    "k": "tasks.filterAll",
+    "v": "Toutes"
+  },
+  {
+    "k": "ecole.direction.periode.tout",
+    "v": "Toutes périodes"
+  },
+  {
+    "k": "ecole.direction.periode.annee",
+    "v": "Cette année"
+  },
+  {
+    "k": "ecole.direction.fin.nbPaiements",
+    "v": "Nombre de paiements"
+  },
+  {
+    "k": "ecole.direction.fin.moyenne",
+    "v": "Moyenne par étudiant"
+  },
+  {
+    "k": "ecole.direction.fin.repartitionMode",
+    "v": "Répartition par mode de paiement"
+  },
+  {
+    "k": "ecole.direction.fin.historique",
+    "v": "Historique des paiements"
+  },
+  {
+    "k": "ecole.direction.kpi.gestionImpayes",
+    "v": "Gestion des impayés"
+  },
+  {
+    "k": "ecole.direction.kpi.gestionImpayesDesc",
+    "v": "Bloquer automatiquement les élèves ayant des impayés"
+  },
+  {
+    "k": "ecole.direction.kpi.diplomes",
+    "v": "Diplômés"
+  },
+  {
+    "k": "ecole.direction.bourse.libellePlaceholder",
+    "v": "Description de la bourse…"
+  },
+  {
+    "k": "ecole.direction.comm.publier",
+    "v": "Publier une annonce"
+  },
+  {
+    "k": "ecole.direction.partner.descPlaceholder",
+    "v": "Description du partenariat…"
+  },
+  {
+    "k": "ecole.direction.partner.contactPlaceholder",
+    "v": "Nom du contact…"
+  },
+  {
+    "k": "daac.title",
+    "v": "DAAC — Direction des Affaires Académiques"
+  },
+  {
+    "k": "daac.subtitle",
+    "v": "Programmes, sessions, examens, délibérations, diplômes & soutenances"
+  },
+  {
+    "k": "daac.kpi.activeSessions",
+    "v": "Sessions en cours"
+  },
+  {
+    "k": "daac.tab.matieres",
+    "v": "Matières"
+  },
+  {
+    "k": "student.subtitle",
+    "v": "Accédez à votre dossier scolaire"
+  },
+  {
+    "k": "student.myFileSubtitle",
+    "v": "Résultats, paiements, absences"
+  },
+  {
+    "k": "student.switchAccount",
+    "v": "Changer de compte"
+  },
+  {
+    "k": "student.accessFile",
+    "v": "Accès à mon dossier"
+  },
+  {
+    "k": "student.adminSubtitle",
+    "v": "Administration · Dossier élève"
+  },
+  {
+    "k": "student.searchPlaceholder",
+    "v": "N° étudiant, nom, prénom…"
+  },
+  {
+    "k": "student.searchPrompt",
+    "v": "Recherchez un étudiant par nom ou numéro"
+  },
+  {
+    "k": "student.suspended",
+    "v": "Accès suspendu"
+  },
+  {
+    "k": "student.unblock",
+    "v": "Débloquer"
+  },
+  {
+    "k": "student.unlockCode",
+    "v": "Code de déblocage :"
+  },
+  {
+    "k": "student.globalAvg",
+    "v": "Moyenne générale"
+  },
+  {
+    "k": "student.justified",
+    "v": "justifiées"
+  },
+  {
+    "k": "student.tab.notes",
+    "v": "Mes notes"
+  },
+  {
+    "k": "student.col.subject",
+    "v": "Matière"
+  },
+  {
+    "k": "student.col.libelle",
+    "v": "Libellé"
+  },
+  {
+    "k": "student.paid",
+    "v": "Payé"
+  },
+  {
+    "k": "student.justified2",
+    "v": "Justifiée"
+  },
+  {
+    "k": "parent.subtitle",
+    "v": "Dossier de votre enfant"
+  },
+  {
+    "k": "parent.childrenSubtitle",
+    "v": "Suivi de vos enfants"
+  },
+  {
+    "k": "parent.myChildren",
+    "v": "Mes enfants"
+  },
+  {
+    "k": "parent.searchPrompt",
+    "v": "Recherchez un parent ou un élève"
+  },
+  {
+    "k": "parent.father",
+    "v": "Père :"
+  },
+  {
+    "k": "parent.mother",
+    "v": "Mère :"
+  },
+  {
+    "k": "parent.suspended",
+    "v": "Accès suspendu — solde impayé détecté"
+  },
+  {
+    "k": "parent.tab.notes",
+    "v": "Résultats"
+  },
+  {
+    "k": "miaa.school.subtitle",
+    "v": "Assistant IA scolaire — analyse & insights en temps réel"
+  },
+  {
+    "k": "miaa.school.loadCtx",
+    "v": "Charger le contexte"
+  },
+  {
+    "k": "miaa.school.placeholder",
+    "v": "Posez votre question…"
+  },
+  {
+    "k": "miaa.school.placeholderNoCtx",
+    "v": "Chargez le contexte puis posez votre question…"
+  },
+  {
+    "k": "miaa.school.kpi.activeStudents",
+    "v": "Élèves actifs"
+  },
+  {
+    "k": "miaa.school.kpi.yearRevenue",
+    "v": "Revenus (année)"
+  },
+  {
+    "k": "miaa.school.kpi.avgGrade",
+    "v": "Moy. générale"
+  },
+  {
+    "k": "miaa.school.kpi.blocked",
+    "v": "élèves bloqués"
+  },
+  {
+    "k": "miaa.school.students",
+    "v": "Élèves"
+  },
+  {
+    "k": "dir.ecole.subtitle",
+    "v": "Pilotage stratégique — effectifs, finances & académique"
+  },
+  {
+    "k": "dir.ecole.tab.evenements",
+    "v": "Événements"
+  },
+  {
+    "k": "dir.ecole.kpi.revenuMois",
+    "v": "Revenu du mois"
+  },
+  {
+    "k": "dir.ecole.kpi.diplomes",
+    "v": "Diplômés"
+  },
+  {
+    "k": "dir.ecole.unpaid",
+    "v": "Gestion des impayés"
+  },
+  {
+    "k": "dir.ecole.unpaidDesc",
+    "v": "Suspendre automatiquement les étudiants actifs sans paiement cette année. Un code de déblocage est généré pour chacun."
+  },
+  {
+    "k": "dir.ecole.blockBtnSuffix",
+    "v": "impayé(s)"
+  },
+  {
+    "k": "formateur.statut.declare",
+    "v": "Déclaré"
+  },
+  {
+    "k": "formateur.statut.paye",
+    "v": "Payé"
+  },
+  {
+    "k": "compta.overview.title",
+    "v": "Comptabilité OHADA"
+  },
+  {
+    "k": "compta.overview.newEntry",
+    "v": "Nouvelle écriture"
+  },
+  {
+    "k": "compta.overview.allEntries",
+    "v": "Toutes les écritures"
+  },
+  {
+    "k": "compta.overview.recentEntries",
+    "v": "Écritures récentes"
+  },
+  {
+    "k": "compta.overview.doubleEntry",
+    "v": "Grand livre en partie double"
+  },
+  {
+    "k": "compta.overview.centresCouts",
+    "v": "Centres de coûts"
+  },
+  {
+    "k": "compta.overview.alertesTva",
+    "v": "Déclaration TVA ce mois"
+  },
+  {
+    "k": "compta.overview.alertesBilan",
+    "v": "Bilan trimestriel à préparer"
+  },
+  {
+    "k": "compta.ecole.title",
+    "v": "Comptabilité & Finance"
+  },
+  {
+    "k": "compta.ecole.tab.previsions",
+    "v": "Prévisions IA"
+  },
+  {
+    "k": "compta.journal.subtitle",
+    "v": "Écritures en partie double — générées automatiquement"
+  },
+  {
+    "k": "compta.journal.entries",
+    "v": "écriture(s) affichée(s)"
+  },
+  {
+    "k": "compta.journal.balanced",
+    "v": "✓ Équilibré"
+  },
+  {
+    "k": "compta.journal.searchPlh",
+    "v": "Libellé, N° compte, pièce…"
+  },
+  {
+    "k": "compta.journal.allSources",
+    "v": "Toutes sources"
+  },
+  {
+    "k": "compta.journal.colPiece",
+    "v": "Pièce"
+  },
+  {
+    "k": "compta.journal.colLabel",
+    "v": "Libellé"
+  },
+  {
+    "k": "compta.journal.colDebitNo",
+    "v": "N° Débit"
+  },
+  {
+    "k": "compta.journal.colDebit",
+    "v": "Débit"
+  },
+  {
+    "k": "compta.journal.colCreditNo",
+    "v": "N° Crédit"
+  },
+  {
+    "k": "compta.journal.colCredit",
+    "v": "Crédit"
+  },
+  {
+    "k": "compta.journal.emptyDesc",
+    "v": "Les écritures sont créées automatiquement par les triggers lors de chaque opération financière."
+  },
+  {
+    "k": "compta.journal.src.cheque",
+    "v": "Chèque"
+  },
+  {
+    "k": "compta.grandlivre.allAccounts",
+    "v": "Tous les comptes"
+  },
+  {
+    "k": "compta.grandlivre.colLabel",
+    "v": "Libellé"
+  },
+  {
+    "k": "compta.grandlivre.colDebit",
+    "v": "Débit"
+  },
+  {
+    "k": "compta.grandlivre.colCredit",
+    "v": "Crédit"
+  },
+  {
+    "k": "compta.balance.subtitle",
+    "v": "Récapitulatif des soldes par compte OHADA"
+  },
+  {
+    "k": "compta.balance.colIntitule",
+    "v": "Intitulé"
+  },
+  {
+    "k": "compta.balance.equilibreOk",
+    "v": "✓ Balance équilibrée"
+  },
+  {
+    "k": "compta.balance.equilibreKo",
+    "v": "⚠ Déséquilibre détecté"
+  },
+  {
+    "k": "compta.bilan.creances",
+    "v": "Créances clients"
+  },
+  {
+    "k": "compta.bilan.capitalReserves",
+    "v": "Capitaux & Réserves"
+  },
+  {
+    "k": "compta.bilan.resultat",
+    "v": "Résultat"
+  },
+  {
+    "k": "compta.tva.title",
+    "v": "Déclaration TVA"
+  },
+  {
+    "k": "compta.tva.subtitle",
+    "v": "Calcul et déclaration TVA mensuelle"
+  },
+  {
+    "k": "compta.tva.collectee",
+    "v": "TVA Collectée"
+  },
+  {
+    "k": "compta.tva.deductible",
+    "v": "TVA Déductible"
+  },
+  {
+    "k": "compta.tva.due",
+    "v": "TVA à Décayer"
+  },
+  {
+    "k": "compta.tva.credit",
+    "v": "Crédit de TVA"
+  },
+  {
+    "k": "compta.tva.periodLabel",
+    "v": "Déclaration de la période"
+  },
+  {
+    "k": "compta.plan.subtitle",
+    "v": "Référentiel des comptes selon OHADA"
+  },
+  {
+    "k": "compta.plan.allClasses",
+    "v": "Toutes classes"
+  },
+  {
+    "k": "compta.plan.colIntitule",
+    "v": "Intitulé"
+  },
+  {
+    "k": "compta.tiers.allTypes",
+    "v": "Tous types"
+  },
+  {
+    "k": "compta.tiers.colDernier",
+    "v": "Dernière opération"
+  },
+  {
+    "k": "compta.immob.colDesig",
+    "v": "Désignation"
+  },
+  {
+    "k": "compta.immob.colAmort",
+    "v": "Amort. cumulé"
+  },
+  {
+    "k": "compta.immob.colDuree",
+    "v": "Durée"
+  },
+  {
+    "k": "compta.rapproch.subtitle",
+    "v": "Réconciliation soldes banque / comptabilité"
+  },
+  {
+    "k": "compta.rapproch.ok",
+    "v": "✓ Rapproché"
+  },
+  {
+    "k": "compta.cloture.title",
+    "v": "Clôture Comptable"
+  },
+  {
+    "k": "compta.cloture.subtitle",
+    "v": "Clôture de période et reports à nouveau"
+  },
+  {
+    "k": "compta.cloture.newCloture",
+    "v": "Nouvelle clôture"
+  },
+  {
+    "k": "compta.cloture.stat.cloture",
+    "v": "Clôturé"
+  },
+  {
+    "k": "compta.rapports.cr",
+    "v": "Compte de Résultat"
+  },
+  {
+    "k": "compta.rapports.resultat",
+    "v": "Résultat net"
+  },
+  {
+    "k": "compta.cc.title",
+    "v": "Centres de Coûts"
+  },
+  {
+    "k": "compta.cc.subtitle",
+    "v": "Analyse des charges par centre analytique"
+  },
+  {
+    "k": "treso.cheques.title",
+    "v": "Chèques"
+  },
+  {
+    "k": "treso.cheques.subtitle",
+    "v": "Suivi des chèques émis et reçus"
+  },
+  {
+    "k": "treso.cheques.new",
+    "v": "Nouveau chèque"
+  },
+  {
+    "k": "treso.cheques.stat.encaisse",
+    "v": "Encaissé"
+  },
+  {
+    "k": "treso.cheques.stat.rejete",
+    "v": "Rejeté"
+  },
+  {
+    "k": "treso.cheques.kpi.encaisses",
+    "v": "Encaissés"
+  },
+  {
+    "k": "treso.cheques.kpi.rejetes",
+    "v": "Rejetés"
+  },
+  {
+    "k": "treso.cheques.kpi.retard",
+    "v": "chèque(s) en retard"
+  },
+  {
+    "k": "treso.cheques.filterAll",
+    "v": "Tous statuts"
+  },
+  {
+    "k": "treso.cheques.searchPlh",
+    "v": "N° chèque, bénéficiaire…"
+  },
+  {
+    "k": "treso.cheques.colNum",
+    "v": "N° Chèque"
+  },
+  {
+    "k": "treso.cheques.colBenef",
+    "v": "Bénéficiaire"
+  },
+  {
+    "k": "treso.cheques.colEcheance",
+    "v": "Échéance"
+  },
+  {
+    "k": "treso.cheques.confirmEncaiss",
+    "v": "Marquer ce chèque comme encaissé ?"
+  },
+  {
+    "k": "treso.cheques.confirmRejet",
+    "v": "Marquer ce chèque comme rejeté ?"
+  },
+  {
+    "k": "treso.cheques.notifCreated",
+    "v": "Chèque enregistré ✓"
+  },
+  {
+    "k": "treso.cheques.notifEncaisse",
+    "v": "Chèque encaissé ✓"
+  },
+  {
+    "k": "treso.cheques.notifRejete",
+    "v": "Chèque marqué rejeté"
+  },
+  {
+    "k": "treso.cheques.modalTitle",
+    "v": "Enregistrer un chèque"
+  },
+  {
+    "k": "treso.cheques.formNum",
+    "v": "N° Chèque *"
+  },
+  {
+    "k": "treso.cheques.formBenef",
+    "v": "Bénéficiaire *"
+  },
+  {
+    "k": "treso.cheques.formMotifPlh",
+    "v": "Objet du paiement (optionnel)"
+  },
+  {
+    "k": "treso.virements.subtitle",
+    "v": "Ordres de virement inter-comptes"
+  },
+  {
+    "k": "treso.virements.searchPlh",
+    "v": "Bénéficiaire, référence…"
+  },
+  {
+    "k": "treso.virements.filterAll",
+    "v": "Tous statuts"
+  },
+  {
+    "k": "treso.virements.colBenef",
+    "v": "Bénéficiaire"
+  },
+  {
+    "k": "treso.virements.colRef",
+    "v": "Référence"
+  },
+  {
+    "k": "treso.virements.stat.rejete",
+    "v": "Rejeté"
+  },
+  {
+    "k": "treso.virements.formBenef",
+    "v": "Bénéficiaire *"
+  },
+  {
+    "k": "treso.virements.formMotif",
+    "v": "Motif / référence"
+  },
+  {
+    "k": "treso.historique.title",
+    "v": "Historique des Transactions"
+  },
+  {
+    "k": "treso.historique.subtitle",
+    "v": "Toutes les opérations de trésorerie"
+  },
+  {
+    "k": "treso.historique.filterAll",
+    "v": "Toutes opérations"
+  },
+  {
+    "k": "treso.historique.colLabel",
+    "v": "Libellé"
+  },
+  {
+    "k": "treso.rapproch.subtitle",
+    "v": "Réconciliation relevés bancaires"
+  },
+  {
+    "k": "treso.rembours.subtitle",
+    "v": "Avances et remboursements employés"
+  },
+  {
+    "k": "treso.rembours.colBenef",
+    "v": "Bénéficiaire"
+  },
+  {
+    "k": "treso.validations.title",
+    "v": "Validations en Attente"
+  },
+  {
+    "k": "treso.validations.subtitle",
+    "v": "Opérations soumises à validation"
+  },
+  {
+    "k": "treso.validations.colLabel",
+    "v": "Libellé"
+  },
+  {
+    "k": "treso.validations.confirmApp",
+    "v": "Approuver cette opération ?"
+  },
+  {
+    "k": "treso.validations.confirmRej",
+    "v": "Rejeter cette opération ?"
+  },
+  {
+    "k": "treso.wallets.colOperateur",
+    "v": "Opérateur"
+  },
+  {
+    "k": "treso.wallets.colNumero",
+    "v": "Numéro"
+  },
+  {
+    "k": "stock.page.subtitle",
+    "v": "Vue globale des articles en stock"
+  },
+  {
+    "k": "stock.page.colRef",
+    "v": "Référence"
+  },
+  {
+    "k": "stock.page.colQty",
+    "v": "Quantité"
+  },
+  {
+    "k": "stock.alertes.colQty",
+    "v": "Quantité"
+  },
+  {
+    "k": "stock.audit.subtitle",
+    "v": "Traçabilité complète des opérations stock"
+  },
+  {
+    "k": "stock.audit.filterAll",
+    "v": "Tous mouvements"
+  },
+  {
+    "k": "stock.audit.colQty",
+    "v": "Quantité"
+  },
+  {
+    "k": "stock.audit.colRef",
+    "v": "Référence"
+  },
+  {
+    "k": "stock.categories.subtitle",
+    "v": "Organisation des articles par catégorie"
+  },
+  {
+    "k": "stock.categories.new",
+    "v": "Nouvelle catégorie"
+  },
+  {
+    "k": "stock.categories.modalTitle",
+    "v": "Nouvelle catégorie"
+  },
+  {
+    "k": "stock.categories.formNom",
+    "v": "Nom de la catégorie *"
+  },
+  {
+    "k": "stock.entrepots.title",
+    "v": "Entrepôts"
+  },
+  {
+    "k": "stock.entrepots.subtitle",
+    "v": "Gestion multi-entrepôts"
+  },
+  {
+    "k": "stock.entrepots.new",
+    "v": "Nouvel entrepôt"
+  },
+  {
+    "k": "stock.entrepots.colNom",
+    "v": "Entrepôt"
+  },
+  {
+    "k": "stock.fournisseurs.subtitle",
+    "v": "Catalogue des fournisseurs"
+  },
+  {
+    "k": "stock.fournisseurs.colTel",
+    "v": "Téléphone"
+  },
+  {
+    "k": "stock.fournisseurs.colDelai",
+    "v": "Délai livraison"
+  },
+  {
+    "k": "stock.mouvements.filterAll",
+    "v": "Tous types"
+  },
+  {
+    "k": "stock.mouvements.colQty",
+    "v": "Quantité"
+  },
+  {
+    "k": "stock.mouvements.colUser",
+    "v": "Opérateur"
+  },
+  {
+    "k": "stock.codesbarre.subtitle",
+    "v": "Gestion et impression des codes-barres"
+  },
+  {
+    "k": "stock.codesbarre.generate",
+    "v": "Générer"
+  },
+  {
+    "k": "stock.codesbarre.printAll",
+    "v": "Tout imprimer"
+  },
+  {
+    "k": "stock.multiunites.title",
+    "v": "Multi-Unités"
+  },
+  {
+    "k": "stock.multiunites.subtitle",
+    "v": "Unités de mesure et conversions"
+  },
+  {
+    "k": "stock.multiunites.new",
+    "v": "Nouvelle unité"
+  },
+  {
+    "k": "stock.multiunites.colNom",
+    "v": "Unité"
+  },
+  {
+    "k": "stock.multiunites.colAbrv",
+    "v": "Abréviation"
+  },
+  {
+    "k": "stock.multiunites.colBase",
+    "v": "Unité de base"
+  },
+  {
+    "k": "stock.transferts.colSource",
+    "v": "Entrepôt source"
+  },
+  {
+    "k": "stock.transferts.colDest",
+    "v": "Entrepôt destination"
+  },
+  {
+    "k": "stock.transferts.colQty",
+    "v": "Quantité"
+  },
+  {
+    "k": "stock.valorisation.subtitle",
+    "v": "Valeur et rotation des stocks"
+  },
+  {
+    "k": "stock.valorisation.colQty",
+    "v": "Quantité"
+  },
+  {
+    "k": "rh.sanctions.type.blame",
+    "v": "Blâme"
+  },
+  {
+    "k": "rh.avantages.colBeneficiaires",
+    "v": "Bénéficiaires"
+  },
+  {
+    "k": "mm.filterAll",
+    "v": "Toutes opérations"
+  },
+  {
+    "k": "mm.colTelephone",
+    "v": "Téléphone"
+  },
+  {
+    "k": "mm.colOperateur",
+    "v": "Opérateur"
+  },
+  {
+    "k": "mm.colRef",
+    "v": "Référence"
+  },
+  {
+    "k": "mm.type.depot",
+    "v": "Dépôt"
+  },
+  {
+    "k": "mm.stat.succes",
+    "v": "Succès"
+  },
+  {
+    "k": "devis.subtitle",
+    "v": "Créez, envoyez et convertissez vos devis en factures"
+  },
+  {
+    "k": "devis.accepted",
+    "v": "Acceptés"
+  },
+  {
+    "k": "devis.convertToInvoice",
+    "v": "Convertir en facture"
+  },
+  {
+    "k": "devis.saveDraft",
+    "v": "Enregistrer brouillon"
+  },
+  {
+    "k": "devis.send",
+    "v": "Envoyer le devis"
+  },
+  {
+    "k": "devis.alreadyConverted",
+    "v": "Déjà converti en facture"
+  },
+  {
+    "k": "devis.netHT",
+    "v": "HT après remise"
+  },
+  {
+    "k": "devis.confirmConvert",
+    "v": "Convertir ce devis en facture ?"
+  },
+  {
+    "k": "devis.convertConfirmMsg",
+    "v": "Un numéro de facture sera généré automatiquement."
+  },
+  {
+    "k": "devis.expired",
+    "v": "Expiré"
+  },
+  {
+    "k": "rapport.ventes.tva",
+    "v": "TVA collectée"
+  },
+  {
+    "k": "rapport.ventes.tvaTable",
+    "v": "Déclaration TVA"
+  },
+  {
+    "k": "rapport.ventes.jRetard",
+    "v": "j de retard"
+  },
+  {
+    "k": "invoice.paymentModal.title",
+    "v": "Enregistrer un paiement"
+  },
+  {
+    "k": "invoice.paymentModal.reste",
+    "v": "Reste à régler"
+  },
+  {
+    "k": "invoice.paymentModal.mode",
+    "v": "Mode de paiement"
+  },
+  {
+    "k": "invoice.paymentModal.ref",
+    "v": "Référence (optionnelle)"
+  },
+  {
+    "k": "invoice.paymentModal.save",
+    "v": "Enregistrer le paiement"
+  },
+  {
+    "k": "ecole.tab.matieres",
+    "v": "Matières"
+  },
+  {
+    "k": "ecole.scolarite.title",
+    "v": "Scolarité"
+  },
+  {
+    "k": "ecole.scolarite.kpi.diplomes",
+    "v": "Diplômés"
+  },
+  {
+    "k": "ecole.scolarite.newStudent",
+    "v": "Nouvel étudiant"
+  },
+  {
+    "k": "ecole.scolarite.filterAll",
+    "v": "Tous"
+  },
+  {
+    "k": "ecole.scolarite.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "ecole.scolarite.unlock",
+    "v": "Débloquer"
+  },
+  {
+    "k": "ecole.scolarite.unblock",
+    "v": "Débloquer le compte"
+  },
+  {
+    "k": "ecole.scolarite.codeDeblocage",
+    "v": "Code de déblocage"
+  },
+  {
+    "k": "ecole.daac.title",
+    "v": "DAAC — Direction des Affaires Académiques"
+  },
+  {
+    "k": "ecole.daac.subtitle",
+    "v": "Programmes, sessions, examens, délibérations, diplômes & soutenances"
+  },
+  {
+    "k": "ecole.daac.kpi.sessions",
+    "v": "Sessions en cours"
+  },
+  {
+    "k": "ecole.daac.kpi.soutenances",
+    "v": "Soutenances planifiées"
+  },
+  {
+    "k": "ecole.direction.title",
+    "v": "Direction Générale"
+  },
+  {
+    "k": "ecole.direction.subtitle",
+    "v": "Vue globale, finances, événements & communication"
+  },
+  {
+    "k": "ecole.direction.tab.evenements",
+    "v": "Événements"
+  },
+  {
+    "k": "ecole.direction.kpi.tauxPaie",
+    "v": "Taux de recouvrement"
+  },
+  {
+    "k": "ecole.direction.kpi.revenuMois",
+    "v": "Recettes du mois"
+  },
+  {
+    "k": "ecole.direction.block",
+    "v": "Bloquer auto impayés"
+  },
+  {
+    "k": "ecole.direction.newEvent",
+    "v": "Nouvel événement"
+  },
+  {
+    "k": "ecole.direction.sendMessage",
+    "v": "Envoyer un message"
+  },
+  {
+    "k": "ecole.etu.subtitle",
+    "v": "Consultez votre dossier académique, notes et paiements"
+  },
+  {
+    "k": "ecole.etu.searchPlh",
+    "v": "Votre numéro étudiant (ETU-XXXX-XXX)…"
+  },
+  {
+    "k": "ecole.etu.access",
+    "v": "Accéder à mon dossier"
+  },
+  {
+    "k": "ecole.etu.tab.notes",
+    "v": "Mes notes"
+  },
+  {
+    "k": "ecole.etu.tab.paiements",
+    "v": "Mes paiements"
+  },
+  {
+    "k": "ecole.etu.tab.absences",
+    "v": "Mes absences"
+  },
+  {
+    "k": "ecole.etu.unlock",
+    "v": "Débloquer"
+  },
+  {
+    "k": "ecole.etu.code",
+    "v": "Code de déblocage"
+  },
+  {
+    "k": "ecole.etu.kpi.paye",
+    "v": "Payé"
+  },
+  {
+    "k": "ecole.parent.subtitle",
+    "v": "Suivez le parcours scolaire de votre enfant"
+  },
+  {
+    "k": "ecole.parent.searchPlh",
+    "v": "Numéro étudiant (ETU-XXXX-XXX)…"
+  },
+  {
+    "k": "ecole.parent.access",
+    "v": "Voir le dossier"
+  },
+  {
+    "k": "ecole.parent.kpi.paye",
+    "v": "Payé"
+  },
+  {
+    "k": "ecole.formateur.subtitle",
+    "v": "Gérez vos classes, notes et emploi du temps"
+  },
+  {
+    "k": "ecole.formateur.tab.notes",
+    "v": "Saisie des notes"
+  },
+  {
+    "k": "ecole.formateur.tab.absences",
+    "v": "Suivi des présences"
+  },
+  {
+    "k": "ecole.formateur.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "ecole.formateur.kpi.matieres",
+    "v": "Matières"
+  },
+  {
+    "k": "ecole.miaa.prompt.paiements",
+    "v": "Analyse des paiements"
+  },
+  {
+    "k": "ecole.miaa.prompt.perf",
+    "v": "Performance académique"
+  },
+  {
+    "k": "ecole.miaa.prompt.rapport",
+    "v": "Rapport de direction"
+  },
+  {
+    "k": "ecole.miaa.kpi.revenuMois",
+    "v": "Recettes du mois"
+  },
+  {
+    "k": "ecole.miaa.placeholder",
+    "v": "Posez une question sur votre école…"
+  },
+  {
+    "k": "ecole.miaa.welcome",
+    "v": "Bonjour ! Je suis MIAA, votre assistant IA scolaire."
+  },
+  {
+    "k": "ecole.miaa.thinking",
+    "v": "Analyse en cours…"
+  },
+  {
+    "k": "ecole.compta.tab.previsions",
+    "v": "Prévisions IA"
+  },
+  {
+    "k": "ecole.compta.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "ecole.rh.subtitle",
+    "v": "Gestion du personnel enseignant, contrats et paie"
+  },
+  {
+    "k": "ecole.rh.tab.liste",
+    "v": "Liste du personnel"
+  },
+  {
+    "k": "ecole.rh.kpi.conges",
+    "v": "En congé"
+  },
+  {
+    "k": "ecole.rh.save",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "ecole.rh.pay",
+    "v": "Calculer la paie"
+  },
+  {
+    "k": "ecole.rh.payAll",
+    "v": "Payer tous"
+  },
+  {
+    "k": "ecole.rh.filter.all",
+    "v": "Tous"
+  },
+  {
+    "k": "ecole.rh.filter.conge",
+    "v": "En congé"
+  },
+  {
+    "k": "ecole.rh.colMatiere",
+    "v": "Matière"
+  },
+  {
+    "k": "rh.analytics.subtitle",
+    "v": "Indicateurs clés et tendances de votre effectif"
+  },
+  {
+    "k": "rh.documents.subtitle",
+    "v": "Contrats, attestations et documents officiels"
+  },
+  {
+    "k": "rh.paie.subtitle",
+    "v": "Calcul et génération des bulletins de paie"
+  },
+  {
+    "k": "rh.paie.run",
+    "v": "Lancer la paie"
+  },
+  {
+    "k": "rh.paie.kpi.net",
+    "v": "Net à payer total"
+  },
+  {
+    "k": "rh.portail.subtitle",
+    "v": "Accédez à vos informations RH personnelles"
+  },
+  {
+    "k": "rh.portail.myInfo",
+    "v": "Mes informations"
+  },
+  {
+    "k": "rh.portail.myPayslips",
+    "v": "Mes bulletins de paie"
+  },
+  {
+    "k": "rh.portail.myLeaves",
+    "v": "Mes congés"
+  },
+  {
+    "k": "rh.portail.myDocs",
+    "v": "Mes documents"
+  },
+  {
+    "k": "rh.recrutement.statut.clos",
+    "v": "Clôturé"
+  },
+  {
+    "k": "stock.produits.subtitle",
+    "v": "Gérez votre catalogue de produits et références"
+  },
+  {
+    "k": "stock.produits.kpi.alerte",
+    "v": "En alerte"
+  },
+  {
+    "k": "stock.produits.kpi.rupture",
+    "v": "En rupture"
+  },
+  {
+    "k": "stock.commandes.subtitle",
+    "v": "Passez et suivez vos commandes"
+  },
+  {
+    "k": "stock.commandes.stat.envoye",
+    "v": "Envoyée"
+  },
+  {
+    "k": "stock.commandes.stat.recu",
+    "v": "Reçue"
+  },
+  {
+    "k": "stock.receptions.title",
+    "v": "Réceptions"
+  },
+  {
+    "k": "stock.receptions.subtitle",
+    "v": "Enregistrez les réceptions de marchandises"
+  },
+  {
+    "k": "stock.receptions.newReception",
+    "v": "Nouvelle réception"
+  },
+  {
+    "k": "stock.receptions.kpi.valeur",
+    "v": "Valeur reçue"
+  },
+  {
+    "k": "stock.retours.subtitle",
+    "v": "Gérez les retours clients et fournisseurs"
+  },
+  {
+    "k": "stock.retours.newReturn",
+    "v": "Nouveau retour"
+  },
+  {
+    "k": "stock.retours.kpi.valeur",
+    "v": "Valeur retournée"
+  },
+  {
+    "k": "stock.inventaires.subtitle",
+    "v": "Vérifiez et ajustez vos stocks physiques"
+  },
+  {
+    "k": "stock.inventaires.kpi.ecarts",
+    "v": "Écarts détectés"
+  },
+  {
+    "k": "stock.inventaires.kpi.valeur",
+    "v": "Valeur inventoriée"
+  },
+  {
+    "k": "stock.achats.subtitle",
+    "v": "Gérez vos achats et relations fournisseurs"
+  },
+  {
+    "k": "stock.analytics.subtitle",
+    "v": "Indicateurs de performance et analyse des mouvements"
+  },
+  {
+    "k": "stock.analytics.kpi.valeur",
+    "v": "Valeur du stock"
+  },
+  {
+    "k": "treso.encaissements.subtitle",
+    "v": "Enregistrez vos entrées de trésorerie"
+  },
+  {
+    "k": "treso.decaissements.subtitle",
+    "v": "Enregistrez vos sorties de trésorerie"
+  },
+  {
+    "k": "treso.decaissements.newEntry",
+    "v": "Nouveau décaissement"
+  },
+  {
+    "k": "treso.banques.subtitle",
+    "v": "Gérez vos comptes et relevés bancaires"
+  },
+  {
+    "k": "treso.caisses.subtitle",
+    "v": "Gérez vos caisses enregistreuses"
+  },
+  {
+    "k": "treso.previsions.subtitle",
+    "v": "Projection IA de vos flux financiers"
+  },
+  {
+    "k": "treso.previsions.generate",
+    "v": "Générer les prévisions"
+  },
+  {
+    "k": "treso.previsions.horizon",
+    "v": "Horizon de prévision"
+  },
+  {
+    "k": "treso.alertes.subtitle",
+    "v": "Surveillez les seuils critiques de trésorerie"
+  },
+  {
+    "k": "treso.analytics.subtitle",
+    "v": "Analyse et tendances de vos flux financiers"
+  },
+  {
+    "k": "treso.analytics.kpi.ratio",
+    "v": "Ratio de liquidité"
+  },
+  {
+    "k": "compta.journal.filterAll",
+    "v": "Toutes sources"
+  },
+  {
+    "k": "action.enregistrer",
+    "v": "Enregistrer"
+  },
+  {
+    "k": "action.generer",
+    "v": "Générer"
+  },
+  {
+    "k": "statut.paye",
+    "v": "Payé"
+  },
+  {
+    "k": "statut.envoye",
+    "v": "Envoyé"
+  },
+  {
+    "k": "statut.retard",
+    "v": "En retard"
+  },
+  {
+    "k": "statut.bloque",
+    "v": "Bloqué"
+  },
+  {
+    "k": "msg.succes",
+    "v": "Opération réussie"
+  },
+  {
+    "k": "msg.erreur",
+    "v": "Une erreur est survenue"
+  },
+  {
+    "k": "msg.sauvegarde",
+    "v": "Modifications enregistrées"
+  },
+  {
+    "k": "msg.copie",
+    "v": "Copié dans le presse-papiers"
+  },
+  {
+    "k": "msg.acces_refuse",
+    "v": "Accès refusé"
+  },
+  {
+    "k": "msg.session_expiree",
+    "v": "Session expirée, veuillez vous reconnecter"
+  },
+  {
+    "k": "dashboard.bienvenue_aprem",
+    "v": "Bon après-midi"
+  },
+  {
+    "k": "dashboard.activite",
+    "v": "Activité récente"
+  }
+]

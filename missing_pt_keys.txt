@@ -1,0 +1,2985 @@
+nav.bi|Analytics
+nav.bi_dg|Analytics général
+nav.bi_rh|Analytics RH
+nav.bi_ecole|Analytics École
+nav.bi_hotel|Analytics Hôtel
+nav.bi_restaurant|Analytics Restaurant
+nav.collab|Collaboration
+nav.salaires|Salaires & Paie
+nav.declarations_cnss|Déclarations CNSS
+nav.housekeeping|Housekeeping
+nav.calendrier|Calendrier
+nav.taches|Tâches
+nav.sante|Clinique
+nav.sante_patients|Patients
+nav.sante_rdv|Rendez-vous
+nav.sante_consultations|Consultations
+nav.sante_medecins|Médecins
+nav.pharmacie|Pharmacie
+nav.pharmacie_meds|Médicaments
+nav.pharmacie_ventes|Ventes / POS
+nav.miaa|IA Académique
+common.seeDetails|Voir détails
+common.create|Créer
+common.duplicate|Dupliquer
+common.archive|Archiver
+common.restore|Restaurer
+common.send|Envoyer
+common.share|Partager
+common.copy|Copier
+common.refresh|Actualiser
+common.reset|Réinitialiser
+common.generate|Générer
+common.warning|Avertissement
+common.info|Information
+common.empty|Aucun résultat
+common.notFound|Introuvable
+common.sent|Envoyé
+common.overdue|En retard
+common.required|Requis
+common.optional|Optionnel
+common.description|Description
+common.type|Type
+common.category|Catégorie
+common.reference|Référence
+common.comment|Commentaire
+common.note|Note
+common.period|Période
+common.year|Année
+common.month|Mois
+common.week|Semaine
+common.student|Étudiant
+common.label|Libellé
+common.method|Méthode
+common.choose|Choisir
+common.contact|Contact
+common.message|Message
+common.nameField|Nom
+common.titleField|Titre
+common.dateStart|Date de début
+common.dateEnd|Date de fin
+common.day|Jour
+dash.recentActivity|Activité récente
+dash.direction|Direction Générale
+dash.revenue12m|Revenus 12 mois
+dash.expenses|Répartition dépenses
+dash.topClients|Top clients
+dash.forecast|Prévisions 30 jours
+dash.activeClients|Clients actifs
+dash.pending|En cours
+dash.shortcuts|Raccourcis
+dash.lastTransactions|Dernières Transactions
+dash.enrolled|Étudiants inscrits
+dash.active|Actifs
+dash.suspended|Suspendus
+dash.totalAbsences|Absences totales
+dash.invoiceBreakdown|Répartition factures
+dash.quickLinks|Accès rapide
+dash.lastDays|30 derniers jours
+dash.positive|Positif
+dash.deficit|Déficit
+dash.monthCumul|Cumul du mois
+dash.restricted|Accès restreint
+dash.billedInvoices|Factures émises
+dash.lowStock|stocks faibles
+dash.noData|Aucune donnée
+dash.overview|Vue d\
+dash.kpiTitle|Indicateurs clés
+finance.margin|Marge nette
+finance.cashflow|Flux de trésorerie
+finance.mobile|Mobile Money
+finance.receivables|Créances clients
+finance.payables|Dettes fournisseurs
+finance.vat|TVA
+finance.vatCollected|TVA collectée
+finance.vatDeductible|TVA déductible
+finance.vatNet|TVA nette à payer
+finance.payroll|Masse salariale
+finance.entries|Entrées
+finance.exits|Sorties
+finance.net|Net
+finance.cumul|Cumul
+finance.monthly|Mensuel
+finance.annual|Annuel
+finance.scoreExcellent|Excellente
+finance.scoreGood|Bonne
+finance.scoreOk|Correcte
+finance.scoreFair|Fragile
+finance.scoreCritical|Critique
+finance.preview|Prévisions
+finance.overview|Aperçu financier
+finance.sources|Sources de revenus
+finance.apercu|Aperçu
+finance.tabs.cashflow|Cashflow
+finance.tabs.sources|Sources
+finance.tabs.previsions|Prévisions
+finance.tabs.tva|TVA
+invoice.title|Facturation
+invoice.new|Nouvelle facture
+invoice.number|Numéro
+invoice.client|Client
+invoice.amount|Montant
+invoice.dueDate|Échéance
+invoice.status.paid|Payée
+invoice.status.unpaid|Impayée
+invoice.status.partial|Partielle
+invoice.status.overdue|En retard
+invoice.sendEmail|Envoyer par email
+invoice.markPaid|Marquer payée
+invoice.download|Télécharger PDF
+treso.title|Trésorerie
+treso.balance|Solde total
+treso.bankAccounts|Comptes bancaires
+treso.cashRegisters|Caisses
+treso.mobileWallets|Portefeuilles Mobile
+treso.transfer|Virement
+treso.withdrawal|Retrait
+treso.deposit|Dépôt
+treso.reconcile|Rapprochement
+wf.all|Tous
+wf.new|Nouvelle demande
+wf.type.depense|Dépense
+wf.type.achat|Achat
+wf.type.conge|Congé
+wf.type.recrutement|Recrutement
+wf.type.facturation|Facturation
+wf.type.paiement|Paiement
+wf.type.stock|Stock
+wf.type.inscription|Inscription
+wf.status.brouillon|Brouillon
+wf.status.soumis|Soumis
+wf.status.approuve|Approuvé
+wf.status.rejete|Rejeté
+wf.status.annule|Annulé
+wf.status.cloture|Clôturé
+wf.priority.urgente|Urgente
+wf.priority.haute|Haute
+wf.priority.normale|Normale
+wf.priority.basse|Basse
+wf.cancel|Annuler
+wf.comment|Commenter
+wf.history|Historique
+wf.timeline|Chronologie
+wf.pendingCount|{{count}} en attente
+wf.sla|Délai SLA
+wf.overdue|En retard
+wf.noInbox|Aucune validation en attente
+wf.noRequests|Aucune demande créée
+rh.employee|Employé
+rh.contract|Contrat
+rh.payslip|Fiche de paie
+rh.payroll|Paie
+rh.leave|Congés
+rh.absence|Absences
+rh.recruitment|Recrutement
+rh.position|Poste
+rh.department|Département
+rh.hire|Embaucher
+rh.terminate|Licencier
+rh.evaluate|Évaluer
+rh.gross|Salaire brut
+rh.net|Salaire net
+rh.deductions|Cotisations
+rh.cnss|CNSS
+rh.irpp|IRPP
+stock.products|Produits
+stock.supplier|Fournisseur
+stock.outOfStock|Rupture de stock
+stock.movement|Mouvement
+stock.entry|Entrée
+stock.exit|Sortie
+stock.adjustment|Ajustement
+stock.inventory|Inventaire
+stock.reorder|Seuil de réappro.
+achats.title|Achats
+achats.order|Bon de commande
+achats.supplier|Fournisseur
+achats.received|Réceptionné
+achats.pending|En cours
+crm.title|CRM
+crm.clients|Clients
+crm.prospect|Prospect
+crm.contact|Contact
+crm.opportunity|Opportunité
+crm.pipeline|Pipeline
+crm.activity|Activité
+crm.followUp|Relance
+school.teachers|Enseignants
+school.classes|Classes
+school.schedule|Emploi du temps
+school.absences|Absences
+school.fees|Frais scolaires
+school.bulletin|Bulletins
+school.diploma|Diplômes
+school.enrollment|Inscription
+school.academic|Académique
+school.recovery|Recouvrement
+school.activeSessions|Sessions actives
+school.unpaid|Impayés
+school.enrolled|Inscrits (année en cours)
+school.agents|Agents
+school.trainers|Formateurs (Enseignants)
+school.receipts|Recettes
+school.exits|Sorties du jour
+school.cashflowAnalysis|Analyse des Flux Financiers
+school.recoveryTarget|Objectif Recouvrement
+school.annualRevenue|Chiffre d\
+school.shortcuts|Raccourcis
+school.recentTransactions|Transactions Récentes
+school.greeting|Bonjour
+school.noTransaction|Aucune transaction pour le moment.
+school.onTrack|En bonne voie
+school.excellent|excellent !
+school.noUnpaid|Aucun impayé
+school.schoolPayments|Paiements scolaires
+school.lastMonths|derniers mois
+school.dashSubtitle|Gérez votre établissement, vos équipes et vos finances en un seul endroit.
+school.last7Days|7 derniers jours
+school.thisMonth|Ce mois
+ohada.balance|Balance de vérification
+ohada.resultat|Compte de résultat
+ohada.tva|Déclaration TVA
+ohada.account|Compte
+ohada.debit|Débit
+ohada.credit|Crédit
+ohada.solde|Solde
+ohada.class1|Classe 1 — Capitaux
+ohada.class2|Classe 2 — Immobilisations
+ohada.class3|Classe 3 — Stocks
+ohada.class4|Classe 4 — Tiers
+ohada.class5|Classe 5 — Trésorerie
+ohada.class6|Classe 6 — Charges
+ohada.class7|Classe 7 — Produits
+roles.title|Rôles & Permissions
+roles.role|Rôle
+roles.permission|Permission
+roles.matrix|Matrice
+roles.members|Membres
+roles.audit|Audit
+roles.createRole|Créer un rôle
+roles.editRole|Modifier le rôle
+roles.deleteRole|Supprimer le rôle
+roles.cloneRole|Dupliquer le rôle
+roles.assignRole|Assigner un rôle
+roles.can_view|Voir
+roles.can_edit|Modifier
+roles.can_delete|Supprimer
+roles.can_export|Exporter
+roles.can_validate|Valider
+roles.can_approve|Approuver
+auth.phone|Téléphone
+auth.otp|Code OTP
+auth.forgot|Mot de passe oublié ?
+auth.noAccount|Pas encore de compte ?
+auth.createAccount|Créer un compte
+auth.signIn|Connexion
+auth.signUp|Inscription
+auth.confirmPassword|Confirmer le mot de passe
+auth.resetPassword|Réinitialiser
+auth.sendCode|Envoyer le code
+auth.verifyCode|Vérifier le code
+notif.markAll|Tout marquer lu
+notif.live|Live
+notif.polling|Polling
+notif.invoice_paid|Facture payée
+notif.low_stock|Stock faible
+notif.payment_late|Paiement en retard
+notif.wf_approved|Workflow approuvé
+notif.wf_rejected|Workflow refusé
+pdf.invoiceTo|Facturer à
+pdf.invoiceNumber|N° Facture
+pdf.date|Date
+pdf.dueDate|Échéance
+pdf.subtotal|Sous-total
+pdf.tax|TVA (18%)
+pdf.ca|CA (5% TVA)
+pdf.terms|Conditions & Mentions légales
+pdf.payment|Mode de paiement
+pdf.notes|Notes
+pdf.bulletin|BULLETIN DE NOTES
+pdf.student|Étudiant
+pdf.class|Classe
+pdf.period|Période
+pdf.subject|Matière
+pdf.grade|Note
+pdf.average|Moyenne
+pdf.rank|Rang
+pdf.payslip|FICHE DE PAIE
+pdf.employee|Employé
+pdf.period_pay|Période de paie
+pdf.gross|Salaire brut
+pdf.deductions|Cotisations
+pdf.net|Salaire net
+import.drop|Glissez-déposez votre fichier Excel ici
+import.or|ou
+import.browse|Parcourir
+import.template|Télécharger le modèle
+import.success|Importation réussie
+import.rows|lignes importées
+import.errors|erreurs détectées
+mm.send|Envoyer un lien de paiement
+mm.amount|Montant à collecter
+mm.operator|Opérateur
+mm.number|Numéro Mobile Money
+mm.confirm|Confirmer le paiement
+mm.success|Paiement confirmé
+ai.forecast|Prévisions IA
+ai.asking|Analyse en cours...
+ai.based|Basé sur vos 90 derniers jours
+error.unauthorized|Accès non autorisé
+error.notFound|Page introuvable
+error.required|Ce champ est requis
+error.invalidEmail|Email invalide
+error.invalidAmount|Montant invalide
+error.tenantMismatch|Accès interdit — données d\
+error.sessionExpired|Session expirée — reconnectez-vous
+rh.newEmployee|Nouvel employé
+rh.addFirstEmployee|Ajouter le premier employé
+rh.contractType|Type de contrat
+rh.startDate|Date d\
+rh.endDate|Fin de contrat
+rh.changeStatus|Changer le statut
+rh.paySimulation|Simulation paie
+rh.payPreview|Aperçu calcul paie
+rh.generateSlip|Générer bulletin
+rh.presences|Présences
+rh.evaluation|Évaluation
+rh.deletePermanent|Supprimer cet employé définitivement ?
+rh.leaveRequest|Demande de congé
+rh.newLeaveRequest|Nouvelle demande
+rh.leaveType|Type de congé
+rh.leaveStart|Date début
+rh.leaveEnd|Date fin
+rh.leaveReason|Motif
+rh.noLeave|Aucune demande de congé.
+rh.noEmployee|Aucun employé dans cette catégorie.
+rh.noAlert|Aucune alerte RH active. Tout est en ordre.
+rh.activeSalary|Effectif actif
+rh.onLeaveOrSick|En congé / Malade
+rh.payrollMass|Masse salariale
+rh.employerCharge|Charge patronale
+rh.lastEmployees|Derniers employés
+rh.lastPayslips|Derniers bulletins de paie
+rh.modules|Modules RH
+rh.payManage|Gérer
+rh.reports|Rapports
+rh.dashboard|Dashboard
+rh.netToPay|Net à payer
+rh.employerCnss|Charge patronale CNSS
+rh.matricule|Matricule / Code
+rh.manager|Manager
+rh.autoMatricule|Matricule généré automatiquement
+rh.workCity|Ville de travail
+rh.directManager|Manager direct
+rh.photoUrl|Photo (URL)
+rh.positionFunc|Poste / Fonction
+rh.saving|Enregistrement…
+rh.createEmployee|Créer employé
+rh.searchEmployee|Rechercher un employé…
+rh.noEmployeeFull|Aucun employé
+rh.noPayslip|Aucun bulletin généré
+rh.pendingLeave|en attente
+rh.expiringContracts|Contrats expirant
+rh.in30days|dans 30 jours
+rh.toValidate|à valider
+rh.grossMass|Masse brute
+rh.netMass|Masse nette
+rh.employerCharges|Charges patronales
+rh.totalCost|Coût total employeur
+rh.grantedLeave|Congés accordés
+rh.totalHeadcount|Effectif total
+rh.contractBreakdown|Répartition par type de contrat
+rh.payProcessing|Traitement de la paie
+rh.generateSlips|Générer les bulletins
+rh.rhAnalytics|Analytics RH
+rh.advancedStats|Statistiques avancées
+rh.contrats.title|Contrats
+rh.contrats.subtitle|employés · contrats expirant
+rh.contrats.expired|expiré(s) — Régulariser immédiatement
+rh.contrats.expiringSoon|expire(nt) dans moins de 30 jours
+rh.contrats.filterAll|Tous
+rh.contrats.filterExpiring|Expirant
+rh.contrats.filterExpired|Expirés
+rh.contrats.colEmployee|Employé
+rh.contrats.colType|Type contrat
+rh.contrats.colStart|Début
+rh.contrats.colEnd|Fin / Échéance
+rh.contrats.colSalary|Salaire brut
+rh.contrats.colStatus|Statut
+rh.contrats.colActions|Actions
+rh.contrats.noData|Aucun contrat trouvé
+rh.contrats.statusActive|Actif
+rh.contrats.statusExpired|Expiré
+rh.contrats.statusExpireSoon|Expire bientôt
+rh.contrats.expiredSince|Expiré depuis
+rh.contrats.inDays|Dans
+rh.contrats.days|j
+rh.contrats.renew|Renouveler
+rh.contrats.print|Imprimer
+rh.contrats.terminate|Résilier le contrat
+rh.contrats.detailType|Type contrat
+rh.contrats.detailStart|Début
+rh.contrats.detailEnd|Fin
+rh.contrats.detailSalary|Salaire brut
+rh.contrats.expiredDays|Contrat expiré depuis
+rh.contrats.expireInDays|Expire dans
+rh.contrats.undetermined|Indéterminé
+rh.contrats.confirmTerminate|Résilier le contrat de
+rh.contrats.printTitle|CONTRAT DE TRAVAIL
+rh.contrats.printEmployee|Employé
+rh.contrats.printFullName|Nom complet
+rh.contrats.printEmail|Email
+rh.contrats.printPosition|Poste
+rh.contrats.printConditions|Conditions
+rh.contrats.printContractType|Type de contrat
+rh.contrats.printHireDate|Date d\
+rh.contrats.printEndDate|Date de fin
+rh.contrats.printGrossSalary|Salaire brut mensuel
+rh.contrats.signEmployer|Signature Employeur
+rh.contrats.signEmployee|Signature Employé
+rh.contrats.signDate|Date: ___________
+rh.contrats.generated|Généré le
+rh.evals.title|Évaluations
+rh.evals.subtitle|évaluations · Moyenne :
+rh.evals.newEval|Nouvelle évaluation
+rh.evals.avgNote|Note moyenne
+rh.evals.excellent|Excellents
+rh.evals.toImprove|À améliorer
+rh.evals.noData|Aucune évaluation enregistrée.
+rh.evals.createFirst|+ Créer la première évaluation
+rh.evals.modalTitle|Nouvelle évaluation
+rh.evals.employee|Employé *
+rh.evals.period|Période
+rh.evals.selectEmployee|Sélectionner…
+rh.evals.notesByCriteria|Notes par critère
+rh.evals.qualityWork|Qualité du travail
+rh.evals.punctuality|Ponctualité & présence
+rh.evals.teamwork|Travail en équipe
+rh.evals.initiative|Initiative & proactivité
+rh.evals.calculatedAvg|Moyenne calculée
+rh.evals.comment|Commentaire
+rh.evals.commentPlaceholder|Points forts, axes d\
+rh.evals.nextObjectives|Objectifs prochaine période
+rh.evals.objectivesPlaceholder|Objectifs à atteindre…
+rh.evals.evaluator|Évaluateur
+rh.evals.evaluatorPlaceholder|Nom du responsable
+rh.evals.evaluatedBy|Évalué par :
+rh.evals.save|Enregistrer
+rh.evals.labelQuality|Qualité travail
+rh.evals.labelPunctuality|Ponctualité
+rh.evals.labelTeamwork|Travail équipe
+rh.evals.labelInitiative|Initiative
+rh.evals.objectivesLabel|Objectifs prochaine période
+rh.org.title|Organigramme
+rh.org.subtitle|Structure organisationnelle de l\
+rh.org.loading|Chargement de l\
+rh.org.searchPlaceholder|Rechercher…
+rh.org.viewDept|Départements
+rh.org.viewTree|Hiérarchie
+rh.org.kpiActive|Effectif actif
+rh.org.kpiDepts|Départements
+rh.org.kpiManagers|Managers
+rh.org.kpiWithHierarchy|Avec hiérarchie
+rh.org.noEmployee|Aucun employé actif
+rh.org.addEmployee|Ajoutez des employés dans le module Employés
+rh.org.noHierarchy|Aucune hiérarchie définie
+rh.org.collapseTip|pour réduire/développer les branches
+rh.org.legend|Légende des couleurs
+rh.org.unassigned|Non assigné
+rh.presences.title|Présences & Pointage
+rh.presences.subtitle|employés actifs
+rh.presences.export|Exporter
+rh.presences.record|Pointer
+rh.presences.presents|Présents
+rh.presences.absents|Absents
+rh.presences.lates|Retards
+rh.presences.noEmployee|Aucun employé actif
+rh.presences.searchPlaceholder|Rechercher un employé…
+rh.presences.detailedTitle|Pointages détaillés
+rh.presences.colDate|Date
+rh.presences.colEmployee|Employé
+rh.presences.colStatus|Statut
+rh.presences.colArrival|Arrivée
+rh.presences.colDeparture|Départ
+rh.presences.colReason|Motif
+rh.presences.modalTitle|Enregistrer une présence
+rh.presences.employee|Employé *
+rh.presences.date|Date *
+rh.presences.status|Statut *
+rh.presences.arrival|Heure arrivée
+rh.presences.departure|Heure départ
+rh.presences.reason|Motif (optionnel)
+rh.presences.reasonPlaceholder|Raison de l\
+rh.presences.selectEmployee|Sélectionner…
+rh.presences.csvHeaders|Date;Employé;Type;Arrivée;Départ;Motif
+rh.sanctions.title|Sanctions & Discipline
+rh.sanctions.subtitle|Gestion des mesures disciplinaires
+rh.sanctions.newBtn|Nouvelle sanction
+rh.sanctions.loading|Chargement…
+rh.sanctions.kpiEnCours|En cours
+rh.sanctions.kpiWarnings|Avertissements
+rh.sanctions.kpiSuspensions|Suspensions
+rh.sanctions.kpiTerminations|Licenciements
+rh.sanctions.modalTitle|Nouvelle sanction disciplinaire
+rh.sanctions.employee|Employé *
+rh.sanctions.selectEmployee|— Sélectionner —
+rh.sanctions.type|Type *
+rh.sanctions.statut|Statut
+rh.sanctions.dateStart|Date de sanction *
+rh.sanctions.dateEnd|Date de fin (optionnel)
+rh.sanctions.motif|Motif *
+rh.sanctions.motifPlaceholder|Décrire les faits reprochés…
+rh.sanctions.observations|Observations / Suite donnée
+rh.sanctions.obsPlaceholder|Décision RH, remarques complémentaires…
+rh.sanctions.save|Enregistrer
+rh.sanctions.filterAll|Tous
+rh.sanctions.noData|Aucune sanction enregistrée
+rh.sanctions.noDataHint|Cliquez sur "Nouvelle sanction" pour commencer
+rh.sanctions.fieldPosition|Poste :
+rh.sanctions.fieldEndDate|Date fin :
+rh.sanctions.fieldMotif|Motif
+rh.sanctions.fieldObs|Observations
+rh.sanctions.close|Clôturer
+rh.sanctions.delete|Supprimer
+rh.sanctions.confirmDelete|Supprimer cette sanction ?
+rh.sanctions.errRequired|Employé et motif obligatoires
+rh.avantages.title|Avantages & Bénéfices
+rh.avantages.subtitle|Gestion des avantages en nature et bénéfices employés
+rh.avantages.newBtn|Nouvel avantage
+rh.avantages.loading|Chargement…
+rh.avantages.kpiActive|Avantages actifs
+rh.avantages.kpiMonthly|Charge mensuelle
+rh.avantages.kpiBeneficiaries|Bénéficiaires
+rh.avantages.kpiGlobal|Avantages globaux
+rh.avantages.modalTitle|Nouvel avantage
+rh.avantages.employeeLabel|Employé
+rh.avantages.employeeHint|(laisser vide = avantage global pour tous)
+rh.avantages.allEmployees|— Tous les employés (global) —
+rh.avantages.type|Type *
+rh.avantages.periodicity|Périodicité
+rh.avantages.label|Libellé *
+rh.avantages.labelPlaceholder|ex: Indemnité transport
+rh.avantages.amount|Montant (FCFA)
+rh.avantages.dateStart|Date de début
+rh.avantages.dateEnd|Date de fin
+rh.avantages.save|Enregistrer
+rh.avantages.filterAll|Tous
+rh.avantages.noData|Aucun avantage enregistré
+rh.avantages.noDataHint|Ajoutez des avantages pour vos employés
+rh.avantages.statusActive|Actif
+rh.avantages.statusInactive|Inactif
+rh.avantages.globalBadge|Global — tous les employés
+rh.avantages.since|depuis
+rh.avantages.disable|Désactiver
+rh.avantages.activate|Activer
+rh.avantages.delete|Supprimer
+rh.avantages.confirmDelete|Supprimer cet avantage ?
+rh.avantages.errRequired|Libellé obligatoire
+invoice.editInvoice|Modifier la facture
+invoice.items|Lignes de facture
+invoice.subtotal|Sous-total HT
+invoice.addLine|Ajouter une ligne
+invoice.designation|Désignation
+invoice.unitPrice|Prix unitaire
+invoice.fiscalSummary|Récapitulatif fiscal · Congo-Brazzaville
+invoice.tva18|TVA (18 %)
+invoice.ca5|CA (5 % de la TVA)
+invoice.totalTTC|TOTAL TTC
+invoice.notesOptional|Notes (optionnel)
+invoice.saveDraft|Enregistrer brouillon
+invoice.emit|Émettre la facture
+invoice.clientInfo|Informations client
+invoice.invoiceInfo|Informations facture
+invoice.companyName|Nom / Entreprise *
+invoice.dueDate2|Date d\
+invoice.thisMonth|Total ce mois
+invoice.collected|Encaissé
+invoice.waiting|En attente
+invoice.late|En retard
+invoice.confirmChange|Confirmer le changement ?
+invoice.noInvoice|Aucune facture trouvée.
+invoice.preview|Aperçu
+invoice.showPreview|Afficher
+invoice.hidePreview|Masquer
+invoice.pdfPreview|l\
+invoice.issuedOn|Émise le
+invoice.dueOn|Échéance
+invoice.clientSection|Client
+invoice.datesSection|Dates
+invoice.loading|Chargement…
+invoice.settings|Paramètres
+invoice.all|Toutes
+invoice.drafts|Brouillons
+invoice.sent|Envoyées
+invoice.paid2|Payées
+invoice.cancelled|Annulées
+invoice.notFound|Facture introuvable
+invoice.sentSuccess|Envoyée !
+invoice.markedSent|Facture marquée comme envoyée !
+treso.enterprise|Trésorerie Enterprise
+treso.subtitle|Flux financiers temps réel · Multi-comptes · OHADA
+treso.globalTreasury|Trésorerie Globale
+treso.bankPlusCash|Banque + Caisse + Mobile
+treso.receipts|Encaissements
+treso.payments|Décaissements
+treso.netCashflow|Cashflow Net
+treso.positivePos|Position positive
+treso.deficitMonth|Déficit ce mois
+treso.fundsBreakdown|Répartition des fonds
+treso.totalLabel|total
+treso.banks|Banques
+treso.cashLabel|Caisses
+treso.mobile|Mobile Money
+treso.noBankAccount|Aucun compte bancaire
+treso.noAccount|Aucun compte configuré
+treso.cashflow30|Cashflow — 30 derniers jours
+treso.entries|Entrées
+treso.exits|Sorties
+treso.quickAccess|Accès rapides
+treso.lastTransactions|Dernières transactions
+treso.seeAll|Tout voir →
+treso.noTransaction|Aucune transaction
+treso.alertsTitle|Alertes trésorerie
+treso.lowCash|solde faible
+treso.negativeCashflow|Cashflow négatif ce mois
+treso.bankAccounts2|Comptes bancaires
+treso.activeCash|Caisses actives
+treso.mobileWallets2|Wallets mobile
+treso.opsThisMonth|Ops ce mois
+treso.encaissement|Encaissement
+treso.decaissement|Décaissement
+treso.category|Catégorie
+treso.descriptionField|Description *
+treso.amountField|Montant (FCFA) *
+treso.paymentMode|Mode de paiement
+treso.register|Enregistrer
+treso.registering|Enregistrement…
+treso.opsCount|opérations ce mois
+treso.loading|Chargement Trésorerie…
+treso.encaisser|Encaisser
+treso.decaisser|Décaisser
+treso.cheques|Chèques
+treso.chequesSubtitle|Suivi des chèques émis et reçus
+treso.newCheque|Nouveau chèque
+treso.registerCheque|Enregistrer un chèque
+treso.chequeNum|N° Chèque
+treso.beneficiaire|Bénéficiaire
+treso.banque|Banque
+treso.emission|Émission
+treso.echeance|Échéance
+treso.encaisse|Encaissé
+treso.rejete|Rejeté
+treso.annule|Annulé
+treso.enAttente|En attente
+treso.echus|Échus
+treso.noCheque|Aucun chèque
+treso.chequeEncaisse|Chèque encaissé ✓
+treso.chequeRejete|Chèque marqué rejeté
+treso.chequeEnregistre|Chèque enregistré ✓
+treso.confirmEncaisser|Marquer ce chèque comme encaissé ?
+treso.confirmRejeter|Marquer ce chèque comme rejeté ?
+treso.chequePlaceholder|N° chèque, bénéficiaire…
+treso.tousStatuts|Tous statuts
+treso.montantFCFA|Montant (FCFA) *
+treso.dateEmission|Date émission
+treso.dateEcheance|Date échéance
+treso.compteBancaire|Compte bancaire
+treso.motif|Motif
+treso.motifPlaceholder|Objet du paiement (optionnel)
+treso.aucun|— Aucun —
+treso.chequesSingular|chèque(s)
+treso.chequesEnRetard|chèque(s) en retard
+treso.chequesRejetes|chèque(s) rejeté(s)
+treso.historique|Historique des transactions
+treso.historiqueOpsCount|opérations enregistrées
+treso.filtres|Filtres
+treso.exporter|Exporter
+treso.entreesPage|Entrées (page)
+treso.sortiesPage|Sorties (page)
+treso.netPage|Net (page)
+treso.tousTypes|Tous types
+treso.encaissementsLabel|Encaissements
+treso.decaissementsLabel|Décaissements
+treso.transfertsLabel|Transferts
+treso.frais|Frais
+treso.toutesSources|Toutes sources
+treso.reinitialiserFiltres|Réinitialiser filtres
+treso.libellePlaceholder|Libellé…
+treso.libelle|Libellé
+treso.detailTransaction|Détail transaction
+treso.refPrefix|Réf:
+treso.debut|Début
+treso.fin|Fin
+treso.rapprochements|Rapprochements bancaires
+treso.rapprochementsSubtitle|Vérification soldes comptables vs relevés bancaires
+treso.ajouterLigne|Ajouter ligne
+treso.etatRapprochement|État du rapprochement
+treso.soldeComptable|Solde comptable
+treso.soldeReleve|Solde relevé bancaire
+treso.saisirSolde|Saisir solde relevé
+treso.ecart|Écart
+treso.rapproche|Rapproché
+treso.ecartSignificatif|Écart significatif
+treso.progression|Progression
+treso.lignesRapprocher|ligne(s) à rapprocher
+treso.lignesRapprochees|ligne(s) rapprochée(s)
+treso.totauxRapproches|Totaux rapprochés
+treso.debit|Débit
+treso.credit|Crédit
+treso.ajouterLigneReleve|Ajouter une ligne de relevé
+treso.compteLabel|Compte:
+treso.debitSortie|Débit (sortie)
+treso.creditEntree|Crédit (entrée)
+treso.reference|Référence
+treso.remboursements|Remboursements
+treso.remboursementsSubtitle|Gestion des remboursements clients, fournisseurs et salariés
+treso.nouvelleDemande|Nouvelle demande
+treso.totalDemande|Total demandé
+treso.enAttenteRemb|En attente de remboursement
+treso.rembourse|Remboursé
+treso.noRemboursement|Aucun remboursement trouvé
+treso.detailRemboursement|Détail remboursement
+treso.dateDemande|Date demande
+treso.tiers|Tiers
+treso.montantDemande|Montant demandé
+treso.montantRembourse|Montant remboursé
+treso.modePaiement|Mode de paiement
+treso.statut|Statut
+treso.notes|Notes
+treso.nouvelleDemandeTitre|Nouvelle demande de remboursement
+treso.tiersPlaceholder|Nom du tiers
+treso.rejeter|Rejeter
+treso.rembourserAction|Rembourser
+treso.virementOpt|Virement
+treso.especes|Espèces
+treso.chequeOption|Chèque
+treso.mobileMoneyOpt|Mobile Money
+treso.validations|Validations & Approbations
+treso.validationsSubtitle|Circuit de validation : Demande → RAF → DG → Comptable → Exécution
+treso.montantEnCircuit|Montant en circuit
+treso.demandesUrgentes|Demandes urgentes
+treso.totalExecute|Total exécuté
+treso.noDemandesLabel|Aucune demande trouvée
+treso.demandeCree|Demande créée
+treso.validationRAF|Validation RAF
+treso.validationDG|Validation DG
+treso.approbationComptable|Approbation Comptable
+treso.executionPaiement|Exécution Paiement
+treso.nouvelleDemandePayment|Nouvelle demande de paiement
+treso.beneficiaireField|Bénéficiaire *
+treso.normale|Normale
+treso.urgente|Urgente
+treso.tresUrgente|Très urgente
+treso.compteSource|Compte source
+treso.compteBancaireOpt|Compte bancaire
+treso.caisse|Caisse
+treso.refFacture|Réf. Facture
+treso.justification|Justification
+treso.soumettreLabel|Soumettre la demande
+treso.validerLabel|Valider
+treso.validerAction|Valider la demande
+treso.rejeterAction|Rejeter la demande
+treso.confirmerValidation|Confirmer la validation
+treso.confirmerRejet|Confirmer le rejet
+treso.commentaire|Commentaire
+treso.motifDecision|Motif de la décision (optionnel)
+treso.detailDemande|Détail de la demande
+treso.etapeSuivante|Étape suivante
+treso.valideParRAF|Validé RAF
+treso.commentaireRAF|Commentaire RAF
+treso.valideDG|Validé DG
+treso.commentaireDG|Commentaire DG
+treso.virements|Virements
+treso.virementsSubtitle|Ordres de virement bancaire
+treso.nouveauVirement|Nouveau virement
+treso.creerVirement|Créer le virement
+treso.virementCree|Virement créé ✓
+treso.virementExecute|Virement exécuté ✓
+treso.virementRejete|Virement rejeté
+treso.confirmExecuter|Exécuter ce virement ?
+treso.confirmRejeterVir|Rejeter ce virement ?
+treso.execute|Exécuté
+treso.noVirement|Aucun virement
+treso.comptesActifs|comptes actifs
+treso.comptesBancaires|Comptes bancaires
+treso.compteDest|Compte destination
+treso.externe|— Externe —
+treso.dateVirement|Date virement
+treso.refBancaire|Référence bancaire
+treso.executerAction|Exécuter
+treso.wallets|Mobile Money
+treso.walletsSubtitle|Wallets Airtel, MTN, Orange…
+treso.ajouterWallet|Ajouter wallet
+treso.soldeTotal|Solde total Mobile Money
+treso.walletsActifs|wallet(s) actif(s)
+treso.mesWallets|MES WALLETS
+treso.aucunWallet|Aucun wallet configuré
+treso.selectionnerWallet|Sélectionner un wallet
+treso.pourVoirOps|pour voir ses opérations
+treso.operationsWallet|OPÉRATIONS
+treso.entree|Entrée
+treso.sortie|Sortie
+treso.aucuneOperation|Aucune opération
+treso.actif|Actif
+treso.inactif|Inactif
+treso.nouveauWallet|Nouveau wallet Mobile Money
+treso.operateur|Opérateur *
+treso.choisir|— Choisir —
+treso.autre|Autre
+treso.numero|Numéro *
+treso.intitule|Intitulé (nom)
+treso.soldeInitial|Solde initial (FCFA)
+treso.walletAjoute|Wallet ajouté ✓
+treso.operationEnregistree|Opération enregistrée ✓
+treso.soldeCourant|Solde actuel:
+act.brouillon|créé un brouillon
+act.envoyee|envoyé une facture
+act.payee|reçu un paiement
+act.annulee|annulé une facture
+dash.greetingMorning|Bonjour
+dash.greetingAfternoon|Bon après-midi
+dash.greetingEvening|Bonsoir
+dash.bannerFinancial|Gérez vos ventes, finances et équipes en un seul endroit.
+dash.bannerSpace|Consultez les informations de votre espace.
+dash.moduleSuffix|module actif
+dash.modulesSuffix|modules actifs
+dash.recovery|Recouvrement
+dash.sessionsHeader|Sessions
+dash.invoiceSg|facture
+dash.invoicePl|factures
+dash.impayesHeader|Impayés
+dash.alertSg|alerte
+dash.alertPl|alertes
+dash.toutEnOrdre|Tout est en ordre
+dash.refresh|Rafraîchir
+dash.connectedAs|Connecté en tant que :
+dash.ago|il y a
+dash.sessionsEnCours|Sessions en cours
+dash.sessionsActivesKpi|Sessions actives ce semestre
+dash.diplomesEnAttente|Diplômes en attente
+dash.enCoursValidation|En cours de validation
+dash.soutenancesPlanif|Soutenances planif.
+dash.aVenirMois|À venir ce mois
+dash.etudiantsActifsKpi|Étudiants actifs
+dash.inscritsActifs|Inscrits et actifs
+dash.employesActifsKpi|Employés actifs
+dash.personnelPoste|Personnel en poste
+dash.enConge|En congé
+dash.absencesCongesKpi|Absences & congés
+dash.totalPersonnel|Total personnel
+dash.tousStatuts|Tous statuts confondus
+dash.revenusScolaires|Revenus scolaires
+dash.impayesScolarite|Impayés scolarité
+dash.facturesPayees|Factures payées
+dash.ceMoisCi|Ce mois-ci
+dash.facturesAttente|Factures en attente
+dash.rupturesStock|Ruptures de stock
+dash.alertesStock|Alertes stock
+dash.dansEquipe|Dans votre équipe
+dash.refsInventoriees|Références inventoriées
+dash.aTraiter|À traiter
+dash.actifs|actifs
+dash.suspendus|suspendus
+dash.paiementsMois|paiements ce mois
+dash.enAttentePmt|FCFA en attente
+dash.articleEpuise|article épuisé
+dash.articlesEpuises|articles épuisés
+dash.newInscription|Nouvelle inscription
+dash.lastFactures|dernières factures
+dash.academicView|Vue académique — accès financier restreint
+dash.paymentsPaid|Paiements reçus
+dash.paymentsPending|Paiements en attente
+dash.vsMoisDernier|vs mois dernier
+dash.dossier|dossier
+dash.dossiers|dossiers
+dash.statut|Statut
+dash.actionsFrequentes|Actions fréquentes
+roles.daac_full|Direction des Affaires Académiques
+roles.scolarite_full|Service Scolarité
+roles.raf_full|Responsable Administratif & Financier
+roles.rhPaie_full|Ressources Humaines & Paie
+roles.formateur_full|Espace Formateur
+roles.etudiant_full|Espace Étudiant
+roles.parent_full|Espace Parent
+invoice.lbl.payee|PAYÉE
+invoice.lbl.envoyee|ENVOYÉE
+invoice.lbl.brouillon|BROUILLON
+invoice.lbl.annulee|ANNULÉE
+nav.scolarite|Scolarité
+nav.rhPaie|RH & Paie
+sc.newEnrollment|Nouvelle inscription
+sc.trainerSpace|Espace Formateur
+sc.generalDir|Direction
+sc.miaaIA|MIAA+ IA
+sc.cashierPOS|Caisse POS
+sc.kitchenStock|Stock cuisine
+sc.miaaPlus|MIAA+
+sc.rayonsStock|Rayons & Stock
+sc.fleet|Flotte
+sc.chauffeurs|Chauffeurs
+sc.reservations|Réservations
+sc.consultations|Consultations
+sc.pharmacie|Pharmacie
+sc.rhMedical|RH médical
+sc.rhShort|RH
+sc.stockShort|Stock
+sc.comptaOhada|Comptabilité OHADA
+sc.matieres|Matières
+sc.sessions|Sessions
+sc.examens|Examens
+sc.diplomes|Diplômes
+sc.soutenances|Soutenances
+sc.budgets|Budgets
+sc.paie|Paie
+sc.employes|Employés
+sc.contrats|Contrats
+sc.paiements|Paiements
+sc.mesCours|Mes cours
+sc.presences|Présences
+sc.mesNotes|Mes notes
+sc.resultats|Résultats
+sc.contact|Contact
+sc.caisse|Caisse
+sc.classes|Classes
+sc.absences|Absences
+sc.departements|Départements
+sc.etudiants|Étudiants
+sc.inscriptions|Inscriptions
+sc.planning|Planning
+sc.bulletins|Bulletins
+sc.d.newEnrollment|Inscrire un étudiant
+sc.d.trainerSpace|Cours & heures
+sc.d.generalDir|Finances & pilotage
+sc.d.rhPaie|Gestion du personnel
+sc.d.comptaOhada|Journal & bilan
+sc.d.miaaIA|Assistant scolaire IA
+sc.d.cashierPOS|Ouvrir la caisse
+sc.d.kitchenStock|Inventaire & alertes
+sc.d.tresoSuivi|Suivi des finances
+sc.d.depenses|Charges & sorties
+sc.d.miaaPlus|Assistant IA
+sc.d.facturation|Devis & factures
+sc.d.stock|Inventaire
+sc.d.achats|Fournisseurs
+sc.d.rh|Personnel
+sc.d.comptabilite|OHADA
+sc.d.caisse|Ventes
+sc.d.fleet|Véhicules & courses
+sc.d.chauffeurs|RH & Paie
+sc.d.finances|Finances
+sc.d.reservations|Chambres & séjours
+sc.d.facturationDevis|Factures & devis
+sc.d.consultations|Ordonnances & actes
+sc.d.pharmacie|Médicaments
+sc.d.rhMedical|Personnel soignant
+sc.d.matieres|Programmes & UE
+sc.d.sessions|Sessions actives
+sc.d.examens|Notes & résultats
+sc.d.diplomes|En attente
+sc.d.soutenances|Planifiées
+sc.d.parametresAcad|Règles LMD
+sc.d.comptaJournal|Journal OHADA
+sc.d.tresoWallets|Wallets & virements
+sc.d.budgets|Suivi budgétaire
+sc.d.paie|Bulletins de paie
+sc.d.depensesSorties|Sorties de fonds
+sc.d.employes|Gestion du personnel
+sc.d.contrats|CDD/CDI
+sc.d.absencesConges|Congés & absences
+sc.d.departements|Organigramme
+sc.d.etudiants|Gestion des étudiants
+sc.d.inscriptions|Nouvelles inscriptions
+sc.d.paiementsScol|Frais de scolarité
+sc.d.classes|Gestion des classes
+sc.d.mesCours|Modules enseignés
+sc.d.presences|Appel & absences
+sc.d.notes|Saisie des notes
+sc.d.mesClasses|Mes classes
+sc.d.deliberations|Délibérations
+sc.d.mesNotes|Résultats & moyennes
+sc.d.bulletins|Bulletins de note
+sc.d.fraisQuittances|Frais & quittances
+sc.d.mesAbsences|Mes absences
+sc.d.planning|Emploi du temps
+sc.d.fraisScolarite|Frais de scolarité
+crm.subtitle|Relations clients & prospects
+crm.newClient|Nouveau client
+crm.searchPlaceholder|Rechercher un client, email, téléphone…
+crm.noClient|Aucun client trouvé
+crm.activeClients|Clients actifs
+crm.prospects|Prospects
+crm.inactiveClients|Clients inactifs
+crm.caGenerated|CA généré
+crm.allClients|Tous les clients
+crm.typeClient|Client
+crm.typeProspect|Prospect
+crm.typeInactif|Inactif
+crm.newClientTitle|Nouveau client / prospect
+crm.fullName|Nom complet *
+crm.company|Entreprise
+crm.typeLabel|Type
+crm.typeClientActif|Client actif
+crm.inactifs|Inactifs
+clients.title|Clients
+clients.subtitle|clients enregistrés
+clients.newClient|Nouveau client
+clients.totalClients|Total clients
+clients.inBase|Dans votre base
+clients.newThisMonth|Nouveaux ce mois
+clients.withEmail|Avec email
+clients.contactByEmail|Contactables par mail
+clients.searchPlaceholder|Rechercher un client…
+clients.noClients|Aucun client encore
+clients.addFirst|Ajoutez votre premier client pour commencer.
+clients.addClient|Ajouter un client
+clients.noSearchResult|Aucun client ne correspond à cette recherche.
+clients.contact|Contacter
+clients.deleteConfirm|Supprimer ce client ?
+clients.deleteWarning|Cette action est irréversible.
+clients.formTitle|Nouveau client
+clients.fullName|Nom complet / Entreprise *
+clients.address|Adresse
+clients.addressPlaceholder|Adresse complète
+clients.addBtn|Ajouter
+clients.errorPrefix|Erreur : 
+clients.addedMsg|Client ajouté !
+clients.deletedMsg|Client supprimé.
+roles.subtitle|RBAC Enterprise — 6 actions : voir · modifier · supprimer · exporter · valider · approuver
+roles.defaultRoles|Rôles par défaut
+roles.newRole|Nouveau rôle
+roles.tabRoles|Rôles
+roles.tabPermissions|Permissions
+roles.tabMembers|Membres
+roles.tabHistory|Historique
+roles.financial|Financier
+roles.viewPermissions|Voir permissions →
+roles.noRole|Aucun rôle — utilisez "Rôles par défaut" pour commencer
+roles.selectRole|Sélectionnez un rôle pour voir sa matrice
+roles.customRole|Rôle personnalisé
+roles.filterModules|Filtrer modules...
+roles.modules|modules
+roles.noMember|Aucun membre
+roles.rbacJournal|Journal RBAC
+roles.noEvent|Aucun événement enregistré
+roles.nameLabel|Nom *
+roles.colorLabel|Couleur
+roles.financialAccess|Accès aux données financières
+roles.createConfirm|Créer les 8 rôles par défaut Oraforme ?
+roles.baseRole|Base:
+equipe.subtitle|Gérez les accès et permissions de chaque membre.
+equipe.inviteMember|Inviter un membre
+equipe.membersCount|Membres
+equipe.selectMember|Sélectionnez un membre pour gérer ses permissions.
+equipe.ownerAccess|Le propriétaire a accès à tous les modules.
+equipe.moduleAccess|Accès aux modules
+equipe.savePerms|Enregistrer les permissions
+equipe.inviteEmail|Email
+equipe.inviteRole|Rôle
+equipe.inviteSend|Envoyer
+equipe.roleAdmin|Administrateur
+equipe.roleMembre|Membre
+equipe.roleBusiness|— Rôle métier —
+equipe.inviteModal|Inviter un membre
+stock.inventaire|Stocks & Inventaire
+stock.updatedAt|Mis à jour
+stock.immediateAction|Action immédiate recommandée
+stock.seeAlerts|Voir les alertes →
+stock.lowStockKpi|Stock faible
+stock.rupturesKpi|Ruptures stock
+stock.movementsMonth|Mouvements/mois
+stock.suppliersKpi|Fournisseurs
+stock.purchasesMonth|Achats ce mois
+stock.warehouses|Entrepôts
+stock.criticalProducts|Produits critiques
+stock.noStockAlert|Aucune alerte stock
+stock.threshold|Seuil:
+stock.rupture|RUPTURE
+stock.faible|FAIBLE
+stock.recentMovements|Mouvements récents
+stock.noRecentMovement|Aucun mouvement récent
+stock.quickAccess|Accès rapide
+stock.qa.products|Produits
+stock.qa.purchases|Achats
+stock.qa.movements|Mouvements
+stock.qa.inventories|Inventaires
+stock.qa.suppliers|Fournisseurs
+stock.qa.orders|Commandes
+stock.qa.valuation|Valorisation
+stock.qa.alerts|Alertes Stock
+params.title|Paramètres
+params.saved|Enregistré !
+params.save|Enregistrer
+params.saveParams|Enregistrer les paramètres
+params.yourCompany|Votre entreprise
+params.uploadLogo|Uploader un logo
+params.changeLogo|Changer le logo
+params.uploading|Upload en cours…
+params.logoFormats|PNG, JPG, WEBP ou SVG · max 2 Mo
+params.address|Adresse
+params.city|Ville
+params.country|Pays
+params.phone|Téléphone
+params.email|Email
+params.legal|Pied de page facture — Informations légales
+params.socialCapital|Capital social
+params.rib|RIB / Coordonnées bancaires (Payment Method)
+params.thankMsg|Message "Merci" affiché en bas de chaque facture
+params.billingPrefs|Préférences facturation
+params.invoicePrefix|Préfixe N° facture
+params.currency|Devise
+params.paymentDelay|Délai de paiement
+params.days|jours
+params.costCenters|Centres de coûts
+params.center|centre
+params.centers|centres
+params.noCostCenter|Aucun centre — créez-en un ci-dessous
+params.addCenter|Ajouter un centre
+params.codePlaceholder|Code (RH…)
+params.centerName|Nom du centre
+params.fiscalTitle|Logique fiscale Congo-Brazzaville
+params.saveError|Erreur de sauvegarde :
+params.cc.direction|Direction générale
+params.cc.rh|Ressources humaines
+params.cc.scolarite|Scolarité
+params.cc.informatique|Informatique
+params.cc.logistique|Logistique
+params.cc.commercial|Commercial
+params.cc.finance|Finance & Compta
+params.cc.autre|Autre
+params.scien|Numéro SCIEN
+params.uploadFailed|Upload échoué :
+params.logoSavedError|Logo uploadé mais non sauvegardé :
+params.tenantNotLoaded|Tenant non chargé
+profil.title|Profil Entreprise
+profil.subtitle|Informations, marque et coordonnées
+profil.logoUrl|URL Logo
+profil.website|Site web
+profil.description|Description
+profil.descPlaceholder|Décrivez votre activité en quelques mots…
+profil.contact|Coordonnées
+profil.emailContact|Email contact
+profil.telephone|Téléphone
+profil.address|Adresse
+profil.city|Ville
+profil.country|Pays
+profil.currency|Devise
+profil.updated|Profil mis à jour
+profil.saving|Enregistrement…
+profil.save|Sauvegarder
+dir.title|Direction Générale
+dir.subtitle|Pilotage stratégique & tableaux de bord
+dir.kpi.collected|Collecté
+dir.kpi.charges|Charges du mois
+dir.kpi.grossMargin|Marge brute
+dir.kpi.headcount|Effectif actif
+dir.kpi.collaborators|Collaborateurs
+dir.kpi.unpaidInvoices|Factures impayées
+dir.kpi.toFollowUp|À relancer
+dir.alerts.none|Aucune alerte — tous les indicateurs sont au vert
+dir.alerts.unpaidFact|facture(s) impayée(s)
+dir.alerts.critMargin|Marge brute critique (< 10%)
+dir.alerts.noEmployee|Aucun employé enregistré
+dir.quickAccess|Accès rapide
+dir.financialSummary|Résumé financier du mois
+dir.caTotal|CA total
+dir.caCollecte|CA collecté
+dir.charges|Charges
+dir.margeBrute|Marge brute
+dir.prevMonth|mois préc.
+dir.ofCA|% du CA
+dir.link.rh|RH & Paie
+dir.link.finance|Finance
+dir.link.compta|Comptabilité
+dir.link.tresorerie|Trésorerie
+dir.link.facturation|Facturation
+dir.link.analytics|Analytics
+analytics.title|Analytics & BI
+analytics.subtitle|Intelligence économique · Exercice
+analytics.loading|Chargement des analytics…
+analytics.tab.financial|Finance
+analytics.tab.rh|RH & Paie
+analytics.tab.ecole|École
+analytics.tab.stock|Stock
+analytics.tab.auto|Automatisation
+analytics.kpi.treso|Trésorerie nette
+analytics.kpi.headcount|Effectif actif
+analytics.kpi.stock|Stock
+analytics.kpi.absences|Absences
+analytics.kpi.onLeave|en congé
+analytics.kpi.encaissements|Encaissements
+analytics.kpi.decaissements|Décaissements
+analytics.kpi.tresoNet|Trésorerie net
+analytics.kpi.creances|Créances
+analytics.kpi.employesActifs|Employés actifs
+analytics.kpi.masseSal|Masse salariale
+analytics.kpi.contratsExp|Contrats expirant
+analytics.kpi.absRegistered|Absences enregistrées
+analytics.kpi.recettesScol|Recettes scolarité
+analytics.kpi.autoNotifs|Automation notifications
+analytics.kpi.valeurStock|Valeur stock
+analytics.kpi.ruptures|Ruptures
+analytics.kpi.stockCritique|Stock critique
+analytics.kpi.articlesOk|Articles OK
+analytics.kpi.tasksDone|Tâches terminées
+analytics.kpi.enAttente|En attente
+analytics.kpi.erreurs|Erreurs
+analytics.kpi.notifications|Notifications
+analytics.chart.cashflow|Flux de trésorerie mensuel
+analytics.chart.invoiceStatus|Statut factures
+analytics.chart.automation|Automatisation
+analytics.chart.activeAlerts|Alertes actives
+analytics.chart.financialEvol|Évolution mensuelle — Facturation vs Trésorerie
+analytics.chart.invoiceStatus2|Statut des factures
+analytics.chart.kpi|Indicateurs clés
+analytics.chart.rhEvol|Évolution masse salariale mensuelle
+analytics.chart.rhRep|Répartition effectif
+analytics.chart.absMonth|Absences par mois
+analytics.chart.scolMonth|Recettes scolarité par mois
+analytics.chart.topArticles|Top articles par valeur
+analytics.chart.stockHealth|Santé du stock
+analytics.chart.automTasks|État des tâches planifiées
+analytics.auto.engineSub|Contrats expirants · Factures impayées · Alertes stock
+analytics.auto.run|Lancer maintenant
+analytics.auto.running|Vérification en cours…
+analytics.auto.runShort|Lancer les vérifications
+analytics.auto.runningShort|Vérification…
+analytics.sub.total|total
+analytics.sub.exercice|exercice
+analytics.sub.dans30j|dans 30 jours
+analytics.sub.artEpuises|articles épuisés
+analytics.sub.sousSeuil|sous le seuil min
+analytics.sub.stockSuffisant|en stock suffisant
+analytics.sub.aTraiter|à traiter
+analytics.sub.tasksFailed|tâches échouées
+analytics.sub.paiementsRecus|paiements reçus
+analytics.sub.nbArticles|articles
+analytics.sub.unites|unités
+analytics.sub.nonLues|non lue(s)
+analytics.alert.contratsExp|contrat(s) expirant dans 30 jours
+analytics.alert.rupture|article(s) en rupture de stock
+analytics.alert.critique|article(s) en stock critique
+analytics.alert.creances|Créances clients
+analytics.alert.notifsUnread|notification(s) non lue(s)
+analytics.alert.none|Aucune alerte active
+analytics.alert.noInvoice|Aucune facture
+analytics.alert.noTask|Aucune tâche planifiée
+analytics.alert.noArticle|Aucun article en stock
+analytics.alert.noArticle2|Aucun article
+analytics.lbl.actifs|Actifs
+analytics.lbl.enConge|En congé
+analytics.lbl.autres|Autres
+analytics.lbl.enStock|En stock
+analytics.lbl.critique|Critique
+analytics.lbl.rupture|Rupture
+analytics.lbl.terminees|Terminées
+analytics.lbl.erreurs|Erreurs
+analytics.lbl.enAttente|En attente
+analytics.lbl.txPaiement|Taux de paiement
+analytics.lbl.facturesPay|Factures payées
+analytics.lbl.recettesScol|Recettes scolarité
+analytics.lbl.contratsExp|Contrats expirants
+analytics.lbl.facturesRetard|Factures en retard
+analytics.lbl.stockCritique|Stock critique
+analytics.lbl.nonPayees|non payées
+analytics.lbl.areapprouv|à réapprovisionner
+analytics.lbl.collaborateurs|collaborateurs
+analytics.verif.done|Vérifications terminées
+analytics.verif.contracts|contrat(s) alerté(s)
+analytics.verif.invoices|facture(s) en retard traitée(s)
+analytics.verif.error|Erreur
+analytics.verif.unknown|inconnue
+dep.title|Dépenses & Charges
+dep.subtitle|Suivi de toutes vos dépenses par catégorie
+dep.newDepense|Dépense
+dep.period7|7 jours
+dep.period30|30 jours
+dep.period90|90 jours
+dep.kpi.total|Total période
+dep.kpi.biggest|Plus grosse dépense
+dep.kpi.avgDay|Moyenne par jour
+dep.kpi.vsPrev|Vs période préc.
+dep.chart.byCat|Répartition par catégorie
+dep.chart.topCat|Top catégories
+dep.list.title|Liste des dépenses
+dep.list.empty|Aucune dépense sur la période
+dep.list.count|dépense
+dep.list.countPl|dépenses
+dep.modal.title|Nouvelle dépense
+dep.modal.category|Catégorie
+dep.modal.description|Description
+dep.modal.descPlaceholder|Description de la dépense...
+dep.modal.amount|Montant (FCFA)
+dep.modal.date|Date
+dep.modal.payMode|Mode de paiement
+dep.modal.costCenter|Centre de coût (facultatif)
+dep.modal.noCostCenter|— Aucun centre —
+dep.modal.refPiece|Réf. pièce (facultatif)
+dep.modal.refPlaceholder|Ex: FAC-2025-001, BON-42...
+dep.modal.ohadaTitle|Écriture OHADA (auto-calculée)
+dep.modal.debit|Débit
+dep.modal.credit|Crédit
+dep.modal.save|Enregistrer
+dep.deleteConfirm|Supprimer cette dépense et la transaction associée ?
+achats.pageTitle|Achats & Fournisseurs
+achats.tabFournisseurs|Fournisseurs
+achats.tabAchats|Achats
+achats.tabDettes|Dettes
+achats.fournisseurSg|fournisseur
+achats.fournisseurPl|fournisseurs
+achats.dettesLabel|Dettes :
+achats.btnFournisseur|Fournisseur
+achats.btnAchat|Achat
+achats.noFournisseur|Aucun fournisseur — ajoutez-en un
+achats.du|dû
+achats.colDate|Date
+achats.colDescription|Description
+achats.colFournisseur|Fournisseur
+achats.colMontant|Montant
+achats.colStatut|Statut
+achats.noAchat|Aucun achat enregistré
+achats.totalNonPaye|Total non payé
+achats.payer|Payer
+achats.noDette|Aucune dette fournisseur !
+achats.achatsJour|Tous vos achats sont à jour
+achats.achatSg|achat
+achats.achatPl|achats
+achats.impayeSg|impayé
+achats.impayePl|impayés
+achats.toutPayer|Tout payer —
+achats.newFournisseur|+ Nouveau fournisseur
+achats.newAchat|+ Nouvel achat
+achats.nomLabel|Nom *
+achats.contactLabel|Contact
+achats.telephoneLabel|Téléphone
+achats.emailLabel|Email
+achats.nomPlaceholder|Nom du fournisseur
+achats.contactPlaceholder|Personne de contact
+achats.fournisseurLabel|Fournisseur
+achats.sansFournisseur|Sans fournisseur
+achats.descriptionLabel|Description *
+achats.centreCout|Centre de coût (facultatif)
+achats.aucunCentre|— Aucun centre —
+achats.montantLabel|Montant (FCFA) *
+achats.dateLabel|Date
+achats.statut.impaye|Impayé
+achats.statut.partiel|Partiel
+achats.statut.paye|Payé
+audit.title|Audit & Logs Système
+audit.subtitle|Traçabilité complète de toutes les opérations
+audit.refresh|Actualiser
+audit.exportCsv|Export CSV
+audit.kpi.week|Cette semaine
+audit.kpi.movements|Mvts stocks
+audit.kpi.transactions|Transactions
+audit.kpi.purchases|Achats
+audit.kpi.invoices|Factures
+audit.search|Rechercher...
+audit.filterAll|Tous
+audit.entries|entrées
+audit.page|Page
+audit.noActivity|Aucune activité trouvée
+audit.searchPlh|Rechercher un événement…
+audit.noEvents|Aucun événement
+audit.export|Exporter
+audit.colDate|Date
+audit.colUser|Utilisateur
+audit.colAction|Action
+audit.colModule|Module
+audit.colDetails|Détails
+audit.colNiveau|Niveau
+audit.colEntite|Entité
+audit.levelInfo|Info
+audit.levelWarning|Attention
+audit.levelCritical|Critique
+audit.levelError|Erreur
+audit.ancien|Avant
+audit.nouveau|Après
+audit.expand|Voir détails
+audit.collapse|Réduire
+acad.title|Paramètres académiques
+acad.subtitle|Règles LMD, mentions, compensation & rattrapage
+acad.save|Enregistrer
+acad.saving|Enregistrement…
+acad.saveParams|Enregistrer les paramètres
+acad.saved|Paramètres académiques sauvegardés
+acad.tabGeneral|Général
+acad.tabMentions|Mentions
+acad.tabLMD|Règles LMD
+acad.tabCompensation|Compensation & Rattr.
+acad.sysLabel|Système pédagogique
+acad.sysClassique|Classique
+acad.sysClassiqueDesc|Notes sur 20, trimestres ou semestres, sans crédits ECTS
+acad.sysLMD|LMD
+acad.sysLMDDesc|Licence–Master–Doctorat avec crédits ECTS et UE
+acad.sysHybride|Hybride
+acad.sysHybrideDesc|Mélange classique + LMD selon le niveau des étudiants
+acad.bareme|Barème de notation
+acad.sur|Sur
+acad.baremeDesc100|Les notes sont saisies sur 100. Les moyennes sont converties sur 20 pour les rapports.
+acad.baremeDesc20|Notation standard sur 20 points.
+acad.addMention|Ajouter une mention
+acad.apercu|Aperçu (ordre appliqué)
+acad.validationAvg|Moyennes de validation
+acad.validUE|Validation UE
+acad.validSemestre|Validation semestre
+acad.validSemestreSub|Moyenne minimale pour valider le semestre
+acad.validAnnee|Validation année
+acad.validAnneeSub|Moyenne annuelle requise pour passer en année supérieure
+acad.creditsECTS|Crédits ECTS
+acad.creditsSemestre|Crédits par semestre
+acad.creditsSemestreSub|Standard LMD : 30 crédits par semestre
+acad.creditsAnnee|Crédits par année
+acad.creditsAnneeSub|Standard LMD : 60 crédits par année
+acad.compensation|Compensation
+acad.compMatieres|Compensation entre matières
+acad.compMatieresSub|Une bonne note dans une matière peut compenser une note insuffisante dans une autre
+acad.compSemestre|Compensation entre semestres
+acad.compSemestreSub|Le S2 peut compenser un S1 insuffisant si la moyenne globale est atteinte
+acad.compAnnuelle|Compensation annuelle
+acad.seuilComp|Seuil de compensation
+acad.noteMinComp|Note minimale compensable
+acad.rattrapage|Session de rattrapage
+acad.seuilRattrapageSub|Moyenne minimale pour être admis à une session de rattrapage
+acad.maxMatieres|Nb max matières en rattrapage
+acad.conserverNote|Conserver la meilleure note
+acad.colorChange|Changer la couleur
+acad.newMention|Nouvelle mention
+ged.title|GED Documents
+ged.subtitle|Gestion électronique des documents
+ged.tabActive|Documents actifs
+ged.tabArchives|Archives
+ged.addBtn|Ajouter document
+ged.searchPlaceholder|Rechercher un document…
+ged.noDocument|Aucun document
+ged.noDocumentDesc|Ajoutez vos contrats, factures, documents RH et plus encore.
+ged.addDocument|Ajouter un document
+ged.modalTitle|Ajouter un document
+ged.nomLabel|Nom du document *
+ged.urlLabel|URL du fichier *
+ged.categorieLabel|Catégorie
+ged.typeLabel|Type
+ged.saving|Enregistrement…
+ged.addSubmit|Ajouter
+ged.deleteConfirm|Supprimer ce document définitivement ?
+miaa.badge|IA
+miaa.subtitle|oraforme ERP · Spécialisé Congo-Brazzaville
+miaa.newChat|Nouvelle conversation
+miaa.typing|MIAA+ est en train d\
+miaa.placeholder|Posez votre question à MIAA+… (Entrée pour envoyer)
+miaa.capabilities|Capacités MIAA+
+miaa.quickQuestions|Questions rapides
+miaa.configTitle|Configuration
+miaa.configModel|Modèle IA
+miaa.configModelValue|Claude Haiku 4.5
+miaa.configLang|Langue
+miaa.configLangValue|Français 🇫🇷
+miaa.configContext|Contexte
+miaa.configContextValue|Congo-Brazzaville
+miaa.configModules|Modules actifs
+miaa.greetMorning|Bonjour
+miaa.greetAfternoon|Bonne après-midi
+miaa.greetEvening|Bonne soirée
+miaa.greetWithCompany|Je suis **MIAA+**, votre assistant intelligent chez **{entreprise}**.\n\nJe peux vous aider avec :\n✓ Calculs fiscaux Congo (TVA, CA, CNSS, IRPP)\n✓ Gestion de votre facturation et comptabilité\n✓ RH, paie et obligations sociales\n✓ Toute question sur votre activité\n\nPosez-moi une question ou choisissez une suggestion ci-dessous.
+miaa.greetNoCompany|Je suis **MIAA+**, l\
+miaa.newConvWithCompany|Nouvelle conversation démarrée. Comment puis-je vous aider chez **{entreprise}** ?
+miaa.newConvNoCompany|Nouvelle conversation. Comment puis-je vous aider ?
+miaa.errorReply|Désolé, je n\
+miaa.errorConnection|❌ Erreur de connexion. Vérifiez votre clé API dans .env.local.
+miaa.cap.fiscal|Calculs fiscaux
+miaa.cap.fiscalDesc|TVA 18%, CA 5%, CNSS, IRPP Congo
+miaa.cap.analyse|Analyse de données
+miaa.cap.analyseDesc|Indicateurs, tendances, comparaisons
+miaa.cap.docs|Génération documents
+miaa.cap.docsDesc|Factures, bulletins de paie, rapports
+miaa.cap.alerts|Alertes intelligentes
+miaa.cap.alertsDesc|Impayés, stock bas, échéances
+miaa.cap.auto|Automatisation
+miaa.cap.autoDesc|Workflows, relances, rappels
+miaa.cap.multi|Multilingue
+miaa.cap.multiDesc|Français, English, Lingala
+miaa.quick.fiscal|🧮 Fiscal Congo
+miaa.quick.facturation|📄 Facturation
+miaa.quick.rh|👔 RH & Paie
+miaa.quick.scolaire|🏫 Scolaire
+miaa.uploadAnalyzing|Analyse du fichier en cours…
+miaa.downloadTxt|Télécharger TXT
+rapports.title|Rapports Financiers
+rapports.subtitle|ERP · {entreprise} · {mois}
+rapports.loading|Chargement des données…
+rapports.tab.overview|Vue d\
+rapports.tab.resultat|Compte de résultat
+rapports.tab.bilan|Bilan
+rapports.tab.flux|Flux de trésorerie
+rapports.tab.tva|Rapport TVA
+rapports.tab.miaa|Analyse MIAA+
+rapports.kpi.recettes|Recettes totales
+rapports.kpi.recettesSub|Encaissements exercice
+rapports.kpi.charges|Charges totales
+rapports.kpi.chargesSub|Toutes dépenses
+rapports.kpi.resultat|Résultat net
+rapports.kpi.tauxPaiement|Taux de paiement
+rapports.detail.title|Détail financier — {annee}
+rapports.detail.recettes|Recettes brutes
+rapports.detail.achats|Achats & stock
+rapports.detail.salaires|Masse salariale
+rapports.detail.loyer|Charges locatives
+rapports.detail.resultat|Résultat net
+rapports.detail.facturesPaid|Factures payées
+rapports.detail.employes|Employés
+rapports.detail.margeNette|Marge nette
+rapports.rh.title|Ressources Humaines
+rapports.rh.effectif|Effectif
+rapports.rh.salaires|Masse salariale
+rapports.rh.cnss|Charges CNSS
+rapports.exports.title|Exports
+rapports.exports.pdf|Rapport PDF
+rapports.exports.csv|Export CSV
+rapports.exports.tva|Rapport TVA Congo
+rapports.exports.soon|À venir
+rapports.exports.tvaTab|Onglet TVA
+rapports.resto.title|Restaurant — {annee}
+rapports.resto.caTtc|CA TTC Restaurant
+rapports.resto.caHt|CA HT
+rapports.resto.tva|TVA collectée (18%)
+rapports.resto.ca|CA (5% TVA)
+rapports.cr.exercice|Exercice {annee} · OHADA / Plan comptable congolais
+rapports.cr.produits|PRODUITS D\
+rapports.cr.charges|CHARGES D\
+rapports.cr.totalProduits|TOTAL PRODUITS
+rapports.cr.totalCharges|TOTAL CHARGES
+rapports.cr.benefice|BÉNÉFICE NET
+rapports.cr.perte|PERTE NETTE
+rapports.cr.exerciceLabel|EXERCICE {annee}
+rapports.cr.margeNette|Marge nette
+rapports.cr.prodRow|Produits
+rapports.cr.chargesRow|Charges
+rapports.cr.resultatRow|Résultat
+rapports.bilan.subtitle|Bilan simplifié au 31/12/{annee} — OHADA
+rapports.bilan.actif|ACTIF
+rapports.bilan.tresorerie|Trésorerie (caisse + banque)
+rapports.bilan.creances|Créances clients (à recevoir)
+rapports.bilan.totalActif|TOTAL ACTIF
+rapports.bilan.capitaux|CAPITAUX PROPRES
+rapports.bilan.report|Report à nouveau (N-1)
+rapports.bilan.exerciceRes|Résultat de l\
+rapports.bilan.totalCapitaux|TOTAL CAPITAUX PROPRES
+rapports.bilan.dettes|DETTES
+rapports.bilan.fournisseurs|Fournisseurs (à payer)
+rapports.bilan.dettesCnss|Dettes sociales (CNSS)
+rapports.bilan.tvaReverser|TVA collectée à reverser
+rapports.bilan.totalDettes|TOTAL DETTES
+rapports.bilan.equilibre|Vérification équilibre
+rapports.bilan.actifPassif|Actif — Passif
+rapports.bilan.simplified|(bilan simplifié — hors immobilisations)
+rapports.flux.subtitle|Flux de trésorerie — Exercice {annee}
+rapports.flux.soldeOuv|Solde ouverture
+rapports.flux.variation|Variation nette
+rapports.flux.soldeClo|Solde clôture
+rapports.flux.exploitation|FLUX D\
+rapports.flux.encaissements|Encaissements clients
+rapports.flux.decaisseFourn|Décaissements fournisseurs
+rapports.flux.decaisseRH|Décaissements salaires & CNSS
+rapports.flux.decaisseDiv|Décaissements charges diverses
+rapports.flux.netExploitation|FLUX NET D\
+rapports.flux.investTitle|FLUX D\
+rapports.flux.finTitle|FLUX DE FINANCEMENT
+rapports.flux.nonSuivi|Non suivi dans cet exercice
+rapports.tva.subtitle|Rapport TVA Congo DRC — Exercice {annee}
+rapports.tva.collected|TVA COLLECTÉE — Sur factures
+rapports.tva.baseHT|Base imposable HT
+rapports.tva.tva18|TVA 18% collectée
+rapports.tva.ca5|Contribution d\
+rapports.tva.totalReverser|TOTAL TVA + CA À REVERSER
+rapports.tva.collectedResto|TVA COLLECTÉE — CA Restaurant
+rapports.tva.caTtcResto|CA TTC restaurant
+rapports.tva.caHtBase|CA HT (base imposable)
+rapports.tva.totalResto|TOTAL TVA RESTO À REVERSER
+rapports.tva.dgiTitle|Déclaration DGI — {annee}
+rapports.tva.ventes|TVA collectée sur ventes
+rapports.tva.deductible|TVA déductible sur achats
+rapports.tva.nette|TVA nette à reverser
+rapports.tva.contribution|Contribution d\
+rapports.tva.totalDgi|TOTAL À PAYER À LA DGI
+rapports.miaa.title|Analyse MIAA+
+rapports.miaa.powered|Powered by Claude · {entreprise} · {annee}
+rapports.miaa.generate|Générer
+rapports.miaa.regenerate|Régénérer
+rapports.miaa.analyzing|MIAA+ rédige votre analyse financière complète…
+rapports.miaa.emptyTitle|MIAA+ analyse vos données et génère une analyse financière complète
+rapports.miaa.emptySubtitle|Compte de résultat · Trésorerie · Créances · Recommandations
+rapports.miaa.errorAnalyse|Erreur lors de l\
+notif.subtitle|Alertes, mises à jour et messages système
+notif.all|Toutes
+notif.unread|Non lues
+notif.noUnread|Aucune notification non lue
+notif.upToDate|Vous êtes à jour !
+notif.markRead|Marquer comme lu
+notif.delete|Supprimer
+notif.ago|il y a
+modules.title|Modules
+modules.activeModules|Modules actifs
+modules.available|Modules disponibles
+modules.activate|Activer
+modules.deactivate|Désactiver
+modules.confirmActivate|Ce module sera immédiatement accessible dans votre sidebar.
+modules.confirmDeactivate|Le module sera retiré de votre sidebar. Vos données sont conservées.
+modules.tarif|Tarif :
+modules.perMonth|/mois
+modules.active|actif
+modules.actives|actifs
+hotel.title|Gestion Hôtelière
+hotel.subtitle|Chambres, réservations, check-in/check-out
+hotel.newRoom|Nouvelle chambre
+hotel.newReservation|Nouvelle réservation
+hotel.tabRooms|Chambres
+hotel.tabReservations|Réservations
+hotel.totalRooms|Chambres totales
+hotel.available|Disponibles
+hotel.occupancyRate|Taux occupation
+hotel.monthRevenue|Revenu ce mois
+hotel.searchRoom|Rechercher une chambre…
+hotel.searchClient|Rechercher un client…
+hotel.room|Chambre
+hotel.floor|Étage
+hotel.noRooms|Aucune chambre — commencez par en ajouter une
+hotel.persons|pers.
+hotel.perNight|/nuit
+hotel.noReservations|Aucune réservation
+hotel.colClient|Client
+hotel.colRoom|Chambre
+hotel.colArrival|Arrivée
+hotel.colDeparture|Départ
+hotel.colNights|Nuits
+hotel.colAmount|Montant
+hotel.colStatus|Statut
+hotel.colActions|Actions
+hotel.checkin|Check-in
+hotel.checkout|Check-out
+hotel.formRoomNumber|Numéro *
+hotel.formType|Type *
+hotel.formPrice|Prix / nuit (FCFA) *
+hotel.formCapacity|Capacité (pers.)
+hotel.formFloor|Étage
+hotel.formStatus|Statut
+hotel.formDescription|Description
+hotel.formDescPlaceholder|Vue mer, balcon, jacuzzi…
+hotel.formClientName|Nom du client *
+hotel.formPhone|Téléphone
+hotel.formPersons|Nb personnes
+hotel.formArrival|Arrivée *
+hotel.formDeparture|Départ *
+hotel.formRoomSelect|Chambre
+hotel.formNoRoom|Sans chambre attribuée
+hotel.errorNumAndPrice|Numéro et prix requis
+hotel.errorClientAndDates|Client et dates requis
+hotel.statusAvailable|Disponible
+hotel.statusOccupied|Occupée
+hotel.statusReserved|Réservée
+hotel.statusMaintenance|Maintenance
+hotel.resaConfirmed|Confirmée
+hotel.resaPending|En attente
+hotel.resaArrived|Arrivée
+hotel.resaDeparted|Départ
+hotel.resaCancelled|Annulée
+transport.title|Transport VTC
+transport.subtitle|Gestion de flotte, courses et chauffeurs
+transport.newDriver|Nouveau chauffeur
+transport.newCourse|Nouvelle course
+transport.tabCourses|Courses
+transport.tabDrivers|Chauffeurs
+transport.tabStats|Statistiques
+transport.totalCourses|Total courses
+transport.completed|Terminées
+transport.activeDrivers|Chauffeurs actifs
+transport.allCourses|Toutes
+transport.noCourses|Aucune course enregistrée
+transport.noDrivers|Aucun chauffeur enregistré
+transport.colClient|Client
+transport.colRoute|Trajet
+transport.colDriver|Chauffeur
+transport.colFare|Tarif
+transport.colStatus|Statut
+transport.colActions|Actions
+transport.start|Démarrer
+transport.finish|Terminer
+transport.cancel|Annuler
+transport.disable|Désactiver
+transport.enable|Activer
+transport.license|Permis :
+transport.modalCourseTitle|Nouvelle course
+transport.modalDriverTitle|Nouveau chauffeur
+transport.selectDriver|Sélectionner un chauffeur
+transport.clientName|Nom client *
+transport.clientPhone|Téléphone
+transport.departure|Point de départ *
+transport.destination|Destination *
+transport.distance|Distance (km)
+transport.fare|Tarif (FCFA) *
+transport.createCourse|Créer la course
+transport.driverFullName|Nom complet *
+transport.driverLicense|N° de permis
+transport.vehicleModel|Modèle véhicule
+transport.plate|Plaque
+transport.statsSuccessRate|Taux de réussite
+transport.statsPending|Courses en attente
+transport.statsCancelled|Courses annulées
+transport.revenueByDriver|Revenus par chauffeur
+transport.noDriver|Aucun chauffeur
+transport.statusAvailable|Disponible
+transport.statusInactive|Inactif
+transport.statusOnRide|En course
+transport.statusPending|En attente
+transport.statusInProgress|En cours
+transport.statusDone|Terminée
+transport.statusCancelled|Annulée
+resto.title|Restaurant & POS
+resto.caToday|CA du jour
+resto.waiting|en attente
+resto.tabCaisse|🧾 Caisse
+resto.tabCommandes|📋 Commandes
+resto.tabMenu|🍽️ Menu
+resto.tabTables|📍 Tables & QR
+resto.tabRecettes|📖 Recettes
+resto.tabAchats|🛒 Achats
+resto.tabRapport|📊 Rapport du jour
+resto.kpiOrders|Commandes
+resto.kpiWaiting|En attente/prép
+resto.kpiDishes|Plats au menu
+resto.allCategories|Tous
+resto.takeaway|À emporter
+resto.selectDishes|Sélectionnez des plats
+resto.subtotalHT|Sous-total HT
+resto.tva|TVA (18%)
+resto.ca|CA (5% TVA)
+resto.totalTTC|Total TTC
+resto.validatePrint|Valider & Imprimer reçu
+resto.recentOrders|commande(s) récentes
+resto.refresh|Actualiser
+resto.inPrep|En préparation
+resto.readyToServe|Prêt à servir
+resto.delivered|Livré
+resto.noOrder|Aucune commande
+resto.table|Table
+resto.takeOut|Emporter
+resto.markReady|Marquer prêt
+resto.markDelivered|Marquer livré
+resto.addDish|Ajouter un plat
+resto.emptyMenu|Menu vide — ajoutez des plats
+resto.colDish|Plat
+resto.colCategory|Catégorie
+resto.colPrice|Prix
+resto.colStatus|Statut
+resto.addDishTitle|Ajouter un plat
+resto.emojiLabel|Emoji
+resto.dishNameLabel|Nom du plat *
+resto.categoryLabel|Catégorie
+resto.priceLabel|Prix (FCFA)
+resto.addTableTitle|Ajouter une table
+resto.tableNum|N° Table *
+resto.tableName|Nom
+resto.tableCapacity|Capacité
+resto.createTable|Créer la table
+resto.noTable|Aucune table configurée
+resto.places|places
+resto.copyLink|Copier lien
+resto.copied|Copié !
+resto.clientPage|Page client
+resto.recipesTitle|Recettes — ingrédients par plat
+resto.recipesDesc|Liez les ingrédients (stock) à chaque plat. Le stock se décrémente automatiquement à chaque vente.
+resto.selectDish|Sélectionner un plat
+resto.selectDishOption|— Choisir un plat du menu —
+resto.currentIngredients|Ingrédients actuels
+resto.colIngredient|Ingrédient
+resto.colQtyPortion|Qté / portion
+resto.colUnit|Unité
+resto.addIngredientSection|Ajouter un ingrédient
+resto.fromStock|Depuis le stock
+resto.orManual|Ou saisir manuellement
+resto.ingredientName|Nom ingrédient
+resto.qty|Qté
+resto.unit|Unité
+resto.selectDishPrompt|Sélectionnez un plat pour gérer sa recette
+resto.recentPurchases|achat(s) récent(s)
+resto.newPurchase|Nouvel achat
+resto.purchaseTitle|Enregistrer un achat fournisseur
+resto.supplier|Fournisseur *
+resto.supplierName|Nom du fournisseur
+resto.date|Date
+resto.paymentMode|Mode de paiement
+resto.note|Note
+resto.articleLines|Articles
+resto.addLine|Ajouter une ligne
+resto.articleName|Ingrédient / article
+resto.stockSelect|Stock…
+resto.purchaseQty|Qté
+resto.unitPrice|Prix unitaire
+resto.purchaseTotal|Total
+resto.noPurchase|Aucun achat enregistré
+resto.noPurchaseDesc|Enregistrez vos achats fournisseurs pour mettre à jour le stock
+resto.colDate|Date
+resto.colSupplier|Fournisseur
+resto.colMode|Mode
+resto.colArticles|Articles
+resto.colTotal|Total
+resto.article|article(s)
+resto.rapportCaTTC|CA TTC
+resto.rapportCaHT|CA HT
+resto.rapportTVA|TVA collectée
+resto.rapportNbOrders|Nb commandes
+resto.caByHour|CA par heure
+resto.paymentBreakdown|Répartition paiements
+resto.top5Dishes|Top 5 plats du jour
+resto.stockAlerts|Alertes stock
+resto.rupture|RUPTURE
+resto.threshold|seuil :
+resto.closeCaisse|Clôture de caisse
+resto.closeCaisseDesc|La clôture enregistre le rapport journalier dans Supabase et lie les données à la trésorerie.
+resto.closeCaisseBtn|Clôturer la caisse du jour
+resto.orderSaved|Commande enregistrée !
+resto.receiptNum|Reçu N°
+resto.close|Fermer
+resto.downloadPDF|Télécharger PDF
+resto.indispo|INDISPO
+resto.cancelOrder|Commande annulée
+resto.errorOrder|Erreur : 
+resto.purchaseSaved|Achat enregistré !
+resto.cashierClosed|Caisse clôturée avec succès !
+resto.cuisine.title|Écran Cuisine
+resto.cuisine.subtitle|commande(s) active(s) · Mise à jour auto toutes les 10s
+resto.cuisine.noOrder|Aucune commande en attente
+resto.cuisine.autoRefresh|La liste s\
+resto.cuisine.markDelivered|Marquer livré
+resto.cuisine.noCmd|Aucune commande
+ged.cat.all|Tous
+ged.cat.contrats|Contrats
+ged.cat.factures|Factures
+ged.cat.rh|RH
+ged.cat.compta|Comptabilité
+ged.cat.juridique|Juridique
+ged.cat.commercial|Commercial
+ged.cat.technique|Technique
+ged.cat.autre|Autre
+ged.archiveBtn|Archiver
+ged.folder.all|Tous les documents
+ged.folder.favorites|Favoris
+ged.folder.toSign|À signer
+ged.folder.title|Dossiers
+ged.folder.new|Nouveau dossier
+ged.folder.newPlh|Nom du dossier
+ged.folder.create|Créer
+ged.folder.deleteConfirm|Supprimer ce dossier ?
+ged.viewGrid|Grille
+ged.viewList|Liste
+ged.favoriteOn|Marquer comme favori
+ged.favoriteOff|Retirer des favoris
+ged.descLabel|Description
+ged.dateDocLabel|Date du document
+ged.dossierLabel|Dossier
+ged.tagsLabel|Tags
+ged.confidentielLabel|Confidentiel
+ged.doc.expiringSoon|Expire bientôt
+ged.doc.expired|Expiré
+ged.doc.signs|signatures
+ged.sig.title|Signature électronique
+ged.sig.draw|Signez dans le cadre ci-dessous
+ged.sig.clear|Effacer
+ged.sig.sign|Valider la signature
+ged.sig.signing|Enregistrement…
+ged.sig.cancel|Annuler
+ged.sig.name|Votre nom *
+ged.sig.role|Votre rôle
+ged.sig.success|Signature enregistrée
+ged.cat.bulletin|Bulletins
+ged.cat.diplome|Diplômes
+ged.cat.attestation|Attestations
+cal.title|Calendrier
+cal.subtitle|Événements, réunions, deadlines
+cal.newEvent|Nouvel événement
+cal.thisMonth|Ce mois
+cal.today|Aujourd\
+cal.reunions|Réunions
+cal.deadlines|Deadlines
+cal.noEvents|Aucun événement
+cal.allDay|Journée entière
+cal.location|Lieu
+cal.description|Description
+cal.type.event|Événement
+cal.type.reunion|Réunion
+cal.type.deadline|Deadline
+cal.type.examen|Examen
+cal.type.paiement|Paiement
+cal.type.conge|Congé
+cal.type.tache|Tâche
+cal.type.rappel|Rappel
+cal.type.formation|Formation
+cal.statut.planifie|Planifié
+cal.statut.confirme|Confirmé
+cal.statut.annule|Annulé
+cal.statut.termine|Terminé
+cal.edit|Modifier
+cal.delete|Supprimer
+cal.save|Enregistrer
+cal.cancel|Annuler
+tasks.title|Tâches & Collaboration
+tasks.subtitle|Kanban board · Suivi temps réel
+tasks.addTask|Ajouter une tâche
+tasks.noTasks|Aucune tâche
+tasks.priority.basse|Basse
+tasks.priority.normale|Normale
+tasks.priority.haute|Haute
+tasks.priority.urgente|Urgente
+tasks.statut.todo|À faire
+tasks.statut.en_cours|En cours
+tasks.statut.en_attente|En attente
+tasks.statut.termine|Terminé
+tasks.due|Échéance
+tasks.assignedTo|Assigné à
+tasks.tags|Tags
+tasks.comments|Commentaires
+tasks.addComment|Ajouter un commentaire…
+tasks.save|Enregistrer
+tasks.delete|Supprimer
+tasks.overdue|En retard
+tasks.filterAll|Toutes
+ecole.direction.periode.tout|Toutes périodes
+ecole.direction.periode.mois|Ce mois
+ecole.direction.periode.annee|Cette année
+ecole.direction.fin.totalEncaisse|Total encaissé
+ecole.direction.fin.nbPaiements|Nombre de paiements
+ecole.direction.fin.moyenne|Moyenne par étudiant
+ecole.direction.fin.repartitionMode|Répartition par mode de paiement
+ecole.direction.fin.historique|Historique des paiements
+ecole.direction.kpi.totalBourses|Total bourses
+ecole.direction.kpi.gestionImpayes|Gestion des impayés
+ecole.direction.kpi.gestionImpayesDesc|Bloquer automatiquement les élèves ayant des impayés
+ecole.direction.kpi.effectifsClasse|Effectifs par classe
+ecole.direction.kpi.noClasse|Aucune classe
+ecole.direction.kpi.derniersPaiements|Derniers paiements
+ecole.direction.kpi.diplomes|Diplômés
+ecole.direction.bourse.montant|Montant
+ecole.direction.bourse.libellePlaceholder|Description de la bourse…
+ecole.direction.comm.publier|Publier une annonce
+ecole.direction.comm.messagePlaceholder|Texte de l\
+ecole.direction.comm.noAnnonce|Aucune annonce
+ecole.direction.comm.destinataires|Destinataires
+ecole.direction.partner.descPlaceholder|Description du partenariat…
+ecole.direction.partner.contactPlaceholder|Nom du contact…
+daac.title|DAAC — Direction des Affaires Académiques
+daac.subtitle|Programmes, sessions, examens, délibérations, diplômes & soutenances
+daac.kpi.activeStudents|Étudiants actifs
+daac.kpi.activeSessions|Sessions en cours
+daac.kpi.pendingDiplomas|Diplômes en attente
+daac.kpi.scheduledDefenses|Soutenances planif.
+daac.tab.matieres|Matières
+daac.tab.sessions|Sessions
+daac.tab.examens|Examens & Notes
+daac.tab.attestations|Attestations
+daac.tab.diplomes|Diplômes
+daac.tab.soutenances|Soutenances
+student.title|Espace Étudiant
+student.subtitle|Accédez à votre dossier scolaire
+student.myFile|Mon Dossier
+student.myFileSubtitle|Résultats, paiements, absences
+student.switchAccount|Changer de compte
+student.accessFile|Accès à mon dossier
+student.idPlaceholder|Ex : ETU-2024-001
+student.adminSubtitle|Administration · Dossier élève
+student.backToSearch|Retour à la recherche
+student.searchPlaceholder|N° étudiant, nom, prénom…
+student.search|Rechercher
+student.searchPrompt|Recherchez un étudiant par nom ou numéro
+student.suspended|Accès suspendu
+student.unblock|Débloquer
+student.suspend|Suspendre
+student.unlockCode|Code de déblocage :
+student.totalPaid|Total payé
+student.globalAvg|Moyenne générale
+student.absences|Absences
+student.justified|justifiées
+student.alerts|Alertes
+student.unread|non lues
+student.tab.notes|Mes notes
+student.tab.paiements|Paiements
+student.tab.absences|Absences
+student.tab.alertes|Notifications
+student.noNote|Aucune note enregistrée.
+student.noPayment|Aucun paiement enregistré.
+student.noAbsence|Aucune absence enregistrée.
+student.noNotif|Aucune notification
+student.col.subject|Matière
+student.col.type|Type
+student.col.note|Note
+student.col.max|/Max
+student.col.avg20|Moy /20
+student.col.coeff|Coeff.
+student.col.mention|Mention
+student.col.date|Date
+student.col.libelle|Libellé
+student.col.mode|Mode
+student.col.amount|Montant
+student.col.status|Statut
+student.col.motif|Motif
+student.paid|Payé
+student.pending|En attente
+student.justified2|Justifiée
+student.unjustified|Non justifiée
+parent.title|Espace Parent
+parent.subtitle|Dossier de votre enfant
+parent.childrenSubtitle|Suivi de vos enfants
+parent.myChildren|Mes enfants
+parent.childrenOf|enfant
+parent.childrenOfPl|enfants
+parent.noChild|Aucun enfant trouvé
+parent.adminSubtitle|Administration · Dossier famille
+parent.search|Rechercher
+parent.searchPrompt|Recherchez un parent ou un élève
+parent.contacts|Contacts
+parent.father|Père :
+parent.mother|Mère :
+parent.suspended|Accès suspendu — solde impayé détecté
+parent.tab.notes|Résultats
+parent.tab.paiements|Paiements
+parent.tab.absences|Absences
+parent.tab.alertes|Alertes
+parent.noNote|Aucune note disponible.
+parent.noPayment|Aucun paiement enregistré.
+parent.noAbsence|Aucune absence enregistrée.
+parent.noAlert|Aucune alerte pour cet enfant
+parent.back|← Retour
+parent.loading|Chargement…
+miaa.school.title|MIAA+
+miaa.school.subtitle|Assistant IA scolaire — analyse & insights en temps réel
+miaa.school.loadCtx|Charger le contexte
+miaa.school.refresh|Actualiser
+miaa.school.suggestions|Suggestions
+miaa.school.quickAnalysis|Analyses rapides
+miaa.school.ctxActive|Contexte actif
+miaa.school.ctxNone|Sans contexte
+miaa.school.placeholder|Posez votre question…
+miaa.school.placeholderNoCtx|Chargez le contexte puis posez votre question…
+miaa.school.kpi.activeStudents|Élèves actifs
+miaa.school.kpi.yearRevenue|Revenus (année)
+miaa.school.kpi.suspension|Taux suspension
+miaa.school.kpi.avgGrade|Moy. générale
+miaa.school.kpi.payments|paiements scolaires
+miaa.school.kpi.blocked|élèves bloqués
+miaa.school.kpi.graded|notes saisies
+miaa.school.students|Élèves
+miaa.school.grades|Notes
+miaa.school.absences|Absences
+miaa.school.payments|Paiements
+dir.ecole.title|Direction École
+dir.ecole.subtitle|Pilotage stratégique — effectifs, finances & académique
+dir.ecole.tab.vue|Vue Globale
+dir.ecole.tab.finances|Finances
+dir.ecole.tab.evenements|Événements
+dir.ecole.tab.bourses|Bourses
+dir.ecole.tab.partenaires|Partenaires
+dir.ecole.tab.communication|Communication
+dir.ecole.tab.diplomes|Diplômes
+dir.ecole.tab.soutenances|Soutenances
+dir.ecole.kpi.revenuMois|Revenu du mois
+dir.ecole.kpi.etudiants|Étudiants
+dir.ecole.kpi.impayes|Impayés
+dir.ecole.kpi.enseignants|Enseignants actifs
+dir.ecole.kpi.classes|Classes
+dir.ecole.kpi.diplomes|Diplômés
+dir.ecole.unpaid|Gestion des impayés
+dir.ecole.unpaidDesc|Suspendre automatiquement les étudiants actifs sans paiement cette année. Un code de déblocage est généré pour chacun.
+dir.ecole.blockBtn|Bloquer
+dir.ecole.blockBtnSuffix|impayé(s)
+dir.ecole.classByHeadcount|Effectifs par classe
+dir.ecole.noClass|Aucune classe configurée.
+dir.ecole.lastPayments|Derniers paiements
+formateur.title|Espace Formateur
+formateur.subtitle|Cours, devoirs, examens & paiements
+formateur.tab.dashboard|Tableau de bord
+formateur.tab.cours|Cours & Supports
+formateur.tab.devoirs|Devoirs
+formateur.tab.examens|Examens & Notes
+formateur.tab.heures|Mes Heures
+formateur.tab.paiements|Paiements
+formateur.statut.declare|Déclaré
+formateur.statut.validated|Validé
+formateur.statut.paye|Payé
+formateur.loading|Chargement de votre espace…
+compta.overview.title|Comptabilité OHADA
+compta.overview.subtitle|Journal, grand livre et états financiers
+compta.overview.addEntry|Ajouter une écriture
+compta.overview.newEntry|Nouvelle écriture
+compta.overview.noEntries|Aucune écriture comptable
+compta.overview.export|Exporter
+compta.overview.allEntries|Toutes les écritures
+compta.overview.recette|Recette
+compta.overview.depense|Dépense
+compta.overview.kpi.ca|Chiffre d\
+compta.overview.kpi.charges|Charges totales
+compta.overview.kpi.solde|Solde net
+compta.overview.kpi.treso|Trésorerie
+compta.overview.kpi.tva|TVA due
+compta.overview.kpi.impaye|Factures impayées
+compta.overview.modules|Modules comptables
+compta.overview.recentEntries|Écritures récentes
+compta.overview.doubleEntry|Grand livre en partie double
+compta.overview.journal|Journal
+compta.overview.balance|Balance
+compta.overview.bilan|Bilan
+compta.overview.tva|TVA
+compta.overview.rapports|Rapports
+compta.overview.immobilisations|Immobilisations
+compta.overview.centresCouts|Centres de coûts
+compta.overview.rapprochement|Rapprochement
+compta.overview.alertes|Alertes
+compta.overview.alertesTva|Déclaration TVA ce mois
+compta.overview.alertesBilan|Bilan trimestriel à préparer
+compta.ecole.title|Comptabilité & Finance
+compta.ecole.subtitle|Journal OHADA · Grand Livre · Bilan · Trésorerie
+compta.ecole.tab.journal|Journal OHADA
+compta.ecole.tab.grandlivre|Grand Livre
+compta.ecole.tab.bilan|Bilan
+compta.ecole.tab.tresorerie|Trésorerie
+compta.ecole.tab.previsions|Prévisions IA
+compta.journal.title|Journal Comptable OHADA
+compta.journal.subtitle|Écritures en partie double — générées automatiquement
+compta.journal.exportCSV|Exporter CSV
+compta.journal.entries|écriture(s) affichée(s)
+compta.journal.totalDebit|Total débit
+compta.journal.totalCredit|Total crédit
+compta.journal.balance|Équilibre
+compta.journal.balanced|✓ Équilibré
+compta.journal.fiscal|Exercice
+compta.journal.searchPlh|Libellé, N° compte, pièce…
+compta.journal.allSources|Toutes sources
+compta.journal.colDate|Date
+compta.journal.colPiece|Pièce
+compta.journal.colLabel|Libellé
+compta.journal.colDebitNo|N° Débit
+compta.journal.colDebit|Débit
+compta.journal.colCreditNo|N° Crédit
+compta.journal.colCredit|Crédit
+compta.journal.colSource|Source
+compta.journal.empty|Aucune écriture pour cette période
+compta.journal.emptyDesc|Les écritures sont créées automatiquement par les triggers lors de chaque opération financière.
+compta.journal.totalPeriod|TOTAL PÉRIODE
+compta.journal.ohadaPlan|PLAN COMPTABLE OHADA — COMPTES UTILISÉS
+compta.journal.src.facture|Facture
+compta.journal.src.achat|Achat
+compta.journal.src.paie|Paie
+compta.journal.src.cheque|Chèque
+compta.journal.src.virement|Virement
+compta.journal.src.caisse|Caisse
+compta.journal.src.transfer|Transfert
+compta.journal.src.mobile|Mobile Money
+compta.journal.src.tva|TVA
+compta.journal.src.stock|Stock
+compta.journal.src.manuel|Manuel
+compta.grandlivre.title|Grand Livre
+compta.grandlivre.subtitle|Comptes OHADA détaillés par exercice
+compta.grandlivre.searchPlh|Rechercher un compte…
+compta.grandlivre.allAccounts|Tous les comptes
+compta.grandlivre.empty|Aucun mouvement sur ce compte
+compta.grandlivre.colCompte|Compte
+compta.grandlivre.colDate|Date
+compta.grandlivre.colLabel|Libellé
+compta.grandlivre.colDebit|Débit
+compta.grandlivre.colCredit|Crédit
+compta.grandlivre.colSolde|Solde
+compta.grandlivre.totalDebit|Total Débit
+compta.grandlivre.totalCredit|Total Crédit
+compta.grandlivre.solde|Solde
+compta.balance.title|Balance des Comptes
+compta.balance.subtitle|Récapitulatif des soldes par compte OHADA
+compta.balance.empty|Aucune donnée de balance disponible
+compta.balance.colCompte|Compte
+compta.balance.colIntitule|Intitulé
+compta.balance.colDebit|Total Débit
+compta.balance.colCredit|Total Crédit
+compta.balance.colSolde|Solde
+compta.balance.totalRow|TOTAL
+compta.balance.equilibre|Équilibre comptable
+compta.balance.equilibreOk|✓ Balance équilibrée
+compta.balance.equilibreKo|⚠ Déséquilibre détecté
+compta.bilan.title|Bilan Comptable OHADA
+compta.bilan.subtitle|Actif / Passif selon le référentiel OHADA
+compta.bilan.actif|ACTIF
+compta.bilan.passif|PASSIF
+compta.bilan.totalActif|TOTAL ACTIF
+compta.bilan.totalPassif|TOTAL PASSIF
+compta.bilan.empty|Aucune donnée disponible
+compta.bilan.immobilisations|Immobilisations
+compta.bilan.stocks|Stocks
+compta.bilan.creances|Créances clients
+compta.bilan.tresorerie|Trésorerie
+compta.bilan.capitalReserves|Capitaux & Réserves
+compta.bilan.dettes|Dettes
+compta.bilan.resultat|Résultat
+compta.tva.title|Déclaration TVA
+compta.tva.subtitle|Calcul et déclaration TVA mensuelle
+compta.tva.collectee|TVA Collectée
+compta.tva.deductible|TVA Déductible
+compta.tva.due|TVA à Décayer
+compta.tva.credit|Crédit de TVA
+compta.tva.periode|Période
+compta.tva.exportDGI|Exporter pour DGI
+compta.tva.empty|Aucune opération TVA pour cette période
+compta.tva.periodLabel|Déclaration de la période
+compta.plan.title|Plan Comptable OHADA
+compta.plan.subtitle|Référentiel des comptes selon OHADA
+compta.plan.searchPlh|Rechercher un compte…
+compta.plan.allClasses|Toutes classes
+compta.plan.empty|Aucun compte trouvé
+compta.plan.colNum|N° Compte
+compta.plan.colIntitule|Intitulé
+compta.plan.colClass|Classe
+compta.plan.colType|Type
+compta.plan.addClass|Ajouter un compte
+compta.tiers.title|Tiers Comptables
+compta.tiers.subtitle|Clients, fournisseurs et partenaires
+compta.tiers.searchPlh|Rechercher un tiers…
+compta.tiers.allTypes|Tous types
+compta.tiers.clients|Clients
+compta.tiers.fournisseurs|Fournisseurs
+compta.tiers.empty|Aucun tiers enregistré
+compta.tiers.colNom|Nom
+compta.tiers.colType|Type
+compta.tiers.colSolde|Solde
+compta.tiers.colDernier|Dernière opération
+compta.tiers.addTiers|Ajouter un tiers
+compta.immob.title|Immobilisations
+compta.immob.subtitle|Actifs immobilisés & amortissements OHADA
+compta.immob.newAsset|Nouvel actif
+compta.immob.searchPlh|Rechercher une immobilisation…
+compta.immob.empty|Aucune immobilisation enregistrée
+compta.immob.colDesig|Désignation
+compta.immob.colValeur|Valeur brute
+compta.immob.colAmort|Amort. cumulé
+compta.immob.colValNet|Val. nette
+compta.immob.colDuree|Durée
+compta.immob.colDate|Date acquisition
+compta.rapproch.title|Rapprochement Bancaire
+compta.rapproch.subtitle|Réconciliation soldes banque / comptabilité
+compta.rapproch.searchPlh|Rechercher…
+compta.rapproch.empty|Aucun écart de rapprochement
+compta.rapproch.soldeCompta|Solde comptabilité
+compta.rapproch.soldeBanque|Solde banque
+compta.rapproch.ecart|Écart
+compta.rapproch.reconcile|Rapprocher
+compta.rapproch.ok|✓ Rapproché
+compta.cloture.title|Clôture Comptable
+compta.cloture.subtitle|Clôture de période et reports à nouveau
+compta.cloture.newCloture|Nouvelle clôture
+compta.cloture.empty|Aucune clôture enregistrée
+compta.cloture.colPeriode|Période
+compta.cloture.colDate|Date clôture
+compta.cloture.colStatut|Statut
+compta.cloture.colUser|Utilisateur
+compta.cloture.stat.ouvert|Ouvert
+compta.cloture.stat.cloture|Clôturé
+compta.cloture.stat.valide|Validé
+compta.cloture.confirm|Confirmer la clôture de cette période ?
+compta.rapports.title|Rapports Comptables
+compta.rapports.subtitle|États financiers OHADA & analyses
+compta.rapports.cr|Compte de Résultat
+compta.rapports.bilan|Bilan
+compta.rapports.flux|Flux de Trésorerie
+compta.rapports.produits|Produits
+compta.rapports.charges|Charges
+compta.rapports.resultat|Résultat net
+compta.rapports.actif|Actif
+compta.rapports.passif|Passif
+compta.rapports.exportPDF|Exporter PDF
+compta.rapports.exportXLS|Exporter Excel
+compta.cc.title|Centres de Coûts
+compta.cc.subtitle|Analyse des charges par centre analytique
+compta.cc.newCenter|Nouveau centre
+compta.cc.searchPlh|Rechercher un centre…
+compta.cc.empty|Aucun centre de coûts configuré
+compta.cc.colNom|Centre
+compta.cc.colCode|Code
+compta.cc.colTotal|Total charges
+compta.cc.colBudget|Budget
+compta.cc.colEcart|Écart
+treso.cheques.title|Chèques
+treso.cheques.subtitle|Suivi des chèques émis et reçus
+treso.cheques.new|Nouveau chèque
+treso.cheques.stat.attente|En attente
+treso.cheques.stat.encaisse|Encaissé
+treso.cheques.stat.rejete|Rejeté
+treso.cheques.stat.annule|Annulé
+treso.cheques.stat.echus|Échus
+treso.cheques.kpi.attente|En attente
+treso.cheques.kpi.encaisses|Encaissés
+treso.cheques.kpi.rejetes|Rejetés
+treso.cheques.kpi.echus|Échus
+treso.cheques.kpi.retard|chèque(s) en retard
+treso.cheques.filterAll|Tous statuts
+treso.cheques.searchPlh|N° chèque, bénéficiaire…
+treso.cheques.colNum|N° Chèque
+treso.cheques.colBenef|Bénéficiaire
+treso.cheques.colBanque|Banque
+treso.cheques.colEmis|Émission
+treso.cheques.colEcheance|Échéance
+treso.cheques.colMontant|Montant
+treso.cheques.colStatut|Statut
+treso.cheques.colActions|Actions
+treso.cheques.empty|Aucun chèque
+treso.cheques.encaisser|Encaisser
+treso.cheques.rejeter|Rejeter
+treso.cheques.confirmEncaiss|Marquer ce chèque comme encaissé ?
+treso.cheques.confirmRejet|Marquer ce chèque comme rejeté ?
+treso.cheques.notifCreated|Chèque enregistré ✓
+treso.cheques.notifEncaisse|Chèque encaissé ✓
+treso.cheques.notifRejete|Chèque marqué rejeté
+treso.cheques.modalTitle|Enregistrer un chèque
+treso.cheques.formNum|N° Chèque *
+treso.cheques.formBanque|Banque
+treso.cheques.formBenef|Bénéficiaire *
+treso.cheques.formMontant|Montant (FCFA) *
+treso.cheques.formEmis|Date émission
+treso.cheques.formEcheance|Date échéance
+treso.cheques.formCompte|Compte bancaire
+treso.cheques.formMotif|Motif
+treso.cheques.formMotifPlh|Objet du paiement (optionnel)
+treso.cheques.formNoCompte|— Aucun —
+treso.virements.title|Virements Bancaires
+treso.virements.subtitle|Ordres de virement inter-comptes
+treso.virements.new|Nouveau virement
+treso.virements.searchPlh|Bénéficiaire, référence…
+treso.virements.filterAll|Tous statuts
+treso.virements.empty|Aucun virement
+treso.virements.colDate|Date
+treso.virements.colBenef|Bénéficiaire
+treso.virements.colMontant|Montant
+treso.virements.colRef|Référence
+treso.virements.colStatut|Statut
+treso.virements.colActions|Actions
+treso.virements.stat.pending|En attente
+treso.virements.stat.valide|Validé
+treso.virements.stat.rejete|Rejeté
+treso.virements.modalTitle|Nouveau virement
+treso.virements.formBenef|Bénéficiaire *
+treso.virements.formMontant|Montant (FCFA) *
+treso.virements.formMotif|Motif / référence
+treso.virements.formCompte|Compte source
+treso.virements.confirmValid|Valider ce virement ?
+treso.historique.title|Historique des Transactions
+treso.historique.subtitle|Toutes les opérations de trésorerie
+treso.historique.searchPlh|Rechercher une transaction…
+treso.historique.filterAll|Toutes opérations
+treso.historique.empty|Aucune transaction
+treso.historique.colDate|Date
+treso.historique.colLabel|Libellé
+treso.historique.colMontant|Montant
+treso.historique.colType|Type
+treso.historique.colCompte|Compte
+treso.historique.colSolde|Solde après
+treso.historique.totalPeriod|Total période
+treso.rapproch.title|Rapprochements Bancaires
+treso.rapproch.subtitle|Réconciliation relevés bancaires
+treso.rapproch.import|Importer relevé
+treso.rapproch.searchPlh|Rechercher…
+treso.rapproch.empty|Aucun écart à rapprocher
+treso.rapproch.soldeBanque|Solde relevé
+treso.rapproch.soldeCompta|Solde comptabilité
+treso.rapproch.ecart|Écart
+treso.rapproch.reconcileBtn|Rapprocher
+treso.rembours.title|Remboursements
+treso.rembours.subtitle|Avances et remboursements employés
+treso.rembours.new|Nouveau remboursement
+treso.rembours.empty|Aucun remboursement
+treso.rembours.searchPlh|Rechercher…
+treso.rembours.colDate|Date
+treso.rembours.colBenef|Bénéficiaire
+treso.rembours.colMontant|Montant
+treso.rembours.colMotif|Motif
+treso.rembours.colStatut|Statut
+treso.validations.title|Validations en Attente
+treso.validations.subtitle|Opérations soumises à validation
+treso.validations.empty|Aucune opération en attente
+treso.validations.approveAll|Tout approuver
+treso.validations.colDate|Date
+treso.validations.colType|Type
+treso.validations.colLabel|Libellé
+treso.validations.colMontant|Montant
+treso.validations.colDemandeur|Demandeur
+treso.validations.approve|Approuver
+treso.validations.reject|Rejeter
+treso.validations.confirmApp|Approuver cette opération ?
+treso.validations.confirmRej|Rejeter cette opération ?
+treso.wallets.title|Wallets Mobile Money
+treso.wallets.subtitle|Portefeuilles Mobile Money & soldes
+treso.wallets.newWallet|Nouveau wallet
+treso.wallets.empty|Aucun wallet configuré
+treso.wallets.searchPlh|Rechercher un wallet…
+treso.wallets.colNom|Nom
+treso.wallets.colOperateur|Opérateur
+treso.wallets.colNumero|Numéro
+treso.wallets.colSolde|Solde
+treso.wallets.colStatut|Statut
+treso.transfers.title|Transferts
+treso.transfers.subtitle|Transferts inter-comptes
+treso.transfers.new|Nouveau transfert
+treso.transfers.empty|Aucun transfert
+treso.transfers.searchPlh|Rechercher…
+treso.transfers.colDate|Date
+treso.transfers.colSource|Source
+treso.transfers.colDest|Destination
+treso.transfers.colMontant|Montant
+treso.transfers.colStatut|Statut
+stock.page.title|Stock & Inventaire
+stock.page.subtitle|Vue globale des articles en stock
+stock.page.searchPlh|Rechercher un article…
+stock.page.empty|Aucun article en stock
+stock.page.addProduct|Ajouter un produit
+stock.page.colRef|Référence
+stock.page.colNom|Article
+stock.page.colCat|Catégorie
+stock.page.colQty|Quantité
+stock.page.colPrix|Prix unitaire
+stock.page.colValeur|Valeur stock
+stock.page.colSeuil|Seuil alerte
+stock.page.colStatut|Statut
+stock.page.stat.ok|OK
+stock.page.stat.low|Stock faible
+stock.page.stat.zero|Rupture
+stock.alertes.title|Alertes Stock
+stock.alertes.subtitle|Articles sous le seuil minimum
+stock.alertes.empty|Aucune alerte — tous les stocks sont suffisants
+stock.alertes.colArticle|Article
+stock.alertes.colQty|Quantité
+stock.alertes.colSeuil|Seuil
+stock.alertes.colEcart|Écart
+stock.alertes.colAction|Action
+stock.alertes.commander|Commander
+stock.alertes.critical|Critique
+stock.alertes.low|Faible
+stock.audit.title|Audit des Mouvements
+stock.audit.subtitle|Traçabilité complète des opérations stock
+stock.audit.searchPlh|Rechercher…
+stock.audit.filterAll|Tous mouvements
+stock.audit.empty|Aucun mouvement enregistré
+stock.audit.colDate|Date
+stock.audit.colArticle|Article
+stock.audit.colType|Type
+stock.audit.colQty|Quantité
+stock.audit.colUser|Utilisateur
+stock.audit.colRef|Référence
+stock.categories.title|Catégories
+stock.categories.subtitle|Organisation des articles par catégorie
+stock.categories.new|Nouvelle catégorie
+stock.categories.searchPlh|Rechercher une catégorie…
+stock.categories.empty|Aucune catégorie
+stock.categories.colNom|Catégorie
+stock.categories.colNbArticles|Articles
+stock.categories.colValeur|Valeur
+stock.categories.modalTitle|Nouvelle catégorie
+stock.categories.formNom|Nom de la catégorie *
+stock.categories.formDesc|Description
+stock.categories.formColor|Couleur
+stock.categories.deleteConfirm|Supprimer cette catégorie ?
+stock.entrepots.title|Entrepôts
+stock.entrepots.subtitle|Gestion multi-entrepôts
+stock.entrepots.new|Nouvel entrepôt
+stock.entrepots.empty|Aucun entrepôt configuré
+stock.entrepots.searchPlh|Rechercher un entrepôt…
+stock.entrepots.colNom|Entrepôt
+stock.entrepots.colAdresse|Adresse
+stock.entrepots.colArticles|Articles
+stock.entrepots.colValeur|Valeur
+stock.entrepots.colResponsable|Responsable
+stock.fournisseurs.title|Fournisseurs
+stock.fournisseurs.subtitle|Catalogue des fournisseurs
+stock.fournisseurs.new|Nouveau fournisseur
+stock.fournisseurs.searchPlh|Rechercher un fournisseur…
+stock.fournisseurs.empty|Aucun fournisseur enregistré
+stock.fournisseurs.colNom|Fournisseur
+stock.fournisseurs.colContact|Contact
+stock.fournisseurs.colTel|Téléphone
+stock.fournisseurs.colEmail|Email
+stock.fournisseurs.colDelai|Délai livraison
+stock.fournisseurs.modalTitle|Nouveau fournisseur
+stock.mouvements.title|Mouvements de Stock
+stock.mouvements.subtitle|Entrées, sorties et ajustements
+stock.mouvements.new|Nouveau mouvement
+stock.mouvements.filterAll|Tous types
+stock.mouvements.searchPlh|Rechercher…
+stock.mouvements.empty|Aucun mouvement
+stock.mouvements.colDate|Date
+stock.mouvements.colArticle|Article
+stock.mouvements.colType|Type
+stock.mouvements.colQty|Quantité
+stock.mouvements.colUser|Opérateur
+stock.mouvements.type.entree|Entrée
+stock.mouvements.type.sortie|Sortie
+stock.mouvements.type.ajust|Ajustement
+stock.codesbarre.title|Codes-barres
+stock.codesbarre.subtitle|Gestion et impression des codes-barres
+stock.codesbarre.searchPlh|Rechercher un article…
+stock.codesbarre.empty|Aucun article
+stock.codesbarre.generate|Générer
+stock.codesbarre.print|Imprimer
+stock.codesbarre.printAll|Tout imprimer
+stock.multiunites.title|Multi-Unités
+stock.multiunites.subtitle|Unités de mesure et conversions
+stock.multiunites.new|Nouvelle unité
+stock.multiunites.empty|Aucune unité configurée
+stock.multiunites.colNom|Unité
+stock.multiunites.colAbrv|Abréviation
+stock.multiunites.colBase|Unité de base
+stock.multiunites.colConv|Facteur conversion
+stock.transferts.title|Transferts inter-entrepôts
+stock.transferts.subtitle|Déplacements d\
+stock.transferts.new|Nouveau transfert
+stock.transferts.searchPlh|Rechercher…
+stock.transferts.empty|Aucun transfert enregistré
+stock.transferts.colDate|Date
+stock.transferts.colArticle|Article
+stock.transferts.colSource|Entrepôt source
+stock.transferts.colDest|Entrepôt destination
+stock.transferts.colQty|Quantité
+stock.transferts.colStatut|Statut
+stock.valorisation.title|Valorisation du Stock
+stock.valorisation.subtitle|Valeur et rotation des stocks
+stock.valorisation.searchPlh|Rechercher…
+stock.valorisation.empty|Aucune donnée de valorisation
+stock.valorisation.totalValue|Valeur totale
+stock.valorisation.colArticle|Article
+stock.valorisation.colQty|Quantité
+stock.valorisation.colPuMoyen|PU moyen
+stock.valorisation.colValeur|Valeur
+stock.valorisation.colRotation|Rotation
+rh.sanctions.new|Nouvelle sanction
+rh.sanctions.searchPlh|Rechercher un employé…
+rh.sanctions.empty|Aucune sanction enregistrée
+rh.sanctions.colEmployee|Employé
+rh.sanctions.colType|Type
+rh.sanctions.colDate|Date
+rh.sanctions.colMotif|Motif
+rh.sanctions.colStatut|Statut
+rh.sanctions.type.avert|Avertissement
+rh.sanctions.type.blame|Blâme
+rh.sanctions.type.suspension|Suspension
+rh.sanctions.type.licencie|Licenciement
+rh.avantages.new|Nouvel avantage
+rh.avantages.searchPlh|Rechercher un avantage…
+rh.avantages.empty|Aucun avantage configuré
+rh.avantages.colNom|Avantage
+rh.avantages.colType|Type
+rh.avantages.colMontant|Montant / %
+rh.avantages.colBeneficiaires|Bénéficiaires
+rh.avantages.colStatut|Statut
+mm.title|Mobile Money
+mm.subtitle|Paiements et transferts mobile
+mm.newTransaction|Nouvelle transaction
+mm.searchPlh|Rechercher une transaction…
+mm.filterAll|Toutes opérations
+mm.empty|Aucune transaction Mobile Money
+mm.colDate|Date
+mm.colType|Type
+mm.colMontant|Montant
+mm.colTelephone|Téléphone
+mm.colOperateur|Opérateur
+mm.colStatut|Statut
+mm.colRef|Référence
+mm.type.depot|Dépôt
+mm.type.retrait|Retrait
+mm.type.paiement|Paiement
+mm.type.transfert|Transfert
+mm.stat.succes|Succès
+mm.stat.encours|En cours
+mm.stat.echec|Échec
+devis.title|Devis & Propositions
+devis.subtitle|Créez, envoyez et convertissez vos devis en factures
+devis.new|Nouveau devis
+devis.thisMonth|Ce mois
+devis.accepted|Acceptés
+devis.acceptanceRate|Taux d\
+devis.pending|En attente
+devis.convertToInvoice|Convertir en facture
+devis.duplicate|Dupliquer
+devis.validUntil|Valide jusqu\
+devis.number|N° Devis
+devis.discount|Remise (%)
+devis.noDevis|Aucun devis trouvé
+devis.saveDraft|Enregistrer brouillon
+devis.send|Envoyer le devis
+devis.alreadyConverted|Déjà converti en facture
+devis.validity|Date de validité
+devis.discountAmount|Montant remise
+devis.netHT|HT après remise
+devis.confirmConvert|Convertir ce devis en facture ?
+devis.convertConfirmMsg|Un numéro de facture sera généré automatiquement.
+devis.expired|Expiré
+devis.editDevis|Modifier le devis
+rapport.ventes.title|Rapports commerciaux
+rapport.ventes.subtitle|Ventes · TVA · Recouvrement · Top clients
+rapport.ventes.ca|Chiffre d\
+rapport.ventes.emis|Factures émises
+rapport.ventes.recouvrement|Taux recouvrement
+rapport.ventes.tva|TVA collectée
+rapport.ventes.impayees|Impayées
+rapport.ventes.topClients|Top clients
+rapport.ventes.byMonth|Ventes par mois
+rapport.ventes.tvaTable|Déclaration TVA
+rapport.ventes.export|Exporter CSV
+rapport.ventes.retour|Retour
+rapport.ventes.jRetard|j de retard
+rapport.ventes.total|Total impayé
+invoice.encaisser|Encaisser
+invoice.avoir|Avoir
+invoice.paymentModal.title|Enregistrer un paiement
+invoice.paymentModal.reste|Reste à régler
+invoice.paymentModal.mode|Mode de paiement
+invoice.paymentModal.montant|Montant
+invoice.paymentModal.date|Date du paiement
+invoice.paymentModal.ref|Référence (optionnelle)
+invoice.paymentModal.partial|Paiement partiel
+invoice.paymentModal.full|Paiement total
+invoice.paymentModal.save|Enregistrer le paiement
+invoice.badgeAvoir|AVOIR
+invoice.badgeProforma|PROFORMA
+invoice.partiel|Partiel
+ecole.tab.inscriptions|Inscriptions
+ecole.tab.paiements|Paiements & Frais
+ecole.tab.notes|Notes & Bulletins
+ecole.tab.classes|Classes
+ecole.tab.planning|Planning
+ecole.tab.absences|Absences
+ecole.tab.matieres|Matières
+ecole.tab.sessions|Sessions
+ecole.tab.examens|Examens & Notes
+ecole.tab.attestations|Attestations
+ecole.tab.diplomes|Diplômes
+ecole.tab.soutenances|Soutenances
+ecole.scolarite.title|Scolarité
+ecole.scolarite.subtitle|Inscriptions, paiements, notes, classes, planning & absences
+ecole.scolarite.kpi.total|Total inscrits
+ecole.scolarite.kpi.actifs|Actifs
+ecole.scolarite.kpi.suspendus|Suspendus
+ecole.scolarite.kpi.diplomes|Diplômés
+ecole.scolarite.newStudent|Nouvel étudiant
+ecole.scolarite.searchPlh|Rechercher un étudiant…
+ecole.scolarite.filterAll|Tous
+ecole.scolarite.noStudent|Aucun étudiant
+ecole.scolarite.save|Enregistrer
+ecole.scolarite.cancel|Annuler
+ecole.scolarite.delete|Supprimer
+ecole.scolarite.print|Imprimer
+ecole.scolarite.unlock|Débloquer
+ecole.scolarite.suspend|Suspendre
+ecole.scolarite.unblock|Débloquer le compte
+ecole.scolarite.codeDeblocage|Code de déblocage
+ecole.daac.title|DAAC — Direction des Affaires Académiques
+ecole.daac.subtitle|Programmes, sessions, examens, délibérations, diplômes & soutenances
+ecole.daac.kpi.actifs|Étudiants actifs
+ecole.daac.kpi.sessions|Sessions en cours
+ecole.daac.kpi.diplomes|Diplômes en attente
+ecole.daac.kpi.soutenances|Soutenances planifiées
+ecole.direction.title|Direction Générale
+ecole.direction.subtitle|Vue globale, finances, événements & communication
+ecole.direction.tab.vue|Vue globale
+ecole.direction.tab.finances|Finances
+ecole.direction.tab.evenements|Événements
+ecole.direction.tab.bourses|Bourses
+ecole.direction.tab.partenaires|Partenaires
+ecole.direction.tab.communication|Communication
+ecole.direction.tab.diplomes|Diplômes
+ecole.direction.tab.soutenances|Soutenances
+ecole.direction.kpi.etudiants|Étudiants
+ecole.direction.kpi.enseignants|Enseignants
+ecole.direction.kpi.classes|Classes
+ecole.direction.kpi.tauxPaie|Taux de recouvrement
+ecole.direction.kpi.revenuMois|Recettes du mois
+ecole.direction.kpi.revenuAnnee|Recettes annuelles
+ecole.direction.kpi.impayes|Impayés
+ecole.direction.block|Bloquer auto impayés
+ecole.direction.export|Exporter CSV
+ecole.direction.newEvent|Nouvel événement
+ecole.direction.newBourse|Nouvelle bourse
+ecole.direction.newPartner|Nouveau partenaire
+ecole.direction.sendMessage|Envoyer un message
+ecole.direction.noEvent|Aucun événement
+ecole.direction.noBourse|Aucune bourse
+ecole.direction.noPartner|Aucun partenaire
+ecole.etu.title|Espace Étudiant
+ecole.etu.subtitle|Consultez votre dossier académique, notes et paiements
+ecole.etu.searchPlh|Votre numéro étudiant (ETU-XXXX-XXX)…
+ecole.etu.access|Accéder à mon dossier
+ecole.etu.tab.notes|Mes notes
+ecole.etu.tab.paiements|Mes paiements
+ecole.etu.tab.absences|Mes absences
+ecole.etu.tab.alertes|Alertes
+ecole.etu.noStudent|Étudiant introuvable
+ecole.etu.blocked|Compte suspendu
+ecole.etu.unlock|Débloquer
+ecole.etu.suspend|Suspendre
+ecole.etu.code|Code de déblocage
+ecole.etu.kpi.moyenne|Moyenne
+ecole.etu.kpi.paye|Payé
+ecole.etu.kpi.absences|Absences
+ecole.etu.kpi.alerts|Alertes
+ecole.etu.noNotes|Aucune note
+ecole.etu.noPaiements|Aucun paiement
+ecole.etu.noAbsences|Aucune absence
+ecole.etu.noAlerts|Aucune alerte
+ecole.parent.title|Espace Parent
+ecole.parent.subtitle|Suivez le parcours scolaire de votre enfant
+ecole.parent.searchPlh|Numéro étudiant (ETU-XXXX-XXX)…
+ecole.parent.access|Voir le dossier
+ecole.parent.tab.notes|Notes
+ecole.parent.tab.paiements|Paiements
+ecole.parent.tab.absences|Absences
+ecole.parent.tab.alertes|Alertes
+ecole.parent.noStudent|Étudiant introuvable
+ecole.parent.kpi.moyenne|Moyenne
+ecole.parent.kpi.paye|Payé
+ecole.parent.kpi.absences|Absences
+ecole.parent.kpi.alerts|Alertes non lues
+ecole.parent.noNotes|Aucune note
+ecole.parent.noPaiements|Aucun paiement
+ecole.parent.noAbsences|Aucune absence
+ecole.parent.noAlerts|Aucune alerte
+ecole.formateur.title|Espace Formateur
+ecole.formateur.subtitle|Gérez vos classes, notes et emploi du temps
+ecole.formateur.tab.classes|Mes Classes
+ecole.formateur.tab.notes|Saisie des notes
+ecole.formateur.tab.planning|Planning
+ecole.formateur.tab.absences|Suivi des présences
+ecole.formateur.noClass|Aucune classe assignée
+ecole.formateur.noStudent|Aucun étudiant
+ecole.formateur.save|Enregistrer
+ecole.formateur.cancel|Annuler
+ecole.formateur.addNote|Ajouter une note
+ecole.formateur.markAbsence|Marquer absent
+ecole.formateur.kpi.classes|Classes
+ecole.formateur.kpi.etudiants|Étudiants
+ecole.formateur.kpi.matieres|Matières
+ecole.formateur.searchPlh|Rechercher un étudiant…
+ecole.miaa.title|MIAA — Assistant IA Scolaire
+ecole.miaa.subtitle|Analyse scolaire, paiements, absences & recommandations
+ecole.miaa.prompt.paiements|Analyse des paiements
+ecole.miaa.prompt.absences|Taux d\
+ecole.miaa.prompt.perf|Performance académique
+ecole.miaa.prompt.risque|Étudiants à risque
+ecole.miaa.prompt.rapport|Rapport de direction
+ecole.miaa.prompt.rh|Recommandations RH
+ecole.miaa.kpi.etudiants|Étudiants
+ecole.miaa.kpi.actifs|Actifs
+ecole.miaa.kpi.suspendus|Suspendus
+ecole.miaa.kpi.revenuMois|Recettes du mois
+ecole.miaa.kpi.revenuAnnee|Recettes annuelles
+ecole.miaa.kpi.absences|Absences
+ecole.miaa.placeholder|Posez une question sur votre école…
+ecole.miaa.send|Envoyer
+ecole.miaa.welcome|Bonjour ! Je suis MIAA, votre assistant IA scolaire.
+ecole.miaa.loadCtx|Chargement du contexte scolaire…
+ecole.miaa.thinking|Analyse en cours…
+ecole.compta.title|Comptabilité École
+ecole.compta.subtitle|Journal OHADA, grand livre, bilan, trésorerie & prévisions
+ecole.compta.tab.journal|Journal OHADA
+ecole.compta.tab.grandlivre|Grand Livre
+ecole.compta.tab.bilan|Bilan
+ecole.compta.tab.tresorerie|Trésorerie
+ecole.compta.tab.previsions|Prévisions IA
+ecole.compta.kpi.produits|Produits
+ecole.compta.kpi.charges|Charges
+ecole.compta.kpi.solde|Solde
+ecole.compta.kpi.tresorerie|Trésorerie
+ecole.compta.addEntry|Ajouter une écriture
+ecole.compta.export|Exporter CSV
+ecole.compta.noData|Aucune écriture
+ecole.compta.save|Enregistrer
+ecole.compta.cancel|Annuler
+ecole.rh.title|RH École
+ecole.rh.subtitle|Gestion du personnel enseignant, contrats et paie
+ecole.rh.newTeacher|Nouveau formateur
+ecole.rh.searchPlh|Rechercher un formateur…
+ecole.rh.tab.liste|Liste du personnel
+ecole.rh.tab.contrats|Contrats
+ecole.rh.tab.paie|Paie
+ecole.rh.tab.planning|Planning
+ecole.rh.kpi.total|Total personnel
+ecole.rh.kpi.actifs|Actifs
+ecole.rh.kpi.conges|En congé
+ecole.rh.kpi.masseSalariale|Masse salariale
+ecole.rh.noStaff|Aucun personnel
+ecole.rh.save|Enregistrer
+ecole.rh.cancel|Annuler
+ecole.rh.delete|Supprimer
+ecole.rh.confirm|Confirmer la suppression ?
+ecole.rh.pay|Calculer la paie
+ecole.rh.payAll|Payer tous
+ecole.rh.filter.all|Tous
+ecole.rh.filter.actif|Actif
+ecole.rh.filter.conge|En congé
+ecole.rh.filter.inactif|Inactif
+ecole.rh.colNom|Nom
+ecole.rh.colMatiere|Matière
+ecole.rh.colStatut|Statut
+ecole.rh.colSalaire|Salaire
+ecole.rh.colActions|Actions
+rh.analytics.title|Analytics RH
+rh.analytics.subtitle|Indicateurs clés et tendances de votre effectif
+rh.analytics.kpi.headcount|Effectif total
+rh.analytics.kpi.turnover|Turnover
+rh.analytics.kpi.absRate|Taux d\
+rh.analytics.kpi.payroll|Masse salariale
+rh.documents.title|Documents RH
+rh.documents.subtitle|Contrats, attestations et documents officiels
+rh.documents.tab.contrats|Contrats
+rh.documents.tab.attestations|Attestations
+rh.documents.tab.autres|Autres documents
+rh.documents.newDoc|Nouveau document
+rh.documents.searchPlh|Rechercher un document…
+rh.documents.noDocuments|Aucun document
+rh.paie.title|Paie & Bulletins
+rh.paie.subtitle|Calcul et génération des bulletins de paie
+rh.paie.run|Lancer la paie
+rh.paie.export|Exporter
+rh.paie.noPayroll|Aucun bulletin de paie
+rh.paie.kpi.employes|Employés payés
+rh.paie.kpi.masseSalariale|Masse salariale brute
+rh.paie.kpi.net|Net à payer total
+rh.paie.kpi.cnss|Cotisations CNSS
+rh.portail.title|Portail Employé
+rh.portail.subtitle|Accédez à vos informations RH personnelles
+rh.portail.myInfo|Mes informations
+rh.portail.myPayslips|Mes bulletins de paie
+rh.portail.myLeaves|Mes congés
+rh.portail.myDocs|Mes documents
+rh.recrutement.title|Recrutement
+rh.recrutement.subtitle|Offres d\
+rh.recrutement.tab.postes|Postes ouverts
+rh.recrutement.tab.candidats|Candidats
+rh.recrutement.tab.entretiens|Entretiens
+rh.recrutement.newPosting|Nouvelle offre
+rh.recrutement.searchPlh|Rechercher un poste ou candidat…
+rh.recrutement.noPostings|Aucune offre
+rh.recrutement.statut.ouvert|Ouvert
+rh.recrutement.statut.suspendu|Suspendu
+rh.recrutement.statut.clos|Clôturé
+stock.produits.title|Catalogue Produits
+stock.produits.subtitle|Gérez votre catalogue de produits et références
+stock.produits.tab.liste|Liste
+stock.produits.tab.fiches|Fiches
+stock.produits.newProduct|Nouveau produit
+stock.produits.searchPlh|Rechercher un produit…
+stock.produits.noProducts|Aucun produit
+stock.produits.kpi.total|Total références
+stock.produits.kpi.alerte|En alerte
+stock.produits.kpi.rupture|En rupture
+stock.produits.kpi.valeur|Valeur totale
+stock.commandes.title|Commandes Fournisseurs
+stock.commandes.subtitle|Passez et suivez vos commandes
+stock.commandes.newOrder|Nouvelle commande
+stock.commandes.noOrders|Aucune commande
+stock.commandes.kpi.total|Total commandes
+stock.commandes.kpi.pending|En cours
+stock.commandes.kpi.valeur|Valeur totale
+stock.commandes.stat.brouillon|Brouillon
+stock.commandes.stat.envoye|Envoyée
+stock.commandes.stat.recu|Reçue
+stock.commandes.stat.annule|Annulée
+stock.receptions.title|Réceptions
+stock.receptions.subtitle|Enregistrez les réceptions de marchandises
+stock.receptions.newReception|Nouvelle réception
+stock.receptions.noReceptions|Aucune réception
+stock.receptions.kpi.total|Total réceptions
+stock.receptions.kpi.valeur|Valeur reçue
+stock.receptions.kpi.fournisseurs|Fournisseurs
+stock.sorties.title|Sorties de Stock
+stock.sorties.subtitle|Mouvements de sortie et consommations
+stock.sorties.newSortie|Nouvelle sortie
+stock.sorties.noSorties|Aucune sortie
+stock.sorties.kpi.total|Total sorties
+stock.sorties.kpi.count|Nombre d\
+stock.sorties.kpi.valeur|Valeur sortie
+stock.retours.title|Retours
+stock.retours.subtitle|Gérez les retours clients et fournisseurs
+stock.retours.tab.client|Retours clients
+stock.retours.tab.fournisseur|Retours fournisseurs
+stock.retours.newReturn|Nouveau retour
+stock.retours.noReturns|Aucun retour
+stock.retours.kpi.total|Total retours
+stock.retours.kpi.valeur|Valeur retournée
+stock.inventaires.title|Inventaires
+stock.inventaires.subtitle|Vérifiez et ajustez vos stocks physiques
+stock.inventaires.newInventory|Nouvel inventaire
+stock.inventaires.noInventories|Aucun inventaire
+stock.inventaires.kpi.total|Total inventaires
+stock.inventaires.kpi.ecarts|Écarts détectés
+stock.inventaires.kpi.valeur|Valeur inventoriée
+stock.achats.title|Achats Fournisseurs
+stock.achats.subtitle|Gérez vos achats et relations fournisseurs
+stock.achats.newPurchase|Nouvel achat
+stock.achats.noPurchases|Aucun achat
+stock.achats.kpi.total|Total achats
+stock.achats.kpi.valeur|Valeur totale
+stock.achats.kpi.fournisseurs|Fournisseurs
+stock.analytics.title|Analytics Stock
+stock.analytics.subtitle|Indicateurs de performance et analyse des mouvements
+stock.analytics.kpi.valeur|Valeur du stock
+stock.analytics.kpi.rotation|Rotation
+stock.analytics.kpi.coverage|Couverture (jours)
+stock.analytics.kpi.ruptures|Ruptures
+treso.encaissements.title|Encaissements
+treso.encaissements.subtitle|Enregistrez vos entrées de trésorerie
+treso.encaissements.newEntry|Nouvel encaissement
+treso.encaissements.noEntries|Aucun encaissement
+treso.encaissements.kpi.total|Total encaissé
+treso.encaissements.kpi.mois|Ce mois
+treso.encaissements.kpi.count|Nombre d\
+treso.decaissements.title|Décaissements
+treso.decaissements.subtitle|Enregistrez vos sorties de trésorerie
+treso.decaissements.newEntry|Nouveau décaissement
+treso.decaissements.noEntries|Aucun décaissement
+treso.decaissements.kpi.total|Total décaissé
+treso.decaissements.kpi.mois|Ce mois
+treso.banques.title|Comptes Bancaires
+treso.banques.subtitle|Gérez vos comptes et relevés bancaires
+treso.banques.newAccount|Nouveau compte
+treso.banques.noAccounts|Aucun compte bancaire
+treso.banques.kpi.total|Solde total
+treso.banques.kpi.movement|Mouvements du mois
+treso.banques.kpi.accounts|Comptes actifs
+treso.caisses.title|Caisses
+treso.caisses.subtitle|Gérez vos caisses enregistreuses
+treso.caisses.newCaisse|Nouvelle caisse
+treso.caisses.noCaisses|Aucune caisse
+treso.caisses.kpi.total|Solde total
+treso.caisses.kpi.movement|Mouvements du mois
+treso.caisses.kpi.caisses|Caisses actives
+treso.previsions.title|Prévisions de Trésorerie
+treso.previsions.subtitle|Projection IA de vos flux financiers
+treso.previsions.generate|Générer les prévisions
+treso.previsions.horizon|Horizon de prévision
+treso.previsions.noData|Aucune donnée de prévision
+treso.previsions.kpi.entrees|Entrées prévues
+treso.previsions.kpi.sorties|Sorties prévues
+treso.previsions.kpi.solde|Solde prévisionnel
+treso.alertes.title|Alertes Trésorerie
+treso.alertes.subtitle|Surveillez les seuils critiques de trésorerie
+treso.alertes.newAlert|Nouvelle alerte
+treso.alertes.noAlerts|Aucune alerte active
+treso.alertes.kpi.active|Alertes actives
+treso.alertes.kpi.critical|Critiques
+treso.alertes.kpi.warning|Avertissements
+treso.analytics.title|Analytics Trésorerie
+treso.analytics.subtitle|Analyse et tendances de vos flux financiers
+treso.analytics.kpi.cashflow|Cash Flow net
+treso.analytics.kpi.days|Jours de trésorerie
+treso.analytics.kpi.ratio|Ratio de liquidité
+compta.journal.colCompte|Compte
+compta.journal.filterAll|Toutes sources
+compta.journal.unbalanced|⚠ Non équilibré
+action.filtrer|Filtrer
+action.suivant|Suivant
+action.precedent|Précédent
+statut.en_cours|En cours
+statut.termine|Terminé
+statut.annule|Annulé
+statut.suspendu|Suspendu
+statut.bloque|Bloqué
+msg.copie|Copié dans le presse-papiers
+msg.acces_refuse|Accès refusé
+msg.session_expiree|Session expirée, veuillez vous reconnecter
