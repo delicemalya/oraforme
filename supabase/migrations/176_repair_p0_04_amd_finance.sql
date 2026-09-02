@@ -153,8 +153,18 @@ WHERE  tenant_id = 'b93b7c3d-815b-4336-bbb2-ac24cda0edb2'
 SELECT fn_ae_retry_errors('b93b7c3d-815b-4336-bbb2-ac24cda0edb2', 'FAC-002', INTERVAL '10 years') AS remis_en_attente;
 SELECT fn_ae_process_pending('b93b7c3d-815b-4336-bbb2-ac24cda0edb2', 'FAC-002', 200)            AS retraites;
 
--- 5. Soldes de trésorerie recalculés depuis journal_entries
-SELECT fn_sync_tresorerie_soldes('b93b7c3d-815b-4336-bbb2-ac24cda0edb2');
+-- 5. Soldes de trésorerie recalculés depuis journal_entries — si la fonction
+--    existe. Production du 2026-09-02 : fn_sync_tresorerie_soldes(uuid) absente
+--    (42883) alors que les migrations 046 et 133 la définissent. Le moteur
+--    l'appelle déjà sous exception silencieuse ; ici, appel conditionnel.
+DO $$
+BEGIN
+  IF to_regprocedure('fn_sync_tresorerie_soldes(uuid)') IS NOT NULL THEN
+    PERFORM fn_sync_tresorerie_soldes('b93b7c3d-815b-4336-bbb2-ac24cda0edb2'::uuid);
+  ELSE
+    RAISE NOTICE 'fn_sync_tresorerie_soldes(uuid) absente : soldes non resynchronisés';
+  END IF;
+END $$;
 
 COMMIT;
 

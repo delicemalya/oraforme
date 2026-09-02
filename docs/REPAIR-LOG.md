@@ -690,3 +690,9 @@ Le bloc 176 a été resserré : une écriture d'origine n'est retirée que si sa
 ré-émission a produit la sienne, intacte (table temporaire `tmp_originaux`) ;
 garde supplémentaire : chaque original doit avoir une ré-émission traitée.
 Attendu : 192 lignes de caisse et 48 écritures archivées, 96 FAC-002 traités.
+
+Première exécution de 176 (2026-09-02) : annulée en entier par l'étape 5,
+`fn_sync_tresorerie_soldes(uuid)` **n'existe pas en production** (42883) alors
+que les migrations 046 et 133 la définissent. Aucune donnée modifiée
+(transaction unique). Appel rendu conditionnel via `to_regprocedure`. À
+ajouter au ticket « migrations non appliquées » avec 148.
