@@ -759,3 +759,20 @@ ANO-C08 est fermée : 0 événement en `error` ou `dead_letter` sur les 771.
 - **168** : réécriture de 76 policies par expression régulière. Reportée : à
   jouer en recette d'abord (ANO-P03).
 - **137** `fn_transfer_to_journal` : legacy, non réappliquée volontairement.
+
+### Bloc A appliqué en production (2026-09-02)
+
+| Contrôle | Résultat |
+|---|---|
+| 133 | `fn_sync_tresorerie_soldes(uuid)` et `vue_tresorerie_unifiee` présentes |
+| 148 | 5 règles BTP/AGR actives ; ordre des versions 1.9.0 → 1.10.0 → 1.11.0 |
+| 155 | `taille_entreprise` NOT NULL + CHECK ; répartition tpe=8, pme=10, grande=8 |
+| 165 | 0 fonction `public` sans `search_path` |
+| Soldes AMD FINANCE | banques 943 464 738 · caisses 118 900 · wallets 0 |
+
+**Résidu relevé sur 133** : `fn_sync_tresorerie_soldes` affecte à **chaque**
+compte bancaire le solde total du 521 (pas de ventilation par compte). AMD
+FINANCE a 3 comptes : la somme affichée vaut trois fois la banque réelle
+(≈ 314 488 246 F). Défaut du dépôt, pas de la réapplication. À traiter avec
+la trésorerie (ticket ultérieur, ventilation par `compte_bancaire_id` dans
+`journal_entries` ou choix d'un compte principal).
