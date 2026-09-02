@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
+import { automationHeaders } from '@/lib/api/require-automation'
 import { uploadDocument } from '@/lib/storage/storage-service'
 import type { DocCategory } from '@/lib/storage/storage-service'
 
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
   if (result.document?.id) {
     fetch(`${req.nextUrl.origin}/api/ocr/extract`, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'x-internal': 'true' },
+      headers: { 'Content-Type': 'application/json', ...automationHeaders() },
       body:    JSON.stringify({ documentId: result.document.id, tenantId: ctx.tid }),
     }).catch(() => {})
   }

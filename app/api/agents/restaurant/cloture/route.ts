@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAutomationSecret } from '@/lib/api/require-automation'
 
 export const runtime = 'nodejs'
 
@@ -12,7 +13,10 @@ function getSupabase() {
 
 // Cloture journalière restaurant — lancée chaque soir à 23h59
 // Calcule le CA du jour, ferme les commandes ouvertes, crée l'entrée caisse
-export async function GET() {
+export async function GET(req: Request) {
+  const denied = requireAutomationSecret(req)
+  if (denied) return denied
+
   const supabase = getSupabase()
   const now = new Date()
   const today = now.toISOString().split('T')[0]

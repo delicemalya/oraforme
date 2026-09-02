@@ -537,7 +537,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     if (!tenantData?.tenant_id) return
     setLoadNotifs(true)
     try {
-      const r = await fetch(`/api/miaa/notifications?tenant_id=${tenantData.tenant_id}`)
+      const r = await fetch('/api/miaa/notifications')
       const d = await r.json()
       setNotifs(d.notifications ?? [])
       setUnreadCount(d.count ?? 0)
@@ -547,7 +547,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
   useEffect(() => { if (activeTab === 'alertes' && open) loadNotifications() }, [activeTab, open, loadNotifications])
   useEffect(() => {
     if (open && tenantData?.tenant_id)
-      fetch(`/api/miaa/notifications?tenant_id=${tenantData.tenant_id}`)
+      fetch('/api/miaa/notifications')
         .then(r => r.json()).then(d => setUnreadCount(d.count ?? 0)).catch(() => {})
   }, [open, tenantData?.tenant_id])
 
@@ -807,7 +807,7 @@ export default function MIAAAssistant({ tenantData, module = 'auto', langue }: P
     if (!tenantData?.tenant_id) return
     await fetch('/api/miaa/notifications', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenant_id: tenantData.tenant_id, notification_id: id, action: 'marquer_lu' }),
+      body: JSON.stringify({ notification_id: id, action: 'marquer_lu' }),
     })
     setNotifs(prev => prev.map(n => n.id === id ? { ...n, lu: true } : n))
     setUnreadCount(prev => Math.max(0, prev - 1))

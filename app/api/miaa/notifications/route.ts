@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { genererNotifications, sauvegarderNotifications } from '@/lib/miaa/notifications'
+import { requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -10,10 +11,13 @@ function getSupabase() {
   )
 }
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url)
-  const tenantId = searchParams.get('tenant_id')
-  if (!tenantId) return Response.json({ notifications: [] })
+// ANO-C05 — le tenant est dérivé de la session, jamais de la query string.
+// Cette route était dans AUTOMATION_PATHS (proxy.ts) et acceptait un tenant_id
+// arbitraire d'un appelant anonyme : lecture ET écriture sur n'importe quel tenant.
+export async function GET(_req: Request) {
+  const ctx = await requireTenant()
+  if (!ctx.ok) return ctx.error
+  const tenantId = ctx.tid
 
   const supabase = getSupabase()
 
@@ -41,8 +45,12 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { tenant_id, notification_id, action } = await req.json()
-  if (!tenant_id || !notification_id) return Response.json({ ok: false }, { status: 400 })
+  const ctx = await requireTenant()
+  if (!ctx.ok) return ctx.error
+  const tenant_id = ctx.tid
+
+  const { notification_id, action } = await req.json()
+  if (!notification_id) return Response.json({ ok: false }, { status: 400 })
 
   const supabase = getSupabase()
 

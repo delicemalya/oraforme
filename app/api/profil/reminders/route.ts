@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { createWhatsappService } from '@/lib/whatsapp-business'
+import { requireAutomationSecret } from '@/lib/api/require-automation'
 
 // ── Fenêtres de rappel (en heures) ────────────────────────────────────────────
 // On envoie quand le temps restant passe SOUS ce seuil ET n'a pas encore été envoyé.
@@ -36,11 +37,9 @@ interface ProfileRow {
 }
 
 export async function POST(req: NextRequest) {
-  // ── Auth : secret de cron ou superadmin ──────────────────────────────────
-  const secret = req.headers.get('x-automation-secret')
-  if (secret !== process.env.AUTOMATION_SECRET) {
-    return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
-  }
+  // ── Auth : secret d'automatisation (pg_cron, migration 167) ───────────────
+  const denied = requireAutomationSecret(req)
+  if (denied) return denied
 
   const body    = await req.json().catch(() => ({})) as { dry_run?: boolean }
   const dryRun  = body.dry_run === true

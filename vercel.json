@@ -12,7 +12,6 @@
     { "path": "/api/agents/ecole/impayes",        "schedule": "0 8 * * 1"  },
     { "path": "/api/agents/restaurant/cloture",   "schedule": "59 23 * * *" },
     { "path": "/api/miaa/proactif",               "schedule": "0 * * * *"   },
-    { "path": "/api/agents/miaa-autonome",        "schedule": "0 6 * * *"   },
-    { "path": "/api/miaa/notifications",          "schedule": "0 8 * * *"   }
+    { "path": "/api/agents/miaa-autonome",        "schedule": "0 6 * * *"   }
   ]
 }
