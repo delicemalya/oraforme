@@ -494,3 +494,127 @@ La première requête chiffre la dette héritée (bulletins jamais comptabilisé
 depuis la migration 141). La deuxième doit montrer les nouveaux événements en
 `processed`. La troisième doit renvoyer `transaction_id` NULL sur tous les
 PAI-001 : la sortie de trésorerie n'apparaît que sur PAI-002.
+
+---
+
+## P0-04 — ÉVÉNEMENTS COMPTABLES EN ERREUR ET TRÉSORERIE FANTÔME
+
+**Statut :** EN COURS — correctif moteur écrit et testé, non appliqué ; diagnostic production requis avant la réparation des données
+**Date :** 2026-09-02
+**Anomalie couverte :** ANO-C08 de `docs/RESTART-AUDIT-AZ.md` (336 événements en `error`, 240 sans message, reprise à l'arrêt)
+
+### Anomalie
+
+Répartition relevée par l'audit : 192 × PAI-001, 96 × FAC-002, 48 × ACH-001,
+tous créés le 2026-06-27 entre 16:36 et 17:06 UTC. 96 portent l'erreur 23505
+`transactions_source_unique` ; 240 n'ont aucun message et `retry_count = 0`.
+
+### Cause racine
+
+**Deux causes, toutes deux établies par le code.**
+
+**1. La ligne de trésorerie est décidée par module, pas par événement.**
+`fn_ae_execute_event` crée une ligne `transactions` dès que
+`fn_ae_has_treasury_impact(event_type)` est vrai, et cette fonction ne regarde
+que le préfixe (`138:585`, reconduite en `146:94`, `147:101`, `148:75`). FAC-001
+(facture émise, 411/706) hérite du module FAC et crée une **entrée de caisse
+du TTC à l'émission**, avant tout encaissement. Le règlement FAC-002, seul
+événement FAC qui touche 5xx, échoue ensuite sur `UNIQUE (tenant_id, source,
+source_id)` (`023:82`) : ce sont les 96 erreurs 23505. Même mécanique pour
+ACH-001 → ACH-002, SAN-001 → SAN-002, AGR-001 → AGR-002, et PAI-001 → PAI-002
+dès que `montant_ttc > 0` (côté routes, corrigé en P0-03). Le document de
+conception prévoyait l'inverse : « Trésorerie — géré par FAC-002 »
+(`docs/plan-directeur/migration-139-facturation-fac.md:43`). Les 22 émetteurs
+passent un `montant_ttc` sur des constatations (FAC-001, ACH-001, SAN-001,
+AGR-001, STK-001/002) : le défaut est dans le moteur, pas dans les routes.
+
+La synchronisation des soldes (`fn_sync_tresorerie_soldes`) suit la même
+liste (`'TRE','MOB','FAC','SAN','RES','ECO'`) : jamais appelée pour PAI-002,
+ACH-002, BOI, HOT, ONG, BTP, AGR, qui touchent pourtant 521/571.
+
+**2. Les 240 événements sans message ne viennent pas du moteur.** Son
+gestionnaire d'exception écrit toujours `SQLERRM || SQLSTATE` et incrémente
+`retry_count` (`142.5:173-178`). Un statut `error` avec message nul et
+`retry_count = 0` ne peut résulter que d'un UPDATE direct. Or 240 = 192 + 48,
+soit exactement les PAI-001 et ACH-001 que `scripts/seed-demo-data.ts`
+ré-émet dans ses sections K0 et K0b « pour bulletins/achats existants », avec
+ce commentaire : *« events en statut 'error' après reset → ON CONFLICT ne
+bloquera plus »* (`seed-demo-data.ts:475`). Le script cible **le tenant le
+plus ancien de la base** (`getTenantId()`, `.order('created_at').limit(1)`)
+et lit `.env.local`, qui pointe la production. La campagne du 27 juin est
+l'exécution de ce script : 192 bulletins, 192 factures, 48 achats, 192
+transactions, 96 mouvements de stock, 8 employés, 30 fournisseurs et 3
+comptes bancaires de démonstration, sur un tenant de production. Les
+originaux ont été basculés en `error` à la main pour contourner
+`uidx_ae_inflight`, puis ré-émis.
+
+Corollaire : les 339 474 246 FCFA « bloqués » de l'audit sont des montants de
+démonstration. Le défaut n°1, lui, touche toute facture réelle émise avec un
+TTC depuis la migration 139.
+
+### Consommateurs identifiés
+
+| Consommateur | Effet du défaut n°1 |
+|---|---|
+| `transactions` (journal de caisse), `fn_finance_kpis` (migration 150, CA de repli sur `transactions.type='entree'`), page Finance | Encaissement compté à l'émission de la facture ; règlement jamais enregistré |
+| `PATCH /api/factures/[id]` statut `payee` | FAC-002 en `error` 23505, silencieusement (la route ne lit pas le retour du rpc) |
+| `PATCH /api/achats` statut `paye`, `SAN-002`, `AGR-002` | Idem |
+| `comptes_bancaires.solde`, `caisses.solde`, `mobile_money_wallets.solde_actuel` | Non resynchronisés après PAI-002, ACH-002, BOI, HOT, ONG, BTP, AGR |
+
+### Correction — partie 1, moteur (écrite, non appliquée)
+
+`supabase/migrations/175_treasury_impact_from_rules.sql` : `CREATE OR REPLACE`
+de `fn_ae_execute_event`, corps identique à 142.5 hors bloc trésorerie.
+
+- Pendant la boucle des règles, chaque séquence dont `account_resolver` vaut
+  `treasury_debit` s'accumule en entrée, `treasury_credit` en sortie.
+- La ligne `transactions` n'est créée que si une telle séquence a été
+  appliquée, pour le solde (entrée − sortie), sens par le signe, rien si nul.
+  FAC-001, ACH-001, SAN-001, AGR-001, PAI-001, STK-* n'en créent plus jamais,
+  quel que soit leur `montant_ttc`.
+- `fn_sync_tresorerie_soldes` est appelée dans ce même cas, sans liste.
+- `accounting_event_log.rules_snapshot` porte `treasury_in` / `treasury_out`.
+- Version moteur 1.11.0. `fn_ae_has_treasury_impact` et `fn_ae_is_income`
+  restent définies, plus consultées par le moteur.
+
+Aucune donnée modifiée par la migration. Aucune route touchée.
+
+### Correction — partie 2, données (à faire après diagnostic)
+
+Bloquée tant que la production n'a pas répondu à trois questions : quel est le
+tenant le plus ancien (démo ou client réel), les 240 originaux ont-ils laissé
+des écritures `journal_entries` (double comptabilisation), et combien de
+lignes `transactions` fantômes ont été créées par des constatations sur des
+tenants réels. Le SQL de diagnostic est remis à l'utilisateur ; la réparation
+(suppression des lignes fantômes référencées par `accounting_event_log`, puis
+`fn_ae_retry_errors` + `fn_ae_process_pending` sur les 96 FAC-002) sera écrite
+sur ces chiffres, en bloc distinct, avec aperçu préalable.
+
+### Tests
+
+| Fichier | Cas |
+|---|---|
+| `lib/architecture/moteur-tresorerie-regles.test.ts` | 28 — la dernière définition du moteur est celle de 175 ; elle ne consulte plus `fn_ae_has_treasury_impact` ni `fn_ae_is_income` ; accumulation debit/credit ; ligne `transactions` conditionnée au solde de trésorerie ; sync des soldes sans liste ; garde-fous 142.5 conservés (CAS, pays, message d'erreur, `retry_count`) ; audit `treasury_in/out` ; catalogue : 7 constatations sans résolveur de trésorerie, 12 mouvements de caisse avec le bon résolveur ; la migration ne contient ni DELETE ni UPDATE hors moteur ; version 1.11.0 |
+
+### Résultats
+
+```
+tsc --noEmit      0 erreur
+vitest            735 tests, 735 passés, 31 fichiers
+```
+
+Suite avant P0-04 : 707 tests. Après : 735, soit 28 nouveaux.
+
+### Non couvert, et pourquoi
+
+- **Reprise automatique.** Aucun appel à `fn_ae_retry_errors` ni
+  `fn_ae_process_pending` n'existe dans le code ni dans les crons Vercel. Le
+  trigger traite les événements de façon synchrone, donc `pending` est rare ;
+  une reprise automatique des `error` rejouerait aussi les vrais doublons.
+  Reprise laissée manuelle, à documenter après la partie 2.
+- **Les routes ignorent le retour de `emit_accounting_event`.** Un événement
+  en `error` reste invisible de l'appelant. Traité route par route dans les
+  tickets qui les touchent (P0-03 pour la paie) ; généralisation en P1.
+- **Le script de démonstration reste exécutable contre la production.** Il
+  lit `.env.local` et choisit le tenant le plus ancien. Verrou à poser en
+  phase 0.1 (environnement de recette), hors périmètre.
