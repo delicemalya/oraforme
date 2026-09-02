@@ -721,3 +721,41 @@ ANO-C08 est fermée : 0 événement en `error` ou `dead_letter` sur les 771.
 - **Migration 148 absente** : BTP-001/002 et AGR-001 émis sans règle.
 - **4 bulletins payés sans événement** sur d'autres tenants (contrôle P0-03) :
   rejouables depuis la page de paie une fois la branche déployée.
+
+---
+
+## P0-05 — MIGRATIONS NON APPLIQUÉES EN PRODUCTION
+
+**Statut :** EN COURS — diagnostic fait, bloc A composé, non appliqué
+**Date :** 2026-09-02
+**Anomalie couverte :** CR-1 / ANO-P04 / §G de `docs/RESTART-AUDIT-AZ.md` (la production n'a jamais été construite par les migrations), restreint aux migrations 130 → 176
+
+### Diagnostic production (47 marqueurs, un par migration)
+
+| Migration | Marqueur | Production |
+|---|---|---|
+| 130, 131, 132, 135 | fonctions legacy de journalisation | présentes |
+| **133** | `fn_sync_tresorerie_soldes(uuid)`, `vue_tresorerie_unifiee` | **absentes** |
+| 137 | `fn_transfer_to_journal` | absente (fonction legacy, remplacée par le moteur, non réappliquée) |
+| 138 → 147 | moteur, règles FAC 4 · SAN 3 · PAI 6 · RES 3 · ECO 1 · HOT 2 · ONG 1 · BOI 2 · STK+ACH 4 | présentes |
+| **148** | règles BTP + AGR | **0 règle** |
+| 149 → 154 | `fn_finance_kpis` dernière version, `v_treso_summary`, `fn_check_tenant_access` | présentes |
+| **155** | `tenants.taille_entreprise` NOT NULL + CHECK | **nullable, sans contrainte** (fail-open ANO-M04) |
+| 156 | `tenant_modules` | 467 lignes |
+| **157, 158, 159** | `auth_logs`, `policy_violations`, `fn_policy_context_counters` | **absentes** — chaque connexion tente d'écrire dans `auth_logs` et échoue en silence (`lib/identity/auth-logger.ts:37`) |
+| 160 → 164, 166, 167, 170 → 176 | précision `factures.tva`, révocations anon, `pg_net`, policies, cron via vault, `facture_lignes`, stock, `purchases`, moteur 1.11.0, `repair_archive` | présentes |
+| **165** | fonctions `public` sans `search_path` fixé | **2** (dont `fn_ae_execute_event` recréée par 175) |
+| **168** | policies avec `auth.uid()` non encapsulé | **76** — migration jamais jouée |
+| Triggers | `transactions` : `trg_update_account_balance` seul ; `achats` : aucun ; `bulletins_paie` : aucun ; `factures` : `trg_sync_facture_tva_montant` (172) | conforme au moteur |
+
+### Plan
+
+- **Bloc A** (`docs/runbooks/p0-05-bloc-A.sql`, assemblé depuis les fichiers du
+  dépôt, une seule transaction, garde-fous en tête) : 133, 148 (version 1.10.0
+  replacée avant 1.11.0 dans l'ordre du moteur), 155, 165, puis recalcul des
+  soldes d'AMD FINANCE.
+- **Bloc B** : 157, 158, 159. La policy de 158 lit `user_tenants` : présence à
+  vérifier avant.
+- **168** : réécriture de 76 policies par expression régulière. Reportée : à
+  jouer en recette d'abord (ANO-P03).
+- **137** `fn_transfer_to_journal` : legacy, non réappliquée volontairement.
