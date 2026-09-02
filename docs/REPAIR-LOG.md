@@ -618,3 +618,31 @@ Suite avant P0-04 : 707 tests. Après : 735, soit 28 nouveaux.
 - **Le script de démonstration reste exécutable contre la production.** Il
   lit `.env.local` et choisit le tenant le plus ancien. Verrou à poser en
   phase 0.1 (environnement de recette), hors périmètre.
+
+### Production — diagnostic exécuté par l'utilisateur (2026-09-02)
+
+| Question | Réponse |
+|---|---|
+| Tenant le plus ancien | `b93b7c3d-815b-4336-bbb2-ac24cda0edb2` · **AMD FINANCE** · créé le 2026-06-10 · 192 bulletins, 192 factures, 48 achats, 771 événements sur 26 tenants |
+| Les 336 erreurs | Toutes sur ce tenant, toutes du 2026-06-27 : 48 × ACH-001 et 192 × PAI-001 `retry=0` **sans message**, 96 × FAC-002 `retry=1` `duplicate key … transactions_source_unique` |
+| Les 240 sans message | **240 sur 240 ont un journal d'audit et des écritures** : traités, puis basculés à la main en `error`, puis ré-émis. Les écritures existent donc **deux fois** pour ces 192 bulletins et 48 achats |
+| Lignes de caisse fantômes | 192 lignes `transactions` de type **sortie**, 628 344 885 F, créées par FAC-001 sur ce tenant. Aucune sur un autre tenant |
+| Moteur | 142.5 appliquée (`ec.pays`). **Migration 148 non appliquée** : version 1.9.0, aucune règle BTP/AGR, `fn_ae_is_income('FAC-001') = false`, `fn_ae_has_treasury_impact('BTP-001') = false`. Seul trigger : `trg_process_accounting_event` |
+
+Conséquences :
+
+- Les 771 événements de la base sont tous sur le tenant de démonstration.
+  Aucun tenant réel n'a encore émis d'événement comptable : le défaut n°1 n'a
+  pas encore corrompu de trésorerie réelle, il le fera à la première facture
+  réglée.
+- La direction `sortie` sur FAC-001 confirme l'absence de 148 : une facture
+  émise était comptée comme un **décaissement** du TTC.
+- Les routes `app/api/btp/chantiers` et `app/api/agriculture/recoltes`
+  émettent BTP-001/002 et AGR-001 sans qu'aucune règle n'existe en base : ces
+  événements sont marqués `processed` avec zéro écriture. Migration 148 à
+  appliquer, ticket distinct (migrations non appliquées, ANO-P04/§G).
+- Réparation des données : uniquement sur `b93b7c3d`. Suppression des 192
+  lignes de caisse fantômes et des écritures dupliquées des 240 originaux,
+  puis rejeu des 96 FAC-002 après application de 175. Décision préalable de
+  l'utilisateur : AMD FINANCE est-il un client réel ou un tenant de
+  démonstration ?
