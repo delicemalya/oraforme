@@ -46,3 +46,6 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# worktrees internes de Claude Code (158 Mo, non versionnables)
+.claude/worktrees/
