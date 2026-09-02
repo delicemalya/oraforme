@@ -499,7 +499,7 @@ PAI-001 : la sortie de trésorerie n'apparaît que sur PAI-002.
 
 ## P0-04 — ÉVÉNEMENTS COMPTABLES EN ERREUR ET TRÉSORERIE FANTÔME
 
-**Statut :** EN COURS — correctif moteur écrit et testé, non appliqué ; diagnostic production requis avant la réparation des données
+**Statut :** EN COURS — migration 175 **appliquée en production le 2026-09-02** (contrôle : liste de modules absente du moteur, version 1.11.0) ; réparation des données en attente de décision
 **Date :** 2026-09-02
 **Anomalie couverte :** ANO-C08 de `docs/RESTART-AUDIT-AZ.md` (336 événements en `error`, 240 sans message, reprise à l'arrêt)
 
