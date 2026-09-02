@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     const { data: facture, error: fetchErr } = await supabaseAdmin
       .from('factures')
-      .select('id, invoice_number, client_email, client_name, tenant_id, statut, total, montant_ht, tva')
+      .select('id, invoice_number, client_email, client_nom, tenant_id, statut, total, montant_ht, tva')
       .eq('id', id)
       .eq('tenant_id', callerProfile.tenant_id)
       .single()
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       <p style="color:#64748B;margin:4px 0 0;font-size:13px">Facture électronique</p>
     </div>
     <div style="padding:32px">
-      <p style="color:#333;font-size:15px">Cher(e) <strong>${facture.client_name ?? 'Client'}</strong>,</p>
+      <p style="color:#333;font-size:15px">Cher(e) <strong>${facture.client_nom ?? 'Client'}</strong>,</p>
       <p style="color:#555;font-size:14px;line-height:1.6">
         Veuillez trouver ci-dessous votre facture <strong>${facture.invoice_number}</strong>.
       </p>

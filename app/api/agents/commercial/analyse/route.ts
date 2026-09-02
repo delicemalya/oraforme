@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     { data: devis },
     { data: relances },
   ] = await Promise.all([
-    supabaseAdmin.from('factures').select('id, invoice_number, client_name, client_id, total, subtotal, tva, ca, statut, date, due_date').eq('tenant_id', ctx.tid).gte('date', debut).order('date', { ascending: false }),
+    supabaseAdmin.from('factures').select('id, invoice_number, client_nom, client_id, total, montant_ht, tva, ca, statut, date, due_date').eq('tenant_id', ctx.tid).gte('date', debut).order('date', { ascending: false }),
     supabaseAdmin.from('clients').select('id, nom, statut, ca_total, impaye_total, score_risque, nb_impayes, nb_factures').eq('tenant_id', ctx.tid),
     supabaseAdmin.from('crm_opportunites').select('id, titre, etape, montant_estime, probabilite, date_cloture_prevue').eq('tenant_id', ctx.tid),
     supabaseAdmin.from('devis').select('id, total, statut, date').eq('tenant_id', ctx.tid).gte('date', debut),
@@ -49,12 +49,12 @@ export async function GET(req: NextRequest) {
   const facMois     = facPayees.filter(f => f.date >= debutM && f.date <= finM)
   const facMois1    = facPayees.filter(f => f.date >= m1debut && f.date <= m1fin)
 
-  const ca_ytd      = facPayees.reduce((s, f) => s + (f.subtotal ?? 0), 0)
+  const ca_ytd      = facPayees.reduce((s, f) => s + (f.montant_ht ?? 0), 0)
   const tva_ytd     = facPayees.reduce((s, f) => s + (f.tva ?? 0), 0)
   const ttc_ytd     = facPayees.reduce((s, f) => s + (f.total ?? 0), 0)
 
-  const ca_mois     = facMois.reduce((s, f) => s + (f.subtotal ?? 0), 0)
-  const ca_mois1    = facMois1.reduce((s, f) => s + (f.subtotal ?? 0), 0)
+  const ca_mois     = facMois.reduce((s, f) => s + (f.montant_ht ?? 0), 0)
+  const ca_mois1    = facMois1.reduce((s, f) => s + (f.montant_ht ?? 0), 0)
   const evolution   = ca_mois1 > 0 ? Math.round((ca_mois - ca_mois1) * 100 / ca_mois1) : 0
 
   // ── Impayés ──────────────────────────────────────────────────────────────

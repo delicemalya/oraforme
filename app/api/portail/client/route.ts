@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
   // 7. Factures
   const { data: factures } = await db
     .from('factures')
-    .select('id, numero, objet, total, statut, date_echeance, created_at')
+    .select('id, numero:invoice_number, total, statut, date_echeance:due_date, created_at')
     .eq('tenant_id', tenantId)
     .order('created_at', { ascending: false })
     .limit(30)

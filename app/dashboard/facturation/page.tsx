@@ -24,14 +24,12 @@ interface FactureLigne { id?: string; description: string; price: number; quanti
 interface Facture {
   id: string
   invoice_number: string | null
-  client_name: string | null
   client_nom: string | null
   client_address: string | null
   client_phone: string | null
   client_email: string | null
   date: string | null
   due_date: string | null
-  subtotal: number
   montant_ht: number
   tva: number
   ca: number
@@ -386,7 +384,7 @@ export default function FacturationPage() {
 
   async function openEdit(f: Facture) {
     const { data: ls } = await supabase.from('facture_lignes').select('*').eq('invoice_id', f.id).order('id')
-    setClientNom(f.client_name ?? f.client_nom ?? '')
+    setClientNom(f.client_nom ?? '')
     setClientAddress(f.client_address ?? '')
     setClientPhone(f.client_phone ?? '')
     setClientEmail(f.client_email ?? '')
@@ -481,10 +479,10 @@ export default function FacturationPage() {
 
     if (editId) {
       const { error: errUpd } = await supabase.from('factures').update({
-        invoice_number: invoiceNum, client_name: clientNom, client_address: clientAddress,
+        invoice_number: invoiceNum, client_nom: clientNom, client_address: clientAddress,
         client_phone: clientPhone, client_email: clientEmail,
         date: dateVal, due_date: dueDate || null,
-        subtotal: ht, tva: tvaFinal, ca: caFinal, total: ttc,
+        montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
         notes: notes || null, statut: finalStatut,
       }).eq('id', editId)
       if (errUpd) { showToast('Erreur mise à jour : ' + errUpd.message); setSaving(false); return }
@@ -499,10 +497,10 @@ export default function FacturationPage() {
       showToast('Facture mise à jour !')
     } else {
       const { data: fac, error: errCreate } = await supabase.from('factures').insert({
-        tenant_id: tenantId, invoice_number: invoiceNum, client_name: clientNom,
+        tenant_id: tenantId, invoice_number: invoiceNum,
         client_nom: clientNom, client_address: clientAddress, client_phone: clientPhone,
         client_email: clientEmail, date: dateVal, due_date: dueDate || null,
-        subtotal: ht, montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
+        montant_ht: ht, tva: tvaFinal, ca: caFinal, total: ttc,
         notes: notes || null, statut: finalStatut,
       }).select('id').single()
       if (errCreate || !fac?.id) { showToast('Erreur création : ' + (errCreate?.message ?? 'ID manquant')); setSaving(false); return }
@@ -544,12 +542,12 @@ export default function FacturationPage() {
     const fac = factures.find(f => f.id === confirmStatut.id)
     await updateStatut(confirmStatut.id, confirmStatut.next)
     if (confirmStatut.next === 'payee' && confirmStatut.current !== 'payee' && fac) {
-      const ht       = fac.subtotal ?? fac.montant_ht ?? 0
+      const ht       = fac.montant_ht ?? 0
       const { tva: tvaAmt, ca: caAmt, ttc } = calculerTVA(ht)
       const dateOp   = new Date().toISOString().split('T')[0]
       const invoiceNo = fac.invoice_number ?? ''
       const facDate   = fac.date ?? dateOp
-      const clientName = fac.client_name ?? fac.client_nom ?? ''
+      const clientName = fac.client_nom ?? ''
       // FAC-001 : idempotent (no-op si déjà émis), FAC-002 : paiement
       await emitFactureEvent({ eventType: 'FAC-001', facId: confirmStatut.id, invoiceNo, clientName, dateOp: facDate, ht, tva: tvaAmt, ttc: ttc || fac.total || 0, ca: caAmt })
       await emitFactureEvent({ eventType: 'FAC-002', facId: confirmStatut.id, invoiceNo, clientName, dateOp, ht: 0, tva: 0, ttc: ttc || fac.total || 0, ca: 0 })
@@ -565,29 +563,29 @@ export default function FacturationPage() {
     const { count } = await supabase.from('factures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId)
     const avoirNum = `AV-${new Date().getFullYear()}-${String((count ?? 0) + 1).padStart(4, '0')}`
     const { data: lignesAvoir } = await supabase.from('facture_lignes').select('*').eq('invoice_id', facture.id)
-    const { data: av } = await supabase.from('factures').insert({
+    const { data: av, error: errAvoir } = await supabase.from('factures').insert({
       tenant_id: tenantId,
       invoice_number: avoirNum,
       type: 'avoir',
       facture_ref_id: facture.id,
-      client_name: facture.client_name ?? facture.client_nom,
-      client_nom: facture.client_name ?? facture.client_nom,
+      client_nom: facture.client_nom,
       client_address: facture.client_address,
       client_phone: facture.client_phone,
       client_email: facture.client_email,
       date: new Date().toISOString().split('T')[0],
-      subtotal: -(facture.subtotal ?? facture.montant_ht ?? 0),
-      montant_ht: -(facture.subtotal ?? facture.montant_ht ?? 0),
+      montant_ht: -(facture.montant_ht ?? 0),
       tva: -(facture.tva ?? 0),
       ca: -(facture.ca ?? 0),
       total: -(facture.total ?? 0),
       notes: `Avoir sur facture ${facture.invoice_number ?? facture.id.slice(0, 8)}`,
       statut: 'envoyee',
     }).select('id').single()
-    if (av?.id && lignesAvoir?.length) {
-      await supabase.from('facture_lignes').insert(
+    if (errAvoir || !av?.id) { showToast('Erreur création avoir : ' + (errAvoir?.message ?? 'ID manquant')); return }
+    if (lignesAvoir?.length) {
+      const { error: errLignesAvoir } = await supabase.from('facture_lignes').insert(
         lignesAvoir.map((l: FactureLigne) => ({ invoice_id: av.id, description: l.description, price: -l.price, quantity: l.quantity, total: -l.total }))
       )
+      if (errLignesAvoir) { showToast('Avoir créé, erreur lignes : ' + errLignesAvoir.message); load(); return }
     }
     showToast('Avoir créé : ' + avoirNum)
     load()
@@ -612,14 +610,14 @@ export default function FacturationPage() {
   function sendWhatsApp(f: Facture) {
     const phone = f.client_phone?.replace(/\D/g, '') ?? ''
     const num = f.invoice_number ?? f.id.slice(0, 8)
-    const ttc = calculerTVA(f.subtotal ?? f.montant_ht ?? 0).ttc
+    const ttc = calculerTVA(f.montant_ht ?? 0).ttc
     const msg = encodeURIComponent(`Bonjour,\n\nVeuillez trouver ci-joint la facture ${num} d'un montant de ${fmt(ttc)}.\n\nCordialement,\n${config.nom ?? 'oraforme'}`)
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank')
   }
 
   function sendEmail(f: Facture) {
     const num = f.invoice_number ?? f.id.slice(0, 8)
-    const ttc = calculerTVA(f.subtotal ?? f.montant_ht ?? 0).ttc
+    const ttc = calculerTVA(f.montant_ht ?? 0).ttc
     const subject = encodeURIComponent(`Facture ${num} — ${config.nom ?? 'oraforme'}`)
     const body = encodeURIComponent(`Bonjour,\n\nVeuillez trouver ci-joint la facture ${num} d'un montant de ${fmt(ttc)}.\n\nCordialement,\n${config.nom ?? 'oraforme'}`)
     window.open(`mailto:${f.client_email ?? ''}?subject=${subject}&body=${body}`, '_blank')
@@ -629,7 +627,7 @@ export default function FacturationPage() {
 
   const displayed = factures.filter(f => {
     const matchFilter = filter === 'toutes' || f.statut === filter
-    const name = (f.client_name ?? f.client_nom ?? '').toLowerCase()
+    const name = (f.client_nom ?? '').toLowerCase()
     const num = (f.invoice_number ?? '').toLowerCase()
     const matchSearch = !search || name.includes(search.toLowerCase()) || num.includes(search.toLowerCase())
     return matchFilter && matchSearch
@@ -758,7 +756,7 @@ export default function FacturationPage() {
               </thead>
               <tbody>
                 {displayed.map((f, i) => {
-                  const ht = f.subtotal ?? f.montant_ht ?? 0
+                  const ht = f.montant_ht ?? 0
                   const { tva, ca, ttc } = calculerTVA(ht)
                   return (
                     <motion.tr
@@ -782,7 +780,7 @@ export default function FacturationPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-sm font-medium text-[#101729]">{f.client_name ?? f.client_nom}</p>
+                        <p className="text-sm font-medium text-[#101729]">{f.client_nom}</p>
                         {f.client_email && <p className="text-[10px] text-[var(--text-secondary)]">{f.client_email}</p>}
                       </td>
                       <td className="px-4 py-3 text-xs text-[var(--text-secondary)] whitespace-nowrap">
@@ -994,7 +992,7 @@ export default function FacturationPage() {
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="text-sm font-bold text-[#101729]">{viewedFac.invoice_number ?? '—'}</p>
-                      <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{viewedFac.client_name ?? viewedFac.client_nom}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{viewedFac.client_nom}</p>
                     </div>
                     <StatutBadge statut={viewedFac.statut} size="xs" />
                   </div>
@@ -1023,7 +1021,7 @@ export default function FacturationPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-2">{t('invoice.clientSection')}</p>
-                      <p className="font-semibold text-[#101729] text-sm">{viewedFac.client_name ?? viewedFac.client_nom}</p>
+                      <p className="font-semibold text-[#101729] text-sm">{viewedFac.client_nom}</p>
                       {viewedFac.client_address && <p className="text-xs text-[var(--text-secondary)] mt-0.5">{viewedFac.client_address}</p>}
                       {viewedFac.client_phone   && <p className="text-xs text-[var(--text-secondary)]">{viewedFac.client_phone}</p>}
                       {viewedFac.client_email   && <p className="text-xs text-[var(--text-secondary)]">{viewedFac.client_email}</p>}
@@ -1067,7 +1065,7 @@ export default function FacturationPage() {
 
                   {/* Totals */}
                   {(() => {
-                    const ht = viewedFac.subtotal ?? viewedFac.montant_ht ?? 0
+                    const ht = viewedFac.montant_ht ?? 0
                     const { tva, ca, ttc } = calculerTVA(ht)
                     return (
                       <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 space-y-2">

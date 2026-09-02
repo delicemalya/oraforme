@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
   const dateLabel = `Année ${year}`
 
   const [factures, bulletins, transactions, stocks, config, tenant] = await Promise.all([
-    supabaseAdmin.from('factures').select('invoice_number,client_name,client_nom,date,statut,subtotal,tva,ca,total,type')
+    supabaseAdmin.from('factures').select('invoice_number,client_nom,date,statut,montant_ht,tva,ca,total,type')
       .eq('tenant_id', tenantId).order('date', { ascending: false }).limit(500),
     supabaseAdmin.from('bulletins_paie').select('mois,annee,employes(nom,poste),salaire_base,brut,cnss_salarie,irpp,net,statut')
       .eq('tenant_id', tenantId).order('annee', { ascending: false }).order('mois', { ascending: false }).limit(500),
@@ -173,10 +173,10 @@ export async function GET(req: NextRequest) {
     const r = wsFac.getRow(5 + i)
     r.values = [
       f.invoice_number ?? '—',
-      f.client_name ?? f.client_nom ?? '—',
+      f.client_nom ?? '—',
       fmtDate(f.date),
       f.type ?? 'facture',
-      f.subtotal ?? 0,
+      f.montant_ht ?? 0,
       f.tva ?? 0,
       f.ca ?? 0,
       f.total ?? 0,

@@ -374,20 +374,20 @@ export default function DevisPage() {
       const { count } = await supabase.from('factures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId)
       const invoiceNum = `FAC-${new Date().getFullYear()}-${String((count ?? 0) + 1).padStart(4, '0')}`
 
-      const { data: fac } = await supabase.from('factures').insert({
+      // Colonnes de factures, pas de devis : une seule colonne par grandeur
+      // (client_nom, montant_ht). tva_montant est tenue par le trigger
+      // trg_sync_facture_tva_montant (migration 172).
+      const { data: fac, error: errFac } = await supabase.from('factures').insert({
         tenant_id: tenantId,
         invoice_number: invoiceNum,
-        client_name: d.client_name ?? d.client_nom,
         client_nom: d.client_name ?? d.client_nom,
         client_address: d.client_address,
         client_phone: d.client_phone,
         client_email: d.client_email,
         date: new Date().toISOString().split('T')[0],
         due_date: d.date_validite,
-        subtotal: d.subtotal,
         montant_ht: d.subtotal,
         tva: d.tva,
-        tva_montant: d.tva,
         ca: d.ca,
         total: d.total,
         notes: d.notes,
@@ -396,15 +396,16 @@ export default function DevisPage() {
         remise_pct: d.remise_pct,
       }).select('id').single()
 
-      if (fac?.id) {
-        const { data: lignesD } = await supabase.from('devis_lignes').select('*').eq('devis_id', d.id)
-        if (lignesD?.length) {
-          await supabase.from('facture_lignes').insert(
-            lignesD.map(l => ({ invoice_id: fac.id, description: l.description, price: l.price, quantity: l.quantity, total: l.total }))
-          )
-        }
-        await supabase.from('devis').update({ facture_id: fac.id, statut: 'accepte' }).eq('id', d.id)
+      if (errFac || !fac?.id) throw errFac ?? new Error('Facture non créée')
+
+      const { data: lignesD } = await supabase.from('devis_lignes').select('*').eq('devis_id', d.id)
+      if (lignesD?.length) {
+        const { error: errLignes } = await supabase.from('facture_lignes').insert(
+          lignesD.map(l => ({ invoice_id: fac.id, description: l.description, price: l.price, quantity: l.quantity, total: l.total }))
+        )
+        if (errLignes) throw errLignes
       }
+      await supabase.from('devis').update({ facture_id: fac.id, statut: 'accepte' }).eq('id', d.id)
 
       showToast('Devis converti en facture !')
       setConfirmConvert(null)

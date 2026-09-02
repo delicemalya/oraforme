@@ -17,7 +17,7 @@ export async function GET() {
   // Factures impayées
   const { data: factures, error: facErr } = await supabaseAdmin
     .from('factures')
-    .select('id, invoice_number, client_name, client_id, total, due_date, date, statut')
+    .select('id, invoice_number, client_nom, client_id, total, due_date, date, statut')
     .eq('tenant_id', ctx.tenantId)
     .in('statut', ['envoyee', 'retard', 'partiellement_payee'])
     .order('due_date', { ascending: true })
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   // Vérifier que la facture appartient au tenant
   const { data: fac } = await supabaseAdmin
     .from('factures')
-    .select('id, client_id, client_name, statut')
+    .select('id, client_id, client_nom, statut')
     .eq('id', facture_id)
     .eq('tenant_id', ctx.tenantId)
     .maybeSingle()
