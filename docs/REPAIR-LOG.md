@@ -499,7 +499,7 @@ PAI-001 : la sortie de trésorerie n'apparaît que sur PAI-002.
 
 ## P0-04 — ÉVÉNEMENTS COMPTABLES EN ERREUR ET TRÉSORERIE FANTÔME
 
-**Statut :** EN COURS — migration 175 **appliquée en production le 2026-09-02** (contrôle : liste de modules absente du moteur, version 1.11.0) ; réparation des données en attente de décision
+**Statut :** RÉPARÉ — migration 175 appliquée en production le 2026-09-02 (moteur 1.11.0), données d'AMD FINANCE réparées par 176 le même jour, contrôle produit ci-dessous
 **Date :** 2026-09-02
 **Anomalie couverte :** ANO-C08 de `docs/RESTART-AUDIT-AZ.md` (336 événements en `error`, 240 sans message, reprise à l'arrêt)
 
@@ -696,3 +696,28 @@ Première exécution de 176 (2026-09-02) : annulée en entier par l'étape 5,
 que les migrations 046 et 133 la définissent. Aucune donnée modifiée
 (transaction unique). Appel rendu conditionnel via `to_regprocedure`. À
 ajouter au ticket « migrations non appliquées » avec 148.
+
+### Résultat de 176 en production (2026-09-02)
+
+| Contrôle | Résultat |
+|---|---|
+| Événements | ACH-001 : 48 processed + 48 superseded · FAC-001 : 192 processed · **FAC-002 : 96 processed, plus aucun en error** · PAI-001 : 192 processed + 192 superseded · ONG-001 : 2 · RES-001 : 1 |
+| Caisse | Plus aucune ligne « sortie · facturation ». **96 entrées « facturation », 314 388 246 F** : les règlements rejoués. Les 192 saisies directes du script (96 entrées, 96 sorties) et les mouvements réels (acompte, facture, ong, remboursement, restaurant, achat, loyer, paie) intacts |
+| Doublons audit ↔ écritures | 0 |
+| Archive | 192 transactions archivées, réversibles. **0 écriture archivée** : les originaux basculés n'avaient pas d'écriture propre, le garde-fou a bien refusé de toucher aux écritures des ré-émissions |
+| Soldes | Banques 85 500 000 · caisses 2 500 000 — **valeurs figées du script**, non recalculées : `fn_sync_tresorerie_soldes` absente en production |
+
+ANO-C08 est fermée : 0 événement en `error` ou `dead_letter` sur les 771.
+
+### Résidus, hors périmètre de ce ticket
+
+- **48 écritures `achats_enregistrement`** (25 086 000 F) coexistent avec les 48
+  `achats_fournisseurs` du moteur pour les mêmes achats. Elles ne sont
+  rattachées à aucun événement : elles viennent d'un ancien trigger sur
+  `achats` (migration 046), pas du moteur. À traiter avec le ticket
+  « triggers hérités » (dépôt : 147 les supprime ; production : à vérifier).
+- **Soldes de banque et de caisse figés** tant que `fn_sync_tresorerie_soldes`
+  n'existe pas en production (migrations 046/133). À réappliquer avec 148.
+- **Migration 148 absente** : BTP-001/002 et AGR-001 émis sans règle.
+- **4 bulletins payés sans événement** sur d'autres tenants (contrôle P0-03) :
+  rejouables depuis la page de paie une fois la branche déployée.
