@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS policy_violations (
   created_at      timestamptz NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE policy_violations IS
-  'Violations de politiques (verdict DENY ou FLAG) — suivies séparément pour la résolution et l'alerte.';
+  'Violations de politiques (verdict DENY ou FLAG) — suivies séparément pour la résolution et l''alerte.';
 CREATE INDEX IF NOT EXISTS idx_policy_violations_tenant
   ON policy_violations (tenant_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_policy_violations_unresolved

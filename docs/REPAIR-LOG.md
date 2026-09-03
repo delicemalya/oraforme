@@ -776,3 +776,15 @@ FINANCE a 3 comptes : la somme affichée vaut trois fois la banque réelle
 (≈ 314 488 246 F). Défaut du dépôt, pas de la réapplication. À traiter avec
 la trésorerie (ticket ultérieur, ventilation par `compte_bancaire_id` dans
 `journal_entries` ou choix d'un compte principal).
+
+### Bloc B (157, 158, 159) — préparation
+
+`docs/runbooks/p0-05-bloc-B.sql`, assemblé depuis les fichiers du dépôt avec
+trois adaptations : index et policies rejouables (`IF NOT EXISTS`, `DROP POLICY
+IF EXISTS`), policies SELECT de 158 construites dynamiquement sur
+`user_tenants` si la table existe, sinon sur `profiles` (même information),
+et `search_path` fixé sur les fonctions créées pour que 165 reste vraie.
+
+**Défaut corrigé à la source** : `158:106` contenait `l'alerte` dans une
+chaîne SQL, apostrophe non doublée — erreur de syntaxe garantie. Jamais vue
+parce que la migration n'avait jamais été jouée. Corrigé en `l''alerte`.
