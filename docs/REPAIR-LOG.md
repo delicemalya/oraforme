@@ -726,7 +726,7 @@ ANO-C08 est fermée : 0 événement en `error` ou `dead_letter` sur les 771.
 
 ## P0-05 — MIGRATIONS NON APPLIQUÉES EN PRODUCTION
 
-**Statut :** EN COURS — diagnostic fait, bloc A composé, non appliqué
+**Statut :** RÉPARÉ — blocs A et B appliqués en production les 2 et 3 septembre 2026 ; 168 reportée en recette
 **Date :** 2026-09-02
 **Anomalie couverte :** CR-1 / ANO-P04 / §G de `docs/RESTART-AUDIT-AZ.md` (la production n'a jamais été construite par les migrations), restreint aux migrations 130 → 176
 
@@ -788,3 +788,24 @@ et `search_path` fixé sur les fonctions créées pour que 165 reste vraie.
 **Défaut corrigé à la source** : `158:106` contenait `l'alerte` dans une
 chaîne SQL, apostrophe non doublée — erreur de syntaxe garantie. Jamais vue
 parce que la migration n'avait jamais été jouée. Corrigé en `l''alerte`.
+
+### Bloc B appliqué en production (2026-09-03)
+
+| Contrôle | Résultat |
+|---|---|
+| 157 | `auth_logs`, `auth_metrics_daily`, 2 policies |
+| 158 | `policy_history`, `policy_violations` ; policies SELECT construites sur **profiles** : `user_tenants` n'existe pas en production, alors que la migration 158 du dépôt la référence |
+| 159 | `fn_policy_context_counters(uuid)`, EXECUTE retiré à anon et authenticated |
+| 165 | 0 fonction sans `search_path` |
+
+Depuis ce point, chaque connexion écrit réellement dans `auth_logs`
+(`app/auth/callback/route.ts`), et le Policy Engine dispose de ses tables.
+
+### Bilan P0-05
+
+- Appliqué : 133, 148, 155, 157, 158, 159, 165 (+ correction de la source 158).
+- Reporté : 168 (76 policies réécrites par expression régulière) → recette.
+- Volontairement non réappliqué : 137 `fn_transfer_to_journal` (legacy).
+- Écarts dépôt ↔ production notés : `user_tenants` absente ; triggers 023/027
+  sur `transactions` absents (dépôt à aligner, migration 177 à écrire) ;
+  `fn_sync_tresorerie_soldes` non ventilée par compte.
