@@ -809,3 +809,27 @@ Depuis ce point, chaque connexion écrit réellement dans `auth_logs`
 - Écarts dépôt ↔ production notés : `user_tenants` absente ; triggers 023/027
   sur `transactions` absents (dépôt à aligner, migration 177 à écrire) ;
   `fn_sync_tresorerie_soldes` non ventilée par compte.
+
+---
+
+## DÉPLOIEMENT — branche fix/p0-securite-automation
+
+**Statut :** BLOQUÉ — push refusé par GitHub (2026-09-03)
+**Contenu :** 25 commits devant `origin/main` (0971c4f), P0-01 à P0-05 : 131 fichiers ajoutés, 89 modifiés, 1 supprimé (`app/api/debug/db-check/route.ts`, ANO-C07), dont 33 captures binaires.
+
+| Étape | État |
+|---|---|
+| `git push -u origin fix/p0-securite-automation` | **403** — « Permission to delicemalya/oraforme.git denied to delicemalya » : l'identifiant enregistré dans le gestionnaire d'identifiants Windows n'a plus le droit d'écrire (jeton expiré ou sans portée `repo`) |
+| CLI `gh` | absente de la machine |
+| MCP GitHub | lecture OK (`list_commits`), écriture par `push_files` impossible : un seul commit aplati, pas de suppression de fichier, pas de binaire |
+| MCP Vercel | équipe visible (`polyvalontech-6578s-projects`), projet et déploiements en **403** : jeton sans portée projet |
+| CI (`.github/workflows/ci.yml`) | se déclenche sur `pull_request` et `push main` : types, lint, tests, puis build avec valeurs de remplacement |
+
+Prérequis avant mise en production, à vérifier dans Vercel (non lisible d'ici) :
+- `CRON_SECRET` (ou `AUTOMATION_SECRET`) défini : 15 routes d'automatisation
+  répondent 401 sans lui (`lib/api/require-automation.ts:44-56`, fermé par
+  défaut). Sans cette variable, les 11 crons de `vercel.json` s'arrêtent.
+- Les variables Supabase et IA existantes restent inchangées.
+
+Chemin prévu une fois le push possible : PR `fix/p0-securite-automation → main`,
+CI verte, merge, déploiement automatique Vercel depuis `main`.
