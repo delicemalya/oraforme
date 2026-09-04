@@ -59,7 +59,10 @@ const AUTHORIZED_EMITTERS = [
   'app/dashboard/erp-sync/page.tsx',
   // Modules métier via API routes
   'app/api/hotel/payments/route.ts',
-  'app/api/rh/paie/route.ts',
+  // P0-03 : la route appelée par l'interface de paie émet PAI-001/002 selon
+  // lib/paie/evenements-comptables.ts. POST /api/rh/paie n'émet plus rien à la
+  // création : la constatation suit la validation (migration 141).
+  'app/api/paie/bulletins/route.ts',
   'app/api/rh/paie/[id]/route.ts',
   'app/api/rh/acomptes/route.ts',
   'app/api/paie/acomptes/route.ts',

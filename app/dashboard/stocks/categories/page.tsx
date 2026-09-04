@@ -79,7 +79,7 @@ export default function CategoriesPage() {
       if (e1?.code === '42P01') { setCategories([]); setLoading(false); return }
 
       const { data: prods } = await supabase
-        .from('products')
+        .from('v_products_stock')
         .select('id, categorie_id, stock_actuel, prix_achat, seuil_alerte')
         .eq('tenant_id', tenantId)
 

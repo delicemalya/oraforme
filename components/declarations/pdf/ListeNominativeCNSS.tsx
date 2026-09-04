@@ -3,7 +3,7 @@
  * Rendu serveur via @react-pdf/renderer renderToBuffer()
  */
 import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
-import type { DeclarationCNSS } from '@/lib/declarations/cnss-congo'
+import { fmtPlafond, type DeclarationCNSS } from '@/lib/declarations/cnss-congo'
 import { periodeLabel, dateAujourdhuiFr, CNSS_CONGO, BRAND } from '@/lib/declarations/branding'
 
 const fmtN = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
@@ -60,6 +60,13 @@ interface Props {
 
 export function ListeNominativeCNSS({ decl, entreprise, numero_cnss_employeur }: Props) {
   const r = decl.recap
+
+  // Plafonds imprimés en pied de page : lus sur les branches du moteur fiscal.
+  // La mention précédente annonçait « Plafond AF/AT/MP : 600 000 » alors que
+  // les allocations familiales sont plafonnées à 1 200 000 F.
+  const piedPlafonds = r.branches
+    .map(b => `${b.libelle} : ${fmtPlafond(b.plafond_mensuel)}`)
+    .join(' · ')
   const periode = periodeLabel(decl.mois, decl.annee)
 
   return (
@@ -165,7 +172,7 @@ export function ListeNominativeCNSS({ decl, entreprise, numero_cnss_employeur }:
         {/* Plafonds note */}
         <View style={{ flexDirection: 'row', gap: 20, marginTop: 8 }}>
           <Text style={{ fontSize: 6, color: '#64748B', flex: 1 }}>
-            Plafond vieillesse : 1 200 000 FCFA/agent/mois · Plafond AF/AT/MP : 600 000 FCFA/agent/mois · TUS déplafonné
+            {piedPlafonds}
           </Text>
           <Text style={{ fontSize: 6, color: '#64748B' }}>
             Signature employeur : ___________________________

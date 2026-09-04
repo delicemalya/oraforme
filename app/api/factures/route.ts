@@ -60,17 +60,14 @@ export async function POST(req: NextRequest) {
     .insert({
       tenant_id:      ctx.tenantId,
       invoice_number,
-      client_name,
       client_nom:     client_name,
       client_address: client_address || null,
       client_phone:   client_phone   || null,
       client_email:   client_email   || null,
       date:           date ?? new Date().toISOString().split('T')[0],
       due_date:       due_date       || null,
-      subtotal:       ht,
       montant_ht:     ht,
       tva,
-      tva_montant:    tva,
       ca,
       total:          ttc,
       notes:          notes          || null,
@@ -82,9 +79,9 @@ export async function POST(req: NextRequest) {
 
   if (facErr) return NextResponse.json({ error: facErr.message }, { status: 500 })
 
-  // Insérer les lignes
+  // Insérer les lignes — l'erreur était ignorée : les lignes se perdaient en silence
   if (facture?.id && lignes.length) {
-    await supabaseAdmin.from('facture_lignes').insert(
+    const { error: lignesErr } = await supabaseAdmin.from('facture_lignes').insert(
       lignes
         .filter((l: { description: string }) => l.description)
         .map((l: { description: string; price: number; quantity: number }) => ({
@@ -95,6 +92,14 @@ export async function POST(req: NextRequest) {
           total:       l.price * l.quantity,
         }))
     )
+    if (lignesErr) {
+      // Une facture sans ses lignes n'est pas une facture : on annule la création.
+      await supabaseAdmin.from('factures').delete().eq('id', facture.id)
+      return NextResponse.json(
+        { error: `Lignes non enregistrées, facture annulée : ${lignesErr.message}` },
+        { status: 500 },
+      )
+    }
   }
 
   // Moteur comptable central (migration 139) — FAC-001 si facture émise directement

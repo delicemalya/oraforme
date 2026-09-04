@@ -77,7 +77,7 @@ export async function auditComptable(supabase: SupabaseClient, tenantId: string)
   const [txRes, factRes] = await Promise.all([
     supabase.from('transactions').select('id, type, montant, reference, description, created_at')
       .eq('tenant_id', tenantId).gte('created_at', since90),
-    supabase.from('factures').select('id, numero, total, statut, created_at')
+    supabase.from('factures').select('id, numero:invoice_number, total, statut, created_at')
       .eq('tenant_id', tenantId).gte('created_at', since90),
   ])
 
@@ -173,7 +173,7 @@ export async function auditFinancier(supabase: SupabaseClient, tenantId: string)
 
   const [txRes, factRes, hisFactRes] = await Promise.all([
     supabase.from('transactions').select('type, montant, created_at').eq('tenant_id', tenantId).gte('created_at', since30),
-    supabase.from('factures').select('statut, total, montant_paye, date_echeance').eq('tenant_id', tenantId).in('statut', ['envoyee', 'retard', 'payee']),
+    supabase.from('factures').select('statut, total, montant_paye, date_echeance:due_date').eq('tenant_id', tenantId).in('statut', ['envoyee', 'retard', 'payee']),
     // his_factures = facturation module Santé (HIS Enterprise)
     supabase.from('his_factures').select('statut, montant_total, montant_paye').eq('tenant_id', tenantId).in('statut', ['en_attente', 'partielle', 'payee']),
   ])

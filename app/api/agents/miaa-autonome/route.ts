@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { chargerMemoireMIAA, sauvegarderRapport } from '@/lib/miaa/memory'
 import { genererNotifications, sauvegarderNotifications } from '@/lib/miaa/notifications'
 import { EXPERTS } from '@/lib/miaa/experts'
+import { requireAutomationSecret } from '@/lib/api/require-automation'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -14,14 +15,6 @@ function getSupabase() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-}
-
-// Vérifie le header cron Vercel pour sécuriser la route
-function isCronAuthorized(req: Request): boolean {
-  const auth = req.headers.get('authorization')
-  return auth === `Bearer ${process.env.CRON_SECRET}` ||
-    req.headers.get('x-vercel-cron') === '1' ||
-    process.env.NODE_ENV === 'development'
 }
 
 // ── Actions autonomes par jour du mois ────────────────────────────────────────
@@ -69,9 +62,8 @@ async function genererRapportMensuel(supabase: ReturnType<typeof getSupabase>, t
 }
 
 export async function POST(req: Request) {
-  if (!isCronAuthorized(req)) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = requireAutomationSecret(req)
+  if (denied) return denied
 
   try {
   const supabase  = getSupabase()
@@ -152,6 +144,7 @@ export async function POST(req: Request) {
 
 // GET pour vérification du cron
 export async function GET(req: Request) {
-  if (!isCronAuthorized(req)) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  const denied = requireAutomationSecret(req)
+  if (denied) return denied
   return Response.json({ status: 'MIAA Autonome prêt', jour: new Date().getDate() })
 }

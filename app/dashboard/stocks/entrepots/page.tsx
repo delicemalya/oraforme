@@ -71,20 +71,21 @@ export default function EntrepotsPage() {
 
       const { data: movements } = await supabase
         .from('stock_movements')
-        .select('warehouse_id, quantity, type')
+        .select('warehouse_id, quantite, type')
         .eq('tenant_id', tenantId)
 
       const { data: prods } = await supabase
-        .from('products')
+        .from('v_products_stock')
         .select('id, stock_actuel, prix_achat, seuil_alerte')
         .eq('tenant_id', tenantId)
 
       // Compute stock per warehouse using movements
       const list = (wares || []).map((w: Entrepot) => {
         const wmovs = (movements || []).filter((m: any) => m.warehouse_id === w.id)
+        // Même règle de signe que fn_stock_sign (migration 173).
         const stockQty = wmovs.reduce((s: number, m: any) => {
-          if (m.type === 'entree' || m.type === 'reception') return s + (m.quantity || 0)
-          if (m.type === 'sortie') return s - (m.quantity || 0)
+          if (['entree', 'reception', 'retour', 'ajustement'].includes(m.type)) return s + (m.quantite || 0)
+          if (m.type === 'sortie') return s - (m.quantite || 0)
           return s
         }, 0)
 

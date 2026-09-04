@@ -35,7 +35,8 @@ export async function GET(req: NextRequest) {
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * POST /api/rh/paie
- * Crée un bulletin de paie — écritures SYSCOHADA gérées par T9 (migration 136)
+ * Crée un bulletin de paie en statut 'generee' — sans écriture comptable.
+ * Les écritures suivent le statut (migration 141) : voir lib/paie/evenements-comptables.ts
  * ─────────────────────────────────────────────────────────────────────────── */
 export async function POST(req: NextRequest) {
   const auth = await hrAuth()
@@ -113,32 +114,12 @@ export async function POST(req: NextRequest) {
 
   if (bulErr) return NextResponse.json({ error: bulErr.message }, { status: 500 })
 
-  // Moteur comptable — PAI-001 (charge salariale)
-  const payDate = `${parseInt(annee)}-${String(parseInt(mois)).padStart(2, '0')}-25`
-  await supabaseAdmin.rpc('emit_accounting_event', {
-    p_tenant_id:     auth.tenantId,
-    p_event_type:    'PAI-001',
-    p_source_module: 'paie',
-    p_source_table:  'bulletins_paie',
-    p_source_id:     bulletin.id,
-    p_montant_ht:    numBrut,
-    p_montant_tva:   0,
-    p_montant_ttc:   0,
-    p_montant_net:   numNet,
-    p_libelle:       `Paie ${String(parseInt(mois)).padStart(2,'0')}/${annee} — ${emp.nom}`,
-    p_date_event:    payDate,
-    p_fiscal_year:   parseInt(annee),
-    p_metadata: {
-      cnss_patronal: numCnssPatron,
-      cnss_salarie:  numCnssSalarie,
-      irpp:          numIrpp,
-      employe_nom:   emp.nom,
-      mois:          parseInt(mois),
-      annee:         parseInt(annee),
-      country_code:  'CG',
-    },
-    p_event_version: 1,
-  })
+  // Aucune écriture comptable à la création : le bulletin naît en statut
+  // 'generee'. La constatation (PAI-001) est émise à la validation et le
+  // paiement (PAI-002) au statut 'payee', par PATCH /api/rh/paie/[id] et
+  // POST/PATCH /api/paie/bulletins, selon le contrat unique de
+  // lib/paie/evenements-comptables.ts (migration 141). Cette route émettait
+  // PAI-001 dès la création, avant toute validation.
 
   // WhatsApp — notification bulletin de paie (non bloquant)
   ;(async () => {

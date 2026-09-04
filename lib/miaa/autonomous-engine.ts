@@ -90,7 +90,7 @@ async function observerFinances(
   if (memory.donnees_live.factures_impayees > 0) {
     const { data: factures } = await supabase
       .from('factures')
-      .select('id, numero, montant_ttc, date_echeance')
+      .select('id, numero:invoice_number, montant_ttc:total, date_echeance:due_date')
       .eq('tenant_id', tenantId)
       .in('statut', ['envoyee', 'retard'])
       .lt('date_echeance', thirtyDaysAgo)

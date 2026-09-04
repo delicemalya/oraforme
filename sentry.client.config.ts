@@ -11,9 +11,11 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 
   integrations: [
+    // ANO-M26 — le rejeu de session capture les écrans de paie et de facturation.
+    // Masquage total par défaut : aucune donnée personnelle ne doit partir chez un tiers.
     Sentry.replayIntegration({
-      maskAllText: false,
-      blockAllMedia: false,
+      maskAllText: true,
+      blockAllMedia: true,
     }),
   ],
 

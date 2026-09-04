@@ -11,41 +11,38 @@ export async function POST(req: NextRequest) {
   if (!product_id || !type || quantite == null) {
     return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 })
   }
-  if (!['IN', 'OUT', 'TRANSFER', 'ADJUSTMENT'].includes(type)) {
+  // Vocabulaire de la contrainte active (migrations 050 et 051) et des
+  // 96 lignes de production. L'ancien jeu IN/OUT/TRANSFER/ADJUSTMENT n'est plus
+  // accepté par la base depuis la 050.
+  if (!['entree', 'sortie', 'reception', 'retour', 'ajustement', 'transfert'].includes(type)) {
     return NextResponse.json({ error: 'Type de mouvement invalide' }, { status: 400 })
   }
 
   // Verify the product belongs to the authenticated user's tenant
-  const ownershipError = await assertResourceOwnership('stock_articles', product_id, ctx.tenantId)
+  const ownershipError = await assertResourceOwnership('products', product_id, ctx.tenantId)
   if (ownershipError) return ownershipError
 
-  // Prevent negative stock on OUT movements
-  if (type === 'OUT') {
-    const { data: currentStock } = await supabaseAdmin.rpc('get_product_stock', { p_id: product_id })
-    const stock = Number(currentStock ?? 0)
-    if (stock < Number(quantite)) {
-      return NextResponse.json({ error: `Stock insuffisant — disponible : ${stock}` }, { status: 422 })
-    }
-  }
+  // Le contrôle anti-négatif et l'insertion se font sous verrou côté base
+  // (fn_stock_move, migration 173) : deux sorties simultanées ne peuvent plus
+  // passer sous zéro.
+  const { data: moveId, error: insertError } = await supabaseAdmin.rpc('fn_stock_move', {
+    p_tenant_id:    ctx.tenantId,
+    p_product_id:   product_id,
+    p_type:         type,
+    p_quantite:     Number(quantite),
+    p_warehouse_id: warehouse_id ?? null,
+    p_reference:    reference ?? null,
+    p_notes:        note ?? null,
+  })
 
-  const { data, error: insertError } = await supabaseAdmin
-    .from('stock_movements')
-    .insert({
-      tenant_id:    ctx.tenantId,
-      product_id,
-      warehouse_id: warehouse_id ?? null,
-      type,
-      quantite:     Number(quantite),
-      reference:    reference ?? null,
-      note:         note ?? null,
-    })
-    .select()
-    .single()
+  if (insertError) return NextResponse.json({ error: insertError.message }, { status: 422 })
 
-  if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 })
+  const data = { id: moveId as string }
 
   // Emit STK-002 — Sortie stock consommation (601/311 HT) — fire-and-forget P-003
-  if (type === 'OUT') {
+  // Déclenchée sur 'sortie' : la règle visait 'OUT', valeur que la contrainte
+  // n'autorise plus, donc aucun STK-002 n'était jamais émis.
+  if (type === 'sortie') {
     const { data: prod } = await supabaseAdmin
       .from('products')
       .select('prix_achat')

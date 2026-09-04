@@ -1,26 +1,35 @@
-// ─── Moteur de calcul — Contribution de la Patente (CGI Congo) ──────────────
-// Source : Loi n°42-2025 du 31 décembre 2025 — Loi de Finances 2026
-// Art. 122 CGI — Barème officiel 10 tranches (CORRECTION LF 2026)
-// MINIMUM PERCEPTION : 10 000 FCFA (anciennement 50 000 FCFA)
+/**
+ * Contribution de la Patente — préparation du document (CGI Congo).
+ *
+ * Ce module ne détient plus le barème. Il vit dans lib/countries/CG.ts, avec sa
+ * source, et n'est lu qu'ici. Le barème y a été déplacé valeur pour valeur.
+ *
+ * Le module en portait deux copies : la table exportée et une cascade de
+ * conditions dans getTauxPatente(). Deux copies d'un même barème finissent
+ * toujours par diverger ; une seule subsiste, dans la configuration pays.
+ */
 
-// Barème officiel LF 2026 — 10 tranches (Art. 122 CGI Congo)
-export const BAREME_PATENTE_CG = [
-  { seuilMax:               1_000_000, type: 'forfait' as const, montant: 10_000 },
-  { seuilMin:    1_000_001, seuilMax:  20_000_000, taux: 0.0975  },
-  { seuilMin:   20_000_001, seuilMax:  40_000_000, taux: 0.0065  },
-  { seuilMin:   40_000_001, seuilMax: 100_000_000, taux: 0.0045  },
-  { seuilMin:  100_000_001, seuilMax: 300_000_000, taux: 0.0020  },
-  { seuilMin:  300_000_001, seuilMax: 500_000_000, taux: 0.0045  },
-  { seuilMin:  500_000_001, seuilMax: 1_000_000_000, taux: 0.0014  },
-  { seuilMin: 1_000_000_001, seuilMax: 3_000_000_000, taux: 0.00135 },
-  { seuilMin: 3_000_000_001, seuilMax: 20_000_000_000, taux: 0.00125 },
-  { seuilMin: 20_000_000_001, taux: 0.00045 },
-] as const
+import { getBaremePatente, type CodePays } from '@/lib/fiscal/universal-tax-engine'
 
-export const MINIMUM_PERCEPTION_FCFA    = 10_000  // LF 2026 (anciennement 50 000 FCFA)
-export const TAUX_CENTIMES_ADDITIONNELS = 0.05    // 5% sur patente liquidée
-export const TAUX_CAMU                  = 0.005   // 0,5% sur patente liquidée
-export const TAUX_REDUCTION_PETROLIERE  = 0.50    // 50% — sociétés pétrolières uniquement (Art. 314 CGI)
+/** Document propre au Congo. */
+const PAYS: CodePays = 'CG'
+
+function bareme() {
+  const p = getBaremePatente(PAYS)
+  if (!p) {
+    throw new Error(
+      `Barème de patente non configuré pour ${PAYS}. Aucun document ne peut être produit sans barème vérifié.`,
+    )
+  }
+  return p
+}
+
+export const BAREME_PATENTE_CG        = bareme().tranches
+export const MINIMUM_PERCEPTION_FCFA  = bareme().minimum_perception
+export const TAUX_CENTIMES_ADDITIONNELS = bareme().taux_centimes_additionnels
+export const TAUX_CAMU                = bareme().taux_camu
+export const TAUX_REDUCTION_PETROLIERE = bareme().taux_reduction_petroliere
+export const SOURCE_PATENTE           = bareme().source
 
 export const DEPARTEMENTS_CG = [
   { code: 'BZV', nom: 'Brazzaville' },
@@ -60,18 +69,21 @@ export interface ResultatPatente {
   patente_nette: number
 }
 
+/** Taux applicable au chiffre d'affaires imposable, lu dans le barème. */
 export function getTauxPatente(caImposable: number): number {
-  if (caImposable <= 0)             return 0
-  if (caImposable <= 1_000_000)    return 0        // forfait — taux symbolique
-  if (caImposable <= 20_000_000)   return 0.0975
-  if (caImposable <= 40_000_000)   return 0.0065
-  if (caImposable <= 100_000_000)  return 0.0045
-  if (caImposable <= 300_000_000)  return 0.0020
-  if (caImposable <= 500_000_000)  return 0.0045
-  if (caImposable <= 1_000_000_000) return 0.0014
-  if (caImposable <= 3_000_000_000) return 0.00135
-  if (caImposable <= 20_000_000_000) return 0.00125
-  return 0.00045
+  if (caImposable <= 0) return 0
+  const tranche = bareme().tranches.find(t =>
+    caImposable >= (t.seuil_min ?? 0) && caImposable <= (t.seuil_max ?? Infinity),
+  )
+  return tranche?.taux ?? 0
+}
+
+/** Forfait de la première tranche, s'il existe. */
+function forfaitPremiereTranche(caImposable: number): number | null {
+  const t = bareme().tranches.find(x =>
+    x.type === 'forfait' && caImposable <= (x.seuil_max ?? Infinity),
+  )
+  return t?.montant ?? null
 }
 
 export function calculerPatente(
@@ -85,12 +97,14 @@ export function calculerPatente(
   let taux = 0
   let patente_brute = 0
 
+  const forfait = ca_imposable > 0 ? forfaitPremiereTranche(ca_imposable) : null
+
   if (ca_imposable <= 0) {
     patente_brute = MINIMUM_PERCEPTION_FCFA
-  } else if (ca_imposable <= 1_000_000) {
-    // Tranche 1 : forfait 10 000 FCFA
+  } else if (forfait !== null) {
+    // Première tranche : forfait, pas de taux
     taux          = 0
-    patente_brute = 10_000
+    patente_brute = forfait
   } else {
     taux          = getTauxPatente(ca_imposable)
     patente_brute = Math.round(ca_imposable * taux)

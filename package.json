@@ -3,15 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "dev": "next dev",
     "lint": "eslint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "lint:debt": "eslint --prune-suppressions",
     "semgrep": "bash scripts/semgrep.sh",
-    "semgrep:json": "bash scripts/semgrep.sh --json"
+    "semgrep:json": "bash scripts/semgrep.sh --json",
+    "start": "next start",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
@@ -44,6 +46,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/glob": "^8.1.0",
     "@types/node": "^20",
@@ -52,6 +55,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "glob": "^11.1.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.9"

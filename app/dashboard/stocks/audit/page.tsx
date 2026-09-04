@@ -12,7 +12,7 @@ import {
 
 interface AuditLog {
   id: string; created_at: string; type: string
-  quantity: number | null; unit_cost: number | null
+  quantite: number | null; unit_cost: number | null
   reference: string | null; notes: string | null
   product_id: string | null; warehouse_id: string | null
   product_nom?: string; product_sku?: string; warehouse_nom?: string
@@ -49,7 +49,7 @@ export default function AuditPage() {
       let q = supabase
         .from('stock_movements')
         .select(`
-          id, created_at, type, quantity, unit_cost, reference, notes,
+          id, created_at, type, quantite, unit_cost, reference, notes,
           product_id, warehouse_id,
           products:product_id (nom, sku),
           warehouses:warehouse_id (nom)
@@ -92,7 +92,7 @@ export default function AuditPage() {
       new Date(l.created_at).toLocaleDateString('fr-FR'),
       new Date(l.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),
       l.type, l.product_nom||'', l.product_sku||'', l.warehouse_nom||'',
-      l.quantity||0, l.unit_cost||0, l.reference||'', l.notes||'',
+      l.quantite||0, l.unit_cost||0, l.reference||'', l.notes||'',
     ])
     const csv = [headers,...rows].map(r=>r.map(String).join(',')).join('\n')
     const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'})
@@ -102,8 +102,8 @@ export default function AuditPage() {
     URL.revokeObjectURL(url)
   }
 
-  const totalEntrees = filtered.filter(l => ['entree','reception'].includes(l.type)).reduce((s,l) => s+(l.quantity||0), 0)
-  const totalSorties = filtered.filter(l => l.type==='sortie').reduce((s,l) => s+(l.quantity||0), 0)
+  const totalEntrees = filtered.filter(l => ['entree','reception'].includes(l.type)).reduce((s,l) => s+(l.quantite||0), 0)
+  const totalSorties = filtered.filter(l => l.type==='sortie').reduce((s,l) => s+(l.quantite||0), 0)
   const totalAjustements = filtered.filter(l => l.type==='ajustement').length
 
   return (
@@ -221,7 +221,7 @@ export default function AuditPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className={`text-xs font-bold ${isIn ? 'text-[#16A34A]' : isOut ? 'text-[#DC2626]' : 'text-[#D97706]'}`}>
-                            {isIn ? '+' : isOut ? '−' : '±'}{(l.quantity||0).toLocaleString()}
+                            {isIn ? '+' : isOut ? '−' : '±'}{(l.quantite||0).toLocaleString()}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right text-xs text-[#64748B]">

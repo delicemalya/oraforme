@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseAdmin
     .from('factures')
-    .select('id, numero, statut, montant_ttc, devise, echeance, created_at, client_id', { count: 'exact' })
+    .select('id, numero:invoice_number, statut, montant_ttc:total, echeance:due_date, created_at, client_id', { count: 'exact' })
     .eq('tenant_id', ctx.tid)
     .order('created_at', { ascending: false })
     .range((page - 1) * limit, page * limit - 1)

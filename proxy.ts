@@ -25,8 +25,10 @@ const PUBLIC_API_PREFIXES = [
 
 // Exact-path automation endpoints — invoked by Vercel Cron (vercel.json) or
 // Supabase pg_cron (migration 167), never by a logged-in browser session.
-// Each of these validates its own secret (CRON_SECRET / x-automation-secret)
-// internally — this only lets the request reach the route handler.
+// Chacune valide son secret via requireAutomationSecret() (lib/api/require-automation) —
+// ce bypass ne fait que laisser la requête atteindre le handler.
+// ⚠️ N'ajouter un chemin ici QU'APRÈS avoir vérifié que le handler appelle ce garde.
+// ANO-C01 : 10 des 15 chemins ne validaient rien — le bypass les rendait publics.
 const AUTOMATION_PATHS = new Set([
   '/api/agents/securite/attaques',
   '/api/agents/securite/performance',
@@ -39,7 +41,6 @@ const AUTOMATION_PATHS = new Set([
   '/api/agents/restaurant/cloture',
   '/api/agents/miaa-autonome',
   '/api/miaa/proactif',
-  '/api/miaa/notifications',
   '/api/miaa/analyse-quotidienne',
   '/api/cron/run',
   '/api/profil/reminders',

@@ -4,18 +4,15 @@ import { processPendingExecutions, fireTrigger } from '@/lib/workflow/engine'
 import { processPendingWebhooks } from '@/lib/webhooks/sender'
 import { createWhatsappService } from '@/lib/whatsapp-business'
 import { archiveDocument } from '@/lib/storage/storage-service'
+import { requireAutomationSecret, automationHeaders } from '@/lib/api/require-automation'
 
 export const dynamic = 'force-dynamic'
 
 // POST /api/cron/run — called by Vercel Cron or external scheduler
 // Header: Authorization: Bearer <CRON_SECRET>
 export async function POST(req: NextRequest) {
-  const auth = req.headers.get('authorization') ?? ''
-  const secret = process.env.CRON_SECRET ?? ''
-
-  if (secret && auth !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = requireAutomationSecret(req)
+  if (denied) return denied
 
   const results: Record<string, number> = {}
 
@@ -251,7 +248,7 @@ async function checkInvoiceOverdue(): Promise<number> {
 
   const { data: invoices } = await supabaseAdmin
     .from('factures')
-    .select('id, tenant_id, invoice_number, total, due_date, client_phone, client_name')
+    .select('id, tenant_id, invoice_number, total, due_date, client_phone, client_nom')
     .lt('due_date', today)
     .in('statut', ['envoyee', 'en_retard'])
 
@@ -267,7 +264,7 @@ async function checkInvoiceOverdue(): Promise<number> {
       tenant_id: inv.tenant_id,
       data: {
         invoice: { id: inv.id, number: inv.invoice_number, montant: inv.total, due_date: inv.due_date },
-        client: { phone: inv.client_phone, name: inv.client_name },
+        client: { phone: inv.client_phone, name: inv.client_nom },
       },
       timestamp: new Date().toISOString(),
     })
@@ -279,7 +276,7 @@ async function checkInvoiceOverdue(): Promise<number> {
       const wa = createWhatsappService(inv.tenant_id)
       await wa.sendReminder({
         to:            inv.client_phone,
-        toName:        inv.client_name ?? undefined,
+        toName:        inv.client_nom ?? undefined,
         invoiceNumber: inv.invoice_number ?? `INV-${inv.id.slice(0, 8)}`,
         amount:        `${(inv.total ?? 0).toLocaleString('fr-FR')} FCFA`,
         daysOverdue,
@@ -427,7 +424,7 @@ async function runMIAADailyAnalysis(): Promise<number> {
             method:  'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-internal':   'true',
+              ...automationHeaders(),
             },
             body: JSON.stringify({ tenant_id: t.id }),
           })

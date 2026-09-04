@@ -4,6 +4,22 @@
 import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
 import { montantEnLettres } from '@/lib/declarations/declaration-generale'
 
+/**
+ * Libellé de la ligne 9 — Taxe Unique sur les Salaires, part fiscale.
+ *
+ * Le document annonçait « TUS 4,5% » en dur, alors que la taxe est supprimée
+ * par la LF 2026 : il nommait un taux qui n'était plus liquidé. Le libellé suit
+ * désormais ce que le pré-remplissage a réellement appliqué pour la période.
+ */
+function libelleTUS(d: DGIData): string {
+  const bruts = n(d.l9_salaires_bruts)
+  const taux  = typeof d.l9_tus_taux === 'number' ? d.l9_tus_taux : null
+  if (taux === null) return `TUS (${bruts} bruts)`
+  if (taux === 0)    return `TUS — supprimée pour la période (${bruts} bruts)`
+  const pct = (taux * 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 })
+  return `TUS ${pct} % (${bruts} bruts)`
+}
+
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const S = StyleSheet.create({
@@ -64,6 +80,8 @@ export interface DGIData {
   l7_irpp_bic_bnc?: number
   l8_irpp_salaires?: number; l8_nb_employes?: number; l8_salaires_bruts?: number
   l9_tus?: number; l9_salaires_bruts?: number
+  /** Taux TUS réellement appliqué pour la période — 0 depuis la LF 2026. */
+  l9_tus_taux?: number
   l10_is?: number; l11_isf?: number; l12_tss?: number; l13_tvts?: number
   l14_irvm?: number; l15_ras_20pct?: number; l16_ras_5pct?: number
   l17_ras_btp?: number; l18_asdi?: number; l19_taxe_appareils?: number
@@ -94,14 +112,14 @@ function lignes(d: DGIData): Array<{
   return [
     { num: 1,  nature: "Droits d'accises",                       principal: d.l1_droits_accises ?? 0,            centimes: 0 },
     { num: 2,  nature: 'Taxe sur boissons et tabac',             principal: d.l2_taxe_boissons_tabac ?? 0,       centimes: 0 },
-    { num: 3,  nature: 'TVA (18%) — Taxe sur valeur ajoutée',   principal: d.l3_tva ?? 0,                       centimes: d.l3_tva_centimes ?? 0, highlight: true },
+    { num: 3,  nature: 'TVA — Taxe sur la valeur ajoutée',      principal: d.l3_tva ?? 0,                       centimes: d.l3_tva_centimes ?? 0, highlight: true },
     { num: 4,  nature: 'TVA tiers (retenue à la source)',        principal: d.l4_tva_tiers ?? 0,                 centimes: d.l4_tva_tiers_centimes ?? 0 },
-    { num: 5,  nature: 'Taxe sur transferts de fonds (1,5%)',    principal: d.l5_taxe_transferts_fonds ?? 0,     centimes: 0 },
+    { num: 5,  nature: 'Taxe sur transferts de fonds',           principal: d.l5_taxe_transferts_fonds ?? 0,     centimes: 0 },
     { num: 6,  nature: 'Taxe sur jeux de hasard',                principal: d.l6_taxe_jeux_hasard ?? 0,          centimes: 0 },
     { num: 7,  nature: 'IRPP — BIC/BNC',                         principal: d.l7_irpp_bic_bnc ?? 0,              centimes: 0 },
     { num: 8,  nature: `IRPP salaires (${d.l8_nb_employes ?? 0} emp. / ${n(d.l8_salaires_bruts)} bruts)`, principal: d.l8_irpp_salaires ?? 0, centimes: 0, highlight: true },
-    { num: 9,  nature: `TUS 4,5% (${n(d.l9_salaires_bruts)} bruts)`, principal: d.l9_tus ?? 0,                  centimes: 0, highlight: true },
-    { num: 10, nature: "IS — Impôt sur les sociétés (30%)",      principal: d.l10_is ?? 0,                       centimes: 0 },
+    { num: 9,  nature: libelleTUS(d),                            principal: d.l9_tus ?? 0,                       centimes: 0, highlight: true },
+    { num: 10, nature: 'IS — Impôt sur les sociétés',            principal: d.l10_is ?? 0,                       centimes: 0 },
     { num: 11, nature: 'ISF — Impôt sur les sociétés financières', principal: d.l11_isf ?? 0,                    centimes: 0 },
     { num: 12, nature: 'TSS — Taxe sur les services spéciaux',   principal: d.l12_tss ?? 0,                      centimes: 0 },
     { num: 13, nature: 'TVTS — Taxe sur véhicules de tourisme',  principal: d.l13_tvts ?? 0,                     centimes: 0 },

@@ -47,7 +47,7 @@ export async function PATCH(
   // Vérifier que la facture appartient au tenant
   const { data: existing } = await supabaseAdmin
     .from('factures')
-    .select('id, tenant_id, statut, subtotal, montant_ht, tva_montant, ca, total, invoice_number, client_name, client_nom')
+    .select('id, tenant_id, statut, montant_ht, tva, ca, total, invoice_number, client_nom')
     .eq('id', id)
     .eq('tenant_id', ctx.tenantId)
     .maybeSingle()
@@ -69,13 +69,13 @@ export async function PATCH(
   const today    = new Date().toISOString().split('T')[0]
   const fiscYear = new Date(today).getFullYear()
   const pieceNum = existing.invoice_number ?? `FAC-${id.slice(0, 8).toUpperCase()}`
-  const clientNom = existing.client_name ?? existing.client_nom ?? ''
+  const clientNom = existing.client_nom ?? ''
 
   // FAC-001 — Facture envoyée : émission comptable via moteur central (migration 139)
   // Remplace le trigger trg_facture_issued supprimé dans migration 139.
   if (statut === 'envoyee' && existing.statut !== 'envoyee') {
-    const ht  = Number(existing.montant_ht ?? existing.subtotal ?? 0)
-    const tva = Number(existing.tva_montant ?? 0)
+    const ht  = Number(existing.montant_ht ?? 0)
+    const tva = Number(existing.tva ?? 0)
     const ca  = Number(existing.ca ?? 0)
     const ttc = Number(existing.total ?? ht + tva + ca)
 

@@ -53,7 +53,7 @@ export default function TransfertsPage() {
       const [{ data: tr }, { data: wh }, { data: pr }] = await Promise.all([
         supabase.from('stock_transferts').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
         supabase.from('warehouses').select('id,nom,ville').eq('tenant_id', tenantId).limit(200),
-        supabase.from('products').select('id,nom,sku,unite,stock_actuel,prix_achat').eq('tenant_id', tenantId).eq('statut','actif').order('nom').limit(200),
+        supabase.from('v_products_stock').select('id,nom,sku,unite,stock_actuel,prix_achat').eq('tenant_id', tenantId).eq('statut','actif').order('nom').limit(200),
       ])
       setWarehouses(wh || [])
       setProducts(pr || [])
@@ -104,20 +104,23 @@ export default function TransfertsPage() {
 
       const destNom = warehouses.find(w => w.id === destination_warehouse_id)?.nom || ''
       const srcNom = warehouses.find(w => w.id === source_warehouse_id)?.nom || ''
-      await supabase.from('stock_movements').insert([
-        {
-          tenant_id: tenantId, product_id, warehouse_id: source_warehouse_id,
-          type: 'sortie', quantity: qty,
-          unit_cost: selectedProduct?.prix_achat || 0,
-          reference: num, notes: `Transfert vers ${destNom}`,
-        },
-        {
-          tenant_id: tenantId, product_id, warehouse_id: destination_warehouse_id,
-          type: 'entree', quantity: qty,
-          unit_cost: selectedProduct?.prix_achat || 0,
-          reference: num, notes: `Transfert depuis ${srcNom}`,
-        },
-      ])
+      // Deux mouvements opposes : le total du produit ne bouge pas, sa
+      // repartition par entrepot change.
+      const { error: errOut } = await supabase.rpc('fn_stock_move', {
+        p_tenant_id: tenantId, p_product_id: product_id, p_type: 'sortie',
+        p_quantite: qty, p_warehouse_id: source_warehouse_id,
+        p_unit_cost: selectedProduct?.prix_achat || 0,
+        p_reference: num, p_notes: `Transfert vers ${destNom}`,
+      })
+      if (errOut) throw errOut
+
+      const { error: errIn } = await supabase.rpc('fn_stock_move', {
+        p_tenant_id: tenantId, p_product_id: product_id, p_type: 'entree',
+        p_quantite: qty, p_warehouse_id: destination_warehouse_id,
+        p_unit_cost: selectedProduct?.prix_achat || 0,
+        p_reference: num, p_notes: `Transfert depuis ${srcNom}`,
+      })
+      if (errIn) throw errIn
 
       setShowModal(false)
       setForm(emptyForm)

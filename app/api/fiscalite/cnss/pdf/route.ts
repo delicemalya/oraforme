@@ -56,6 +56,14 @@ export async function GET(req: NextRequest) {
   const totSal     = items.reduce((s, b) => s + b.cnss_salarie, 0)
   const totPat     = items.reduce((s, b) => s + b.cnss_patronal, 0)
   const totCnss    = totSal + totPat
+
+  // Taux imprimés : dérivés des montants réellement liquidés, jamais saisis.
+  // Le document annonçait « 5,04 % / 14,36 % », valeurs qui ne correspondaient
+  // à aucun calcul du moteur fiscal.
+  const pct = (montant: number) =>
+    totBrut > 0 ? `${((montant / totBrut) * 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} %` : '—'
+  const tauxSalEffectif = pct(totSal)
+  const tauxPatEffectif = pct(totPat)
   const totIrpp    = items.reduce((s, b) => s + b.irpp, 0)
 
   function fmt(n: number) { return new Intl.NumberFormat('fr-FR').format(Math.round(n)) }
@@ -154,7 +162,7 @@ export async function GET(req: NextRequest) {
   <div class="title-block">
     <h1>Déclaration CNSS Mensuelle</h1>
     <div class="period">Mois de ${MOIS_LABELS[mois]} ${annee}</div>
-    <div style="font-size:8pt;color:#888;margin-top:4px">République du Congo · CNSS · Taux salarié: 5,04% · Patronal: 14,36%</div>
+    <div style="font-size:8pt;color:#888;margin-top:4px">République du Congo · CNSS · Taux effectifs sur la masse : salarié ${tauxSalEffectif} · patronal ${tauxPatEffectif}</div>
   </div>
   <div class="stamp-block">
     <div class="label">Date d'édition</div>
@@ -166,8 +174,8 @@ export async function GET(req: NextRequest) {
 <div class="info-bar">
   <div class="item"><label>Effectif déclaré</label><span>${items.length} salarié${items.length > 1 ? 's' : ''}</span></div>
   <div class="item"><label>Masse salariale brute</label><span>${fmt(totBrut)} FCFA</span></div>
-  <div class="item"><label>CNSS salarié (5,04%)</label><span>${fmt(totSal)} FCFA</span></div>
-  <div class="item"><label>CNSS patronal (14,36%)</label><span>${fmt(totPat)} FCFA</span></div>
+  <div class="item"><label>CNSS salarié (${tauxSalEffectif} effectif)</label><span>${fmt(totSal)} FCFA</span></div>
+  <div class="item"><label>CNSS patronal (${tauxPatEffectif} effectif)</label><span>${fmt(totPat)} FCFA</span></div>
   <div class="item"><label>Total CNSS à verser</label><span style="color:#dc2626;font-weight:900">${fmt(totCnss)} FCFA</span></div>
 </div>
 

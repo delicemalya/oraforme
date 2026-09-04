@@ -77,7 +77,8 @@ await supabase.rpc('fn_reverse_accounting_event', {
 |---|---|---|
 | `FAC-001` | Facture émise | D411 / C706 (HT) · D411 / C4441 (TVA 18%) · D411 / C447 (CA 5%, CG) |
 | `FAC-002` | Règlement reçu | D521 / C411 (TTC) |
-| `PAI-001` | Bulletin de paie | D661 / C421 (salaire net) · D646 / C431 (cotisations) |
+| `PAI-001` | Bulletin validé (`statut → validee`) | D661 / C421 (brut) · D664 / C431 (CNSS patronal) · D421 / C431 (CNSS salarié) · D421 / C447 (IRPP) — `montant_ttc = 0`, pas de trésorerie |
+| `PAI-002` | Bulletin payé (`statut → payee`) | D421 / C5xx (net, compte résolu par `mode_paiement`) — seule sortie de trésorerie de la paie |
 | _(voir migration 139 pour liste complète)_ | | |
 
 ---
@@ -159,8 +160,11 @@ Une nouvelle exemption nécessite :
 - `app/api/factures/route.ts` — FAC-001 (création)
 - `app/api/factures/[id]/route.ts` — FAC-001 (mise à jour), FAC-002 (règlement)
 - `app/dashboard/facturation/page.tsx` — FAC-001, FAC-002 (UI dashboard)
-- `app/api/rh/paie/route.ts` — PAI-001
-- `app/api/rh/paie/[id]/route.ts` — PAI-001
+- `app/api/paie/bulletins/route.ts` — PAI-001, PAI-002 (route appelée par `app/dashboard/rh/paie`) — P0-03
+- `app/api/rh/paie/[id]/route.ts` — PAI-001, PAI-002
+- `app/api/rh/paie/route.ts` — plus aucune émission : la création d'un bulletin (`generee`) n'est pas un fait comptable
+
+Les trois routes paie tirent leurs paramètres d'un seul contrat, `lib/paie/evenements-comptables.ts` : `evenementsComptablesBulletin()` renvoie les événements dus dans le statut courant, et le moteur ignore les doublons par (tenant, event_type, source_table, source_id).
 - _(+ 16 routes métier, voir AUTHORIZED_EMITTERS dans le test)_
 
 ---
@@ -171,5 +175,6 @@ Une nouvelle exemption nécessite :
 |---|---|---|
 | 2026-07-13 | C-004.1 : Suppression `postFactureToJournal` et `postPaiementToJournal` | Dashboard facture passe via moteur |
 | 2026-07-13 | C-004.2 : LOI-K créée — ESLint + Vitest + documentation | CI bloquant activé |
+| 2026-09-02 | P0-03 : chaîne paie → comptabilité rebranchée — `/api/paie/bulletins` émet, contrat unique `lib/paie/evenements-comptables.ts` | Les bulletins produits par l'interface sont de nouveau comptabilisés |
 | _(futur)_ | Migration EXM-JE-002 : `accounting-engine.ts` → `emit_accounting_event` | Réduction dette |
 | _(futur)_ | Migration EXM-JE-003 : `compta-sync-client.ts` → `emit_accounting_event` | Réduction dette |

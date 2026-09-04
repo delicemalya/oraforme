@@ -82,7 +82,7 @@ export default function FournisseursPage() {
 
       const { data: achats } = await supabase
         .from('purchases')
-        .select('supplier_id, total_amount')
+        .select('supplier_id, montant_total')
         .eq('tenant_id', tenantId)
 
       const { data: prods } = await supabase
@@ -96,7 +96,7 @@ export default function FournisseursPage() {
         return {
           ...f,
           nb_commandes: fAchats.length,
-          total_achats: fAchats.reduce((s: number, a: any) => s + (a.total_amount || 0), 0),
+          total_achats: fAchats.reduce((s: number, a: any) => s + (a.montant_total || 0), 0),
           nb_produits: fProds.length,
         }
       })

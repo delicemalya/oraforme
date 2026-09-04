@@ -152,22 +152,20 @@ export default function RetoursPage() {
       await supabase.from('stock_retours').update({ statut: newStatut }).eq('id', ret.id).eq('tenant_id', tenantId)
 
       if (newStatut === 'validé') {
-        // Update stock: retour client = déstockage, retour fournisseur = restockage
+        // Un retour client fait revenir la marchandise, un retour fournisseur
+        // la fait sortir. Le sens vit dans le type du mouvement : il ne peut pas
+        // dependre d'une colonne d'une autre table.
         if (ret.product_id) {
-          const { data: prod } = await supabase.from('products').select('stock_actuel').eq('id', ret.product_id).single()
-          if (prod) {
-            const delta = ret.type_retour === 'fournisseur' ? -ret.quantite : ret.quantite
-            await supabase.from('products').update({ stock_actuel: Math.max(0, (prod.stock_actuel || 0) + delta) }).eq('id', ret.product_id)
-          }
-          await supabase.from('stock_movements').insert({
-            tenant_id: tenantId,
-            product_id: ret.product_id,
-            type: 'retour',
-            quantity: ret.quantite,
-            unit_cost: ret.valeur / ret.quantite,
-            reference: ret.numero,
-            notes: `Retour ${ret.type_retour} validé: ${ret.motif}`,
+          const { error: errMvt } = await supabase.rpc('fn_stock_move', {
+            p_tenant_id:  tenantId,
+            p_product_id: ret.product_id,
+            p_type:       ret.type_retour === 'fournisseur' ? 'sortie' : 'retour',
+            p_quantite:   ret.quantite,
+            p_unit_cost:  ret.quantite ? ret.valeur / ret.quantite : 0,
+            p_reference:  ret.numero,
+            p_notes:      `Retour ${ret.type_retour} valide: ${ret.motif}`,
           })
+          if (errMvt) throw errMvt
         }
 
         // OHADA

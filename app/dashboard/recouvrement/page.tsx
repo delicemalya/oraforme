@@ -19,7 +19,7 @@ type TypeRelance = 'email' | 'sms' | 'courrier' | 'appel' | 'mise_en_demeure'
 interface FactureImpayee {
   id: string
   invoice_number: string | null
-  client_name: string | null
+  client_nom: string | null
   client_id: string | null
   total: number
   due_date: string | null
@@ -95,7 +95,7 @@ export default function RecouvrementPage() {
     // Factures impayées (envoyée ou en retard, due_date < aujourd'hui)
     const { data: raw } = await supabase
       .from('factures')
-      .select('id, invoice_number, client_name, client_id, total, due_date, date, statut')
+      .select('id, invoice_number, client_nom, client_id, total, due_date, date, statut')
       .eq('tenant_id', tid)
       .in('statut', ['envoyee', 'retard', 'partiellement_payee'])
       .order('due_date', { ascending: true })
@@ -295,7 +295,7 @@ export default function RecouvrementPage() {
                           <p className="text-[11px] text-[#94A3B8]">{fmtDate(f.date)}</p>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="font-semibold text-[13px] text-[#0F172A]">{f.client_name ?? '—'}</p>
+                          <p className="font-semibold text-[13px] text-[#0F172A]">{f.client_nom ?? '—'}</p>
                           {f.due_date && <p className="text-[11px] text-[#64748B]">Échéance: {fmtDate(f.due_date)}</p>}
                         </td>
                         <td className="px-4 py-3">
@@ -383,7 +383,7 @@ export default function RecouvrementPage() {
               </h3>
               {Object.entries(
                 factures.reduce((acc, f) => {
-                  const nom = f.client_name ?? '—'
+                  const nom = f.client_nom ?? '—'
                   if (!acc[nom]) acc[nom] = { nom, total: 0, nb: 0 }
                   acc[nom].total += f.total
                   acc[nom].nb += 1
@@ -411,7 +411,7 @@ export default function RecouvrementPage() {
             <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0]">
               <div>
                 <h2 className="font-bold text-[15px] text-[#0F172A]">{selectedFac.invoice_number ?? '—'}</h2>
-                <p className="text-[12px] text-[#64748B]">{selectedFac.client_name}</p>
+                <p className="text-[12px] text-[#64748B]">{selectedFac.client_nom}</p>
               </div>
               <button onClick={() => setSelectedFac(null)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]">
                 <X size={16} />
@@ -490,7 +490,7 @@ export default function RecouvrementPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-[16px] font-bold text-[#0F172A]">Envoyer une relance</h2>
-                <p className="text-[12px] text-[#64748B]">{selectedFac.client_name} — {fmt(selectedFac.total)} — J+{selectedFac.retard_jours}</p>
+                <p className="text-[12px] text-[#64748B]">{selectedFac.client_nom} — {fmt(selectedFac.total)} — J+{selectedFac.retard_jours}</p>
               </div>
               <button onClick={() => setShowRelanceModal(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9]"><X size={16} /></button>
             </div>

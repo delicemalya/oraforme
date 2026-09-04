@@ -75,7 +75,7 @@ export default function StocksAnalyticsPage() {
       // Movements
       const { data: movs, error: e1 } = await supabase
         .from('stock_movements')
-        .select('type, quantity, unit_cost, created_at, product_id, products(nom, sku)')
+        .select('type, quantite, unit_cost, created_at, product_id, products(nom, sku)')
         .eq('tenant_id', tenantId)
         .gte('created_at', fromDate)
         .order('created_at')
@@ -85,13 +85,13 @@ export default function StocksAnalyticsPage() {
       // Purchases
       const { data: purch } = await supabase
         .from('purchases')
-        .select('total_amount, date')
+        .select('montant_total, date')
         .eq('tenant_id', tenantId)
         .gte('date', fromDate)
 
       // Products for stock value
       const { data: prods } = await supabase
-        .from('products')
+        .from('v_products_stock')
         .select('id, nom, sku, stock_actuel, prix_achat, prix_vente, seuil_alerte')
         .eq('tenant_id', tenantId)
 
@@ -119,12 +119,12 @@ export default function StocksAnalyticsPage() {
         const d = new Date(mv.created_at)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
         if (!monthMap[key]) continue
-        const valeur = (mv.quantity || 0) * (mv.unit_cost || 0)
+        const valeur = (mv.quantite || 0) * (mv.unit_cost || 0)
         if (['entree', 'reception', 'retour'].includes(mv.type)) {
-          monthMap[key].entrees_qty += mv.quantity || 0
+          monthMap[key].entrees_qty += mv.quantite || 0
           monthMap[key].entrees_val += valeur
         } else if (mv.type === 'sortie') {
-          monthMap[key].sorties_qty += mv.quantity || 0
+          monthMap[key].sorties_qty += mv.quantite || 0
           monthMap[key].sorties_val += valeur
         }
       }
@@ -132,7 +132,7 @@ export default function StocksAnalyticsPage() {
       for (const p of (purch || [])) {
         const d = new Date(p.date)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-        if (monthMap[key]) monthMap[key].achats += p.total_amount || 0
+        if (monthMap[key]) monthMap[key].achats += p.montant_total || 0
       }
 
       setData(Object.values(monthMap))
@@ -145,14 +145,14 @@ export default function StocksAnalyticsPage() {
         const prodNom = (mv as any).products?.nom || 'Inconnu'
         const prodSku = (mv as any).products?.sku || ''
         const key = mv.product_id || 'x'
-        const valeur = (mv.quantity || 0) * (mv.unit_cost || 0)
+        const valeur = (mv.quantite || 0) * (mv.unit_cost || 0)
         if (['entree', 'reception'].includes(mv.type)) {
           if (!entreeMap[key]) entreeMap[key] = { nom: prodNom, sku: prodSku, quantite: 0, valeur: 0 }
-          entreeMap[key].quantite += mv.quantity || 0
+          entreeMap[key].quantite += mv.quantite || 0
           entreeMap[key].valeur += valeur
         } else if (mv.type === 'sortie') {
           if (!sortieMap[key]) sortieMap[key] = { nom: prodNom, sku: prodSku, quantite: 0, valeur: 0 }
-          sortieMap[key].quantite += mv.quantity || 0
+          sortieMap[key].quantite += mv.quantite || 0
           sortieMap[key].valeur += valeur
         }
       }
@@ -172,7 +172,7 @@ export default function StocksAnalyticsPage() {
 
       // Summary
       const valeur_stock = (prods || []).reduce((s: number, p: any) => s + (p.stock_actuel || 0) * (p.prix_achat || 0), 0)
-      const total_achats = (purch || []).reduce((s: number, p: any) => s + (p.total_amount || 0), 0)
+      const total_achats = (purch || []).reduce((s: number, p: any) => s + (p.montant_total || 0), 0)
       const total_sorties_val = Object.values(monthMap).reduce((s, m) => s + m.sorties_val, 0)
       const avgStock = (prods || []).reduce((s: number, p: any) => s + (p.stock_actuel || 0), 0) / Math.max((prods || []).length, 1)
       const rotation_moy = avgStock > 0 ? (total_sorties_val / Math.max(valeur_stock, 1)) : 0

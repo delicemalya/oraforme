@@ -57,13 +57,13 @@ export async function GET(
 
   const factureData = {
     invoice_number: facture.invoice_number ?? facture.id.slice(0, 8).toUpperCase(),
-    client_name:    facture.client_name ?? facture.client_nom ?? 'Client',
+    client_name:    facture.client_nom ?? 'Client',
     client_address: facture.client_address ?? null,
     client_phone:   facture.client_phone ?? null,
     client_email:   facture.client_email ?? null,
     date:           facture.date ?? facture.created_at?.split('T')[0] ?? new Date().toISOString().split('T')[0],
     due_date:       facture.due_date ?? null,
-    subtotal:       facture.subtotal ?? facture.montant_ht ?? 0,
+    subtotal:       facture.montant_ht ?? 0,
     notes:          facture.notes ?? null,
     statut:         facture.statut ?? 'brouillon',
     qr_data_url:    qrDataUrl,

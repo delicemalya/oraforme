@@ -1,5 +1,34 @@
-// Moteur de pré-remplissage — Déclaration Générale des Impôts (DGI Congo)
-// Tire les données des modules existants : factures, bulletins_paie
+/**
+ * Pré-remplissage de la Déclaration Générale des Impôts et Taxes (DGI Congo).
+ *
+ * Document propre au Congo : ses lignes sont celles du formulaire congolais.
+ * Une version multi-pays suppose une correspondance ligne à ligne par pays,
+ * qui n'existe pas ; le pays est donc figé et déclaré ici plutôt que deviné.
+ *
+ * Aucun taux dans ce fichier. Deux corrections de fond par rapport à la
+ * version précédente :
+ *
+ *  - Ligne 9, TUS. La taxe unique sur les salaires, part fiscale, était
+ *    liquidée à 4,5 % en dur. Elle est supprimée par la LF 2026. Le taux vient
+ *    désormais de getTaxeAbrogee(), qui rend 0 pour une période postérieure à
+ *    l'abrogation et le taux d'origine pour une période antérieure : une
+ *    déclaration rectificative sur 2025 reste juste.
+ *
+ *  - Ligne 3, TVA. Le code lisait factures.tva comme un TAUX et le multipliait
+ *    par le montant hors taxe. Cette colonne porte un MONTANT depuis la
+ *    migration 160, qui l'a élargie à NUMERIC(14,2) pour cette raison. La TVA
+ *    collectée est donc la somme des montants, et le centime additionnel vient
+ *    du moteur fiscal.
+ */
+
+import {
+  getTaxeAbrogee,
+  calculerTaxesAdditionnellesSurTVA,
+  type CodePays,
+} from '@/lib/fiscal/universal-tax-engine'
+
+/** Formulaire propre à la DGI congolaise. */
+const PAYS: CodePays = 'CG'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -11,9 +40,12 @@ export interface PreRemplissageResult {
   l8_irpp_salaires: number
   l8_nb_employes: number
   l8_salaires_bruts: number
-  // Ligne 9 — TUS
+  // Ligne 9 — TUS (part fiscale, supprimée par la LF 2026)
   l9_tus: number
   l9_salaires_bruts: number
+  l9_tus_taux: number
+  l9_tus_abrogee: boolean
+  l9_tus_base_legale: string
   // Totaux estimés
   total_principal: number
   total_centimes: number
@@ -34,7 +66,7 @@ export async function preRemplirDeclaration(
   const finDate   = new Date(annee, mois, 0).toISOString().split('T')[0]
 
   // ── Ligne 3 : TVA depuis les factures payées du mois ──────────────────────
-  // factures.tva = taux TVA (ex: 18), factures.montant_ht = base HT
+  // factures.tva porte un MONTANT de TVA, pas un taux (migration 160).
   const { data: factures } = await supabase
     .from('factures')
     .select('montant_ht, tva')
@@ -44,13 +76,11 @@ export async function preRemplirDeclaration(
     .lte('created_at', finDate + 'T23:59:59Z')
 
   const tvaCollectee = (factures as Array<{ montant_ht: number; tva: number }> | null)
-    ?.reduce((s, f) => {
-      const taux = Number(f.tva || 18) / 100
-      return s + Number(f.montant_ht || 0) * taux
-    }, 0) ?? 0
+    ?.reduce((s, f) => s + Number(f.tva || 0), 0) ?? 0
 
-  // Centime additionnel Congo = 5% de la TVA collectée
-  const centimesAdditionnels = Math.round(tvaCollectee * 0.05)
+  // Taxes additionnelles assises sur la TVA collectée — Centime Additionnel au
+  // Congo. Taux lu dans la configuration pays, jamais réécrit ici.
+  const centimesAdditionnels = calculerTaxesAdditionnellesSurTVA(PAYS, tvaCollectee).total
 
   // ── Lignes 8 & 9 : IRPP et TUS depuis les bulletins de paie du mois ───────
   const { data: bulletins } = await supabase
@@ -66,8 +96,11 @@ export async function preRemplirDeclaration(
   const irppTotal    = (bulletins as Array<{ brut: number; irpp: number }> | null)
     ?.reduce((s, b) => s + Number(b.irpp || 0), 0) ?? 0
 
-  // TUS = Taxe Unique sur les Salaires = 4,5% des salaires bruts
-  const tus = Math.round(salaireBrut * 0.045)
+  // TUS part fiscale — abrogée par la LF 2026, donc 0 à compter du 1er janvier
+  // 2026. Le taux dépend de la période déclarée, pas d'une constante.
+  const tusRegle = getTaxeAbrogee(PAYS, 'TUS_FISCALE', debutDate)
+  const tusTaux  = tusRegle?.taux ?? 0
+  const tus      = Math.round(salaireBrut * tusTaux)
 
   // ── Calcul des totaux estimés ──────────────────────────────────────────────
   const totalPrincipal = Math.round(tvaCollectee) + irppTotal + tus
@@ -82,6 +115,9 @@ export async function preRemplirDeclaration(
     l8_salaires_bruts: Math.round(salaireBrut),
     l9_tus:            tus,
     l9_salaires_bruts: Math.round(salaireBrut),
+    l9_tus_taux:       tusTaux,
+    l9_tus_abrogee:    tusRegle?.abrogee ?? true,
+    l9_tus_base_legale: tusRegle?.base_legale ?? 'Taxe inconnue de la configuration pays',
     total_principal:   totalPrincipal,
     total_centimes:    totalCentimes,
     total_droits_payes: totalGeneral,

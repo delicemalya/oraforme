@@ -36,7 +36,7 @@ export default function CodesBarresPage() {
     setLoading(true)
     try {
       const { data } = await supabase
-        .from('products')
+        .from('v_products_stock')
         .select('id,nom,sku,code_barre,unite,prix_vente,categorie,stock_actuel')
         .eq('tenant_id', tenantId)
         .eq('statut','actif')

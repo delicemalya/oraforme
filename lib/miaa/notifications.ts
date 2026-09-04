@@ -99,7 +99,7 @@ export async function genererNotifications(
     const [factRes, stockRes, rhRes, txRes] = await Promise.all([
       // Factures impayées > 30 jours
       supabase.from('factures')
-        .select('id, numero, client_nom, total, date_echeance')
+        .select('id, numero:invoice_number, client_nom, total, date_echeance:due_date')
         .eq('tenant_id', tenantId)
         .in('statut', ['envoyee', 'retard'])
         .lt('date_echeance', new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10)),

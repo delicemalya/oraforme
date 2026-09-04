@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   const { data: factures } = await supabaseAdmin
     .from('factures')
-    .select('montant_ttc')
+    .select('montant_ttc:total')
     .eq('tenant_id', ctx.tid)
     .gte('created_at', startOfMonth)
     .eq('statut', 'payee')

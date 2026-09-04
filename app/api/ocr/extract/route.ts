@@ -3,13 +3,15 @@
  *
  * Deux modes :
  *   1. Fichier direct  : FormData { file, type?, documentId? }
- *   2. Document en DB  : JSON { documentId, tenantId } (appelé par /api/storage/upload)
+ *   2. Document en DB  : JSON { documentId, tenantId } — appel serveur→serveur
+ *      depuis /api/storage/upload, authentifié par le secret d'automatisation.
  *
  * Résultat stocké dans documents.ocr_text + documents.ocr_data.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
+import { requireAutomationSecret } from '@/lib/api/require-automation'
 import { extractText } from '@/lib/ocr/ocr-engine'
 import {
   detectDocumentType,
@@ -26,8 +28,11 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60   // OCR peut prendre du temps
 
 export async function POST(req: NextRequest) {
-  // Route interne (depuis /api/storage/upload) — pas d'auth utilisateur
-  const isInternal = req.headers.get('x-internal') === 'true'
+  // §22.1 — le mode interne acceptait un tenantId du corps de requête dès que
+  // l'en-tête `x-internal: true` était présent. Ce n'est pas un secret : tout
+  // compte authentifié pouvait lire et écrire les documents d'un autre tenant.
+  // Le mode interne exige désormais le secret d'automatisation.
+  const isInternal = requireAutomationSecret(req) === null
 
   let tenantId: string
   let fileBuffer: Buffer | null = null

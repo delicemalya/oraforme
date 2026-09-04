@@ -9,17 +9,27 @@ import type { ReactElement } from 'react'
 import { ReceiptPDF } from '@/components/resto/ReceiptPDF'
 import type { ReceiptData } from '@/components/resto/ReceiptPDF'
 import { calculerTVACongo } from '@/lib/fiscalite-congo'
+import { requireTenant } from '@/lib/api/require-tenant'
 
+// ANO-C06 — le reçu contient les données personnelles du client final
+// (nom, téléphone, adresse de livraison). Le seul appelant est le dashboard
+// restaurant (app/dashboard/restaurant/page.tsx:1242) : une session est donc
+// toujours disponible. La route est sous le préfixe public /api/resto/ du proxy,
+// elle doit donc s'authentifier elle-même.
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ commandeId: string }> }
 ) {
+  const ctx = await requireTenant()
+  if (!ctx.ok) return ctx.error
+
   const { commandeId } = await params
 
   const { data: cmd } = await supabaseAdmin
     .from('resto_commandes')
     .select('*, tenants(nom_entreprise, entreprise_config(adresse, telephone))')
     .eq('id', commandeId)
+    .eq('tenant_id', ctx.tid)
     .single()
 
   if (!cmd) return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 })

@@ -15,6 +15,7 @@ import { createClient } from '@supabase/supabase-js'
 import { chargerMemoireMIAA } from '@/lib/miaa/memory'
 import { runAgentAnalysis } from '@/lib/miaa/autonomous-engine'
 import { computeCollectionStatus, sumAmount } from '@/lib/erp-core/compute/payments'
+import { requireAutomationSecret } from '@/lib/api/require-automation'
 
 export const runtime  = 'nodejs'
 export const maxDuration = 60
@@ -170,14 +171,8 @@ async function analyserTresorerie(supabase: ReturnType<typeof db>, tenantId: str
 // ── Handler principal ────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
-  const authHeader = req.headers.get('authorization')
-  const secret     = process.env.CRON_SECRET ?? ''
-
-  // Accepter appel interne (depuis cron) ou direct avec secret
-  const isInternal = req.headers.get('x-internal') === 'true'
-  if (!isInternal && secret && authHeader !== `Bearer ${secret}`) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = requireAutomationSecret(req)
+  if (denied) return denied
 
   const { tenant_id } = await req.json() as { tenant_id: string }
   if (!tenant_id) return Response.json({ error: 'tenant_id requis' }, { status: 400 })

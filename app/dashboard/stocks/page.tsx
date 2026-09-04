@@ -62,7 +62,7 @@ export default function StocksDashboard() {
         { data: whs },
         { data: recentMovs },
       ] = await Promise.all([
-        supabase.from('products').select('id,nom,categorie,sku,unite,prix_achat,prix_vente,seuil_alerte,stock_actuel').eq('tenant_id', tenantId).limit(200),
+        supabase.from('v_products_stock').select('id,nom,categorie,sku,unite,prix_achat,prix_vente,seuil_alerte,stock_actuel').eq('tenant_id', tenantId).limit(200),
         supabase.from('stock_movements').select('id,type,quantite,created_at').eq('tenant_id', tenantId)
           .gte('created_at', monthStart.toISOString()).limit(200),
         supabase.from('suppliers').select('id').eq('tenant_id', tenantId).limit(200),

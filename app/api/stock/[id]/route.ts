@@ -12,7 +12,7 @@ export async function GET(
   if (error) return error
 
   // Verify the product belongs to the authenticated user's tenant
-  const ownershipError = await assertResourceOwnership('stock_articles', id, ctx.tenantId)
+  const ownershipError = await assertResourceOwnership('products', id, ctx.tenantId)
   if (ownershipError) return ownershipError
 
   const { data: stock, error: rpcError } = await supabaseAdmin.rpc('get_product_stock', { p_id: id })
