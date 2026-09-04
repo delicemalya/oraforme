@@ -958,3 +958,156 @@ bancaire/caisse créé via l'UI (Trésorerie › Banques) n'est pas marqué
 explicite ou une évolution de l'UI de création. Comportement sûr par défaut
 (pas de nouveau triplement), mais pas de suivi automatique tant qu'il n'est
 pas désigné principal.
+
+---
+
+## TICKET — R004-DB-TRIGGER-TRANSACTIONS (promesse non tenue par la migration 177)
+
+**Statut :** OUVERT le 2026-09-04 (mission R-004) — diagnostic en attente d'exécution
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-02)
+
+### Contexte
+
+Le diagnostic du 2026-09-02 (§P0-04, « Diagnostic complémentaire ») affirmait que
+`trg_auto_journal_entry` et `trg_transaction_to_journal` (`AFTER INSERT ON
+transactions`, migrations 023/027 — `fn_auto_journal_entry` sans aucune garde,
+comptes devinés `571000`/`709000` par mot-clé de catégorie) **n'existaient pas en
+production**, et annonçait : « le dépôt et la production divergent (ANO-P04) : la
+migration 177 alignera le dépôt en supprimant ces deux triggers, sans effet en
+production. »
+
+**Vérifié le 2026-09-04 (mission R-004) sur le fichier réel** :
+`supabase/migrations/177_repair_achats_legacy_doublons.sql`, tel qu'écrit et
+committé, **ne contient aucun `DROP TRIGGER` pour ces deux noms** — il ne traite
+que les 48 doublons `achats_enregistrement`. La promesse n'a pas été tenue.
+
+**Cause racine** : le ticket 177 a été scopé, en session, sur le seul défaut
+confirmé et chiffré (doublons achats) ; la promesse d'alignement du dépôt pour ces
+deux autres triggers, formulée dans une session antérieure au moment du diagnostic
+P0-04, n'a pas été reportée dans le périmètre de 177 au moment de son écriture.
+
+**Conséquence si non traité** : si le dépôt est rejoué intégralement (nouvel
+environnement de recette, disaster recovery, `supabase db reset`), ces deux
+triggers seraient recréés (rien ne les supprime après leur création en 026/027) et
+le bug de double écriture — déjà vu pour les achats — se reproduirait à l'échelle
+de **tous** les événements du moteur central à impact trésorerie (FAC-002,
+PAI-002, RES-001, ECO-001, SAN-002, etc.), pas seulement ACH-001.
+
+**État réel en production actuelle** : non re-vérifié depuis le 2026-09-02 (2
+jours). Diagnostic demandé, Bloc SQL 1 de la mission R-004 (lecture seule,
+`pg_trigger` sur `transactions`).
+
+### Interdiction explicite de cette mission
+
+Ne pas appliquer de `DROP TRIGGER` avant d'avoir la confirmation de l'état réel en
+production. Si les triggers sont bien absents (diagnostic 2026-09-02 confirmé), le
+correctif à apporter est uniquement dans le **dépôt** (aligner 177 ou une nouvelle
+migration avec les `DROP TRIGGER`), sans effet en production. S'ils sont présents,
+traiter avec la méthodologie 176/177 (garde-fous, archivage `repair_archive`,
+contrôle chiffré avant/après) — hors périmètre de la mission R-004, qui est
+strictement une mission de vérification.
+
+---
+
+## TICKET — R004-CAISSE-DUPLICATE-WRITER (double écriture confirmée au niveau code)
+
+**Statut :** OUVERT le 2026-09-04 (mission R-004) — diagnostic en attente d'exécution
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-01), `docs/RESTART-AUDIT-AZ.md` ANO-M10
+
+### Deux writers identifiés pour la même opération
+
+**Writer A — `trg_caisse_operation`** (`fn_caisse_operation_to_journal()`, migration
+046:542-587, `AFTER INSERT ON caisse_operations`, jamais droppé). Pour une
+`dépense` : écrit une ligne `transactions` (source=`caisse_operations`,
+source_id=`NEW.id`, débit=`NEW.compte_charge`, crédit=`'571000'`) **et** une ligne
+`journal_entries` (mêmes source/source_id, mêmes comptes).
+
+**Writer B — `writeComptaEntry()`** (`lib/compta-sync-client.ts:133-175`, exemption
+officielle EXM-JE-003), appelé depuis `app/dashboard/tresorerie/caisses/page.tsx:97-105`
+juste après l'insert `caisse_operations` du même clic utilisateur (ligne 87). Écrit
+une ligne `journal_comptable` **et** une ligne `journal_entries` (source=`caisse`,
+**source_id NULL**, débit/crédit fixés dans la page : `658`/`571` pour une dépense —
+**valeurs différentes du Writer A**, qui utilise `571000` à 6 chiffres au lieu de
+`571` à 3 chiffres).
+
+### Cause racine
+
+Aucune garde d'idempotence commune entre les deux mécanismes : le Writer A se
+protège contre son propre re-déclenchement (`IF EXISTS (... source='caisse_operations'
+AND source_id=NEW.id)`) mais ne voit pas l'insert du Writer B, qui porte un
+`source` différent et aucun `source_id`. Si les deux sont actifs, **chaque
+dépense/approvisionnement de caisse produit 2 écritures `journal_entries`**, avec
+des codes de compte incohérents entre elles (`571000` vs `571` — la même
+divergence de normalisation déjà rencontrée en migration 133).
+
+### Diagnostic demandé
+
+Bloc SQL 1 de la mission R-004 (lecture seule) : présence réelle de
+`trg_caisse_operation` en production, et quantification des doublons par
+recoupement montant/date/tenant (le Writer B n'a pas de `source_id` exploitable).
+
+### Interdiction explicite de cette mission
+
+Ne pas corriger avant d'avoir confirmé l'ampleur réelle (nombre d'opérations
+concernées, montants). Hors périmètre de la mission R-004.
+
+---
+
+## TICKET — R004-TREASURY-VERIFICATION (généralisation de la preuve du correctif 178)
+
+**Statut :** OUVERT le 2026-09-04 (mission R-004) — diagnostic en attente d'exécution
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-04)
+**Ne duplique pas le ticket « VENTILATION TRÉSORERIE PAR COMPTE » ci-dessus**, qui
+reste `FERMÉ` pour l'incident historique AMD FINANCE (preuve chiffrée réelle déjà
+obtenue). Ce ticket suit uniquement la généralisation de la preuve, demandée par
+la mission R-004 : plusieurs tenants, 1/2/3 comptes bancaires, entrée/sortie/
+transfert, compte principal/secondaire/caisse — pas seulement le cas AMD FINANCE
+à 3 comptes déjà corrigé.
+
+### Ce qui reste à prouver
+
+Que `solde calculé = somme des mouvements réels du compte principal` — et non
+`solde × nombre de comptes` — tient pour :
+- un tenant à 1 seul compte (cas trivial, doit rester correct) ;
+- un tenant à 2 comptes (principal + secondaire, avec un transfert vers une
+  caisse) ;
+- un tenant à 3 comptes (principal + 2 secondaires) ;
+- l'isolation stricte entre tenants (aucune fuite de montant d'un tenant à
+  l'autre dans le recalcul).
+
+### Résidu déjà documenté, non traité par ce ticket
+
+`comptes_bancaires.solde` reste modifiable par arithmétique cliente depuis
+plusieurs pages UI (`banques/page.tsx:352`, `transferts/page.tsx:207-218`,
+`decaissements`/`encaissements`), en concurrence avec le recalcul absolu du
+moteur — la migration 178 réduit le *scope* du problème (un seul compte
+auto-géré) mais n'élimine pas cette concurrence d'écriture. Voir NEW-04 dans le
+registre maître.
+
+### Diagnostic demandé
+
+Bloc SQL 4 de la mission R-004 (tenants isolés, `ROLLBACK` en fin de script — voir
+ce bloc pour le détail complet).
+
+---
+
+## TICKET — R004-ACH-002-UNTESTABLE (suivi formel)
+
+**Statut :** NOT_TESTABLE — NO PRODUCTION DATA (2026-09-04, mission R-004)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`
+
+0 achat marqué payé en production à ce jour (confirmé par le diagnostic du
+2026-09-04, §« Ticket triggers hérités achats », section 8 : « 48 achats total, 0
+payé »). Conformément à l'interdiction explicite de la mission R-004, aucune
+donnée n'a été écrite en production pour fabriquer artificiellement une
+transaction.
+
+Un test isolé sur tenant jetable (`ROLLBACK` en fin de script, Bloc SQL 4 de la
+mission R-004) vérifie le mécanisme générique — achat marqué payé → émission
+ACH-002 → une seule écriture `journal_entries` + une seule ligne `transactions` →
+ré-émission (double clic/retry simulé) → toujours une seule écriture (même
+contrainte `uidx_ae_inflight` que pour ACH-001, déjà vérifiée). Ce test prouve le
+**mécanisme**, pas le comportement avec un vrai achat production — le statut
+`NOT_TESTABLE` ne se lèvera que lorsqu'un achat sera réellement marqué payé en
+production et qu'un contrôle réel sera exécuté sur ce cas précis. Ne pas déclarer
+`VERIFIED` avant cet événement, même si le test isolé passe.
