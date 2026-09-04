@@ -896,3 +896,65 @@ archivage et suppression.
 **Statut : FERMÉ.** Le volet paiement (`trg_achat_paye` vs ACH-002) reste à
 surveiller au premier achat marqué payé en production — pas de réparation
 nécessaire tant qu'il n'existe pas de doublon (diagnostic section 5-7 à zéro).
+
+---
+
+## TICKET — VENTILATION TRÉSORERIE PAR COMPTE (résidu P0-04, « défaut relevé sur 133 »)
+
+**Statut :** FERMÉ le 2026-09-04 — migration 178, appliquée et vérifiée en production
+
+### Contexte
+
+`fn_sync_tresorerie_soldes(tenant)` n'a jamais distingué les comptes bancaires
+individuels : elle affecte à **chaque** ligne `comptes_bancaires`/`caisses`
+d'un tenant la somme totale des mouvements `521`/`571` du tenant entier. Le
+moteur comptable lui-même n'a aucune notion de compte précis —
+`fn_ae_resolve_treasury` ne résout qu'un code de classe OHADA générique
+(`521`, `571`, `5711`, `5712`) depuis le moyen de paiement, jamais un compte
+spécifique. AMD FINANCE (3 comptes bancaires réels) affichait donc le même
+solde total (314 488 246 F) sur ses 3 comptes au lieu d'un seul.
+
+Une vraie ventilation par compte (`compte_bancaire_id` dans le moteur, sur
+chaque appel d'émission) est un chantier de plusieurs sessions et,
+rétroactivement, impossible sur l'historique (aucune donnée ne permet de
+savoir à quel compte physique une écriture `521` déjà enregistrée
+appartenait). Décision utilisateur (2026-09-04) : corriger l'affichage plutôt
+que reconstruire l'architecture — un **compte principal** par tenant, seul
+suivi automatiquement par le moteur ; les autres redeviennent manuels (déjà
+possible via Trésorerie › Banques, bouton « Modifier solde »).
+
+### Diagnostic
+
+Tenant AMD FINANCE (b93b7c3d-815b-4336-bbb2-ac24cda0edb2) : 3 comptes
+bancaires (BGFI — exploitation 521001, LCB — courant 521002, BOCEC — épargne
+521003), tous à 314 488 246 F ; 1 seule caisse (« Caisse principale »,
+571000, 118 900 F — pas concernée par le bug, un seul compte). Compte
+principal choisi par l'utilisateur : **LCB — Compte courant (521002)**.
+
+### Réparation appliquée (`supabase/migrations/178_tresorerie_compte_principal.sql`)
+
+1. Colonne `compte_principal` (boolean) sur `comptes_bancaires` et `caisses`,
+   index unique partiel (un seul principal par tenant).
+2. AMD FINANCE : LCB marqué principal explicitement (choix utilisateur).
+3. Tous les autres tenants : backfill automatique (compte actif le plus
+   ancien) — sans effet pratique pour les tenants à un seul compte.
+4. `fn_sync_tresorerie_soldes` réécrite : ne met plus à jour que la ligne
+   `compte_principal = true` de chaque tenant (comptes bancaires et caisses ;
+   wallets mobile money inchangés, `compte_ohada` distingue déjà chaque
+   wallet sans collision constatée).
+5. AMD FINANCE : BGFI et BOCEC remis à 0 (leur valeur affichée n'était que la
+   somme triplée, pas un solde saisi manuellement) ; LCB resynchronisé.
+
+| Contrôle | Résultat |
+|---|---|
+| BGFI / BOCEC | `principal=false · solde=0` |
+| LCB | `principal=true · solde=314 488 246` (recalculé, inchangé) |
+| Tenants sans compte principal | 0 |
+| Tenants sans caisse principale | 0 |
+
+**Limite connue, documentée volontairement non traitée :** un nouveau compte
+bancaire/caisse créé via l'UI (Trésorerie › Banques) n'est pas marqué
+`compte_principal` automatiquement — il restera manuel jusqu'à un `UPDATE`
+explicite ou une évolution de l'UI de création. Comportement sûr par défaut
+(pas de nouveau triplement), mais pas de suivi automatique tant qu'il n'est
+pas désigné principal.
