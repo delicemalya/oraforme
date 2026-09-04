@@ -814,22 +814,61 @@ Depuis ce point, chaque connexion écrit réellement dans `auth_logs`
 
 ## DÉPLOIEMENT — branche fix/p0-securite-automation
 
-**Statut :** BLOQUÉ — push refusé par GitHub (2026-09-03)
+**Statut :** DÉBLOQUÉ le 2026-09-04 — push réussi, PR ouverte
 **Contenu :** 25 commits devant `origin/main` (0971c4f), P0-01 à P0-05 : 131 fichiers ajoutés, 89 modifiés, 1 supprimé (`app/api/debug/db-check/route.ts`, ANO-C07), dont 33 captures binaires.
 
 | Étape | État |
 |---|---|
-| `git push -u origin fix/p0-securite-automation` | **403** — « Permission to delicemalya/oraforme.git denied to delicemalya » : l'identifiant enregistré dans le gestionnaire d'identifiants Windows n'a plus le droit d'écrire (jeton expiré ou sans portée `repo`) |
-| CLI `gh` | absente de la machine |
-| MCP GitHub | lecture OK (`list_commits`), écriture par `push_files` impossible : un seul commit aplati, pas de suppression de fichier, pas de binaire |
-| MCP Vercel | équipe visible (`polyvalontech-6578s-projects`), projet et déploiements en **403** : jeton sans portée projet |
-| CI (`.github/workflows/ci.yml`) | se déclenche sur `pull_request` et `push main` : types, lint, tests, puis build avec valeurs de remplacement |
+| `git push -u origin fix/p0-securite-automation` | 403 initial — « Permission to delicemalya/oraforme.git denied to delicemalya » : jeton Windows expiré. **Corrigé** : `cmdkey /delete:LegacyGeneric:target=git:https://github.com` a effacé l'identifiant en cache, Git Credential Manager a rouvert le navigateur pour une ré-authentification. Push réussi le 2026-09-04. |
+| CLI `gh` | absente de la machine — non nécessaire, MCP GitHub a suffi pour la PR |
+| PR | **#1** créée via MCP GitHub : https://github.com/delicemalya/oraforme/pull/1 (`fix/p0-securite-automation` → `main`) |
+| MCP Vercel | équipe visible (`polyvalontech-6578s-projects`), projet et déploiements en **403** : jeton sans portée projet. Vercel a néanmoins posté un statut "Deployment has completed" (succès) sur le commit de tête — la preview build fonctionne |
+| CI (`.github/workflows/ci.yml`) | déclenchée à l'ouverture de la PR : Semgrep (Security Scan + OSS Scan), `CI`, `Types, lint et tests`, `Build de production` — en cours au moment de la rédaction |
 
-Prérequis avant mise en production, à vérifier dans Vercel (non lisible d'ici) :
+Prérequis avant merge, à vérifier dans Vercel (non lisible d'ici) :
 - `CRON_SECRET` (ou `AUTOMATION_SECRET`) défini : 15 routes d'automatisation
   répondent 401 sans lui (`lib/api/require-automation.ts:44-56`, fermé par
   défaut). Sans cette variable, les 11 crons de `vercel.json` s'arrêtent.
 - Les variables Supabase et IA existantes restent inchangées.
 
-Chemin prévu une fois le push possible : PR `fix/p0-securite-automation → main`,
-CI verte, merge, déploiement automatique Vercel depuis `main`.
+Reste : CI verte sur la PR, revue, merge → déploiement automatique Vercel depuis `main`.
+
+---
+
+## TICKET — TRIGGERS HÉRITÉS SUR ACHATS (doublons journal_entries/transactions)
+
+**Statut :** DIAGNOSTIC PRÉPARÉ le 2026-09-04, en attente d'exécution en production
+**Anomalie couverte :** résidu relevé pendant P0-04 (§P0-04, « Résidus, hors périmètre de ce ticket ») — non classée dans `docs/RESTART-AUDIT-AZ.md`, ouverte ici par prudence avant qu'elle ne s'aggrave (chaque nouvel achat en production continue de créer un doublon tant que les triggers ne sont pas retirés).
+
+### Contexte
+
+La migration 147 du dépôt (`ANOM-ACH-01`, `ANOM-ACH-02`) supprime les triggers
+`trg_achat_enregistrement` (AFTER INSERT sur `achats` → journal_entries direct,
+`source='achats_enregistrement'`, migrations 044/046) et `trg_achat_paye`
+(AFTER UPDATE OF statut → transactions + journal_entries direct, migration 044
+uniquement), remplacés par les événements moteur ACH-001/ACH-002 émis depuis
+`app/api/achats/route.ts:39,94`. Le diagnostic P0-04 du 2026-09-02 a trouvé, pour
+le seul tenant AMD FINANCE, 48 écritures `achats_enregistrement` (25 086 000 F)
+coexistant avec 48 écritures du moteur pour les mêmes achats — signe que le
+`DROP TRIGGER` de la migration 147 n'a pas pris en production, cohérent avec le
+constat P0-05 (la production n'a jamais été construite par rejeu strict des
+migrations). Un trigger Postgres s'applique à toute la table, donc à tous les
+tenants, pas seulement AMD FINANCE — d'où un diagnostic global avant réparation.
+
+### Diagnostic préparé
+
+`docs/runbooks/triggers-herites-achats-diagnostic.sql` — une seule instruction
+en lecture seule (style maison : UNION ALL section/cle/valeur). Vérifie :
+1. Présence résiduelle de `trg_achat_enregistrement` / `trg_achat_paye` sur `achats`
+2. Volume des écritures `journal_entries.source='achats_enregistrement'`, par tenant
+3. Doublons confirmés : achats avec écriture legacy ET événement ACH-001 traité par le moteur
+4. Écritures legacy sans événement moteur correspondant — jamais touchées, seule trace comptable
+5-7. Même diagnostic côté règlements (`trg_achat_paye` vs ACH-002), via le lien `accounting_event_log` plutôt qu'un littéral de source (plus fiable, cf. P0-05 : « les libellés en production ne sont pas ceux du dépôt »)
+8. Volume total d'achats et de règlements, pour situer l'ampleur
+
+### Prochaine étape
+
+Faire exécuter le diagnostic par l'utilisateur dans l'éditeur SQL Supabase, puis
+construire le correctif guardé (assertions sur les comptes exacts trouvés, archivage
+dans `repair_archive` avant toute suppression, `DROP TRIGGER` aligné sur la
+migration 147, dans le style de 176/p0-05-bloc-A).
