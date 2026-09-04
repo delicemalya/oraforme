@@ -837,7 +837,7 @@ Reste : CI verte sur la PR, revue, merge → déploiement automatique Vercel dep
 
 ## TICKET — TRIGGERS HÉRITÉS SUR ACHATS (doublons journal_entries/transactions)
 
-**Statut :** DIAGNOSTIC PRÉPARÉ le 2026-09-04, en attente d'exécution en production
+**Statut :** FERMÉ le 2026-09-04 — 48 doublons archivés puis supprimés (migration 177)
 **Anomalie couverte :** résidu relevé pendant P0-04 (§P0-04, « Résidus, hors périmètre de ce ticket ») — non classée dans `docs/RESTART-AUDIT-AZ.md`, ouverte ici par prudence avant qu'elle ne s'aggrave (chaque nouvel achat en production continue de créer un doublon tant que les triggers ne sont pas retirés).
 
 ### Contexte
@@ -866,9 +866,33 @@ en lecture seule (style maison : UNION ALL section/cle/valeur). Vérifie :
 5-7. Même diagnostic côté règlements (`trg_achat_paye` vs ACH-002), via le lien `accounting_event_log` plutôt qu'un littéral de source (plus fiable, cf. P0-05 : « les libellés en production ne sont pas ceux du dépôt »)
 8. Volume total d'achats et de règlements, pour situer l'ampleur
 
-### Prochaine étape
+### Résultat du diagnostic (production, 2026-09-04)
 
-Faire exécuter le diagnostic par l'utilisateur dans l'éditeur SQL Supabase, puis
-construire le correctif guardé (assertions sur les comptes exacts trouvés, archivage
-dans `repair_archive` avant toute suppression, `DROP TRIGGER` aligné sur la
-migration 147, dans le style de 176/p0-05-bloc-A).
+| Section | Résultat |
+|---|---|
+| 1. Triggers `trg_achat_enregistrement` / `trg_achat_paye` sur `achats` | **absents** — le `DROP TRIGGER` de la migration 147 a bien pris ; il ne reste que des écritures orphelines créées avant sa suppression, aucun nouveau doublon ne se crée depuis |
+| 2/2b. `journal_entries.source='achats_enregistrement'` | 48 lignes · 25 086 000 F, toutes sur AMD FINANCE |
+| 3. Doublons confirmés (legacy + ACH-001 moteur traité) | 48/48 |
+| 4. Legacy sans contrepartie moteur (à préserver) | 0 |
+| 5-7. Volet paiement (`trg_achat_paye` vs ACH-002) | 0 partout — 0 achat payé à ce jour, rien à réparer de ce côté |
+| 8. Volume | 48 achats, 0 payé |
+
+Conclusion : réparation à sens unique, pas de `DROP TRIGGER` nécessaire (déjà
+fait), 48 doublons à archiver puis supprimer, tous confirmés, rien à préserver.
+
+### Réparation appliquée (production, 2026-09-04)
+
+`supabase/migrations/177_repair_achats_legacy_doublons.sql` — garde-fous sur
+les comptes exacts ci-dessus (abandon si l'état diverge), archivage dans
+`repair_archive` (repair='ACH-TRG') puis suppression, filtre identique entre
+archivage et suppression.
+
+| Contrôle | Résultat |
+|---|---|
+| `journal_entries` restantes source='achats_enregistrement' | 0 |
+| `repair_archive` (ACH-TRG, journal_entries) | 48 |
+| Achats avec ≠ 1 écriture journal_entries restante | 0 — chaque achat n'a plus que l'écriture du moteur |
+
+**Statut : FERMÉ.** Le volet paiement (`trg_achat_paye` vs ACH-002) reste à
+surveiller au premier achat marqué payé en production — pas de réparation
+nécessaire tant qu'il n'existe pas de doublon (diagnostic section 5-7 à zéro).
