@@ -1431,3 +1431,129 @@ sera jamais touché par 168 telle qu'écrite.
 **Sévérité : LOW** — performance uniquement, petite table (bucket logos).
 
 **Recommandation** : ticket séparé de 168 (« 168-bis »), même mécanisme, périmètre `storage`.
+
+---
+
+## TICKET — R006-MIGRATION-PHANTOM-TABLES (rejeu bloqué dès le fichier 68/179)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03) — **BLOCKED**, priorité haute
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R006-ANO-P03-RECETTE-ENVIRONMENT.md` §D
+
+Quatre migrations référencent des tables **jamais créées par aucune migration du dépôt**
+(existent uniquement en production, hors gouvernance des migrations) :
+
+- `068_entretiens_ia.sql:7` — `REFERENCES candidatures(id)`. **Premier point de rupture du rejeu
+  séquentiel complet** (fichier 68 sur 179) : `ERROR: relation "candidatures" does not exist`.
+- `110_ats_pipeline.sql` (lignes 7,14,17,38,57,76,97) — `candidatures`/`candidats`, même cause.
+- `120_wave4a_rls_security.sql` (lignes 8,10,11) — `candidatures`, même cause. Le même fichier
+  (lignes 19-52) montre pourtant le bon pattern défensif pour une autre table
+  (`IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='cabinet_affaires' ...)`)
+  sans l'appliquer ici.
+- `164_fix_fiscal_declarations_rls_bypass.sql` (lignes 29,31,33) — `fiscal_declarations`, même
+  cause. **Cette migration corrige la faille de sécurité la plus critique identifiée dans
+  `docs/RESTART-AUDIT-AZ.md`** (accès non authentifié aux déclarations fiscales de n'importe quel
+  tenant) — sur une base de recette neuve, elle ne peut même pas s'appliquer.
+
+**Cause racine** : ces tables ont été créées directement en production (dashboard Supabase ou
+script ad hoc), jamais versionnées comme migration — cohérent avec le constat P0-05 déjà établi
+(« la production n'a jamais été construite par rejeu strict des migrations »).
+
+**Impact** : bloque totalement la construction d'une base de recette au-delà du fichier 68 — tout
+ce qui suit (069→179, y compris l'essentiel du moteur comptable SYSCOHADA) ne serait jamais
+appliqué par un rejeu complet.
+
+**Interdiction explicite de cette mission : ne pas corriger.** Diagnostic uniquement — correction
+minimale proposée dans `docs/R006-ANO-P03-RECETTE-ENVIRONMENT.md` §D (créer les tables manquantes
+dans une migration antérieure, ou rendre ces 4 fichiers défensifs sur le modèle de
+`090_nif_to_niu.sql`), non appliquée.
+
+---
+
+## TICKET — R006-REPAIR-MIGRATIONS-NOT-REPLAYABLE (176-179 échouent sur base vierge)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03) — **BLOCKED**, priorité haute
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R006-ANO-P03-RECETTE-ENVIRONMENT.md` §D
+
+`176_repair_p0_04_amd_finance.sql:48`, `177_repair_achats_legacy_doublons.sql:47-48`,
+`178_tresorerie_compte_principal.sql:47-48`, `179_purge_seed_demo_amd_finance.sql:65` sont chacune
+encapsulées dans `BEGIN; ... COMMIT;` avec un garde-fou `DO $$ ... RAISE EXCEPTION ... END $$;` à
+comptage **exact** (« 240 originaux », « 48 écritures », « 3 comptes »…) — conçu pour vérifier
+l'état diagnostiqué en production avant de réparer. Sur une base vierge, tous les comptages valent
+0, ce qui ne correspond à aucune valeur attendue non nulle → **exception levée, transaction
+annulée, rejeu séquentiel arrêté à ce fichier**.
+
+**Confirmation précise (mission R-006)** : ces migrations ne sont **pas** des no-op silencieux sur
+base vide — ce sont des échecs bruyants qui propagent l'erreur au client SQL. Sous
+`supabase db reset`/rejeu séquentiel avec arrêt-sur-erreur, tout le reste s'arrêterait ici.
+
+**Cause racine** : ce ne sont pas des migrations de schéma rejouables — ce sont des réparations
+ponctuelles de données de production spécifiques, avec leur propre en-tête « BLOC À EXÉCUTER »
+manuel, jamais conçues pour un rejeu automatique sur base neuve.
+
+**Interdiction explicite de cette mission : ne pas corriger.** Correction minimale proposée :
+sortir ces 4 fichiers de `supabase/migrations/` vers `docs/runbooks/` (cohérent avec
+`p0-05-bloc-A.sql`/`p0-05-bloc-B.sql` déjà présents) — non appliquée dans cette session.
+
+---
+
+## TICKET — R006-EMPLOYES-FK-CASCADE-LOSS (perte silencieuse de contraintes)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`
+
+`038_employes.sql:2` (`DROP TABLE IF EXISTS employes CASCADE;`) détruit et recrée la table
+`employes` (déjà créée par `001_initial.sql:81`) avec un schéma étendu. Le `CASCADE` supprime
+silencieusement 3 contraintes de clé étrangère posées par des migrations antérieures, jamais
+restaurées ensuite :
+- `006_rh_lifecycle.sql:21` — `conges.employe_id REFERENCES employes(id) ON DELETE CASCADE`
+- `007_paie.sql:8` — `bulletins_paie.employe_id REFERENCES employes(id) ON DELETE SET NULL`
+- `017_hr_complete.sql:35` — `contrats.manager_id REFERENCES employes(id) ON DELETE SET NULL`
+
+**Impact** : sur un rejeu complet, `conges.employe_id`, `bulletins_paie.employe_id` et
+`contrats.manager_id` seraient orphelins de toute contrainte référentielle — état différent de
+l'intention du code source, sans erreur (pas bloquant), mais intégrité référentielle affaiblie.
+
+**Sévérité : MEDIUM.** Non corrigé dans cette session.
+
+---
+
+## TICKET — R006-MIGRATION-NAMING-ORDER (fichiers hors convention numérique)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`
+
+Trois anomalies de nommage/ordre sans impact bloquant constaté aujourd'hui, mais fragiles :
+- `142.5_fix_fn_ae_execute_event_country.sql` trie **avant** `142_accounting_rules_restaurant.sql`
+  (`.` < `_` en tri lexicographique) — sans dépendance réelle entre les deux aujourd'hui, mais un
+  futur fichier `14X.5_*` qui dépendrait du contenu de `14X_*` casserait silencieusement le rejeu.
+- `CATCHUP_008_to_025.sql` — entièrement redondant avec les migrations 008-025 numérotées
+  (contenu vérifié identique en substance, toutes protégées `IF NOT EXISTS`), conçu comme script
+  manuel de rattrapage hors-migration (son en-tête le dit explicitement) — sa présence dans
+  `supabase/migrations/` est trompeuse.
+- `20260524_mission_critique.sql` — non redondant (ajoute `profiles.created_at`,
+  `tenants.status`/`deleted_at`), mais trie après `179_*`, alors que d'autres migrations y font
+  implicitement référence en corps de fonction (sans blocage constaté, la validation n'a lieu qu'à
+  l'exécution, pas à la création).
+
+**Sévérité : LOW.** Non corrigé dans cette session.
+
+---
+
+## TICKET — R006-SEED-SCRIPT-NO-GUARD (risque de récidive de l'incident AMD FINANCE)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-06, incident historique déjà nettoyé)
+
+`scripts/seed-demo-data.ts` reste, tel quel, exécutable contre n'importe quel `.env.local` — y
+compris celui qui pointe vers production. `getTenantId()` (ligne 55-59) sélectionne automatiquement
+« le tenant le plus ancien de la base » sans aucune vérification d'environnement. C'est exactement
+le mécanisme qui a produit l'incident nettoyé par la migration 179 (1344 écritures fictives sur
+AMD FINANCE). Rien n'empêche une récidive si ce script est ré-exécuté, par erreur ou par un futur
+développeur qui ne connaît pas cet historique.
+
+**Recommandation (non appliquée)** : refuser l'exécution si l'URL Supabase cible correspond au
+projet de production connu ; exiger un `--tenant-id` explicite plutôt que « le plus ancien
+tenant ».
+
+**Sévérité : MEDIUM** (risque de récidive, indépendant de l'existence ou non d'un environnement de
+recette). Non corrigé dans cette session.
