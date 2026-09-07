@@ -1243,9 +1243,9 @@ isolé passe.
 
 ---
 
-## FORENSIQUE — journal_entries 2024-2025 (investigation en cours, pas encore un ticket)
+## FORENSIQUE — journal_entries 2024-2025 (résolu — migration 179)
 
-**Statut :** EN INVESTIGATION (2026-09-07, mission R-004) — pas de ticket ouvert tant que l'analyse SQL groupée n'a pas confirmé la conclusion
+**Statut :** FERMÉ le 2026-09-08 — purge complète, réversible (`repair_archive`, tag `SEED-CLEANUP-AMD`)
 **Découvert pendant :** le contrôle de production étendu de P0-02 (§P0-02, tableau 12×4)
 
 ### Constat initial
@@ -1278,33 +1278,66 @@ avec l'ancien moteur ») et avec les 23 écritures réelles restantes en juin
 jamais été nettoyées — hors périmètre de ces réparations, qui ne portaient
 que sur les doublons de juin 2026).
 
-### Classification provisoire
+### Classification définitive (confirmée empiriquement, 2026-09-07)
 
-**DONNÉES DE TEST/SEED — haute confiance, non encore confirmée empiriquement.**
-L'indice de code est quasi conclusif, mais conformément à la rigueur exigée
-par cette mission, la classification reste « provisoire » tant que l'analyse
-SQL groupée (tenant_id exact, clustering des `created_at`, comptes
-débit/crédit utilisés) n'a pas été exécutée et ses résultats obtenus.
+**DONNÉES DE TEST/SEED — confirmé, pas une hypothèse.** Diagnostic exhaustif
+en production :
+- Un seul tenant concerné : **AMD FINANCE**, 1344/1344 lignes.
+- `created_at` clustering sur **2 jours seulement** (2026-06-27 : 1248 lignes ;
+  2026-09-02 : 96 lignes) malgré des `date_operation` étalées sur 24 mois —
+  signature définitive d'une génération en masse, pas d'activité organique.
+- Le lot du 2026-09-02 s'explique entièrement : ce sont les 96 règlements
+  FAC-002 rejoués par la migration 176 (P0-04) sur ces mêmes factures de
+  démo — `date_operation` reste celle du fait d'origine (2024-2025),
+  `created_at` celle du rejeu.
+- 100% des lignes liées à un `accounting_events` réel (0 orpheline).
+- Correspondance **exacte** (total = scope) confirmée table par table :
+  `comptes_bancaires` (3), `employes` (8), `fournisseurs` (30),
+  `bulletins_paie` (192), `achats` (48), `stock_movements` (96) — aucune
+  donnée réelle mélangée sur ces 6 tables.
+- `factures` : 192, `created_at` backdaté individuellement sur toute la
+  période (pas de clustering, contrairement aux autres tables) mais total
+  exactement conforme au script — aucune facture supplémentaire.
+  `facture_lignes` : 0 ligne liée à AMD FINANCE.
+- `transactions` : 300 au total, 288 dans le périmètre du script — **12
+  lignes distinctes, datées du 2026-06-26/29**, catégories plausibles
+  d'activité réelle (Honoraires conseil, Loyers, Charges personnel,
+  Remboursements, ONG, Restaurant), montants de 100 000 à 8 500 000 F.
+  `accounting_events` : 771 au total, 768 dans le périmètre — **3 événements
+  hors script** (ONG-001 ×2, RES-001 ×1, mêmes 2026-06-26). Ces 15 lignes ne
+  viennent pas du script — **identifiées et préservées**, pas touchées par
+  la purge.
 
-### Diagnostic SQL préparé, remis à l'utilisateur (résultats en attente)
+**Découverte notable** : les 3 comptes bancaires (BGFI, LCB, BOCEC) que la
+migration 178 avait corrigés pour le triplement de solde faisaient
+eux-mêmes partie du jeu de démo (créés le 2026-06-27) — la correction de
+178 portait donc sur des données de démonstration, pas sur les comptes
+bancaires réels d'AMD FINANCE (dont on ignore l'état, puisqu'ils n'existent
+pas en base à ce jour).
 
-Deux blocs : (A) analyse groupée tenant×année×mois avec agrégats
-(`min`/`max created_at`, comptes distincts, `source` distincts,
-`piece_number`/`reference_piece` distincts, totaux) ; (B) empreinte
-qualitative (nombre de tenants concernés, distribution des dates de création
-— le test décisif : si les ~1344 lignes ont été créées en une poignée de
-jours malgré des `date_operation` étalées sur 24 mois, c'est la signature
-d'un script de génération en masse — libellés fréquents, comptes débit/crédit
-utilisés, lien avec `accounting_events`, comparaison avec `journal_comptable`
-sur la même période).
+### Réparation appliquée — migration 179
 
-### Prochaine étape
+`supabase/migrations/179_purge_seed_demo_amd_finance.sql` — garde-fous sur
+les 11 comptes exacts diagnostiqués, archivage JSONB intégral dans
+`repair_archive` (tag `SEED-CLEANUP-AMD`) avant suppression, ordre
+respectant les clés étrangères (`journal_entries` → `accounting_event_log`
+→ `accounting_events` → `transactions` → `stock_movements` → `achats` →
+`bulletins_paie` → `factures` → `comptes_bancaires` → `employes` →
+`fournisseurs`). Décision utilisateur : purge complète, y compris comptes
+bancaires/employés/fournisseurs, après confirmation qu'aucune donnée réelle
+n'y est mélangée.
 
-Si les résultats confirment un tenant unique, une provenance batch (`created_at`
-groupé sur peu de jours) et une correspondance avec le script de seed : ouvrir
-un ticket formel (impact sur les états comptables du tenant concerné si un
-utilisateur consulte les années 2024/2025 — à documenter, pas à corriger sans
-décision explicite sur le sort de ces données : suppression, ré-étiquetage,
-ou tenant de démonstration accepté comme tel). Si l'origine reste indéterminée
-malgré l'analyse SQL, le dire explicitement plutôt que de conclure par excès
-de confiance dans l'indice de code.
+`cheques`/`virements` référencent `comptes_bancaires` en `ON DELETE SET
+NULL` (vérifié avant exécution) — aucun risque de casse ou d'orphelin.
+
+### Contrôle post-exécution (production, 2026-09-08)
+
+| Contrôle | Résultat |
+|---|---|
+| `journal_entries`/`comptes_bancaires`/`employes`/`fournisseurs`/`factures`/`bulletins_paie`/`achats`/`stock_movements` restants pour AMD FINANCE | **0** sur les 8 tables |
+| `transactions` préservées (hors script) | **12** — conforme |
+| `accounting_events` préservés (hors script) | **3** — conforme |
+| `repair_archive` (SEED-CLEANUP-AMD) | journal_entries=1344, accounting_event_log=768, accounting_events=768, transactions=288, stock_movements=96, achats=48, bulletins_paie=192, factures=192, comptes_bancaires=3, employes=8, fournisseurs=30 |
+
+**Statut : FERMÉ.** Réversible via `repair_archive` (ordre de réinsertion
+documenté dans la migration 179) si besoin.
