@@ -1,5 +1,9 @@
 /**
+ * scripts/seed-employes-test.ts
  * Seed 5 employés de test pour adjigordon@gmail.com
+ *
+ * Usage : SEED_TARGET_ENV=recette npx tsx scripts/seed-employes-test.ts
+ *
  * Colonnes DB réelles (probing 2026-06-21) :
  *   nom, postnom, prenom, sexe, date_naissance, nationalite,
  *   situation_matrimoniale, nb_enfants, telephone, telephone2, email_pro,
@@ -12,25 +16,22 @@
  *   situation_familiale, nombre_enfants, nombre_parts, indemnite_vie_chere
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 import * as path from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { assertSeedTargetIsNotProduction, ProductionSeedGuardError } from './lib/seed-production-guard'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 
-const SUPABASE_URL = 'https://mrzixapnaqsbqmagivvf.supabase.co'
+// URL/clé reçues exclusivement de l'environnement — aucune valeur codée en dur ici
+// (ticket P0A-SEED-EMPLOYES-TEST-HARDCODED-PROD : l'ancienne version pointait
+// systématiquement vers la production, indépendamment de .env.local).
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY manquant — requis pour seed-employes-test')
-const TENANT_ID    = '64c244e5-02fd-4cf7-a56f-b0bdd48fdc09'
+const TENANT_ID     = '64c244e5-02fd-4cf7-a56f-b0bdd48fdc09'
 
-const sb = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false }
-})
-
-// Supprime les anciens employés de test
-await sb.from('employes').delete()
-  .eq('tenant_id', TENANT_ID)
-  .in('nom', ['MBOUNGOU', 'NZABA', 'KIMBEMBE', 'MOUKALA', 'DIALLO'])
+const NOMS_TEST = ['MBOUNGOU', 'NZABA', 'KIMBEMBE', 'MOUKALA', 'DIALLO']
 
 const employes = [
   {
@@ -225,24 +226,71 @@ const employes = [
   },
 ]
 
-console.log(`\n📝 Insertion des 5 employés — tenant ${TENANT_ID}\n`)
-
-let ok = 0
-for (const emp of employes) {
-  const { data, error } = await sb.from('employes').insert(emp).select('id,nom,prenom,poste,salaire_base').single()
-  if (error) {
-    console.error(`❌ ${emp.prenom} ${emp.nom} (${emp.poste}): ${error.message}`)
-  } else {
-    const label = `${data.prenom} ${data.nom} — ${data.poste}`
-    console.log(`✅ ${label.padEnd(50)} ${data.salaire_base?.toLocaleString('fr-FR')} FCFA`)
-    ok++
-  }
+/**
+ * Supprime les anciens employés de test. N'est JAMAIS appelée au chargement du
+ * module — uniquement depuis main(), après validation du garde de production
+ * (ticket P0A-SEED-EMPLOYES-TEST-HARDCODED-PROD : l'ancienne version exécutait
+ * ce DELETE au chargement, hors de toute fonction).
+ */
+async function deleteExistingTestEmployes(sb: SupabaseClient): Promise<void> {
+  await sb.from('employes').delete().eq('tenant_id', TENANT_ID).in('nom', NOMS_TEST)
 }
 
-console.log(`\n🎉 ${ok}/5 employés insérés avec succès\n`)
-console.log('📊 Scénarios couverts :')
-console.log('   1. MBOUNGOU Jean-Pierre  → CDI 850k  · dossier complet  · score VERT')
-console.log('   2. NZABA Christelle      → CDD 420k  · contrat expiré 07/2025')
-console.log('   3. KIMBEMBE Rodrigue     → Stage 90k · pas de CNSS/fiscal · score ROUGE')
-console.log('   4. MOUKALA Patience      → CDI 560k  · EN CONGÉ · 8 ans ancienneté')
-console.log('   5. DIALLO Mamadou        → Freelance 1.2M · non-résident Sénégal\n')
+async function insertTestEmployes(sb: SupabaseClient): Promise<void> {
+  console.log(`\n📝 Insertion des 5 employés — tenant ${TENANT_ID}\n`)
+
+  let ok = 0
+  for (const emp of employes) {
+    const { data, error } = await sb.from('employes').insert(emp).select('id,nom,prenom,poste,salaire_base').single()
+    if (error) {
+      console.error(`❌ ${emp.prenom} ${emp.nom} (${emp.poste}): ${error.message}`)
+    } else {
+      const label = `${data.prenom} ${data.nom} — ${data.poste}`
+      console.log(`✅ ${label.padEnd(50)} ${data.salaire_base?.toLocaleString('fr-FR')} FCFA`)
+      ok++
+    }
+  }
+
+  console.log(`\n🎉 ${ok}/5 employés insérés avec succès\n`)
+  console.log('📊 Scénarios couverts :')
+  console.log('   1. MBOUNGOU Jean-Pierre  → CDI 850k  · dossier complet  · score VERT')
+  console.log('   2. NZABA Christelle      → CDD 420k  · contrat expiré 07/2025')
+  console.log('   3. KIMBEMBE Rodrigue     → Stage 90k · pas de CNSS/fiscal · score ROUGE')
+  console.log('   4. MOUKALA Patience      → CDI 560k  · EN CONGÉ · 8 ans ancienneté')
+  console.log('   5. DIALLO Mamadou        → Freelance 1.2M · non-résident Sénégal\n')
+}
+
+export async function main(): Promise<void> {
+  try {
+    assertSeedTargetIsNotProduction({
+      SEED_TARGET_ENV: process.env.SEED_TARGET_ENV,
+      NEXT_PUBLIC_SUPABASE_URL: SUPABASE_URL,
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      NODE_ENV: process.env.NODE_ENV,
+    })
+  } catch (e) {
+    if (e instanceof ProductionSeedGuardError) {
+      console.error(`❌ GARDE-FOU PRODUCTION — exécution refusée.\n   ${e.message}`)
+      process.exit(1)
+    }
+    throw e
+  }
+
+  if (!SUPABASE_URL || !SERVICE_KEY) {
+    console.error('❌ NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY manquant dans .env.local')
+    process.exit(1)
+  }
+
+  const sb = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+
+  await deleteExistingTestEmployes(sb)
+  await insertTestEmployes(sb)
+}
+
+// N'exécute main() que si ce fichier est lancé directement (`npx tsx
+// scripts/seed-employes-test.ts`) — un simple `import` de ce module (par un test,
+// par exemple) ne déclenche jamais de DELETE ni d'INSERT.
+const isMainModule = process.argv[1] ? import.meta.url === pathToFileURL(process.argv[1]).href : false
+if (isMainModule) {
+  main().catch(e => { console.error('FATAL:', e); process.exit(1) })
+}

@@ -1653,3 +1653,139 @@ configuration locale.
 
 **Sévérité : HIGH** (URL de production non contournable par la configuration de l'environnement
 d'exécution, suppression de données au chargement du module sans aucun garde).
+
+---
+
+## CLÔTURE — P0A-SEED-EMPLOYES-TEST-HARDCODED-PROD (mission P0-A.2, 2026-09-07)
+
+**Statut : VERIFIED FIX.**
+
+**Cause racine.** `scripts/seed-employes-test.mjs` codait en dur l'URL Supabase de production
+(`https://mrzixapnaqsbqmagivvf.supabase.co`, confirmée identique à `.env.local`), rendant inopérante
+toute protection basée sur la configuration locale (`.env.local`, `SEED_TARGET_ENV`, etc.) : même un
+`.env.local` de recette correctement configuré n'aurait aucun effet, le fichier ignorait
+totalement `.env.local` pour l'URL. De plus, le `DELETE FROM employes ...` s'exécutait au chargement
+du module — au niveau racine du fichier, hors de toute fonction — donc un simple `import` (par un
+outil, un test, un futur refactor) l'aurait déclenché.
+
+**Comportement avant/après.**
+
+| | Avant | Après |
+|---|---|---|
+| URL Supabase | codée en dur dans le source, ignore `.env.local` | lue depuis `NEXT_PUBLIC_SUPABASE_URL` (`.env.local`/environnement), aucune valeur codée en dur |
+| Garde d'environnement | aucun | `assertSeedTargetIsNotProduction()` (réutilisé tel quel depuis `scripts/lib/seed-production-guard.ts` — même module que `seed-demo-data.ts`, aucun système concurrent créé) |
+| `DELETE FROM employes` | exécuté au chargement du module, avant toute vérification | déplacé dans `deleteExistingTestEmployes()`, appelée uniquement par `main()`, elle-même appelée uniquement si le garde n'a pas levé d'exception, et uniquement quand le fichier est exécuté directement (`npx tsx scripts/seed-employes-test.ts`) — un `import` du module ne déclenche ni le garde ni `main()` |
+| Point d'entrée | tout le corps du script au niveau racine | racine = déclarations pures (constantes, fonctions) ; exécution réelle gardée par `if (isMainModule) { main()... }`, détectée via `import.meta.url === pathToFileURL(process.argv[1]).href` |
+| Extension/exécution | `.mjs`, `node scripts/seed-employes-test.mjs` | `.ts`, `npx tsx scripts/seed-employes-test.ts` (même convention que `seed-demo-data.ts`, nécessaire pour importer le garde TypeScript sans dupliquer sa logique) |
+
+**Tests ajoutés** — `scripts/seed-employes-test.test.ts` (9 tests, `@supabase/supabase-js` et
+`dotenv` mockés, aucune connexion réelle) :
+1. `SEED_TARGET_ENV=recette` → autorisé, delete puis 5 insert exécutés.
+2. URL Supabase de production (`KNOWN_PRODUCTION_SUPABASE_URL`) → refusé, `createClient` jamais
+   appelé, même avec `SEED_TARGET_ENV=recette`.
+3. `VERCEL_ENV=production` → refusé, même avec `SEED_TARGET_ENV=recette`.
+4. `NODE_ENV=production` → refusé, même avec `SEED_TARGET_ENV=recette`.
+5. `SEED_TARGET_ENV` absent → refusé (fail-closed).
+6. `SEED_TARGET_ENV="staging"` (valeur inconnue) → refusé (fail-closed).
+7. **Import du module sans appeler `main()`** → `createClient` jamais appelé, aucune entrée dans le
+   journal d'appels (`callLog`) — preuve directe qu'un import seul ne modifie jamais la base.
+8. Quand autorisé : le premier appel enregistré est toujours `delete`, avant tout `insert`.
+9. Quand refusé : ni `createClient`, ni `delete`, ni `insert` ne sont jamais appelés — le refus
+   intervient strictement avant toute opération, y compris la création du client.
+
+**Résultats réels (exécutés le 2026-09-07, pas de connexion Supabase)**
+- `npx vitest run scripts/seed-employes-test.test.ts` → **9/9 passés**.
+- `npx vitest run` (suite complète) → **760/760 passés, 33 fichiers**, aucune régression (751 avant
+  + 9 nouveaux).
+- `npx tsc --noEmit` → **0 erreur**.
+- `npx eslint` sur les fichiers modifiés → **0 erreur** (avertissements « file ignored » attendus,
+  `scripts/` déjà exclu du lint, convention préexistante) ; `npx eslint .` (projet complet) →
+  **0 erreur**, warnings préexistants sans rapport avec ces fichiers.
+
+**Limites documentées.** Comme pour R006-SEED-SCRIPT-NO-GUARD, le garde n'a pas été exercé contre le
+vrai projet de production (interdit par le périmètre de la mission). `TENANT_ID` reste codé en dur
+(`64c244e5-…`) — hors périmètre explicite de cette mission (qui portait sur l'URL, le garde, et le
+side-effect au chargement, pas sur l'identifiant de tenant).
+
+---
+
+## RECHERCHE EXHAUSTIVE — autres scripts pouvant modifier une base (mission P0-A.2, 2026-09-07)
+
+Recherche dans `scripts/`, `supabase/`, `.github/`, `package.json` : `seed`, `demo`, `fixture`,
+`DELETE FROM`, `TRUNCATE`, `SUPABASE_SERVICE_ROLE_KEY`, URLs Supabase codées en dur, `createClient(`.
+
+| Fichier | Classe | Constat |
+|---|---|---|
+| `scripts/seed-demo-data.ts` | **GUARDED** | Corrigé mission P0-A (`R006-SEED-SCRIPT-NO-GUARD`) |
+| `scripts/seed-employes-test.ts` | **GUARDED** | Corrigé cette mission (P0-A.2) |
+| `scripts/*.js`/`*.mjs`/`*.ts` restants (outillage i18n : `apply_sw.js`, `audit_values.js`, `check2.js`, `check_coverage.js`, `find_untranslated.js`, `fix-i18n-*.mjs`, `gen_*.ts/js`, `generate-i18n.js`, `insert-i18n-keys.mjs`, `insert-sidebar-keys.mjs`, `migrate-fmt*.mjs`, `translate_batch.js`) | **SAFE** | Aucun de ces fichiers n'appelle `createClient(` ni ne référence `SUPABASE_SERVICE_ROLE_KEY` (recherche exhaustive du dépôt) — n'opèrent que sur des fichiers JSON locaux |
+| `scripts/semgrep.sh` | **SAFE** | Wrapper d'analyse statique, aucun accès DB |
+| `supabase/seed_ecam_congo.sql` | **UNSAFE — CRITIQUE, NOUVEAU** | Fichier SQL brut hors `migrations/`, en-tête « Exécuter dans Supabase → SQL Editor ». `DELETE FROM employes/staff_ecole/etudiants/enseignants WHERE tenant_id = 'c9651476-…'` inconditionnel puis `INSERT` — tenant codé en dur, vraisemblablement le client réel ECAM CONGO. **Aucun garde de script ne peut le protéger** : conçu pour un copier-coller manuel direct. Voir ticket dédié ci-dessous |
+| `supabase/backfill_paie_comptabilite.sql` | **GUARDED (idempotent)** | Même tenant ECAM CONGO codé en dur, mais `INSERT` protégé par `NOT EXISTS` — pas de perte de données possible en cas de ré-exécution. Voir ticket dédié |
+| `supabase/tests/validate_rls_wave4a.sql` | **SAFE** | Gabarit de test RLS avec placeholders `<TENANT_B>`/`<USER_A>` — non exécutable tel quel, nécessite substitution manuelle |
+| `supabase/migrations/*.sql` (179 fichiers, dont 176/177/179 et les migrations `accounting_rules_*` 139-148) | **GUARDED (collectif)** | Les `DELETE FROM` trouvés sont soit des sections de rollback idempotentes sur des tables de règles (ex. `139_accounting_rules_facturation.sql:300`), soit des migrations de réparation déjà auditées sous R-006 — non ré-audités individuellement ici pour éviter le doublon avec l'audit des 179 migrations (R-006) |
+| `.github/workflows/ci.yml` | **SAFE** | Aucune étape n'invoque `npx tsx scripts/seed-*` ; le job `build` utilise des valeurs de remplacement explicites (`https://placeholder.supabase.co`) — même en cas d'appel accidentel, aucune cible réelle ; le job `quality` exécute uniquement `vitest run` (aucune DB réelle) |
+| `.github/workflows/semgrep.yml` | **SAFE** | Analyse statique uniquement, aucun accès DB |
+| `package.json` | **SAFE** | Aucun script `seed`/`demo`/`fixture` — recherche vide confirmée |
+
+**Correction : le P0-A initial affirmait à tort l'absence de tout pipeline CI** (`.github/workflows`
+n'avait pas été trouvé par un glob qui a échoué silencieusement). Il existe bien deux workflows
+(`ci.yml`, `semgrep.yml`), inspectés ci-dessus — verdict inchangé : aucun ne peut invoquer un script
+de seed contre production, aucun guard CI supplémentaire n'est nécessaire (§7 de la mission).
+
+---
+
+## TICKET — P0A2-SEED-ECAM-CONGO-SQL-UNGUARDABLE (découvert en marge de P0-A.2, 2026-09-07)
+
+**Statut :** OUVERT, non corrigé (hors périmètre de la mission P0-A.2, qui portait exclusivement sur
+`scripts/seed-employes-test.mjs` — signalement uniquement).
+
+`supabase/seed_ecam_congo.sql` est un fichier SQL brut placé directement sous `supabase/` (hors
+`migrations/`), avec l'en-tête explicite « Exécuter dans Supabase → SQL Editor ». Il exécute, pour
+le tenant codé en dur `c9651476-2fc4-407a-8a4e-778fa1332689` :
+
+```
+DELETE FROM employes    WHERE tenant_id = tid;
+DELETE FROM staff_ecole WHERE tenant_id = tid;
+DELETE FROM etudiants   WHERE tenant_id = tid;
+DELETE FROM enseignants WHERE tenant_id = tid;
+```
+
+suivi d'`INSERT` de données nominatives (enseignants, étudiants, personnel). Le nom du tenant —
+« ECAM CONGO » — et la présence d'un dossier utilisateur `OneDrive - GROUPE ECAM CONGO` suggèrent
+fortement qu'il s'agit d'un **client réel**, pas d'une donnée de démo abstraite comme AMD FINANCE
+dans `seed-demo-data.ts`.
+
+**Différence fondamentale avec les tickets précédents** : ce fichier n'est pas du code exécuté par
+Node — c'est un script SQL destiné à être copié-collé manuellement dans l'éditeur SQL Supabase.
+**Aucun garde applicatif (TypeScript/JavaScript) ne peut l'intercepter.** Toute protection doit être
+structurelle : retrait du dépôt de code, déplacement vers un emplacement clairement hors-production
+(ex. `docs/runbooks/` avec avertissement explicite), ou suppression pure si la donnée n'est plus
+nécessaire.
+
+**Recommandation (non appliquée)** : vérifier auprès de l'utilisateur si `c9651476-…` est le tenant
+de production réel d'ECAM CONGO ; si oui, retirer ce fichier du dépôt (ou le déplacer hors de
+`supabase/` avec un avertissement) et considérer le remplacer par un script paramétrable protégé par
+le même garde que `seed-demo-data.ts`/`seed-employes-test.ts`, s'il doit être conservé pour usage
+futur sur un tenant de démonstration distinct.
+
+**Sévérité : HIGH** (aucune protection technique possible par un garde de script ; DELETE
+inconditionnel sur des données potentiellement réelles d'un client nommé).
+
+---
+
+## TICKET — P0A2-BACKFILL-ECAM-CONGO-SQL (découvert en marge de P0-A.2, 2026-09-07)
+
+**Statut :** OUVERT, non corrigé (signalement uniquement, hors périmètre).
+
+`supabase/backfill_paie_comptabilite.sql` cible le même tenant ECAM CONGO codé en dur, mais
+n'exécute que des `INSERT` protégés par une clause `NOT EXISTS` (ne réinsère que les écritures de
+paie absentes de `journal_comptable`) — idempotent par construction, aucune perte de données
+possible en cas de ré-exécution accidentelle. Même remarque que ci-dessus sur l'impossibilité d'un
+garde applicatif pour un fichier SQL destiné au copier-coller manuel.
+
+**Recommandation (non appliquée)** : si conservé, déplacer vers `docs/runbooks/` avec le même
+avertissement que `seed_ecam_congo.sql`.
+
+**Sévérité : LOW** (idempotent, pas de risque de perte de données — signalé pour traçabilité et
+cohérence avec le ticket précédent, même tenant).
