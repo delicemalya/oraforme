@@ -1341,3 +1341,93 @@ NULL` (vérifié avant exécution) — aucun risque de casse ou d'orphelin.
 
 **Statut : FERMÉ.** Réversible via `repair_archive` (ordre de réinsertion
 documenté dans la migration 179) si besoin.
+
+---
+
+## TICKET — R005-OCR-PROXY-GAP (`/api/ocr/extract` absente de `AUTOMATION_PATHS`)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code, non vérifié en HTTP réel
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §B
+
+`proxy.ts` (`AUTOMATION_PATHS`, lignes 32-47) liste 14 chemins d'automatisation, pas 15 —
+`/api/ocr/extract` en est absente, et n'est pas non plus dans `PUBLIC_API_PREFIXES`.
+`app/api/storage/upload/route.ts:70-74` déclenche l'OCR via `fetch()` avec un
+`Authorization: Bearer <CRON_SECRET>` valide (`automationHeaders()`), mais sans cookie de
+session. Le proxy voit `user=null`, la route n'est exemptée nulle part → **401 renvoyé par le
+proxy avant que `requireAutomationSecret` ne soit jamais évalué**. L'échec est avalé
+silencieusement (`.catch(() => {})`, ligne 74) — aucune alerte, aucun log.
+
+**Cause racine** : `AUTOMATION_PATHS` a été construite à partir des 14 routes déjà connues au
+moment de la correction ANO-C01 (commit `f0d43f2`) ; `ocr/extract` a son propre garde
+`requireAutomationSecret` mais n'a jamais été ajoutée à la liste d'exemption du proxy — décalage
+entre deux mécanismes qui devraient être synchronisés.
+
+**Impact** : fonctionnel, pas une exposition de sécurité (le proxy bloque, il n'ouvre rien).
+L'OCR asynchrone post-upload semble structurellement en échec en production.
+
+**Gap CI associé** : `lib/architecture/automation-guard.test.ts` vérifie que chaque chemin de
+`AUTOMATION_PATHS` appelle le garde, mais pas l'inverse (qu'une route appelant le garde soit bien
+listée) — c'est cet angle mort qui laisse passer le cas sans échec CI.
+
+**Interdiction explicite de cette mission** : ne rien corriger sans validation. Diagnostic
+uniquement.
+
+---
+
+## TICKET — R005-AUTOMATION-RUN-TIMING (`automation/run` hors garde unique)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §B
+
+`app/api/automation/run/route.ts` est une 16ᵉ route d'automatisation, non couverte par
+`requireAutomationSecret`/`safeEqual`. Elle réimplémente son propre contrôle :
+`secret !== process.env.AUTOMATION_SECRET` — comparaison **directe**, pas à temps constant.
+Accepte aussi une session utilisateur en parallèle (mode double), ce qui limite l'exposition
+réelle. Non couverte par `lib/architecture/automation-guard.test.ts`.
+
+**Sévérité : LOW** — timing attack théorique sur la comparaison de secret, mitigée par le mode
+session parallèle et par le fait que l'attaquant devrait déjà connaître l'existence de cette route
+spécifique (hors des 15 documentées).
+
+---
+
+## TICKET — R005-RLS-FUNCTION-BODY-GAP (gisement de performance hors périmètre de 168)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §A
+**Dépend de :** migration 168
+
+`get_my_tenant_id()` (migration 118), `get_my_role()` (053) et `fn_is_user_financial()` (030)
+contiennent `WHERE user_id = auth.uid()` **non encapsulé, dans le corps de la fonction**
+(`get_my_tenant_id`/`get_my_role` en `STABLE` ; `fn_is_user_financial` sans marqueur `STABLE`
+explicite, donc `VOLATILE` par défaut — pire cas, aucune mise en cache possible par appel). La
+migration 168 ne réécrit que `pg_policies` — elle ne touche jamais le corps d'une fonction. Or la
+quasi-totalité des ~110+ tables du dépôt délèguent leur isolation tenant à `get_my_tenant_id()`
+plutôt qu'à un `auth.uid()` direct dans leur policy — **le point d'optimisation le plus
+impactant en volume n'est donc pas couvert par 168**, même si elle est appliquée intégralement.
+
+**Non vérifiable depuis le dépôt seul** : si Postgres *inline* effectivement ces fonctions
+`STABLE` dans le plan d'exécution des policies appelantes (auquel cas le défaut se propage à
+chaque appelant) dépend de la version Postgres et du contenu exact de la requête — seul un
+`EXPLAIN (ANALYZE, BUFFERS)` réel en base trancherait.
+
+**Recommandation** : ticket séparé de 168, à traiter en recette une fois celle-ci disponible
+(ANO-P03).
+
+---
+
+## TICKET — R005-STORAGE-RLS-GAP (`storage.objects` hors périmètre de 168)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §A
+**Dépend de :** migration 168
+
+`168_fix_auth_rls_initplan.sql:54` filtre `schemaname = 'public'` — le schéma `storage` est donc
+hors périmètre, alors que l'introduction du fichier (lignes 3-4) prétend couvrir `auth.role()`
+sans réserve. `storage.objects` (`logos_auth_insert`/`logos_auth_update`, migration
+`041_storage_logos_bucket.sql:26-32`) utilise `auth.role() = 'authenticated'` non encapsulé et ne
+sera jamais touché par 168 telle qu'écrite.
+
+**Sévérité : LOW** — performance uniquement, petite table (bucket logos).
+
+**Recommandation** : ticket séparé de 168 (« 168-bis »), même mécanisme, périmètre `storage`.

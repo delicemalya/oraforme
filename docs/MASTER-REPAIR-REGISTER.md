@@ -149,23 +149,27 @@ R-003 §8, confirmée et localisée ici.
 | P0-05 | Infrastructure | VERIFIED (7 migrations) / OPEN (168) | Tables de contrôle réelles chiffrées | Migration 168 |
 | 177 (TRIGGERS HÉRITÉS ACHATS) | Comptabilité | **CLOSED** (historique **et** mécanisme d'idempotence) | Contrôle réel 0 restant, 48 archivés ; idempotence ACH-001 confirmée (2026-09-07) sur tenant isolé — 2 `accounting_events` malgré 2 tentatives d'émission sur le même achat, pas 3 | — |
 | 178 (VENTILATION TRÉSORERIE) | Trésorerie | **CLOSED** (historique AMD FINANCE **et** généralisation multi-tenant) | Contrôle réel conforme ; math généralisée confirmée (2026-09-07) sur 1/2/3 comptes, 3 tenants isolés, aucune fuite | — |
-| 168 | Sécurité (RLS) | OPEN | Aucune — jamais appliquée en prod | ANO-P03 (pas de recette pour valider) |
-| CRON/AUTOMATION_SECRET | Automatisation | PRODUCTION_PENDING | 15/15 routes HTTP réel = 401 ; secret non confirmable de l'extérieur | ANO-C01 |
+| 168 | Sécurité (RLS) | OPEN — **verdict B (sûre, adaptation recommandée)** établi le 2026-09-08 (R-005) | Aucune — jamais appliquée en prod. ~19 policies confirmées comme cibles valides (plancher, pas les 76 exactes — bloc dynamique). Aucun conflit avec 169-179 constaté. Plan d'application en 9 étapes documenté, non exécuté | ANO-P03 (pas de recette pour valider) ; R005-RLS-FUNCTION-BODY-GAP (le vrai gain de perf est hors périmètre de 168) ; R005-STORAGE-RLS-GAP |
+| CRON/AUTOMATION_SECRET | Automatisation | PRODUCTION_PENDING | 15/15 routes HTTP réel = 401 ; secret non confirmable de l'extérieur ; tableau détaillé des 15 routes établi le 2026-09-08 (R-005), aucune anomalie de garde trouvée sur ces 15 | ANO-C01 ; R005-OCR-PROXY-GAP ; R005-AUTOMATION-RUN-TIMING |
 | ACH-002 | Comptabilité | NOT_TESTABLE — NO PRODUCTION DATA | 0 achat payé en prod ; mécanisme générique (idempotence, 1 événement = 1 écriture) confirmé sur tenant isolé (2026-09-07) — ne lève pas le statut, qui reste lié à l'absence de données réelles | R004-ACH-002-UNTESTABLE |
 
 ---
 
-## Table 4 — Nouveaux tickets créés par la mission R-004
+## Table 4 — Nouveaux tickets créés par les missions R-004 et R-005
 
 Voir `docs/REPAIR-LOG.md` pour le détail complet de chacun (cause racine, mécanisme exact,
 diagnostic SQL fourni). Résumé :
 
 | ID | Titre | Statut | Diagnostic | Dépendances |
 |---|---|---|---|---|
-| R004-DB-TRIGGER-TRANSACTIONS | Triggers legacy jamais droppés **dans le dépôt** sur `transactions` (`trg_auto_journal_entry`, `trg_transaction_to_journal`) — promesse REPAIR-LOG non tenue par la migration 177 | **OPEN — risque latent uniquement, pas d'incident actif** (confirmé absents en production le 2026-09-07, seul `trg_update_account_balance` actif) | Bloc SQL 1 (R-004), exécuté 2026-09-07 | NEW-02 |
-| R004-CAISSE-DUPLICATE-WRITER | Double écriture sur `caisse_operations` (trigger `trg_caisse_operation` + `writeComptaEntry()`) | **OPEN — risque latent uniquement, pas d'incident actif** (`trg_caisse_operation` absent en production le 2026-09-07, 0 `caisse_operations` existante ; seul `trg_sync_caisse_solde`, sans écriture comptable, est actif) | Bloc SQL 1 (R-004), exécuté 2026-09-07 | NEW-01, ANO-M10 |
+| R004-DB-TRIGGER-TRANSACTIONS | Triggers legacy jamais droppés **dans le dépôt** sur `transactions` (`trg_auto_journal_entry`, `trg_transaction_to_journal`) — promesse REPAIR-LOG non tenue par la migration 177 | **OPEN — risque latent uniquement, pas d'incident actif**. Protection recommandée (R-005, 2026-09-08) : combinaison DB guard (migration DROP explicite, pattern déjà éprouvé 4× : 127/139/141/147) + CI guard (test statique parsant les migrations, pattern déjà éprouvé dans `chaine-paie-comptabilite.test.ts:201-205`) + documentation (déjà faite, insuffisante seule) | Bloc SQL 1 (R-004), exécuté 2026-09-07 ; recommandation R-005 | NEW-02 |
+| R004-CAISSE-DUPLICATE-WRITER | Double écriture sur `caisse_operations` (trigger `trg_caisse_operation` + `writeComptaEntry()`) | **OPEN — risque latent uniquement, pas d'incident actif**. Même protection recommandée que R004-DB-TRIGGER-TRANSACTIONS (combinaison DB+CI guard) | Bloc SQL 1 (R-004), exécuté 2026-09-07 ; recommandation R-005 | NEW-01, ANO-M10 |
 | R004-TREASURY-VERIFICATION | Généralisation de la preuve mathématique du correctif 178 (multi-tenant, 1/2/3 comptes, nouveau compte, transfert) — le correctif historique AMD FINANCE est déjà `CLOSED`, ce ticket suivait la vérification élargie | **VERIFIED** — confirmée le 2026-09-07 sur 3 tenants isolés (1/2/3 comptes), aucune fuite inter-tenant, comptes secondaires jamais touchés | Bloc SQL 4 (R-004), exécuté 2026-09-07 | 178 |
 | R004-ACH-002-UNTESTABLE | Suivi formel du statut `NOT_TESTABLE — NO PRODUCTION DATA` d'ACH-002 (0 achat payé en production) | **NOT_TESTABLE — NO PRODUCTION DATA** (inchangé — le mécanisme générique est confirmé sur tenant isolé le 2026-09-07, mais ceci ne lève pas le statut, réservé à une preuve avec un achat production réel) | Bloc SQL 4 (R-004), exécuté 2026-09-07 | — |
+| R005-OCR-PROXY-GAP | `/api/ocr/extract` absente de `AUTOMATION_PATHS` (`proxy.ts`) — le proxy bloque l'appel interne (`storage/upload` → `ocr/extract`) avant que `requireAutomationSecret` soit évalué ; échec avalé silencieusement (`.catch(() => {})`) | **OPEN** — fonctionnel (MEDIUM), pas une exposition de sécurité (le proxy bloque, il n'ouvre rien) | Lecture de code (R-005, 2026-09-08), non vérifié en HTTP réel avec un vrai upload | — |
+| R005-AUTOMATION-RUN-TIMING | `app/api/automation/run/route.ts` : 16ᵉ route d'automatisation, hors du garde unique `requireAutomationSecret`, compare son secret avec `!==` au lieu d'une comparaison à temps constant | **OPEN** — LOW (timing attack théorique, mitigé par un mode session utilisateur en parallèle) | Lecture de code (R-005, 2026-09-08) | — |
+| R005-RLS-FUNCTION-BODY-GAP | `get_my_tenant_id()` (118), `get_my_role()` (053), `fn_is_user_financial()` (030) contiennent `auth.uid()` non encapsulé **dans leur corps** — hors périmètre de la migration 168 (qui ne réécrit que `pg_policies`), alors que la quasi-totalité des tables délèguent leur isolation à ces fonctions | **OPEN** — MEDIUM (le vrai gisement de performance RLS, non couvert par 168) | Lecture de code (R-005, 2026-09-08) | 168 |
+| R005-STORAGE-RLS-GAP | `storage.objects` (`logos_auth_insert`/`logos_auth_update`, migration 041, `auth.role()` littéral) hors périmètre de la migration 168 (`schemaname='public'` exclut `storage`) malgré l'introduction du fichier qui prétend couvrir `auth.role()` sans réserve | **OPEN** — LOW (perf uniquement, petite table) | Lecture de code (R-005, 2026-09-08) | 168 |
 
 ---
 
@@ -180,6 +184,6 @@ diagnostic SQL fourni). Résumé :
 | — dont obsolètes (`OBSOLETE`) | **1** (ANO-N16) |
 | — dont encore ouvertes (`OPEN`) | **55** |
 | Total (contrôle) | 5+10+1+1+55 = **72** ✓ |
-| Nouveaux problèmes découverts (hors des 72, Tables 2+4) | **10** (NEW-01→06, R004-xx ×4) — dont 3 requalifiés « risque latent, pas incident actif » (NEW-01, NEW-02, R004-DB-TRIGGER-TRANSACTIONS/R004-CAISSE-DUPLICATE-WRITER), 1 VERIFIED (R004-TREASURY-VERIFICATION) et **1 CLOSED (NEW-06 — purge des données de démo AMD FINANCE, migration 179)** le 2026-09-07/08 |
+| Nouveaux problèmes découverts (hors des 72, Tables 2+4) | **14** (NEW-01→06, R004-xx ×4, R005-xx ×4) — dont 3 requalifiés « risque latent, pas incident actif » (NEW-01, NEW-02, R004-DB-TRIGGER-TRANSACTIONS/R004-CAISSE-DUPLICATE-WRITER), 1 VERIFIED (R004-TREASURY-VERIFICATION), **1 CLOSED (NEW-06)** le 2026-09-07/08, et 4 nouveaux `OPEN` ajoutés le 2026-09-08 (R005-OCR-PROXY-GAP, R005-AUTOMATION-RUN-TIMING, R005-RLS-FUNCTION-BODY-GAP, R005-STORAGE-RLS-GAP) |
 | Tickets P0/résidus en cours de suivi (Table 3, hors doublon avec Table 1) | **10** entrées de suivi — P0-02, 177, 178 passés VERIFIED/CLOSED le 2026-09-07 ; P0-03 précisé CODE_FIXED — NOT PRODUCTION EXERCISED |
-| **Total réel restant à traiter (`OPEN`+`PRODUCTION_PENDING`, tables 1+2+4)** | **55 + 1 + 5 + 4 = 65** |
+| **Total réel restant à traiter (`OPEN`+`PRODUCTION_PENDING`, tables 1+2+4)** | 56 (table 1) + 5 (table 2 : NEW-01→05, NEW-06 exclue car `CLOSED`) + 6 (table 4 : 2 R004 + 4 R005, `VERIFIED`/`NOT_TESTABLE` exclus) = **67** au 2026-09-08 |
