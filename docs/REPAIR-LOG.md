@@ -1557,3 +1557,99 @@ tenant ».
 
 **Sévérité : MEDIUM** (risque de récidive, indépendant de l'existence ou non d'un environnement de
 recette). Non corrigé dans cette session.
+
+---
+
+## CLÔTURE — R006-SEED-SCRIPT-NO-GUARD (mission P0-A, 2026-09-07)
+
+**Statut : CODE_FIXED.**
+
+**Cause racine.** `scripts/seed-demo-data.ts` ne contenait aucune vérification d'environnement.
+`getTenantId()` sélectionnait « le tenant le plus ancien » sans distinction dev/prod, et la clé
+utilisée (`SUPABASE_SERVICE_ROLE_KEY`) contourne RLS — combinaison identique à celle qui a produit
+l'incident nettoyé par la migration 179 (1344 écritures fictives sur AMD FINANCE).
+
+**Protection implémentée.** `scripts/lib/seed-production-guard.ts` — fonction pure
+`assertSeedTargetIsNotProduction()`, appelée dans `scripts/seed-demo-data.ts` immédiatement après
+le chargement de `.env.local`, avant toute création de client Supabase (`createClient`) et avant
+toute opération réseau. Quatre signaux, dont trois non contournables :
+
+1. **URL Supabase de production connue** (`KNOWN_PRODUCTION_SUPABASE_URL`, comparaison
+   normalisée) — bloque inconditionnellement, quelle que soit la configuration déclarée. Ce n'est
+   pas un secret : c'est une variable `NEXT_PUBLIC_*`, déjà publique dans le bundle client envoyé
+   au navigateur.
+2. `VERCEL_ENV === 'production'` — bloque inconditionnellement.
+3. `NODE_ENV === 'production'` — bloque inconditionnellement (défense en profondeur ; **jamais**
+   utilisé pour autoriser, seulement pour refuser — conforme à l'exigence « NODE_ENV seul n'est
+   jamais une preuve suffisante »).
+4. `SEED_TARGET_ENV` — déclaration explicite **obligatoire**, liste blanche
+   (`development`/`local`/`recette`/`test`), absence ou valeur non reconnue = refus par défaut
+   (fail-closed). Documentée dans `.env.example`. Cette variable n'est pas un interrupteur qui
+   désactive la protection : même correctement déclarée, elle ne permet jamais de contourner les
+   signaux 1 à 3.
+
+Aucun mécanisme de contournement (`--force-prod` ou équivalent) n'existe. Aucun secret ni clé
+Supabase n'est codé en dur — uniquement une URL publique utilisée en comparaison de blocage.
+
+**Tests ajoutés** — `scripts/lib/seed-production-guard.test.ts` (16 tests, tous déterministes,
+aucune connexion Supabase réelle) :
+- (A) `recette`/`development`/`local`/`test` explicites → autorisé.
+- (B) `SEED_TARGET_ENV="production"` refusé ; `VERCEL_ENV="production"` refusé même avec
+  `SEED_TARGET_ENV="recette"`.
+- (C) URL Supabase de production refusée même avec `SEED_TARGET_ENV="development"` +
+  `NODE_ENV="development"` (le signal URL prime) ; détection insensible à la casse et au slash
+  final.
+- (D) configuration ambiguë refusée par défaut (`SEED_TARGET_ENV` absent, vide, ou valeur inconnue
+  type `staging`/`prod`) ; `NODE_ENV="development"` seul, sans `SEED_TARGET_ENV`, n'autorise pas.
+- (E) test statique sur `scripts/seed-demo-data.ts` : vérifie que l'appel au garde précède
+  textuellement `createClient(` dans le fichier — garantit qu'aucune opération DB ne peut se
+  produire avant validation.
+
+`vitest.config.ts` étendu (`include`) pour couvrir `scripts/**/*.test.ts`, en plus de `lib/` et
+`__tests__/`.
+
+**Résultats réels (exécutés le 2026-09-07, pas de connexion Supabase, comme exigé par la mission)**
+- `npx vitest run scripts/lib/seed-production-guard.test.ts` → **16/16 passés**.
+- `npx vitest run` (suite complète) → **751/751 passés, 32 fichiers**, aucune régression.
+- `npx tsc --noEmit` → **0 erreur**.
+- `npx eslint` sur les fichiers modifiés → **0 erreur** (avertissements « file ignored » attendus :
+  `scripts/` est déjà exclu du lint dans ce dépôt, convention préexistante, non introduite ici).
+
+**Limites documentées.** Le garde n'a pas été exercé en conditions réelles contre le vrai projet
+Supabase de production (interdit par le périmètre de la mission — « ne pas se connecter à la
+production »). Sa robustesse repose sur la justesse de `KNOWN_PRODUCTION_SUPABASE_URL` : si le
+projet de production change d'URL sans mise à jour de cette constante, le signal 1 perdrait sa
+force et le garde reposerait uniquement sur les signaux 2-4 (toujours fail-closed par défaut, donc
+toujours sûr, mais moins redondant).
+
+---
+
+## TICKET — P0A-SEED-EMPLOYES-TEST-HARDCODED-PROD (découvert en marge de P0-A, 2026-09-07)
+
+**Statut :** OUVERT, non corrigé (hors périmètre de la mission P0-A, qui portait exclusivement sur
+`scripts/seed-demo-data.ts` — signalement uniquement, conformément à l'instruction « flag only »).
+
+En auditant `scripts/` à la recherche d'autres scripts à risque, `scripts/seed-employes-test.mjs`
+s'est révélé **plus dangereux** que `seed-demo-data.ts` :
+
+- **L'URL Supabase de production est codée en dur dans le source** (ligne 21 :
+  `const SUPABASE_URL = 'https://mrzixapnaqsbqmagivvf.supabase.co'`), confirmée identique à
+  `NEXT_PUBLIC_SUPABASE_URL` de `.env.local` (comparaison faite sans afficher la valeur). Cela
+  signifie que même un `.env.local` correctement reconfigué vers un futur projet de recette ne
+  protège pas : ce script ignore `.env.local` pour l'URL et cible toujours la production.
+- **Un `DELETE` inconditionnel s'exécute au chargement du module**, hors de toute fonction :
+  `await sb.from('employes').delete().eq('tenant_id', TENANT_ID).in('nom', [...])` (lignes 30-33),
+  avant même l'insertion des employés de test. Aucune confirmation, aucun garde d'environnement.
+- `TENANT_ID` est également codé en dur (`64c244e5-02fd-4cf7-a56f-b0bdd48fdc09`), avec des données
+  nominatives associées à un client réel (`amdfinance.cg` dans les adresses email).
+- Absent de `package.json` (aucun script npm ne l'invoque) — exécutable uniquement via
+  `node scripts/seed-employes-test.mjs` manuel, comme `seed-demo-data.ts`.
+
+**Recommandation (non appliquée)** : appliquer le même garde-fou (`seed-production-guard.ts`,
+adapté en `.mjs` ou converti en `.ts`), et supprimer l'URL/le tenant codés en dur au profit de
+`.env.local` + variable explicite. Priorité plus haute que R006-SEED-SCRIPT-NO-GUARD ne l'était,
+car le contournement de `.env.local` rend inefficace toute protection basée uniquement sur la
+configuration locale.
+
+**Sévérité : HIGH** (URL de production non contournable par la configuration de l'environnement
+d'exécution, suppression de données au chargement du module sans aucun garde).

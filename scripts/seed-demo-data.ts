@@ -15,6 +15,7 @@ import { createClient } from '@supabase/supabase-js'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as dotenv from 'dotenv' // will use manual parse below
+import { assertSeedTargetIsNotProduction, ProductionSeedGuardError } from './lib/seed-production-guard'
 
 // ── 1. Charger .env.local ──────────────────────────────────────────────────
 function loadEnv() {
@@ -36,6 +37,23 @@ function loadEnv() {
 const env = loadEnv()
 const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE_KEY  = env.SUPABASE_SERVICE_ROLE_KEY
+
+// ── 1bis. Garde-fou production — AVANT toute connexion/écriture DB ─────────
+// Voir scripts/lib/seed-production-guard.ts (ticket R006-SEED-SCRIPT-NO-GUARD).
+try {
+  assertSeedTargetIsNotProduction({
+    SEED_TARGET_ENV: process.env.SEED_TARGET_ENV ?? env.SEED_TARGET_ENV,
+    NEXT_PUBLIC_SUPABASE_URL: SUPABASE_URL,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    NODE_ENV: process.env.NODE_ENV,
+  })
+} catch (e) {
+  if (e instanceof ProductionSeedGuardError) {
+    console.error(`❌ GARDE-FOU PRODUCTION — exécution refusée.\n   ${e.message}`)
+    process.exit(1)
+  }
+  throw e
+}
 
 if (!SUPABASE_URL || !SERVICE_KEY) {
   console.error('❌ NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY manquant dans .env.local')
