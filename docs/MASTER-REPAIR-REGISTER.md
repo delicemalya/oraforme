@@ -37,7 +37,7 @@ corrigé.
 | ANO-C06 | Sécurité | Critique | IDOR `/api/resto/receipt/[commandeId]` | Commit `f0d43f2` | Aucun | Déploiement confirmé ; non testé spécifiquement | `app/api/resto/receipt/[commandeId]/route.ts:12-33` | **CODE_FIXED** | — |
 | ANO-C07 | Sécurité | Critique→Majeure | `/api/debug/db-check` écrit en GET sans contrôle de rôle | Fichier supprimé, commit `f0d43f2` | — | Suppression = fait binaire | `REPAIR-LOG.md:818` | **VERIFIED** | — |
 | ANO-C08 | Comptabilité | Critique | 336/771 événements en erreur, trésorerie fantôme | Migrations 175+176 (P0-04) | 28 cas (forme statique), 115/115 ré-exécutés | **Table de contrôle réelle chiffrée : 0/771 en erreur** | `REPAIR-LOG.md` §"Résultat de 176" | **VERIFIED** | 178 (ventilation soldes) |
-| ANO-C09 | Comptabilité | Critique | Grand Livre 400, Balance 22008 sur 5 mois/12 | P0-02, commit `c209869` | 39+27 cas, tous ré-exécutés réellement | Contrôle SQL **en attente** (Bloc 2 de R-004) | R003 §1/§2 | **CODE_FIXED** | NEW-05 (UI dupliquée) |
+| ANO-C09 | Comptabilité | Critique | Grand Livre 400, Balance 22008 sur 5 mois/12 | P0-02, commit `c209869` | 39+27 cas, tous ré-exécutés réellement | **Confirmée en production (2026-09-07)** : 48/48 combinaisons mois×année (4 ans) sans erreur 22008 ; `piece_number`/`reference_piece` présentes, `reference`/`journal_type` absentes ; 6 policies RLS tenant-scopées confirmées sur `journal_entries` | R003 §1/§2 ; R-004 Bloc 2 (résultats bruts 2026-09-07) | **VERIFIED** | NEW-05 (UI dupliquée, non bloquant) |
 | ANO-C10 | Fiscalité | Critique | TUS abrogée facturée 4,5%, AF sous-plafonnée, CNSS faux | P0-01, commit `7025c03` | 18+8+1 cas, tous ré-exécutés réellement | Aucune (nature calculatoire, pas d'artefact stocké) | R003 §1 | **CODE_FIXED** | — |
 
 ### 🟠 Majeures (36)
@@ -129,10 +129,10 @@ R-003 §8, confirmée et localisée ici.
 
 | ID | Origine | Domaine | Gravité | Cause racine | Fix | Tests | Production | Preuve | Statut | Dépendances |
 |---|---|---|---|---|---|---|---|---|---|---|
-| NEW-01 | R-003 §9 | Comptabilité | Majeure | `writeComptaEntry()` (exemption EXM-JE-003) + trigger `trg_caisse_operation` (migration 046, jamais droppé) écrivent chacun pour la même opération de caisse | Aucun — voir R004-CAISSE-DUPLICATE-WRITER | Aucun | État réel des 2 writers **en attente** (Bloc SQL 1 de R-004) | `app/dashboard/tresorerie/caisses/page.tsx:87-105`, `046:542-587` | **OPEN** | R004-CAISSE-DUPLICATE-WRITER |
-| NEW-02 | R-003 §9 | Comptabilité | Majeure | `trg_auto_journal_entry`/`trg_transaction_to_journal` (migrations 026/027) jamais droppés dans le dépôt malgré la promesse de REPAIR-LOG (« migration 177 alignera le dépôt ») — vérifié faux, 177 ne traite que les achats | Aucun — voir R004-DB-TRIGGER-TRANSACTIONS | Aucun | État réel **en attente** (Bloc SQL 1) ; diagnostic du 2026-09-02 (jamais re-vérifié) affirmait ces triggers absents en prod | `supabase/migrations/177_repair_achats_legacy_doublons.sql` (relu intégralement, aucun DROP TRIGGER) | **OPEN** | R004-DB-TRIGGER-TRANSACTIONS |
+| NEW-01 | R-003 §9 | Comptabilité | Majeure → **mitigée en risque latent** | `writeComptaEntry()` (exemption EXM-JE-003) écrit toujours pour les opérations de caisse ; le trigger `trg_caisse_operation` (migration 046) **n'existe pas en production** (confirmé `pg_trigger`, 2026-09-07) — seul `trg_sync_caisse_solde` (migration 042, `UPDATE caisses.solde` uniquement, aucune écriture comptable) est actif | Aucun — voir R004-CAISSE-DUPLICATE-WRITER | Aucun | **Confirmé (2026-09-07)** : `trg_caisse_operation` absent, `0` `caisse_operations` en production — **aucun doublon actif possible aujourd'hui** | `pg_trigger` sur `caisse_operations` (Bloc SQL 1 R-004) | **OPEN** (risque latent uniquement — se réactiverait si la migration 046 était rejouée) | R004-CAISSE-DUPLICATE-WRITER |
+| NEW-02 | R-003 §9 | Comptabilité | Majeure → **risque latent confirmé** | `trg_auto_journal_entry`/`trg_transaction_to_journal` (migrations 026/027) jamais droppés dans le **dépôt** malgré la promesse de REPAIR-LOG (« migration 177 alignera le dépôt ») — vérifié faux, 177 ne traite que les achats | Aucun — voir R004-DB-TRIGGER-TRANSACTIONS | Aucun | **Confirmé (2026-09-07)** : re-vérifié en production, seul `trg_update_account_balance` actif sur `transactions` — **pas d'incident actif**, le gap reste au niveau du dépôt (rejeu futur) | `pg_trigger` sur `transactions` (Bloc SQL 1 R-004) | **OPEN** (risque latent uniquement, pas d'incident actif) | R004-DB-TRIGGER-TRANSACTIONS |
 | NEW-03 | R-003 §9 | Trésorerie | Majeure | Scission de schéma Mobile Money : `wallets`/`wallet_operations` (UI) vs `mobile_money_wallets`/`mobile_wallet_operations` (moteur/API), aucun lien | Aucun | Aucun | Non vérifié | `app/dashboard/tresorerie/mobile-money/page.tsx` vs `app/api/tresorerie/wallets/**` | **OPEN** | — |
-| NEW-04 | R-003 §4/§9 | Trésorerie | Moyenne | `comptes_bancaires.solde` modifié par arithmétique cliente (pages UI) en concurrence avec le recalcul absolu du moteur (`fn_sync_tresorerie_soldes`), y compris potentiellement sur le compte principal — migration 178 réduit le scope, n'élimine pas la concurrence | Partiel (178) | Aucun | Preuve mathématique généralisée **en attente** (Bloc SQL 4) | `banques/page.tsx:352`, `transferts/page.tsx:207-218` | **OPEN** | R004-TREASURY-VERIFICATION |
+| NEW-04 | R-003 §4/§9 | Trésorerie | Moyenne | `comptes_bancaires.solde` modifié par arithmétique cliente (pages UI) en concurrence avec le recalcul absolu du moteur (`fn_sync_tresorerie_soldes`), y compris potentiellement sur le compte principal — migration 178 réduit le scope, n'élimine pas la concurrence | Partiel (178) | Aucun | Preuve mathématique généralisée **confirmée (2026-09-07)** sur tenants isolés 1/2/3 comptes (Bloc SQL 4) : `solde = Σ mouvements du compte principal`, comptes secondaires jamais touchés, aucune fuite inter-tenant. La concurrence d'écriture UI côté client reste, elle, non traitée (résidu distinct) | `banques/page.tsx:352`, `transferts/page.tsx:207-218` | **OPEN** (résidu UI non corrigé) — voir R004-TREASURY-VERIFICATION (VERIFIED) | R004-TREASURY-VERIFICATION |
 | NEW-05 | R-003 §2 | Comptabilité | Moyenne | Pages UI `/dashboard/comptabilite/{balance,grand-livre,bilan}` dupliquent la logique corrigée par P0-02 sans la réutiliser (requête client sans filtre de date SQL par mois — jamais exposées au bug -31, mais non couvertes par les 39+27 tests) | Aucun | Aucun (0 test sur ce chemin) | Non applicable (jamais exposées au bug d'origine) | `app/dashboard/comptabilite/balance/page.tsx:48-100` | **OPEN** | ANO-C09 |
 
 ---
@@ -142,15 +142,15 @@ R-003 §8, confirmée et localisée ici.
 | ID | Domaine | Statut | Preuve | Dépendances |
 |---|---|---|---|---|
 | P0-01 | Fiscalité | CODE_FIXED | 186/186 tests réels, 0 preuve prod | ANO-C10 |
-| P0-02 | Comptabilité | CODE_FIXED | 39+27 tests réels, contrôle SQL en attente (Bloc 2) | ANO-C09, NEW-05 |
-| P0-03 | Paie | CODE_FIXED | 186/186 tests réels, contrôle SQL en attente (Bloc 3) | — |
+| P0-02 | Comptabilité | **VERIFIED** | 39+27 tests réels + contrôle SQL production réel (48/48 combinaisons, 2026-09-07) | ANO-C09, NEW-05 |
+| P0-03 | Paie | **CODE_FIXED — NOT PRODUCTION EXERCISED** | 186/186 tests réels ; contrôle SQL réel (2026-09-07) : 0 événement PAI-001/PAI-002 émis depuis le déploiement (2026-09-04), aucun succès ni échec observable — dette héritée toujours présente (4 bulletins payés, 2 536 534 F, sans événement comptable) | — |
 | P0-04 | Comptabilité | VERIFIED (cœur) / CODE_FIXED (ventilation soldes) | Table de contrôle réelle 0/771 erreurs | ANO-C08, 178 |
 | P0-05 | Infrastructure | VERIFIED (7 migrations) / OPEN (168) | Tables de contrôle réelles chiffrées | Migration 168 |
-| 177 (TRIGGERS HÉRITÉS ACHATS) | Comptabilité | CLOSED (historique) / PRODUCTION_PENDING (idempotence généralisée) | Contrôle réel 0 restant, 48 archivés | Bloc SQL 4 |
-| 178 (VENTILATION TRÉSORERIE) | Trésorerie | CLOSED (historique AMD FINANCE) / PRODUCTION_PENDING (généralisation) | Contrôle réel conforme | R004-TREASURY-VERIFICATION, Bloc SQL 4 |
+| 177 (TRIGGERS HÉRITÉS ACHATS) | Comptabilité | **CLOSED** (historique **et** mécanisme d'idempotence) | Contrôle réel 0 restant, 48 archivés ; idempotence ACH-001 confirmée (2026-09-07) sur tenant isolé — 2 `accounting_events` malgré 2 tentatives d'émission sur le même achat, pas 3 | — |
+| 178 (VENTILATION TRÉSORERIE) | Trésorerie | **CLOSED** (historique AMD FINANCE **et** généralisation multi-tenant) | Contrôle réel conforme ; math généralisée confirmée (2026-09-07) sur 1/2/3 comptes, 3 tenants isolés, aucune fuite | — |
 | 168 | Sécurité (RLS) | OPEN | Aucune — jamais appliquée en prod | ANO-P03 (pas de recette pour valider) |
 | CRON/AUTOMATION_SECRET | Automatisation | PRODUCTION_PENDING | 15/15 routes HTTP réel = 401 ; secret non confirmable de l'extérieur | ANO-C01 |
-| ACH-002 | Comptabilité | NOT_TESTABLE — NO PRODUCTION DATA | 0 achat payé en prod | R004-ACH-002-UNTESTABLE |
+| ACH-002 | Comptabilité | NOT_TESTABLE — NO PRODUCTION DATA | 0 achat payé en prod ; mécanisme générique (idempotence, 1 événement = 1 écriture) confirmé sur tenant isolé (2026-09-07) — ne lève pas le statut, qui reste lié à l'absence de données réelles | R004-ACH-002-UNTESTABLE |
 
 ---
 
@@ -161,10 +161,10 @@ diagnostic SQL fourni). Résumé :
 
 | ID | Titre | Statut | Diagnostic | Dépendances |
 |---|---|---|---|---|
-| R004-DB-TRIGGER-TRANSACTIONS | Triggers legacy jamais droppés sur `transactions` (`trg_auto_journal_entry`, `trg_transaction_to_journal`) — promesse REPAIR-LOG non tenue par la migration 177 | OPEN | Bloc SQL 1 (R-004), en attente | NEW-02 |
-| R004-CAISSE-DUPLICATE-WRITER | Double écriture confirmée au niveau code sur `caisse_operations` (trigger `trg_caisse_operation` + `writeComptaEntry()`) | OPEN | Bloc SQL 1 (R-004), en attente | NEW-01, ANO-M10 |
-| R004-TREASURY-VERIFICATION | Généralisation de la preuve mathématique du correctif 178 (multi-tenant, 1/2/3 comptes, nouveau compte, transfert) — le correctif historique AMD FINANCE est déjà `CLOSED`, ce ticket suit uniquement la vérification élargie | OPEN | Bloc SQL 4 (R-004), en attente | 178, NEW-04 |
-| R004-ACH-002-UNTESTABLE | Suivi formel du statut `NOT_TESTABLE — NO PRODUCTION DATA` d'ACH-002 (0 achat payé en production) ; test isolé sur tenant jetable préparé | NOT_TESTABLE — NO PRODUCTION DATA | Bloc SQL 4 (R-004), en attente ; se lèvera naturellement au premier achat réellement payé en production | — |
+| R004-DB-TRIGGER-TRANSACTIONS | Triggers legacy jamais droppés **dans le dépôt** sur `transactions` (`trg_auto_journal_entry`, `trg_transaction_to_journal`) — promesse REPAIR-LOG non tenue par la migration 177 | **OPEN — risque latent uniquement, pas d'incident actif** (confirmé absents en production le 2026-09-07, seul `trg_update_account_balance` actif) | Bloc SQL 1 (R-004), exécuté 2026-09-07 | NEW-02 |
+| R004-CAISSE-DUPLICATE-WRITER | Double écriture sur `caisse_operations` (trigger `trg_caisse_operation` + `writeComptaEntry()`) | **OPEN — risque latent uniquement, pas d'incident actif** (`trg_caisse_operation` absent en production le 2026-09-07, 0 `caisse_operations` existante ; seul `trg_sync_caisse_solde`, sans écriture comptable, est actif) | Bloc SQL 1 (R-004), exécuté 2026-09-07 | NEW-01, ANO-M10 |
+| R004-TREASURY-VERIFICATION | Généralisation de la preuve mathématique du correctif 178 (multi-tenant, 1/2/3 comptes, nouveau compte, transfert) — le correctif historique AMD FINANCE est déjà `CLOSED`, ce ticket suivait la vérification élargie | **VERIFIED** — confirmée le 2026-09-07 sur 3 tenants isolés (1/2/3 comptes), aucune fuite inter-tenant, comptes secondaires jamais touchés | Bloc SQL 4 (R-004), exécuté 2026-09-07 | 178 |
+| R004-ACH-002-UNTESTABLE | Suivi formel du statut `NOT_TESTABLE — NO PRODUCTION DATA` d'ACH-002 (0 achat payé en production) | **NOT_TESTABLE — NO PRODUCTION DATA** (inchangé — le mécanisme générique est confirmé sur tenant isolé le 2026-09-07, mais ceci ne lève pas le statut, réservé à une preuve avec un achat production réel) | Bloc SQL 4 (R-004), exécuté 2026-09-07 | — |
 
 ---
 
@@ -173,12 +173,12 @@ diagnostic SQL fourni). Résumé :
 | Compteur | Valeur |
 |---|---|
 | Anomalies originales (RESTART-AUDIT-AZ) | **72** |
-| — dont fermées avec preuve réelle (`VERIFIED`/`CLOSED`) | **4** (ANO-C07, ANO-C08, ANO-M04, ANO-P04) |
-| — dont corrigées mais non vérifiées en production (`CODE_FIXED`) | **11** |
+| — dont fermées avec preuve réelle (`VERIFIED`/`CLOSED`) | **5** (ANO-C07, ANO-C08, ANO-C09, ANO-M04, ANO-P04) — ANO-C09 passée VERIFIED le 2026-09-07 |
+| — dont corrigées mais non vérifiées en production (`CODE_FIXED`) | **10** |
 | — dont en attente de vérification production (`PRODUCTION_PENDING`) | **1** (ANO-C01) |
 | — dont obsolètes (`OBSOLETE`) | **1** (ANO-N16) |
 | — dont encore ouvertes (`OPEN`) | **55** |
-| Total (contrôle) | 4+11+1+1+55 = **72** ✓ |
-| Nouveaux problèmes découverts (hors des 72, Tables 2+4) | **9** (NEW-01→05, R004-xx ×4) |
-| Tickets P0/résidus en cours de suivi (Table 3, hors doublon avec Table 1) | **10** entrées de suivi (P0-01→05, 177, 178, 168, CRON/AUTOMATION_SECRET, ACH-002) |
+| Total (contrôle) | 5+10+1+1+55 = **72** ✓ |
+| Nouveaux problèmes découverts (hors des 72, Tables 2+4) | **9** (NEW-01→05, R004-xx ×4) — dont 3 requalifiés « risque latent, pas incident actif » (NEW-01, NEW-02, R004-DB-TRIGGER-TRANSACTIONS/R004-CAISSE-DUPLICATE-WRITER) et 1 VERIFIED (R004-TREASURY-VERIFICATION) le 2026-09-07 |
+| Tickets P0/résidus en cours de suivi (Table 3, hors doublon avec Table 1) | **10** entrées de suivi — P0-02, 177, 178 passés VERIFIED/CLOSED le 2026-09-07 ; P0-03 précisé CODE_FIXED — NOT PRODUCTION EXERCISED |
 | **Total réel restant à traiter (`OPEN`+`PRODUCTION_PENDING`, tables 1+2+4)** | **55 + 1 + 5 + 4 = 65** |

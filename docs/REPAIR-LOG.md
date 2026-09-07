@@ -154,7 +154,7 @@ volontairement est celui qui produisait les montants faux.
 
 ## P0-02 — GRAND LIVRE ET BALANCE (ERP Core comptabilité)
 
-**Statut :** CODE PASS — non déployé, non vérifié en production
+**Statut :** **VERIFIED — déployé et vérifié en production le 2026-09-07** (mission R-004)
 **Date :** 2026-09-02
 **Anomalie couverte :** ANO-C09 de `docs/RESTART-AUDIT-AZ.md`
 
@@ -307,11 +307,31 @@ ORDER  BY m.mois;
 La première requête doit renvoyer `piece_number` et `reference_piece`, et
 seulement elles. La seconde doit renvoyer cinq lignes sans erreur 22008.
 
+### Résultat réel en production (2026-09-07, mission R-004)
+
+Requête étendue à 12 mois × 4 années (2024-2027) au lieu des 5 mois d'origine.
+
+| Contrôle | Résultat |
+|---|---|
+| Colonnes | `piece_number`, `reference_piece` présentes ; `reference`, `journal_type` absentes |
+| 48 combinaisons année×mois | **Aucune erreur 22008**, y compris les 5 mois auparavant cassés (février, avril, juin, septembre, novembre), sur les 4 années testées |
+| Policies RLS sur `journal_entries` | 6 policies réelles, toutes scopées `tenant_id = get_my_tenant_id()` (`select`, `insert`, `update`, `delete`, `financial read`, `financial write`) |
+
+**ANO-C09 / P0-02 : VERIFIED.** Résidu distinct non corrigé par ce ticket :
+NEW-05 (pages UI Balance/Grand Livre/Bilan dupliquent la logique sans la
+réutiliser — non couvertes par les tests, jamais exposées au bug d'origine).
+
+**Anomalie non liée découverte pendant ce contrôle** : le tableau 12×4 révèle
+que `journal_entries` porte exactement 56 écritures par mois sur 24 mois
+consécutifs (2024-01 → 2025-12, ~1344 lignes), hors périmètre de P0-02 —
+investiguée séparément, voir §« FORENSIQUE journal_entries 2024-2025 » plus
+loin dans ce journal.
+
 ---
 
 ## P0-03 — CHAÎNE PAIE → COMPTABILITÉ ROMPUE
 
-**Statut :** CODE PASS — non déployé, non vérifié en production
+**Statut :** CODE_FIXED — déployé, **NOT PRODUCTION EXERCISED** (vérifié le 2026-09-07, mission R-004 : 0 événement PAI-001/PAI-002 émis depuis le déploiement — le correctif n'a encore été exercé par aucune paie réelle)
 **Date :** 2026-09-02
 **Anomalie couverte :** §6.2 de `docs/RESTART-AUDIT-AZ.md` (classée P0 en §27)
 
@@ -494,6 +514,65 @@ La première requête chiffre la dette héritée (bulletins jamais comptabilisé
 depuis la migration 141). La deuxième doit montrer les nouveaux événements en
 `processed`. La troisième doit renvoyer `transaction_id` NULL sur tous les
 PAI-001 : la sortie de trésorerie n'apparaît que sur PAI-002.
+
+### Résultat réel en production (2026-09-07, mission R-004)
+
+| Contrôle | Résultat |
+|---|---|
+| Dette héritée (bulletins validés/payés sans événement comptable) | **4 bulletins `payee`, 2 536 534 F, toujours sans événement comptable** — inchangé depuis le diagnostic du 2026-09-02, jamais rejoué |
+| Événements PAI-001/PAI-002 émis depuis le déploiement (2026-09-04) | **0 ligne** — aucun bulletin n'a été validé ni payé via la route corrigée depuis la mise en ligne |
+| `transaction_id` sur les PAI-001 récents | **0 ligne** (rien à contrôler, cohérent avec l'absence totale d'événements) |
+
+**Conclusion :** le correctif est déployé et testé unitairement (186/186), mais
+n'a été exercé par **aucune action réelle** en production depuis le
+déploiement — ni succès ni échec observable. Statut `CODE_FIXED — NOT
+PRODUCTION EXERCISED`, distinct de `VERIFIED` : il n'existe littéralement
+aucun événement PAI post-déploiement à vérifier. La dette héritée (4
+bulletins, 2 536 534 F) reste un résidu séparé, non traité par ce ticket
+(rejouable manuellement depuis la page de paie, jamais fait).
+
+### Chemin de code vérifié (2026-09-07)
+
+`app/dashboard/rh/paie/page.tsx` → `POST/PATCH /api/paie/bulletins`
+(`app/api/paie/bulletins/route.ts:22-41`) → `evenementsComptablesBulletin()`
+(`lib/paie/evenements-comptables.ts:129-201`, contrat pur, aucun accès
+réseau) → `supabaseAdmin.rpc('emit_accounting_event', ev)` → trigger
+`trg_process_accounting_event` (migration 138:815-818, `AFTER INSERT ... WHEN
+(NEW.status='pending')`) → `fn_ae_execute_event()` (migration 175) →
+`journal_entries` (+ `transactions` pour PAI-002 uniquement, `montant_ttc=0`
+sur PAI-001 pour éviter la contrainte unique) → `accounting_event_log.transaction_id`.
+
+**Couverture de tests réelle** (fichiers relus intégralement) :
+- **Émission PAI-001/PAI-002** : couverte en détail (`evenements-comptables.test.ts:78-172`) — types d'événement, montants HT/TTC/net, dates, libellés.
+- **Idempotence** : **partielle** — un seul test documente que les deux événements partagent le même `source_id` avec un `event_type` différent (ligne 164-167, assertion sur la forme des paramètres) ; **aucun test n'appelle `emit_accounting_event` deux fois** pour vérifier la contrainte `uidx_ae_inflight` sur des PAI réels (cette contrainte a été vérifiée en session sur ACH-001/ACH-002 via le Bloc SQL 4, pas sur PAI).
+- **`transaction_id`** : **non testé** dans ces fichiers (nécessite un test d'intégration DB, hors périmètre des tests unitaires purs).
+- **`tenant_id`** : couvert (identité de la source, ligne 87 ; garde 403 sur la route, `chaine-paie-comptabilite.test.ts:126-129`).
+- **Montant** : couvert extensivement (brut/net/cnss/irpp, formes NUMERIC-en-chaîne de PostgREST).
+- **Période comptable** : couverte (12 mois + bissextile pour `dernierJourDuMois`, `fiscal_year`).
+- **Échec/rollback** : **partiel** — les gardes de la fonction pure (montants négatifs, mois invalide, id/tenant manquant → `RangeError`) sont testées ; le comportement de la **route** en cas d'échec d'émission (statut 500, message explicite) est vérifié par correspondance de motif sur le code source (`chaine-paie-comptabilite.test.ts:121-124`), pas par une simulation réelle d'échec réseau/DB suivie d'une vérification d'état.
+
+**Aucune validation de production réelle n'existe** — ce constat n'est pas
+contredit par ce qui précède.
+
+### Validation E2E isolée possible, non exécutée
+
+Sur le modèle du Bloc SQL 4 (tenant jetable, `ROLLBACK` en fin de script,
+utilisé cette session pour ACH-001/ACH-002/178) : créer un tenant de test,
+insérer une ligne `bulletins_paie` minimale (`tenant_id`, `employe_id` NULL ou
+un employé de test, `mois`, `annee`, `statut='payee'`, `brut`, `net`,
+`cnss_salarie`, `cnss_patronal`, `irpp`, `mode_paiement`), puis appeler
+directement `emit_accounting_event` deux fois avec les paramètres exacts que
+produirait `evenementsComptablesBulletin()` pour PAI-001 (une fois) et
+PAI-002 (une fois, puis une ré-émission pour tester l'idempotence) — en
+répliquant manuellement le calcul (`p_montant_ht=brut`, `p_montant_ttc=0` pour
+PAI-001 ; `p_montant_ttc=net` pour PAI-002), puisqu'appeler la fonction
+TypeScript elle-même n'est pas possible depuis l'éditeur SQL. Vérifier ensuite
+: 4 lignes `journal_entries` pour PAI-001 (661/421, 664/431, 421/431, 421/447),
+1 ligne pour PAI-002, `accounting_event_log.transaction_id` renseigné
+uniquement pour PAI-002, et qu'une ré-émission ne double aucune des deux.
+**Non exécuté dans cette session**, conformément à l'instruction de ne rejouer
+aucun événement financier ni fabriquer de donnée de test sans autorisation
+explicite pour ce ticket précis.
 
 ---
 
@@ -837,7 +916,7 @@ Reste : CI verte sur la PR, revue, merge → déploiement automatique Vercel dep
 
 ## TICKET — TRIGGERS HÉRITÉS SUR ACHATS (doublons journal_entries/transactions)
 
-**Statut :** FERMÉ le 2026-09-04 — 48 doublons archivés puis supprimés (migration 177)
+**Statut :** FERMÉ le 2026-09-04 — 48 doublons archivés puis supprimés (migration 177). Mécanisme d'idempotence ACH-001 (contrainte `uidx_ae_inflight`) confirmé le 2026-09-07 sur tenant isolé (mission R-004, Bloc SQL 4) : une ré-émission du même achat ne crée pas de seconde écriture.
 **Anomalie couverte :** résidu relevé pendant P0-04 (§P0-04, « Résidus, hors périmètre de ce ticket ») — non classée dans `docs/RESTART-AUDIT-AZ.md`, ouverte ici par prudence avant qu'elle ne s'aggrave (chaque nouvel achat en production continue de créer un doublon tant que les triggers ne sont pas retirés).
 
 ### Contexte
@@ -963,8 +1042,19 @@ pas désigné principal.
 
 ## TICKET — R004-DB-TRIGGER-TRANSACTIONS (promesse non tenue par la migration 177)
 
-**Statut :** OUVERT le 2026-09-04 (mission R-004) — diagnostic en attente d'exécution
+**Statut :** OUVERT — **risque latent confirmé, pas d'incident actif** (diagnostic exécuté le 2026-09-07)
 **Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-02)
+
+### Résultat du diagnostic (production, 2026-09-07)
+
+`pg_trigger` sur `transactions` : seul `trg_update_account_balance` est actif.
+`trg_auto_journal_entry` et `trg_transaction_to_journal` **confirmés absents**
+(re-vérifié, le diagnostic du 2026-09-02 datait de 5 jours et n'avait jamais été
+refait). **Aucun doublon actif en production.** Le risque reste réel mais
+**latent** : rien dans le dépôt n'empêche ces triggers d'être recréés si les
+migrations 026/027 sont rejouées intégralement (nouvel environnement,
+disaster recovery). Ticket laissé `OPEN` — le gap de dépôt n'est pas corrigé,
+seule son absence d'impact actuel est établie.
 
 ### Contexte
 
@@ -1011,8 +1101,23 @@ strictement une mission de vérification.
 
 ## TICKET — R004-CAISSE-DUPLICATE-WRITER (double écriture confirmée au niveau code)
 
-**Statut :** OUVERT le 2026-09-04 (mission R-004) — diagnostic en attente d'exécution
+**Statut :** OUVERT — **risque latent uniquement, pas d'incident actif** (diagnostic exécuté le 2026-09-07)
 **Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-01), `docs/RESTART-AUDIT-AZ.md` ANO-M10
+
+### Résultat du diagnostic (production, 2026-09-07) — corrige l'hypothèse initiale
+
+Le Writer A supposé (`trg_caisse_operation`, migration 046) **n'existe pas en
+production** — vérifié par `pg_trigger`. Le seul trigger actif sur
+`caisse_operations` est `trg_sync_caisse_solde` (migration 042), dont le code a
+été relu intégralement : il ne fait qu'`UPDATE caisses SET solde = solde ±
+NEW.montant`, **aucune écriture comptable**. De plus, `0` ligne
+`caisse_operations` n'existe à ce jour en production. **Aucun doublon possible
+aujourd'hui**, ni au niveau du mécanisme (le trigger risqué est absent) ni au
+niveau des données (rien à doubler). Le risque reste latent : si la migration
+046 était un jour rejouée, `trg_caisse_operation` réapparaîtrait aux côtés de
+`writeComptaEntry()` (Writer B, toujours actif dans le code). Ticket laissé
+`OPEN` pour ce risque latent, requalifié depuis « double écriture confirmée »
+vers « risque latent, pas d'incident actif ».
 
 ### Deux writers identifiés pour la même opération
 
@@ -1055,8 +1160,30 @@ concernées, montants). Hors périmètre de la mission R-004.
 
 ## TICKET — R004-TREASURY-VERIFICATION (généralisation de la preuve du correctif 178)
 
-**Statut :** OUVERT le 2026-09-04 (mission R-004) — diagnostic en attente d'exécution
+**Statut :** VERIFIED — confirmé le 2026-09-07 sur 3 tenants isolés (`ROLLBACK` en fin de script, aucune donnée réelle touchée)
 **Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-04)
+
+### Résultat (tenants isolés, 2026-09-07)
+
+| Cas | Attendu | Obtenu |
+|---|---|---|
+| Tenant 1 compte : entrée 50 000, sortie 5 000 | solde = 45 000 | **45 000** |
+| Tenant 2 comptes, principal : entrée 100 000, sortie 30 000, transfert 20 000, puis règlement ACH-002 de 10 000 (resync automatique post-175) | solde = 40 000 (100000-30000-20000-10000) | **40 000** |
+| Tenant 2 comptes, secondaire | jamais touché | **0** |
+| Tenant 2 comptes, caisse | 20 000 (transfert reçu) | **20 000** |
+| Tenant 3 comptes, principal : entrée 999 000, sortie 111 000 | solde = 888 000 | **888 000** |
+| Tenant 3 comptes, secondaire A et B | jamais touchés | **0** et **0** |
+| Isolation inter-tenant (tenant B à 999 999, tenant A à 40 000/45 000/888 000) | aucun mélange | confirmé |
+
+Deux écarts initialement relevés (40 000 au lieu de 50 000 « attendu », lecture
+`journal_entries` à 3 au lieu de 2 « attendu ») se sont révélés être des erreurs
+d'assertion dans le script de test lui-même, pas des anomalies système : depuis
+la migration 175, `fn_ae_execute_event` resynchronise automatiquement la
+trésorerie après tout événement à impact trésorerie, ACH inclus — la
+resynchronisation post-ACH-002 était donc correcte et attendue, et la 3ᵉ ligne
+`journal_entries` correspondait légitimement à l'écriture ACH-002 (règlement),
+distincte de l'écriture ACH-001 (constatation), sur le même `source_id`.
+**Faux positifs, classés définitivement clos — aucune anomalie système.**
 **Ne duplique pas le ticket « VENTILATION TRÉSORERIE PAR COMPTE » ci-dessus**, qui
 reste `FERMÉ` pour l'incident historique AMD FINANCE (preuve chiffrée réelle déjà
 obtenue). Ce ticket suit uniquement la généralisation de la preuve, demandée par
@@ -1103,11 +1230,81 @@ donnée n'a été écrite en production pour fabriquer artificiellement une
 transaction.
 
 Un test isolé sur tenant jetable (`ROLLBACK` en fin de script, Bloc SQL 4 de la
-mission R-004) vérifie le mécanisme générique — achat marqué payé → émission
-ACH-002 → une seule écriture `journal_entries` + une seule ligne `transactions` →
-ré-émission (double clic/retry simulé) → toujours une seule écriture (même
-contrainte `uidx_ae_inflight` que pour ACH-001, déjà vérifiée). Ce test prouve le
-**mécanisme**, pas le comportement avec un vrai achat production — le statut
-`NOT_TESTABLE` ne se lèvera que lorsqu'un achat sera réellement marqué payé en
-production et qu'un contrôle réel sera exécuté sur ce cas précis. Ne pas déclarer
-`VERIFIED` avant cet événement, même si le test isolé passe.
+mission R-004, exécuté le 2026-09-07) a vérifié le mécanisme générique : achat
+marqué payé → émission ACH-002 (1 `accounting_events`, 1 `journal_entries`
+401, 1 `transactions`) → ré-émission (double clic/retry simulé) → toujours 1
+seul de chacun, malgré la tentative de doublon (même contrainte
+`uidx_ae_inflight` que pour ACH-001, déjà vérifiée). **Mécanisme confirmé.**
+Ce test prouve le **mécanisme**, pas le comportement avec un vrai achat
+production — le statut `NOT_TESTABLE` ne se lèvera que lorsqu'un achat sera
+réellement marqué payé en production et qu'un contrôle réel sera exécuté sur
+ce cas précis. Ne pas déclarer `VERIFIED` avant cet événement, même si le test
+isolé passe.
+
+---
+
+## FORENSIQUE — journal_entries 2024-2025 (investigation en cours, pas encore un ticket)
+
+**Statut :** EN INVESTIGATION (2026-09-07, mission R-004) — pas de ticket ouvert tant que l'analyse SQL groupée n'a pas confirmé la conclusion
+**Découvert pendant :** le contrôle de production étendu de P0-02 (§P0-02, tableau 12×4)
+
+### Constat initial
+
+`journal_entries` porte exactement 56 écritures par mois, 24 mois consécutifs
+sans exception (2024-01 → 2025-12), pour un total avoisinant 1344 lignes — un
+volume constant mois après mois qui ne ressemble pas à une activité comptable
+organique.
+
+### Indice fort trouvé par lecture de code (pas encore confirmé en base)
+
+`scripts/seed-demo-data.ts:1-11` (docstring) : « Produit : 8 employés · 30
+fournisseurs · 3 comptes bancaires · 192 factures (24 mois) · 192 bulletins
+paie · 48 achats · 192 transactions · 96 mouvements stock · **~1 400
+écritures journal via moteur accounting_engine** » — chiffre quasi identique
+au volume observé. Le script boucle explicitement `for (const year of [2024,
+2025]) { for (let month = 1; month <= 12; month++) { ... } }` à 5 endroits
+distincts (lignes 255, 326, 397, 437, 544 — probablement un par générateur :
+factures, paie, achats, transactions, stock). `getTenantId()` (ligne 55-59)
+sélectionne **le tenant le plus ancien de la base**
+(`order('created_at').limit(1).single()`) — un seul tenant, pas plusieurs.
+Le script lit `.env.local`, qui pointe vers le projet Supabase de
+**production** (déjà relevé par l'audit R-003 des writers).
+
+Ce script a très probablement été exécuté le 2026-06-27 contre le tenant AMD
+FINANCE (b93b7c3d-815b-4336-bbb2-ac24cda0edb2) — cohérent avec le récit déjà
+établi en P0-04 (« le script de démonstration y a été exécuté le 2026-06-27
+avec l'ancien moteur ») et avec les 23 écritures réelles restantes en juin
+2026 après les réparations 176/177/178 (les entrées 2024-2025, elles, n'ont
+jamais été nettoyées — hors périmètre de ces réparations, qui ne portaient
+que sur les doublons de juin 2026).
+
+### Classification provisoire
+
+**DONNÉES DE TEST/SEED — haute confiance, non encore confirmée empiriquement.**
+L'indice de code est quasi conclusif, mais conformément à la rigueur exigée
+par cette mission, la classification reste « provisoire » tant que l'analyse
+SQL groupée (tenant_id exact, clustering des `created_at`, comptes
+débit/crédit utilisés) n'a pas été exécutée et ses résultats obtenus.
+
+### Diagnostic SQL préparé, remis à l'utilisateur (résultats en attente)
+
+Deux blocs : (A) analyse groupée tenant×année×mois avec agrégats
+(`min`/`max created_at`, comptes distincts, `source` distincts,
+`piece_number`/`reference_piece` distincts, totaux) ; (B) empreinte
+qualitative (nombre de tenants concernés, distribution des dates de création
+— le test décisif : si les ~1344 lignes ont été créées en une poignée de
+jours malgré des `date_operation` étalées sur 24 mois, c'est la signature
+d'un script de génération en masse — libellés fréquents, comptes débit/crédit
+utilisés, lien avec `accounting_events`, comparaison avec `journal_comptable`
+sur la même période).
+
+### Prochaine étape
+
+Si les résultats confirment un tenant unique, une provenance batch (`created_at`
+groupé sur peu de jours) et une correspondance avec le script de seed : ouvrir
+un ticket formel (impact sur les états comptables du tenant concerné si un
+utilisateur consulte les années 2024/2025 — à documenter, pas à corriger sans
+décision explicite sur le sort de ces données : suppression, ré-étiquetage,
+ou tenant de démonstration accepté comme tel). Si l'origine reste indéterminée
+malgré l'analyse SQL, le dire explicitement plutôt que de conclure par excès
+de confiance dans l'indice de code.
