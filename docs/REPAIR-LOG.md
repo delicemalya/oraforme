@@ -1789,3 +1789,275 @@ avertissement que `seed_ecam_congo.sql`.
 
 **Sévérité : LOW** (idempotent, pas de risque de perte de données — signalé pour traçabilité et
 cohérence avec le ticket précédent, même tenant).
+
+---
+
+## DIAGNOSTIC — P0A2-SEED-ECAM-CONGO-SQL-UNGUARDABLE (mission P0-A.3, 2026-09-07)
+
+**Objet : déterminer si le fichier représente encore un risque réel, avant toute décision de
+déplacement/suppression. Aucune donnée modifiée, aucun SQL exécuté, aucune connexion DB en
+écriture.** Le ticket **reste OPEN** — ce diagnostic ne le ferme pas.
+
+**Contenu fonctionnel exact du seed** (`supabase/seed_ecam_congo.sql`, 102 lignes) :
+- 1 `ALTER TABLE enseignants ADD COLUMN IF NOT EXISTS ...` (8 colonnes, idempotent, ré-application
+  sans danger de la migration 036).
+- 1 bloc `DO $$ ... END $$` — statement unique, donc atomique (tout ou rien en cas d'erreur) :
+  - `DELETE FROM employes/staff_ecole/etudiants/enseignants WHERE tenant_id = 'c9651476-…'` (4
+    tables, inconditionnel sur ce tenant).
+  - `INSERT INTO enseignants` (7 lignes), `INSERT INTO etudiants` (8 lignes, données nominatives de
+    mineurs : nom, date de naissance, contacts parents), `INSERT INTO staff_ecole` (5 lignes),
+    `INSERT INTO employes` (5 lignes, dont un enregistrement `Gordon Mabiala` — à rapprocher de
+    l'adresse `adjigordon@gmail.com` déjà vue dans l'en-tête de `seed-employes-test.ts`).
+- 1 `SELECT ... UNION ALL` final, lecture seule (vérification de comptage).
+- **UUID codé en dur unique** : tenant `c9651476-2fc4-407a-8a4e-778fa1332689` — aucun autre UUID en
+  dur dans le fichier.
+- **Ré-exécutable sans doublon** : chaque section `DELETE` précède son `INSERT`, donc rejouer le
+  fichier ne crée jamais de doublons — mais **écrase silencieusement tout ce qui existe pour ce
+  tenant au moment de l'exécution**, y compris des données réelles accumulées depuis.
+- **Exécution partielle** : le bloc `DO $$…$$` est un statement unique, atomique par nature
+  PostgreSQL (rollback automatique en cas d'erreur en cours de bloc) — risque d'incohérence faible
+  pour ce bloc. Le seul risque de partiel concerne le `ALTER TABLE` (statement séparé, avant le
+  bloc) : il est idempotent (`IF NOT EXISTS`), donc son omission ou sa ré-exécution isolée ne laisse
+  aucune incohérence.
+- **Nature des données** : ambiguë par construction. La forme (noms, téléphones, RIB, CNSS,
+  emails `@ecamcongo.cd`) est typique d'un jeu de démonstration soigné — mais rien dans le fichier
+  ne permet de distinguer une fabrication pure d'une copie de données réelles anonymisées à moitié.
+
+**Identification du tenant : UNKNOWN (non vérifiable cette session).** L'accès en lecture seule à la
+base (`mcp__postgres__query`, seul outil disponible pour une requête SQL réelle) a échoué à la
+connexion — erreur `(ENOTFOUND) tenant/user postgres.mrzixapnaqsbqmagivvf not found` — un échec de
+connexion (cohérent avec les échecs déjà documentés en mémoire des serveurs MCP `supabase` et
+`supabase-moonbank`, `CONNECTION_CLOSED`), pas un refus d'accès délibéré. Le nom du projet dans
+l'erreur (`mrzixapnaqsbqmagivvf`) confirme que l'outil visait bien le projet de production connu,
+mais la connexion elle-même n'a pas abouti. Aucun contournement n'a été tenté (hors périmètre
+explicite de la mission). **Aucune requête SQL réelle n'a donc pu être exécutée, ni en lecture ni en
+écriture.**
+
+**Preuves indirectes (code source, non une confirmation DB) pointant vers un tenant réel plutôt
+qu'une donnée de démonstration abstraite :**
+1. `components/dashboard/Sidebar.tsx:215` — la navigation **de production** contient littéralement
+   `{ id: 'salaires', label: 'Paie & Bulletins', sublabel: 'ECAM Congo', href: '/dashboard/rh/paie' }`.
+   Un sous-libellé d'interface nommant explicitement « ECAM Congo » dans le code de navigation
+   suggère un client identifié, pas une donnée fictive interchangeable.
+2. `supabase/migrations/053_rbac_enterprise.sql:7-10` — commentaire décrivant un bug RLS multi-tenant
+   réel : « BUG : sans ORDER BY, PostgreSQL choisit n'importe quelle ligne pour un utilisateur
+   multi-tenant... Résultat : **ECAM CONGO** peut voir les données de **BADIBA** et vice-versa. » —
+   un correctif de sécurité réel citant des noms d'entreprises concrets pour illustrer un incident
+   observé est un signal fort (mais indirect) de tenants réels, pas de placeholders.
+
+Ces deux éléments sont des **indices**, pas une preuve d'identité formelle (pas de confirmation
+`tenant_id` ↔ raison sociale en base). Conformément à l'instruction de ne pas transformer une
+hypothèse en fait, le statut d'identification reste **UNKNOWN**.
+
+**Données encore présentes dans le tenant : NON VÉRIFIABLE** (même cause — connexion DB en échec).
+Aucun comptage réel n'a pu être obtenu pour `enseignants`/`etudiants`/`staff_ecole`/`employes` sur ce
+tenant.
+
+**Historique Git :**
+- `seed_ecam_congo.sql` : **un seul commit** dans tout l'historique —
+  `436d8a13accd1cdceacbced5f3960304bca7d8b8` (2026-05-18 23:55:47 +0100, auteur « Oraforme Dev »,
+  co-auteur Claude), message **« @ refonte(couleurs): theme clair permanent, sidebar marine, accents
+  marque »** — un commit de **refonte de thème CSS touchant 94+ fichiers**, sans aucun rapport avec
+  le contenu du fichier. Le fichier n'a donc jamais été introduit par un commit dédié et documenté —
+  il a été balayé accidentellement dans un commit massif et non lié (probablement via un `git add`
+  large pendant une session de travail). Aucune trace de revue ou de justification explicite.
+- `backfill_paie_comptabilite.sql` : même schéma — commit unique `9db5fd0d657837ba354e73aa7d4731d0df8d8672`
+  (2026-05-16 23:06:38 +0100), message « fix(compta): align categorie format with Grand Livre OHADA
+  code grouping » — également sans rapport.
+- **Aucun lien avec l'incident AMD FINANCE** (migration 179) : tenant différent
+  (`b93b7c3d-815b-4336-bbb2-ac24cda0edb2`, domaine comptabilité/finance) contre `c9651476-…` (domaine
+  scolaire : `enseignants`/`etudiants`/`staff_ecole`) — deux verticaux métier distincts de l'ERP.
+- **Autres références « ECAM » dans le dépôt** (recherche exhaustive, insensible à la casse, sur
+  `seed_ecam_congo`, `c9651476`, `ECAM CONGO`, `ECAM`, `seed_ecam`, `ecamcongo`) : uniquement
+  `components/dashboard/Sidebar.tsx` (sous-libellé UI, voir ci-dessus) et
+  `supabase/migrations/053_rbac_enterprise.sql` (commentaire de bug, voir ci-dessus), en plus des
+  fichiers de ce diagnostic lui-même (`docs/REPAIR-LOG.md`, `docs/MASTER-REPAIR-REGISTER.md`) et des
+  deux fichiers SQL déjà connus. Aucune autre occurrence. « BADIBA » (cité dans la migration 053)
+  n'apparaît nulle part ailleurs dans le dépôt.
+
+**Classification : D. UNSAFE AND PRODUCTION-RELEVANT (sous réserve — voir justification).**
+Justification : le fichier est objectivement UNSAFE (DELETE inconditionnel sur un tenant codé en
+dur, aucun garde possible). Le classement en D plutôt qu'en C (« UNSAFE BUT UNUSED ») repose sur les
+deux indices indirects ci-dessus (libellé UI de production + commentaire de bug citant le nom comme
+tenant réel) — suffisants pour ne pas classer le fichier comme sûrement inoffensif, insuffisants pour
+en faire une certitude absolue en l'absence de confirmation DB. Si l'identité du tenant était
+confirmée `UNKNOWN` de façon définitive (jamais vérifiable), la classification prudente resterait D
+par précaution plutôt que de rétrograder vers C sur la base d'une simple absence de preuve.
+
+**Risque réel :** si `c9651476-…` est effectivement le tenant de production d'ECAM Congo et que ce
+tenant est en usage actif (l'entrée dans `Sidebar.tsx` suggère que le module Paie de ce client est
+opérationnel), toute ré-exécution de ce fichier — accidentelle ou par un développeur pensant
+« régénérer les données de démo » — **effacerait silencieusement les données réelles actuelles**
+(enseignants, étudiants, personnel, employés RH) au profit du jeu de données du 2026-05-18. Le
+fichier ne peut être déclenché que manuellement (copier-coller SQL Editor), donc le risque est lié à
+l'erreur humaine ou à une mauvaise compréhension du fichier par un futur développeur — pas à une
+automatisation.
+
+**Stratégie recommandée (proposition uniquement — aucune action effectuée) :**
+Compte tenu de l'incertitude sur l'identité réelle du tenant, la stratégie recommandée est un
+**DÉPLACEMENT vers `docs/runbooks/`** avec un avertissement explicite en tête de fichier (« ⚠️ ce
+script efface les données actuelles du tenant ciblé avant de les remplacer — ne jamais exécuter sans
+confirmation explicite de l'identité et de l'état du tenant »), plutôt qu'une suppression pure : la
+suppression serait prématurée sans confirmation que le fichier est obsolète, et le maintien en l'état
+dans `supabase/` (à côté des migrations versionnées) est trompeur car il laisse penser à un artefact
+de déploiement légitime. Ceci reste une **proposition** ; aucun déplacement n'a été effectué dans
+cette mission, conformément à la consigne.
+
+**Modifications NON effectuées dans ce diagnostic :** aucune donnée modifiée, aucun fichier
+déplacé/supprimé/renommé, aucun SQL exécuté, aucune tentative de contournement de l'échec de
+connexion DB.
+
+**Prochaine action exacte recommandée :** obtenir confirmation de votre part sur l'identité réelle du
+tenant `c9651476-2fc4-407a-8a4e-778fa1332689` (est-ce le tenant de production d'un client réel nommé
+ECAM Congo, actuellement actif ?). Si confirmé actif → exécuter le déplacement vers
+`docs/runbooks/` avec avertissement (mission dédiée, hors du présent diagnostic). Si confirmé
+obsolète/tenant de test jamais mis en production → suppression du dépôt (mission dédiée). Si accès
+DB rétabli entre-temps → relancer la vérification READ-ONLY décrite en §2-3 de la présente mission
+avant de trancher.
+
+---
+
+## CLÔTURE — MISSION P0-CRITICAL-01 (2026-09-15/16) — 5 risques CRITICAL de l'audit A→Z
+
+**Source :** `docs/MASTER-A-Z-AUDIT-2026-09.md` (audit forensique complet, 2026-09-14). Mission
+explicitement limitée à la correction de 5 problèmes CRITICAL — aucun HIGH/MEDIUM/LOW commencé.
+
+### Étape 0 — Revérification des preuves avant modification
+
+Chaque preuve de l'audit a été revérifiée directement (requêtes `pg_policies`/`pg_proc`/`pg_roles`/
+`pg_class` en lecture seule sur le projet de production `mrzixapnaqsbqmagivvf`, et lecture intégrale
+des 2 fichiers SQL + du helper Playwright) avant toute modification. Toutes les preuves se sont
+révélées **toujours exactes** — aucune conclusion du rapport n'a dû être invalidée.
+
+Vérification technique supplémentaire effectuée avant d'écrire la migration RLS : `emit_accounting_event()`,
+`fn_ae_execute_event()`, `fn_reverse_accounting_event()`, `fn_replay_accounting_event()` sont toutes
+`SECURITY DEFINER`, appartiennent au rôle `postgres` (`rolbypassrls = true`), et `journal_entries`/
+`tenants` n'ont pas `FORCE ROW LEVEL SECURITY` (`relforcerowsecurity = false`). Conclusion : ces
+fonctions et le service_role des routes API contournent déjà RLS entièrement, indépendamment des
+policies — retirer les policies larges ne pouvait donc pas casser le moteur comptable ni les routes
+serveur légitimes. C'est cette vérification qui a permis de procéder avec confiance.
+
+### CRITICAL #1 — Fuite RLS `tenants`
+
+- **Cause racine :** policy `tenants_select` (`qual: auth.uid() IS NOT NULL`, aucun filtre tenant),
+  absente de toute migration versionnée du dépôt (`grep tenants_select supabase/migrations/*.sql` =
+  0 résultat) — dérive de configuration appliquée hors-pipeline (SQL Editor/Dashboard), non datable.
+- **Correction :** `supabase/migrations/180_fix_rls_tenants_journal_entries_leak.sql` —
+  `DROP POLICY IF EXISTS "tenants_select" ON public.tenants;`. Les policies restantes
+  (`tenants: select` → `id = get_my_tenant_id()`, `tenants: visibilite groupe membres` → hiérarchie
+  de groupe légitime) suffisent et restent inchangées.
+- **Tests :** `lib/architecture/rls-tenants-journal-entries-fix.test.ts` (statique — vérifie que la
+  migration retire bien `tenants_select` et ne touche pas les policies légitimes). **Comportement RLS
+  réel en exécution NOT TESTABLE** : aucun environnement de recette n'existe (ANO-P03, toujours
+  BLOCKED) pour exécuter un vrai test d'isolation tenant A/tenant B.
+- **Statut :** CODE VERIFIED (migration écrite, vérifiée par test statique) / TEST VERIFIED (test
+  statique passant) / **PRODUCTION VERIFIED : EN ATTENTE** — la migration n'a pas été exécutée par
+  l'assistant (convention de l'engagement : le bloc SQL est fourni à l'utilisateur pour exécution
+  manuelle dans Supabase SQL Editor, cf. décision explicite de l'utilisateur au début de cette
+  mission). Se reporter au message de conversation contenant le bloc SQL complet.
+
+### CRITICAL #2 — Fuite RLS `journal_entries`
+
+- **Cause racine :** migration `026_erp_interconnection.sql` (lignes 118-131) a créé 4 policies
+  larges (`select`/`insert`/`update`/`delete`, tenant seul, sans `fn_is_user_financial()`) ; la
+  migration `030_financial_rls.sql` (lignes 66-80) a ajouté des policies strictes
+  (`financial read`/`financial write`) **sans jamais `DROP POLICY`** les 4 larges. En RLS Postgres,
+  les policies permissives d'une même commande s'additionnent en OR — la policy stricte n'avait
+  donc jamais eu d'effet réel.
+- **Correction :** même migration 180 — `DROP POLICY IF EXISTS` sur les 4 policies larges
+  (`journal_entries: select/insert/update/delete`), conservation de `financial read`/`financial write`.
+- **Tests :** même fichier statique, section dédiée journal_entries (vérifie les 4 DROP, la
+  non-suppression des policies financières, l'idempotence de toutes les instructions `DROP POLICY`,
+  et l'absence de toute instruction `DELETE FROM`/`TRUNCATE` dans la migration).
+- **Statut :** CODE VERIFIED / TEST VERIFIED / **PRODUCTION VERIFIED : EN ATTENTE** (même migration
+  180, même convention d'exécution manuelle par l'utilisateur).
+
+### SQL #1 — `supabase/tests/demo_data_sprint_s02_p3.sql`
+
+- **Cause racine :** SQL brut destiné au copier-coller dans Supabase SQL Editor, ciblant
+  automatiquement `SELECT id INTO v_tid FROM tenants ORDER BY created_at LIMIT 1` — le tenant le
+  plus ancien de la base connectée, qui en production est un tenant AMD FINANCE réel (mécanisme
+  identique à l'incident NEW-06 nettoyé par la migration 179). Committé 2026-09-02, jamais couvert
+  par P0-A/A.2/A.3 (qui ne portaient que sur `scripts/` et les fichiers `.sql` à la racine de
+  `supabase/`).
+- **Correction :** déplacé vers `docs/runbooks/demo_data_sprint_s02_p3.sql` (rupture de l'apparence
+  de script de test légitime sous `supabase/tests/`) **et** garde technique ajoutée directement dans
+  le SQL — `RAISE EXCEPTION` inconditionnel si le tenant trouvé correspond à l'un des 3 UUID AMD
+  FINANCE connus de production (`b93b7c3d-…`, `64c244e5-…`, `810892b1-…`). Ce n'est pas un simple
+  commentaire d'avertissement : c'est une instruction SQL qui bloque réellement l'exécution.
+  **Limite assumée et documentée** : cette garde protège spécifiquement contre les 3 tenants
+  actuellement connus, elle ne remplace pas un véritable environnement de recette isolé (toujours
+  BLOCKED).
+- **Tests :** `lib/architecture/rls-tenants-journal-entries-fix.test.ts` (section dédiée) — vérifie
+  que l'ancien chemin `supabase/tests/demo_data_sprint_s02_p3.sql` n'existe plus, que le nouveau
+  existe, et que la garde `RAISE EXCEPTION`/les 3 UUID sont bien présents dans son contenu.
+- **Statut :** VERIFIED FIX (déplacement + garde confirmés par test statique réel sur le système de
+  fichiers).
+
+### SQL #2 — `supabase/tests/seed_amd_finance.sql`
+
+- **Cause racine :** cible explicitement AMD FINANCE par recherche floue
+  (`nom_entreprise ILIKE '%amd%' OR ILIKE '%finance%'`), committé le 2026-06-29 — 2 jours après
+  l'incident NEW-06 daté du 2026-06-27. Sa finalité même (injecter des factures/transactions
+  fictives sur AMD FINANCE) contredit la règle établie que ce tenant est un client réel à ne jamais
+  polluer avec des données de démonstration.
+- **Correction :** même traitement que SQL #1 — déplacé vers `docs/runbooks/seed_amd_finance.sql`,
+  garde technique `RAISE EXCEPTION` sur les 3 mêmes UUID AMD FINANCE ajoutée.
+- **Nuance non tranchée dans cette mission :** la pertinence métier de conserver ce fichier reste
+  questionnable (voir ticket `P0CRIT01-SEED-AMD-FINANCE` au registre) — une suppression complète
+  aurait été une décision plus lourde et irréversible que le périmètre de cette mission
+  (« neutraliser le risque d'exécution accidentelle ») ne le justifiait à lui seul ; signalé pour
+  revue séparée.
+- **Tests :** même fichier statique que SQL #1.
+- **Statut :** VERIFIED FIX (déplacement + garde confirmés par test statique).
+
+### Playwright DB Helper — `tests/certifications/helpers/db.ts`
+
+- **Cause racine :** `SUPABASE_URL` codée en dur en littéral (`https://mrzixapnaqsbqmagivvf.supabase.co`),
+  `SUPABASE_SERVICE_ROLE_KEY` lue sans aucun garde d'environnement — `createTestAccount`/
+  `createEcoleAccount` créent de vrais tenants en production via l'API PostgREST/Auth admin,
+  `deleteTestAccount` a ses 4 `DELETE` chacun encapsulé dans `.catch(() => {})` (nettoyage
+  silencieusement défaillant, non corrigé dans cette mission — hors périmètre explicite, qui ne
+  portait que sur les credentials codées en dur).
+- **Correction :** `SUPABASE_URL` lue depuis `process.env.NEXT_PUBLIC_SUPABASE_URL` ; garde
+  `assertSeedTargetIsNotProduction()` **réutilisé tel quel** depuis
+  `scripts/lib/seed-production-guard.ts` (aucun système de sécurité concurrent créé, conformément à
+  la consigne explicite de la mission), appelé au chargement du module — avant toute création de
+  requête réseau, avant même la vérification de présence de `SUPABASE_SERVICE_ROLE_KEY`.
+- **Tests :** `tests/certifications/helpers/db.test.ts` (9 tests, mêmes techniques de mock que
+  `scripts/seed-employes-test.test.ts`) : import réussi en configuration recette ; refus si URL de
+  production même avec `SEED_TARGET_ENV=recette` ; refus si `VERCEL_ENV=production` ; refus
+  (fail-closed) si `SEED_TARGET_ENV` absent ou inconnu ; messages d'erreur clairs si
+  `NEXT_PUBLIC_SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` manquants après le garde ; vérification
+  directe que le fichier source ne contient plus l'URL de production en littéral.
+- **Statut :** VERIFIED FIX (9/9 tests réels passants, aucune connexion Supabase requise).
+
+### Résultats réels (exécutés le 2026-09-15/16)
+
+- `npx vitest run lib/architecture/rls-tenants-journal-entries-fix.test.ts tests/certifications/helpers/db.test.ts`
+  → **22/22 passés** (un faux positif dans mon propre test corrigé en cours de route — une regex
+  capturait un commentaire prose contenant les mots « DROP POLICY », pas un défaut de la migration).
+- `npx vitest run` (suite complète) → **782/782 passés, 35 fichiers** (760 avant + 22 nouveaux),
+  aucune régression.
+- `npx tsc --noEmit` → **0 erreur**.
+- `npx eslint .` (projet complet) → voir résultat rapporté dans la sortie finale de la mission.
+- `npm run build` (avec les valeurs de remplacement de la CI) → voir résultat rapporté dans la
+  sortie finale de la mission.
+
+### Scan global après correction — nouveaux vecteurs comparables détectés, NON corrigés
+
+Recherche exhaustive (`scripts/`, `supabase/`, `tests/`, `.github/`) pour : URL Supabase de
+production, `service_role`, `DELETE FROM`/`TRUNCATE`, UUID de tenant, `seed`/`demo`/`fixture`,
+`createClient(`. Résultat : les 5 vecteurs de cette mission sont neutralisés. **4 nouveaux fichiers
+comparables détectés, signalés mais non corrigés (hors périmètre explicite)** :
+- `tests/certifications/c002-tenant-core.spec.ts` (URL de production en dur, ×2)
+- `tests/certifications/c003-flash-reload.spec.ts` (URL de production en dur, ×2)
+- `tests/certifications/c005-erp-certification.spec.ts` (URL de production en dur, ×2)
+- `tests/qa/sql-client.ts` (`PROJECT_ID` de production en dur, utilise `createClient`/service_role)
+
+Également signalé (déjà noté au §0 de l'audit A→Z, confirmé toujours ouvert) : la policy
+`tenants: insert` (`auth.uid() IS NOT NULL`, sans validation) reste ouverte — non corrigée dans
+cette mission, hors périmètre explicite des 5 problèmes autorisés.
+
+Voir tickets `P0CRIT01-OTHER-HARDCODED-PROD-REFS` et `P0CRIT01-TENANTS-INSERT-OPEN` au registre
+maître.

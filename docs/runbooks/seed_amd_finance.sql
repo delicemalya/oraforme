@@ -1,6 +1,30 @@
 -- ═════════════════════════════════════════════════════════════════════════════
--- SEED DATA TEST — AMD FINANCE
+-- ⚠️  RUNBOOK — NE PAS EXÉCUTER SANS LIRE CE BLOC EN ENTIER
+--
+-- Déplacé depuis supabase/tests/seed_amd_finance.sql le 2026-09-15
+-- (ticket P0CRIT01-SEED-AMD-FINANCE, docs/MASTER-A-Z-AUDIT-2026-09.md §32/§16-18).
+--
+-- CE FICHIER CIBLE EXPLICITEMENT LE TENANT « AMD FINANCE » (recherche floue
+-- `nom_entreprise ILIKE '%amd%' OR ILIKE '%finance%'`). AMD FINANCE est un
+-- tenant RÉEL de production (confirmé par l'utilisateur : « tous les comptes
+-- sont des comptes de test sauf AMD FINANCE ») — ce fichier existe pour lui
+-- injecter des factures/transactions FICTIVES. Sa raison d'être même est donc
+-- en tension directe avec la règle établie de ne jamais injecter de données de
+-- démonstration sur ce tenant. Il n'a AUCUN moyen d'être intercepté par un
+-- garde applicatif : il est écrit pour être copié-collé directement dans
+-- l'éditeur SQL de Supabase.
+--
+-- GARDE TECHNIQUE AJOUTÉE (pas seulement ce commentaire) : le bloc ci-dessous
+-- refuse explicitement de s'exécuter (RAISE EXCEPTION) si le tenant trouvé par
+-- la recherche floue correspond à l'un des 3 identifiants AMD FINANCE connus
+-- de production. Cette garde bloque le cas précis qui a motivé ce ticket ;
+-- elle ne remplace pas une décision explicite sur l'utilité future de ce
+-- fichier (voir docs/REPAIR-LOG.md — recommandation : suppression après revue,
+-- hors périmètre de cette mission P0-CRITICAL-01 qui ne fait que neutraliser
+-- le risque d'exécution accidentelle).
 -- ═════════════════════════════════════════════════════════════════════════════
+--
+-- SEED DATA TEST — AMD FINANCE
 --
 -- ⚡ À EXÉCUTER dans Supabase SQL Editor (onglet SQL)
 -- ⚠️  PAS une migration de schéma — données de test uniquement
@@ -31,6 +55,20 @@ BEGIN
   IF v_tid IS NULL THEN
     RAISE EXCEPTION 'Tenant AMD FINANCE introuvable (cherche nom_entreprise ILIKE %%amd%% ou %%finance%%)';
   END IF;
+
+  -- ── GARDE-FOU PRODUCTION (ajouté, ticket P0CRIT01) ──────────────────────────
+  -- Refuse inconditionnellement si le tenant trouvé est l'un des 3 tenants AMD
+  -- FINANCE connus de la production Oraforme (voir
+  -- docs/MASTER-A-Z-AUDIT-2026-09.md §31). Aucune variable ne peut désactiver
+  -- ce contrôle.
+  IF v_tid IN (
+    'b93b7c3d-815b-4336-bbb2-ac24cda0edb2', -- AMD FINANCE (suspended)
+    '64c244e5-02fd-4cf7-a56f-b0bdd48fdc09', -- AMD FINANCE (suspended)
+    '810892b1-646b-43d3-9534-3c17cc1417fb'  -- AMD FINANCE (active)
+  ) THEN
+    RAISE EXCEPTION 'GARDE-FOU PRODUCTION : le tenant trouvé (%) est un tenant AMD FINANCE connu de production. Exécution refusée. AMD FINANCE est un client réel — ne jamais lui injecter de données fictives.', v_tid;
+  END IF;
+
   RAISE NOTICE 'Tenant AMD FINANCE trouvé : %', v_tid;
 
   -- ── 2. Comptes bancaires ──────────────────────────────────────────────────

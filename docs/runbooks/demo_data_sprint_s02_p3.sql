@@ -1,6 +1,27 @@
 -- ═════════════════════════════════════════════════════════════════════════════
--- SPRINT S-02 PHASE 3 — Données de démonstration Oraforme
+-- ⚠️  RUNBOOK — NE PAS EXÉCUTER SANS LIRE CE BLOC EN ENTIER
+--
+-- Déplacé depuis supabase/tests/demo_data_sprint_s02_p3.sql le 2026-09-15
+-- (ticket P0CRIT01-SEED-DEMO-DATA-SPRINT-S02, docs/MASTER-A-Z-AUDIT-2026-09.md §32/§16-18).
+--
+-- CE FICHIER CIBLE AUTOMATIQUEMENT « LE TENANT LE PLUS ANCIEN » DE LA BASE
+-- CONNECTÉE À L'ÉDITEUR SQL (`ORDER BY created_at LIMIT 1`, plus bas). Dans la
+-- base de production Oraforme, le tenant le plus ancien est un tenant réel
+-- nommé AMD FINANCE — c'est exactement le mécanisme qui a produit l'incident
+-- nettoyé par la migration 179 (1344 écritures fictives). Ce fichier n'a AUCUN
+-- moyen d'être intercepté par un garde applicatif : il est écrit pour être
+-- copié-collé directement dans l'éditeur SQL de Supabase.
+--
+-- GARDE TECHNIQUE AJOUTÉE (pas seulement ce commentaire) : le bloc ci-dessous
+-- refuse explicitement de s'exécuter (RAISE EXCEPTION) si le tenant trouvé
+-- correspond à l'un des 3 identifiants AMD FINANCE connus de production. Cette
+-- garde protège contre CE cas précis ; elle ne remplace pas un véritable
+-- environnement de recette isolé (toujours BLOCKED — voir ANO-P03, section 34
+-- du rapport A→Z). N'exécutez ce script QUE contre une base de recette dédiée,
+-- après avoir vérifié vous-même qu'aucun des UUID ci-dessous n'y figure.
 -- ═════════════════════════════════════════════════════════════════════════════
+--
+-- SPRINT S-02 PHASE 3 — Données de démonstration Oraforme
 --
 -- ⚡ BLOC À EXÉCUTER dans Supabase SQL Editor (onglet SQL)
 --
@@ -62,6 +83,20 @@ BEGIN
   IF v_tid IS NULL THEN
     RAISE EXCEPTION 'Aucun tenant trouvé — créez un compte sur l''application d''abord.';
   END IF;
+
+  -- ── GARDE-FOU PRODUCTION (ajouté, ticket P0CRIT01) ──────────────────────────
+  -- Refuse inconditionnellement si le tenant le plus ancien est l'un des 3
+  -- tenants AMD FINANCE connus de la production Oraforme (voir
+  -- docs/MASTER-A-Z-AUDIT-2026-09.md §31). Aucune variable ne peut désactiver
+  -- ce contrôle.
+  IF v_tid IN (
+    'b93b7c3d-815b-4336-bbb2-ac24cda0edb2', -- AMD FINANCE (suspended)
+    '64c244e5-02fd-4cf7-a56f-b0bdd48fdc09', -- AMD FINANCE (suspended)
+    '810892b1-646b-43d3-9534-3c17cc1417fb'  -- AMD FINANCE (active)
+  ) THEN
+    RAISE EXCEPTION 'GARDE-FOU PRODUCTION : le tenant le plus ancien (%) est un tenant AMD FINANCE connu de production. Exécution refusée. Ce script ne doit être exécuté que contre un environnement de recette isolé.', v_tid;
+  END IF;
+
   RAISE NOTICE 'Tenant : %', v_tid;
 
   -- ─────────────────────────────────────────────────────────────────────────
