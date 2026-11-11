@@ -6,6 +6,7 @@ import { chargerMemoireMIAA, mettreAJourMemoire } from '@/lib/miaa/memory'
 import { getMIAASystemPrompt } from '@/lib/miaa/system-prompt'
 import { trackUsage } from '@/lib/miaa/usage-tracker'
 import { detecterPaysMentionne, getMiaaFiscalContext, getNomPaysSansMoteur } from '@/lib/miaa-fiscal-router'
+import { requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -232,16 +233,22 @@ const SUGGESTIONS: Record<string, string[]> = {
 // ── Handler principal ─────────────────────────────────────────────────────────
 export async function POST(req: Request) {
   try {
+    const ctx = await requireTenant()
+    if (!ctx.ok) return ctx.error
+
     const { module, message, history, tenantData, langue, gedContext } = await req.json() as {
       module:     string
       message:    string
       history:    { role: 'user' | 'assistant'; content: string }[]
-      tenantData?: { tenant_id?: string; secteur?: string; pays?: string }
+      tenantData?: { secteur?: string; pays?: string }
       langue?:    string
       gedContext?: string
     }
 
-    const tenantId = tenantData?.tenant_id
+    // tenant_id dérivé exclusivement de la session serveur — jamais du corps de
+    // la requête (IDOR cross-tenant, Critical #1). secteur/pays restent des
+    // indices de routage non sensibles fournis par le client.
+    const tenantId = ctx.tid
 
     // Cerveau Central : quand module='auto' on détecte le meilleur agent
     const effectiveModule = (module === 'auto' || module === 'general')

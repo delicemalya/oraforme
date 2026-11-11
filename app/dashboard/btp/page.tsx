@@ -46,14 +46,14 @@ export default function BTPDashboardPage() {
     { label: 'Chantiers',               href: '/dashboard/btp/chantiers',  icon: '🏗️' },
     { label: 'Matériaux & Équipements', href: '/dashboard/btp/materiaux',  icon: '🧱' },
     { label: 'Facturation',             href: '/dashboard/facturation',    icon: '💰' },
-    { label: 'Achats Fournisseurs',     href: '/dashboard/achats',         icon: '🛒' },
+    { label: 'Achats Fournisseurs',     href: '/dashboard/stocks/achats',  icon: '🛒' },
     { label: 'RH & Équipes',           href: '/dashboard/rh',             icon: '👷' },
   ]
 
   return (
     <div style={{ padding: '24px', fontFamily: 'Inter, sans-serif', color: '#0F172A' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>BTP & Construction</h1>
+        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>BTP &amp; Construction</h1>
         <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: '14px' }}>Gestion des chantiers, matériaux et équipes</p>
       </div>
 

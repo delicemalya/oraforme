@@ -265,23 +265,24 @@ export function genererReference(mois: number, annee: number): string {
 // Les attendus précédents consacraient le défaut : ils exigeaient
 // cotisation_at_mp_pf = 73 680 pour tout brut, montant obtenu en assoyant les
 // allocations familiales sur le plafond AT/MP de 600 000 F. Les attendus
-// ci-dessous sont ceux de lib/countries/CG.ts, branche par branche.
+// ci-dessous sont ceux de lib/countries/CG.ts, branche par branche —
+// PF 10,03 % et TUS 5,475 % depuis la Mission P0 paie 2026-09-17.
 // La couverture réelle est dans lib/declarations/cnss-congo.test.ts.
 
 export function _selfTestCNSS(): boolean {
   const c1 = calculerCNSSEmploye(1, { nom: 'T', prenom: 'A', salaire_brut: 900_000 })
   if (c1.cotisation_employe     !== 36_000)  throw new Error(`CAS1 employé: attendu 36000, obtenu ${c1.cotisation_employe}`)
   if (c1.cotisation_vieillesse  !== 72_000)  throw new Error(`CAS1 VID: attendu 72000, obtenu ${c1.cotisation_vieillesse}`)
-  if (c1.allocations_familiales !== 90_315)  throw new Error(`CAS1 AF: attendu 90315, obtenu ${c1.allocations_familiales}`)
+  if (c1.allocations_familiales !== 90_270)  throw new Error(`CAS1 AF: attendu 90270, obtenu ${c1.allocations_familiales}`)
   if (c1.accidents_travail      !== 13_500)  throw new Error(`CAS1 AT: attendu 13500, obtenu ${c1.accidents_travail}`)
-  if (c1.cotisation_tus         !== 27_000)  throw new Error(`CAS1 TUS: attendu 27000, obtenu ${c1.cotisation_tus}`)
+  if (c1.cotisation_tus         !== 49_275)  throw new Error(`CAS1 TUS: attendu 49275, obtenu ${c1.cotisation_tus}`)
 
   const c2 = calculerCNSSEmploye(2, { nom: 'T', prenom: 'B', salaire_brut: 1_500_000 })
   if (c2.cotisation_employe     !== 48_000)  throw new Error(`CAS2 employé: attendu 48000, obtenu ${c2.cotisation_employe}`)
   if (c2.cotisation_vieillesse  !== 96_000)  throw new Error(`CAS2 VID: attendu 96000, obtenu ${c2.cotisation_vieillesse}`)
-  if (c2.allocations_familiales !== 120_420) throw new Error(`CAS2 AF: attendu 120420, obtenu ${c2.allocations_familiales}`)
+  if (c2.allocations_familiales !== 120_360) throw new Error(`CAS2 AF: attendu 120360, obtenu ${c2.allocations_familiales}`)
   if (c2.accidents_travail      !== 13_500)  throw new Error(`CAS2 AT: attendu 13500, obtenu ${c2.accidents_travail}`)
-  if (c2.cotisation_tus         !== 45_000)  throw new Error(`CAS2 TUS: attendu 45000, obtenu ${c2.cotisation_tus}`)
+  if (c2.cotisation_tus         !== 82_125)  throw new Error(`CAS2 TUS: attendu 82125, obtenu ${c2.cotisation_tus}`)
 
   return true
 }

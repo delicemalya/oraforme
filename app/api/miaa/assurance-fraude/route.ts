@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import { requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -78,6 +79,9 @@ function computeRuleScore(s: {
 
 export async function POST(req: NextRequest) {
   try {
+    const ctx = await requireTenant(req)
+    if (!ctx.ok) return ctx.error
+
     const body = await req.json()
     const { sinistre_id } = body as { sinistre_id: string }
 
@@ -85,11 +89,14 @@ export async function POST(req: NextRequest) {
 
     const db = getSupabase()
 
-    // Fetch sinistre + police
+    // Fetch sinistre + police — scopé au tenant de session (Critical #1) :
+    // sinistre_id seul ne suffisait pas à empêcher un tenant A d'analyser le
+    // dossier sinistre d'un tenant B.
     const { data: sinistre, error: sinErr } = await db
       .from('ass_sinistres')
       .select('*, ass_polices(type_police, prime_montant, date_effet, assure_nom)')
       .eq('id', sinistre_id)
+      .eq('tenant_id', ctx.tid)
       .single()
 
     if (sinErr || !sinistre) return NextResponse.json({ error: 'Sinistre introuvable' }, { status: 404 })

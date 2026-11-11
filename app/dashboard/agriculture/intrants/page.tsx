@@ -57,7 +57,7 @@ export default function AgricultureIntrantsPage() {
     <div style={{ fontFamily:'Inter,sans-serif', color:'#0F172A' }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24 }}>
         <div>
-          <h1 style={{ fontSize:22, fontWeight:700, margin:0 }}>Intrants & Équipements</h1>
+          <h1 style={{ fontSize:22, fontWeight:700, margin:0 }}>Intrants &amp; Équipements</h1>
           <p style={{ color:'#64748B', margin:'4px 0 0', fontSize:14 }}>Semences, engrais, pesticides et matériel agricole</p>
         </div>
         <button onClick={openCreate} style={{ display:'flex', alignItems:'center', gap:8, background:'#16A34A', color:'#fff', border:'none', borderRadius:8, padding:'10px 16px', cursor:'pointer', fontWeight:600, fontSize:14 }}>

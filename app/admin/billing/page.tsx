@@ -103,7 +103,7 @@ export default async function BillingPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-[22px] font-bold text-gray-900">Billing & Paiements</h1>
+        <h1 className="text-[22px] font-bold text-gray-900">Billing &amp; Paiements</h1>
         <p className="text-sm text-gray-500 mt-0.5">Facturation SaaS — abonnements, revenus et alertes</p>
       </div>
 

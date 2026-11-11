@@ -9,7 +9,7 @@ export default function BoissonDashboardPage() {
     { label: 'Tournées & Livraisons', href: '/dashboard/boisson/tournees', icon: '🚚' },
     { label: 'Stock & Dépôt',         href: '/dashboard/stocks',           icon: '📦' },
     { label: 'Clients & Commandes',   href: '/dashboard/crm',              icon: '👥' },
-    { label: 'Achats Fournisseurs',   href: '/dashboard/achats',           icon: '🛒' },
+    { label: 'Achats Fournisseurs',   href: '/dashboard/stocks/achats',    icon: '🛒' },
     { label: 'Facturation',           href: '/dashboard/facturation',      icon: '💰' },
     { label: 'Trésorerie',           href: '/dashboard/tresorerie',        icon: '🏦' },
   ]
@@ -17,7 +17,7 @@ export default function BoissonDashboardPage() {
   return (
     <div style={{ padding: '24px', fontFamily: 'Inter, sans-serif', color: '#0F172A' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Boissons & Distribution</h1>
+        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Boissons &amp; Distribution</h1>
         <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: '14px' }}>Distribution de boissons, tournées et gestion du dépôt</p>
       </div>
 

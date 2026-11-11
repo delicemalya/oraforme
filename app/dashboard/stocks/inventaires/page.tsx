@@ -376,7 +376,7 @@ export default function InventairesPage() {
                     {inv.statut === 'terminé' && (
                       <button onClick={() => changeStatut(inv, 'validé')} disabled={saving}
                         className="flex items-center gap-1 px-2.5 py-1.5 bg-[#16A34A] text-white rounded-lg text-[11px] font-semibold hover:bg-[#15803D] disabled:opacity-50">
-                        <CheckCircle2 size={11} /> Valider & Appliquer
+                        <CheckCircle2 size={11} /> Valider &amp; Appliquer
                       </button>
                     )}
                   </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
+import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
 import {
   ShoppingCart, Plus, Search, Trash2, CheckCircle, Loader2,
   RefreshCw, X, Receipt, Package,
@@ -26,6 +27,20 @@ interface LigneVente {
   produit: Produit
   qte: number
   sous_total: number
+  // BOI-010 : provenance choisie explicitement par l'utilisateur si le
+  // produit a du stock dans plusieurs provenances — jamais devinée. Reste
+  // `null` si le produit n'a aucun mouvement tagué (cas normal aujourd'hui,
+  // 0 mouvement réel en production) : aucune régression du comportement
+  // existant dans ce cas.
+  origine: string | null
+}
+
+interface OrigineDisponible { origine: string; quantite: number }
+
+const ORIGINE_LABELS: Record<string, string> = {
+  achat_fournisseur: 'Achat fournisseur',
+  production_locale: 'Production locale',
+  import_direct:     'Import direct',
 }
 
 interface Vente {
@@ -50,17 +65,24 @@ const MODES_PAIEMENT = [
 // ── Modal confirmation paiement ───────────────────────────────────────────────
 
 function ModalPaiement({
-  total, onClose, onConfirm, saving,
+  total, montantHT, montantTVA, montantCA, onClose, onConfirm, saving,
 }: {
   total: number
+  montantHT: number
+  montantTVA: number
+  montantCA: number
   onClose: () => void
-  onConfirm: (mode: string, rendu: number) => void
+  onConfirm: (mode: string, rendu: number, destinataire: string) => void
   saving: boolean
 }) {
   const { fmt } = useFmt()
   const [mode, setMode] = useState('especes')
   const [recu, setRecu] = useState('')
+  const [destinataire, setDestinataire] = useState('')
   const rendu = mode === 'especes' && parseFloat(recu) > total ? parseFloat(recu) - total : 0
+  // D3 : une vente à crédit exige un client nommé — pas de recouvrement
+  // possible sinon (C6-PRODUCT-DECISIONS §4).
+  const creditSansClient = mode === 'credit' && !destinataire.trim()
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4" onClick={onClose}>
@@ -71,8 +93,11 @@ function ModalPaiement({
         </div>
         <div className="p-5 space-y-4">
           <div className="bg-[#F8FAFC] rounded-xl px-4 py-3 text-center">
-            <p className="text-[11px] text-[#64748B] mb-0.5">Total à payer</p>
+            <p className="text-[11px] text-[#64748B] mb-0.5">Total à payer (TTC)</p>
             <p className="text-[28px] font-black text-[#0F172A]">{fmt(total)}</p>
+            <p className="text-[10px] text-[#94A3B8] mt-1">
+              HT {fmt(montantHT)} · TVA {fmt(montantTVA)} · CA {fmt(montantCA)}
+            </p>
           </div>
 
           <div>
@@ -101,7 +126,15 @@ function ModalPaiement({
             </div>
           )}
 
-          <button onClick={() => onConfirm(mode, rendu)} disabled={saving}
+          {mode === 'credit' && (
+            <div>
+              <label className="block text-[12px] font-bold text-[#374151] mb-1.5">Client (obligatoire pour une vente à crédit)</label>
+              <input type="text" value={destinataire} onChange={e => setDestinataire(e.target.value)} placeholder="Nom du client"
+                className="w-full px-3 py-2.5 text-[14px] font-bold border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-300" />
+            </div>
+          )}
+
+          <button onClick={() => onConfirm(mode, rendu, destinataire.trim())} disabled={saving || creditSansClient}
             className="w-full py-3 bg-green-600 text-white rounded-xl text-[14px] font-black hover:bg-green-700 disabled:opacity-40 flex items-center justify-center gap-2">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
             Valider la vente
@@ -122,6 +155,10 @@ export default function CommercePage() {
   const [produits,  setProduits]  = useState<Produit[]>([])
   const [ventes,    setVentes]    = useState<Vente[]>([])
   const [panier,    setPanier]    = useState<LigneVente[]>([])
+  // BOI-010 : provenances disponibles par produit (somme tous entrepôts —
+  // le POS n'a pas de notion d'entrepôt aujourd'hui, cohérent avec
+  // v_products_stock qui ignore déjà cette dimension, BOI-007 §1).
+  const [originesParProduit, setOriginesParProduit] = useState<Record<string, OrigineDisponible[]>>({})
   const [search,    setSearch]    = useState('')
   const [loading,   setLoading]   = useState(true)
   const [showPay,   setShowPay]   = useState(false)
@@ -129,18 +166,39 @@ export default function CommercePage() {
   const [tab,       setTab]       = useState<'pos' | 'ventes'>('pos')
   const [stockError, setStockError] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
+  // Idempotence (C6) : une clé générée à l'ouverture du paiement, réutilisée
+  // pour tout retry de CE paiement tant que le panier n'a pas été vidé — un
+  // double-clic ou un retry réseau renvoie alors la vente déjà créée au lieu
+  // d'en créer une seconde (voir app/api/sales/route.ts).
+  const idempotencyKeyRef = useRef<string | null>(null)
 
   const load = useCallback(async () => {
     if (!tid) return
     setLoading(true)
-    const [{ data: p }, { data: v }] = await Promise.all([
+    const [{ data: p }, { data: v }, { data: origines }] = await Promise.all([
       supabase.from('v_products_stock').select('id, nom, prix_vente, code_barre, categorie, stock_actuel, unite')
-        .eq('tenant_id', tid).eq('statut', 'actif').order('nom').limit(200),
+        // BOI-005 : products/v_products_stock n'a pas de colonne statut
+        // (migration 050 jamais appliquée) — filtre retiré, tous les
+        // produits sont vendables en caisse pour l'instant.
+        .eq('tenant_id', tid).order('nom').limit(200),
       supabase.from('ventes').select('id, created_at, total, mode_paiement, caissier_nom, nb_articles, statut')
         .eq('tenant_id', tid).order('created_at', { ascending: false }).limit(50),
+      // BOI-010 : lecture seule de la vue dérivée (aucune seconde source de
+      // vérité — stock_movements reste l'unique source, BOI-007 §10).
+      supabase.from('v_products_stock_par_origine').select('product_id, origine, quantite_disponible')
+        .eq('tenant_id', tid).limit(2000),
     ])
     setProduits((p ?? []) as Produit[])
     setVentes((v ?? []) as Vente[])
+
+    const map: Record<string, OrigineDisponible[]> = {}
+    for (const row of (origines ?? []) as { product_id: string; origine: string; quantite_disponible: number }[]) {
+      const list = map[row.product_id] ?? (map[row.product_id] = [])
+      const existing = list.find(o => o.origine === row.origine)
+      if (existing) existing.quantite += row.quantite_disponible
+      else list.push({ origine: row.origine, quantite: row.quantite_disponible })
+    }
+    setOriginesParProduit(map)
     setLoading(false)
   }, [tid])
 
@@ -153,6 +211,21 @@ export default function CommercePage() {
 
   const total = panier.reduce((s, l) => s + l.sous_total, 0)
   const nbArticles = panier.reduce((s, l) => s + l.qte, 0)
+  // Affichage HT/TVA/CA uniquement — le serveur recalcule la même
+  // décomposition de manière autoritaire à l'émission (app/api/sales/route.ts),
+  // jamais un taux local (0.18/0.05/0.189 interdits, Phase 6).
+  const decompositionFiscale = decomposerTTCUnifie(total, 'CG')
+
+  // BOI-010 : une seule provenance disponible → pré-sélectionnée (elle reste
+  // enregistrée sur le mouvement, jamais omise — la traçabilité n'est jamais
+  // supprimée, seule la saisie est évitée). Plusieurs provenances → aucune
+  // sélection silencieuse, `origine` reste null tant que l'utilisateur n'a
+  // pas choisi. Aucune provenance connue (mouvements historiques sans
+  // origine) → comportement inchangé, `origine` reste null en permanence.
+  function origineParDefaut(prodId: string): string | null {
+    const origines = originesParProduit[prodId] ?? []
+    return origines.length === 1 ? origines[0].origine : null
+  }
 
   function addToCart(prod: Produit) {
     setPanier(p => {
@@ -162,7 +235,7 @@ export default function CommercePage() {
         updated[idx] = { ...updated[idx], qte: updated[idx].qte + 1, sous_total: (updated[idx].qte + 1) * prod.prix_vente }
         return updated
       }
-      return [...p, { produit: prod, qte: 1, sous_total: prod.prix_vente }]
+      return [...p, { produit: prod, qte: 1, sous_total: prod.prix_vente, origine: origineParDefaut(prod.id) }]
     })
   }
 
@@ -174,35 +247,54 @@ export default function CommercePage() {
     }).filter(l => l.qte > 0))
   }
 
-  async function handleConfirmVente(mode: string, _rendu: number) {
+  function updateOrigine(prodId: string, origine: string) {
+    setPanier(p => p.map(l => l.produit.id === prodId ? { ...l, origine } : l))
+  }
+
+  // Bloque l'encaissement tant qu'une ligne à provenances multiples n'a pas
+  // de choix explicite — jamais de bascule automatique (BOI-009/BOI-010).
+  const origineManquante = panier.some(l => (originesParProduit[l.produit.id]?.length ?? 0) > 1 && !l.origine)
+
+  async function handleConfirmVente(mode: string, _rendu: number, destinataire: string) {
     if (panier.length === 0 || !tid) return
+    // BOI-010 : jamais d'encaissement tant qu'une provenance reste à choisir
+    // — pas de sélection silencieuse (BOI-009).
+    if (origineManquante) {
+      setStockError('Choisissez la provenance pour chaque article concerné avant d\'encaisser.')
+      return
+    }
     setSaving(true)
     setStockError(null)
-    const { data: vente } = await supabase.from('ventes').insert({
-      tenant_id: tid, total, mode_paiement: mode, nb_articles: nbArticles, statut: 'validee',
-    }).select().single()
-    if (vente) {
-      await supabase.from('vente_lignes').insert(
-        panier.map(l => ({ vente_id: vente.id, produit_id: l.produit.id, produit_nom: l.produit.nom, qte: l.qte, prix: l.produit.prix_vente, sous_total: l.sous_total }))
-      )
 
-      // Le point de vente n'a jamais décrémenté le stock : la vente s'arrêtait
-      // aux lignes. Chaque ligne devient une sortie de stock.
-      for (const l of panier) {
-        const { error: errMvt } = await supabase.rpc('fn_stock_move', {
-          p_tenant_id:  tid,
-          p_product_id: l.produit.id,
-          p_type:       'sortie',
-          p_quantite:   l.qte,
-          p_unit_cost:  l.produit.prix_vente,
-          p_reference:  `VTE-${vente.id.slice(0, 8).toUpperCase()}`,
-          p_notes:      'Vente au comptoir',
-        })
-        if (errMvt) setStockError(`${l.produit.nom} : ${errMvt.message}`)
-      }
+    // C6 : un seul point d'entrée serveur — remplace les 3 appels directs
+    // (insert ventes, insert vente_lignes, rpc fn_stock_move) par un appel
+    // unique qui valide le tenant, le stock, la provenance, calcule le
+    // fiscal central et émet VTE-001. Voir app/api/sales/route.ts.
+    const res = await fetch('/api/sales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        idempotency_key: idempotencyKeyRef.current,
+        mode_paiement:   mode,
+        destinataire:    mode === 'credit' ? destinataire : undefined,
+        lignes: panier.map(l => ({
+          produit_id: l.produit.id,
+          qte:        l.qte,
+          origine:    l.origine,
+        })),
+      }),
+    })
+    const body = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      setStockError(body.error ?? 'Erreur lors de l\'encaissement')
+      setSaving(false)
+      return
     }
+    if (body.warning) setStockError(body.warning)
+
     setSaving(false)
     setPanier([])
+    idempotencyKeyRef.current = null
     setShowPay(false)
     load()
   }
@@ -399,26 +491,49 @@ export default function CommercePage() {
                 </div>
               ) : (
                 <div className="divide-y divide-[#F1F5F9]">
-                  {panier.map(ligne => (
-                    <div key={ligne.produit.id} className="px-4 py-2.5 flex items-center gap-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-bold text-[#0F172A] truncate">{ligne.produit.nom}</p>
-                        <p className="text-[11px] text-[#94A3B8]">{fmt(ligne.produit.prix_vente)} × {ligne.qte}</p>
+                  {panier.map(ligne => {
+                    const origines = originesParProduit[ligne.produit.id] ?? []
+                    return (
+                    <div key={ligne.produit.id} className="px-4 py-2.5 space-y-1.5">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-bold text-[#0F172A] truncate">{ligne.produit.nom}</p>
+                          <p className="text-[11px] text-[#94A3B8]">{fmt(ligne.produit.prix_vente)} × {ligne.qte}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <button onClick={() => updateQte(ligne.produit.id, -1)}
+                            className="w-6 h-6 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#64748B] hover:bg-red-50 hover:text-red-600">
+                            <Minus size={11} />
+                          </button>
+                          <span className="text-[12px] font-black text-[#0F172A] min-w-[20px] text-center">{ligne.qte}</span>
+                          <button onClick={() => updateQte(ligne.produit.id, 1)}
+                            className="w-6 h-6 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#64748B] hover:bg-green-50 hover:text-green-600">
+                            <Plus size={11} />
+                          </button>
+                        </div>
+                        <span className="text-[12px] font-black text-[#0F172A] w-16 text-right">{fmt(ligne.sous_total)}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={() => updateQte(ligne.produit.id, -1)}
-                          className="w-6 h-6 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#64748B] hover:bg-red-50 hover:text-red-600">
-                          <Minus size={11} />
-                        </button>
-                        <span className="text-[12px] font-black text-[#0F172A] min-w-[20px] text-center">{ligne.qte}</span>
-                        <button onClick={() => updateQte(ligne.produit.id, 1)}
-                          className="w-6 h-6 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#64748B] hover:bg-green-50 hover:text-green-600">
-                          <Plus size={11} />
-                        </button>
-                      </div>
-                      <span className="text-[12px] font-black text-[#0F172A] w-16 text-right">{fmt(ligne.sous_total)}</span>
+                      {/* BOI-010 : provenance — affichée dès qu'elle est connue,
+                          choix obligatoire si plusieurs provenances ont du stock. */}
+                      {origines.length > 1 && (
+                        <select value={ligne.origine ?? ''} onChange={e => updateOrigine(ligne.produit.id, e.target.value)}
+                          className={`w-full text-[11px] rounded-lg px-2 py-1.5 border focus:outline-none ${ligne.origine ? 'border-[#E2E8F0]' : 'border-red-400 bg-red-50'}`}>
+                          <option value="" disabled>Choisir la provenance…</option>
+                          {origines.map(o => (
+                            <option key={o.origine} value={o.origine}>
+                              {ORIGINE_LABELS[o.origine] ?? o.origine} ({o.quantite} dispo.)
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {origines.length === 1 && (
+                        <p className="text-[10px] text-[#94A3B8]">
+                          Provenance : {ORIGINE_LABELS[origines[0].origine] ?? origines[0].origine} ({origines[0].quantite} dispo.)
+                        </p>
+                      )}
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -429,7 +544,12 @@ export default function CommercePage() {
                 <span className="text-[13px] font-bold text-[#374151]">Total</span>
                 <span className="text-[22px] font-black text-[#0F172A]">{fmt(total)}</span>
               </div>
-              <button onClick={() => setShowPay(true)} disabled={panier.length === 0}
+              {origineManquante && (
+                <p className="text-[11px] text-red-600 font-semibold">
+                  Choisissez la provenance de chaque article marqué en rouge.
+                </p>
+              )}
+              <button onClick={() => { idempotencyKeyRef.current = crypto.randomUUID(); setShowPay(true) }} disabled={panier.length === 0 || origineManquante}
                 className="w-full py-3 bg-red-600 text-white rounded-xl text-[14px] font-black hover:bg-red-700 disabled:opacity-30 flex items-center justify-center gap-2">
                 <Receipt size={16} /> Encaisser
               </button>
@@ -441,7 +561,10 @@ export default function CommercePage() {
       {showPay && (
         <ModalPaiement
           total={total}
-          onClose={() => setShowPay(false)}
+          montantHT={decompositionFiscale.ht}
+          montantTVA={decompositionFiscale.tva}
+          montantCA={decompositionFiscale.ca}
+          onClose={() => { idempotencyKeyRef.current = null; setShowPay(false) }}
           onConfirm={handleConfirmVente}
           saving={saving}
         />

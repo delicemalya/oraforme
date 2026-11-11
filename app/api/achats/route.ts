@@ -4,6 +4,12 @@ import { requireTenant } from '@/lib/tenant-guard'
 
 export const dynamic = 'force-dynamic'
 
+// BOI-004 (docs/BOI-004-REPAIR-PLAN-ACHATS-STOCKS.md) : DEPRECATE.
+// achats/fournisseurs n'est plus la pile canonique — voir
+// /api/stocks/purchases (suppliers/purchases/purchase_items), qui réutilise
+// le même mécanisme d'émission ACH-001/ACH-002 ci-dessous. Conservé
+// fonctionnel pour compatibilité, plus lié depuis la navigation principale.
+
 // ── POST /api/achats ─────────────────────────────────────────────────────────
 // Crée un achat fournisseur + émet ACH-001 (601/401 HT SYSCOHADA)
 export async function POST(req: NextRequest) {

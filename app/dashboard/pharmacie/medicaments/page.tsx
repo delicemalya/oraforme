@@ -102,7 +102,7 @@ export default function MedicamentsPage() {
           </Link>
           <div>
             <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2"><Pill size={18} className="text-[#2563EB]" /> Médicaments ({meds.length})</h1>
-            <p className="text-xs text-[#64748B]">Stock & catalogue pharmacie</p>
+            <p className="text-xs text-[#64748B]">Stock &amp; catalogue pharmacie</p>
           </div>
         </div>
         <button onClick={openNew} className="flex items-center gap-1.5 bg-[#DC2626] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#B91C1C]">

@@ -164,7 +164,7 @@ export default function CaissePage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-[22px] font-bold text-gray-900">Caisse & Liquidités</h1>
+          <h1 className="text-[22px] font-bold text-gray-900">Caisse &amp; Liquidités</h1>
           <p className="text-sm text-gray-500 mt-0.5">Gestion des flux de trésorerie Oraforme</p>
         </div>
         <div className="flex items-center gap-2">

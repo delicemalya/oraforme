@@ -3,6 +3,8 @@
 // Données vérifiées et certifiées — Analyse complète 238 pages
 // Dernière mise à jour : 2026-06-14
 
+import { calculerTVASurMontantUnifie } from './fiscalite/engine-adapter'
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // INTERFACES
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -293,6 +295,22 @@ export function calculerIS(
 /**
  * Calcule la TVA Congo (18% + Centime Additionnel 5% de la TVA).
  *
+ * Mission P0-FISCAL-CG-2026, migration (2026-09-18) : le cas normal (taux
+ * 18%) délègue désormais à lib/fiscalite/engine-adapter.ts::
+ * calculerTVASurMontantUnifie(), qui route vers le moteur central
+ * lib/fiscal/universal-tax-engine.ts pour le Congo — mêmes valeurs
+ * (taux_normal 0,18 et Centime Additionnel 0,05 sur tva_collectee, vérifiés
+ * identiques dans lib/countries/CG.ts), donc aucun changement de résultat
+ * pour tout appelant existant. Vérifié par recherche exhaustive : les 8
+ * consommateurs réels appellent tous calculerTVACongo() (donc calculerTVA()
+ * SANS tauxReduit) — personne n'utilise la branche taux réduit.
+ *
+ * Le taux réduit véhicules (5%, import de véhicules neufs) N'A PAS de
+ * configuration équivalente dans lib/countries/CG.ts (le moteur central ne
+ * connaît que taux_normal) : cette branche reste donc locale, non migrée,
+ * plutôt que d'inventer une règle côté moteur central pour un cas sans
+ * appelant réel à ce jour.
+ *
  * @param montantHT   - Montant hors taxes (FCFA)
  * @param tauxReduit  - true pour taux réduit 5% (véhicules neufs import)
  * @returns           TVA, Centime Additionnel et TTC
@@ -310,11 +328,15 @@ export function calculerTVA(
   montantHT:   number,
   tauxReduit?: boolean,
 ): { tva: number; ca: number; ttc: number; tauxApplique: number } {
-  const tauxApplique = tauxReduit ? C.tva.taux_reduit_vehicules : C.tva.taux_normal
-  const tva = Math.round(montantHT * tauxApplique)
-  const ca  = Math.round(tva * C.tva.taux_ca)
-  const ttc = montantHT + tva + ca
-  return { tva, ca, ttc, tauxApplique }
+  if (tauxReduit) {
+    const tauxApplique = C.tva.taux_reduit_vehicules
+    const tva = Math.round(montantHT * tauxApplique)
+    const ca  = Math.round(tva * C.tva.taux_ca)
+    const ttc = montantHT + tva + ca
+    return { tva, ca, ttc, tauxApplique }
+  }
+  const r = calculerTVASurMontantUnifie(montantHT, 'CG')
+  return { tva: r.tva, ca: r.ca, ttc: r.ttc, tauxApplique: r.taux }
 }
 
 /** Alias rétrocompatible `calculerTVACongo` */

@@ -268,7 +268,7 @@ export default function NouveauClientPage() {
         {step === 3 && (
           <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6 space-y-4">
             <div>
-              <h2 className="text-[16px] font-black text-[#0F172A]">Mission & Honoraires</h2>
+              <h2 className="text-[16px] font-black text-[#0F172A]">Mission &amp; Honoraires</h2>
               <p className="text-[12px] text-[#64748B] mt-0.5">Définissez le périmètre de la mission et les conditions financières.</p>
             </div>
 

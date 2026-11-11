@@ -17,7 +17,7 @@ export default function OngDashboardPage() {
   return (
     <div style={{ padding: '24px', fontFamily: 'Inter, sans-serif', color: '#0F172A' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>ONG & Association</h1>
+        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>ONG &amp; Association</h1>
         <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: '14px' }}>Gestion des programmes, dons, bénéficiaires et rapports bailleurs</p>
       </div>
 

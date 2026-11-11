@@ -10,9 +10,27 @@
  * data_confidence : 'verified'
  * Dernière mise à jour : 2026-06-20
  *
- * IRPP/ITS Congo : seuils ANNUELS 615 000 / 1 500 000 / 3 500 000 / 5 000 000 FCFA — Art. 114-116G CGI.
- * T1 imposé au montant fixe 4 200 F/an/part. Abattement 20% sur (brut - CNSS).
- * methode_base = 'annuelle_div12' — moteur divise seuils par 12 pour application mensuelle.
+ * IRPP Congo — reconstitué et validé contre bulletins réels ECAM Congo
+ * (3 salariés, janvier 2024 — Mission P0 paie 2026-09-17) : base après CNSS
+ * salarié, abattement 20%, division par le nombre de parts, barème 4 tranches
+ * [0→38 667] 1% / [38 667→83 333] 10% / [83 333→250 000] 25% / [250 000→∞] 40%
+ * par part, seuils mensuels = seuils annuels 464 000/1 000 000/3 000 000 ÷ 12
+ * (methode_base = 'annuelle_div12'). Résultat vérifié exact à la FCFA près sur
+ * les 3 bulletins (95 034,83 / 44 014,83 / 4 846,87). Le barème précédemment
+ * codé ici (5 tranches avec une tranche 0% initiale, méthode mensuelle_directe)
+ * ne reproduisait aucun de ces 3 bulletins — corrigé.
+ *
+ * CNSS/TUS Congo, juin 2026 (déclarations réelles CNSS/TUS, 20 salariés) :
+ * PF 10,03% · AT/MP 2,25% · TUS CNSS 5,475%. Base CNSS/TUS = brut global −
+ * indemnités (vérifié exact sur cas réel MOUTINOU MAYIMA J.P. : 887 213 −
+ * 171 111 = 716 102). Composante « TUS DGI » (2,025% ou autre) NON DÉMONTRÉE
+ * par aucun document primaire 2026 — non implémentée, voir taxes_abrogees.
+ *
+ * Plafonds CNSS 1 200 000 (VID/AF) et 600 000 (AT) : NON MODIFIÉS. Une
+ * déclaration CNSS réelle de juin 2026 les ignore (base 716 102 non plafonnée
+ * en pratique) alors qu'un bulletin interne de janvier 2024 plafonne
+ * explicitement la ligne AF+AT à 600 000. Contradiction non résolue — voir
+ * notes ci-dessous, marqué "À CONFIRMER".
  */
 
 import type { CountryConfig } from './types'
@@ -80,13 +98,19 @@ export const CG: CountryConfig = {
   irpp: {
     nom: 'IRPP (Impôt sur le Revenu des Personnes Physiques)',
 
-    // Seuils mensuels appliqués directement (Art. 76 CGI LF 2026)
-    methode_base: 'mensuelle_directe',
+    // Seuils exprimés en valeur annuelle par part, divisés par 12 par le moteur
+    // (voir appliquerBareme() dans universal-tax-engine.ts). Vérifié exact
+    // contre 3 bulletins réels ECAM Congo janvier 2024 — voir note en tête de
+    // fichier. Remplace l'ancienne valeur 'mensuelle_directe', qui appliquait
+    // les seuils sans division et ne reproduisait aucun bulletin réel.
+    methode_base: 'annuelle_div12',
 
-    // Pas d'abattement professionnel — Art. 76 CGI Congo
+    // Abattement professionnel 20% sur (brut - CNSS salarié) — vérifié exact
+    // sur 3 bulletins réels ECAM Congo janvier 2024 (formule confirmée :
+    // base_imposable = (brut_imposable - cnss_salarie) × 0,80).
     abattement: {
-      type:   'aucun',
-      valeur: 0,
+      type:   'pct_net_cnss',
+      valeur: 0.20,
     },
 
     quotient_familial: {
@@ -96,14 +120,19 @@ export const CG: CountryConfig = {
       parts_par_enfant: 0.5,   // +0,5 par enfant à charge
     },
 
-    // Barème IRPP mensuel — 5 tranches LF 2026 (Art. 76 CGI Congo)
-    // Seuils mensuels directs par part (quotient familial appliqué avant)
+    // Barème IRPP mensuel par part — 4 tranches, vérifiées exactes contre 3
+    // bulletins réels ECAM Congo janvier 2024 (MOUTINOU MAYIMA J.P. 95 034,83 ·
+    // ONDOUMA ASSIANGOULI J.G.M. 44 014,83 · IMANA Claude Christian 4 846,87).
+    // Seuils = 464 000/1 000 000/3 000 000 ÷ 12 (méthode annuelle_div12) =
+    // 38 667/83 333/250 000 par part et par mois. Aucune tranche 0% observée
+    // dans les 3 bulletins : la première tranche taxe dès le premier FCFA à 1%.
+    // La tranche 40% (au-delà de 250 000/part/mois) provient du modèle du
+    // document source mais n'a été déclenchée par aucun des 3 bulletins testés.
     tranches: [
-      { min: 0,         max: 464_000,   taux: 0,    montant_fixe: null },  // 0%   exonéré
-      { min: 464_001,   max: 1_000_000, taux: 0.01, montant_fixe: null },  // 1%
-      { min: 1_000_001, max: 3_000_000, taux: 0.10, montant_fixe: null },  // 10%
-      { min: 3_000_001, max: 8_000_000, taux: 0.25, montant_fixe: null },  // 25%
-      { min: 8_000_001, max: Infinity,  taux: 0.40, montant_fixe: null },  // 40%
+      { min: 0,         max: 464_000,   taux: 0.01, montant_fixe: null },  // 1%
+      { min: 464_001,   max: 1_000_000, taux: 0.10, montant_fixe: null },  // 10%
+      { min: 1_000_001, max: 3_000_000, taux: 0.25, montant_fixe: null },  // 25%
+      { min: 3_000_001, max: Infinity,  taux: 0.40, montant_fixe: null },  // 40% — non observé dans les fixtures
     ],
 
     // Plancher d'IRPP pour salariés gagnant moins du SMIG — Art. 116G CGI Congo
@@ -148,10 +177,19 @@ export const CG: CountryConfig = {
         plafond_mensuel: 1_200_000,
       },
       {
+        // PF 10,03% — vérifié exact contre CNSS_Cotisation_Fevrier_2026.docx
+        // (20 salariés ECAM Congo) et déclaration CNSS juin 2026. Remplace
+        // 10,035%, non observé dans aucun document réel.
         code:            'AF',
-        libelle:         'Allocations Familiales',
+        libelle:         'Allocations Familiales (PF)',
         taux_salarie:    0,
-        taux_patronal:   0.10035,       // 10,035% — plafonné 1 200 000 FCFA/mois (LF 2026)
+        taux_patronal:   0.1003,        // 10,03% — plafonné 1 200 000 FCFA/mois
+        // ⚠️ PLAFOND À CONFIRMER — voir note en tête de fichier : une
+        // déclaration CNSS juin 2026 réelle NE plafonne PAS cette branche à
+        // 1 200 000 en pratique (base observée 716 102, non plafonnée), alors
+        // qu'un bulletin interne janvier 2024 la plafonne explicitement à
+        // 600 000 (combinée avec AT). Valeur conservée sans modification tant
+        // que la contradiction documentaire n'est pas tranchée juridiquement.
         plafond_mensuel: 1_200_000,
       },
       {
@@ -159,13 +197,21 @@ export const CG: CountryConfig = {
         libelle:         'Accidents du Travail / Maladie Professionnelle',
         taux_salarie:    0,
         taux_patronal:   0.0225,        // 2,25% — plafonné 600 000 FCFA/mois
+        // ⚠️ PLAFOND À CONFIRMER — même contradiction documentaire que AF ci-dessus.
         plafond_mensuel: 600_000,
       },
       {
+        // TUS CNSS 5,475% — vérifié exact sur 20/20 lignes de la déclaration
+        // CNSS/TUS réelle de juin 2026 (Model Declaration Mensuelle CNSS TUS).
+        // Remplace 3%, non observé dans aucun document 2026. Une composante
+        // distincte « TUS DGI » a existé par le passé (voir taxes_abrogees
+        // ci-dessous) mais AUCUN document primaire 2026 ne prouve son taux ni
+        // son maintien — elle n'est délibérément PAS ajoutée ici tant qu'aucune
+        // preuve primaire n'est produite (STATUT = NON DÉTERMINÉ).
         code:            'TUS',
-        libelle:         'Taxe Unique sur les Salaires',
+        libelle:         'Taxe Unique sur les Salaires (part CNSS)',
         taux_salarie:    0,
-        taux_patronal:   0.03,          // 3% — DÉPLAFONNÉ (LF 2026, TUS Fiscale 4,5% supprimée)
+        taux_patronal:   0.05475,       // 5,475% — DÉPLAFONNÉ
         plafond_mensuel: null,
       },
     ],
@@ -252,18 +298,26 @@ export const CG: CountryConfig = {
   },
 
   // ── Taxes abrogées ─────────────────────────────────────────────────────────
-  // La TUS fiscale (4,5 % des salaires bruts, ligne 9 de la déclaration DGI)
-  // est supprimée par la LF 2026. Seul subsiste le TUS CNSS de 3 %, déclaré à
-  // la CNSS et non à la DGI — voir la branche 'TUS' ci-dessus.
-  // Conservée datée pour qu'une déclaration portant sur 2025 reste exacte.
+  // Une TUS fiscale distincte (4,5 % des salaires bruts, collectée par
+  // l'administration fiscale/DGI) apparaît réellement dans des documents
+  // internes ECAM Congo 2022/2023 (récapitulatifs de charges fiscales et
+  // sociales), aux côtés d'une ligne « TUS recouvrée par la CNSS à 3 % »
+  // — total 7,5 %. Ce code affirmait sa suppression par la LF 2026 ; AUCUN
+  // document primaire 2026 fourni ne confirme ni le taux exact que porterait
+  // une composante DGI en 2026, ni sa suppression effective (STATUT = NON
+  // DÉTERMINÉ, Mission P0 paie 2026-09-17). Elle n'est PAS implémentée dans
+  // la branche 'TUS' ci-dessus, qui ne porte que le taux CNSS 5,475% observé
+  // sur la déclaration CNSS/TUS réelle de juin 2026. Conservée datée pour
+  // qu'une déclaration portant sur une période où elle était incontestablement
+  // en vigueur (avant 2026) reste calculable si un jour rejouée.
   taxes_abrogees: [
     {
       code:                  'TUS_FISCALE',
-      libelle:               'Taxe Unique sur les Salaires — part fiscale (DGI)',
+      libelle:               'Taxe Unique sur les Salaires — part fiscale (DGI) — statut 2026 non déterminé',
       base:                  'salaires_bruts',
       taux_avant_abrogation: 0.045,
       abrogee_le:            '2026-01-01',
-      base_legale:           'LF 2026 (loi n°42-2025 du 31 décembre 2025) — suppression de la TUS fiscale',
+      base_legale:           'LF 2026 (loi n°42-2025 du 31 décembre 2025) — suppression annoncée de la TUS fiscale, statut non confirmé par document primaire 2026 — voir commentaire ci-dessus',
     },
   ],
 
@@ -302,12 +356,13 @@ export const CG: CountryConfig = {
   notes: [
     'SMIG 90 000 FCFA/mois (arrêté 2020)',
     'TVA 18% + Centime Additionnel 5% sur TVA = 18,9% effectif sur HT',
-    'CNSS salarié 4% VID (plaf. 1 200 000) · patronal total 23,285% avec TUS déplafonné',
-    'IRPP/ITS 5 tranches ANNUELLES [615k/1,5M/3,5M/5M/∞] — Art. 114-116G CGI — méthode annuelle_div12',
-    'T1 IRPP : montant fixe 4 200 F/an/part (non un taux %) — plancher 1 200 F/an si brut < SMIG',
-    'Abattement professionnel 20% sur (brut - CNSS salarié) — Art. 116A CGI Congo',
-    'Mesure LF 2026 : État prend en charge IRPP + 50% patronal CNSS (25 000 premiers déclarants)',
-    'TUS Fiscale 4,5% supprimée par LF 2026 — seul TUS CNSS 3% subsiste',
+    'CNSS salarié 4% VID (plaf. 1 200 000) · patronal VID 8% + PF 10,03% + AT/MP 2,25% + TUS 5,475% déplafonné',
+    'IRPP : base après CNSS salarié, abattement 20%, division par le nombre de parts, barème 4 tranches par part — vérifié exact sur 3 bulletins réels ECAM Congo janvier 2024 (Mission P0 paie 2026-09-17)',
+    'Plancher IRPP : 1 200 F/an si brut < SMIG (minimum_annuel, inchangé)',
+    'Base CNSS/TUS = brut global − indemnités (vérifié exact, déclaration CNSS/TUS juin 2026, cas MOUTINOU MAYIMA J.P. : 887 213 − 171 111 = 716 102) — voir genererResumeFiscalMensuel()',
+    'Mesure LF 2026 : État prend en charge IRPP + 50% patronal CNSS (25 000 premiers déclarants) — non activée',
+    '⚠️ TUS DGI (composante fiscale distincte du TUS CNSS) : STATUT NON DÉTERMINÉ — aucun document primaire 2026 disponible ne la prouve ; non implémentée — voir taxes_abrogees',
+    '⚠️ Plafonds CNSS 1 200 000 (VID/AF) et 600 000 (AT) : À CONFIRMER — contradiction non résolue entre une déclaration CNSS réelle juin 2026 (non plafonnée en pratique) et un bulletin interne janvier 2024 (plafonné) — voir commentaires sur les branches AF/AT ci-dessus. Valeurs conservées sans modification.',
     '⚠️ Plafonds exonération transport/logement : non documentés — À confirmer DGI Congo',
     '⚠️ TOL 1 000 F : article CGI exact à confirmer',
   ],

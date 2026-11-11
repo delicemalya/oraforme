@@ -113,7 +113,24 @@ function toSituFiscale(s?: string | null): SituFiscale {
   return s === 'marie' ? 'marie' : 'celibataire'
 }
 
-function calcNet(
+/**
+ * POINT MÉTIER NON RÉSOLU (audit consommateurs Mission P0, 2026-09-17) :
+ * cette fonction exclut prime_transport + prime_logement de la base cotisable
+ * (brutImposable) sans qu'aucune preuve documentaire ou légale ne l'établisse
+ * (voir lib/countries/CG.ts — aucune configuration d'exonération pour ces
+ * primes). `app/dashboard/rh/paie/page.tsx` (le moteur de paie qui génère
+ * réellement les bulletins et alimente les déclarations) fait l'inverse :
+ * ces mêmes primes sont pleinement cotisables par défaut, sauf si le champ
+ * `indemnites_non_imposables` est explicitement renseigné (jamais le cas en
+ * production à ce jour). Les deux pages peuvent donc afficher un CNSS/IRPP/net
+ * différent pour le même salarié avec les mêmes primes.
+ *
+ * Ni l'une ni l'autre règle n'est démontrée : ne pas arbitrer ici. Ce
+ * commentaire documente le point ; il ne le résout pas. Le calcul CNSS/IRPP
+ * lui-même délègue déjà entièrement à lib/fiscal/universal-tax-engine.ts
+ * (aucun taux recopié dans cette fonction) — seule la base d'entrée diverge.
+ */
+export function calcNet(
   codePays: CodePays,
   brut: number,
   situation: SituationFamiliale = 'celibataire',
@@ -730,7 +747,7 @@ function TabEquipe({ tenantId, employes, onRefresh, plan }: {
 
                 {/* Primes */}
                 <div className="mt-3">
-                  <p className={`${lCls} mb-2`}>Primes & indemnités</p>
+                  <p className={`${lCls} mb-2`}>Primes &amp; indemnités</p>
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { key: 'prime_transport',    label: 'Transport',    color: '#10B981', tag: 'non-imp.' },

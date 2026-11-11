@@ -149,7 +149,7 @@ export default function TaxeApprentissagePage() {
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0F172A] flex items-center gap-2">
             <GraduationCap size={22} className="text-[#7C3AED]" />
-            Taxe d&apos;Apprentissage & FPC
+            Taxe d&apos;Apprentissage &amp; FPC
           </h1>
           <p className="text-[13px] text-[#64748B] mt-0.5">
             Art. 186 CGI Congo · Versement avant le 30/04/{year + 1}

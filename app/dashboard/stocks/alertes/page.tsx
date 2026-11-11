@@ -19,7 +19,6 @@ interface StockAlerte {
   product_unite: string
   stock_actuel: number
   seuil: number
-  stock_max: number | null
   message: string
   priorite: 'haute' | 'moyenne' | 'basse'
   lue: boolean
@@ -69,7 +68,7 @@ export default function AlertesStocksPage() {
     if (!tenantId) return []
     const { data: prods } = await supabase
       .from('v_products_stock')
-      .select('id, nom, sku, unite, stock_actuel, seuil_alerte, stock_max, prix_achat')
+      .select('id, nom, sku, unite, stock_actuel, seuil_alerte, prix_achat')
       .eq('tenant_id', tenantId)
 
     const generated: StockAlerte[] = []
@@ -89,7 +88,6 @@ export default function AlertesStocksPage() {
           product_unite: p.unite,
           stock_actuel: stock,
           seuil: seuil,
-          stock_max: p.stock_max,
           message: `Rupture de stock — ${p.nom} (stock: 0 ${p.unite})`,
           priorite: 'haute',
           lue: false,
@@ -105,29 +103,16 @@ export default function AlertesStocksPage() {
           product_unite: p.unite,
           stock_actuel: stock,
           seuil: seuil,
-          stock_max: p.stock_max,
           message: `Stock faible — ${p.nom}: ${stock} ${p.unite} (seuil: ${seuil})`,
           priorite: 'moyenne',
           lue: false,
           created_at: now,
         })
-      } else if (p.stock_max && stock >= p.stock_max && config.notif_surplus) {
-        generated.push({
-          id: `surplus-${p.id}`,
-          type: 'surplus',
-          product_id: p.id,
-          product_nom: p.nom,
-          product_sku: p.sku,
-          product_unite: p.unite,
-          stock_actuel: stock,
-          seuil: seuil,
-          stock_max: p.stock_max,
-          message: `Surplus de stock — ${p.nom}: ${stock} ${p.unite} (max: ${p.stock_max})`,
-          priorite: 'basse',
-          lue: false,
-          created_at: now,
-        })
       }
+      // BOI-005 : l'alerte 'surplus' dépendait de products.stock_max, colonne
+      // qui n'a jamais existé en base (migration 050 jamais appliquée) — cette
+      // branche générait toujours une alerte vide. Retirée jusqu'à preuve d'un
+      // besoin métier réel (voir docs/BOI-005-AUDIT-MODELE-PRODUIT.md).
     }
 
     return generated

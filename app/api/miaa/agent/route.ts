@@ -13,7 +13,7 @@ import {
   sauvegarderProposals,
   chargerProposals,
 } from '@/lib/miaa/autonomous-engine'
-import { checkPlanAccess } from '@/lib/api/require-tenant'
+import { checkPlanAccess, requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime  = 'nodejs'
 export const maxDuration = 30
@@ -32,14 +32,13 @@ function getSupabase() {
 // ── GET — Lancer l'analyse et retourner les propositions ──────────────────────
 
 export async function GET(req: Request) {
+  const ctx = await requireTenant()
+  if (!ctx.ok) return ctx.error
+  const tenantId = ctx.tid
+
   const url = new URL(req.url)
-  const tenantId  = url.searchParams.get('tenant_id')
   const doSave    = url.searchParams.get('save') === '1'
   const savedOnly = url.searchParams.get('saved') === '1'
-
-  if (!tenantId) {
-    return Response.json({ error: 'tenant_id requis' }, { status: 400 })
-  }
 
   const planDenied = await checkPlanAccess(tenantId, 'academy')
   if (planDenied) return planDenied
@@ -84,16 +83,15 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const ctx = await requireTenant()
+    if (!ctx.ok) return ctx.error
+    const tenant_id = ctx.tid
+
     const body = await req.json() as {
       action:       'accept' | 'reject' | 'execute' | 'briefing'
       proposal_id?: string
-      tenant_id:    string
     }
-    const { action, proposal_id, tenant_id } = body
-
-    if (!tenant_id) {
-      return Response.json({ error: 'tenant_id requis' }, { status: 400 })
-    }
+    const { action, proposal_id } = body
 
     const planDenied = await checkPlanAccess(tenant_id, 'academy')
     if (planDenied) return planDenied

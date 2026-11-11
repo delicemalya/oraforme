@@ -68,6 +68,14 @@ export interface InputIRPP {
   salaireBrutOriginal?:        number
   situation:                   SituationFamiliale
   nombreEnfants:               number
+  /**
+   * Nombre de parts fiscales déjà connu (ex : valeur figée sur un bulletin
+   * réel). Quand fourni, remplace le calcul interne à partir de `situation` +
+   * `nombreEnfants` (voir calcNombreParts) — utile pour rejouer exactement un
+   * bulletin réel sans dépendre de la règle de dérivation situation→parts,
+   * qui n'a pas été auditée par la Mission P0 paie 2026-09-17.
+   */
+  nombreParts?:                number
   /** Active les mesures spéciales marquées `actif: true` dans CountryConfig */
   appliquerMesuresSpeciales?:  boolean
 }
@@ -116,9 +124,20 @@ export interface InputFiscaliteEntreprise {
 export interface InputResumeFiscalMensuel {
   codePays:                    CodePays
   periode:                     string      // 'YYYY-MM'
+  /** Salaire brut global mensuel (toutes primes/indemnités comprises). */
   salaireBrut:                 number
+  /**
+   * Indemnités non imposables à retrancher du brut global avant calcul des
+   * cotisations CNSS/TUS et de l'IRPP (ex : prime de transport, indemnité de
+   * représentation). Base = salaireBrut − indemnites — vérifié exact sur un
+   * cas réel juin 2026 (Mission P0 paie 2026-09-17 : 887 213 − 171 111 =
+   * 716 102). Défaut 0 — comportement inchangé si non fourni.
+   */
+  indemnites?:                 number
   situation:                   SituationFamiliale
   nombreEnfants:               number
+  /** Voir InputIRPP.nombreParts — remplace le calcul situation/nombreEnfants si fourni. */
+  nombreParts?:                number
   appliquerMesuresSpeciales?:  boolean
 }
 
@@ -235,13 +254,19 @@ export interface ResumeFiscalMensuel {
   periode:                    string
   loi_reference:              string
   data_confidence:            DataConfidence
+  /** Salaire brut global reçu en entrée (toutes primes/indemnités comprises). */
+  salaire_brut_global:        number
+  /** Indemnités non imposables retranchées (voir InputResumeFiscalMensuel.indemnites). */
+  indemnites:                 number
+  /** Base réellement soumise à cotisation CNSS/TUS = salaire_brut_global - indemnites. */
+  brut_imposable:             number
   irpp:                       ResultatIRPP
   charges_sociales:           ResultatChargesSociales
   taxes_fixes:                Array<{ code: string; libelle: string; montant: number }>
   total_retenues_salariales:  number
   total_charges_patronales:   number
-  net_theorique:              number   // salaireBrut - total_retenues_salariales
-  cout_employeur_mensuel:     number   // salaireBrut + total_charges_patronales
+  net_theorique:              number   // salaireBrutGlobal - total_retenues_salariales
+  cout_employeur_mensuel:     number   // brut_imposable + total_charges_patronales
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -349,8 +374,8 @@ export function calculerIRPP(input: InputIRPP): ResultatIRPP {
   const { base_apres: baseApresAbatt, montant: abattementMontant, type: abattType }
     = calcAbattement(cfg, input.salaireBrut)
 
-  // 2. Parts fiscales
-  const nombreParts = calcNombreParts(cfg, input.situation, input.nombreEnfants)
+  // 2. Parts fiscales — valeur fournie explicitement prioritaire (voir InputIRPP.nombreParts)
+  const nombreParts = input.nombreParts ?? calcNombreParts(cfg, input.situation, input.nombreEnfants)
 
   // 3. Base par part
   const baseParPart = nombreParts > 0 ? baseApresAbatt / nombreParts : 0
@@ -728,22 +753,29 @@ export function genererResumeFiscalMensuel(
 ): ResumeFiscalMensuel {
   const cfg = getCountryConfig(input.codePays)
 
-  // 1. Charges sociales sur brut complet
+  // 0. Base réellement soumise à cotisation = brut global - indemnités non
+  //    imposables (vérifié exact sur cas réel — voir InputResumeFiscalMensuel.indemnites)
+  const indemnites    = input.indemnites ?? 0
+  const brutImposable = Math.max(0, input.salaireBrut - indemnites)
+
+  // 1. Charges sociales sur le brut imposable (hors indemnités)
   const cs = calculerChargesSociales({
     codePays:                   input.codePays,
-    salaireBrut:                input.salaireBrut,
+    salaireBrut:                brutImposable,
     appliquerMesuresSpeciales:  input.appliquerMesuresSpeciales,
   })
 
-  // 2. Base IRPP = brut - CNSS salarié
-  const baseIRPP = Math.max(0, input.salaireBrut - cs.total_salarie)
+  // 2. Base IRPP = brut imposable - CNSS salarié
+  const baseIRPP = Math.max(0, brutImposable - cs.total_salarie)
 
   // 3. IRPP
   const irpp = calculerIRPP({
     codePays:                   input.codePays,
     salaireBrut:                baseIRPP,
+    salaireBrutOriginal:        brutImposable,
     situation:                  input.situation,
     nombreEnfants:              input.nombreEnfants,
+    nombreParts:                input.nombreParts,
     appliquerMesuresSpeciales:  input.appliquerMesuresSpeciales,
   })
 
@@ -754,10 +786,12 @@ export function genererResumeFiscalMensuel(
 
   const totalTaxesFixes = taxesFixes.reduce((s, t) => s + t.montant, 0)
 
-  // 5. Totaux
+  // 5. Totaux — le net théorique part du brut GLOBAL (indemnités incluses,
+  //    puisqu'elles sont versées au salarié) diminué des retenues, elles,
+  //    assises sur le seul brut imposable.
   const totalRetenuesSalariales = cs.total_salarie + irpp.irpp_net + totalTaxesFixes
   const netTheorique = Math.max(0, input.salaireBrut - totalRetenuesSalariales)
-  const coutEmployeur = input.salaireBrut + cs.total_patronal_net
+  const coutEmployeur = brutImposable + cs.total_patronal_net
 
   return {
     codePays:                  cfg.code_pays,
@@ -765,6 +799,9 @@ export function genererResumeFiscalMensuel(
     periode:                   input.periode,
     loi_reference:             cfg.loi_reference,
     data_confidence:           cfg.data_confidence,
+    salaire_brut_global:       input.salaireBrut,
+    indemnites,
+    brut_imposable:            brutImposable,
     irpp,
     charges_sociales:          cs,
     taxes_fixes:               taxesFixes,

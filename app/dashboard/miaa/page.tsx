@@ -707,7 +707,7 @@ export default function MIAAPage() {
         <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
           <p className="text-xs font-bold text-gray-900 mb-3 flex items-center gap-2">
             <GraduationCap size={13} style={{ color: brandColor }} />
-            Academy & Audit MIAA+
+            Academy &amp; Audit MIAA+
           </p>
           <div className="space-y-2">
             <button

@@ -89,7 +89,7 @@ export default function PharmaciePage() {
         <h1 className="text-2xl font-bold text-[#0F172A] flex items-center gap-2">
           <Pill size={22} className="text-[#2563EB]" /> Pharmacie
         </h1>
-        <p className="text-sm text-[#64748B] mt-0.5">Tableau de bord · Gestion médicaments & ventes</p>
+        <p className="text-sm text-[#64748B] mt-0.5">Tableau de bord · Gestion médicaments &amp; ventes</p>
       </div>
 
       {/* KPIs */}

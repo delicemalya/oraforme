@@ -466,7 +466,7 @@ export default function NouvelleEntreprisePage() {
             <div className="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center">
               <CheckCircle2 size={15} className="text-green-600" />
             </div>
-            <h2 className="text-[15px] font-bold text-gray-900">Récapitulatif & Confirmation</h2>
+            <h2 className="text-[15px] font-bold text-gray-900">Récapitulatif &amp; Confirmation</h2>
           </div>
 
           {/* Company recap */}

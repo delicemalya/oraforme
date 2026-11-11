@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
+import { calculerTVASurMontantUnifie } from '@/lib/fiscalite/engine-adapter'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,22 +57,33 @@ export async function POST(req: NextRequest) {
   if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 })
 
   // Émettre BTP-001 : 411 Clients / 722 Travaux exécutés (devis initial = travaux planifiés)
+  //
+  // Mission P0-FISCAL-CG-2026 (2026-09-18) : TVA (18%) et Centime Additionnel
+  // (5% de la TVA) sont calculés séparément via le moteur central — plus de
+  // taux recopié dans ce routeur. L'ancien calcul (montantHT × 0.189) fusionnait
+  // les deux dans p_montant_tva, que la règle BTP-001 séquence 2 postait en
+  // entier sur 4441 (TVA collectée) : le Centime Additionnel se retrouvait
+  // compté comme de la TVA, ce qui faussait computeTVAFromJournal() pour tout
+  // tenant BTP. p_montant_tva porte désormais la TVA pure ; le Centime
+  // Additionnel passe dans metadata.ca, lu par BTP-001 séquence 3 (migration
+  // 181, 411/447 — même compte que FAC-001 séquence 3, précédent démontré,
+  // pas inventé).
   if (budget && budget > 0) {
-    const montantHT  = Number(budget)
-    const montantTVA = Math.round(montantHT * 0.189 * 100) / 100
+    const montantHT = Number(budget)
+    const { tva, ca, ttc } = calculerTVASurMontantUnifie(montantHT, 'CG')
     await supabaseAdmin.rpc('emit_accounting_event', {
       p_event_type:    'BTP-001',
       p_tenant_id:     ctx.tenantId,
       p_montant_ht:    montantHT,
-      p_montant_tva:   montantTVA,
-      p_montant_ttc:   Math.round((montantHT + montantTVA) * 100) / 100,
+      p_montant_tva:   tva,
+      p_montant_ttc:   ttc,
       p_date_event:    date_debut || new Date().toISOString().split('T')[0],
       p_fiscal_year:   new Date().getFullYear(),
       p_libelle:       `Chantier BTP : ${nom}`,
       p_source_module: 'btp',
       p_source_table:  'btp_chantiers',
       p_source_id:     data.id,
-      p_metadata:      JSON.stringify({ client_nom: client_nom || null, chef_projet: chef_projet || null }),
+      p_metadata:      JSON.stringify({ client_nom: client_nom || null, chef_projet: chef_projet || null, ca, country_code: 'CG' }),
     })
   }
 
@@ -108,21 +120,25 @@ export async function PATCH(req: NextRequest) {
       .maybeSingle()
     const budget = chantier?.budget ?? 0
     if (budget > 0) {
-      const montantHT  = Number(budget)
-      const montantTTC = Math.round(montantHT * 1.189 * 100) / 100
+      const montantHT = Number(budget)
+      // Même moteur central qu'à BTP-001 : garantit que le règlement (BTP-002)
+      // solde exactement le même TTC que celui facturé à la création du
+      // chantier. BTP-002 n'a qu'une séquence (montant_ttc → 521/411) : le
+      // détail tva/ca n'est pas journalisé ici, seulement transmis pour trace.
+      const { tva, ca, ttc } = calculerTVASurMontantUnifie(montantHT, 'CG')
       await supabaseAdmin.rpc('emit_accounting_event', {
         p_event_type:    'BTP-002',
         p_tenant_id:     ctx.tenantId,
         p_montant_ht:    montantHT,
-        p_montant_tva:   Math.round((montantTTC - montantHT) * 100) / 100,
-        p_montant_ttc:   montantTTC,
+        p_montant_tva:   tva,
+        p_montant_ttc:   ttc,
         p_date_event:    new Date().toISOString().split('T')[0],
         p_fiscal_year:   new Date().getFullYear(),
         p_libelle:       `Règlement chantier : ${chantier?.nom ?? id}`,
         p_source_module: 'btp',
         p_source_table:  'btp_chantiers',
         p_source_id:     id,
-        p_metadata:      JSON.stringify({ client_nom: chantier?.client_nom || null, mode_paiement: updates.mode_paiement || 'virement' }),
+        p_metadata:      JSON.stringify({ client_nom: chantier?.client_nom || null, mode_paiement: updates.mode_paiement || 'virement', ca, country_code: 'CG' }),
       })
     }
   }

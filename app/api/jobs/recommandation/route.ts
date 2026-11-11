@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { requireTenant } from '@/lib/api/require-tenant'
 import { calculerScore } from '@/lib/miaa-job/scoring'
 import { genererRapportIA } from '@/lib/miaa-job/rapport-ia'
 import type { OffreCriteres, CVData } from '@/lib/miaa-job/cv-analyzer'
@@ -40,6 +41,9 @@ function buildCVData(candidat: CandidatDB | null, rapportIa: { cv_analyse?: CVDa
 }
 
 export async function POST(req: NextRequest) {
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+
   const { offreId } = await req.json() as { offreId?: string }
   if (!offreId) return NextResponse.json({ error: 'offreId requis' }, { status: 400 })
 
@@ -47,6 +51,7 @@ export async function POST(req: NextRequest) {
     .from('offres_emploi')
     .select('id, titre, competences_obligatoires, competences_souhaitees, langues, certifications, logiciels, experience_min, diplome_requis')
     .eq('id', offreId)
+    .eq('tenant_id', ctx.tid)
     .maybeSingle()
 
   if (!offre) return NextResponse.json({ error: 'Offre introuvable' }, { status: 404 })
@@ -69,6 +74,7 @@ export async function POST(req: NextRequest) {
       candidats(id, nom, prenom, email, competences, diplomes, langues, certifications, annees_experience, niveau_etudes)
     `)
     .eq('offre_id', offreId)
+    .eq('tenant_id', ctx.tid)
     .neq('statut', 'rejete')
 
   if (!candidatures || candidatures.length === 0) {

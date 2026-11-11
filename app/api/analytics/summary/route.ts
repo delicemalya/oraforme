@@ -1,24 +1,22 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { createSupabaseServerClient } from '@/lib/supabase-client-server'
+import { requireTenant, checkPlanAccess } from '@/lib/api/require-tenant'
 import { computePayrollSummary, BULLETIN_SELECT } from '@/lib/erp-core/compute/payroll'
 
 // GET /api/analytics/summary?year=2026&months=6
+//
+// 'analytics' est un module Business+ (lib/plan-access.ts, REQUIRES_GRANDE —
+// bloqué pour Entrepreneur/tpe uniquement, pas Compagnie-exclusif malgré le
+// nom du Set) — Critical #4 : cette route réimplémentait sa propre
+// authentification (sans gateway canonique) et ne vérifiait aucun plan.
 export async function GET(req: NextRequest) {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
 
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('tenant_id, role, ecole_role_name')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle()
-  if (!profile?.tenant_id) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
+  const planDenied = await checkPlanAccess(ctx.tid, 'analytics')
+  if (planDenied) return planDenied
 
-  const tid = profile.tenant_id
+  const tid = ctx.tid
   const url = new URL(req.url)
   const year = parseInt(url.searchParams.get('year') ?? String(new Date().getFullYear()))
   const months = Math.min(parseInt(url.searchParams.get('months') ?? '12'), 12)

@@ -480,7 +480,7 @@ export default function LandingPage() {
                 <div className="border-t border-gray-100 pt-8 mb-8">
                   <div className="text-center mb-7">
                     <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.18em]">CABINETS PROFESSIONNELS</span>
-                    <h3 className="text-xl font-black text-[#111827] mt-2 mb-1">Suite dédiée aux cabinets & conseils</h3>
+                    <h3 className="text-xl font-black text-[#111827] mt-2 mb-1">Suite dédiée aux cabinets &amp; conseils</h3>
                     <p className="text-[#6B7280] text-sm max-w-lg mx-auto">
                       Gestion multi-clients, honoraires, missions, Mode Expert, agenda fiscal & social,
                       conformité OHADA, dossiers judiciaires — uniquement disponible en plan Business.

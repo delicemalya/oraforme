@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { aggregatePaymentsByMode } from '@/lib/erp-core/compute/payments'
+import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
 
 export async function GET(req: NextRequest) {
   const { ctx, error } = await requireTenant()
@@ -69,10 +70,15 @@ export async function POST(req: NextRequest) {
   }
 
   // Emit HOT-001 (fire-and-forget — P-003)
-  // Congo: TTC = HT × 1.189 (TVA 18% + CA 5%/TVA). montant collecté = TTC.
+  //
+  // Mission P0-FISCAL-CG-2026, correction transversale (2026-09-18) : le
+  // montant collecté (TTC) est décomposé via decomposerTTCUnifie() — aucun
+  // taux recopié ici. p_montant_tva ne porte plus que la TVA pure ; le
+  // Centime Additionnel passe dans metadata.ca, lu par HOT-001 séquence 3
+  // (411/447, migration à exécuter séparément — voir rapport de mission),
+  // sur le même modèle que FAC-001/BTP-001.
   const montantTTC = Number(montant)
-  const montantHT  = Math.round(montantTTC / 1.189)
-  const montantTVA = montantTTC - montantHT
+  const { ht: montantHT, tva: montantTVA, ca: montantCA } = decomposerTTCUnifie(montantTTC, 'CG')
 
   await supabaseAdmin.rpc('emit_accounting_event', {
     p_tenant_id:     ctx.tenantId,
@@ -90,6 +96,8 @@ export async function POST(req: NextRequest) {
       mode_paiement:  mode_paiement ?? 'especes',
       invoice_id:     invoice_id  ?? null,
       reservation_id: reservation_id ?? null,
+      ca:             montantCA,
+      country_code:   'CG',
     },
   })
 

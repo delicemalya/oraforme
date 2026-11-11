@@ -27,7 +27,7 @@ export default function AuditComptablePage() {
     <div className="space-y-5 w-full">
       <div className="flex items-center gap-3">
         <Link href="/dashboard/audit" className="flex items-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-          <ChevronLeft size={15} /> Audit & Conformité
+          <ChevronLeft size={15} /> Audit &amp; Conformité
         </Link>
       </div>
 

@@ -379,13 +379,15 @@ describe('7 — Bulletin CM', () => {
     expect(b.irpp.centimes_additionnels).toBeGreaterThanOrEqual(0)
   })
 
-  it('IRPP CM < IRPP CG (abattement 30%)', () => {
+  it('CM abattement 30%, CG abattement 20% — les deux via pct_net_cnss', () => {
     const bCM = genererBulletinPaie({ periode: '2026-06', employe: employeCM(), salaire_base: 800_000 })
     const bCG = genererBulletinPaie({ periode: '2026-06', employe: employeCG({ situation_familiale: 'celibataire', nombre_enfants: 0 }), salaire_base: 800_000 })
-    // CM a abattement 30% qui réduit la base → IRPP avant CAC souvent < CG
-    // (le CAC peut compenser — ce test vérifie juste la structure)
+    // CG a désormais un abattement 20% (vérifié contre bulletins réels ECAM
+    // Congo, Mission P0 paie 2026-09-17) — remplace 'aucun'.
     expect(bCM.irpp.abattement_type).toBe('pct_net_cnss')
-    expect(bCG.irpp.abattement_type).toBe('aucun')
+    expect(bCG.irpp.abattement_type).toBe('pct_net_cnss')
+    expect(bCM.irpp.abattement_montant).toBe(Math.round(bCM.irpp.base_brut * 0.30))
+    expect(bCG.irpp.abattement_montant).toBe(Math.round(bCG.irpp.base_brut * 0.20))
   })
 })
 

@@ -180,7 +180,7 @@ function RafView({ k, nomEcole }: { k: EcoleKpis; nomEcole: string }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fade(0)}>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>RAF — Finances & Trésorerie</h1>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>RAF — Finances &amp; Trésorerie</h1>
         <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{nomEcole}</p>
       </motion.div>
 

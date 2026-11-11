@@ -45,6 +45,32 @@ const SCHEMAS: Record<string, string[]> = {
     'reference', 'notes', 'date',
   ],
   purchase_items: ['id', 'purchase_id', 'product_id', 'quantite', 'prix'],
+  // BOI-004 (docs/BOI-004-REPAIR-PLAN-ACHATS-STOCKS.md) — schémas relevés en
+  // production le 2026-09-21 (BOI-003). Absence de couverture ici est
+  // exactement ce qui a laissé product_categories/purchase_orders/
+  // stock_receptions référencées par du code sans jamais exister en base.
+  suppliers: [
+    'id', 'tenant_id', 'nom', 'telephone', 'email', 'adresse', 'created_at',
+    // migration 183 (préparée, non exécutée)
+    'actif', 'conditions_paiement',
+  ],
+  products: [
+    'id', 'tenant_id', 'nom', 'categorie', 'sku', 'code_barre', 'unite',
+    'prix_achat', 'prix_vente', 'seuil_alerte', 'image_url', 'created_at',
+  ],
+  stock_movements: [
+    'id', 'tenant_id', 'product_id', 'warehouse_id', 'type', 'quantite',
+    'reference', 'note', 'created_at', 'unit_cost', 'notes',
+    // migration 184 (préparée, non exécutée)
+    'origine', 'purchase_item_id',
+    // migration 186 (préparée, non exécutée)
+    'reversed_movement_id',
+  ],
+  warehouses: [
+    'id', 'tenant_id', 'nom', 'localisation', 'created_at',
+    // migration 183 (préparée, non exécutée)
+    'actif',
+  ],
 }
 
 /**

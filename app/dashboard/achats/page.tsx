@@ -1,5 +1,12 @@
 'use client'
 
+// BOI-004 (docs/BOI-004-REPAIR-PLAN-ACHATS-STOCKS.md) : DEPRECATE.
+// fournisseurs/achats n'est plus la pile canonique (voir CANONICAL_PURCHASE_
+// STACK = suppliers/purchases/purchase_items) — retiré de la navigation
+// principale et des raccourcis sectoriels, remplacés par
+// /dashboard/stocks/achats. Conservé fonctionnel (0 donnée production,
+// comptabilité ACH-001/002 toujours active) pour accès direct/historique
+// tant qu'aucune donnée réelle ne justifie une migration/suppression.
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'

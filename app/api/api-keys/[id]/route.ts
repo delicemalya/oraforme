@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireRole } from '@/lib/api/require-tenant'
+import { requireRole, checkPlanAccess } from '@/lib/api/require-tenant'
 import { checkRateLimit, RATE_LIMITS } from '@/lib/api/rate-limit'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
@@ -14,6 +14,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   const ctx = await requireRole('admin', req)
   if (!ctx.ok) return ctx.error
+
+  const planDenied = await checkPlanAccess(ctx.tid, 'api-keys')
+  if (planDenied) return planDenied
 
   const { id } = await params
   const body = await req.json().catch(() => null)
@@ -44,6 +47,9 @@ export async function DELETE(req: NextRequest, { params }: Params) {
 
   const ctx = await requireRole('admin', req)
   if (!ctx.ok) return ctx.error
+
+  const planDenied = await checkPlanAccess(ctx.tid, 'api-keys')
+  if (planDenied) return planDenied
 
   const { id } = await params
 

@@ -48,7 +48,7 @@ export default function ApisPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-[22px] font-bold text-gray-900">APIs & Intégrations</h1>
+        <h1 className="text-[22px] font-bold text-gray-900">APIs &amp; Intégrations</h1>
         <p className="text-sm text-gray-500 mt-0.5">Documentation des routes API et services connectés</p>
       </div>
 

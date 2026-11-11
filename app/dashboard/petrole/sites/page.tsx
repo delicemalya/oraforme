@@ -145,7 +145,7 @@ export default function PetroleSitesPage() {
             </div>
             <div style={{ display:'flex', gap:10, marginTop:20 }}>
               <button onClick={() => setShowForm(false)} style={{ flex:1, padding:10, border:'1px solid #E2E8F0', borderRadius:8, background:'#fff', cursor:'pointer' }}>{t('common.cancel')}</button>
-              <button onClick={handleSave} disabled={saving||!form.nom.trim()} style={{ flex:2, padding:10, border:'none', borderRadius:8, background:'#2563EB', color:'#fff', cursor:'pointer', fontWeight:600, opacity:saving||!form.nom.trim()?.6:1 }}>
+              <button onClick={handleSave} disabled={saving||!form.nom.trim()} style={{ flex:2, padding:10, border:'none', borderRadius:8, background:'#2563EB', color:'#fff', cursor:'pointer', fontWeight:600, opacity: (saving || !form.nom.trim()) ? 0.6 : 1 }}>
                 {saving ? 'Enregistrement…' : editing ? 'Modifier' : 'Créer le site'}
               </button>
             </div>

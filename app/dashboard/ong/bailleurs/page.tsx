@@ -168,7 +168,7 @@ export default function OngBailleursPage() {
             <span className="text-[#E2E8F0]">/</span>
             <div className="flex items-center gap-2">
               <Globe size={16} className="text-green-700" />
-              <h1 className="text-[16px] font-black">Bailleurs & Donateurs</h1>
+              <h1 className="text-[16px] font-black">Bailleurs &amp; Donateurs</h1>
             </div>
           </div>
           <div className="flex gap-2">

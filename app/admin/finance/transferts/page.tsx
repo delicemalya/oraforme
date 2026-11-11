@@ -177,7 +177,7 @@ export default function TransfertsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-[22px] font-bold text-gray-900">Transferts & Remboursements</h1>
+          <h1 className="text-[22px] font-bold text-gray-900">Transferts &amp; Remboursements</h1>
           <p className="text-sm text-gray-500 mt-0.5">Mouvements entre comptes et remboursements clients</p>
         </div>
         <div className="flex items-center gap-2">

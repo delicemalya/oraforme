@@ -15,6 +15,7 @@ import {
   type TypeEvent, TYPE_EVENT, generateCode, KpiCard, Avatar, FI,
 } from '../_lib/shared'
 import { SectionDiplomes, SectionSoutenances } from '../_lib/academic-sections'
+import { computeUnpaidActifs, runMassSuspension, type PaidLookupResult } from '../_lib/mass-suspension'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
 
@@ -30,10 +31,18 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
   const { t } = useLocale()
   const [revenuMois,   setRevenuMois]   = useState(0)
   const [revenuAnnee,  setRevenuAnnee]  = useState(0)
-  const [impayeCount,  setImpayeCount]  = useState(0)
+  const [impayeCount,  setImpayeCount]  = useState<number | null>(0)
   const [recentPaie,   setRecentPaie]   = useState<PaiementScolaire[]>([])
   const [statsLoading, setStatsLoading] = useState(true)
   const [blocking,     setBlocking]     = useState(false)
+  const [blockMsg,     setBlockMsg]     = useState<string | null>(null)
+
+  // Lecture des paiements de l'année pour les élèves actifs (critère inchangé).
+  // L'erreur est renvoyée : elle ne doit jamais être lue comme « aucun paiement ».
+  const fetchPaid = useCallback(async (actifIds: string[], annee: string): Promise<PaidLookupResult> => {
+    const { data, error } = await supabase.from('paiements_scolaires').select('etudiant_id').eq('tenant_id', tenantId).in('etudiant_id', actifIds).ilike('annee_scolaire', `%${annee}%`)
+    return { data, error }
+  }, [tenantId])
 
   useEffect(() => {
     async function loadStats() {
@@ -49,12 +58,11 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
         supabase.from('paiements_scolaires').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(8),
       ])
 
-      const actifs = etudiants.filter(e => e.statut === 'actif').map(e => e.id)
-      let impaye = 0
+      const actifs = etudiants.filter(e => e.statut === 'actif')
+      let impaye: number | null = 0
       if (actifs.length > 0) {
-        const { data: pPaid } = await supabase.from('paiements_scolaires').select('etudiant_id').eq('tenant_id', tenantId).in('etudiant_id', actifs).ilike('annee_scolaire', `%${annee}%`)
-        const paidIds = new Set((pPaid ?? []).map(p => p.etudiant_id))
-        impaye = actifs.filter(id => !paidIds.has(id)).length
+        const unpaid = computeUnpaidActifs(actifs, await fetchPaid(actifs.map(e => e.id), annee))
+        impaye = unpaid === null ? null : unpaid.length
       }
 
       setRevenuMois(pMois?.reduce((s, p) => s + p.montant, 0) ?? 0)
@@ -64,28 +72,37 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
       setStatsLoading(false)
     }
     loadStats()
-  }, [tenantId, etudiants])
+  }, [tenantId, etudiants, fetchPaid])
 
   async function autoBlock() {
-    setBlocking(true)
-    const annee   = new Date().getFullYear().toString()
-    const actifs  = etudiants.filter(e => e.statut === 'actif').map(e => e.id)
-    if (actifs.length > 0) {
-      const { data: paid } = await supabase.from('paiements_scolaires').select('etudiant_id').eq('tenant_id', tenantId).in('etudiant_id', actifs).ilike('annee_scolaire', `%${annee}%`)
-      const paidIds = new Set((paid ?? []).map(p => p.etudiant_id))
-      const toBlock = actifs.filter(id => !paidIds.has(id))
-      for (const id of toBlock) {
-        await supabase.from('etudiants').update({ statut: 'suspendu', code_deblocage: generateCode() }).eq('id', id)
-      }
+    setBlocking(true); setBlockMsg(null)
+    const annee  = new Date().getFullYear().toString()
+    const result = await runMassSuspension({
+      etudiants,
+      annee,
+      fetchPaid: ids => fetchPaid(ids, annee),
+      confirm: message => window.confirm(message),
+      suspend: async (id, code) => {
+        const { error } = await supabase.from('etudiants').update({ statut: 'suspendu', code_deblocage: code }).eq('id', id)
+        return { error }
+      },
+      generateCode,
+    })
+    setBlocking(false)
+    if (result.status === 'lookup_error') setBlockMsg('Paiements illisibles : aucune suspension effectuée.')
+    if (result.status === 'done') {
+      setBlockMsg(result.failed
+        ? `Arrêt sur erreur : ${result.suspended}/${result.candidates} élève(s) suspendu(s).`
+        : `${result.suspended} élève(s) suspendu(s).`)
+      onRefresh()
     }
-    setBlocking(false); onRefresh()
   }
 
   const kpis = [
     { label: t('ecole.direction.kpi.revenuMois'),  value: statsLoading ? '…' : fmtCurrency(revenuMois),   color: '#0F172A' },
     { label: t('ecole.direction.kpi.revenuAnnee'), value: statsLoading ? '…' : fmtCurrency(revenuAnnee), color: '#DC2626' },
     { label: t('ecole.direction.kpi.etudiants'),   value: etudiants.filter(e => e.statut === 'actif').length, color: '#DC2626' },
-    { label: t('ecole.direction.kpi.impayes'),     value: statsLoading ? '…' : impayeCount,                  color: '#DC2626' },
+    { label: t('ecole.direction.kpi.impayes'),     value: statsLoading ? '…' : (impayeCount ?? '—'),         color: '#DC2626' },
   ]
 
   return (
@@ -109,12 +126,13 @@ function SectionVue({ tenantId, etudiants, enseignants, classes, onRefresh }: {
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {t('ecole.direction.kpi.gestionImpayesDesc')}
           </p>
-          <button onClick={autoBlock} disabled={blocking || impayeCount === 0 || statsLoading}
+          <button onClick={autoBlock} disabled={blocking || !impayeCount || statsLoading}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
             style={{ background: '#00b9a7', color: '#fff' }}>
             {blocking ? <Loader2 className="animate-spin" size={12} /> : <Unlock size={12} />}
-            {t('ecole.direction.block')} {impayeCount}
+            {t('ecole.direction.block')} {impayeCount ?? '—'}
           </button>
+          {blockMsg && <p className="text-xs text-[var(--text-secondary)]">{blockMsg}</p>}
         </div>
 
         <div className="rounded-xl border border-[var(--border)] p-4" style={{ background: '#FFFFFF' }}>

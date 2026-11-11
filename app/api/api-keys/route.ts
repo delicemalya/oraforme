@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireRole } from '@/lib/api/require-tenant'
+import { requireRole, checkPlanAccess } from '@/lib/api/require-tenant'
 import { checkRateLimit, RATE_LIMITS } from '@/lib/api/rate-limit'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
@@ -12,6 +12,14 @@ export async function GET(req: NextRequest) {
 
   const ctx = await requireRole('admin', req)
   if (!ctx.ok) return ctx.error
+
+  // 'api-keys' est un module Business+ (lib/plan-access.ts, REQUIRES_GRANDE —
+  // bloqué pour Entrepreneur/tpe uniquement, pas Compagnie-exclusif malgré le
+  // nom du Set) — Critical #4 : aucune vérification de plan n'existait ici,
+  // tout tenant admin, même Entrepreneur, pouvait créer des clés API. Le plan
+  // vient de ctx.tid (session), jamais du client.
+  const planDenied = await checkPlanAccess(ctx.tid, 'api-keys')
+  if (planDenied) return planDenied
 
   const { data, error } = await supabaseAdmin
     .from('api_keys')
@@ -30,6 +38,9 @@ export async function POST(req: NextRequest) {
 
   const ctx = await requireRole('admin', req)
   if (!ctx.ok) return ctx.error
+
+  const planDenied = await checkPlanAccess(ctx.tid, 'api-keys')
+  if (planDenied) return planDenied
 
   const body = await req.json().catch(() => null)
   if (!body?.name) return NextResponse.json({ error: 'name requis' }, { status: 400 })

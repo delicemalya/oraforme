@@ -161,7 +161,49 @@ export default function SortiesPage() {
 
   const totalValeur = form.lines.reduce((s, l) => s + l.quantite * l.prix_unitaire, 0)
 
+  // C6 (D2) : la branche "vente" converge vers le flux canonique /api/sales —
+  // même table (ventes/vente_lignes) que le POS, destinataire/warehouse_id
+  // préservés comme contexte propre à cet écran (client nommé, entrepôt
+  // précis). Toujours un entretien de type crédit (411), comme le code
+  // précédent le faisait déjà inconditionnellement pour cette branche —
+  // aucun sélecteur de mode de paiement ajouté, comportement reproduit à
+  // l'identique. Les 5 autres raisons (consommation/transfert/perte/don/
+  // usage_interne) restent INCHANGÉES ci-dessous (hors périmètre C6).
+  const handleCreateVente = async () => {
+    if (!tenantId || !form.destinataire.trim()) {
+      setCreateError('Client requis pour une vente à crédit')
+      return
+    }
+    setSaving(true)
+    setCreateError('')
+    try {
+      const res = await fetch('/api/sales', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idempotency_key: crypto.randomUUID(),
+          mode_paiement:   'credit',
+          destinataire:    form.destinataire.trim(),
+          warehouse_id:    form.warehouse_id || undefined,
+          lignes: form.lines
+            .filter(l => l.product_id && l.quantite > 0)
+            .map(l => ({ produit_id: l.product_id, qte: l.quantite })),
+        }),
+      })
+      const resBody = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(resBody.error ?? 'Erreur lors de la création de la vente')
+
+      setShowCreate(false)
+      setForm({ type_sortie: 'vente', warehouse_id: '', destinataire: '', date_sortie: new Date().toISOString().split('T')[0], motif: '', notes: '', lines: [{ product_id: '', quantite: 1, prix_unitaire: 0 }] })
+      setStockAlert(null)
+      await load()
+    } catch (e: any) { setCreateError(e.message || 'Erreur') }
+    setSaving(false)
+  }
+
   const handleCreate = async () => {
+    if (form.type_sortie === 'vente') return handleCreateVente()
+
     if (!tenantId || !form.lines.some(l => l.product_id)) {
       setCreateError('Ajoutez au moins un produit')
       return
@@ -217,23 +259,11 @@ export default function SortiesPage() {
         if (errMvt) throw errMvt
       }
 
-      // OHADA entry
+      // OHADA entry — 'vente' est traité par handleCreateVente() ci-dessus
+      // (converge vers /api/sales), jamais atteint ici.
       const today = form.date_sortie
       if (totalValeur > 0) {
-        if (form.type_sortie === 'vente') {
-          await writeComptaEntry({
-            tenantId,
-            date: today,
-            libelle: `Sortie stock vente ${numero} — ${form.destinataire || 'Client'}`,
-            type: 'recette',
-            montant: totalValeur,
-            categorie: 'ventes',
-            debitAccount: '411',
-            creditAccount: '701',
-            source: 'sorties',
-            sourceId: sortie.id,
-          })
-        } else if (['perte', 'don'].includes(form.type_sortie)) {
+        if (['perte', 'don'].includes(form.type_sortie)) {
           await writeComptaEntry({
             tenantId,
             date: today,

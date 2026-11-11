@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { checkRateLimit, RATE_LIMITS } from '@/lib/api/rate-limit'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { calculerCNSSAggrege } from '@/lib/fiscalite/engine'
+import { calculerCNSSAggregeUnifie, getConfigAffichageUnifie } from '@/lib/fiscalite/engine-adapter'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
-import { getPaysConfig } from '@/lib/fiscalite/pays'
 import { supporteDeclarationsCNSS, type CodePays } from '@/lib/fiscal/universal-tax-engine'
 import { computeCNSSSummary, BULLETIN_FISCAL_SELECT } from '@/lib/erp-core/compute/fiscal'
 
@@ -50,7 +49,7 @@ export async function GET(req: NextRequest) {
   const { data: bulletins, error } = await q
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const cfg     = getPaysConfig(pays)
+  const cfg     = getConfigAffichageUnifie(pays)
   const items   = bulletins ?? []
 
   // ERP Core — agrégation depuis valeurs stockées (précision maximale)
@@ -61,10 +60,13 @@ export async function GET(req: NextRequest) {
     const mp = summary.mensuel.find(p => p.mois === m)
     if (!mp || mp.nb_employes === 0) return null
 
-    // Pour pays autres que CG : recalcul CNSS selon barème national
+    // Pour pays autres que CG : recalcul CNSS selon barème national (moteur
+    // central lib/fiscal/universal-tax-engine.ts pour CM/GA/CD — seuls pays
+    // autres que CG à la fois validés ET autorisés pour les déclarations,
+    // voir supporteDeclarationsCNSS ci-dessus)
     if (pays !== 'CG') {
       const mvsMois = items.filter(b => b.mois === m)
-      const result  = calculerCNSSAggrege(mvsMois.map(b => ({ salaire_brut: b.brut })), pays)
+      const result  = calculerCNSSAggregeUnifie(mvsMois.map(b => ({ salaire_brut: b.brut })), pays)
       return {
         mois: m, annee, nb_employes: mp.nb_employes,
         salaire_brut_total: result.salaire_brut_total,

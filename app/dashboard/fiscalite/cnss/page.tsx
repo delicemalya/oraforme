@@ -100,7 +100,7 @@ export default function CNSSPage() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Users size={20} color={PURPLE} /> {String(config?.acronyme ?? 'CNSS')} & Charges sociales
+            <Users size={20} color={PURPLE} /> {String(config?.acronyme ?? 'CNSS')} &amp; Charges sociales
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: MUTED }}>
             Déclarations {annee} · {PAYS_LIST.find(p => p.code === pays)?.drapeau} {PAYS_LIST.find(p => p.code === pays)?.nom}

@@ -10,7 +10,7 @@ export default function BTPDevisPage() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <button onClick={() => router.push('/dashboard/btp')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px' }}>←</button>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Devis & Appels d'offres</h1>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Devis &amp; Appels d'offres</h1>
           <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: '14px' }}>Rédaction, soumission et suivi des devis BTP</p>
         </div>
       </div>

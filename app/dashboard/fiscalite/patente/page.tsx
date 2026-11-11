@@ -111,7 +111,7 @@ export default function PatentePage() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Building2 size={20} color={GREEN} /> Patente & Taxes professionnelles
+            <Building2 size={20} color={GREEN} /> Patente &amp; Taxes professionnelles
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: MUTED }}>
             Taxes annuelles · {annee} · {PAYS_LIST.find(p => p.code === pays)?.drapeau} {PAYS_LIST.find(p => p.code === pays)?.nom}

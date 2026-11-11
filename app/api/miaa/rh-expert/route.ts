@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireTenant, getTenantPlan } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -212,18 +213,25 @@ Réalise un audit des risques RH complet :
 
 export async function POST(req: NextRequest) {
   try {
+    const ctx = await requireTenant(req)
+    if (!ctx.ok) return ctx.error
+    const tenantId = ctx.tid
+
     const body = await req.json() as {
       tool: string
       inputs: Record<string, string>
-      tenantId: string
-      plan: string
     }
 
-    const { tool, inputs, tenantId, plan } = body
+    const { tool, inputs } = body
 
-    if (!tool || !tenantId) {
-      return NextResponse.json({ error: 'tool and tenantId required' }, { status: 400 })
+    if (!tool) {
+      return NextResponse.json({ error: 'tool required' }, { status: 400 })
     }
+
+    // plan dérivé du tenant de session (require-tenant.ts), jamais du corps —
+    // un tenant 'tpe' ne doit pas pouvoir s'auto-déclarer 'grande' pour
+    // débloquer les outils EXPERT_TOOLS/EXEC_TOOLS ci-dessous.
+    const plan = (await getTenantPlan(tenantId)) ?? 'tpe'
 
     // ── Plan-gated access ──
     const STANDARD_TOOLS = ['analyser_cv', 'fiche_poste', 'annonce_emploi', 'preparer_entretien']

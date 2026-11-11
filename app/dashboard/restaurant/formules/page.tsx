@@ -66,7 +66,7 @@ export default function FormulesPage() {
           <div className="flex items-center gap-3">
             <Link href="/dashboard/restaurant" className="flex items-center gap-1 text-[#64748B] text-[13px]"><ArrowLeft size={14} /> Restaurant</Link>
             <span className="text-[#E2E8F0]">/</span>
-            <h1 className="text-[16px] font-black text-[#0F172A]">Formules & Menus</h1>
+            <h1 className="text-[16px] font-black text-[#0F172A]">Formules &amp; Menus</h1>
           </div>
           <div className="flex gap-2">
             <button onClick={load} className="p-2 border border-[#E2E8F0] rounded-xl text-[#64748B]"><RefreshCw size={13} /></button>

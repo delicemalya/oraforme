@@ -181,7 +181,7 @@ export default function EcoleThesesPage() {
             <span className="text-[#E2E8F0]">/</span>
             <div className="flex items-center gap-2">
               <BookOpen size={16} className="text-amber-500" />
-              <h1 className="text-[16px] font-black text-[#0F172A]">Thèses & Mémoires</h1>
+              <h1 className="text-[16px] font-black text-[#0F172A]">Thèses &amp; Mémoires</h1>
             </div>
           </div>
           <div className="flex gap-2">

@@ -127,7 +127,7 @@ export default function AssuranceDashboard() {
         <div>
           <h1 className="text-2xl font-black text-[#0F172A] flex items-center gap-2">
             <Shield className="text-[#DC2626]" size={26} />
-            Assurance & Réassurance
+            Assurance &amp; Réassurance
           </h1>
           <p className="text-sm text-[#64748B] mt-1">Vue d&apos;ensemble · Portefeuille & sinistralité</p>
         </div>

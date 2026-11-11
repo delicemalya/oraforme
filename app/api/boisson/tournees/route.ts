@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
+import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,7 +73,12 @@ export async function PATCH(req: NextRequest) {
 
   // Emit BOI-001 uniquement lors de la première transition vers 'terminee' (fire-and-forget — P-003)
   // Guard : current.statut !== 'terminee' évite le double-emit sur re-PATCH (ANOM-06).
-  // Congo: TTC = HT × 1.189 (TVA 18% + CA 5%/TVA). montant_collecte = TTC.
+  //
+  // Mission P0-FISCAL-CG-2026, correction transversale (2026-09-18) : le
+  // montant collecté (TTC) est décomposé via decomposerTTCUnifie() — aucun
+  // taux recopié ici. p_montant_tva ne porte plus que la TVA pure ; le
+  // Centime Additionnel passe dans metadata.ca, lu par BOI-001 séquence 3
+  // (411/447, migration à exécuter séparément — voir rapport de mission).
   if (updates.statut === 'terminee' && Number(updates.montant_collecte) > 0) {
     const { data: current } = await supabaseAdmin
       .from('boisson_tournees')
@@ -83,8 +89,7 @@ export async function PATCH(req: NextRequest) {
 
     if (current && current.statut !== 'terminee') {
       const montantTTC = Number(updates.montant_collecte)
-      const montantHT  = Math.round(montantTTC / 1.189)
-      const montantTVA = montantTTC - montantHT
+      const { ht: montantHT, tva: montantTVA, ca: montantCA } = decomposerTTCUnifie(montantTTC, 'CG')
 
       await supabaseAdmin.rpc('emit_accounting_event', {
         p_tenant_id:     ctx.tenantId,
@@ -102,6 +107,8 @@ export async function PATCH(req: NextRequest) {
           mode_paiement: 'especes',
           chauffeur_nom: updates.chauffeur_nom ?? current.chauffeur_nom,
           zone:          current.zone ?? null,
+          ca:            montantCA,
+          country_code:  'CG',
         },
       })
     }

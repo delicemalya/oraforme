@@ -166,7 +166,7 @@ export default function ParcoursPage() {
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
         className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Parcours & Programmes</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Parcours &amp; Programmes</h1>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
             Licences, Masters, Doctorats et autres programmes d'études.
           </p>

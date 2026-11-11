@@ -173,7 +173,7 @@ export default function PharmacieVentesPage() {
           </Link>
           <div>
             <h1 className="text-lg font-bold text-[#0F172A] flex items-center gap-2">
-              <ShoppingCart size={18} className="text-[#16A34A]" /> Ventes & Caisse
+              <ShoppingCart size={18} className="text-[#16A34A]" /> Ventes &amp; Caisse
             </h1>
             <p className="text-xs text-[#64748B]">POS Pharmacie</p>
           </div>

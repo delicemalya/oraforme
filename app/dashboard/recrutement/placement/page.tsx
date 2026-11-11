@@ -45,7 +45,7 @@ export default function PlacementPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-[18px] sm:text-xl font-bold text-[#0F172A]">Placements</h1>
-          <p className="text-[11px] text-[#64748B]">Missions & contrats placés</p>
+          <p className="text-[11px] text-[#64748B]">Missions &amp; contrats placés</p>
         </div>
         <button
           className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-[13px] font-bold hover:bg-[#D97706] shadow-sm"

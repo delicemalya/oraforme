@@ -4,7 +4,8 @@ import { createContext, useContext, ReactNode } from 'react'
 import { useGeolocation } from '@/lib/hooks/useGeolocation'
 import { getPaysGeo, formaterMontant, PAYS_GEO_LIST, type PaysGeo } from '@/lib/geolocation'
 import { PAYS_CONFIGS } from '@/lib/fiscalite/pays'
-import type { PaysConfig } from '@/lib/fiscalite/types'
+import { calculerSalaireNetUnifie, calculerTVASurMontantUnifie } from '@/lib/fiscalite/engine-adapter'
+import type { PaysConfig, PaysFiscal } from '@/lib/fiscalite/types'
 
 interface PaysContextValue {
   pays: string
@@ -21,17 +22,6 @@ interface PaysContextValue {
 
 const PaysContext = createContext<PaysContextValue | null>(null)
 
-function calculerIRPP(baseImposable: number, config: PaysConfig): number {
-  const base = baseImposable * (1 - config.irpp.abattement_pct)
-  let irpp = 0
-  for (const tranche of config.irpp.tranches) {
-    if (base <= tranche.min) break
-    const montantDansLaTranche = Math.min(base, tranche.max) - tranche.min
-    irpp += montantDansLaTranche * tranche.taux
-  }
-  return Math.round(irpp)
-}
-
 export function PaysProvider({ children }: { children: ReactNode }) {
   const { pays, setPays, detected, loading } = useGeolocation()
   const paysGeo = getPaysGeo(pays)
@@ -40,27 +30,18 @@ export function PaysProvider({ children }: { children: ReactNode }) {
 
   const fmt = (montant: number) => formaterMontant(montant, pays)
 
+  // Délègue à lib/fiscalite/engine-adapter.ts (Mission P0-FISCAL-CG-2026,
+  // 2026-09-18) — même principe que calculerSalaireNet ci-dessous.
   function calculerTVA(montantHT: number) {
-    const taux = paysFiscal.tva.taux_normal
-    const tva = montantHT * taux
-    // Taxes additionnelles (CA Congo, CAC Cameroun...)
-    let taxes_add = 0
-    for (const ta of paysFiscal.tva.taxes_additionnelles ?? []) {
-      taxes_add += ta.base === 'tva_collectee' ? tva * ta.taux : montantHT * ta.taux
-    }
-    const ttc = montantHT + tva + taxes_add
-    return { tva: Math.round(tva), ca: Math.round(taxes_add), ttc: Math.round(ttc), taux }
+    return calculerTVASurMontantUnifie(montantHT, fiscalCode as PaysFiscal)
   }
 
+  // Délègue à lib/fiscalite/engine-adapter.ts (Mission P0-PAIE-CG-2026,
+  // 2026-09-18) : moteur central lib/fiscal/universal-tax-engine.ts pour les
+  // pays validés (CG/CM/GA/CD/CF/TD/GQ), ancien moteur conservé explicitement
+  // pour les 8 pays sans configuration validée. Aucun taux recopié ici.
   function calculerSalaireNet(brut: number) {
-    const plafond = paysFiscal.cnss.plafond_mensuel
-    const base_cnss = plafond ? Math.min(brut, plafond) : brut
-    const cnss_salarie = Math.round(base_cnss * paysFiscal.cnss.taux_salarie)
-    const base_irpp = brut - cnss_salarie
-    const irpp = calculerIRPP(base_irpp, paysFiscal)
-    const total_retenues = cnss_salarie + irpp
-    const net = Math.round(brut - total_retenues)
-    return { net, cnss_salarie, irpp, total_retenues }
+    return calculerSalaireNetUnifie(brut, fiscalCode as PaysFiscal)
   }
 
   return (

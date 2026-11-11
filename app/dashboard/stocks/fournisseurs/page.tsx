@@ -82,22 +82,26 @@ export default function FournisseursPage() {
 
       const { data: achats } = await supabase
         .from('purchases')
-        .select('supplier_id, montant_total')
+        .select('id, supplier_id, montant_total')
         .eq('tenant_id', tenantId)
 
-      const { data: prods } = await supabase
-        .from('products')
-        .select('fournisseur_id')
-        .eq('tenant_id', tenantId)
+      // products n'a pas de fournisseur_id (BOI-004) : le nombre de produits
+      // par fournisseur se déduit des lignes d'achat réellement passées
+      // auprès de lui, pas d'un lien direct produit→fournisseur inexistant.
+      const purchaseIds = (achats || []).map((a: any) => a.id)
+      const { data: items } = purchaseIds.length
+        ? await supabase.from('purchase_items').select('purchase_id, product_id').in('purchase_id', purchaseIds)
+        : { data: [] as { purchase_id: string; product_id: string }[] }
 
       const list = (fours || []).map((f: Fournisseur) => {
         const fAchats = (achats || []).filter((a: any) => a.supplier_id === f.id)
-        const fProds = (prods || []).filter((p: any) => p.fournisseur_id === f.id)
+        const fAchatIds = new Set(fAchats.map((a: any) => a.id))
+        const fProduitIds = new Set((items || []).filter(i => fAchatIds.has(i.purchase_id)).map(i => i.product_id))
         return {
           ...f,
           nb_commandes: fAchats.length,
           total_achats: fAchats.reduce((s: number, a: any) => s + (a.montant_total || 0), 0),
-          nb_produits: fProds.length,
+          nb_produits: fProduitIds.size,
         }
       })
 

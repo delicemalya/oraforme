@@ -449,8 +449,13 @@ export default function FacturationPage() {
     })
   }
 
-  async function reverseFactureEvents(facId: string) {
-    if (!tenantId) return
+  // ACCOUNTING-REVERSE-001-FIX : l'erreur de fn_reverse_accounting_event
+  // n'était pas lue — un échec d'extourne (ex. le défaut corrigé par la
+  // migration 187) passait silencieusement, et la facture était supprimée
+  // quand même, laissant des accounting_events/journal_entries orphelins.
+  // Retourne maintenant un résultat explicite ; voir l'appelant (del()).
+  async function reverseFactureEvents(facId: string): Promise<{ ok: boolean; error?: string }> {
+    if (!tenantId) return { ok: true }
     const { data: events } = await supabase
       .from('accounting_events')
       .select('id')
@@ -460,12 +465,14 @@ export default function FacturationPage() {
       .eq('status', 'processed')
       .in('event_type', ['FAC-001', 'FAC-002'])
     for (const ev of events ?? []) {
-      await supabase.rpc('fn_reverse_accounting_event', {
+      const { error } = await supabase.rpc('fn_reverse_accounting_event', {
         p_event_id:   ev.id,
         p_reason:     'Facture supprimée',
         p_created_by: null,
       })
+      if (error) return { ok: false, error: error.message }
     }
+    return { ok: true }
   }
 
   // ── Save ─────────────────────────────────────────────────────────────────────
@@ -524,7 +531,11 @@ export default function FacturationPage() {
   // ── Delete / Statut ───────────────────────────────────────────────────────────
 
   async function del(id: string) {
-    await reverseFactureEvents(id)
+    const reversed = await reverseFactureEvents(id)
+    if (!reversed.ok) {
+      showToast('Extourne comptable échouée, facture NON supprimée : ' + reversed.error)
+      return
+    }
     const { error } = await supabase.from('factures').delete().eq('id', id)
     if (error) { showToast('Erreur suppression : ' + error.message); return }
     setFactures(f => f.filter(x => x.id !== id))

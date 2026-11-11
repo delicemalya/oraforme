@@ -11,14 +11,17 @@ import {
 } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
+// BOI-005 (docs/BOI-005-AUDIT-MODELE-PRODUIT.md) : products ne porte que ces
+// 12 colonnes réelles (migration 050, qui ajoutait description/categorie_id/
+// stock_max/fournisseur_id/emplacement/statut/taxe_pct, n'a jamais été
+// appliquée en production). Cette page n'écrit et n'affiche plus que le
+// schéma réellement en base — aucun de ces 7 champs n'est recréé ici.
 
 interface Product {
   id: string
   tenant_id: string
   nom: string
-  description: string
   categorie: string | null
-  categorie_id: string | null
   sku: string | null
   code_barre: string | null
   unite: string
@@ -26,32 +29,23 @@ interface Product {
   prix_vente: number
   stock_actuel: number
   seuil_alerte: number
-  stock_max: number
-  fournisseur_id: string | null
-  emplacement: string
-  statut: 'actif' | 'inactif' | 'archive'
-  taxe_pct: number
   image_url: string | null
   created_at: string
 }
-
-interface Category { id: string; nom: string; code: string }
-interface Supplier  { id: string; nom: string }
 
 const UNITES = ['pièce', 'kg', 'g', 'litre', 'ml', 'mètre', 'cm', 'carton', 'sac', 'palette', 'boîte', 'tonne', 'lot', 'rouleau', 'bouteille']
 
 function generateSKU(nom: string, cat: string, year: number, count: number) {
   const prefix = nom.slice(0, 3).toUpperCase().replace(/\s/g, 'X')
-  const catCode = cat.slice(0, 3).toUpperCase().replace(/\s/g, 'X')
+  const catCode = (cat || 'GEN').slice(0, 3).toUpperCase().replace(/\s/g, 'X')
   const num = String(count + 1).padStart(4, '0')
   return `${prefix}-${catCode}-${year}-${num}`
 }
 
 const EMPTY_FORM = {
-  nom: '', description: '', categorie: '', categorie_id: '',
+  nom: '', categorie: '',
   sku: '', code_barre: '', unite: 'pièce',
-  prix_achat: '', prix_vente: '', seuil_alerte: '0', stock_max: '0',
-  fournisseur_id: '', emplacement: '', statut: 'actif', taxe_pct: '0',
+  prix_achat: '', prix_vente: '', seuil_alerte: '0',
 }
 
 export default function ProduitsPage() {
@@ -59,8 +53,6 @@ export default function ProduitsPage() {
   const { tenantId } = useTenant()
   const { t } = useLocale()
   const [products, setProducts]     = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [suppliers, setSuppliers]   = useState<Supplier[]>([])
   const [loading, setLoading]       = useState(true)
   const [showModal, setShowModal]   = useState(false)
   const [editItem, setEditItem]     = useState<Product | null>(null)
@@ -68,7 +60,6 @@ export default function ProduitsPage() {
   const [form, setForm]             = useState({ ...EMPTY_FORM })
   const [search, setSearch]         = useState('')
   const [filterCat, setFilterCat]   = useState('all')
-  const [filterStatut, setFilterStatut] = useState('all')
   const [filterStock, setFilterStock]   = useState('all')
   const [selected, setSelected]     = useState<Product | null>(null)
   const [confirmDel, setConfirmDel] = useState<Product | null>(null)
@@ -77,14 +68,9 @@ export default function ProduitsPage() {
     if (!tenantId) return
     setLoading(true)
     try {
-      const [{ data: prods }, { data: cats }, { data: supps }] = await Promise.all([
-        supabase.from('v_products_stock').select('*').eq('tenant_id', tenantId).order('nom').limit(200),
-        supabase.from('product_categories').select('id,nom,code').eq('tenant_id', tenantId).order('nom').limit(200),
-        supabase.from('suppliers').select('id,nom').eq('tenant_id', tenantId).order('nom').limit(200),
-      ])
+      const { data: prods } = await supabase
+        .from('v_products_stock').select('*').eq('tenant_id', tenantId).order('nom').limit(200)
       setProducts(prods ?? [])
-      setCategories(cats ?? [])
-      setSuppliers(supps ?? [])
     } finally {
       setLoading(false)
     }
@@ -101,13 +87,10 @@ export default function ProduitsPage() {
   function openEdit(p: Product) {
     setEditItem(p)
     setForm({
-      nom: p.nom, description: p.description || '',
-      categorie: p.categorie || '', categorie_id: p.categorie_id || '',
+      nom: p.nom, categorie: p.categorie || '',
       sku: p.sku || '', code_barre: p.code_barre || '',
       unite: p.unite, prix_achat: String(p.prix_achat), prix_vente: String(p.prix_vente),
-      seuil_alerte: String(p.seuil_alerte), stock_max: String(p.stock_max || 0),
-      fournisseur_id: p.fournisseur_id || '', emplacement: p.emplacement || '',
-      statut: p.statut, taxe_pct: String(p.taxe_pct || 0),
+      seuil_alerte: String(p.seuil_alerte),
     })
     setShowModal(true)
   }
@@ -116,29 +99,21 @@ export default function ProduitsPage() {
     if (!tenantId || !form.nom || !form.prix_achat) return
     setSaving(true)
     try {
-      const cat = categories.find(c => c.id === form.categorie_id)
       let sku = form.sku
       if (!sku) {
-        sku = generateSKU(form.nom, cat?.nom ?? 'GEN', new Date().getFullYear(), products.length)
+        sku = generateSKU(form.nom, form.categorie, new Date().getFullYear(), products.length)
       }
 
       const payload = {
         tenant_id: tenantId,
         nom: form.nom,
-        description: form.description,
-        categorie: cat?.nom ?? form.categorie,
-        categorie_id: form.categorie_id || null,
+        categorie: form.categorie || null,
         sku,
         code_barre: form.code_barre || null,
         unite: form.unite,
         prix_achat: parseFloat(form.prix_achat) || 0,
         prix_vente: parseFloat(form.prix_vente) || 0,
         seuil_alerte: parseFloat(form.seuil_alerte) || 0,
-        stock_max: parseFloat(form.stock_max) || 0,
-        fournisseur_id: form.fournisseur_id || null,
-        emplacement: form.emplacement,
-        statut: form.statut,
-        taxe_pct: parseFloat(form.taxe_pct) || 0,
       }
 
       if (editItem) {
@@ -171,7 +146,6 @@ export default function ProduitsPage() {
 
   const filtered = products.filter(p => {
     if (filterCat !== 'all' && p.categorie !== filterCat) return false
-    if (filterStatut !== 'all' && p.statut !== filterStatut) return false
     if (filterStock === 'rupture' && p.stock_actuel > 0) return false
     if (filterStock === 'faible' && (p.stock_actuel <= 0 || p.stock_actuel > p.seuil_alerte)) return false
     if (filterStock === 'ok' && p.stock_actuel <= p.seuil_alerte) return false
@@ -184,12 +158,12 @@ export default function ProduitsPage() {
   const uniqueCats  = [...new Set(products.map(p => p.categorie).filter(Boolean))]
 
   function exportCSV() {
-    const lines = ['SKU,Nom,Catégorie,Unité,Prix achat,Prix vente,Stock,Seuil,Valeur stock,Statut']
+    const lines = ['SKU,Nom,Catégorie,Unité,Prix achat,Prix vente,Stock,Seuil,Valeur stock']
     filtered.forEach(p => {
       lines.push([
         p.sku ?? '', `"${p.nom}"`, p.categorie ?? '', p.unite,
         p.prix_achat, p.prix_vente, p.stock_actuel, p.seuil_alerte,
-        (p.stock_actuel * p.prix_achat).toFixed(0), p.statut,
+        (p.stock_actuel * p.prix_achat).toFixed(0),
       ].join(','))
     })
     const blob = new Blob([lines.join('\n')], { type: 'text/csv' })
@@ -199,9 +173,8 @@ export default function ProduitsPage() {
   }
 
   function getStockStatus(p: Product): { label: string; color: string; bg: string } {
-    if (p.stock_actuel <= 0)            return { label: 'Rupture', color: 'text-red-700',   bg: 'bg-red-50 border border-red-200' }
+    if (p.stock_actuel <= 0)              return { label: 'Rupture', color: 'text-red-700',   bg: 'bg-red-50 border border-red-200' }
     if (p.stock_actuel <= p.seuil_alerte) return { label: 'Faible',   color: 'text-amber-700', bg: 'bg-amber-50 border border-amber-200' }
-    if (p.stock_max > 0 && p.stock_actuel >= p.stock_max) return { label: 'Surplus', color: 'text-blue-700', bg: 'bg-blue-50 border border-blue-200' }
     return { label: 'OK', color: 'text-green-700', bg: 'bg-green-50 border border-green-200' }
   }
 
@@ -231,7 +204,7 @@ export default function ProduitsPage() {
 
       {/* Filters */}
       <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 space-y-3">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <div className="relative col-span-2 md:col-span-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
             <input value={search} onChange={e => setSearch(e.target.value)}
@@ -242,13 +215,6 @@ export default function ProduitsPage() {
             className="border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
             <option value="all">Toutes catégories</option>
             {uniqueCats.map(c => <option key={c!} value={c!}>{c}</option>)}
-          </select>
-          <select value={filterStatut} onChange={e => setFilterStatut(e.target.value)}
-            className="border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
-            <option value="all">Tous statuts</option>
-            <option value="actif">{t('common.active')}</option>
-            <option value="inactif">{t('common.inactive')}</option>
-            <option value="archive">Archivé</option>
           </select>
           <select value={filterStock} onChange={e => setFilterStock(e.target.value)}
             className="border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
@@ -295,7 +261,7 @@ export default function ProduitsPage() {
             <table className="w-full">
               <thead className="bg-[#F8FAFC]">
                 <tr>
-                  {['SKU', 'Produit', 'Catégorie', 'Stock actuel', 'Prix achat', 'Prix vente', 'Valeur', 'Statut', ''].map(h => (
+                  {['SKU', 'Produit', 'Catégorie', 'Stock actuel', 'Prix achat', 'Prix vente', 'Valeur', 'État', ''].map(h => (
                     <th key={h} className="px-4 py-2.5 text-left text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -311,7 +277,6 @@ export default function ProduitsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs font-semibold text-[#0F172A]">{p.nom}</div>
-                        {p.emplacement && <div className="text-[10px] text-[#94A3B8]">📍 {p.emplacement}</div>}
                       </td>
                       <td className="px-4 py-3">
                         {p.categorie && (
@@ -389,10 +354,6 @@ export default function ProduitsPage() {
               ['Prix achat', fmtFCFA(selected.prix_achat)],
               ['Prix vente', fmtFCFA(selected.prix_vente)],
               ['Seuil alerte', selected.seuil_alerte],
-              ['Stock max', selected.stock_max || '—'],
-              ['Emplacement', selected.emplacement || '—'],
-              ['Taxe (%)', selected.taxe_pct || '0'],
-              ['Statut', selected.statut],
               ['Créé le', new Date(selected.created_at).toLocaleDateString('fr-FR')],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between text-xs gap-4">
@@ -400,9 +361,6 @@ export default function ProduitsPage() {
                 <span className="text-[#0F172A] font-medium text-right">{String(v)}</span>
               </div>
             ))}
-            {selected.description && (
-              <div className="text-xs text-[#64748B] bg-[#F8FAFC] rounded-xl p-3">{selected.description}</div>
-            )}
             <button onClick={() => { openEdit(selected); setSelected(null) }}
               className="w-full py-2 text-xs font-semibold text-white bg-[#16A34A] rounded-xl hover:bg-green-700">
               Modifier ce produit
@@ -465,11 +423,9 @@ export default function ProduitsPage() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.category')}</label>
-                <select value={form.categorie_id} onChange={e => setForm(f => ({ ...f, categorie_id: e.target.value }))}
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
-                  <option value="">— Sélectionner —</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
-                </select>
+                <input value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))}
+                  placeholder="Ex: Bureau, Informatique..."
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-[#374151] mb-1">Unité</label>
@@ -492,46 +448,6 @@ export default function ProduitsPage() {
                 <label className="block text-xs font-medium text-[#374151] mb-1">Seuil alerte</label>
                 <input type="number" value={form.seuil_alerte} onChange={e => setForm(f => ({ ...f, seuil_alerte: e.target.value }))}
                   className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Stock maximum</label>
-                <input type="number" value={form.stock_max} onChange={e => setForm(f => ({ ...f, stock_max: e.target.value }))}
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Fournisseur principal</label>
-                <select value={form.fournisseur_id} onChange={e => setForm(f => ({ ...f, fournisseur_id: e.target.value }))}
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
-                  <option value="">— Sélectionner —</option>
-                  {suppliers.map(s => <option key={s.id} value={s.id}>{s.nom}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Emplacement</label>
-                <input value={form.emplacement} onChange={e => setForm(f => ({ ...f, emplacement: e.target.value }))}
-                  placeholder="Ex: Rayon A3, Entrepôt Nord"
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">Taxe (%)</label>
-                <input type="number" value={form.taxe_pct} onChange={e => setForm(f => ({ ...f, taxe_pct: e.target.value }))}
-                  placeholder="18"
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.status')}</label>
-                <select value={form.statut} onChange={e => setForm(f => ({ ...f, statut: e.target.value }))}
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A]">
-                  <option value="actif">{t('common.active')}</option>
-                  <option value="inactif">{t('common.inactive')}</option>
-                  <option value="archive">Archivé</option>
-                </select>
-              </div>
-              <div className="col-span-2">
-                <label className="block text-xs font-medium text-[#374151] mb-1">{t('common.description')}</label>
-                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  rows={2} placeholder="Description du produit (optionnel)"
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#16A34A] resize-none" />
               </div>
             </div>
 

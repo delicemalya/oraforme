@@ -8,7 +8,7 @@ export default function PetroleDashboardPage() {
   const shortcuts = [
     { label: 'Sites & Puits',        href: '/dashboard/petrole/sites',  icon: '🛢️' },
     { label: 'Stock & Inventaire',   href: '/dashboard/stocks',         icon: '📦' },
-    { label: 'Achats & Fournisseurs',href: '/dashboard/achats',         icon: '🛒' },
+    { label: 'Achats & Fournisseurs',href: '/dashboard/stocks/achats',  icon: '🛒' },
     { label: 'Facturation',          href: '/dashboard/facturation',    icon: '💰' },
     { label: 'RH & Équipes',         href: '/dashboard/rh',             icon: '👷' },
     { label: 'Finance & KPIs',       href: '/dashboard/finance',        icon: '📊' },
@@ -17,7 +17,7 @@ export default function PetroleDashboardPage() {
   return (
     <div style={{ padding: '24px', fontFamily: 'Inter, sans-serif', color: '#0F172A' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Pétrole & Mines</h1>
+        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Pétrole &amp; Mines</h1>
         <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: '14px' }}>Gestion des sites d'extraction, production et ventes</p>
       </div>
 

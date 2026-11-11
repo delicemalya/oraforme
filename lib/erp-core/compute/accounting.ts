@@ -337,16 +337,41 @@ export function computeGrandLivre(
   }
 }
 
-// ── computeTVAFromJournal ─────────────────────────────────────────────────────
+// ── computeTVAFromJournal — SOURCE CANONIQUE de la déclaration TVA Congo ──────
+//
+// Mission P0-FISCAL-CG-2026 (2026-09-18) : cette fonction est désormais LA
+// source unique de la déclaration TVA. lib/declarations/declaration-generale.ts
+// (déclaration DGI) et app/api/fiscalite/tva/route.ts (dashboard) la
+// consomment tous deux — aucun des deux ne doit plus recalculer la TVA
+// collectée/déductible/nette depuis une autre source (factures, requêtes
+// manuelles, etc.).
+//
+// Pourquoi journal_entries et pas `factures` : journal_entries est déjà la
+// source de vérité comptable unique de tout le reste d'Oraforme (Grand Livre,
+// Balance — voir l'en-tête de ce fichier). L'utiliser pour la TVA aussi évite
+// une deuxième vérité qui diverge du Grand Livre (c'était exactement
+// l'anomalie B002/I-03 documentée dans docs/F005-FCI-FISCAL-CERTIFICATION.md
+// depuis 2026-06-30, jamais corrigée). Ce choix NE tranche PAS la question
+// légale de l'exigibilité (émission vs encaissement) : il fait seulement en
+// sorte qu'une seule mécanique — celle qui existe déjà et poste au journal à
+// l'émission de facture — nourrisse la déclaration, au lieu de deux
+// mécaniques concurrentes. Voir docs/MASTER-A-Z-AUDIT-2026-09.md pour le
+// statut « NON DÉMONTRÉ » de la règle d'exigibilité elle-même.
 
 export interface TVAMonthPoint {
-  mois:           number
-  tva_collectee:  number   // crédit comptes 4441/4442
-  tva_deductible: number   // débit comptes 4445/4446
-  tva_nette:      number   // collectée - déductible
-  a_payer:        number   // max(0, tva_nette)
-  credit_tva:     number   // max(0, -tva_nette) — report sur période suivante
-  nb_ecritures:   number
+  mois:             number
+  tva_collectee:    number   // crédit comptes 4441/4442
+  tva_deductible:   number   // débit comptes 4445/4446
+  tva_nette:        number   // collectée - déductible, ce mois seul
+  credit_anterieur: number   // crédit de TVA reporté du mois précédent (ou creditInitial pour le premier mois calculé)
+  a_payer:          number   // max(0, tva_nette - credit_anterieur)
+  credit_nouveau:   number   // max(0, credit_anterieur - tva_nette) — reporté au mois suivant
+  nb_ecritures:     number
+}
+
+export interface TVADeductibleFiabilite {
+  fiable: boolean
+  raison: string
 }
 
 export interface TVASummary {
@@ -355,20 +380,42 @@ export interface TVASummary {
   total_collectee:  number
   total_deductible: number
   total_a_payer:    number
-  total_credit:     number
+  /** Solde de crédit de TVA à la fin de la période demandée (dernier mois calculé). */
+  credit_fin_periode: number
+  /**
+   * La TVA déductible n'est JAMAIS fiable au sens d'un rapprochement
+   * automatique avec un achat réel : la table `achats` (et `purchases`/
+   * `purchase_items`) ne porte aucun champ TVA — confirmée par lecture directe
+   * du schéma (Mission P0-FISCAL-CG-2026, 2026-09-18). Tout montant sur
+   * 4445/4446 provient nécessairement d'une écriture comptable manuelle, pas
+   * d'un calcul depuis une facture fournisseur. Ne jamais présenter ce champ
+   * comme "TVA déductible calculée depuis les achats" dans une UI.
+   */
+  deductible_fiabilite: TVADeductibleFiabilite
 }
 
 /**
- * Calcule la TVA collectée et déductible depuis les écritures du grand livre.
+ * Calcule la TVA collectée, déductible, nette et le crédit reporté, depuis
+ * les écritures du grand livre — mois par mois, dans l'ordre, avec report du
+ * crédit d'un mois sur l'autre.
+ *
  * Source SYSCOHADA : 4441/4442 (TVA collectée) · 4445/4446 (TVA déductible)
  * LF Congo 2026 Art. n°42-2025 — comptes conformes migrations 119+131.
+ *
+ * @param creditInitial Crédit de TVA reporté d'une période antérieure à
+ *   `year` (ex : décembre de l'année précédente). Non déduit automatiquement
+ *   — doit être fourni explicitement par l'appelant s'il existe ; défaut 0
+ *   (pas d'invention d'un report non prouvé).
  */
 export function computeTVAFromJournal(
-  entries: JournalBalanceRow[],
-  year:    number,
+  entries:       JournalBalanceRow[],
+  year:          number,
+  creditInitial: number = 0,
 ): TVASummary {
-  const mensuel: TVAMonthPoint[] = Array.from({ length: 12 }, (_, i) => {
-    const moisNum = i + 1
+  const mensuel: TVAMonthPoint[] = []
+  let creditCourant = creditInitial
+
+  for (let moisNum = 1; moisNum <= 12; moisNum++) {
     const mvs = entries.filter(e => {
       if (!e.date_operation) return false
       const m = parseInt(e.date_operation.slice(5, 7))
@@ -384,25 +431,39 @@ export function computeTVAFromJournal(
       .reduce((s, e) => s + (e.montant ?? 0), 0)
 
     const tva_nette = tva_collectee - tva_deductible
+    const credit_anterieur = creditCourant
+    const solde = tva_nette - credit_anterieur
+    const a_payer = Math.max(0, solde)
+    const credit_nouveau = Math.max(0, -solde)
 
-    return {
-      mois:          moisNum,
-      tva_collectee,
-      tva_deductible,
-      tva_nette,
-      a_payer:       Math.max(0, tva_nette),
-      credit_tva:    Math.max(0, -tva_nette),
-      nb_ecritures:  mvs.length,
-    }
-  })
+    mensuel.push({
+      mois: moisNum, tva_collectee, tva_deductible, tva_nette,
+      credit_anterieur, a_payer, credit_nouveau,
+      nb_ecritures: mvs.length,
+    })
+
+    creditCourant = credit_nouveau
+  }
+
+  const total_deductible = mensuel.reduce((s, m) => s + m.tva_deductible, 0)
+  const deductible_fiabilite: TVADeductibleFiabilite = total_deductible > 0
+    ? {
+        fiable: false,
+        raison: "Un montant est présent sur les comptes 4445/4446, mais provient nécessairement d'une écriture manuelle : la table achats ne porte aucun champ TVA et aucun trigger ne l'alimente automatiquement depuis un achat réel.",
+      }
+    : {
+        fiable: false,
+        raison: "Aucune écriture sur les comptes 4445/4446 : la table achats ne porte aucun champ TVA — la TVA déductible n'est structurellement jamais calculée depuis un achat réel à ce jour.",
+      }
 
   return {
     year,
     mensuel,
-    total_collectee:  mensuel.reduce((s, m) => s + m.tva_collectee, 0),
-    total_deductible: mensuel.reduce((s, m) => s + m.tva_deductible, 0),
-    total_a_payer:    mensuel.reduce((s, m) => s + m.a_payer, 0),
-    total_credit:     mensuel.reduce((s, m) => s + m.credit_tva, 0),
+    total_collectee:    mensuel.reduce((s, m) => s + m.tva_collectee, 0),
+    total_deductible,
+    total_a_payer:      mensuel.reduce((s, m) => s + m.a_payer, 0),
+    credit_fin_periode: mensuel[mensuel.length - 1]?.credit_nouveau ?? creditInitial,
+    deductible_fiabilite,
   }
 }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireTenant, checkPlanAccess } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { buildDgAlerts, buildRhAlerts, buildEcoleAlerts, buildHotelAlerts } from '@/lib/analytics/alerts-engine'
 import { growthPct } from '@/lib/analytics/formatters'
 import type { DgKpis, RhKpis, EcoleKpis, HotelKpis, RestoKpis } from '@/lib/analytics/types'
@@ -11,22 +11,21 @@ import { computeCA } from '@/lib/erp-core/compute/ca'
  * GET /api/bi/insights?module=dg|rh|ecole|hotel|resto&year=2026
  * Returns structured BI data for the requested module.
  * Always tenant-isolated via RLS + explicit tenant_id filter.
+ *
+ * 'bi' est un module Business+ (lib/plan-access.ts, REQUIRES_GRANDE — bloqué
+ * pour Entrepreneur/tpe uniquement, pas Compagnie-exclusif malgré le nom du
+ * Set) — Critical #4 : cette route réimplémentait sa propre authentification
+ * (sans passer par le gateway canonique) et ne vérifiait aucun plan, ouvrant
+ * la BI à tout tenant, y compris Entrepreneur.
  */
 export async function GET(req: NextRequest) {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
 
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('tenant_id, role')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle()
-  if (!profile?.tenant_id) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
+  const planDenied = await checkPlanAccess(ctx.tid, 'bi')
+  if (planDenied) return planDenied
 
-  const tid = profile.tenant_id
+  const tid = ctx.tid
   const url = new URL(req.url)
   const moduleKey = url.searchParams.get('module') ?? 'dg'
   const year = parseInt(url.searchParams.get('year') ?? String(new Date().getFullYear()))

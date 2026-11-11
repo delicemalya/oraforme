@@ -7,6 +7,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { requireTenant, checkPlanAccess } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -17,12 +18,19 @@ function db() {
   )
 }
 
+// 'academy' est un module Business+ (lib/plan-access.ts, REQUIRES_PME) —
+// Critical #4 : les routes sœurs (academy/lessons, academy/quiz non touchée
+// ici) vérifient déjà le plan ; cette route principale ne le faisait pas.
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url)
-  const tenantId  = searchParams.get('tenant_id')
-  const categorie = searchParams.get('categorie')
+  const ctx = await requireTenant()
+  if (!ctx.ok) return ctx.error
+  const tenantId = ctx.tid
 
-  if (!tenantId) return Response.json({ error: 'tenant_id requis' }, { status: 400 })
+  const planDenied = await checkPlanAccess(tenantId, 'academy')
+  if (planDenied) return planDenied
+
+  const { searchParams } = new URL(req.url)
+  const categorie = searchParams.get('categorie')
 
   const supabase = db()
 
@@ -65,9 +73,15 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const ctx = await requireTenant()
+  if (!ctx.ok) return ctx.error
+  const tenant_id = ctx.tid
+
+  const planDenied = await checkPlanAccess(tenant_id, 'academy')
+  if (planDenied) return planDenied
+
   const body = await req.json() as {
     action:     string
-    tenant_id:  string
     user_id?:   string
     user_name?: string
     categorie:  string
@@ -76,10 +90,10 @@ export async function POST(req: Request) {
     score_max?: number
   }
 
-  const { action, tenant_id, user_id, user_name, categorie, niveau, score, score_max } = body
+  const { action, user_id, user_name, categorie, niveau, score, score_max } = body
 
-  if (!tenant_id || !categorie) {
-    return Response.json({ error: 'tenant_id et categorie requis' }, { status: 400 })
+  if (!categorie) {
+    return Response.json({ error: 'categorie requis' }, { status: 400 })
   }
 
   const supabase = db()

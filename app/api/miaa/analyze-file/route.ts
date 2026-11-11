@@ -6,7 +6,7 @@ import { chargerMemoireMIAA } from '@/lib/miaa/memory'
 import { getMIAASystemPrompt } from '@/lib/miaa/system-prompt'
 import { trackUsage } from '@/lib/miaa/usage-tracker'
 import { createClient } from '@supabase/supabase-js'
-import { checkPlanAccess } from '@/lib/api/require-tenant'
+import { checkPlanAccess, requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -61,20 +61,23 @@ async function extraireWord(buffer: Buffer, filename: string): Promise<string> {
 
 export async function POST(req: Request) {
   try {
-    const { module, filename, filetype, filesize, base64, tenantData } = await req.json() as {
+    const { module, filename, filetype, filesize, base64 } = await req.json() as {
       module:     string
       filename:   string
       filetype:   string
       filesize:   number
       base64:     string
-      tenantData?: { tenant_id?: string }
     }
 
     if (!base64 || base64.length > MAX_BASE64_BYTES * 1.4) {
       return Response.json({ error: 'Fichier trop volumineux ou invalide.' }, { status: 400 })
     }
 
-    const tenantId = tenantData?.tenant_id
+    // tenant_id dérivé exclusivement de la session serveur (Critical #1) ;
+    // dégrade proprement vers une analyse générique sans session (comportement
+    // préexistant pour un appelant sans tenant_id).
+    const ctx = await requireTenant()
+    const tenantId = ctx.ok ? ctx.tid : undefined
 
     if (tenantId) {
       const planDenied = await checkPlanAccess(tenantId, 'academy')

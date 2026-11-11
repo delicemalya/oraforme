@@ -119,7 +119,7 @@ export default function SeriesLyceePage() {
         className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>
-            Séries & Options
+            Séries &amp; Options
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
             Séries du baccalauréat, coefficients et options pour le Lycée.

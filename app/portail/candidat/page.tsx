@@ -764,7 +764,7 @@ function CandidatPortalContent() {
             )}
 
             {/* Tests */}
-            <p className="text-[14px] font-bold text-[#0F172A]">Tests & Évaluations</p>
+            <p className="text-[14px] font-bold text-[#0F172A]">Tests &amp; Évaluations</p>
             {data.evaluations.length === 0
               ? <EmptyState icon={Star} text="Aucun test ou évaluation enregistré" />
               : data.evaluations.map(e => (

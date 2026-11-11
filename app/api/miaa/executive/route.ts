@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 
@@ -175,15 +176,18 @@ Génère les prévisions :
 
 export async function POST(req: NextRequest) {
   try {
+    const ctx = await requireTenant(req)
+    if (!ctx.ok) return ctx.error
+    const tenantId = ctx.tid
+
     const body = await req.json() as {
       tool: string
       inputs: Record<string, unknown>
-      tenantId: string
     }
-    const { tool, inputs, tenantId } = body
+    const { tool, inputs } = body
 
-    if (!tool || !tenantId) {
-      return NextResponse.json({ error: 'tool and tenantId required' }, { status: 400 })
+    if (!tool) {
+      return NextResponse.json({ error: 'tool required' }, { status: 400 })
     }
 
     const promptFn = TOOL_PROMPTS[tool]

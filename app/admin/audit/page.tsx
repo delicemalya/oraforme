@@ -68,7 +68,7 @@ export default async function AuditPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-[22px] font-bold text-gray-900">Logs & Audit</h1>
+        <h1 className="text-[22px] font-bold text-gray-900">Logs &amp; Audit</h1>
         <p className="text-sm text-gray-500 mt-0.5">Traçabilité complète des actions sur la plateforme</p>
       </div>
 

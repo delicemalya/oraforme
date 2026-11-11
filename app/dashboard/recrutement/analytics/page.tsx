@@ -52,7 +52,7 @@ export default function AnalyticsRH() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-[18px] sm:text-xl font-bold text-[#0F172A]">Analytics RH</h1>
-          <p className="text-[11px] text-[#64748B]">KPIs & performance recrutement</p>
+          <p className="text-[11px] text-[#64748B]">KPIs &amp; performance recrutement</p>
         </div>
         <div className="flex gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1">
           {(['30j', '90j', '1an'] as const).map(p => (

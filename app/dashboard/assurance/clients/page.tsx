@@ -79,7 +79,7 @@ export default function ClientsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-black text-[#0F172A] flex items-center gap-2">
-            <Users className="text-[#DC2626]" size={22} /> Clients & Assurés
+            <Users className="text-[#DC2626]" size={22} /> Clients &amp; Assurés
           </h1>
           <p className="text-sm text-[#64748B]">{clients.length} client{clients.length !== 1 ? 's' : ''} dans le portefeuille</p>
         </div>

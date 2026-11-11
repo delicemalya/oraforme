@@ -64,7 +64,7 @@ export default function BanqueOperationsPage() {
     <div style={{ fontFamily:'Inter,sans-serif', color:'#0F172A' }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24 }}>
         <div>
-          <h1 style={{ fontSize:22, fontWeight:700, margin:0 }}>Opérations & Transactions</h1>
+          <h1 style={{ fontSize:22, fontWeight:700, margin:0 }}>Opérations &amp; Transactions</h1>
           <p style={{ color:'#64748B', margin:'4px 0 0', fontSize:14 }}>Dépôts, retraits et mouvements de fonds</p>
         </div>
         <button onClick={() => setShowForm(true)} style={{ display:'flex', alignItems:'center', gap:8, background:'#2563EB', color:'#fff', border:'none', borderRadius:8, padding:'10px 16px', cursor:'pointer', fontWeight:600, fontSize:14 }}>

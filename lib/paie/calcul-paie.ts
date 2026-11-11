@@ -1,42 +1,28 @@
-// ── Moteur de calcul paie — Congo-Brazzaville (Droit du Travail officiel) ──────
-// Sources : CGI Congo, CNSS Congo, Code du Travail loi 45-75 et décrets CNSS
-// Validé sur 3 cas test (voir README)
+// ── Moteur de calcul paie — Congo-Brazzaville ──────────────────────────────────
+//
+// Aucun taux ni plafond n'est détenu ici. Le calcul CNSS/TUS/IRPP délègue à
+// lib/fiscal/universal-tax-engine.ts (source de vérité), lui-même alimenté par
+// lib/countries/CG.ts. Ce module ne fait plus que construire les gains et
+// retenues d'un bulletin autour de ce calcul central.
+//
+// Avant Mission P0 paie (2026-09-17), ce fichier détenait sa propre copie des
+// taux CNSS/TUS et son propre barème IRPP (sans abattement ni quotient
+// familial) — un second moteur fiscal actif en parallèle de
+// universal-tax-engine.ts, avec des résultats divergents. Consolidé ici.
 
-// ── Constantes légales Congo — CNSS (LF n°42-2025 du 31 décembre 2025) ────────
+import {
+  calculerChargesSociales,
+  calculerIRPP,
+  getSMIG,
+  type SituationFamiliale,
+} from '@/lib/fiscal/universal-tax-engine'
 
-// Vieillesse-Décès (VID) — plafond 1 200 000 FCFA/mois
-export const PLAFOND_CNSS_EMPLOYE  = 1_200_000  // plafond VID salarié
-export const PLAFOND_VID           = 1_200_000  // plafond VID + Allocations Familiales
-export const TAUX_CNSS_EMPLOYE     = 0.04       // 4% VID part salariale
-export const TAUX_VID_PATRONAL     = 0.08       // 8% VID part patronale
+export const SMIG_MENSUEL = getSMIG('CG').montant   // SMIG Congo (arrêté 2020) — lu depuis CG.ts
 
-// Allocations Familiales — plafonné 1 200 000 FCFA/mois (correction LF 2026)
-export const PLAFOND_AF            = 1_200_000  // AF plafonnée sur base vieillesse (LF 2026)
-export const TAUX_AF               = 0.10035    // 10,035% Allocations Familiales (LF 2026)
-
-// Accidents du Travail — plafonné 600 000 FCFA/mois
-export const PLAFOND_AT_AF         = 600_000    // Plafond AT / Maladie professionnelle uniquement
-export const TAUX_AT               = 0.0225     // 2,25%  Accidents du Travail
-
-// TUS + Médecine du travail — déplafonnés
-export const TAUX_TUS              = 0.03       // 3%    TUS (LF 2026 — TUS Fiscale 4,5% supprimée)
-export const TAUX_MEDECINE         = 0.005      // 0,5%  Médecine du travail
-
-// Taux patronal global (VID 8% + AF 10,035% + AT 2,25% = 20,285%) — fallback
-export const TAUX_CNSS_PATRONAL    = 0.20285
-export const SMIG_MENSUEL          = 90_000     // SMIG Congo (arrêté 2020)
-
-// ── Barème IRPP mensuel Congo-Brazzaville ─────────────────────────────────────
-// Sources : art. 76 CGI Congo, appliqué mensuellement
-// Cas test 1 : brut=900 000 → base IRPP=864 000 → IRPP=4 000 FCFA ✓
-// Cas test 3 : brut=3 000 000 → base IRPP=2 952 000 → IRPP=200 560 FCFA ✓
-export const TRANCHES_IRPP = [
-  { min: 0,          max: 464_000,   taux: 0,    label: '0 — 464 000'        },
-  { min: 464_000,    max: 1_000_000, taux: 0.01, label: '464 000 — 1 000 000' },
-  { min: 1_000_000,  max: 3_000_000, taux: 0.10, label: '1 000 000 — 3 000 000' },
-  { min: 3_000_000,  max: 8_000_000, taux: 0.25, label: '3 000 000 — 8 000 000' },
-  { min: 8_000_000,  max: Infinity,  taux: 0.40, label: 'Au-delà de 8 000 000'   },
-]
+// Médecine du travail (0,5%) : CG.ts ne porte pas encore cette branche
+// (cnss.medecine_travail_taux absent) ; ticket PAIE-03. Exporté pour que tout
+// recalcul serveur (ex. app/api/paie/bulletins) utilise la même valeur.
+export const TAUX_MEDECINE_NON_MIGRE = 0.005
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -65,6 +51,12 @@ export interface ElementsPaie {
   autres_retenues?: number
   taux_cnss_employe?: number
   taux_cnss_patronal?: number
+  /** Indemnités non imposables à exclure de la base CNSS/TUS/IRPP (voir CG.ts). Défaut 0. */
+  indemnites_non_imposables?: number
+  /** Situation familiale pour le quotient familial IRPP. Défaut 'celibataire'. */
+  situation?: SituationFamiliale
+  /** Nombre d'enfants à charge pour le quotient familial IRPP. Défaut 0. */
+  nombreEnfants?: number
 }
 
 export interface ResultatPaie {
@@ -80,6 +72,7 @@ export interface ResultatPaie {
   avantages_nature: number
   autres_gains: number
   salaire_brut: number
+  brut_imposable: number
   // Retenues employé
   cnss_employe: number
   base_irpp: number
@@ -101,18 +94,42 @@ export interface ResultatPaie {
 
 // ── Fonctions ──────────────────────────────────────────────────────────────────
 
-export function calcIRPP(revenuImposable: number): { irpp: number; detail: DetailIRPP[] } {
-  if (revenuImposable <= 0) return { irpp: 0, detail: [] }
-  const detail: DetailIRPP[] = []
-  let irpp = 0
-  for (const tranche of TRANCHES_IRPP) {
-    if (revenuImposable <= tranche.min) break
-    const base = Math.min(revenuImposable, tranche.max) - tranche.min
-    const montant = Math.round(base * tranche.taux)
-    detail.push({ label: tranche.label, taux: tranche.taux * 100, base, montant })
-    irpp += montant
-  }
-  return { irpp, detail }
+/**
+ * Noyau partagé CNSS + IRPP — Critical #3 (IRPP falsifiable côté client).
+ *
+ * Seule fonction qui doit décider cnss_salarie/cnss_patronal/tus_patronal/irpp
+ * à partir d'un brut imposable déjà assemblé. Utilisée par calculerPaie()
+ * ci-dessous ET par les deux routes qui persistent un bulletin
+ * (app/api/rh/paie, app/api/paie/bulletins) — pour que les deux routes et le
+ * simulateur restent rigoureusement d'accord, pas seulement chacun "correct"
+ * séparément. `situation`/`nombreEnfants` doivent provenir du dossier RH
+ * serveur de l'employé, jamais du corps d'une requête client.
+ */
+export interface ChampsFiscauxDerives {
+  cnss_salarie:  number
+  cnss_patronal: number
+  tus_patronal:  number
+  irpp:          number
+}
+
+export function calculerChampsFiscauxDerives(
+  brutImposable:  number,
+  situation:      SituationFamiliale,
+  nombreEnfants:  number,
+): ChampsFiscauxDerives {
+  const cnssRes      = calculerChargesSociales({ codePays: 'CG', salaireBrut: brutImposable })
+  const cnss_salarie  = cnssRes.total_salarie
+  const tusBranch     = cnssRes.branches.find(b => b.code === 'TUS')
+  const tus_patronal  = tusBranch?.montant_patronal ?? 0
+  const cnss_patronal = cnssRes.total_patronal_net - tus_patronal
+
+  const base_irpp = Math.max(0, brutImposable - cnss_salarie)
+  const irppRes   = calculerIRPP({
+    codePays: 'CG', salaireBrut: base_irpp, salaireBrutOriginal: brutImposable,
+    situation, nombreEnfants,
+  })
+
+  return { cnss_salarie, cnss_patronal, tus_patronal, irpp: irppRes.irpp_net }
 }
 
 export function calculerPaie(el: ElementsPaie): ResultatPaie {
@@ -130,10 +147,26 @@ export function calculerPaie(el: ElementsPaie): ResultatPaie {
     prime_anciennete + prime_transport + prime_logement + prime_responsabilite +
     indemnite_deplacement + avantages_nature + autres_gains
 
-  const taux_cnss    = el.taux_cnss_employe   || TAUX_CNSS_EMPLOYE
-  const cnss_employe = Math.round(Math.min(salaire_brut, PLAFOND_CNSS_EMPLOYE) * taux_cnss)
-  const base_irpp    = Math.max(0, salaire_brut - cnss_employe)
-  const { irpp, detail: irpp_detail } = calcIRPP(base_irpp)
+  const indemnites_non_imposables = el.indemnites_non_imposables || 0
+  const brut_imposable = Math.max(0, salaire_brut - indemnites_non_imposables)
+
+  const situation     = el.situation ?? 'celibataire'
+  const nombreEnfants = el.nombreEnfants ?? 0
+  const { cnss_salarie: cnss_employe, cnss_patronal, tus_patronal } =
+    calculerChampsFiscauxDerives(brut_imposable, situation, nombreEnfants)
+
+  const base_irpp = Math.max(0, brut_imposable - cnss_employe)
+  const irppRes = calculerIRPP({
+    codePays:             'CG',
+    salaireBrut:          base_irpp,
+    salaireBrutOriginal:  brut_imposable,
+    situation,
+    nombreEnfants,
+  })
+  const irpp = irppRes.irpp_net
+  const irpp_detail: DetailIRPP[] = irppRes.tranches
+    .filter(t => t.impot_total > 0)
+    .map(t => ({ label: t.libelle, taux: t.taux * 100, base: t.base, montant: t.impot_total }))
 
   const mutuelle       = el.mutuelle       || 0
   const acompte        = el.acompte        || 0
@@ -143,20 +176,11 @@ export function calculerPaie(el: ElementsPaie): ResultatPaie {
   const total_retenues = cnss_employe + irpp + mutuelle + acompte + opposition + autres_retenues
   const salaire_net    = salaire_brut - total_retenues
 
-  let cnss_patronal: number
-  if (el.taux_cnss_patronal) {
-    // override manuel : taux unique appliqué sur le brut (sans plafond)
-    cnss_patronal = Math.round(salaire_brut * el.taux_cnss_patronal)
-  } else {
-    // calcul légal multi-plafond CNSS Congo
-    const vid_patro = Math.round(Math.min(salaire_brut, PLAFOND_VID)   * TAUX_VID_PATRONAL)
-    const af_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AF)   * TAUX_AF)   // plaf. 1 200 000
-    const at_patro  = Math.round(Math.min(salaire_brut, PLAFOND_AT_AF) * TAUX_AT)  // plaf. 600 000
-    cnss_patronal = vid_patro + af_patro + at_patro
-  }
-  const tus_patronal   = Math.round(salaire_brut * TAUX_TUS)
-  const medecine_travail = Math.round(salaire_brut * TAUX_MEDECINE)
-  const cout_total_employeur = salaire_brut + cnss_patronal + tus_patronal + medecine_travail
+  // Médecine du travail (0,5%) : hors périmètre de cette mission (PAIE/CNSS/TUS/IRPP
+  // uniquement) — comportement préexistant conservé tel quel. CG.ts ne porte pas
+  // cette branche (cnss.medecine_travail_taux absent) ; ticket PAIE-03, non traité ici.
+  const medecine_travail = Math.round(brut_imposable * TAUX_MEDECINE_NON_MIGRE)
+  const cout_total_employeur = brut_imposable + cnss_patronal + tus_patronal + medecine_travail
 
   return {
     salaire_base: el.salaire_base,
@@ -170,6 +194,7 @@ export function calculerPaie(el: ElementsPaie): ResultatPaie {
     avantages_nature,
     autres_gains,
     salaire_brut,
+    brut_imposable,
     cnss_employe,
     base_irpp,
     irpp,
@@ -201,27 +226,4 @@ export function fmtNum(n: number): string {
 }
 export function fmtFCFA(n: number): string {
   return fmtNum(n) + ' FCFA'
-}
-
-// ── Auto-tests (taux officiels CNSS Congo — ECAM Pointe-Noire 2024) ──────────
-// CAS 1 : brut=900 000 → VID=36 000, base IRPP=864 000, IRPP=4 000, net=860 000
-// CAS 2 : brut=300 000 → VID=12 000, base IRPP=288 000, IRPP=0,     net=288 000
-// CAS 3 : brut=3 000 000 → VID=48 000 (plaf. 1 200 000), IRPP=200 560, net=2 751 440
-export function _selfTest(): boolean {
-  const cas1 = calculerPaie({ salaire_base: 900_000 })
-  if (cas1.cnss_employe !== 36_000)  throw new Error(`CAS1 CNSS: ${cas1.cnss_employe}`)
-  if (cas1.irpp         !== 4_000)   throw new Error(`CAS1 IRPP: ${cas1.irpp}`)
-  if (cas1.salaire_net  !== 860_000) throw new Error(`CAS1 NET: ${cas1.salaire_net}`)
-
-  const cas2 = calculerPaie({ salaire_base: 300_000 })
-  if (cas2.cnss_employe !== 12_000)  throw new Error(`CAS2 CNSS: ${cas2.cnss_employe}`)
-  if (cas2.irpp         !== 0)       throw new Error(`CAS2 IRPP: ${cas2.irpp}`)
-  if (cas2.salaire_net  !== 288_000) throw new Error(`CAS2 NET: ${cas2.salaire_net}`)
-
-  const cas3 = calculerPaie({ salaire_base: 3_000_000 })
-  if (cas3.cnss_employe !== 48_000)    throw new Error(`CAS3 CNSS: ${cas3.cnss_employe}`)
-  if (cas3.irpp         !== 200_560)   throw new Error(`CAS3 IRPP: ${cas3.irpp}`)
-  if (cas3.salaire_net  !== 2_751_440) throw new Error(`CAS3 NET: ${cas3.salaire_net}`)
-
-  return true
 }

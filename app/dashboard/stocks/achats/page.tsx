@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase'
 import { useTenant } from '@/lib/hooks/useTenant'
 import { useLocale } from '@/lib/hooks/useLocale'
 import { useFmt } from '@/lib/hooks/useFmt'
-import { writeComptaEntry } from '@/lib/compta-sync-client'
 import {
   ShoppingCart, Plus, X, Save, Search,
   CheckCircle2, AlertTriangle,
@@ -38,7 +37,7 @@ interface PurchaseItem {
 }
 
 interface Product { id: string; nom: string; sku: string; prix_achat: number; unite: string }
-interface Supplier { id: string; nom: string; code: string }
+interface Supplier { id: string; nom: string }
 
 const STATUT_CONFIG: Record<string, { label: string; color: string; bg: string; next?: string; nextLabel?: string }> = {
   brouillon:   { label: 'Brouillon',    color: '#64748B', bg: '#F1F5F9', next: 'commandé', nextLabel: 'Envoyer commande' },
@@ -86,7 +85,7 @@ export default function AchatsPage() {
 
       if (e1?.code === '42P01') { setPurchases([]); setLoading(false); return }
 
-      const { data: sups } = await supabase.from('suppliers').select('id, nom, code').eq('tenant_id', tenantId).eq('actif', true).limit(200)
+      const { data: sups } = await supabase.from('suppliers').select('id, nom').eq('tenant_id', tenantId).eq('actif', true).limit(200)
       const { data: prods } = await supabase.from('products').select('id, nom, sku, prix_achat, unite').eq('tenant_id', tenantId).limit(200)
 
       setSuppliers(sups || [])
@@ -137,6 +136,11 @@ export default function AchatsPage() {
 
   const totalForm = form.lines.reduce((s, l) => s + (l.quantite || 0) * (l.prix || 0), 0)
 
+  // BOI-004 : la création et les transitions de statut passent par
+  // /api/stocks/purchases (serveur), qui gère fn_stock_move (réception) et
+  // emit_accounting_event (ACH-001/ACH-002) — plus d'écriture client directe
+  // ni de writeComptaEntry() (dette technique EXM-JE-003, remplacée par le
+  // moteur événementiel déjà utilisé par le flux achats legacy).
   const handleCreate = async () => {
     if (!tenantId || !form.lines.some(l => l.product_id)) {
       setCreateError('Ajoutez au moins un produit')
@@ -145,32 +149,18 @@ export default function AchatsPage() {
     setSaving(true)
     setCreateError('')
     try {
-      const { data: purch, error: e } = await supabase
-        .from('purchases')
-        .insert({
-          tenant_id: tenantId,
+      const res = await fetch('/api/stocks/purchases', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
           supplier_id: form.supplier_id || null,
-          reference: form.reference.trim() || `ACH-${Date.now()}`,
-          date: form.date,
-          statut: 'brouillon',
-          montant_total: totalForm,
-          notes: form.notes.trim() || null,
-        })
-        .select().single()
-      if (e) throw e
-
-      const validLines = form.lines.filter(l => l.product_id)
-      if (validLines.length > 0) {
-        const { error: e2 } = await supabase.from('purchase_items').insert(
-          validLines.map(l => ({
-            purchase_id: purch.id,
-            product_id: l.product_id,
-            quantite: l.quantite,
-            prix: l.prix,
-          }))
-        )
-        if (e2) throw e2
-      }
+          reference:   form.reference.trim() || null,
+          date:        form.date,
+          notes:       form.notes.trim() || null,
+          lines:       form.lines.filter(l => l.product_id),
+        }),
+      })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Erreur serveur') }
 
       setShowCreate(false)
       setForm({ supplier_id: '', reference: '', date: new Date().toISOString().split('T')[0], notes: '', lines: [{ product_id: '', quantite: 1, prix: 0 }] })
@@ -183,43 +173,12 @@ export default function AchatsPage() {
     if (!tenantId) return
     setSaving(true)
     try {
-      await supabase.from('purchases').update({ statut: newStatut }).eq('id', p.id).eq('tenant_id', tenantId)
-
-      // On reception: update stocks
-      if (newStatut === 'reçu') {
-        const { data: pItems } = await supabase.from('purchase_items').select('*').eq('purchase_id', p.id)
-        // purchase_items porte quantite et prix (migration 016), pas quantity
-        // ni unit_price.
-        for (const item of (pItems || [])) {
-          const { error: errMvt } = await supabase.rpc('fn_stock_move', {
-            p_tenant_id:  tenantId,
-            p_product_id: item.product_id,
-            p_type:       'reception',
-            p_quantite:   item.quantite,
-            p_unit_cost:  item.prix,
-            p_reference:  p.reference,
-            p_notes:      `Reception achat ${p.reference}`,
-          })
-          if (errMvt) throw errMvt
-        }
-      }
-
-      // On payment: OHADA entry
-      if (newStatut === 'payé') {
-        const today = new Date().toISOString().split('T')[0]
-        await writeComptaEntry({
-          tenantId,
-          date: today,
-          libelle: `Paiement achat ${p.reference || p.id.slice(0, 8)} — ${p.supplier_nom || 'Fournisseur'}`,
-          type: 'depense',
-          montant: p.montant_total,
-          categorie: 'achats',
-          debitAccount: '401',
-          creditAccount: '521',
-          source: 'achats',
-          sourceId: p.id,
-        })
-      }
+      const res = await fetch('/api/stocks/purchases', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ id: p.id, statut: newStatut }),
+      })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Erreur serveur') }
 
       await load()
       if (openId === p.id) await loadItems(p.id)

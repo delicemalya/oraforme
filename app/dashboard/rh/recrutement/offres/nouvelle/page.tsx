@@ -218,7 +218,7 @@ export default function NouvelleOffrePage() {
 
           {/* QR + Lien */}
           <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-sm space-y-3">
-            <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">Lien & QR Code</p>
+            <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">Lien &amp; QR Code</p>
             {form.titre && tenantNom ? (
               <>
                 <div className="bg-[#F8FAFC] rounded-lg p-2 break-all">

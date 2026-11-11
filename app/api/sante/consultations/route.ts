@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
+import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
+import { estCategorieSanteExonereeTVA } from '@/lib/fiscalite/sante-exonerations'
 
 export const dynamic = 'force-dynamic'
 
@@ -119,6 +121,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Catégorie unique de cette ligne — même littéral utilisé pour l'insertion
+    // ET pour le calcul fiscal ci-dessous, afin qu'elle ne puisse jamais
+    // diverger entre la donnée persistée et l'écriture comptable émise.
+    const ligneCategorie = 'consultation'
+
     const { error: ligneErr } = await supabaseAdmin.from('his_lignes_facture').insert({
       tenant_id:     ctx.tenantId,
       facture_id:    facture.id,
@@ -126,7 +133,7 @@ export async function POST(req: NextRequest) {
       quantite:      1,
       prix_unitaire: montant,
       montant_ligne: montant,
-      categorie:     'consultation',
+      categorie:     ligneCategorie,
     })
 
     if (ligneErr) {
@@ -142,10 +149,21 @@ export async function POST(req: NextRequest) {
 
     // SAN-001 — Facture médicale émise (moteur comptable central, migration 140)
     // Remplace les écritures manquantes signalées dans AN-014 Plan Directeur Phase 4.
+    //
+    // Mission P0-FISCAL-CG-2026, exonérations confirmées (2026-09-18) :
+    // 'consultation' est exonérée de TVA — Loi n°12-97, Art. 7 point 6°
+    // (« examens, consultations, soins, hospitalisation, travaux d'analyse et
+    // de biologie médicale, fournitures de prothèses »), vérifiée par mission
+    // documentaire dédiée. Une ligne exonérée n'a pas de TVA « embarquée » à
+    // décomposer : le montant facturé est intégralement du HT, tva=ca=0 — on
+    // n'appelle donc PAS decomposerTTCUnifie() pour cette catégorie (l'appeler
+    // inventerait une TVA qui n'existe pas). Le montant HT et le chiffre
+    // d'affaires ne sont PAS réduits : seule la TVA est supprimée.
     const dateF    = dateFacture
     const fiscYear = new Date(dateF).getFullYear()
-    const ht       = Math.round(montant / 1.189)
-    const tva      = montant - ht
+    const { ht, tva, ca } = estCategorieSanteExonereeTVA(ligneCategorie)
+      ? { ht: montant, tva: 0, ca: 0 }
+      : decomposerTTCUnifie(montant, 'CG')
     const pieceNum = facture.numero_facture ?? `SAN-${facture.id.slice(0, 8).toUpperCase()}`
     const patNom   = `${patient.prenom} ${patient.nom}`
 
@@ -161,7 +179,7 @@ export async function POST(req: NextRequest) {
       p_libelle:       `Consultation ${pieceNum} — ${patNom}`,
       p_date_event:    dateF,
       p_fiscal_year:   fiscYear,
-      p_metadata:      { piece_number: pieceNum, patient_nom: patNom, motif: motif.trim() },
+      p_metadata:      { piece_number: pieceNum, patient_nom: patNom, motif: motif.trim(), ca, country_code: 'CG' },
     })
 
     // Paiement immédiat : mise à jour du montant_paye (trg_his_facture_journal supprimé mig. 140)

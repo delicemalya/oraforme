@@ -17,14 +17,14 @@ export default function AgricultureDashboardPage() {
     { label: 'Récoltes & Production',   href: '/dashboard/agriculture/recoltes',  icon: '🌽' },
     { label: 'Intrants & Outils',       href: '/dashboard/agriculture/intrants',  icon: '🌱' },
     { label: 'Stocks',                  href: '/dashboard/stocks',                icon: '📦' },
-    { label: 'Achats Fournisseurs',     href: '/dashboard/achats',                icon: '🛒' },
+    { label: 'Achats Fournisseurs',     href: '/dashboard/stocks/achats',         icon: '🛒' },
     { label: 'Facturation Clients',     href: '/dashboard/facturation',           icon: '💰' },
   ]
 
   return (
     <div style={{ padding: '24px', fontFamily: 'Inter, sans-serif', color: '#0F172A' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Agriculture & Exploitation</h1>
+        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Agriculture &amp; Exploitation</h1>
         <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: '14px' }}>Gestion des parcelles, récoltes et intrants agricoles</p>
       </div>
 

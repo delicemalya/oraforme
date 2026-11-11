@@ -84,6 +84,13 @@ export async function POST(req: NextRequest) {
   }
 
   // RES-001 — Vente POS restaurant (moteur comptable central, migration 142)
+  //
+  // Mission P0-FISCAL-CG-2026, correction transversale (2026-09-18) :
+  // p_montant_tva portait auparavant tva+ca fusionnés, intégralement postés
+  // sur 4441 (séquence 2). Le Centime Additionnel (déjà calculé séparément
+  // par calculerTVACongo, déjà transmis dans metadata.ca) est désormais lu
+  // par RES-001 séquence 3 (411/447, migration à exécuter séparément — voir
+  // rapport de mission), sur le même modèle que FAC-001/BTP-001.
   await supabaseAdmin.rpc('emit_accounting_event', {
     p_tenant_id:     tenantId,
     p_event_type:    'RES-001',
@@ -91,7 +98,7 @@ export async function POST(req: NextRequest) {
     p_source_table:  'resto_commandes',
     p_source_id:     commande.id,
     p_montant_ht:    fiscal.ht,
-    p_montant_tva:   fiscal.tva + fiscal.ca,
+    p_montant_tva:   fiscal.tva,
     p_montant_ttc:   fiscal.ttc,
     p_libelle:       `Vente POS ${numeroRecu}${table_num ? ` — Table ${table_num}` : ''}`,
     p_date_event:    new Date().toISOString().split('T')[0],
@@ -103,6 +110,7 @@ export async function POST(req: NextRequest) {
       mode_paiement: mode_paiement || 'especes',
       tva:           fiscal.tva,
       ca:            fiscal.ca,
+      country_code:  'CG',
     },
   })
 

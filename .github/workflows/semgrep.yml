@@ -47,8 +47,11 @@ jobs:
             --exclude "supabase/migrations" \
             --error \
             --json \
-            --output semgrep-results.json \
-            . || true
+            --output semgrep-results.json
+          # Pas de `|| true` : si semgrep plante (crash, config invalide
+          # fatale), ce step doit échouer. Le step suivant fait le reste du
+          # diagnostic (config errors, 0 fichier scanné) à partir du JSON,
+          # dans tous les cas (if: always()).
 
       - name: Display results summary
         if: always()
@@ -60,19 +63,38 @@ jobs:
           with open('semgrep-results.json') as f:
               data = json.load(f)
           results = data.get('results', [])
+          config_errors = data.get('errors', [])
+          scanned = data.get('paths', {}).get('scanned', [])
           errors = [r for r in results if r.get('extra', {}).get('severity') == 'ERROR']
           warnings = [r for r in results if r.get('extra', {}).get('severity') == 'WARNING']
+          print(f'Fichiers scannés: {len(scanned)}')
           print(f'Total findings: {len(results)}')
           print(f'  Errors:   {len(errors)}')
           print(f'  Warnings: {len(warnings)}')
+          print(f'Erreurs de config/règle: {len(config_errors)}')
           if errors:
               print()
               print('ERROR findings:')
               for r in errors:
                   print(f'  [{r[\"check_id\"]}] {r[\"path\"]}:{r[\"start\"][\"line\"]}')
                   print(f'    {r[\"extra\"][\"message\"][:120]}')
-          sys.exit(1 if errors else 0)
+          if config_errors:
+              print()
+              print('Erreurs de configuration/règle (empêchent potentiellement un scan complet) :')
+              for e in config_errors:
+                  print(f'  {e}')
+          if not scanned:
+              print()
+              print('AUCUN FICHIER SCANNÉ — configuration invalide ou périmètre vide.')
+          # Échoue si : des findings ERROR existent, OU des erreurs de
+          # configuration/règle existent, OU aucun fichier n'a été scanné.
+          # C'est ce dernier cas qui a laissé le scan inopérant 3 mois sans
+          # que le job n'échoue jamais (0 scanned == 0 results == 'succès').
+          sys.exit(1 if (errors or config_errors or not scanned) else 0)
           "
+          else
+            echo 'semgrep-results.json absent — le step de scan a probablement échoué avant de produire une sortie.'
+            exit 1
           fi
 
       - name: Upload SARIF to GitHub Security tab

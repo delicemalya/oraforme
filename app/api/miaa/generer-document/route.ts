@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { chargerMemoireMIAA, sauvegarderRapport } from '@/lib/miaa/memory'
 import { EXPERTS } from '@/lib/miaa/experts'
-import { checkPlanAccess } from '@/lib/api/require-tenant'
+import { checkPlanAccess, requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -30,16 +30,21 @@ const DOC_PROMPTS: Record<DocType, (ctx: string) => string> = {
 
 export async function POST(req: Request) {
   try {
-    const { type, context, tenant_id, data } = await req.json() as {
+    const { type, context, data } = await req.json() as {
       type: DocType
       context?: string
-      tenant_id?: string
       data?: Record<string, unknown>
     }
 
     if (!type || !DOC_PROMPTS[type]) {
       return Response.json({ error: 'Type de document inconnu' }, { status: 400 })
     }
+
+    // tenant_id dérivé exclusivement de la session serveur (Critical #1) —
+    // seulement si une session existe : ce endpoint reste utilisable en mode
+    // générique (sans contexte entreprise) si l'appelant n'a pas de session.
+    const authCtx = await requireTenant()
+    const tenant_id = authCtx.ok ? authCtx.tid : undefined
 
     if (tenant_id) {
       const planDenied = await checkPlanAccess(tenant_id, 'academy')
