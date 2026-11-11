@@ -138,15 +138,13 @@ describe('Architecture — aucun calcul TVA local dupliqué pour le chemin norma
     expect(aprèsBrancheReduite).not.toContain('taux_normal')
   })
 
-  it('les 8 consommateurs réels de fiscalite-congo.ts n’ont pas de littéral 0.18/0.05 en parallèle', () => {
+  it('les 5 consommateurs réels de fiscalite-congo.ts n’ont pas de littéral 0.18/0.05 en parallèle', () => {
+    // Refonte 2026-11 : les 3 consommateurs restauration ont été supprimés avec le secteur.
     const consommateurs = [
       'app/api/factures/route.ts',
-      'app/api/resto/commandes/route.ts',
-      'app/api/resto/receipt/[commandeId]/route.ts',
       'app/dashboard/devis/page.tsx',
       'app/dashboard/factures/[id]/preview/page.tsx',
       'app/dashboard/rapports/page.tsx',
-      'app/dashboard/restaurant/page.tsx',
       'components/facture/FacturePDF.tsx',
     ]
     for (const rel of consommateurs) {

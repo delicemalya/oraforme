@@ -1,6 +1,6 @@
 // ── Alerts Engine — threshold-based detection ─────────────────────────────────
 
-import type { BiAlert, DgKpis, RhKpis, EcoleKpis, HotelKpis } from './types'
+import type { BiAlert, DgKpis, RhKpis, EcoleKpis } from './types'
 
 let _id = 0
 function id() { return String(++_id) }
@@ -126,21 +126,6 @@ export function buildEcoleAlerts(kpis: EcoleKpis): BiAlert[] {
       title: `${kpis.nbAbsences} absences enregistrées`,
       description: 'Vérifier les motifs et contacter les familles concernées',
       link: '/dashboard/ecole',
-    })
-  }
-
-  return alerts
-}
-
-export function buildHotelAlerts(kpis: HotelKpis): BiAlert[] {
-  const alerts: BiAlert[] = []
-
-  if (kpis.tauxOccupation < 40) {
-    alerts.push({
-      id: id(), severity: 'warning',
-      title: `Taux d'occupation faible : ${kpis.tauxOccupation}%`,
-      description: 'Moins de 40% des chambres occupées — considérer des promotions',
-      link: '/dashboard/hotel',
     })
   }
 

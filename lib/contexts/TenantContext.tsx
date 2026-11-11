@@ -28,6 +28,7 @@ import {
   type ReactNode,
 } from 'react'
 import { supabase } from '@/lib/supabase'
+import { normalizeSecteur } from '@/lib/erp-sectors'
 import { SUPER_ADMIN_EMAILS } from '@/lib/admin-config'
 import type { UserRole } from '@/lib/hooks/usePermissions'
 
@@ -134,7 +135,8 @@ async function fetchTenantForUser(
     tenantId:           profile.tenant_id as string,
     profileId:          profile.id as string,
     nomEntreprise:      t?.nom_entreprise ?? '',
-    secteur:            t?.secteur_activite ?? null,
+    // Valeurs historiques (autre, supermarche, secteurs retirés) ramenées au périmètre 2026-11.
+    secteur:            normalizeSecteur(t?.secteur_activite),
     sousType:           t?.sous_type ?? null,
     plan:               t?.plan ?? null,
     taille:             t?.taille_entreprise ?? null,

@@ -119,10 +119,7 @@ describe('BOI-004 — dépréciation legacy documentée, pas supprimée', () => 
     const navFiles = [
       'lib/erp-sectors.ts',
       'components/dashboard/DashboardClient.tsx',
-      'app/dashboard/boisson/page.tsx',
-      'app/dashboard/btp/page.tsx',
-      'app/dashboard/agriculture/page.tsx',
-      'app/dashboard/petrole/page.tsx',
+      // refonte 2026-11 : pages boisson/btp/agriculture/petrole supprimées
     ]
     for (const rel of navFiles) {
       const src = read(rel)

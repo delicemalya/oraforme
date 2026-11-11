@@ -11,7 +11,7 @@ import { useTenantContext } from '@/lib/contexts/TenantContext'
 import { useLocale } from '@/lib/hooks/useLocale'
 import ERPPageLayout, { ERPSectionCard } from '@/components/ui/ERPPageLayout'
 import { Building2, Save, Upload, Globe, Phone, Mail, MapPin, CheckCircle } from 'lucide-react'
-import { SECTOR_LABELS } from '@/lib/erp-sectors'
+import { sectorLabel as sectorLabelOf } from '@/lib/erp-sectors'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -110,9 +110,7 @@ export default function ProfilPage() {
     }
   }
 
-  const sectorLabel = profile?.secteur_activite
-    ? (SECTOR_LABELS[profile.secteur_activite] ?? profile.secteur_activite)
-    : '—'
+  const sectorLabel = sectorLabelOf(profile?.secteur_activite) || '—'
 
   return (
     <ERPPageLayout

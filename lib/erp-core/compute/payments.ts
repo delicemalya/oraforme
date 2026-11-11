@@ -3,8 +3,7 @@
  *
  * UNIQUE source de vérité pour l'agrégation des paiements.
  * Remplace la logique inline dans :
- *   - app/api/hotel/payments/route.ts      (4× reduce par mode)
- *   - app/api/resto/direction/route.ts     (byPaiement object)
+ *   - (ex-consommateurs hotel/resto supprimés avec leurs secteurs — refonte 2026-11)
  *   - app/api/ecole/paiements/route.ts     (mode paiement)
  *   - app/api/sante/facturation/route.ts   (sum_paye, sum_impaye)
  *

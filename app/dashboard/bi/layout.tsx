@@ -4,16 +4,13 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
-  BarChart2, Users, GraduationCap, Building2,
-  ShoppingCart, Activity,
+  BarChart2, Users, GraduationCap, Activity,
 } from 'lucide-react'
 
 const ALL_TABS = [
   { id: 'dg',         href: '/dashboard/bi',            label: 'Direction',    icon: BarChart2,     sectors: null },
   { id: 'rh',         href: '/dashboard/bi/rh',         label: 'RH',           icon: Users,         sectors: null },
   { id: 'ecole',      href: '/dashboard/bi/ecole',      label: 'École',        icon: GraduationCap, sectors: ['ecole'] },
-  { id: 'hotel',      href: '/dashboard/bi/hotel',      label: 'Hôtel',        icon: Building2,     sectors: ['hotel'] },
-  { id: 'restaurant', href: '/dashboard/bi/restaurant', label: 'Restaurant',   icon: ShoppingCart,  sectors: ['restaurant'] },
   { id: 'analytics',  href: '/dashboard/bi/analytics',  label: 'Multi-module', icon: Activity,      sectors: null },
 ] as const
 

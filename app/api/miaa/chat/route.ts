@@ -7,6 +7,7 @@ import { getMIAASystemPrompt } from '@/lib/miaa/system-prompt'
 import { trackUsage } from '@/lib/miaa/usage-tracker'
 import { detecterPaysMentionne, getMiaaFiscalContext, getNomPaysSansMoteur } from '@/lib/miaa-fiscal-router'
 import { requireTenant } from '@/lib/api/require-tenant'
+import { normalizeSecteur, type SectorId } from '@/lib/erp-sectors'
 
 export const runtime = 'nodejs'
 
@@ -45,32 +46,20 @@ function selectModel(message: string): { model: string; maxTokens: number; isCom
 // Quand module === 'auto', on choisit le meilleur agent selon le contexte secteur
 // et les mots-clés du message. L'utilisateur voit toujours "MIAA+" mais le moteur
 // envoie la personnalité du bon expert.
-const SECTOR_TO_AGENT: Record<string, string> = {
-  // Restauration & Hôtellerie
-  restaurant: 'restaurant', hotel: 'hotel', hotellerie: 'hotel', boisson: 'restaurant',
-  // Santé
-  sante: 'sante', pharmacie: 'pharmacie', clinique: 'sante', hopital: 'sante',
-  // Éducation
-  ecole: 'ecole', universite: 'ecole',
-  // Cabinet & Conseil
-  cabinet: 'cabinet', audit: 'audit',
-  // BTP & Transport
-  btp: 'comptabilite', transport: 'tresorerie', transport_public: 'rh',
-  // Agriculture & Commerce
-  agriculture: 'stock', commerce: 'crm', supermarche: 'stock', boutique: 'crm',
-  // Finance & Banque
-  banque: 'tresorerie', microfinance: 'tresorerie',
-  // ONG
-  ong: 'comptabilite',
-  // Industrie
-  industrie: 'stock', petrole: 'comptabilite',
-  // Assurance
-  assurance: 'assurance', compagnie_assurance: 'assurance', courtier_assurance: 'assurance', agent_assurance: 'assurance',
+// Refonte 2026-11 : 6 secteurs. 'entreprise' n'a pas d'expert dédié → routage par mots-clés.
+const SECTOR_TO_AGENT: Partial<Record<SectorId, string>> = {
+  sante:   'sante',
+  ecole:   'ecole',
+  cabinet: 'cabinet',
+  commerce: 'crm',
+  recrutement: 'rh',
 }
 
 function detectAgent(message: string, secteur?: string): string {
   // 1. Le secteur de l'entreprise prime — chaque secteur a son expert dédié
-  if (secteur && SECTOR_TO_AGENT[secteur]) return SECTOR_TO_AGENT[secteur]
+  const sid = normalizeSecteur(secteur)
+  const sectorAgent = sid ? SECTOR_TO_AGENT[sid] : undefined
+  if (sectorAgent) return sectorAgent
 
   // 2. Routage par mots-clés — du plus spécifique au plus général
   const msg = message.toLowerCase()
@@ -91,27 +80,16 @@ function detectAgent(message: string, secteur?: string): string {
     return 'crm'
   if (/audit|conformit|anomali|score.*audit|contrôle.*intern|risque.*entreprise|ohada.*conform|plan.*action.*audit|non-conformit|redressement.*fiscal/.test(msg))
     return 'audit'
-  if (/restaurant|cuisine|menu|couverts|food cost|haccp|caisse.*jour|plat.*ven/.test(msg))
-    return 'restaurant'
-  if (/hôtel|chambre|check.in|check.out|revpar|occupat|reservation|housekeeping/.test(msg))
-    return 'hotel'
-  if (/patient|consul|ordonnance|médecin|soins|clinique|camu|hôpital|infirmier/.test(msg))
+  if (/patient|consul|ordonnance|médecin|soins|clinique|camu|hôpital|infirmier|médic|pharmacie/.test(msg))
     return 'sante'
-  if (/médic|pharmacie|officine|ordonnance.*méd|bpd|fefo.*méd|stupéfiant/.test(msg))
-    return 'pharmacie'
   if (/élève|étudiant|scolarité|bulletin.*note|classe|enseignant|frais.*scol/.test(msg))
     return 'ecole'
   if (/audit.*cabinet|cliente.*cabinet|liasse|commissar|expert.comptable/.test(msg))
     return 'cabinet'
-  if (/transport|flotte|chauffeur|kilomét|livraison.*route/.test(msg))
-    return 'tresorerie'
   if (/conformit|anomalie.*compta|anomalie.*fiscal|anomalie.*rh|score.*ohada|balance.*général|grand.*livre.*anomalie|risque.*fiscal|risque.*compta|vérif.*comptab|écritures.*incohérent|pénalité.*tva|retard.*cnss|retard.*déclaration/.test(msg))
     return 'conformite'
   if (/score.*audit|audit.*complet|rapport.*audit|contrôle.*interne|fraude.*interne|séparation.*tâches|plan.*remédiation|anomalies.*détect/.test(msg))
     return 'audit'
-  if (/assur|police.*assurance|sinistre|prime.*assurance|garantie.*assurance|franchise.*assurance|réassurance|actuariat|ratio.*sinistres|cima\b|souscription|indemnisation|courtier|avenant.*police/.test(msg))
-    return 'assurance'
-
   // 3. Défaut : comptabilité — l'agent le plus polyvalent
   return 'comptabilite'
 }
@@ -225,7 +203,6 @@ const SUGGESTIONS: Record<string, string[]> = {
   tresorerie:   ['Quel est mon solde actuel ?', 'Prévision à 30 jours', 'Analyser entrées vs sorties', 'Alertes trésorerie'],
   stock:        ['Articles en rupture', 'Valeur totale du stock', 'Rotation des articles', 'Commander aux fournisseurs'],
   comptabilite: ['Générer le bilan', 'Calculer la TVA à déclarer', 'Analyser mes charges', 'État des résultats'],
-  restaurant:   ['CA du jour', 'Plats les plus vendus', 'Stock cuisine critique', 'Rapport caisse'],
   ecole:        ['Étudiants avec impayés', 'Taux de recouvrement', 'Générer les bulletins', 'Rapport académique'],
   general:      ['Analyse globale', 'Points urgents', 'Mes performances du mois', 'Recommandations MIAA+'],
 }

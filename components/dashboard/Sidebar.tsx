@@ -7,11 +7,11 @@ import { logAuthClient } from '@/lib/identity/log-client'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   LayoutDashboard, FileText, Package, Users,
-  ChefHat, GraduationCap, Hotel, Bot,
+  GraduationCap, Bot,
   LogOut, Menu, X, Lock, Globe,
   Settings, ShieldAlert, ShieldCheck, Store,
   Wallet, BookOpen, ShoppingCart,
-  Receipt, BarChart2, Truck,
+  Receipt, BarChart2,
   BookMarked, Calculator, HeartHandshake, UsersRound,
   Layers, Activity, TrendingUp,
   Bell, FolderOpen, Building2,
@@ -25,9 +25,10 @@ import {
   CORE_ERP_MODULES,
   SECTOR_SPECIFIC,
   PLATFORM_MODULES,
-  SECTOR_LABELS,
   ECOLE_CORE_ROLE_FILTER,
   ECOLE_NIVEAU,
+  isSectorId,
+  sectorLabel,
   type SectorId,
   type EcoleSousType,
 } from '@/lib/erp-sectors'
@@ -62,8 +63,6 @@ const ICONS: Record<string, LucideIcon> = {
   'bi-dg':           LineChart,
   'bi-rh':           Users,
   'bi-ecole':        GraduationCap,
-  'bi-hotel':        Hotel,
-  'bi-restaurant':   ChefHat,
   direction:     BarChart2,
   finance:       TrendingUp,
   analytics:     Activity,
@@ -118,11 +117,6 @@ const ICONS: Record<string, LucideIcon> = {
   'espace-etudiant':        GraduationCap,
   'espace-parent':          HeartHandshake,
   'parametres-academiques': Settings,
-  restaurant:   ChefHat,
-  cuisine:      ChefHat,
-  hotel:        Hotel,
-  housekeeping: Sparkles,
-  transport:    Truck,
   ecole:        GraduationCap,
   sante:               Heart,
   'sante-patients':    UserRound,
@@ -140,49 +134,16 @@ const ICONS: Record<string, LucideIcon> = {
   'sante-direction':   LayoutDashboard,
   'sante-miaa':        Sparkles,
   'sante-hospitalisation': BedDouble,
-  // ── Assurance ──────────────────────────────────────────────────────────────
-  'assurance-direction':   LayoutDashboard,
-  'assurance-polices':     FileText,
-  'assurance-sinistres':   ShieldAlert,
-  'assurance-clients':     Users,
-  'assurance-produits':    Package,
-  'assurance-partenaires': Building2,
-  'assurance-commissions': DollarSign,
-  'assurance-analytics':   BarChart2,
-  'assurance-miaa':        Sparkles,
-  pharmacie:           Pill,
-  'pharmacie-meds':    Package,
-  'pharmacie-ventes':  ShoppingCart,
   abonnement:          CreditCard,
   fiscalite:           Landmark,
   'cnss-congo':        BookMarked,
-  btp:                 Building2,
-  'btp-devis':         FileText,
-  'btp-chantiers':     Layers,
-  'btp-materiaux':     Package,
   recrutement:         Briefcase,
-  banque:              Landmark,
-  'banque-clients':    Users,
-  'banque-credits':    CreditCard,
-  'banque-epargne':    Wallet,
-  'banque-operations': TrendingUp,
-  agriculture:         Layers,
-  'agriculture-parcelles': Layers,
-  'agriculture-recoltes':  Package,
-  'agriculture-intrants':  ShoppingCart,
   cabinet:              Building2,
   'cabinet-clients':    Users,
   'cabinet-documents':  FileText,
   'cabinet-taches':     CheckSquare,
   'cabinet-revenue':    DollarSign,
   'cabinet-projets':    FolderOpen,
-  petrole:             Zap,
-  'petrole-sites':     Activity,
-  ong:                 HeartHandshake,
-  'ong-projets':       Layers,
-  'ong-dons':          Heart,
-  boisson:             Package,
-  'boisson-tournees':  Truck,
   // MIAA+ Agent sous-modules
   'miaa-agent':     Zap,
   'miaa-rapports':  FileText,
@@ -217,8 +178,6 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'bi-dg',       label: 'Analytics & BI',         sublabel: 'Direction · RH · Secteur', href: '/dashboard/bi' },
   { id: 'bi-rh',       label: 'Analytics RH',           sublabel: '', href: '/dashboard/bi/rh' },
   { id: 'bi-ecole',    label: 'Analytics École',        sublabel: '', href: '/dashboard/bi/ecole' },
-  { id: 'bi-hotel',    label: 'Analytics Hôtel',        sublabel: '', href: '/dashboard/bi/hotel' },
-  { id: 'bi-restaurant', label: 'Analytics Restaurant', sublabel: '', href: '/dashboard/bi/restaurant' },
   ...(CORE_ERP_MODULES as unknown as ModuleDef[]),
   ...(PLATFORM_MODULES as unknown as ModuleDef[]),
   { id: 'ecole',                 label: 'École & Université',   sublabel: '', href: '/dashboard/ecole'                      },
@@ -230,18 +189,11 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'ecole-facultes',       label: 'Facultés',                  sublabel: '', href: '/dashboard/ecole/facultes'            },
   { id: 'ecole-departements',   label: 'Départements',              sublabel: '', href: '/dashboard/ecole/departements'        },
   { id: 'ecole-parcours',       label: 'Parcours & Programmes',     sublabel: '', href: '/dashboard/ecole/parcours'            },
-  { id: 'restaurant',            label: 'Restauration POS',     sublabel: '', href: '/dashboard/restaurant'                 },
-  { id: 'hotel',                 label: 'Hôtellerie',           sublabel: '', href: '/dashboard/hotel'                      },
-  { id: 'housekeeping',          label: 'Housekeeping',         sublabel: '', href: '/dashboard/hotel/housekeeping'         },
-  { id: 'transport',             label: 'Transport VTC',        sublabel: '', href: '/dashboard/transport'                  },
-  { id: 'sante',                 label: 'Clinique',             sublabel: '', href: '/dashboard/sante'                      },
+  { id: 'sante',               label: 'Clinique',             sublabel: '', href: '/dashboard/sante'                      },
   { id: 'sante-patients',        label: 'Patients',             sublabel: '', href: '/dashboard/sante/patients'             },
   { id: 'sante-rdv',             label: 'Rendez-vous',          sublabel: '', href: '/dashboard/sante/rendez-vous'          },
   { id: 'sante-consultations',   label: 'Consultations',        sublabel: '', href: '/dashboard/sante/consultations'        },
   { id: 'sante-medecins',        label: 'Médecins',             sublabel: '', href: '/dashboard/sante/medecins'             },
-  { id: 'pharmacie',             label: 'Pharmacie',            sublabel: '', href: '/dashboard/pharmacie'                  },
-  { id: 'pharmacie-meds',        label: 'Médicaments',          sublabel: '', href: '/dashboard/pharmacie/medicaments'      },
-  { id: 'pharmacie-ventes',      label: 'Ventes / POS',         sublabel: '', href: '/dashboard/pharmacie/ventes'           },
   { id: 'abonnement',            label: 'Abonnement',           sublabel: '', href: '/dashboard/abonnement'                 },
   { id: 'workflows',             label: 'Workflows',            sublabel: '', href: '/dashboard/workflows'                  },
   { id: 'api-keys',              label: 'Clés API',             sublabel: '', href: '/dashboard/api-keys'                   },
@@ -308,8 +260,6 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'bi-dg':         'nav.bi_dg',
   'bi-rh':         'nav.bi_rh',
   'bi-ecole':      'nav.bi_ecole',
-  'bi-hotel':      'nav.bi_hotel',
-  'bi-restaurant': 'nav.bi_restaurant',
   direction:       'nav.direction',
   finance:         'nav.finance',
   analytics:    'nav.analytics',
@@ -334,10 +284,6 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   profil:       'nav.profil',
   parametres:   'nav.parametres',
   ecole:        'nav.ecole',
-  restaurant:   'nav.restaurant',
-  hotel:        'nav.hotel',
-  housekeeping: 'nav.housekeeping',
-  transport:    'nav.transport',
   workflows:    'nav.workflows',
   'api-keys':   'nav.api_keys',
   sante:               'nav.sante',
@@ -345,40 +291,16 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'sante-rdv':         'nav.sante_rdv',
   'sante-consultations': 'nav.sante_consultations',
   'sante-medecins':    'nav.sante_medecins',
-  pharmacie:           'nav.pharmacie',
-  'pharmacie-meds':    'nav.pharmacie_meds',
-  'pharmacie-ventes':  'nav.pharmacie_ventes',
   abonnement:          'nav.abonnement',
   fiscalite:           'nav.fiscalite',
   'cnss-congo':        'nav.cnss_congo',
   // Secteurs métier
-
-  btp:                     'nav.btp',
-  'btp-devis':             'nav.btp_devis',
-  'btp-chantiers':         'nav.btp_chantiers',
-  'btp-materiaux':         'nav.btp_materiaux',
-  banque:                  'nav.banque',
-  'banque-clients':        'nav.banque_clients',
-  'banque-credits':        'nav.banque_credits',
-  'banque-epargne':        'nav.banque_epargne',
-  'banque-operations':     'nav.banque_operations',
-  agriculture:             'nav.agriculture',
-  'agriculture-parcelles': 'nav.agri_parcelles',
-  'agriculture-recoltes':  'nav.agri_recoltes',
-  'agriculture-intrants':  'nav.agri_intrants',
   cabinet:                 'nav.cabinet',
   'cabinet-clients':       'nav.cabinet_clients',
   'cabinet-documents':     'nav.cabinet_documents',
   'cabinet-taches':        'nav.cabinet_taches',
   'cabinet-revenue':       'nav.cabinet_revenue',
   'cabinet-projets':       'nav.cabinet_projets',
-  petrole:                 'nav.petrole',
-  'petrole-sites':         'nav.petrole_sites',
-  ong:                     'nav.ong',
-  'ong-projets':           'nav.ong_projets',
-  'ong-dons':              'nav.ong_dons',
-  boisson:                 'nav.boisson',
-  'boisson-tournees':      'nav.boisson_tournees',
   // MIAA+ sous-modules
   'miaa-agent':     'nav.miaa_agent',
   'miaa-rapports':  'nav.miaa_rapports',
@@ -401,20 +323,11 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'recrutement-miaa':         'nav.recrutement_miaa',
 }
 
-const SECTOR_LABEL_KEYS: Record<string, string> = {
+// Libellé i18n du groupe « métier » ; entreprise et commerce retombent sur sectorLabel().
+const SECTOR_LABEL_KEYS: Partial<Record<SectorId, string>> = {
   ecole:            'nav.ecole',
-  restaurant:       'nav.restaurant',
-  hotel:            'nav.hotel',
   sante:            'nav.sante',
-  pharmacie:        'nav.pharmacie',
-  transport:        'nav.transport',
-  btp:              'nav.btp',
-  banque:           'nav.banque',
-  agriculture:      'nav.agriculture',
   cabinet:          'nav.cabinet',
-  petrole:          'nav.petrole',
-  ong:              'nav.ong',
-  boisson:          'nav.boisson',
   recrutement:      'nav.recrutement',
 }
 
@@ -424,46 +337,29 @@ const PLATFORM_RESTRICTED = new Set(['roles'])
 const ADMIN_MODULE_IDS    = new Set(['workflows', 'api-keys', 'analytics', 'audit',
   'audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci',
   'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'])
-const BI_MODULE_IDS       = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel', 'bi-restaurant'])
+const BI_MODULE_IDS       = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole'])
 
-const SECTOR_BI_MAP: Record<string, string[]> = {
+const SECTOR_BI_MAP: Record<SectorId, string[]> = {
+  entreprise:       ['bi-dg', 'bi-rh'],
   ecole:            ['bi-dg', 'bi-rh', 'bi-ecole'],
-  hotel:            ['bi-dg', 'bi-hotel'],
-  restaurant:       ['bi-dg', 'bi-restaurant'],
-  sante:            ['bi-dg', 'bi-rh'],
-  pharmacie:        ['bi-dg', 'bi-rh'],
-  transport:        ['bi-dg'],
-  transport_public: ['bi-dg'],
   commerce:         ['bi-dg'],
-  supermarche:      ['bi-dg'],
-  boutique:         ['bi-dg'],
-  btp:              ['bi-dg', 'bi-rh'],
-  banque:           ['bi-dg', 'bi-rh'],
-  ong:              ['bi-dg', 'bi-rh'],
-  agriculture:      ['bi-dg'],
-  petrole:          ['bi-dg', 'bi-rh'],
   cabinet:          ['bi-dg'],
-  boisson:          ['bi-dg'],
+  sante:            ['bi-dg', 'bi-rh'],
   recrutement:      ['bi-dg', 'bi-rh'],
 }
 
 const ALL_MODULE_IDS = [
   ...CORE_ERP_MODULES.map(m => m.id),
   ...PLATFORM_MODULES.map(m => m.id),
-  'ecole', 'restaurant', 'hotel', 'housekeeping', 'transport',
+  'ecole',
   'calendrier', 'taches',
   'sante', 'sante-direction', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'sante-pharmacie', 'sante-urgences', 'sante-labo', 'sante-imagerie', 'sante-bloc',
   'sante-facturation', 'sante-assurances', 'sante-rh', 'sante-miaa', 'sante-hospitalisation',
-  'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
   'abonnement', 'fiscalite', 'cnss-congo',
   'academy',
   'miaa-agent', 'miaa-rapports', 'miaa-expertise',
   'email-management', 'social-media',
-  // ── Assurance ──────────────────────────────────────────────────────────────
-  'assurance-direction', 'assurance-polices', 'assurance-sinistres',
-  'assurance-clients', 'assurance-produits', 'assurance-partenaires',
-  'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
   // ── Recrutement & Placement RH ─────────────────────────────────────────────
   'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
   'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement', 'recrutement-mad',
@@ -472,18 +368,15 @@ const ALL_MODULE_IDS = [
 ]
 
 function getSectorIcon(secteur: string): LucideIcon {
-  const M: Record<string, LucideIcon> = {
-    ecole: GraduationCap, restaurant: ChefHat, hotel: Hotel,
-    transport: Truck, transport_public: Truck, commerce: Store,
-    supermarche: Store, boutique: Store, sante: Activity,
-    btp: Building2, banque: Wallet, ong: HeartHandshake,
-    recrutement: Briefcase,
+  const M: Record<SectorId, LucideIcon> = {
+    entreprise: Building2, ecole: GraduationCap, commerce: Store,
+    cabinet: Briefcase, sante: Activity, recrutement: Briefcase,
   }
-  return M[secteur] ?? Settings
+  return isSectorId(secteur) ? M[secteur] : Settings
 }
 
 function getSectorLabel(secteur: string): string {
-  return (SECTOR_LABELS[secteur] ?? secteur).split(/[ &]/)[0]
+  return (sectorLabel(secteur) || secteur).split(/[ &]/)[0]
 }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
@@ -583,7 +476,7 @@ export default function Sidebar() {
     if (BI_MODULE_IDS.has(id)) {
       if (!isOwner && role !== 'admin') return false
       if (secteur) {
-        const allowed = SECTOR_BI_MAP[secteur] ?? ['bi-dg']
+        const allowed = isSectorId(secteur) ? SECTOR_BI_MAP[secteur] : ['bi-dg']
         return allowed.includes(id)
       }
       return isOwner || role === 'admin'
@@ -681,10 +574,11 @@ export default function Sidebar() {
           return permissions[item.id]?.can_view !== false
         })
       if (!sectorItems.length) return null
-      const sectorLabel = SECTOR_LABEL_KEYS[secteur] ? t(SECTOR_LABEL_KEYS[secteur]) : (SECTOR_LABELS[secteur] ?? secteur)
-      return { id: 'metier', label: sectorLabel, icon: getSectorIcon(secteur), items: sectorItems }
+      const labelKey = SECTOR_LABEL_KEYS[secteur as SectorId]
+      const groupLabel = labelKey ? t(labelKey) : (sectorLabel(secteur) || secteur)
+      return { id: 'metier', label: groupLabel, icon: getSectorIcon(secteur), items: sectorItems }
     }
-    const EXTRA_IDS = ['ecole', 'restaurant', 'hotel', 'transport']
+    const EXTRA_IDS = ['ecole']
     const extraItems: NavItem[] = []
     for (const mid of EXTRA_IDS) {
       if (!modulesActifs.includes(mid) || permissions[mid]?.can_view === false) continue

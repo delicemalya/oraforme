@@ -7,8 +7,8 @@ import {
   ChevronDown, Eye, Edit3, Trash2, Loader2,
   BookMarked, BarChart2, Users, Calculator,
   GraduationCap, HeartHandshake, Bot,
-  FileText, Package, Wallet, ChefHat,
-  ShoppingCart, Receipt, Truck, Hotel, BookOpen,
+  FileText, Package, Wallet,
+  ShoppingCart, Receipt, BookOpen,
   Lock, ShieldAlert, Send,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -58,13 +58,6 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
     { id: 'espace-parent',   label: 'Espace Parent',   sublabel: 'Suivi familles',       icon: HeartHandshake, color: '#7C3AED' },
     { id: 'miaa',            label: 'MIAA+',           sublabel: 'IA scolaire',          icon: Bot,            color: '#DC2626' },
   ],
-  restaurant: [
-    { id: 'pos',        label: 'Caisse POS',  sublabel: 'Ventes',     icon: ChefHat,   color: '#DC2626' },
-    { id: 'stock',      label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0F172A' },
-    { id: 'rh',         label: 'RH & Paie',  sublabel: 'Personnel',  icon: Users,     color: '#DC2626' },
-    { id: 'tresorerie', label: 'Trésorerie',  sublabel: 'Finances',   icon: Wallet,    color: '#7C3AED' },
-    { id: 'miaa',       label: 'MIAA+',       sublabel: 'IA',         icon: Bot,       color: '#DC2626' },
-  ],
   commerce: [
     { id: 'facturation', label: 'Facturation', sublabel: 'Devis',      icon: FileText,  color: '#DC2626' },
     { id: 'stock',       label: 'Stock',       sublabel: 'Inventaire', icon: Package,   color: '#0F172A' },
@@ -80,8 +73,6 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
     { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#7C3AED' },
     { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#0F172A' },
     { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#7C3AED' },
-    { id: 'transport',    label: 'Transport',    sublabel: '',          icon: Truck,     color: '#DC2626' },
-    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#0F172A' },
   ],
 }
 

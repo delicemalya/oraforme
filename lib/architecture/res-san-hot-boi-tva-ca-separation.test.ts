@@ -69,26 +69,9 @@ describe('decomposerTTCUnifie — décomposition TTC → HT/TVA/CA', () => {
   })
 })
 
-// ── RES-001 — app/api/resto/commandes/route.ts ──────────────────────────────
-
-describe('RES-001 — app/api/resto/commandes/route.ts', () => {
-  const src = sourceSansCommentaires('app/api/resto/commandes/route.ts')
-
-  it('p_montant_tva ne fusionne plus tva+ca', () => {
-    expect(src).not.toMatch(/p_montant_tva:\s*fiscal\.tva\s*\+\s*fiscal\.ca/)
-    expect(src).toMatch(/p_montant_tva:\s*fiscal\.tva\b/)
-  })
-
-  it('metadata porte ca et country_code séparément', () => {
-    expect(src).toContain('ca:            fiscal.ca')
-    expect(src).toContain("country_code:  'CG'")
-  })
-
-  it('aucun littéral 1.189/0.189 dans le code (hors commentaires)', () => {
-    expect(src).not.toMatch(/1\.189/)
-    expect(src).not.toMatch(/0\.189/)
-  })
-})
+// Refonte 2026-11 (réduction des secteurs) : les secteurs restauration, hôtel
+// et boissons ont été supprimés avec leurs routes (RES-001, HOT-001, BOI-001).
+// Seuls SAN-001 (santé, conservé) et les tests de la migration 182 restent.
 
 // ── SAN-001 — 2 writers ─────────────────────────────────────────────────────
 
@@ -107,40 +90,6 @@ describe.each([
 
   it('metadata porte ca et country_code', () => {
     expect(src).toMatch(/ca,\s*country_code:\s*'CG'/)
-  })
-})
-
-// ── HOT-001 — app/api/hotel/payments/route.ts ───────────────────────────────
-
-describe('HOT-001 — app/api/hotel/payments/route.ts', () => {
-  const src = sourceSansCommentaires('app/api/hotel/payments/route.ts')
-
-  it('délègue à decomposerTTCUnifie, aucun calcul local par 1.189', () => {
-    expect(src).toContain("from '@/lib/fiscalite/engine-adapter'")
-    expect(src).toContain('decomposerTTCUnifie(')
-    expect(src).not.toMatch(/1\.189/)
-  })
-
-  it('metadata porte ca et country_code', () => {
-    expect(src).toContain('ca:             montantCA')
-    expect(src).toContain("country_code:   'CG'")
-  })
-})
-
-// ── BOI-001 — app/api/boisson/tournees/route.ts ─────────────────────────────
-
-describe('BOI-001 — app/api/boisson/tournees/route.ts', () => {
-  const src = sourceSansCommentaires('app/api/boisson/tournees/route.ts')
-
-  it('délègue à decomposerTTCUnifie, aucun calcul local par 1.189', () => {
-    expect(src).toContain("from '@/lib/fiscalite/engine-adapter'")
-    expect(src).toContain('decomposerTTCUnifie(')
-    expect(src).not.toMatch(/1\.189/)
-  })
-
-  it('metadata porte ca et country_code', () => {
-    expect(src).toContain('ca:            montantCA')
-    expect(src).toContain("country_code:  'CG'")
   })
 })
 

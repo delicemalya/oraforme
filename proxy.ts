@@ -18,7 +18,6 @@ const PUBLIC_PAGES = new Set([
 const PUBLIC_API_PREFIXES = [
   '/api/auth/',       // Supabase OAuth callbacks
   '/api/v1/',         // External REST API — uses API key auth
-  '/api/resto/',      // Public menu + order endpoints (QR code, no session)
   '/api/webhooks/',   // External webhook receivers
   '/api/monitoring/', // Error/performance logging from error boundaries
 ]
@@ -38,7 +37,6 @@ const AUTOMATION_PATHS = new Set([
   '/api/agents/superviseur/rapport',
   '/api/agents/rh/bulletins',
   '/api/agents/ecole/impayes',
-  '/api/agents/restaurant/cloture',
   '/api/agents/miaa-autonome',
   '/api/miaa/proactif',
   '/api/miaa/analyse-quotidienne',

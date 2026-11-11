@@ -113,36 +113,3 @@ export interface EcoleInsights {
   alerts: BiAlert[]
   lastUpdated: string
 }
-
-// ── Hôtel ─────────────────────────────────────────────────────────────────────
-export interface HotelKpis {
-  nbChambres: number
-  chambresOccupees: number
-  tauxOccupation: number
-  revenuAnnee: number
-  revenuMois: number
-  nbReservations: number
-  revParChambre: number
-}
-
-export interface HotelInsights {
-  kpis: HotelKpis
-  alerts: BiAlert[]
-  lastUpdated: string
-}
-
-// ── Restaurant ────────────────────────────────────────────────────────────────
-export interface RestoKpis {
-  ventesTotales: number
-  ventesMois: number
-  nbCommandes: number
-  ticketMoyen: number
-  topPlat: string
-  heureFort: string
-}
-
-export interface RestoInsights {
-  kpis: RestoKpis
-  alerts: BiAlert[]
-  lastUpdated: string
-}

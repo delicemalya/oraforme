@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { buildTenantProfile } from '@/lib/tenant/TenantProfileFactory'
 import type { TailleEntreprise, SecteurId } from '@/lib/plans'
+import { isSectorId } from '@/lib/erp-sectors'
 
 export async function createTenantAndProfile(data: {
   nomEntreprise:   string
@@ -29,13 +30,8 @@ export async function createTenantAndProfile(data: {
     return { error: 'Plan invalide.' }
   }
 
-  const VALID_SECTEURS = new Set<string>([
-    'commerce', 'restaurant', 'ecole', 'sante', 'btp',
-    'transport', 'hotel', 'agriculture', 'pharmacie', 'banque',
-    'ong', 'cabinet', 'boisson', 'petrole', 'supermarche',
-    'boutique', 'assurance', 'recrutement', 'autre',
-  ])
-  if (!VALID_SECTEURS.has(data.secteurActivite as string)) {
+  // Source unique : lib/erp-sectors.ts (refonte 2026-11 — 6 secteurs).
+  if (!isSectorId(data.secteurActivite)) {
     return { error: 'Secteur invalide.' }
   }
   // ── End validation ────────────────────────────────────────────────────────────

@@ -19,6 +19,9 @@
  * reste à faire dès qu'un canal de validation transactionnel est rétabli —
  * voir docs/C1-MIAA-IDOR-CLOSURE.md, section PRODUCTION_VALIDATION_REQUIRED.
  *
+ * Refonte 2026-11 (réduction des secteurs) : la route assurance-fraude a été
+ * supprimée avec le secteur assurance ; elle ne fait plus partie de la liste.
+ *
  * Routes déjà corrigées par une mission antérieure (ANO-C05), non retouchées
  * ici : notifications, document-context, compliance (toutes utilisent déjà
  * ctx.tid).
@@ -54,7 +57,6 @@ const FIXED_ROUTES = [
   'app/api/miaa/academy/route.ts',
   'app/api/miaa/generer-document/route.ts',
   'app/api/miaa/analyze-file/route.ts',
-  'app/api/miaa/assurance-fraude/route.ts',
   'app/api/miaa/executive/route.ts',
   'app/api/miaa/rh-expert/route.ts',
 ]
@@ -94,11 +96,6 @@ describe('CRITICAL #1 — /api/miaa/* isolation tenant (test statique)', () => {
   it('analyze-file ne lit plus tenant_id depuis tenantData du body', () => {
     const src = read('app/api/miaa/analyze-file/route.ts')
     expect(src).not.toMatch(/tenantData\?:\s*\{\s*tenant_id/)
-  })
-
-  it('assurance-fraude filtre ass_sinistres par tenant_id de session, pas seulement par id', () => {
-    const src = read('app/api/miaa/assurance-fraude/route.ts')
-    expect(src).toMatch(/\.eq\('id',\s*sinistre_id\)\s*\n\s*\.eq\('tenant_id',\s*ctx\.tid\)/)
   })
 
   it('executive ne lit plus tenantId depuis le body client', () => {

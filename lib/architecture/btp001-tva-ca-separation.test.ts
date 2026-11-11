@@ -31,7 +31,6 @@ import { computeTVAFromJournal, type JournalBalanceRow } from '../erp-core/compu
 import { calculerTVASurMontantUnifie } from '../fiscalite/engine-adapter'
 
 const ROOT = path.resolve(__dirname, '../..')
-const ROUTE_SOURCE     = readFileSync(path.join(ROOT, 'app/api/btp/chantiers/route.ts'), 'utf-8')
 const MIGRATION_181     = readFileSync(path.join(ROOT, 'supabase/migrations/181_fix_btp001_tva_ca_separation.sql'), 'utf-8')
 const MIGRATION_148     = readFileSync(path.join(ROOT, 'supabase/migrations/148_accounting_rules_btp_agriculture.sql'), 'utf-8')
 const MIGRATION_139_FAC = readFileSync(path.join(ROOT, 'supabase/migrations/139_accounting_rules_facturation.sql'), 'utf-8')
@@ -153,34 +152,9 @@ describe('BTP-001 — isolation multi-tenant', () => {
     expect(rA.total_collectee).not.toBe(rB.total_collectee)
     expect(computeTVAFromJournal(tenantA, 2026).total_collectee).toBe(rA.total_collectee)
   })
-
-  it('app/api/btp/chantiers/route.ts filtre tenant_id avant tout emit_accounting_event (vérification statique)', () => {
-    // Les 3 points d'émission (POST création, PATCH règlement) doivent tous
-    // utiliser ctx.tenantId — jamais un tenant_id venu du corps de la requête.
-    const occurrences = ROUTE_SOURCE.split("p_tenant_id:").length - 1
-    expect(occurrences).toBeGreaterThanOrEqual(2)   // BTP-001 et BTP-002
-    expect(ROUTE_SOURCE).not.toContain('p_tenant_id:     body.')
-    expect(ROUTE_SOURCE).toContain('const { ctx, error } = await requireTenant()')
-  })
 })
 
-// ── 5. Aucun taux recopié dans le routeur (section 4 de la mission) ───────
-
-describe('Architecture — app/api/btp/chantiers/route.ts ne recopie plus aucun taux TVA', () => {
-  it('délègue à calculerTVASurMontantUnifie, aucun calcul par 0.189/0.18/0.05/1.189 dans le code (hors commentaires)', () => {
-    expect(ROUTE_SOURCE).toContain("from '@/lib/fiscalite/engine-adapter'")
-    expect(ROUTE_SOURCE).toContain('calculerTVASurMontantUnifie(montantHT')
-
-    // Ignore les lignes de commentaire (// ...) qui documentent l'ancien
-    // calcul à des fins d'historique — seul le CODE compte ici.
-    const codeSansCommentaires = ROUTE_SOURCE
-      .split('\n')
-      .filter(l => !l.trim().startsWith('//'))
-      .join('\n')
-
-    expect(codeSansCommentaires).not.toMatch(/\*\s*0\.189/)
-    expect(codeSansCommentaires).not.toMatch(/\*\s*1\.189/)
-    expect(codeSansCommentaires).not.toMatch(/\*\s*0\.18\b/)
-    expect(codeSansCommentaires).not.toMatch(/\*\s*0\.05\b/)
-  })
-})
+// Refonte 2026-11 (réduction des secteurs) : le secteur BTP et sa route
+// app/api/btp/chantiers/route.ts ont été supprimés. Les vérifications statiques
+// de cette route sont retirées ; les tests de la migration 181 (toujours dans
+// l'historique supabase/migrations) sont conservés.

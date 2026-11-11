@@ -22,18 +22,14 @@ interface SectorOption {
   sousType: string | null
 }
 
-// Entrepreneur — 10 secteurs
+// Entrepreneur — 6 profils (refonte 2026-11)
 const SECTORS_TPE: SectorOption[] = [
   { id: 'commerce',    label: 'Commerce / Boutique',    secteur: 'commerce',    sousType: null          },
-  { id: 'restaurant',  label: 'Restaurant',              secteur: 'restaurant',  sousType: null          },
-  { id: 'pharmacie',   label: 'Pharmacie',               secteur: 'pharmacie',   sousType: null          },
-  { id: 'agriculture', label: 'Agriculture',              secteur: 'agriculture', sousType: null          },
   { id: 'boulangerie', label: 'Boulangerie',              secteur: 'commerce',    sousType: 'boulangerie' },
-  { id: 'boisson',     label: 'Distribution boissons',    secteur: 'boisson',     sousType: null          },
   { id: 'creche',      label: 'Crèche',                   secteur: 'ecole',       sousType: 'creche'      },
   { id: 'primaire',    label: 'Primaire',                  secteur: 'ecole',       sousType: 'primaire'    },
   { id: 'college',     label: 'Collège',                   secteur: 'ecole',       sousType: 'college'     },
-  { id: 'autre',       label: 'Autre activité',            secteur: 'autre',       sousType: null          },
+  { id: 'entreprise',  label: 'Entreprise / PME',          secteur: 'entreprise',  sousType: null          },
 ]
 
 // Business — secteurs regroupés par famille
@@ -51,50 +47,32 @@ const SECTORS_PME: SectorOption[] = [
   // Éducation
   { id: 'lycee',                 label: 'Lycée',                    secteur: 'ecole',       sousType: 'lycee'                },
   { id: 'universite',            label: 'Université',               secteur: 'ecole',       sousType: 'universite'           },
-  // Finance & Banque
-  { id: 'banque',                label: 'Banque',                   secteur: 'banque',      sousType: 'banque_comm'          },
-  { id: 'microfinance',          label: 'Microfinance',             secteur: 'banque',      sousType: 'microfinance'         },
-  // Hôtellerie
-  { id: 'hotel',                 label: 'Hôtel',                    secteur: 'hotel',       sousType: null                   },
-  // Commerce & Industrie
-  { id: 'supermarche',           label: 'Supermarché',              secteur: 'supermarche', sousType: null                   },
-  { id: 'grande_distrib',        label: 'Grande distribution',      secteur: 'supermarche', sousType: 'grande_distribution'  },
-  { id: 'logistique',            label: 'Logistique',               secteur: 'transport',   sousType: 'logistique'           },
-  { id: 'transport',             label: 'Transport',                secteur: 'transport',   sousType: null                   },
-  { id: 'btp',                   label: 'BTP',                      secteur: 'btp',         sousType: null                   },
-  { id: 'industrie',             label: 'Industrie',                secteur: 'autre',       sousType: 'industrie'            },
-  { id: 'petrole',               label: 'Pétrole & Mines',          secteur: 'petrole',     sousType: null                   },
-  // Assurance
-  { id: 'compagnie_assurance',   label: "Compagnie d'assurance",    secteur: 'assurance',   sousType: 'compagnie'            },
-  { id: 'courtier_assurance',    label: 'Courtier en assurance',    secteur: 'assurance',   sousType: 'courtier'             },
-  { id: 'agent_assurance',       label: "Agent d'assurance",        secteur: 'assurance',   sousType: 'agent'                },
+  // Commerce
+  { id: 'boutique',              label: 'Commerce / Boutique',      secteur: 'commerce',    sousType: null                   },
+  { id: 'grande_distrib',        label: 'Grande distribution',      secteur: 'commerce',    sousType: 'grande_distribution'  },
   // Recrutement & RH (3 familles au lieu de 8 doublons)
   { id: 'cabinet-recrutement',   label: 'Recrutement & Placement',  secteur: 'recrutement', sousType: 'cabinet_recrutement'  },
   { id: 'interim',               label: 'Intérim & Staffing',       secteur: 'recrutement', sousType: 'interim'              },
   { id: 'chasseur-tetes',        label: 'Executive Search',         secteur: 'recrutement', sousType: 'chasseur_tetes'       },
-  // Autres
-  { id: 'ong',                   label: 'ONG',                      secteur: 'ong',         sousType: null                   },
-  { id: 'autre_business',        label: 'Autre activité',           secteur: 'autre',       sousType: null                   },
+  // Entreprises
+  { id: 'entreprise_pme',        label: 'Entreprise / PME',         secteur: 'entreprise',  sousType: null                   },
+  { id: 'industrie',             label: 'Industrie',                secteur: 'entreprise',  sousType: 'industrie'            },
 ]
 
 // Groupes pour l'affichage PME
 const PME_GROUPS: { label: string; icon: string; ids: string[] }[] = [
+  { label: 'Entreprises',          icon: '🏢', ids: ['entreprise_pme','industrie'] },
   { label: 'Cabinets & Conseil',   icon: '💼', ids: ['cabinet-comptable','cabinet-fiscal','cabinet-audit','cabinet-conseil','cabinet-juridique','cabinet-avocat'] },
-  { label: 'Santé',                icon: '🏥', ids: ['clinique','hopital'] },
   { label: 'Éducation',            icon: '🎓', ids: ['lycee','universite'] },
-  { label: 'Finance & Banque',     icon: '🏦', ids: ['banque','microfinance'] },
-  { label: 'Hôtellerie',           icon: '🏨', ids: ['hotel'] },
-  { label: 'Commerce & Industrie', icon: '🏭', ids: ['supermarche','grande_distrib','logistique','transport','btp','industrie','petrole'] },
-  { label: 'Assurance',            icon: '🛡️', ids: ['compagnie_assurance','courtier_assurance','agent_assurance'] },
+  { label: 'Commerce',             icon: '🛍️', ids: ['boutique','grande_distrib'] },
+  { label: 'Santé',                icon: '🏥', ids: ['clinique','hopital'] },
   { label: 'Recrutement & RH',     icon: '👥', ids: ['cabinet-recrutement','interim','chasseur-tetes'] },
-  { label: 'Autres',               icon: '✦',  ids: ['ong','autre_business'] },
 ]
 
 // Icônes par secteur TPE
 const TPE_ICONS: Record<string, string> = {
-  commerce: '🛍️', restaurant: '🍽️', pharmacie: '💊', agriculture: '🌾',
-  boulangerie: '🥖', boisson: '🍺', creche: '👶', primaire: '✏️',
-  college: '📚', autre: '✦',
+  commerce: '🛍️', boulangerie: '🥖', creche: '👶', primaire: '✏️',
+  college: '📚', entreprise: '🏢',
 }
 
 // ── Left-panel gradient by step ───────────────────────────────────────────────
