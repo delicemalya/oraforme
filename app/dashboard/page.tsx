@@ -10,7 +10,7 @@ const MODULE_LABELS: Record<string, string> = {
   stock:        'nav.stock',        rh:           'nav.rh',
   ecole:        'nav.ecole',        achats:       'nav.achats',
   depenses:     'nav.depenses',     rapports:     'nav.rapports',
-  bizbot:       'nav.bizbot',
+  hotel:        'nav.hotel',        bizbot:       'nav.bizbot',
 }
 
 const MODULE_COLORS = [

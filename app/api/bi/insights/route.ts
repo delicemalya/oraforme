@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant, checkPlanAccess } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
-import { buildDgAlerts, buildRhAlerts, buildEcoleAlerts } from '@/lib/analytics/alerts-engine'
+import { buildDgAlerts, buildRhAlerts, buildEcoleAlerts, buildHotelAlerts } from '@/lib/analytics/alerts-engine'
 import { growthPct } from '@/lib/analytics/formatters'
-import type { DgKpis, RhKpis, EcoleKpis } from '@/lib/analytics/types'
+import type { DgKpis, RhKpis, EcoleKpis, HotelKpis } from '@/lib/analytics/types'
 import { computePayrollSummary, BULLETIN_SELECT } from '@/lib/erp-core/compute/payroll'
 import { computeCA } from '@/lib/erp-core/compute/ca'
 
 /**
- * GET /api/bi/insights?module=dg|rh|ecole&year=2026
+ * GET /api/bi/insights?module=dg|rh|ecole|hotel&year=2026
  * Returns structured BI data for the requested module.
  * Always tenant-isolated via RLS + explicit tenant_id filter.
  *
@@ -264,6 +264,33 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  // Modules BI hotel/resto retirés avec leurs secteurs (refonte 2026-11).
+  // ── Hôtel ──────────────────────────────────────────────────────────────────
+  if (moduleKey === 'hotel') {
+    const [{ data: chambres }, { data: reservations }] = await Promise.all([
+      supabaseAdmin.from('chambres').select('id,statut,prix_nuit').eq('tenant_id', tid),
+      supabaseAdmin.from('reservations').select('montant_total,statut,date_debut,date_fin').eq('tenant_id', tid).gte('date_debut', yearStart),
+    ])
+
+    const chbs = chambres ?? []
+    const ress = reservations ?? []
+
+    const nbChambres       = chbs.length
+    const chambresOccupees = chbs.filter(c => c.statut === 'occupee').length
+    const tauxOccupation   = nbChambres > 0 ? Math.round((chambresOccupees / nbChambres) * 100) : 0
+    const revenuAnnee      = ress.filter(r => r.statut === 'termine' || r.statut === 'confirmee').reduce((s, r) => s + (r.montant_total ?? 0), 0)
+    const revenuMois       = ress.filter(r => r.date_debut?.startsWith(monthStart.slice(0, 7))).reduce((s, r) => s + (r.montant_total ?? 0), 0)
+    const nbReservations   = ress.length
+    const revParChambre    = nbChambres > 0 ? Math.round(revenuAnnee / nbChambres) : 0
+
+    const kpis: HotelKpis = { nbChambres, chambresOccupees, tauxOccupation, revenuAnnee, revenuMois, nbReservations, revParChambre }
+
+    return NextResponse.json({
+      module: 'hotel', year, kpis,
+      alerts: buildHotelAlerts(kpis),
+      lastUpdated,
+    })
+  }
+
+  // Module BI resto retiré avec le secteur restaurant (refonte 2026-11).
   return NextResponse.json({ error: 'Module inconnu' }, { status: 400 })
 }

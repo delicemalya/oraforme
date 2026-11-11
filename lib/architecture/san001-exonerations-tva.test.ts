@@ -165,8 +165,9 @@ describe('Architecture — la catégorie persistée est exactement celle utilis�
 
 describe('Non-régression — RES-001/HOT-001/BOI-001/BTP-001/FAC-001 non concernés par ce fichier', () => {
   it('lib/fiscalite/sante-exonerations.ts n’est importé que par les 2 writers santé', () => {
-    // Refonte 2026-11 : routes resto/hotel/boisson/btp supprimées avec leurs secteurs.
+    // Refonte 2026-11 : routes resto/boisson/btp supprimées avec leurs secteurs.
     const consumers = [
+      'app/api/hotel/payments/route.ts',
       'app/api/factures/[id]/route.ts',
     ]
     for (const rel of consumers) {

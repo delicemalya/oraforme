@@ -113,3 +113,20 @@ export interface EcoleInsights {
   alerts: BiAlert[]
   lastUpdated: string
 }
+
+// ── Hôtel ─────────────────────────────────────────────────────────────────────
+export interface HotelKpis {
+  nbChambres: number
+  chambresOccupees: number
+  tauxOccupation: number
+  revenuAnnee: number
+  revenuMois: number
+  nbReservations: number
+  revParChambre: number
+}
+
+export interface HotelInsights {
+  kpis: HotelKpis
+  alerts: BiAlert[]
+  lastUpdated: string
+}

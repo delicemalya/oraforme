@@ -1,11 +1,16 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- Migration 188 — Refonte 2026-11 : réduction du périmètre à 6 secteurs
+-- Migration 188 — Refonte 2026-11 : réduction du périmètre
 -- ═══════════════════════════════════════════════════════════════════════════
 --
--- Secteurs conservés : entreprise, ecole, commerce, cabinet, sante, recrutement.
+-- Secteurs conservés : entreprise, ecole, commerce, cabinet, sante, hotel,
+--                      recrutement.
 -- Secteurs retirés   : restaurant, supermarche, boisson, transport,
---                      transport_public, hotel, btp, petrole, ong, banque,
+--                      transport_public, btp, petrole, ong, banque,
 --                      pharmacie, agriculture, assurance.
+--
+-- NB : appliquée en production le 2026-11-11 alors que la liste excluait
+-- encore 'hotel' ; aucun tenant n'était en secteur hôtel à ce moment, la
+-- liste ci-dessous a été corrigée ensuite pour l'inclure.
 --
 -- Aligne tenants.secteur_activite sur la fonction normalizeSecteur() de
 -- lib/erp-sectors.ts (le code normalise déjà à la lecture : cette migration
@@ -36,7 +41,7 @@ INSERT INTO public.tenants_secteur_backup_188 (tenant_id, secteur_activite, sous
 SELECT id, secteur_activite, sous_type
 FROM public.tenants
 WHERE secteur_activite IS NOT NULL
-  AND secteur_activite NOT IN ('entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'recrutement')
+  AND secteur_activite NOT IN ('entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'hotel', 'recrutement')
 ON CONFLICT (tenant_id) DO NOTHING;
 
 -- 2. Supermarché → commerce, sous-type grande distribution
@@ -54,6 +59,6 @@ WHERE secteur_activite = 'boutique';
 UPDATE public.tenants
 SET secteur_activite = 'entreprise'
 WHERE secteur_activite IS NOT NULL
-  AND secteur_activite NOT IN ('entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'recrutement');
+  AND secteur_activite NOT IN ('entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'hotel', 'recrutement');
 
 COMMIT;

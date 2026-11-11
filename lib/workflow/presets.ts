@@ -341,7 +341,82 @@ export const WORKFLOW_PRESETS: WorkflowPreset[] = [
     color: '#7C3AED',
   },
 
-  // (Modèles hôtel et restaurant retirés avec leurs secteurs — refonte 2026-11.)
+  // ── Hôtel ─────────────────────────────────────────────────────────────────
+
+  {
+    id: 'reservation-confirmation',
+    name: 'Confirmation réservation',
+    description: 'Envoie un email de confirmation immédiatement après la réservation.',
+    category: 'hotel',
+    trigger_type: 'reservation.created',
+    trigger_config: {},
+    conditions: [],
+    actions: [
+      {
+        id: 'a1',
+        type: 'email.send',
+        label: 'Email confirmation',
+        config: {
+          to: '{{client.email}}',
+          subject: 'Réservation confirmée — {{hotel.nom}}',
+          template: 'reservation_confirmation',
+        },
+      },
+      {
+        id: 'a2',
+        type: 'sms.send',
+        label: 'SMS confirmation',
+        config: {
+          to: '{{client.telephone}}',
+          message: 'Réservation confirmée au {{hotel.nom}}. Chambre : {{chambre.numero}}. Arrivée : {{reservation.checkin_date}}. Bienvenue !',
+        },
+      },
+      {
+        id: 'a3',
+        type: 'notification.create',
+        label: 'Notif réception',
+        config: {
+          title: 'Nouvelle réservation',
+          body: '{{client.nom}} — Chambre {{chambre.numero}} — du {{reservation.checkin_date}} au {{reservation.checkout_date}}',
+          type: 'info',
+        },
+      },
+    ],
+    icon: 'BedDouble',
+    color: '#0891B2',
+  },
+
+  {
+    id: 'checkin-notification',
+    name: 'Notification check-in',
+    description: 'Notifie la réception au check-in et met à jour le statut de la chambre.',
+    category: 'hotel',
+    trigger_type: 'reservation.checkin',
+    trigger_config: {},
+    conditions: [],
+    actions: [
+      {
+        id: 'a1',
+        type: 'status.update',
+        label: 'Chambre occupée',
+        config: { table: 'chambres', id: '{{chambre.id}}', field: 'statut', value: 'occupee' },
+      },
+      {
+        id: 'a2',
+        type: 'notification.create',
+        label: 'Notif check-in',
+        config: {
+          title: 'Check-in — {{client.nom}}',
+          body: 'Chambre {{chambre.numero}} maintenant occupée.',
+          type: 'success',
+        },
+      },
+    ],
+    icon: 'LogIn',
+    color: '#16A34A',
+  },
+
+  // (Modèle restaurant retiré avec son secteur — refonte 2026-11.)
 
   // ── Stock ─────────────────────────────────────────────────────────────────
 

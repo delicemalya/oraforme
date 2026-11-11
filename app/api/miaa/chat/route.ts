@@ -46,9 +46,10 @@ function selectModel(message: string): { model: string; maxTokens: number; isCom
 // Quand module === 'auto', on choisit le meilleur agent selon le contexte secteur
 // et les mots-clés du message. L'utilisateur voit toujours "MIAA+" mais le moteur
 // envoie la personnalité du bon expert.
-// Refonte 2026-11 : 6 secteurs. 'entreprise' n'a pas d'expert dédié → routage par mots-clés.
+// Refonte 2026-11 : 7 secteurs. 'entreprise' n'a pas d'expert dédié → routage par mots-clés.
 const SECTOR_TO_AGENT: Partial<Record<SectorId, string>> = {
   sante:   'sante',
+  hotel:   'hotel',
   ecole:   'ecole',
   cabinet: 'cabinet',
   commerce: 'crm',
@@ -80,6 +81,8 @@ function detectAgent(message: string, secteur?: string): string {
     return 'crm'
   if (/audit|conformit|anomali|score.*audit|contrôle.*intern|risque.*entreprise|ohada.*conform|plan.*action.*audit|non-conformit|redressement.*fiscal/.test(msg))
     return 'audit'
+  if (/hôtel|chambre|check.in|check.out|revpar|occupat|reservation|housekeeping/.test(msg))
+    return 'hotel'
   if (/patient|consul|ordonnance|médecin|soins|clinique|camu|hôpital|infirmier|médic|pharmacie/.test(msg))
     return 'sante'
   if (/élève|étudiant|scolarité|bulletin.*note|classe|enseignant|frais.*scol/.test(msg))

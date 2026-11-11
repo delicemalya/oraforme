@@ -7,7 +7,7 @@ import { logAuthClient } from '@/lib/identity/log-client'
 import { useTenantContext } from '@/lib/contexts/TenantContext'
 import {
   LayoutDashboard, FileText, Package, Users,
-  GraduationCap, Bot,
+  GraduationCap, Hotel, Bot,
   LogOut, Menu, X, Lock, Globe,
   Settings, ShieldAlert, ShieldCheck, Store,
   Wallet, BookOpen, ShoppingCart,
@@ -63,6 +63,7 @@ const ICONS: Record<string, LucideIcon> = {
   'bi-dg':           LineChart,
   'bi-rh':           Users,
   'bi-ecole':        GraduationCap,
+  'bi-hotel':        Hotel,
   direction:     BarChart2,
   finance:       TrendingUp,
   analytics:     Activity,
@@ -117,8 +118,10 @@ const ICONS: Record<string, LucideIcon> = {
   'espace-etudiant':        GraduationCap,
   'espace-parent':          HeartHandshake,
   'parametres-academiques': Settings,
+  hotel:        Hotel,
+  housekeeping: Sparkles,
   ecole:        GraduationCap,
-  sante:               Heart,
+  sante:            Heart,
   'sante-patients':    UserRound,
   'sante-rdv':         CalendarClock,
   'sante-consultations': Stethoscope,
@@ -178,6 +181,7 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'bi-dg',       label: 'Analytics & BI',         sublabel: 'Direction · RH · Secteur', href: '/dashboard/bi' },
   { id: 'bi-rh',       label: 'Analytics RH',           sublabel: '', href: '/dashboard/bi/rh' },
   { id: 'bi-ecole',    label: 'Analytics École',        sublabel: '', href: '/dashboard/bi/ecole' },
+  { id: 'bi-hotel',    label: 'Analytics Hôtel',        sublabel: '', href: '/dashboard/bi/hotel' },
   ...(CORE_ERP_MODULES as unknown as ModuleDef[]),
   ...(PLATFORM_MODULES as unknown as ModuleDef[]),
   { id: 'ecole',                 label: 'École & Université',   sublabel: '', href: '/dashboard/ecole'                      },
@@ -189,7 +193,9 @@ const MODULE_DEFS: ModuleDef[] = [
   { id: 'ecole-facultes',       label: 'Facultés',                  sublabel: '', href: '/dashboard/ecole/facultes'            },
   { id: 'ecole-departements',   label: 'Départements',              sublabel: '', href: '/dashboard/ecole/departements'        },
   { id: 'ecole-parcours',       label: 'Parcours & Programmes',     sublabel: '', href: '/dashboard/ecole/parcours'            },
-  { id: 'sante',               label: 'Clinique',             sublabel: '', href: '/dashboard/sante'                      },
+  { id: 'hotel',                 label: 'Hôtellerie',           sublabel: '', href: '/dashboard/hotel'                      },
+  { id: 'housekeeping',          label: 'Housekeeping',         sublabel: '', href: '/dashboard/hotel/housekeeping'         },
+  { id: 'sante',             label: 'Clinique',             sublabel: '', href: '/dashboard/sante'                      },
   { id: 'sante-patients',        label: 'Patients',             sublabel: '', href: '/dashboard/sante/patients'             },
   { id: 'sante-rdv',             label: 'Rendez-vous',          sublabel: '', href: '/dashboard/sante/rendez-vous'          },
   { id: 'sante-consultations',   label: 'Consultations',        sublabel: '', href: '/dashboard/sante/consultations'        },
@@ -260,6 +266,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   'bi-dg':         'nav.bi_dg',
   'bi-rh':         'nav.bi_rh',
   'bi-ecole':      'nav.bi_ecole',
+  'bi-hotel':      'nav.bi_hotel',
   direction:       'nav.direction',
   finance:         'nav.finance',
   analytics:    'nav.analytics',
@@ -284,6 +291,8 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
   profil:       'nav.profil',
   parametres:   'nav.parametres',
   ecole:        'nav.ecole',
+  hotel:        'nav.hotel',
+  housekeeping: 'nav.housekeeping',
   workflows:    'nav.workflows',
   'api-keys':   'nav.api_keys',
   sante:               'nav.sante',
@@ -327,6 +336,7 @@ const MODULE_LABEL_KEYS: Record<string, string> = {
 const SECTOR_LABEL_KEYS: Partial<Record<SectorId, string>> = {
   ecole:            'nav.ecole',
   sante:            'nav.sante',
+  hotel:            'nav.hotel',
   cabinet:          'nav.cabinet',
   recrutement:      'nav.recrutement',
 }
@@ -337,7 +347,7 @@ const PLATFORM_RESTRICTED = new Set(['roles'])
 const ADMIN_MODULE_IDS    = new Set(['workflows', 'api-keys', 'analytics', 'audit',
   'audit-comptable', 'audit-financier', 'audit-fiscal', 'audit-rh', 'audit-ci',
   'audit-risques', 'audit-ohada', 'audit-plans', 'audit-rapports'])
-const BI_MODULE_IDS       = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole'])
+const BI_MODULE_IDS       = new Set(['bi', 'bi-dg', 'bi-rh', 'bi-ecole', 'bi-hotel'])
 
 const SECTOR_BI_MAP: Record<SectorId, string[]> = {
   entreprise:       ['bi-dg', 'bi-rh'],
@@ -345,13 +355,14 @@ const SECTOR_BI_MAP: Record<SectorId, string[]> = {
   commerce:         ['bi-dg'],
   cabinet:          ['bi-dg'],
   sante:            ['bi-dg', 'bi-rh'],
+  hotel:            ['bi-dg', 'bi-hotel'],
   recrutement:      ['bi-dg', 'bi-rh'],
 }
 
 const ALL_MODULE_IDS = [
   ...CORE_ERP_MODULES.map(m => m.id),
   ...PLATFORM_MODULES.map(m => m.id),
-  'ecole',
+  'ecole', 'hotel', 'housekeeping',
   'calendrier', 'taches',
   'sante', 'sante-direction', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins',
   'sante-pharmacie', 'sante-urgences', 'sante-labo', 'sante-imagerie', 'sante-bloc',
@@ -370,7 +381,7 @@ const ALL_MODULE_IDS = [
 function getSectorIcon(secteur: string): LucideIcon {
   const M: Record<SectorId, LucideIcon> = {
     entreprise: Building2, ecole: GraduationCap, commerce: Store,
-    cabinet: Briefcase, sante: Activity, recrutement: Briefcase,
+    cabinet: Briefcase, sante: Activity, hotel: Hotel, recrutement: Briefcase,
   }
   return isSectorId(secteur) ? M[secteur] : Settings
 }
@@ -578,7 +589,7 @@ export default function Sidebar() {
       const groupLabel = labelKey ? t(labelKey) : (sectorLabel(secteur) || secteur)
       return { id: 'metier', label: groupLabel, icon: getSectorIcon(secteur), items: sectorItems }
     }
-    const EXTRA_IDS = ['ecole']
+    const EXTRA_IDS = ['ecole', 'hotel']
     const extraItems: NavItem[] = []
     for (const mid of EXTRA_IDS) {
       if (!modulesActifs.includes(mid) || permissions[mid]?.can_view === false) continue

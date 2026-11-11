@@ -58,7 +58,8 @@ const AUTHORIZED_EMITTERS = [
   'app/dashboard/facturation/page.tsx',
   'app/dashboard/erp-sync/page.tsx',
   // Modules métier via API routes
-  // (refonte 2026-11 : routes hotel, agriculture, btp, boisson, ong, resto supprimées)
+  'app/api/hotel/payments/route.ts',
+  // (refonte 2026-11 : routes agriculture, btp, boisson, ong, resto supprimées)
   // P0-03 : la route appelée par l'interface de paie émet PAI-001/002 selon
   // lib/paie/evenements-comptables.ts. POST /api/rh/paie n'émet plus rien à la
   // création : la constatation suit la validation (migration 141).

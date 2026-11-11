@@ -17,6 +17,7 @@ function detectModule(path: string): string {
   if (path.includes('/fiscalite'))             return 'fiscalite'
   if (path.includes('/audit'))                 return 'audit'
   if (path.includes('/crm'))                   return 'crm'
+  if (path.includes('/hotel'))                 return 'hotel'
   if (path.includes('/depenses'))              return 'depenses'
   if (path.includes('/cabinet'))               return 'comptabilite'
   return 'auto'

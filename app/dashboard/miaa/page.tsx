@@ -8,7 +8,7 @@ import {
   Send, FileText, Loader2, Trash2,
   ChevronDown, ChevronUp, Sparkles, Paperclip, Download, X, Brain,
   BookOpen, Calculator, Users, Shield, Scale, GraduationCap,
-  Heart, Stethoscope,
+  Building2, Heart, Stethoscope,
   Zap, PanelRightOpen, PanelRightClose,
   type LucideIcon,
 } from 'lucide-react'
@@ -36,7 +36,8 @@ const EXPERTS: ExpertPersona[] = [
   // Sector-specific (shown first when sector matches)
   { id: 'medecin',    labelKey: 'miaa.expert.medecin',    descKey: 'miaa.expert.medecinDesc',    icon: Stethoscope,    color: '#E8633A', sectors: ['sante', 'clinique', 'hopital'] },
   { id: 'gyneco',     labelKey: 'miaa.expert.gyneco',     descKey: 'miaa.expert.gynecoDesc',     icon: Heart,          color: '#EC4899', sectors: ['sante', 'clinique', 'hopital'] },
-  { id: 'pedagogue',  labelKey: 'miaa.expert.pedagogue',  descKey: 'miaa.expert.pedagogueDesc',  icon: GraduationCap,  color: '#2563EB', sectors: ['ecole', 'universite', 'academie'] },
+  { id: 'hotelier',   labelKey: 'miaa.expert.hotelier',   descKey: 'miaa.expert.hotelierDesc',   icon: Building2,      color: '#0891B2', sectors: ['hotel'] },
+  { id: 'pedagogue', labelKey: 'miaa.expert.pedagogue',  descKey: 'miaa.expert.pedagogueDesc',  icon: GraduationCap,  color: '#2563EB', sectors: ['ecole', 'universite', 'academie'] },
   // Universal (always shown)
   { id: 'comptable',  labelKey: 'miaa.expert.comptable',  descKey: 'miaa.expert.comptableDesc',  icon: BookOpen,       color: '#6366F1', sectors: null },
   { id: 'fiscaliste', labelKey: 'miaa.expert.fiscaliste', descKey: 'miaa.expert.fiscalisteDesc', icon: Calculator,     color: '#F59E0B', sectors: null },

@@ -47,8 +47,10 @@ const SECTORS_PME: SectorOption[] = [
   // Éducation
   { id: 'lycee',                 label: 'Lycée',                    secteur: 'ecole',       sousType: 'lycee'                },
   { id: 'universite',            label: 'Université',               secteur: 'ecole',       sousType: 'universite'           },
+  // Hôtellerie
+  { id: 'hotel',                 label: 'Hôtel',                    secteur: 'hotel',       sousType: null                   },
   // Commerce
-  { id: 'boutique',              label: 'Commerce / Boutique',      secteur: 'commerce',    sousType: null                   },
+  { id: 'boutique',             label: 'Commerce / Boutique',      secteur: 'commerce',    sousType: null                   },
   { id: 'grande_distrib',        label: 'Grande distribution',      secteur: 'commerce',    sousType: 'grande_distribution'  },
   // Recrutement & RH (3 familles au lieu de 8 doublons)
   { id: 'cabinet-recrutement',   label: 'Recrutement & Placement',  secteur: 'recrutement', sousType: 'cabinet_recrutement'  },
@@ -66,7 +68,8 @@ const PME_GROUPS: { label: string; icon: string; ids: string[] }[] = [
   { label: 'Éducation',            icon: '🎓', ids: ['lycee','universite'] },
   { label: 'Commerce',             icon: '🛍️', ids: ['boutique','grande_distrib'] },
   { label: 'Santé',                icon: '🏥', ids: ['clinique','hopital'] },
-  { label: 'Recrutement & RH',     icon: '👥', ids: ['cabinet-recrutement','interim','chasseur-tetes'] },
+  { label: 'Hôtellerie',           icon: '🏨', ids: ['hotel'] },
+  { label: 'Recrutement & RH',    icon: '👥', ids: ['cabinet-recrutement','interim','chasseur-tetes'] },
 ]
 
 // Icônes par secteur TPE

@@ -9,7 +9,7 @@ import {
   Clock, GraduationCap, UserX, CalendarOff, Lock,
   Wallet, CheckCircle, FileText, ArrowUpRight,
   Zap, BarChart2, Star, ChevronRight, Bot, ShoppingCart,
-  BookOpen, Calculator, HeartHandshake,
+  Hotel, BookOpen, Calculator, HeartHandshake,
   Award, Layers, Settings, RefreshCw,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -321,6 +321,13 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
     { labelKey: 'nav.achats',       href: '/dashboard/stocks/achats',icon: ShoppingCart,color: '#DC2626', descKey: 'sc.d.achats' },
     { labelKey: 'nav.rhPaie',       href: '/dashboard/rh',           icon: Users,       color: '#DC2626', descKey: 'sc.d.rh' },
     { labelKey: 'nav.comptabilite', href: '/dashboard/comptabilite', icon: Calculator,  color: '#DC2626', descKey: 'sc.d.comptabilite' },
+  ],
+  hotel: [
+    { labelKey: 'sc.reservations',  href: '/dashboard/hotel',       icon: Hotel,    color: '#DC2626', descKey: 'sc.d.reservations' },
+    { labelKey: 'nav.facturation',  href: '/dashboard/facturation', icon: FileText, color: '#DC2626', descKey: 'sc.d.facturationDevis' },
+    { labelKey: 'nav.rhPaie',       href: '/dashboard/rh',          icon: Users,    color: '#DC2626', descKey: 'sc.d.rh' },
+    { labelKey: 'nav.tresorerie',   href: '/dashboard/tresorerie',  icon: Wallet,   color: '#DC2626', descKey: 'sc.d.finances' },
+    { labelKey: 'sc.miaaPlus',      href: '/dashboard/miaa',        icon: Bot,      color: '#DC2626', descKey: 'sc.d.miaaPlus' },
   ],
   sante: [
     { labelKey: 'sc.consultations', href: '/dashboard/facturation', icon: FileText, color: '#DC2626', descKey: 'sc.d.consultations' },

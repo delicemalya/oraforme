@@ -8,7 +8,7 @@ import {
   BookMarked, BarChart2, Users, Calculator,
   GraduationCap, HeartHandshake, Bot,
   FileText, Package, Wallet,
-  ShoppingCart, Receipt, BookOpen,
+  ShoppingCart, Receipt, Hotel, BookOpen,
   Lock, ShieldAlert, Send,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -73,6 +73,7 @@ const SECTOR_MODULE_DEFS: Record<string, ModuleDef[]> = {
     { id: 'comptabilite', label: 'Comptabilité', sublabel: '',          icon: BookOpen,  color: '#7C3AED' },
     { id: 'achats',       label: 'Achats',       sublabel: '',          icon: ShoppingCart, color: '#0F172A' },
     { id: 'depenses',     label: 'Dépenses',     sublabel: '',          icon: Receipt,   color: '#7C3AED' },
+    { id: 'hotel',        label: 'Hôtel',        sublabel: '',          icon: Hotel,     color: '#0F172A' },
   ],
 }
 

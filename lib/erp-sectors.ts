@@ -7,11 +7,11 @@
  *  COUCHE 3 — Plateforme           : outils transverses toujours en bas
  */
 
-// Refonte 2026-11 — périmètre réduit à 6 secteurs (décision fondateur + partenaires).
+// Refonte 2026-11 — périmètre réduit à 7 secteurs (décision fondateur + partenaires).
 // Secteurs retirés : restaurant, supermarche, boisson, transport, transport_public,
-// hotel, btp, petrole, ong, banque, pharmacie, agriculture, assurance.
+// btp, petrole, ong, banque, pharmacie, agriculture, assurance.
 export const SECTOR_IDS = [
-  'entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'recrutement',
+  'entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'hotel', 'recrutement',
 ] as const
 
 export type SectorId = typeof SECTOR_IDS[number]
@@ -39,7 +39,6 @@ const LEGACY_SECTOR_MAP: Record<string, SectorId> = {
   boisson:          'entreprise',
   transport:        'entreprise',
   transport_public: 'entreprise',
-  hotel:            'entreprise',
   btp:              'entreprise',
   petrole:          'entreprise',
   ong:              'entreprise',
@@ -264,8 +263,16 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'sante-rh',              href: '/dashboard/sante/rh',              label: 'RH Médical',          sublabel: 'Personnel paramédical & gardes'  },
     { id: 'sante-miaa',            href: '/dashboard/miaa?context=sante',    label: 'MIAA+',               sublabel: 'IA assistant médical'            },
   ],
+  hotel: [
+    { id: 'hotel',               href: '/dashboard/hotel',               label: 'Hébergement',    sublabel: 'Tableau de bord hôtel'        },
+    { id: 'hotel-reservations',  href: '/dashboard/hotel/reservations',  label: 'Réservations',   sublabel: 'Check-in & check-out'         },
+    { id: 'hotel-chambres',      href: '/dashboard/hotel/chambres',      label: 'Chambres',       sublabel: 'Inventaire & tarification'    },
+    { id: 'housekeeping',        href: '/dashboard/hotel/housekeeping',  label: 'Housekeeping',   sublabel: 'Ménage & entretien'           },
+    { id: 'hotel-maintenance',   href: '/dashboard/hotel/maintenance',   label: 'Maintenance',    sublabel: 'Pannes & interventions'       },
+    { id: 'hotel-miaa',          href: '/dashboard/miaa?context=hotel',  label: 'MIAA+',          sublabel: 'IA assistant hôtelier'        },
+  ],
   cabinet: [
-    { id: 'cabinet',              href: '/dashboard/cabinet',              label: 'Cabinet',       sublabel: 'Tableau de bord direction'   },
+    { id: 'cabinet',              href: '/dashboard/cabinet',             label: 'Cabinet',       sublabel: 'Tableau de bord direction'   },
     { id: 'cabinet-clients',      href: '/dashboard/cabinet/clients',      label: 'Portefeuille',  sublabel: 'Clients & dossiers'          },
     // Agenda fiscal — uniquement comptable & fiscal
     { id: 'cabinet-declarations', href: '/dashboard/cabinet/declarations', label: 'Déclarations',  sublabel: 'Agenda fiscal & social',
@@ -329,6 +336,7 @@ export const SECTOR_LABELS: Record<SectorId, string> = {
   commerce:    'Commerce & Boutique',
   cabinet:     'Cabinet & Conseil',
   sante:       'Santé & Clinique',
+  hotel:       'Hôtellerie',
   recrutement: 'Recrutement & Placement RH',
 }
 

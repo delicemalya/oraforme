@@ -22,7 +22,7 @@ const BORDER = '#E5E7EB'
 
 const CATEGORY_LABELS: Record<string, string> = {
   finance: 'Finance', rh: 'RH', ecole: 'École',
-  stock: 'Stock', system: 'Système',
+  hotel: 'Hôtel', stock: 'Stock', system: 'Système',
 }
 
 

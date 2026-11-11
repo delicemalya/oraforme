@@ -117,7 +117,7 @@ const PLANS = [
     targets: [
       'PME',
       'Cabinets (compta, fiscal, audit…)',
-      'Lycées & Universités',
+      'Hôtels & Universités',
       'Cliniques & Hôpitaux',
       'Grande distribution',
       'Recrutement & Placement RH',
@@ -139,7 +139,7 @@ const PLANS = [
       'Multinationales multi-pays',
       'Réseaux de franchises',
       'Réseaux d\'écoles & Groupes scolaires',
-      'Réseaux de cliniques',
+      'Chaînes hôtelières & Réseaux de cliniques',
     ],
   },
 ]
@@ -165,6 +165,7 @@ const LANDING_SECTORS = [
   { id: 'cabinet-avocat',      label: "Cabinet d'Avocats"             },
   { id: 'clinique',            label: 'Clinique / Santé'              },
   { id: 'hopital',             label: 'Hôpital'                       },
+  { id: 'hotel',               label: 'Hôtel & Hébergement'          },
   { id: 'cabinet-recrutement', label: 'Recrutement & Placement RH'   },
   { id: 'interim',             label: 'Intérim & Staffing'            },
   { id: 'chasseur-tetes',      label: 'Executive Search'              },

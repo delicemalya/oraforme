@@ -1,9 +1,9 @@
 /**
- * Refonte 2026-11 — réduction du périmètre à 6 secteurs.
+ * Refonte 2026-11 — réduction du périmètre à 7 secteurs.
  *
  * Décision fondateur + partenaires : on garde entreprises, écoles, commerces
  * (boutique, boulangerie, grande distribution), cabinets, santé (clinique,
- * hôpital) et recrutement. Tout le reste est retiré du code.
+ * hôpital), hôtellerie et recrutement. Tout le reste est retiré du code.
  *
  * Ce test verrouille :
  *  1. la liste canonique des secteurs (lib/erp-sectors.ts, source unique) ;
@@ -26,14 +26,22 @@ const ROOT = path.resolve(__dirname, '../..')
 
 const SECTEURS_RETIRES = [
   'restaurant', 'supermarche', 'boisson', 'transport', 'transport_public',
-  'hotel', 'btp', 'petrole', 'ong', 'banque', 'pharmacie', 'agriculture', 'assurance',
+  'btp', 'petrole', 'ong', 'banque', 'pharmacie', 'agriculture', 'assurance',
 ]
 
-describe('Périmètre — 6 secteurs canoniques', () => {
-  it('SECTOR_IDS contient exactement les 6 secteurs retenus', () => {
+describe('Périmètre — 7 secteurs canoniques', () => {
+  it('SECTOR_IDS contient exactement les 7 secteurs retenus', () => {
     expect([...SECTOR_IDS].sort()).toEqual(
-      ['cabinet', 'commerce', 'ecole', 'entreprise', 'recrutement', 'sante'],
+      ['cabinet', 'commerce', 'ecole', 'entreprise', 'hotel', 'recrutement', 'sante'],
     )
+  })
+
+  it('le secteur hôtel est conservé avec ses modules et sa route de paiement', () => {
+    expect(isSectorId('hotel')).toBe(true)
+    expect(normalizeSecteur('hotel')).toBe('hotel')
+    expect(SECTOR_SPECIFIC.hotel?.map(m => m.id)).toContain('hotel-reservations')
+    expect(existsSync(path.join(ROOT, 'app/api/hotel/payments/route.ts'))).toBe(true)
+    expect(existsSync(path.join(ROOT, 'app/dashboard/hotel/page.tsx'))).toBe(true)
   })
 
   it('chaque secteur a un libellé et une config d\'onboarding', () => {
@@ -82,18 +90,19 @@ describe('normalizeSecteur — valeurs historiques de tenants.secteur_activite',
 
   it('sectorLabel accepte une valeur historique', () => {
     expect(sectorLabel('autre')).toBe('Entreprise & PME')
-    expect(sectorLabel('hotel')).toBe('Entreprise & PME')
+    expect(sectorLabel('ong')).toBe('Entreprise & PME')
+    expect(sectorLabel('hotel')).toBe('Hôtellerie')
     expect(sectorLabel(null)).toBe('')
   })
 })
 
 describe('Arborescence — les modules retirés ne reviennent pas', () => {
   const dossiers = [
-    'app/dashboard/restaurant', 'app/dashboard/pharmacie', 'app/dashboard/hotel',
+    'app/dashboard/restaurant', 'app/dashboard/pharmacie',
     'app/dashboard/transport', 'app/dashboard/btp', 'app/dashboard/banque',
     'app/dashboard/agriculture', 'app/dashboard/petrole', 'app/dashboard/ong',
     'app/dashboard/boisson', 'app/dashboard/assurance',
-    'app/api/resto', 'app/api/hotel', 'app/api/btp', 'app/api/banque',
+    'app/api/resto', 'app/api/btp', 'app/api/banque',
     'app/api/agriculture', 'app/api/petrole', 'app/api/ong', 'app/api/boisson',
     'app/api/assurance', 'app/api/agents/restaurant', 'app/resto',
   ]

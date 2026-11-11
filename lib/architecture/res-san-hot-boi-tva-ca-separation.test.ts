@@ -69,9 +69,9 @@ describe('decomposerTTCUnifie — décomposition TTC → HT/TVA/CA', () => {
   })
 })
 
-// Refonte 2026-11 (réduction des secteurs) : les secteurs restauration, hôtel
-// et boissons ont été supprimés avec leurs routes (RES-001, HOT-001, BOI-001).
-// Seuls SAN-001 (santé, conservé) et les tests de la migration 182 restent.
+// Refonte 2026-11 (réduction des secteurs) : les secteurs restauration et
+// boissons ont été supprimés avec leurs routes (RES-001, BOI-001).
+// SAN-001 (santé), HOT-001 (hôtel) et les tests de la migration 182 restent.
 
 // ── SAN-001 — 2 writers ─────────────────────────────────────────────────────
 
@@ -90,6 +90,23 @@ describe.each([
 
   it('metadata porte ca et country_code', () => {
     expect(src).toMatch(/ca,\s*country_code:\s*'CG'/)
+  })
+})
+
+// ── HOT-001 — app/api/hotel/payments/route.ts ───────────────────────────────
+
+describe('HOT-001 — app/api/hotel/payments/route.ts', () => {
+  const src = sourceSansCommentaires('app/api/hotel/payments/route.ts')
+
+  it('délègue à decomposerTTCUnifie, aucun calcul local par 1.189', () => {
+    expect(src).toContain("from '@/lib/fiscalite/engine-adapter'")
+    expect(src).toContain('decomposerTTCUnifie(')
+    expect(src).not.toMatch(/1\.189/)
+  })
+
+  it('metadata porte ca et country_code', () => {
+    expect(src).toContain('ca:             montantCA')
+    expect(src).toContain("country_code:   'CG'")
   })
 })
 

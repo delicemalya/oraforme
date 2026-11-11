@@ -63,6 +63,7 @@ export const SECTOR_EXTRA_MODULES: Partial<Record<SecteurId, string[]>> = {
   ],
   sante:       ['sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins'],
   cabinet:     ['cabinet'],
+  hotel:       ['hotel', 'housekeeping'],
   recrutement: [
     'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
     'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
@@ -141,7 +142,7 @@ export const PLAN_CONFIG: Record<TailleEntreprise, {
       'Audit & Conformité OHADA',
       'MIAA+ Premium (IA avancée)',
       'GED & Documents',
-      'Modules sectoriels (École, Commerce, Cabinet, Santé…)',
+      'Modules sectoriels (École, Hôtel, Cabinet, Santé…)',
       '25 utilisateurs inclus',
     ],
   },
@@ -179,6 +180,7 @@ export const SECTEUR_CONFIG: Record<SecteurId, {
   commerce:    { label: 'Commerce & Boutique',        emoji: '🏪', description: 'Boutique, boulangerie, grande distribution' },
   cabinet:     { label: 'Cabinet & Conseil',          emoji: '📋', description: 'Comptable, fiscal, audit, conseil, juridique' },
   sante:       { label: 'Santé & Clinique',           emoji: '🏥', description: 'Clinique, hôpital' },
+  hotel:       { label: 'Hôtel & Hébergement',        emoji: '🏨', description: 'Hôtel, auberge, résidence' },
   recrutement: { label: 'Recrutement & Placement RH', emoji: '👔', description: 'Cabinet RH, recrutement, intérim, placement' },
 }
 
