@@ -159,3 +159,14 @@ describe('Garage — secteur enregistré', () => {
     expect(SECTEUR_CONFIG.garage.label).toBeTruthy()
   })
 })
+
+describe('Garage — 189 rejouable sur une base qui a la version à 8 paramètres', () => {
+  const sql = readFileSync(path.join(__dirname, '../../supabase/migrations/189_garage.sql'), 'utf8')
+  it('supprime l\'ancienne signature avant de créer la nouvelle, COMMENT avec signature complète', () => {
+    const drop = sql.indexOf('DROP FUNCTION IF EXISTS public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT);')
+    const create = sql.indexOf('CREATE OR REPLACE FUNCTION public.fn_garage_facturer_ordre(')
+    expect(drop).toBeGreaterThan(-1)
+    expect(drop).toBeLessThan(create)
+    expect(sql).toContain('COMMENT ON FUNCTION public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT, TEXT) IS')
+  })
+})

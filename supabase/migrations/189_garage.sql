@@ -155,6 +155,13 @@ $$;
 -- ── 6. Facturation atomique d'un OR ─────────────────────────────────────────
 -- Montants HT/TVA/CA/TTC calculés côté serveur par le moteur fiscal central
 -- (lib/fiscalite/engine-adapter) et revérifiés ici contre les lignes.
+--
+-- Une première version à 8 paramètres (sans p_country_code) existe en
+-- production : la supprimer, sinon CREATE OR REPLACE crée une surcharge et
+-- tout appel/COMMENT sans signature devient ambigu (42725, constaté le
+-- 2026-11-21).
+DROP FUNCTION IF EXISTS public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT);
+
 CREATE OR REPLACE FUNCTION public.fn_garage_facturer_ordre(
   p_tenant_id   UUID,
   p_ordre_id    UUID,
@@ -312,7 +319,7 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION public.fn_garage_facturer_ordre IS
+COMMENT ON FUNCTION public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT, TEXT) IS
   'Facturation atomique d''un ordre de réparation garage : facture + lignes + sorties de stock (STK-002) + FAC-001, ou rien. Idempotente via garage_ordres.facture_id.';
 
 -- Ces fonctions reçoivent p_tenant_id en paramètre : seul le serveur
