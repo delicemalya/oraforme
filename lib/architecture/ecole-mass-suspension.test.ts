@@ -34,7 +34,7 @@ const COLONNE_INEXISTANTE: PaidLookupResult = {
 
 function setup(paid: PaidLookupResult, confirmAnswer: boolean, suspendError?: (id: string) => unknown) {
   const fetchPaid = vi.fn(async () => paid)
-  const confirm = vi.fn(() => confirmAnswer)
+  const confirm = vi.fn((_message: string) => confirmAnswer)
   const suspend = vi.fn(async (id: string) => ({ error: suspendError?.(id) ?? null }))
   const generateCode = vi.fn(() => 'NEWCOD')
   return { fetchPaid, confirm, suspend, generateCode }
