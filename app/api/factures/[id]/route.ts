@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,6 +71,7 @@ export async function PATCH(
   const fiscYear = new Date(today).getFullYear()
   const pieceNum = existing.invoice_number ?? `FAC-${id.slice(0, 8).toUpperCase()}`
   const clientNom = existing.client_nom ?? ''
+  const pays      = await getPaysTenant(ctx.tenantId)
 
   // FAC-001 — Facture envoyée : émission comptable via moteur central (migration 139)
   // Remplace le trigger trg_facture_issued supprimé dans migration 139.
@@ -91,7 +93,7 @@ export async function PATCH(
       p_libelle:       `Facture ${pieceNum} — ${clientNom}`,
       p_date_event:    today,
       p_fiscal_year:   fiscYear,
-      p_metadata:      { piece_number: pieceNum, client_name: clientNom, ca, country_code: 'CG' },
+      p_metadata:      { piece_number: pieceNum, client_name: clientNom, ca, country_code: pays },
     })
   }
 
@@ -126,7 +128,7 @@ export async function PATCH(
       p_libelle:       `Reglement facture ${pieceNum} — ${clientNom}`,
       p_date_event:    today,
       p_fiscal_year:   fiscYear,
-      p_metadata:      { piece_number: pieceNum, client_name: clientNom, mode_paiement: modePaie, country_code: 'CG' },
+      p_metadata:      { piece_number: pieceNum, client_name: clientNom, mode_paiement: modePaie, country_code: pays },
     })
   }
 

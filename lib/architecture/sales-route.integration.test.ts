@@ -25,6 +25,11 @@ vi.mock('@/lib/api/require-tenant', () => ({
   requireTenant: vi.fn(async () => ({ ok: true, tid: TID, userId: 'u1', profileId: 'p1', role: 'membre' })),
 }))
 
+// Pays du tenant (migration 190) — Congo ici, couvert à part par pays-tenant.test.ts.
+vi.mock('@/lib/api/pays-tenant', () => ({
+  getPaysTenant: vi.fn(async () => 'CG'),
+}))
+
 // ── Faux client Supabase, programmable par table ────────────────────────────
 type Resp = { data?: unknown; error?: { message: string; code?: string } | null }
 

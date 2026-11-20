@@ -163,7 +163,8 @@ CREATE OR REPLACE FUNCTION public.fn_garage_facturer_ordre(
   p_montant_ca  NUMERIC,
   p_montant_ttc NUMERIC,
   p_event_date  DATE,
-  p_fiscal_year INT
+  p_fiscal_year INT,
+  p_country_code TEXT DEFAULT 'CG'
 ) RETURNS TABLE(facture_id UUID, replay BOOLEAN) LANGUAGE plpgsql AS $$
 DECLARE
   v_ordre      public.garage_ordres%ROWTYPE;
@@ -293,7 +294,7 @@ BEGIN
       'piece_number', v_piece_num,
       'client_name',  v_vehicule.proprietaire_nom,
       'ca',           p_montant_ca,
-      'country_code', 'CG',
+      'country_code', COALESCE(NULLIF(p_country_code, ''), 'CG'),
       'ordre_id',     p_ordre_id
     )
   );
@@ -317,9 +318,9 @@ COMMENT ON FUNCTION public.fn_garage_facturer_ordre IS
 -- Ces fonctions reçoivent p_tenant_id en paramètre : seul le serveur
 -- (service_role, tenant lu depuis la session) peut les appeler.
 REVOKE ALL ON FUNCTION public.fn_garage_numero_ordre(UUID) FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT, TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.fn_garage_numero_ordre(UUID) TO service_role;
-GRANT EXECUTE ON FUNCTION public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT) TO service_role;
+GRANT EXECUTE ON FUNCTION public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT, TEXT) TO service_role;
 
 COMMIT;
 
@@ -348,7 +349,7 @@ COMMIT;
 -- Les factures déjà émises depuis un OR restent (ce sont des factures
 -- standard, comptabilisées) : seul le lien garage_ordres.facture_id disparaît.
 -- BEGIN;
--- DROP FUNCTION IF EXISTS public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT);
+-- DROP FUNCTION IF EXISTS public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT, TEXT);
 -- DROP FUNCTION IF EXISTS public.fn_garage_numero_ordre(UUID);
 -- DROP TABLE IF EXISTS public.garage_ordre_lignes;
 -- DROP TABLE IF EXISTS public.garage_ordres;

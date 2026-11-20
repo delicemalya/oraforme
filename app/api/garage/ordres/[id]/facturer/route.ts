@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { totauxOrdre } from '@/lib/garage/ordres'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -28,7 +29,8 @@ export async function POST(req: NextRequest, { params }: Params) {
     .from('garage_ordre_lignes').select('quantite, prix_unitaire').eq('ordre_id', id).eq('tenant_id', ctx.tid)
   if (!lignes?.length) return NextResponse.json({ error: 'OR sans ligne facturable' }, { status: 400 })
 
-  const { ht, tva, ca, ttc } = totauxOrdre(lignes)
+  const pays = await getPaysTenant(ctx.tid)
+  const { ht, tva, ca, ttc } = totauxOrdre(lignes, pays)
   const today = new Date().toISOString().split('T')[0]
 
   const { data: result, error } = await supabaseAdmin.rpc('fn_garage_facturer_ordre', {
@@ -40,6 +42,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     p_montant_ttc: ttc,
     p_event_date:  today,
     p_fiscal_year: new Date().getFullYear(),
+    p_country_code: pays,
   })
 
   // Stock insuffisant, OR non terminé, comptabilisation non aboutie : tout est annulé.

@@ -10,6 +10,8 @@
  */
 
 import { calculerTVASurMontantUnifie, decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
+import { PAYS_PAR_DEFAUT } from '@/lib/fiscalite/pays-tenant'
+import type { PaysFiscal } from '@/lib/fiscalite/types'
 
 export const STATUTS_ORDRE = ['ouvert', 'en_cours', 'termine', 'facture', 'livre', 'annule'] as const
 export type StatutOrdre = typeof STATUTS_ORDRE[number]
@@ -56,7 +58,7 @@ export type LigneMontant = { quantite: number; prix_unitaire: number }
 const arrondi2 = (n: number) => Math.round(n * 100) / 100
 
 /** Totaux d'un OR — HT des lignes, TVA + centime additionnel via le moteur central. */
-export function totauxOrdre(lignes: LigneMontant[], pays: 'CG' = 'CG') {
+export function totauxOrdre(lignes: LigneMontant[], pays: PaysFiscal = PAYS_PAR_DEFAUT) {
   const ht = arrondi2(lignes.reduce((s, l) => s + arrondi2(Number(l.quantite) * Number(l.prix_unitaire)), 0))
   const { tva, ca, ttc } = calculerTVASurMontantUnifie(ht, pays)
   return { ht, tva, ca, ttc }
@@ -66,7 +68,7 @@ export function totauxOrdre(lignes: LigneMontant[], pays: 'CG' = 'CG') {
  * products.prix_vente est un prix TTC (cf. /api/sales qui le décompose).
  * Une ligne d'OR est saisie en HT : on en déduit le prix unitaire HT.
  */
-export function prixUnitaireHTDepuisTTC(prixVenteTTC: number, pays: 'CG' = 'CG'): number {
+export function prixUnitaireHTDepuisTTC(prixVenteTTC: number, pays: PaysFiscal = PAYS_PAR_DEFAUT): number {
   return decomposerTTCUnifie(Number(prixVenteTTC) || 0, pays).ht
 }
 

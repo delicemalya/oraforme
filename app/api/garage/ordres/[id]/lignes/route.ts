@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { lignesModifiables, prixUnitaireHTDepuisTTC, TYPES_LIGNE, type StatutOrdre, type TypeLigne } from '@/lib/garage/ordres'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     if (!produit) return NextResponse.json({ error: 'Pièce introuvable pour ce tenant' }, { status: 403 })
     productId = produit.id
     if (!description) description = produit.nom
-    if (!Number.isFinite(prixUnitaire)) prixUnitaire = prixUnitaireHTDepuisTTC(Number(produit.prix_vente))
+    if (!Number.isFinite(prixUnitaire)) prixUnitaire = prixUnitaireHTDepuisTTC(Number(produit.prix_vente), await getPaysTenant(ctx.tid))
   }
 
   if (!description) return NextResponse.json({ error: 'Description requise' }, { status: 400 })

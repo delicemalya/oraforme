@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
 import { estCategorieSanteExonereeTVA } from '@/lib/fiscalite/sante-exonerations'
 
 export const dynamic = 'force-dynamic'
@@ -161,9 +162,10 @@ export async function POST(req: NextRequest) {
     // d'affaires ne sont PAS réduits : seule la TVA est supprimée.
     const dateF    = dateFacture
     const fiscYear = new Date(dateF).getFullYear()
+    const pays     = await getPaysTenant(ctx.tenantId)
     const { ht, tva, ca } = estCategorieSanteExonereeTVA(ligneCategorie)
       ? { ht: montant, tva: 0, ca: 0 }
-      : decomposerTTCUnifie(montant, 'CG')
+      : decomposerTTCUnifie(montant, pays)
     const pieceNum = facture.numero_facture ?? `SAN-${facture.id.slice(0, 8).toUpperCase()}`
     const patNom   = `${patient.prenom} ${patient.nom}`
 
@@ -179,7 +181,7 @@ export async function POST(req: NextRequest) {
       p_libelle:       `Consultation ${pieceNum} — ${patNom}`,
       p_date_event:    dateF,
       p_fiscal_year:   fiscYear,
-      p_metadata:      { piece_number: pieceNum, patient_nom: patNom, motif: motif.trim(), ca, country_code: 'CG' },
+      p_metadata:      { piece_number: pieceNum, patient_nom: patNom, motif: motif.trim(), ca, country_code: pays },
     })
 
     // Paiement immédiat : mise à jour du montant_paye (trg_his_facture_journal supprimé mig. 140)

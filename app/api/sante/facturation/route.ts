@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
 import { estCategorieSanteExonereeTVA } from '@/lib/fiscalite/sante-exonerations'
 
 export async function GET(req: NextRequest) {
@@ -117,13 +118,14 @@ export async function POST(req: NextRequest) {
   if (montant_total > 0) {
     const today    = new Date().toISOString().split('T')[0]
     const fiscYear = new Date(today).getFullYear()
+    const pays     = await getPaysTenant(ctx.tenantId)
 
     let ht = 0, tva = 0, ca = 0
     for (const r of rows) {
       if (estCategorieSanteExonereeTVA(r.categorie)) {
         ht += r.montant_ligne
       } else {
-        const d = decomposerTTCUnifie(r.montant_ligne, 'CG')
+        const d = decomposerTTCUnifie(r.montant_ligne, pays)
         ht += d.ht; tva += d.tva; ca += d.ca
       }
     }
@@ -142,7 +144,7 @@ export async function POST(req: NextRequest) {
       p_libelle:       `Facture médicale ${pieceNum}`,
       p_date_event:    today,
       p_fiscal_year:   fiscYear,
-      p_metadata:      { piece_number: pieceNum, ca, country_code: 'CG' },
+      p_metadata:      { piece_number: pieceNum, ca, country_code: pays },
     })
   }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
 
 /**
  * POST /api/sales — point d'entrée canonique de la vente (C6).
@@ -113,7 +114,8 @@ export async function POST(req: NextRequest) {
     const p = produitsById.get(l.produit_id)!
     return s + l.qte * Number(p.prix_vente ?? 0)
   }, 0)
-  const { ht: montantHT, tva: montantTVA, ca: montantCA } = decomposerTTCUnifie(totalTTC, 'CG')
+  const pays = await getPaysTenant(ctx.tid)
+  const { ht: montantHT, tva: montantTVA, ca: montantCA } = decomposerTTCUnifie(totalTTC, pays)
 
   const coutMarchandises = lignes.reduce((s, l) => {
     const p = produitsById.get(l.produit_id)!
@@ -152,7 +154,7 @@ export async function POST(req: NextRequest) {
       p_montant_tva:       montantTVA,
       p_montant_ca:        montantCA,
       p_cout_marchandises: coutMarchandises,
-      p_country_code:      'CG',
+      p_country_code:      pays,
       p_event_date:        new Date().toISOString().split('T')[0],
       p_fiscal_year:       new Date().getFullYear(),
     })

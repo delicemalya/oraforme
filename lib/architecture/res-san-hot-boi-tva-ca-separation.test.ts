@@ -89,7 +89,7 @@ describe.each([
   })
 
   it('metadata porte ca et country_code', () => {
-    expect(src).toMatch(/ca,\s*country_code:\s*'CG'/)
+    expect(src).toMatch(/ca,\s*country_code:\s*pays\b/)
   })
 })
 
@@ -106,7 +106,7 @@ describe('HOT-001 — app/api/hotel/payments/route.ts', () => {
 
   it('metadata porte ca et country_code', () => {
     expect(src).toContain('ca:             montantCA')
-    expect(src).toContain("country_code:   'CG'")
+    expect(src).toContain('country_code:   pays,')
   })
 })
 

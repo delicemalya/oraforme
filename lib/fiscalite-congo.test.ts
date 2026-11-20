@@ -149,7 +149,9 @@ describe('Architecture — aucun calcul TVA local dupliqué pour le chemin norma
     ]
     for (const rel of consommateurs) {
       const src = readFileSync(path.join(ROOT, rel), 'utf-8')
-      expect(src, `${rel} doit importer calculerTVACongo`).toContain('calculerTVACongo')
+      // app/api/factures/route.ts calcule désormais au pays réel du tenant
+      // (calculerTVASurMontantUnifie, migration 190) — même moteur, pas de taux local.
+      expect(src, `${rel} doit passer par le moteur fiscal central`).toMatch(/calculerTVACongo|calculerTVASurMontantUnifie/)
       expect(src, `${rel} ne doit pas recalculer 18% localement`).not.toMatch(/\*\s*0\.18\b/)
       expect(src, `${rel} ne doit pas recalculer 5% localement`).not.toMatch(/\*\s*0\.05\b/)
     }
