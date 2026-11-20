@@ -329,3 +329,11 @@ describe('Revue d\'application 2026-11-21 — isolation tenant de 186', () => {
     expect(src).toMatch(/GRANT EXECUTE ON FUNCTION fn_create_vente_atomique\([^)]*\) TO service_role/)
   })
 })
+
+describe('Revue d\'application 2026-11-21 — fn_stock_move jamais anonyme', () => {
+  it('EXECUTE retiré à PUBLIC/anon, accordé à authenticated et service_role', () => {
+    const src = read(MIGRATION_186)
+    expect(src).toMatch(/REVOKE ALL ON FUNCTION fn_stock_move\([^)]*\) FROM PUBLIC, anon;/)
+    expect(src).toMatch(/GRANT EXECUTE ON FUNCTION fn_stock_move\([^)]*\) TO authenticated, service_role;/)
+  })
+})

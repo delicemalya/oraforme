@@ -347,6 +347,11 @@ COMMENT ON FUNCTION fn_create_vente_atomique IS
 REVOKE ALL ON FUNCTION fn_create_vente_atomique(UUID, JSONB, TEXT, TEXT, TEXT, UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT, DATE, INT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION fn_create_vente_atomique(UUID, JSONB, TEXT, TEXT, TEXT, UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT, DATE, INT) TO service_role;
 
+-- fn_stock_move est appelée depuis le navigateur par des utilisateurs
+-- connectés uniquement : jamais par anon.
+REVOKE ALL ON FUNCTION fn_stock_move(UUID, UUID, TEXT, NUMERIC, UUID, NUMERIC, TEXT, TEXT, TEXT, UUID, UUID) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION fn_stock_move(UUID, UUID, TEXT, NUMERIC, UUID, NUMERIC, TEXT, TEXT, TEXT, UUID, UUID) TO authenticated, service_role;
+
 DO $$
 BEGIN
   RAISE NOTICE 'Migration 186 OK — reverse stock idempotent (reversed_movement_id) ; fn_stock_move à 11 paramètres ; fn_create_vente_atomique créée';
