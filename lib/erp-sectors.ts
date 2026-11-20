@@ -370,6 +370,21 @@ export const ECOLE_CORE_ROLE_FILTER: Record<string, string[]> = {
   depenses:      ['DIRECTION_GENERALE', 'RAF'],
 }
 
+/**
+ * Rôle école effectif — même règle que fn_get_my_ecole_role() (migration 034)
+ * et que le proxy : le propriétaire du compte est la Direction Générale.
+ * Sans cette règle, un propriétaire d'école (ecole_role_name vide, jamais
+ * renseigné à l'inscription) perdait toute la partie administration du menu
+ * (Direction, RH, Finance, Comptabilité, Trésorerie, Facturation…).
+ */
+export function roleEcoleEffectif(
+  role: string | null | undefined,
+  ecoleRoleName: string | null | undefined,
+): string | null {
+  if (role === 'owner') return 'DIRECTION_GENERALE'
+  return ecoleRoleName ?? null
+}
+
 // ── Set d'IDs core pour le check rapide ───────────────────────────────────────
 
 export const CORE_IDS = new Set(CORE_ERP_MODULES.map(m => m.id))

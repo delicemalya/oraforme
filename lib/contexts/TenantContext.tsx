@@ -28,7 +28,7 @@ import {
   type ReactNode,
 } from 'react'
 import { supabase } from '@/lib/supabase'
-import { normalizeSecteur } from '@/lib/erp-sectors'
+import { normalizeSecteur, roleEcoleEffectif } from '@/lib/erp-sectors'
 import { SUPER_ADMIN_EMAILS } from '@/lib/admin-config'
 import type { UserRole } from '@/lib/hooks/usePermissions'
 
@@ -143,7 +143,8 @@ async function fetchTenantForUser(
     pays:               t?.pays ?? null,
     langue:             t?.langue ?? null,
     role:               profile.role as UserRole,
-    ecoleRole:          (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null,
+    // Propriétaire = DIRECTION_GENERALE (même règle que fn_get_my_ecole_role, migration 034).
+    ecoleRole:          roleEcoleEffectif(profile.role as string, (profile as { ecole_role_name?: string | null }).ecole_role_name),
     isSuperAdmin:       SUPER_ADMIN_EMAILS.includes(email),
     modulesActifs,
     userId,

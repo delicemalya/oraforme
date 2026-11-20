@@ -16,6 +16,7 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { roleEcoleEffectif } from '@/lib/erp-sectors'
 
 export interface TenantContext {
   userId:    string
@@ -73,7 +74,7 @@ export async function requireTenant(requiredRole?: 'owner' | 'admin'): Promise<G
       userId:    user.id,
       tenantId:  profile.tenant_id as string,
       role,
-      ecoleRole: (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null,
+      ecoleRole: roleEcoleEffectif(role, (profile as { ecole_role_name?: string | null }).ecole_role_name),
     },
     error: null,
   }
