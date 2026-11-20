@@ -141,6 +141,18 @@ BEGIN
       USING ERRCODE = 'insufficient_privilege';
   END IF;
 
+  -- Revue d'application 2026-11-21 — le produit doit appartenir au tenant.
+  -- fn_stock_move est appelée depuis le navigateur (pages stocks) : la RLS
+  -- force tenant_id du mouvement, mais le stock disponible est calculé sur
+  -- product_id seul. Sans ce contrôle, un utilisateur connaissant l'UUID d'un
+  -- produit d'un autre tenant pourrait en fausser le stock.
+  IF NOT EXISTS (
+    SELECT 1 FROM products WHERE id = p_product_id AND tenant_id = p_tenant_id
+  ) THEN
+    RAISE EXCEPTION 'Produit % introuvable pour ce tenant', p_product_id
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+
   PERFORM pg_advisory_xact_lock(hashtext(p_product_id::TEXT));
 
   v_sign := fn_stock_sign(p_type);
@@ -326,6 +338,14 @@ $$;
 
 COMMENT ON FUNCTION fn_create_vente_atomique IS
   'Point transactionnel unique pour la création d''une vente (C6-POST-REVIEW-FIX, anomalie A1). Remplace les appels séquentiels vente/lignes/stock/comptabilité par UNE transaction Postgres réelle — toute exception interne annule la totalité.';
+
+-- Revue d'application 2026-11-21 — fn_create_vente_atomique reçoit
+-- p_tenant_id en paramètre et n'est appelée que par le serveur
+-- (app/api/sales/route.ts, supabaseAdmin) : réservée à service_role, comme
+-- fn_garage_facturer_ordre (189). Sans ce REVOKE, tout utilisateur connecté
+-- pouvait l'appeler via /rest/v1/rpc avec le tenant de son choix.
+REVOKE ALL ON FUNCTION fn_create_vente_atomique(UUID, JSONB, TEXT, TEXT, TEXT, UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT, DATE, INT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION fn_create_vente_atomique(UUID, JSONB, TEXT, TEXT, TEXT, UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT, DATE, INT) TO service_role;
 
 DO $$
 BEGIN

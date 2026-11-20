@@ -315,3 +315,17 @@ describe('C6 — paiement crédit : structure FAC-002 réutilisée, pas un nouve
     expect(src).toContain("p_source_table:  'ventes'")
   })
 })
+
+describe('Revue d\'application 2026-11-21 — isolation tenant de 186', () => {
+  const src = read(MIGRATION_186)
+
+  it('fn_stock_move refuse un produit d\'un autre tenant (appelée depuis le navigateur)', () => {
+    expect(src).toContain('SELECT 1 FROM products WHERE id = p_product_id AND tenant_id = p_tenant_id')
+    expect(src).toContain("'Produit % introuvable pour ce tenant'")
+  })
+
+  it('fn_create_vente_atomique réservée à service_role, jamais anon/authenticated', () => {
+    expect(src).toMatch(/REVOKE ALL ON FUNCTION fn_create_vente_atomique\([^)]*\) FROM PUBLIC, anon, authenticated/)
+    expect(src).toMatch(/GRANT EXECUTE ON FUNCTION fn_create_vente_atomique\([^)]*\) TO service_role/)
+  })
+})
