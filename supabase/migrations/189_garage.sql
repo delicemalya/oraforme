@@ -28,27 +28,27 @@ DECLARE
   v_manquants TEXT[] := ARRAY[]::TEXT[];
 BEGIN
   IF to_regprocedure('public.get_my_tenant_id()') IS NULL THEN
-    v_manquants := v_manquants || 'get_my_tenant_id() (118)';
+    v_manquants := array_append(v_manquants, 'get_my_tenant_id() (118)');
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
                  WHERE n.nspname = 'public' AND p.proname = 'fn_stock_move' AND p.pronargs >= 10) THEN
-    v_manquants := v_manquants || 'fn_stock_move à 10+ paramètres (184/186)';
+    v_manquants := array_append(v_manquants, 'fn_stock_move à 10+ paramètres (184/186)');
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
                  WHERE n.nspname = 'public' AND p.proname = 'emit_accounting_event') THEN
-    v_manquants := v_manquants || 'emit_accounting_event (138)';
+    v_manquants := array_append(v_manquants, 'emit_accounting_event (138)');
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.accounting_event_rules WHERE event_type = 'FAC-001' AND status = 'active') THEN
-    v_manquants := v_manquants || 'règle FAC-001 active (139)';
+    v_manquants := array_append(v_manquants, 'règle FAC-001 active (139)');
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.accounting_event_rules WHERE event_type = 'STK-002' AND status = 'active') THEN
-    v_manquants := v_manquants || 'règle STK-002 active (147)';
+    v_manquants := array_append(v_manquants, 'règle STK-002 active (147)');
   END IF;
   IF to_regclass('public.facture_lignes') IS NULL THEN
-    v_manquants := v_manquants || 'table facture_lignes (172)';
+    v_manquants := array_append(v_manquants, 'table facture_lignes (172)');
   END IF;
   IF to_regclass('public.employes') IS NULL OR to_regclass('public.clients') IS NULL THEN
-    v_manquants := v_manquants || 'tables clients / employes';
+    v_manquants := array_append(v_manquants, 'tables clients / employes');
   END IF;
 
   IF array_length(v_manquants, 1) > 0 THEN

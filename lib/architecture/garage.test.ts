@@ -141,6 +141,11 @@ describe('Garage — migration 189', () => {
     expect(sql.match(/IS DISTINCT FROM 'processed'/g)?.length).toBe(2)
   })
 
+  it('prérequis : ajout au tableau via array_append (text[] || \'littéral\' est lu comme un tableau)', () => {
+    expect(sql).not.toMatch(/v_manquants\s*\|\|\s*'/)
+    expect(sql.match(/array_append\(v_manquants, '/g)?.length).toBe(7)
+  })
+
   it('fonctions réservées au serveur (service_role), jamais anon/authenticated', () => {
     expect(sql).toMatch(/REVOKE ALL ON FUNCTION public\.fn_garage_facturer_ordre\([^)]*\) FROM PUBLIC, anon, authenticated/)
     expect(sql).toMatch(/REVOKE ALL ON FUNCTION public\.fn_garage_numero_ordre\(UUID\) FROM PUBLIC, anon, authenticated/)
