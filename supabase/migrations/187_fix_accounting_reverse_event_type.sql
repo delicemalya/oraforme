@@ -94,7 +94,7 @@ CREATE OR REPLACE FUNCTION fn_reverse_accounting_event(
   p_event_id   UUID,
   p_reason     TEXT,
   p_created_by UUID DEFAULT NULL
-) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER AS $$
+) RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   v_event       accounting_events%ROWTYPE;
   v_log         accounting_event_log%ROWTYPE;
@@ -104,6 +104,14 @@ BEGIN
   SELECT * INTO v_event FROM accounting_events WHERE id = p_event_id;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'fn_reverse_accounting_event: événement % introuvable', p_event_id;
+  END IF;
+  -- Revue d'application 2026-11-21 — SECURITY DEFINER appelée aussi depuis le
+  -- navigateur (app/dashboard/facturation) : un utilisateur connecté ne peut
+  -- extourner que les événements de son propre tenant. Les appels serveur
+  -- (service_role, auth.uid() NULL) ne sont pas concernés.
+  IF auth.uid() IS NOT NULL AND v_event.tenant_id IS DISTINCT FROM get_my_tenant_id() THEN
+    RAISE EXCEPTION 'fn_reverse_accounting_event: événement % introuvable', p_event_id
+      USING ERRCODE = 'insufficient_privilege';
   END IF;
   IF v_event.status != 'processed' THEN
     RAISE EXCEPTION 'fn_reverse_accounting_event: statut % — seul ''processed'' peut être extourné',

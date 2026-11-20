@@ -103,3 +103,15 @@ describe('ACCOUNTING-REVERSE-001-FIX — app/dashboard/facturation/page.tsx', ()
     expect(src).toMatch(/if \(!reversed\.ok\)/)
   })
 })
+
+describe('Revue d\'application 2026-11-21 — isolation tenant de fn_reverse_accounting_event', () => {
+  const src = read(MIGRATION_187)
+
+  it('un utilisateur connecté ne peut extourner que les événements de son tenant', () => {
+    expect(src).toContain('IF auth.uid() IS NOT NULL AND v_event.tenant_id IS DISTINCT FROM get_my_tenant_id() THEN')
+  })
+
+  it('SECURITY DEFINER avec search_path figé', () => {
+    expect(src).toContain('SECURITY DEFINER SET search_path = public AS $$')
+  })
+})
