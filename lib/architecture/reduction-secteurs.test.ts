@@ -96,6 +96,17 @@ describe('normalizeSecteur — valeurs historiques de tenants.secteur_activite',
   })
 })
 
+describe('Migration 188 — alignée sur le registre', () => {
+  it('chaque liste de secteurs conservés de 188 est exactement SECTOR_IDS', () => {
+    const sql = readFileSync(path.join(ROOT, 'supabase/migrations/188_reduction_secteurs.sql'), 'utf8')
+    const listes = [...sql.matchAll(/NOT IN \(([^)]*)\)/g)].map(m =>
+      m[1].split(',').map(s => s.trim().replace(/'/g, '')).sort(),
+    )
+    expect(listes.length).toBe(2)
+    for (const l of listes) expect(l).toEqual([...SECTOR_IDS].sort())
+  })
+})
+
 describe('Arborescence — les modules retirés ne reviennent pas', () => {
   const dossiers = [
     'app/dashboard/restaurant', 'app/dashboard/pharmacie',

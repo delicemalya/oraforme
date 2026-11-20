@@ -22,6 +22,40 @@
 
 BEGIN;
 
+-- ── 0. Prérequis — échoue proprement (rien n'est créé) s'il en manque un ───
+DO $$
+DECLARE
+  v_manquants TEXT[] := ARRAY[]::TEXT[];
+BEGIN
+  IF to_regprocedure('public.get_my_tenant_id()') IS NULL THEN
+    v_manquants := v_manquants || 'get_my_tenant_id() (118)';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+                 WHERE n.nspname = 'public' AND p.proname = 'fn_stock_move' AND p.pronargs >= 10) THEN
+    v_manquants := v_manquants || 'fn_stock_move à 10+ paramètres (184/186)';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+                 WHERE n.nspname = 'public' AND p.proname = 'emit_accounting_event') THEN
+    v_manquants := v_manquants || 'emit_accounting_event (138)';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.accounting_event_rules WHERE event_type = 'FAC-001' AND status = 'active') THEN
+    v_manquants := v_manquants || 'règle FAC-001 active (139)';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.accounting_event_rules WHERE event_type = 'STK-002' AND status = 'active') THEN
+    v_manquants := v_manquants || 'règle STK-002 active (147)';
+  END IF;
+  IF to_regclass('public.facture_lignes') IS NULL THEN
+    v_manquants := v_manquants || 'table facture_lignes (172)';
+  END IF;
+  IF to_regclass('public.employes') IS NULL OR to_regclass('public.clients') IS NULL THEN
+    v_manquants := v_manquants || 'tables clients / employes';
+  END IF;
+
+  IF array_length(v_manquants, 1) > 0 THEN
+    RAISE EXCEPTION 'Migration 189 annulée — prérequis manquants : %', array_to_string(v_manquants, ', ');
+  END IF;
+END $$;
+
 -- ── 1. Véhicules ────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.garage_vehicules (
   id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -288,3 +322,35 @@ GRANT EXECUTE ON FUNCTION public.fn_garage_numero_ordre(UUID) TO service_role;
 GRANT EXECUTE ON FUNCTION public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT) TO service_role;
 
 COMMIT;
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- ✅ VÉRIFICATION APRÈS APPLICATION (lecture seule)
+-- ═════════════════════════════════════════════════════════════════════════════
+-- SELECT relname, relrowsecurity FROM pg_class
+--   WHERE relname IN ('garage_vehicules','garage_ordres','garage_ordre_lignes');
+-- Attendu : 3 lignes, relrowsecurity = true.
+--
+-- SELECT tablename, policyname FROM pg_policies WHERE tablename LIKE 'garage_%';
+-- Attendu : 3 policies « … : tenant ».
+--
+-- SELECT p.proname, has_function_privilege('authenticated', p.oid, 'EXECUTE') AS auth,
+--        has_function_privilege('service_role', p.oid, 'EXECUTE') AS srv
+--   FROM pg_proc p WHERE p.proname IN ('fn_garage_numero_ordre','fn_garage_facturer_ordre');
+-- Attendu : auth = false, srv = true pour les deux.
+--
+-- -- Test fonctionnel (tenant de recette uniquement) : OR terminé avec une
+-- -- pièce dont la quantité dépasse le stock → exception, et aucune ligne
+-- -- créée dans factures / facture_lignes / stock_movements / accounting_events.
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- ⛔ RETOUR ARRIÈRE
+-- ═════════════════════════════════════════════════════════════════════════════
+-- Les factures déjà émises depuis un OR restent (ce sont des factures
+-- standard, comptabilisées) : seul le lien garage_ordres.facture_id disparaît.
+-- BEGIN;
+-- DROP FUNCTION IF EXISTS public.fn_garage_facturer_ordre(UUID, UUID, NUMERIC, NUMERIC, NUMERIC, NUMERIC, DATE, INT);
+-- DROP FUNCTION IF EXISTS public.fn_garage_numero_ordre(UUID);
+-- DROP TABLE IF EXISTS public.garage_ordre_lignes;
+-- DROP TABLE IF EXISTS public.garage_ordres;
+-- DROP TABLE IF EXISTS public.garage_vehicules;
+-- COMMIT;
