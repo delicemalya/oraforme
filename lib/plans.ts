@@ -64,6 +64,8 @@ export const SECTOR_EXTRA_MODULES: Partial<Record<SecteurId, string[]>> = {
   sante:       ['sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins'],
   cabinet:     ['cabinet'],
   hotel:       ['hotel', 'housekeeping'],
+  // Le garage s'appuie sur le stock (pièces) et la facturation, même en TPE.
+  garage:      ['garage', 'garage-vehicules', 'garage-pieces', 'garage-factures', 'stock', 'achats'],
   recrutement: [
     'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
     'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
@@ -181,6 +183,7 @@ export const SECTEUR_CONFIG: Record<SecteurId, {
   cabinet:     { label: 'Cabinet & Conseil',          emoji: '📋', description: 'Comptable, fiscal, audit, conseil, juridique' },
   sante:       { label: 'Santé & Clinique',           emoji: '🏥', description: 'Clinique, hôpital' },
   hotel:       { label: 'Hôtel & Hébergement',        emoji: '🏨', description: 'Hôtel, auberge, résidence' },
+  garage:      { label: 'Garage & Atelier auto',      emoji: '🔧', description: 'Mécanique, entretien, réparation automobile' },
   recrutement: { label: 'Recrutement & Placement RH', emoji: '👔', description: 'Cabinet RH, recrutement, intérim, placement' },
 }
 

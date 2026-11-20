@@ -19,7 +19,7 @@ import {
   Heart, Pill, Sparkles, Stethoscope, UserRound, CalendarClock,
   CreditCard, LineChart, Zap, Landmark, Briefcase, ClipboardList,
   DollarSign, FlaskConical, Shield, Siren, BedDouble,
-  Mail, Share2, Kanban, UserCog,
+  Mail, Share2, Kanban, UserCog, Wrench, Car,
 } from 'lucide-react'
 import {
   CORE_ERP_MODULES,
@@ -120,6 +120,10 @@ const ICONS: Record<string, LucideIcon> = {
   'parametres-academiques': Settings,
   hotel:        Hotel,
   housekeeping: Sparkles,
+  garage:             Wrench,
+  'garage-vehicules': Car,
+  'garage-pieces':    Package,
+  'garage-factures':  FileText,
   ecole:        GraduationCap,
   sante:            Heart,
   'sante-patients':    UserRound,
@@ -356,6 +360,7 @@ const SECTOR_BI_MAP: Record<SectorId, string[]> = {
   cabinet:          ['bi-dg'],
   sante:            ['bi-dg', 'bi-rh'],
   hotel:            ['bi-dg', 'bi-hotel'],
+  garage:           ['bi-dg', 'bi-rh'],
   recrutement:      ['bi-dg', 'bi-rh'],
 }
 
@@ -381,7 +386,7 @@ const ALL_MODULE_IDS = [
 function getSectorIcon(secteur: string): LucideIcon {
   const M: Record<SectorId, LucideIcon> = {
     entreprise: Building2, ecole: GraduationCap, commerce: Store,
-    cabinet: Briefcase, sante: Activity, hotel: Hotel, recrutement: Briefcase,
+    cabinet: Briefcase, sante: Activity, hotel: Hotel, garage: Wrench, recrutement: Briefcase,
   }
   return isSectorId(secteur) ? M[secteur] : Settings
 }

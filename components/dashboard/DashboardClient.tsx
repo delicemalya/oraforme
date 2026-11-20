@@ -329,6 +329,14 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
     { labelKey: 'nav.tresorerie',   href: '/dashboard/tresorerie',  icon: Wallet,   color: '#DC2626', descKey: 'sc.d.finances' },
     { labelKey: 'sc.miaaPlus',      href: '/dashboard/miaa',        icon: Bot,      color: '#DC2626', descKey: 'sc.d.miaaPlus' },
   ],
+  garage: [
+    { labelKey: 'Atelier',          href: '/dashboard/garage',            icon: Settings, color: '#DC2626', descKey: 'Ordres de réparation' },
+    { labelKey: 'Véhicules',        href: '/dashboard/garage/vehicules',  icon: Layers,   color: '#DC2626', descKey: 'Parc clients & historique' },
+    { labelKey: 'sc.stockShort',    href: '/dashboard/stocks/produits',   icon: Package,  color: '#DC2626', descKey: 'sc.d.stock' },
+    { labelKey: 'nav.facturation',  href: '/dashboard/facturation',       icon: FileText, color: '#DC2626', descKey: 'sc.d.facturation' },
+    { labelKey: 'nav.tresorerie',   href: '/dashboard/tresorerie',        icon: Wallet,   color: '#DC2626', descKey: 'sc.d.finances' },
+    { labelKey: 'sc.miaaPlus',      href: '/dashboard/miaa',              icon: Bot,      color: '#DC2626', descKey: 'sc.d.miaaPlus' },
+  ],
   sante: [
     { labelKey: 'sc.consultations', href: '/dashboard/facturation', icon: FileText, color: '#DC2626', descKey: 'sc.d.consultations' },
     { labelKey: 'sc.pharmacie',     href: '/dashboard/stocks',       icon: Package,  color: '#DC2626', descKey: 'sc.d.pharmacie' },

@@ -64,6 +64,7 @@ const ALWAYS_VISIBLE = new Set([
   'sante-bloc', 'sante-pharmacie', 'sante-facturation', 'sante-assurances',
   'sante-medecins', 'sante-rh', 'sante-direction', 'sante-miaa',
   'hotel', 'hotel-reservations', 'hotel-chambres', 'housekeeping', 'hotel-maintenance', 'hotel-miaa',
+  'garage', 'garage-vehicules', 'garage-pieces', 'garage-factures',
   'cabinet','cabinet-clients', 'cabinet-declarations', 'cabinet-documents',
   'cabinet-taches', 'cabinet-projets', 'cabinet-honoraires', 'cabinet-conformite',
   'cabinet-analytiques', 'cabinet-miaa', 'cabinet-affaires',

@@ -29,6 +29,7 @@ const SECTORS_TPE: SectorOption[] = [
   { id: 'creche',      label: 'Crèche',                   secteur: 'ecole',       sousType: 'creche'      },
   { id: 'primaire',    label: 'Primaire',                  secteur: 'ecole',       sousType: 'primaire'    },
   { id: 'college',     label: 'Collège',                   secteur: 'ecole',       sousType: 'college'     },
+  { id: 'garage',      label: 'Garage / Mécanique',        secteur: 'garage',      sousType: null          },
   { id: 'entreprise',  label: 'Entreprise / PME',          secteur: 'entreprise',  sousType: null          },
 ]
 
@@ -49,6 +50,8 @@ const SECTORS_PME: SectorOption[] = [
   { id: 'universite',            label: 'Université',               secteur: 'ecole',       sousType: 'universite'           },
   // Hôtellerie
   { id: 'hotel',                 label: 'Hôtel',                    secteur: 'hotel',       sousType: null                   },
+  // Automobile
+  { id: 'garage_pme',            label: 'Garage & Atelier auto',    secteur: 'garage',      sousType: null                   },
   // Commerce
   { id: 'boutique',             label: 'Commerce / Boutique',      secteur: 'commerce',    sousType: null                   },
   { id: 'grande_distrib',        label: 'Grande distribution',      secteur: 'commerce',    sousType: 'grande_distribution'  },
@@ -69,13 +72,14 @@ const PME_GROUPS: { label: string; icon: string; ids: string[] }[] = [
   { label: 'Commerce',             icon: '🛍️', ids: ['boutique','grande_distrib'] },
   { label: 'Santé',                icon: '🏥', ids: ['clinique','hopital'] },
   { label: 'Hôtellerie',           icon: '🏨', ids: ['hotel'] },
+  { label: 'Automobile',           icon: '🔧', ids: ['garage_pme'] },
   { label: 'Recrutement & RH',    icon: '👥', ids: ['cabinet-recrutement','interim','chasseur-tetes'] },
 ]
 
 // Icônes par secteur TPE
 const TPE_ICONS: Record<string, string> = {
   commerce: '🛍️', boulangerie: '🥖', creche: '👶', primaire: '✏️',
-  college: '📚', entreprise: '🏢',
+  college: '📚', garage: '🔧', entreprise: '🏢',
 }
 
 // ── Left-panel gradient by step ───────────────────────────────────────────────

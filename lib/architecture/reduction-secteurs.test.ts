@@ -29,10 +29,10 @@ const SECTEURS_RETIRES = [
   'btp', 'petrole', 'ong', 'banque', 'pharmacie', 'agriculture', 'assurance',
 ]
 
-describe('Périmètre — 7 secteurs canoniques', () => {
-  it('SECTOR_IDS contient exactement les 7 secteurs retenus', () => {
+describe('Périmètre — 8 secteurs canoniques', () => {
+  it('SECTOR_IDS contient exactement les 8 secteurs retenus', () => {
     expect([...SECTOR_IDS].sort()).toEqual(
-      ['cabinet', 'commerce', 'ecole', 'entreprise', 'hotel', 'recrutement', 'sante'],
+      ['cabinet', 'commerce', 'ecole', 'entreprise', 'garage', 'hotel', 'recrutement', 'sante'],
     )
   })
 

@@ -7,11 +7,12 @@
  *  COUCHE 3 — Plateforme           : outils transverses toujours en bas
  */
 
-// Refonte 2026-11 — périmètre réduit à 7 secteurs (décision fondateur + partenaires).
+// Refonte 2026-11 — périmètre de 8 secteurs (décision fondateur + partenaires).
 // Secteurs retirés : restaurant, supermarche, boisson, transport, transport_public,
 // btp, petrole, ong, banque, pharmacie, agriculture, assurance.
+// Secteur ajouté : garage (migration 189).
 export const SECTOR_IDS = [
-  'entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'hotel', 'recrutement',
+  'entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'hotel', 'garage', 'recrutement',
 ] as const
 
 export type SectorId = typeof SECTOR_IDS[number]
@@ -271,8 +272,14 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'hotel-maintenance',   href: '/dashboard/hotel/maintenance',   label: 'Maintenance',    sublabel: 'Pannes & interventions'       },
     { id: 'hotel-miaa',          href: '/dashboard/miaa?context=hotel',  label: 'MIAA+',          sublabel: 'IA assistant hôtelier'        },
   ],
+  garage: [
+    { id: 'garage',            href: '/dashboard/garage',           label: 'Atelier',      sublabel: 'Ordres de réparation'      },
+    { id: 'garage-vehicules',  href: '/dashboard/garage/vehicules', label: 'Véhicules',    sublabel: 'Parc clients & historique' },
+    { id: 'garage-pieces',     href: '/dashboard/stocks/produits',  label: 'Pièces',       sublabel: 'Stock de pièces détachées' },
+    { id: 'garage-factures',   href: '/dashboard/facturation',      label: 'Facturation',  sublabel: 'Factures & encaissements'  },
+  ],
   cabinet: [
-    { id: 'cabinet',              href: '/dashboard/cabinet',             label: 'Cabinet',       sublabel: 'Tableau de bord direction'   },
+    { id: 'cabinet',              href: '/dashboard/cabinet',            label: 'Cabinet',       sublabel: 'Tableau de bord direction'   },
     { id: 'cabinet-clients',      href: '/dashboard/cabinet/clients',      label: 'Portefeuille',  sublabel: 'Clients & dossiers'          },
     // Agenda fiscal — uniquement comptable & fiscal
     { id: 'cabinet-declarations', href: '/dashboard/cabinet/declarations', label: 'Déclarations',  sublabel: 'Agenda fiscal & social',
@@ -337,6 +344,7 @@ export const SECTOR_LABELS: Record<SectorId, string> = {
   cabinet:     'Cabinet & Conseil',
   sante:       'Santé & Clinique',
   hotel:       'Hôtellerie',
+  garage:      'Garage & Atelier auto',
   recrutement: 'Recrutement & Placement RH',
 }
 
