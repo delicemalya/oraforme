@@ -1,16 +1,16 @@
 import { createSupabaseServerClient } from '@/lib/supabase-client-server'
 import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/dashboard/DashboardClient'
+import { normalizeSecteur } from '@/lib/erp-sectors'
 
 // Values are i18n keys — resolved client-side in ModuleChart
 const MODULE_LABELS: Record<string, string> = {
   facturation:  'nav.facturation',  tresorerie:   'nav.tresorerie',
   comptabilite: 'nav.comptabilite', mobilemoney:  'nav.mobilemoney',
   stock:        'nav.stock',        rh:           'nav.rh',
-  ecole:        'nav.ecole',        restaurant:   'nav.restaurant',
-  achats:       'nav.achats',       depenses:     'nav.depenses',
-  rapports:     'nav.rapports',     hotel:        'nav.hotel',
-  transport:    'nav.transport',    bizbot:       'nav.bizbot',
+  ecole:        'nav.ecole',        achats:       'nav.achats',
+  depenses:     'nav.depenses',     rapports:     'nav.rapports',
+  hotel:        'nav.hotel',        bizbot:       'nav.bizbot',
 }
 
 const MODULE_COLORS = [
@@ -46,13 +46,12 @@ export default async function DashboardPage() {
   const lastName   = (profile as { nom?: string | null }).nom ?? null
   const userName   = firstName ? [firstName, lastName].filter(Boolean).join(" ") : null
   const tid        = profile.tenant_id
-  const secteur   = tenant?.secteur_activite ?? null
+  const secteur   = normalizeSecteur(tenant?.secteur_activite)
   const ecoleRole = (profile as { ecole_role_name?: string | null }).ecole_role_name ?? null
 
   // Sector-specific dashboards — redirect to dedicated experience
   if (secteur === 'ecole')     redirect('/dashboard/ecole')
   if (secteur === 'sante')     redirect('/dashboard/sante')
-  if (secteur === 'pharmacie') redirect('/dashboard/pharmacie')
 
   // ── Résoudre isFinancial depuis le rôle dynamique ─────────────────────────
   // DIRECTION_GENERALE is treated as financial — same full access as owner
@@ -162,60 +161,12 @@ export default async function DashboardPage() {
   if (!isFinancial) nbAlertes = nbStockZero > 0 ? 1 : 0
   else nbAlertes += nbStockZero > 0 ? 1 : 0
 
-  // ── KPIs école (données selon rôle) ──────────────────────────────────────
-  let ecoleKpis: { nbEtudiants: number; nbActifs: number; nbSuspendus: number; nbAbsences: number } | null = null
-  let daacKpis:  { sessionsEnCours: number; diplomesEnAttente: number; nbSoutenances: number } | null = null
-  let rhKpis:    { nbActifs: number; nbConges: number } | null = null
-  let ecoleFinancials: { revenusMois: number; nbPaiementsMois: number; nbImpayesDossiers: number; montantImpayeTotal: number } | null = null
-
-  if (secteur === 'ecole') {
-    const moisCourant = now.getMonth() + 1
-    const anneeCourante = now.getFullYear()
-
-    const [etuRes, etuActifRes, etuSusp, absRes, sesRes, dipRes, defRes, empActifRes, empCongeRes] =
-      await Promise.all([
-        supabase.from('etudiants').select('id', { count: 'exact', head: true }).eq('tenant_id', tid),
-        supabase.from('etudiants').select('id', { count: 'exact', head: true }).eq('tenant_id', tid).eq('statut', 'actif'),
-        supabase.from('etudiants').select('id', { count: 'exact', head: true }).eq('tenant_id', tid).eq('statut', 'suspendu'),
-        supabase.from('absences_ecole').select('id', { count: 'exact', head: true }).eq('tenant_id', tid),
-        supabase.from('sessions_ecole').select('id', { count: 'exact', head: true }).eq('tenant_id', tid).eq('statut', 'en_cours'),
-        supabase.from('diplomas').select('id', { count: 'exact', head: true }).eq('tenant_id', tid).eq('statut', 'en_attente'),
-        supabase.from('defenses').select('id', { count: 'exact', head: true }).eq('tenant_id', tid).eq('statut', 'planifie'),
-        supabase.from('employes').select('id', { count: 'exact', head: true }).eq('tenant_id', tid).eq('statut', 'actif'),
-        supabase.from('employes').select('id', { count: 'exact', head: true }).eq('tenant_id', tid).eq('statut', 'conge'),
-      ])
-    ecoleKpis = {
-      nbEtudiants: etuRes.count     ?? 0,
-      nbActifs:    etuActifRes.count ?? 0,
-      nbSuspendus: etuSusp.count    ?? 0,
-      nbAbsences:  absRes.count     ?? 0,
-    }
-    daacKpis = {
-      sessionsEnCours:   sesRes.count ?? 0,
-      diplomesEnAttente: dipRes.count ?? 0,
-      nbSoutenances:     defRes.count ?? 0,
-    }
-    rhKpis = {
-      nbActifs: empActifRes.count ?? 0,
-      nbConges: empCongeRes.count ?? 0,
-    }
-
-    // Données financières scolaires (uniquement pour les rôles financiers)
-    if (isFinancial) {
-      const [paieRes, impayesRes] = await Promise.all([
-        supabase.from('paiements_scolaires').select('montant')
-          .eq('tenant_id', tid).eq('mois', moisCourant).eq('annee', anneeCourante).limit(200),
-        supabase.from('paiements_scolaires').select('montant')
-          .eq('tenant_id', tid).eq('statut', 'en_attente').limit(200),
-      ])
-      ecoleFinancials = {
-        revenusMois:         paieRes.data?.reduce((s, p) => s + Number(p.montant ?? 0), 0) ?? 0,
-        nbPaiementsMois:     paieRes.data?.length ?? 0,
-        nbImpayesDossiers:   impayesRes.data?.length ?? 0,
-        montantImpayeTotal:  impayesRes.data?.reduce((s, p) => s + Number(p.montant ?? 0), 0) ?? 0,
-      }
-    }
-  }
+  // Les KPIs école ne sont jamais calculés ici : un tenant école est redirigé
+  // vers /dashboard/ecole plus haut (code mort retiré lors de la refonte 2026-11).
+  const ecoleKpis = null
+  const daacKpis = null
+  const rhKpis = null
+  const ecoleFinancials = null
 
   return (
     <DashboardClient

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/api/require-tenant'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { calculerPaie, SMIG_MENSUEL } from '@/lib/paie/calcul-paie'
+import type { SituationFamiliale } from '@/lib/fiscal/universal-tax-engine'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
   // ── 1. Données employés ──────────────────────────────────────────────────
   const { data: employes } = await supabaseAdmin
     .from('employes')
-    .select('id, nom, poste, salaire_base, contrat, statut, date_fin_contrat, date_naissance, date_embauche, solde_conges, cnss')
+    .select('id, nom, poste, salaire_base, contrat, statut, date_fin_contrat, date_naissance, date_embauche, solde_conges, cnss, situation_matrimoniale, nb_enfants')
     .eq('tenant_id', ctx.tid)
     .order('nom')
 
@@ -46,8 +47,20 @@ export async function GET(req: NextRequest) {
     .limit(20)
 
   // ── 4. Calculs masse salariale ───────────────────────────────────────────
+  // situation_matrimoniale/nb_enfants transmis tels quels au moteur central,
+  // qui dérive lui-même le nombre de parts (calcNombreParts) — aucune règle
+  // de conversion des parts n'est réécrite ici (audit consommateurs Mission
+  // P0, 2026-09-17). Auparavant, l'IA traitait systématiquement tous les
+  // salariés comme célibataires sans enfant faute de sélectionner ces colonnes.
   const masseBrute  = actifs.reduce((s, e) => s + e.salaire_base, 0)
-  const masseCalc   = actifs.map(e => ({ ...e, calc: calculerPaie({ salaire_base: e.salaire_base }) }))
+  const masseCalc   = actifs.map(e => ({
+    ...e,
+    calc: calculerPaie({
+      salaire_base:   e.salaire_base,
+      situation:      (e.situation_matrimoniale as SituationFamiliale) ?? undefined,
+      nombreEnfants:  e.nb_enfants ?? undefined,
+    }),
+  }))
   const masseNette  = masseCalc.reduce((s, e) => s + e.calc.salaire_net, 0)
   const massePatron = masseCalc.reduce((s, e) => s + e.calc.cout_total_employeur - e.salaire_base, 0)
   const coutTotal   = masseBrute + massePatron

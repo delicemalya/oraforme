@@ -47,7 +47,7 @@ export default function BiEcolePage() {
             <GraduationCap size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-[20px] font-bold text-[#0F172A] tracking-tight">École & Université</h1>
+            <h1 className="text-[20px] font-bold text-[#0F172A] tracking-tight">École &amp; Université</h1>
             <p className="text-[11px] text-[#6B7280]">Tableau de bord pédagogique — Exercice {year}</p>
           </div>
         </div>

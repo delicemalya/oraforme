@@ -9,10 +9,13 @@ import {
   Package, Plus, Search, RefreshCw, Loader2, X, CheckCircle, Edit3, AlertTriangle,
 } from 'lucide-react'
 
+// BOI-005 (docs/BOI-005-AUDIT-MODELE-PRODUIT.md) : products n'a ni
+// `description` ni `statut` (migration 050 jamais appliquée) — le statut
+// « rupture » affiché ici est calculé depuis stock_actuel/seuil_alerte, pas
+// stocké.
 interface Produit {
   id: string
   nom: string
-  description: string | null
   prix_vente: number
   prix_achat: number | null
   code_barre: string | null
@@ -20,7 +23,6 @@ interface Produit {
   stock_actuel: number
   seuil_alerte: number | null
   unite: string | null
-  statut: 'actif' | 'inactif' | 'rupture'
   created_at: string
 }
 
@@ -30,7 +32,6 @@ function ModalProduit({
   const { tenant } = useTenantContext()
   const [form, setForm] = useState({
     nom:         produit?.nom               ?? '',
-    description: produit?.description       ?? '',
     prix:        produit?.prix_vente?.toString()   ?? '',
     prix_achat:  produit?.prix_achat?.toString()   ?? '',
     code_barre:  produit?.code_barre        ?? '',
@@ -38,7 +39,6 @@ function ModalProduit({
     stock:       produit?.stock_actuel?.toString() ?? '0',
     stock_min:   produit?.seuil_alerte?.toString() ?? '',
     unite:       produit?.unite             ?? 'pcs',
-    statut:      produit?.statut            ?? 'actif' as Produit['statut'],
   })
   const [saving, setSaving] = useState(false)
 
@@ -46,11 +46,11 @@ function ModalProduit({
     if (!form.nom || !form.prix) return
     setSaving(true)
     const data = {
-      nom: form.nom, description: form.description || null,
+      nom: form.nom,
       prix_vente: parseFloat(form.prix) || 0, prix_achat: form.prix_achat ? parseFloat(form.prix_achat) : null,
       code_barre: form.code_barre || null, categorie: form.categorie || null,
       seuil_alerte: form.stock_min ? parseInt(form.stock_min) : null,
-      unite: form.unite, statut: form.statut,
+      unite: form.unite,
     }
     if (produit) {
       // Le stock ne se modifie pas depuis la fiche produit : il est la somme
@@ -97,10 +97,6 @@ function ModalProduit({
             <label className="block text-[12px] font-bold mb-1.5">Nom *</label>
             <input value={form.nom} onChange={e => setForm(f => ({ ...f, nom: e.target.value }))} className={I} placeholder="Nom du produit" />
           </div>
-          <div>
-            <label className="block text-[12px] font-bold mb-1.5">Description</label>
-            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className={`${I} resize-none`} />
-          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-[12px] font-bold mb-1.5">Prix de vente (FCFA) *</label>
@@ -142,14 +138,6 @@ function ModalProduit({
               </select>
             </div>
           </div>
-          <div>
-            <label className="block text-[12px] font-bold mb-1.5">Statut</label>
-            <select value={form.statut} onChange={e => setForm(f => ({ ...f, statut: e.target.value as Produit['statut'] }))} className={I}>
-              <option value="actif">Actif</option>
-              <option value="inactif">Inactif</option>
-              <option value="rupture">Rupture</option>
-            </select>
-          </div>
           <button onClick={handleSave} disabled={!form.nom || !form.prix || saving}
             className="w-full py-2.5 bg-red-600 text-white rounded-xl text-[13px] font-bold hover:bg-red-700 disabled:opacity-40 flex items-center justify-center gap-1.5">
             {saving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
@@ -170,7 +158,6 @@ export default function CommerceCataloguePage() {
   const [loading,    setLoading]    = useState(true)
   const [search,     setSearch]     = useState('')
   const [filterCat,  setFilterCat]  = useState('tous')
-  const [filterStat, setFilterStat] = useState('tous')
   const [modal,      setModal]      = useState(false)
   const [edit,       setEdit]       = useState<Produit | null>(null)
 
@@ -189,20 +176,15 @@ export default function CommerceCataloguePage() {
   const filtered = produits.filter(p => {
     const q = search.toLowerCase()
     const matchQ = !q || p.nom.toLowerCase().includes(q) || p.code_barre?.includes(q) || p.categorie?.toLowerCase().includes(q)
-    const matchC = filterCat  === 'tous' || p.categorie === filterCat
-    const matchS = filterStat === 'tous' || p.statut    === filterStat
-    return matchQ && matchC && matchS
+    const matchC = filterCat === 'tous' || p.categorie === filterCat
+    return matchQ && matchC
   })
 
+  // BOI-005 : products n'a pas de statut stocké (migration 050 jamais
+  // appliquée) — "rupture" est calculé depuis stock_actuel/seuil_alerte, la
+  // seule source de vérité réelle.
   const ruptures   = produits.filter(p => p.seuil_alerte != null && p.stock_actuel <= (p.seuil_alerte ?? 0))
-  const actifs     = produits.filter(p => p.statut === 'actif').length
   const valeurStock= produits.reduce((s, p) => s + p.stock_actuel * (p.prix_achat ?? p.prix_vente), 0)
-
-  const STATUT_COLORS: Record<string, { color: string; bg: string }> = {
-    actif:   { color: '#16A34A', bg: '#F0FDF4' },
-    inactif: { color: '#64748B', bg: '#F8FAFC' },
-    rupture: { color: '#DC2626', bg: '#FEF2F2' },
-  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-20">
@@ -233,7 +215,6 @@ export default function CommerceCataloguePage() {
           <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-sm">
             <p className="text-[10px] font-bold text-[#64748B] uppercase mb-1">Total produits</p>
             <p className="text-[22px] font-black text-[#0F172A]">{produits.length}</p>
-            <p className="text-[11px] text-green-600">{actifs} actifs</p>
           </div>
           <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-sm">
             <p className="text-[10px] font-bold text-[#64748B] uppercase mb-1">Catégories</p>
@@ -277,13 +258,6 @@ export default function CommerceCataloguePage() {
             <option value="tous">Toutes catégories</option>
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select value={filterStat} onChange={e => setFilterStat(e.target.value)}
-            className="px-3 py-2.5 text-[12px] border border-[#E2E8F0] rounded-xl bg-white focus:outline-none">
-            <option value="tous">Tous statuts</option>
-            <option value="actif">Actif</option>
-            <option value="inactif">Inactif</option>
-            <option value="rupture">Rupture</option>
-          </select>
         </div>
 
         {loading ? (
@@ -311,7 +285,7 @@ export default function CommerceCataloguePage() {
                       <th className="text-right px-4 py-2.5">Prix achat</th>
                       <th className="text-right px-4 py-2.5">Marge</th>
                       <th className="text-right px-4 py-2.5">Stock</th>
-                      <th className="text-left px-4 py-2.5">Statut</th>
+                      <th className="text-left px-4 py-2.5">État</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -319,7 +293,6 @@ export default function CommerceCataloguePage() {
                     {filtered.map(p => {
                       const marge = p.prix_achat ? ((p.prix_vente - p.prix_achat) / p.prix_vente * 100) : null
                       const stockAlerte = p.seuil_alerte != null && p.stock_actuel <= p.seuil_alerte
-                      const sc = STATUT_COLORS[p.statut]
                       return (
                         <tr key={p.id} className="hover:bg-[#F8FAFC] group">
                           <td className="px-4 py-3">
@@ -335,7 +308,10 @@ export default function CommerceCataloguePage() {
                             {stockAlerte && <AlertTriangle size={10} className="inline ml-1" />}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: sc.bg, color: sc.color }}>{p.statut}</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold"
+                              style={stockAlerte ? { background: '#FEF2F2', color: '#DC2626' } : { background: '#F0FDF4', color: '#16A34A' }}>
+                              {stockAlerte ? 'Stock faible' : 'En stock'}
+                            </span>
                           </td>
                           <td className="px-4 py-3">
                             <button onClick={() => { setEdit(p); setModal(true) }}
@@ -356,7 +332,6 @@ export default function CommerceCataloguePage() {
               {filtered.map(p => {
                 const marge = p.prix_achat ? ((p.prix_vente - p.prix_achat) / p.prix_vente * 100) : null
                 const stockAlerte = p.seuil_alerte != null && p.stock_actuel <= p.seuil_alerte
-                const sc = STATUT_COLORS[p.statut]
                 return (
                   <div key={p.id} className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4" onClick={() => { setEdit(p); setModal(true) }}>
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -364,7 +339,10 @@ export default function CommerceCataloguePage() {
                         <p className="font-black text-[13px] text-[#0F172A]">{p.nom}</p>
                         {p.categorie && <p className="text-[11px] text-[#94A3B8]">{p.categorie}</p>}
                       </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0" style={{ background: sc.bg, color: sc.color }}>{p.statut}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0"
+                        style={stockAlerte ? { background: '#FEF2F2', color: '#DC2626' } : { background: '#F0FDF4', color: '#16A34A' }}>
+                        {stockAlerte ? 'Stock faible' : 'En stock'}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-[12px]">
                       <div>

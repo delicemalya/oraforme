@@ -98,8 +98,9 @@ const PLANS = [
       'Auto-entrepreneurs',
       'ETS · TPE',
       'Boutiques & Commerces',
-      'Restaurants indépendants',
-      'Pharmacies indépendantes',
+      'Boulangeries',
+      'Garages & ateliers auto',
+      'Petites entreprises',
       'Écoles primaires & Collèges',
     ],
   },
@@ -119,7 +120,7 @@ const PLANS = [
       'Cabinets (compta, fiscal, audit…)',
       'Hôtels & Universités',
       'Cliniques & Hôpitaux',
-      'Assurances & Transport',
+      'Grande distribution',
       'Recrutement & Placement RH',
     ],
   },
@@ -138,43 +139,38 @@ const PLANS = [
       'Groupes internationaux & Holdings',
       'Multinationales multi-pays',
       'Réseaux de franchises',
-      'Banques régionales & Assurances int.',
+      'Réseaux d\'écoles & Groupes scolaires',
       'Chaînes hôtelières & Réseaux de cliniques',
     ],
   },
 ]
 
 // Sectors compatible with onboarding sector IDs (direct match for pre-fill)
+// Refonte 2026-11 : ids alignés sur le catalogue de app/onboarding/page.tsx.
 const LANDING_SECTORS = [
-  { id: 'restaurant',          label: 'Restaurant / Fast-food'       },
-  { id: 'commerce',            label: 'Commerce & Boutique'           },
-  { id: 'pharmacie',           label: 'Pharmacie'                     },
-  { id: 'agriculture',         label: 'Agriculture & Élevage'        },
-  { id: 'boisson',             label: 'Distribution Boissons'         },
-  { id: 'boulangerie',         label: 'Boulangerie / Pâtisserie'     },
-  { id: 'hotel',               label: 'Hôtel & Hébergement'          },
-  { id: 'clinique',            label: 'Clinique / Santé'              },
-  { id: 'hopital',             label: 'Hôpital'                       },
-  { id: 'btp',                 label: 'BTP & Construction'            },
-  { id: 'transport',           label: 'Transport & Logistique'        },
-  { id: 'logistique',          label: 'Logistique'                    },
-  { id: 'banque',              label: 'Banque & Finance'              },
-  { id: 'microfinance',        label: 'Microfinance'                  },
-  { id: 'supermarche',         label: 'Supermarché / GMS'            },
-  { id: 'ong',                 label: 'ONG & Association'             },
-  { id: 'petrole',             label: 'Pétrole & Énergie'            },
+  { id: 'entreprise_pme',      label: 'Entreprise / PME'              },
   { id: 'industrie',           label: 'Industrie'                     },
+  { id: 'commerce',            label: 'Commerce & Boutique'           },
+  { id: 'boulangerie',         label: 'Boulangerie / Pâtisserie'     },
+  { id: 'grande_distrib',      label: 'Grande distribution'           },
+  { id: 'creche',              label: 'Crèche'                        },
+  { id: 'primaire',            label: 'École primaire'                },
+  { id: 'college',             label: 'Collège'                       },
+  { id: 'lycee',               label: 'Lycée'                         },
+  { id: 'universite',          label: 'Université'                    },
   { id: 'cabinet-comptable',   label: 'Cabinet Comptable'             },
   { id: 'cabinet-fiscal',      label: 'Cabinet Fiscal'                },
   { id: 'cabinet-audit',       label: "Cabinet d'Audit"               },
   { id: 'cabinet-conseil',     label: 'Cabinet Conseil'               },
-  { id: 'universite',          label: 'Université'                    },
-  { id: 'lycee',               label: 'Lycée'                         },
-  { id: 'compagnie_assurance', label: "Compagnie d'Assurance"        },
+  { id: 'cabinet-juridique',   label: 'Cabinet Juridique'             },
+  { id: 'cabinet-avocat',      label: "Cabinet d'Avocats"             },
+  { id: 'clinique',            label: 'Clinique / Santé'              },
+  { id: 'hopital',             label: 'Hôpital'                       },
+  { id: 'hotel',               label: 'Hôtel & Hébergement'          },
+  { id: 'garage',              label: 'Garage & Mécanique auto'      },
   { id: 'cabinet-recrutement', label: 'Recrutement & Placement RH'   },
   { id: 'interim',             label: 'Intérim & Staffing'            },
   { id: 'chasseur-tetes',      label: 'Executive Search'              },
-  { id: 'autre_business',      label: 'Autre activité'                },
 ]
 
 const PLAN_PILLS = [
@@ -480,7 +476,7 @@ export default function LandingPage() {
                 <div className="border-t border-gray-100 pt-8 mb-8">
                   <div className="text-center mb-7">
                     <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-[0.18em]">CABINETS PROFESSIONNELS</span>
-                    <h3 className="text-xl font-black text-[#111827] mt-2 mb-1">Suite dédiée aux cabinets & conseils</h3>
+                    <h3 className="text-xl font-black text-[#111827] mt-2 mb-1">Suite dédiée aux cabinets &amp; conseils</h3>
                     <p className="text-[#6B7280] text-sm max-w-lg mx-auto">
                       Gestion multi-clients, honoraires, missions, Mode Expert, agenda fiscal & social,
                       conformité OHADA, dossiers judiciaires — uniquement disponible en plan Business.

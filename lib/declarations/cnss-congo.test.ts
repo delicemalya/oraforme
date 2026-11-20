@@ -39,14 +39,14 @@ describe('CNSS Congo — allocations familiales et accidents du travail ont des 
     expect(c.base_allocations_familiales).not.toBe(c.base_at_mp_pf)
   })
 
-  it('allocations familiales à 1 500 000 F de brut : 120 420 F', () => {
-    expect(emp(1_500_000).allocations_familiales).toBe(120_420)
+  it('allocations familiales (PF) à 1 500 000 F de brut : 120 360 F (10,03 %)', () => {
+    expect(emp(1_500_000).allocations_familiales).toBe(120_360)
   })
 
-  it('l’écart avec l’ancien calcul est bien de 60 240 F par salarié et par mois', () => {
+  it('l’écart de base avec l’ancien calcul (plafond AT 600 000 au lieu de 1 200 000) reste significatif', () => {
     const correct = emp(1_500_000).allocations_familiales
-    const ancien  = Math.round(600_000 * 0.1003)   // ancienne base et ancien taux
-    expect(correct - ancien).toBe(60_240)
+    const ancienneBase = Math.round(600_000 * 0.1003)   // ancienne base (plafond AT), taux PF actuel
+    expect(correct - ancienneBase).toBe(60_180)
   })
 })
 
@@ -66,9 +66,9 @@ describe('CNSS Congo — les autres branches restent au barème', () => {
     expect(emp(1_500_000).accidents_travail).toBe(13_500)
   })
 
-  it('taxe unique sur les salaires CNSS : 3 % déplafonné', () => {
-    expect(emp(900_000).cotisation_tus).toBe(27_000)
-    expect(emp(1_500_000).cotisation_tus).toBe(45_000)
+  it('taxe unique sur les salaires CNSS : 5,475 % déplafonné', () => {
+    expect(emp(900_000).cotisation_tus).toBe(49_275)
+    expect(emp(1_500_000).cotisation_tus).toBe(82_125)
   })
 })
 
@@ -99,7 +99,7 @@ describe('CNSS Congo — récapitulatif de la déclaration', () => {
     const af = recap.branches.find(b => b.code === 'AF')
     expect(af).toBeDefined()
     expect(af!.plafond_mensuel).toBe(1_200_000)
-    expect(af!.montant_patronal).toBe(90_315 + 120_420)
+    expect(af!.montant_patronal).toBe(90_270 + 120_360)
     expect(af!.base_totale).toBe(900_000 + 1_200_000)
   })
 

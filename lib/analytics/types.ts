@@ -130,19 +130,3 @@ export interface HotelInsights {
   alerts: BiAlert[]
   lastUpdated: string
 }
-
-// ── Restaurant ────────────────────────────────────────────────────────────────
-export interface RestoKpis {
-  ventesTotales: number
-  ventesMois: number
-  nbCommandes: number
-  ticketMoyen: number
-  topPlat: string
-  heureFort: string
-}
-
-export interface RestoInsights {
-  kpis: RestoKpis
-  alerts: BiAlert[]
-  lastUpdated: string
-}

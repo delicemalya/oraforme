@@ -416,31 +416,7 @@ export const WORKFLOW_PRESETS: WorkflowPreset[] = [
     color: '#16A34A',
   },
 
-  // ── Restaurant ────────────────────────────────────────────────────────────
-
-  {
-    id: 'order-kitchen-notify',
-    name: 'Notification cuisine nouvelle commande',
-    description: 'Alerte la cuisine immédiatement à chaque nouvelle commande.',
-    category: 'restaurant',
-    trigger_type: 'order.created',
-    trigger_config: {},
-    conditions: [],
-    actions: [
-      {
-        id: 'a1',
-        type: 'notification.create',
-        label: 'Notif cuisine',
-        config: {
-          title: 'Nouvelle commande #{{order.numero}}',
-          body: 'Table {{order.table}} — {{order.items_count}} article(s)',
-          type: 'info',
-        },
-      },
-    ],
-    icon: 'UtensilsCrossed',
-    color: '#EA580C',
-  },
+  // (Modèle restaurant retiré avec son secteur — refonte 2026-11.)
 
   // ── Stock ─────────────────────────────────────────────────────────────────
 

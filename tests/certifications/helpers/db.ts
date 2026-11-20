@@ -3,11 +3,54 @@
  *
  * Fournit des méthodes pour créer/supprimer des tenants de test
  * et exécuter des preuves SQL directement via l'API Supabase.
+ *
+ * GARDE-FOU PRODUCTION (ticket P0CRIT01-PLAYWRIGHT-DB-HELPER) : ce fichier créait
+ * et supprimait auparavant de vrais tenants directement en production — URL
+ * Supabase de production codée en dur, clé service_role sans aucun garde
+ * d'environnement, nettoyage silencieusement défaillant. Il réutilise désormais
+ * le même garde que scripts/lib/seed-production-guard.ts (aucun système
+ * concurrent créé) : aucune opération réseau n'a lieu tant que l'environnement
+ * n'est pas explicitement validé comme non-production.
  */
 
-const SUPABASE_URL     = 'https://mrzixapnaqsbqmagivvf.supabase.co'
+import {
+  assertSeedTargetIsNotProduction,
+  ProductionSeedGuardError,
+} from '../../../scripts/lib/seed-production-guard'
+
+const SUPABASE_URL     = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!SERVICE_ROLE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY manquant — requis pour les helpers de certification')
+
+// Le garde s'exécute au chargement du module, avant toute création de requête
+// réseau — voir scripts/seed-demo-data.ts / scripts/seed-employes-test.ts pour
+// le même motif. Aucune variable ne désactive ce contrôle ; il refuse par
+// défaut (fail-closed) si SEED_TARGET_ENV est absent ou ambigu, et refuse
+// inconditionnellement si NEXT_PUBLIC_SUPABASE_URL correspond au projet de
+// production connu, quelle que soit la déclaration d'environnement.
+try {
+  assertSeedTargetIsNotProduction({
+    SEED_TARGET_ENV: process.env.SEED_TARGET_ENV,
+    NEXT_PUBLIC_SUPABASE_URL: SUPABASE_URL,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    NODE_ENV: process.env.NODE_ENV,
+  })
+} catch (e) {
+  if (e instanceof ProductionSeedGuardError) {
+    throw new Error(
+      `GARDE-FOU PRODUCTION — tests/certifications/helpers/db.ts refuse de s'initialiser.\n` +
+      `  ${e.message}\n` +
+      `  Ces helpers créent/suppriment de vrais tenants ; ils ne doivent jamais tourner contre production.`
+    )
+  }
+  throw e
+}
+
+if (!SUPABASE_URL) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_URL manquant — requis pour les helpers de certification (environnement de recette/test)')
+}
+if (!SERVICE_ROLE_KEY) {
+  throw new Error('SUPABASE_SERVICE_ROLE_KEY manquant — requis pour les helpers de certification')
+}
 
 const HEADERS = {
   'apikey':        SERVICE_ROLE_KEY,

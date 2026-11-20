@@ -80,7 +80,7 @@ export default function OffresPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-[18px] sm:text-xl font-bold text-[#0F172A]">Offres d&apos;emploi</h1>
-          <p className="text-[11px] text-[#64748B]">Postes ouverts & diffusion</p>
+          <p className="text-[11px] text-[#64748B]">Postes ouverts &amp; diffusion</p>
         </div>
         <button
           onClick={() => router.push('/dashboard/recrutement/offres/nouvelle')}

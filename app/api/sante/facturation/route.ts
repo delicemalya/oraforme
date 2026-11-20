@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireTenant } from '@/lib/tenant-guard'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { decomposerTTCUnifie } from '@/lib/fiscalite/engine-adapter'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
+import { estCategorieSanteExonereeTVA } from '@/lib/fiscalite/sante-exonerations'
 
 export async function GET(req: NextRequest) {
   const { ctx, error } = await requireTenant()
@@ -69,26 +72,64 @@ export async function POST(req: NextRequest) {
 
   if (fErr) return NextResponse.json({ error: fErr.message }, { status: 500 })
 
-  if (lignes.length) {
-    const rows = lignes.map(l => ({
-      tenant_id:    ctx.tenantId,
-      facture_id:   facture.id,
-      description:  l.description,
-      quantite:     l.quantite,
-      prix_unitaire:l.prix_unitaire,
-      montant_ligne: l.quantite * l.prix_unitaire,
-      categorie:    l.categorie ?? 'autre',
-    }))
+  // Résolu une seule fois ici, réutilisé tel quel pour l'insertion ET pour le
+  // calcul fiscal ci-dessous — la catégorie qui atterrit dans his_lignes_facture
+  // est exactement celle qui détermine l'exonération, aucune divergence possible.
+  const rows = lignes.map(l => ({
+    tenant_id:    ctx.tenantId,
+    facture_id:   facture.id,
+    description:  l.description,
+    quantite:     l.quantite,
+    prix_unitaire:l.prix_unitaire,
+    montant_ligne: l.quantite * l.prix_unitaire,
+    categorie:    l.categorie ?? 'autre',
+  }))
+
+  if (rows.length) {
     const { error: lErr } = await supabaseAdmin.from('his_lignes_facture').insert(rows)
     if (lErr) return NextResponse.json({ error: lErr.message }, { status: 500 })
   }
 
   // SAN-001 — Facture médicale émise (moteur comptable central, migration 140)
+  //
+  // Mission P0-FISCAL-CG-2026, exonérations confirmées (2026-09-18) :
+  // une facture peut mélanger des lignes exonérées ('consultation',
+  // 'hospitalisation', 'labo' — Loi n°12-97 Art. 7 point 6°, vérifié par
+  // mission documentaire dédiée) et des lignes taxables (les autres
+  // catégories, comportement inchangé). Le calcul se fait donc PAR LIGNE,
+  // pas sur le total de la facture comme avant cette correction : une ligne
+  // exonérée n'a pas de TVA « embarquée » à décomposer (son montant est
+  // intégralement du HT, tva=ca=0) ; une ligne taxable continue d'utiliser
+  // decomposerTTCUnifie() exactement comme avant. Les totaux HT/TVA/CA de
+  // l'événement comptable sont la somme des lignes.
+  //
+  // Effet de bord assumé, pas caché : pour une facture entièrement taxable,
+  // décomposer chaque ligne séparément puis sommer peut différer de ±quelques
+  // francs par rapport à l'ancienne décomposition sur le total (arrondi par
+  // ligne au lieu d'un arrondi unique) — écart nécessaire pour permettre le
+  // mélange exonéré/taxable, pas un choix arbitraire. Sans impact aujourd'hui :
+  // aucune donnée réelle n'existe sur his_lignes_facture (NO PRODUCTION DATA).
+  //
+  // NON DÉTERMINÉ, toujours pas traité : 'pharmacie' (dépend du médicament,
+  // Art. 7-7° et non 6°), 'imagerie', 'bloc' (correspondance non confirmée
+  // nommément), 'autre' — ces 4 catégories restent taxables comme avant,
+  // par défaut de decomposerTTCUnifie(), sans qu'aucun choix fiscal n'ait été
+  // fait pour elles ici.
   if (montant_total > 0) {
     const today    = new Date().toISOString().split('T')[0]
     const fiscYear = new Date(today).getFullYear()
-    const ht       = Math.round(montant_total / 1.189)
-    const tva      = montant_total - ht
+    const pays     = await getPaysTenant(ctx.tenantId)
+
+    let ht = 0, tva = 0, ca = 0
+    for (const r of rows) {
+      if (estCategorieSanteExonereeTVA(r.categorie)) {
+        ht += r.montant_ligne
+      } else {
+        const d = decomposerTTCUnifie(r.montant_ligne, pays)
+        ht += d.ht; tva += d.tva; ca += d.ca
+      }
+    }
+
     const pieceNum = facture.numero_facture ?? `SAN-${facture.id.slice(0, 8).toUpperCase()}`
 
     await supabaseAdmin.rpc('emit_accounting_event', {
@@ -103,7 +144,7 @@ export async function POST(req: NextRequest) {
       p_libelle:       `Facture médicale ${pieceNum}`,
       p_date_event:    today,
       p_fiscal_year:   fiscYear,
-      p_metadata:      { piece_number: pieceNum },
+      p_metadata:      { piece_number: pieceNum, ca, country_code: pays },
     })
   }
 

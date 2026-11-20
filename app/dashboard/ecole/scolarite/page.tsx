@@ -320,7 +320,7 @@ function SectionInscriptions({ tenantId, etudiants, onRefresh, nomEcole: _nomEco
                   <FI label="Ann�e scolaire" value={form.annee_scolaire} onChange={v => sf('annee_scolaire', v)} placeholder="2024-2025" />
                   <FI label="Photo (URL)" value={form.photo_url} onChange={v => sf('photo_url', v)} placeholder="https://�/photo.jpg" />
 
-                  <div className="col-span-2 border-t border-[var(--border)] pt-4"><p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Parents & Tuteur</p></div>
+                  <div className="col-span-2 border-t border-[var(--border)] pt-4"><p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Parents &amp; Tuteur</p></div>
                   {([['Nom du p�re', 'nom_pere', ''], ['Nom de la m�re', 'nom_mere', ''], ['T�l�phone parent', 'tel_parent', '+242 06�'], ['Email parent', 'email_parent', ''], ['Profession', 'profession_parent', ''], ['Nom tuteur', 'nom_tuteur', ''], ['T�l tuteur', 'tel_tuteur', ''], ['Lien (ex: oncle)', 'lien_tuteur', '']] as [string,string,string][]).map(([label, key, ph]) => (
                     <FI key={key} label={label} value={(form as Record<string, string>)[key]} onChange={v => sf(key, v)} placeholder={ph} />
                   ))}

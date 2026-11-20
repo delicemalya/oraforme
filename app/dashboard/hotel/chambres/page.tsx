@@ -264,7 +264,7 @@ export default function HotelChambresPage() {
         {roomTypes.length > 0 && (
           <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-5">
             <p className="text-[13px] font-black text-[#0F172A] mb-4 flex items-center gap-2">
-              <BedDouble size={14} className="text-amber-500" /> Types de chambres & Tarifs
+              <BedDouble size={14} className="text-amber-500" /> Types de chambres &amp; Tarifs
             </p>
             <div className="overflow-x-auto">
               <table className="w-full">

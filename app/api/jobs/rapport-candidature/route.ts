@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { requireTenant } from '@/lib/api/require-tenant'
 import { calculerScore } from '@/lib/miaa-job/scoring'
 import { genererRapportIA } from '@/lib/miaa-job/rapport-ia'
 import type { OffreCriteres, CVData } from '@/lib/miaa-job/cv-analyzer'
@@ -29,6 +30,9 @@ type CandidatRow = {
 }
 
 export async function GET(req: NextRequest) {
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+
   const candidatureId = req.nextUrl.searchParams.get('candidatureId')
   if (!candidatureId) return NextResponse.json({ error: 'candidatureId requis' }, { status: 400 })
 
@@ -40,6 +44,7 @@ export async function GET(req: NextRequest) {
       offres_emploi(titre, competences_obligatoires, competences_souhaitees, langues, certifications, logiciels, experience_min, diplome_requis)
     `)
     .eq('id', candidatureId)
+    .eq('tenant_id', ctx.tid)
     .maybeSingle()
 
   if (!c) return NextResponse.json({ error: 'Candidature introuvable' }, { status: 404 })

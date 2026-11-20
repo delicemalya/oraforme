@@ -1,5 +1,21 @@
 /**
  * lib/fiscal/congo-calculs.ts
+ *
+ * ⚠️ ORPHELIN / NON CONSOMMÉ — vérifié Mission P0 paie 2026-09-17 : aucun
+ * fichier de l'application n'importe ce module (recherche exhaustive). C'est
+ * un second moteur fiscal Congo complet et indépendant, avec ses propres
+ * constantes et son propre barème IRPP — non alimenté par CountryConfig, non
+ * validé contre les documents réels de la Mission P0 paie, ET DIVERGENT du
+ * barème corrigé (voir lib/countries/CG.ts : ce fichier code une tranche 1 à
+ * 0%, celle validée par les bulletins réels commence directement à 1%). Les
+ * taux CNSS/TUS ci-dessous (10,035%, 3%) sont également obsolètes.
+ *
+ * NE PAS BRANCHER CE FICHIER. La source de vérité unique pour la paie Congo
+ * est lib/fiscal/universal-tax-engine.ts (calculerChargesSociales,
+ * calculerIRPP, genererResumeFiscalMensuel), alimentée par lib/countries/CG.ts.
+ * Conservé pour référence historique uniquement.
+ *
+ * Ancien en-tête :
  * Moteur fiscal Congo-Brazzaville — LF n°42-2025 du 31 décembre 2025
  *
  * CORRECTIONS LF 2026 :

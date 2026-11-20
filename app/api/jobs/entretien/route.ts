@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { requireTenant } from '@/lib/api/require-tenant'
 import { genererQuestionsEntretien, calculerPrediction } from '@/lib/miaa-job/entretien-generator'
 import type { CVData, OffreCriteres } from '@/lib/miaa-job/cv-analyzer'
 
 // ── GET : récupère le rapport complet d'un entretien ────────────────────────
 export async function GET(req: NextRequest) {
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+
   const entretienId = req.nextUrl.searchParams.get('entretienId')
   if (!entretienId) return NextResponse.json({ error: 'entretienId requis' }, { status: 400 })
 
@@ -21,6 +25,7 @@ export async function GET(req: NextRequest) {
       )
     `)
     .eq('id', entretienId)
+    .eq('tenant_id', ctx.tid)
     .single()
 
   if (error || !data) return NextResponse.json({ error: 'Entretien introuvable' }, { status: 404 })
@@ -29,6 +34,9 @@ export async function GET(req: NextRequest) {
 
 // ── POST : génère les questions IA pour un entretien ────────────────────────
 export async function POST(req: NextRequest) {
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+
   const body = await req.json() as { entretienId: string }
   const { entretienId } = body
   if (!entretienId) return NextResponse.json({ error: 'entretienId requis' }, { status: 400 })
@@ -44,6 +52,7 @@ export async function POST(req: NextRequest) {
       )
     `)
     .eq('id', entretienId)
+    .eq('tenant_id', ctx.tid)
     .single()
 
   if (error || !data) return NextResponse.json({ error: 'Entretien introuvable' }, { status: 404 })
@@ -104,12 +113,16 @@ export async function POST(req: NextRequest) {
     .from('entretiens')
     .update({ questions_ia: questions, statut: 'en_cours' })
     .eq('id', entretienId)
+    .eq('tenant_id', ctx.tid)
 
   return NextResponse.json({ questions })
 }
 
 // ── PUT : enregistre les notes + calcule le score final ─────────────────────
 export async function PUT(req: NextRequest) {
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+
   const body = await req.json() as {
     entretienId: string
     evaluation: { communication: number; technique: number; leadership: number; initiative: number; culture_fit: number }
@@ -128,6 +141,7 @@ export async function PUT(req: NextRequest) {
     .from('entretiens')
     .select('candidatures(candidats(score_global))')
     .eq('id', entretienId)
+    .eq('tenant_id', ctx.tid)
     .single()
 
   const scoreCv: number = (entr?.candidatures as unknown as {
@@ -147,6 +161,7 @@ export async function PUT(req: NextRequest) {
       statut: 'termine',
     })
     .eq('id', entretienId)
+    .eq('tenant_id', ctx.tid)
 
   return NextResponse.json({ prediction, scoreEntretien, scoreCv })
 }

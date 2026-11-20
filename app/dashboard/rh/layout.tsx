@@ -42,7 +42,7 @@ export default function RHLayout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-1.5 py-2 text-[11px] text-[#94A3B8]">
           <span>Dashboard</span>
           <ChevronRight size={11} />
-          <span className="font-semibold text-[#0F172A]">RH & Paie</span>
+          <span className="font-semibold text-[#0F172A]">RH &amp; Paie</span>
         </div>
 
         {/* Module tabs scroll */}

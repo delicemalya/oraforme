@@ -9,7 +9,7 @@ import {
   Warehouse, AlertTriangle, ChevronRight, ArrowLeftRight
 } from 'lucide-react'
 
-interface WH { id: string; nom: string; ville: string | null }
+interface WH { id: string; nom: string }
 interface Prod { id: string; nom: string; sku: string; unite: string; stock_actuel: number; prix_achat: number }
 interface Transfert {
   id: string; numero: string
@@ -52,8 +52,8 @@ export default function TransfertsPage() {
     try {
       const [{ data: tr }, { data: wh }, { data: pr }] = await Promise.all([
         supabase.from('stock_transferts').select('*').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(200),
-        supabase.from('warehouses').select('id,nom,ville').eq('tenant_id', tenantId).limit(200),
-        supabase.from('v_products_stock').select('id,nom,sku,unite,stock_actuel,prix_achat').eq('tenant_id', tenantId).eq('statut','actif').order('nom').limit(200),
+        supabase.from('warehouses').select('id,nom').eq('tenant_id', tenantId).limit(200),
+        supabase.from('v_products_stock').select('id,nom,sku,unite,stock_actuel,prix_achat').eq('tenant_id', tenantId).order('nom').limit(200),
       ])
       setWarehouses(wh || [])
       setProducts(pr || [])
@@ -268,7 +268,7 @@ export default function TransfertsPage() {
                   <select value={form.source_warehouse_id} onChange={e => setForm(f => ({ ...f, source_warehouse_id: e.target.value }))}
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20">
                     <option value="">Sélectionner…</option>
-                    {warehouses.map(w => <option key={w.id} value={w.id}>{w.nom}{w.ville ? ` (${w.ville})` : ''}</option>)}
+                    {warehouses.map(w => <option key={w.id} value={w.id}>{w.nom}</option>)}
                   </select>
                 </div>
                 <div>
@@ -276,7 +276,7 @@ export default function TransfertsPage() {
                   <select value={form.destination_warehouse_id} onChange={e => setForm(f => ({ ...f, destination_warehouse_id: e.target.value }))}
                     className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/20">
                     <option value="">Sélectionner…</option>
-                    {warehouses.filter(w => w.id !== form.source_warehouse_id).map(w => <option key={w.id} value={w.id}>{w.nom}{w.ville ? ` (${w.ville})` : ''}</option>)}
+                    {warehouses.filter(w => w.id !== form.source_warehouse_id).map(w => <option key={w.id} value={w.id}>{w.nom}</option>)}
                   </select>
                 </div>
               </div>

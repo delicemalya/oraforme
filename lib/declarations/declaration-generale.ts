@@ -16,9 +16,23 @@
  *
  *  - Ligne 3, TVA. Le code lisait factures.tva comme un TAUX et le multipliait
  *    par le montant hors taxe. Cette colonne porte un MONTANT depuis la
- *    migration 160, qui l'a élargie à NUMERIC(14,2) pour cette raison. La TVA
- *    collectée est donc la somme des montants, et le centime additionnel vient
- *    du moteur fiscal.
+ *    migration 160, qui l'a élargie à NUMERIC(14,2) pour cette raison — ce
+ *    premier défaut était déjà corrigé avant la mission ci-dessous.
+ *
+ * Mission P0-FISCAL-CG-2026 (2026-09-18) — Ligne 3, TVA, second défaut :
+ * la TVA collectée était reconstruite ici depuis `factures` (statut='payee',
+ * fenêtre sur created_at), une source DIFFÉRENTE de celle utilisée par
+ * app/api/fiscalite/tva/route.ts (journal_entries) — c'était l'anomalie
+ * B002/I-03 de docs/F005-FCI-FISCAL-CERTIFICATION.md, jamais corrigée avant
+ * ce jour. La Ligne 3 lit désormais lib/erp-core/compute/accounting.ts
+ * ::computeTVAFromJournal(), la même source unique que le dashboard TVA.
+ *
+ * Effet de bord assumé, pas caché : `total_principal` ne sommait avant que
+ * la TVA COLLECTÉE brute (aucune soustraction de la TVA déductible n'existait
+ * dans ce fichier). Il retient maintenant le montant réellement dû après
+ * déduction et report de crédit (mp.a_payer) — cohérent avec ce qu'une
+ * Ligne 3 de déclaration DGI doit représenter. Voir le rapport de mission,
+ * section L, pour l'écart chiffré entre les deux méthodes.
  */
 
 import {
@@ -26,6 +40,7 @@ import {
   calculerTaxesAdditionnellesSurTVA,
   type CodePays,
 } from '@/lib/fiscal/universal-tax-engine'
+import { computeTVAFromJournal, BALANCE_SELECT } from '@/lib/erp-core/compute/accounting'
 
 /** Formulaire propre à la DGI congolaise. */
 const PAYS: CodePays = 'CG'
@@ -33,9 +48,21 @@ const PAYS: CodePays = 'CG'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface PreRemplissageResult {
-  // Ligne 3 — TVA
+  // Ligne 3 — TVA (source unique : computeTVAFromJournal, voir en-tête)
   l3_tva: number
   l3_tva_centimes: number
+  l3_tva_deductible: number
+  l3_tva_nette: number
+  l3_credit_anterieur: number
+  l3_credit_nouveau: number
+  /**
+   * TOUJOURS false : la TVA déductible ne peut structurellement pas être
+   * rapprochée d'un achat réel à ce jour (achats/purchases n'ont aucun champ
+   * TVA). Voir TVADeductibleFiabilite dans accounting.ts. Ne jamais masquer
+   * ce champ dans une UI qui affiche l3_tva_deductible.
+   */
+  l3_deductible_fiable: boolean
+  l3_deductible_raison: string
   // Ligne 8 — IRPP salaires
   l8_irpp_salaires: number
   l8_nb_employes: number
@@ -63,20 +90,23 @@ export async function preRemplirDeclaration(
   supabase: any,
 ): Promise<PreRemplissageResult> {
   const debutDate = `${annee}-${String(mois).padStart(2, '0')}-01`
-  const finDate   = new Date(annee, mois, 0).toISOString().split('T')[0]
 
-  // ── Ligne 3 : TVA depuis les factures payées du mois ──────────────────────
-  // factures.tva porte un MONTANT de TVA, pas un taux (migration 160).
-  const { data: factures } = await supabase
-    .from('factures')
-    .select('montant_ht, tva')
+  // ── Ligne 3 : TVA — source unique computeTVAFromJournal (journal_entries) ─
+  // Toute l'année est chargée (pas seulement `mois`) : le report de crédit
+  // d'un mois sur l'autre a besoin des mois précédents. Pas de creditInitial
+  // fourni : aucun report inter-exercice n'est aujourd'hui tracé ailleurs
+  // dans Oraforme — documenté comme un manque réel, pas inventé (défaut 0).
+  const { data: ecrituresAnnee } = await supabase
+    .from('journal_entries')
+    .select(BALANCE_SELECT)
     .eq('tenant_id', tenantId)
-    .eq('statut', 'payee')
-    .gte('created_at', debutDate)
-    .lte('created_at', finDate + 'T23:59:59Z')
+    .eq('fiscal_year', annee)
 
-  const tvaCollectee = (factures as Array<{ montant_ht: number; tva: number }> | null)
-    ?.reduce((s, f) => s + Number(f.tva || 0), 0) ?? 0
+  const summaryTVA = computeTVAFromJournal(ecrituresAnnee ?? [], annee)
+  const mp = summaryTVA.mensuel.find(m => m.mois === mois)
+    ?? { tva_collectee: 0, tva_deductible: 0, tva_nette: 0, credit_anterieur: 0, a_payer: 0, credit_nouveau: 0 }
+
+  const tvaCollectee = mp.tva_collectee
 
   // Taxes additionnelles assises sur la TVA collectée — Centime Additionnel au
   // Congo. Taux lu dans la configuration pays, jamais réécrit ici.
@@ -103,13 +133,21 @@ export async function preRemplirDeclaration(
   const tus      = Math.round(salaireBrut * tusTaux)
 
   // ── Calcul des totaux estimés ──────────────────────────────────────────────
-  const totalPrincipal = Math.round(tvaCollectee) + irppTotal + tus
+  // total_principal utilise mp.a_payer (net de déductible ET de crédit
+  // reporté), pas la TVA collectée brute — voir en-tête du fichier.
+  const totalPrincipal = Math.round(mp.a_payer) + irppTotal + tus
   const totalCentimes  = centimesAdditionnels
   const totalGeneral   = totalPrincipal + totalCentimes
 
   return {
-    l3_tva:            Math.round(tvaCollectee),
-    l3_tva_centimes:   centimesAdditionnels,
+    l3_tva:              Math.round(tvaCollectee),
+    l3_tva_centimes:     centimesAdditionnels,
+    l3_tva_deductible:   Math.round(mp.tva_deductible),
+    l3_tva_nette:        Math.round(mp.tva_nette),
+    l3_credit_anterieur: Math.round(mp.credit_anterieur),
+    l3_credit_nouveau:   Math.round(mp.credit_nouveau),
+    l3_deductible_fiable: summaryTVA.deductible_fiabilite.fiable,
+    l3_deductible_raison: summaryTVA.deductible_fiabilite.raison,
     l8_irpp_salaires:  irppTotal,
     l8_nb_employes:    nbEmployes,
     l8_salaires_bruts: Math.round(salaireBrut),

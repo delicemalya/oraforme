@@ -238,7 +238,7 @@ export function BulletinPDF({ data }: { data: BulletinPDFData }) {
               <Text style={s.signLabel}>Professeur principal</Text>
               <View style={s.signLine} />
               <Text style={s.signName}>{data.professeur_principal}</Text>
-              <Text style={s.signTitle}>Signature & cachet</Text>
+              <Text style={s.signTitle}>Signature &amp; cachet</Text>
             </View>
           )}
           <View style={{ alignItems: 'center' }}>

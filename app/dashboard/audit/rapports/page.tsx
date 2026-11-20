@@ -50,7 +50,7 @@ export default function RapportsPage() {
   return (
     <div className="space-y-5 w-full">
       <Link href="/dashboard/audit" className="inline-flex items-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
-        <ChevronLeft size={15} /> Audit & Conformité
+        <ChevronLeft size={15} /> Audit &amp; Conformité
       </Link>
 
       <div className="flex items-start gap-4">

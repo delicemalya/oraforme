@@ -8,8 +8,8 @@ import {
   Send, FileText, Loader2, Trash2,
   ChevronDown, ChevronUp, Sparkles, Paperclip, Download, X, Brain,
   BookOpen, Calculator, Users, Shield, Scale, GraduationCap,
-  ChefHat, Building2, Heart, Stethoscope, Leaf,
-  Landmark, Zap, PanelRightOpen, PanelRightClose,
+  Building2, Heart, Stethoscope,
+  Zap, PanelRightOpen, PanelRightClose,
   type LucideIcon,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -36,15 +36,8 @@ const EXPERTS: ExpertPersona[] = [
   // Sector-specific (shown first when sector matches)
   { id: 'medecin',    labelKey: 'miaa.expert.medecin',    descKey: 'miaa.expert.medecinDesc',    icon: Stethoscope,    color: '#E8633A', sectors: ['sante', 'clinique', 'hopital'] },
   { id: 'gyneco',     labelKey: 'miaa.expert.gyneco',     descKey: 'miaa.expert.gynecoDesc',     icon: Heart,          color: '#EC4899', sectors: ['sante', 'clinique', 'hopital'] },
-  { id: 'pharmacien', labelKey: 'miaa.expert.pharmacien', descKey: 'miaa.expert.pharmacienDesc', icon: Shield,         color: '#16A34A', sectors: ['pharmacie'] },
-  { id: 'cuisinier',  labelKey: 'miaa.expert.cuisinier',  descKey: 'miaa.expert.cuisinierDesc',  icon: ChefHat,        color: '#FF6B35', sectors: ['restaurant'] },
   { id: 'hotelier',   labelKey: 'miaa.expert.hotelier',   descKey: 'miaa.expert.hotelierDesc',   icon: Building2,      color: '#0891B2', sectors: ['hotel'] },
-  { id: 'pedagogue',  labelKey: 'miaa.expert.pedagogue',  descKey: 'miaa.expert.pedagogueDesc',  icon: GraduationCap,  color: '#2563EB', sectors: ['ecole', 'universite', 'academie'] },
-  { id: 'btp',        labelKey: 'miaa.expert.btp',        descKey: 'miaa.expert.btpDesc',        icon: Building2,      color: '#78716C', sectors: ['btp'] },
-  { id: 'agronome',   labelKey: 'miaa.expert.agronome',   descKey: 'miaa.expert.agronomeDesc',   icon: Leaf,           color: '#15803D', sectors: ['agriculture'] },
-  { id: 'ong',        labelKey: 'miaa.expert.ong',        descKey: 'miaa.expert.ongDesc',        icon: Heart,          color: '#7C3AED', sectors: ['ong'] },
-  { id: 'banquier',   labelKey: 'miaa.expert.banquier',   descKey: 'miaa.expert.banquierDesc',   icon: Landmark,       color: '#2563EB', sectors: ['banque'] },
-  { id: 'assureur',   labelKey: 'miaa.expert.assureur',   descKey: 'miaa.expert.assureurDesc',   icon: Shield,         color: '#DC2626', sectors: ['assurance', 'compagnie_assurance', 'courtier_assurance', 'agent_assurance'] },
+  { id: 'pedagogue', labelKey: 'miaa.expert.pedagogue',  descKey: 'miaa.expert.pedagogueDesc',  icon: GraduationCap,  color: '#2563EB', sectors: ['ecole', 'universite', 'academie'] },
   // Universal (always shown)
   { id: 'comptable',  labelKey: 'miaa.expert.comptable',  descKey: 'miaa.expert.comptableDesc',  icon: BookOpen,       color: '#6366F1', sectors: null },
   { id: 'fiscaliste', labelKey: 'miaa.expert.fiscaliste', descKey: 'miaa.expert.fiscalisteDesc', icon: Calculator,     color: '#F59E0B', sectors: null },
@@ -707,7 +700,7 @@ export default function MIAAPage() {
         <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
           <p className="text-xs font-bold text-gray-900 mb-3 flex items-center gap-2">
             <GraduationCap size={13} style={{ color: brandColor }} />
-            Academy & Audit MIAA+
+            Academy &amp; Audit MIAA+
           </p>
           <div className="space-y-2">
             <button

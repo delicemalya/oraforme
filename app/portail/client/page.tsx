@@ -501,7 +501,7 @@ function ClientPortalContent() {
         {/* FACTURES */}
         {tab === 'factures' && (
           <div className="space-y-3">
-            <p className="text-[14px] font-bold text-[#0F172A]">Factures & Paiements</p>
+            <p className="text-[14px] font-bold text-[#0F172A]">Factures &amp; Paiements</p>
             {data.factures.length === 0
               ? <EmptyState icon={CreditCard} text="Aucune facture" />
               : data.factures.map(f => {

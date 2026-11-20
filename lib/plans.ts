@@ -7,13 +7,12 @@
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+import type { SectorId } from './erp-sectors'
+
 export type TailleEntreprise = 'tpe' | 'pme' | 'grande'
 
-export type SecteurId =
-  | 'commerce' | 'restaurant' | 'ecole' | 'sante' | 'btp'
-  | 'transport' | 'hotel' | 'agriculture' | 'pharmacie' | 'banque'
-  | 'ong' | 'cabinet' | 'boisson' | 'petrole' | 'supermarche'
-  | 'boutique' | 'assurance' | 'recrutement' | 'autre'
+/** Source unique : lib/erp-sectors.ts (refonte 2026-11). */
+export type SecteurId = SectorId
 
 // ── Modules par plan (cumulatifs vers le haut) ────────────────────────────────
 
@@ -57,41 +56,26 @@ export const PLAN_MODULES: Record<TailleEntreprise, string[]> = {
 // ── Modules spécifiques au secteur (ajoutés quel que soit le plan) ─────────────
 
 export const SECTOR_EXTRA_MODULES: Partial<Record<SecteurId, string[]>> = {
-  restaurant:  ['restaurant', 'cuisine'],
   ecole:       [
     'ecole', 'ecole-direction', 'ecole-rh', 'ecole-comptabilite',
     'scolarite', 'daac', 'espace-formateur', 'espace-etudiant',
     'espace-parent', 'parametres-academiques', 'ecole-miaa',
   ],
   sante:       ['sante', 'sante-patients', 'sante-rdv', 'sante-consultations', 'sante-medecins'],
-  hotel:       ['hotel', 'housekeeping'],
-  btp:         ['btp'],
-  transport:   ['transport'],
-  banque:      ['banque'],
-  ong:         ['ong'],
   cabinet:     ['cabinet'],
-  boisson:     ['boisson'],
-  petrole:     ['petrole'],
-  pharmacie:   ['pharmacie'],
-  agriculture: ['agriculture'],
+  hotel:       ['hotel', 'housekeeping'],
+  // Le garage s'appuie sur le stock (pièces) et la facturation, même en TPE.
+  garage:      ['garage', 'garage-vehicules', 'garage-pieces', 'garage-factures', 'stock', 'achats'],
   recrutement: [
     'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
     'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
     'recrutement-mad', 'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
     'recrutement-miaa',
   ],
-  supermarche: [
+  // Boutique, boulangerie et grande distribution (sous-types de commerce).
+  commerce: [
     'commerce', 'commerce-catalogue', 'commerce-clients', 'commerce-analytics',
     'stock', 'achats',
-  ],
-  boutique: [
-    'commerce', 'commerce-catalogue', 'commerce-clients', 'commerce-analytics',
-    'stock',
-  ],
-  assurance: [
-    'assurance-direction', 'assurance-polices', 'assurance-sinistres',
-    'assurance-clients', 'assurance-produits', 'assurance-partenaires',
-    'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
   ],
 }
 
@@ -160,7 +144,7 @@ export const PLAN_CONFIG: Record<TailleEntreprise, {
       'Audit & Conformité OHADA',
       'MIAA+ Premium (IA avancée)',
       'GED & Documents',
-      'Modules sectoriels (Restaurant, École, Santé…)',
+      'Modules sectoriels (École, Hôtel, Cabinet, Santé…)',
       '25 utilisateurs inclus',
     ],
   },
@@ -193,25 +177,14 @@ export const SECTEUR_CONFIG: Record<SecteurId, {
   emoji: string
   description: string
 }> = {
-  commerce:    { label: 'Commerce & Distribution',  emoji: '🏪', description: 'Négoce, import-export, distribution' },
-  restaurant:  { label: 'Restaurant & Hôtellerie',  emoji: '🍽️', description: 'Restauration, fast-food, traiteur' },
-  ecole:       { label: 'École & Université',        emoji: '🎓', description: 'Enseignement, formation professionnelle' },
-  sante:       { label: 'Santé & Clinique',          emoji: '🏥', description: 'Clinique, cabinet médical' },
-  btp:         { label: 'BTP & Construction',        emoji: '🏗️', description: 'Bâtiment, travaux publics' },
-  transport:   { label: 'Transport & Logistique',    emoji: '🚛', description: 'Transport routier, taxi, logistique' },
-  hotel:       { label: 'Hôtel & Tourisme',          emoji: '🏨', description: 'Hôtel, auberge, tourisme' },
-  agriculture: { label: 'Agriculture & Élevage',    emoji: '🌾', description: 'Exploitation agricole, élevage' },
-  pharmacie:   { label: 'Pharmacie',                 emoji: '💊', description: 'Pharmacie, para-pharmacie' },
-  banque:      { label: 'Banque & Finance',          emoji: '🏦', description: 'Banque, microfinance, épargne' },
-  ong:         { label: 'ONG & Associations',        emoji: '🤝', description: 'ONG, associations, fondations' },
-  cabinet:     { label: 'Cabinet Comptable',         emoji: '📋', description: 'Expertise comptable, audit' },
-  boisson:     { label: 'Boisson & Distribution',   emoji: '🍺', description: 'Production, distribution boissons' },
-  petrole:     { label: 'Pétrole & Énergie',         emoji: '⛽', description: 'Station service, énergie' },
-  supermarche: { label: 'Supermarché & GMS',         emoji: '🛒', description: 'Grande distribution' },
-  boutique:    { label: 'Boutique & Magasin',        emoji: '👗', description: 'Mode, accessoires, bijoux' },
-  assurance:   { label: 'Assurance & Réassurance',    emoji: '🛡️', description: 'Compagnie, courtier, agent assurance' },
+  entreprise:  { label: 'Entreprise & PME',           emoji: '🏢', description: 'PME, industrie, services — socle ERP complet' },
+  ecole:       { label: 'École & Université',         emoji: '🎓', description: 'Crèche, primaire, collège, lycée, université' },
+  commerce:    { label: 'Commerce & Boutique',        emoji: '🏪', description: 'Boutique, boulangerie, grande distribution' },
+  cabinet:     { label: 'Cabinet & Conseil',          emoji: '📋', description: 'Comptable, fiscal, audit, conseil, juridique' },
+  sante:       { label: 'Santé & Clinique',           emoji: '🏥', description: 'Clinique, hôpital' },
+  hotel:       { label: 'Hôtel & Hébergement',        emoji: '🏨', description: 'Hôtel, auberge, résidence' },
+  garage:      { label: 'Garage & Atelier auto',      emoji: '🔧', description: 'Mécanique, entretien, réparation automobile' },
   recrutement: { label: 'Recrutement & Placement RH', emoji: '👔', description: 'Cabinet RH, recrutement, intérim, placement' },
-  autre:       { label: 'Autre activité',              emoji: '🏢', description: "Autre type d'entreprise" },
 }
 
 // ── Pays ──────────────────────────────────────────────────────────────────────

@@ -7,11 +7,54 @@
  *  COUCHE 3 — Plateforme           : outils transverses toujours en bas
  */
 
-export type SectorId =
-  | 'ecole' | 'restaurant' | 'commerce' | 'supermarche' | 'boutique'
-  | 'boisson' | 'sante' | 'transport' | 'transport_public' | 'hotel'
-  | 'btp' | 'cabinet' | 'petrole' | 'ong' | 'banque' | 'pharmacie' | 'agriculture'
-  | 'assurance' | 'recrutement'
+// Refonte 2026-11 — périmètre de 8 secteurs (décision fondateur + partenaires).
+// Secteurs retirés : restaurant, supermarche, boisson, transport, transport_public,
+// btp, petrole, ong, banque, pharmacie, agriculture, assurance.
+// Secteur ajouté : garage (migration 189).
+export const SECTOR_IDS = [
+  'entreprise', 'ecole', 'commerce', 'cabinet', 'sante', 'hotel', 'garage', 'recrutement',
+] as const
+
+export type SectorId = typeof SECTOR_IDS[number]
+
+const SECTOR_ID_SET = new Set<string>(SECTOR_IDS)
+
+export function isSectorId(value: unknown): value is SectorId {
+  return typeof value === 'string' && SECTOR_ID_SET.has(value)
+}
+
+/**
+ * Valeurs historiques de tenants.secteur_activite → secteur actuel.
+ * - 'autre' devient 'entreprise' (renommage).
+ * - 'supermarche' / 'boutique' rejoignent 'commerce' (la grande distribution
+ *   est désormais un sous-type de commerce).
+ * - Les secteurs retirés retombent sur 'entreprise' : le tenant garde tout le
+ *   socle ERP (RH, compta, stocks, facturation…), seuls les modules métier
+ *   supprimés disparaissent. Aucune donnée n'est effacée.
+ */
+const LEGACY_SECTOR_MAP: Record<string, SectorId> = {
+  autre:            'entreprise',
+  supermarche:      'commerce',
+  boutique:         'commerce',
+  restaurant:       'entreprise',
+  boisson:          'entreprise',
+  transport:        'entreprise',
+  transport_public: 'entreprise',
+  btp:              'entreprise',
+  petrole:          'entreprise',
+  ong:              'entreprise',
+  banque:           'entreprise',
+  pharmacie:        'entreprise',
+  agriculture:      'entreprise',
+  assurance:        'entreprise',
+}
+
+/** Normalise une valeur brute de tenants.secteur_activite (null si vide). */
+export function normalizeSecteur(raw: string | null | undefined): SectorId | null {
+  if (!raw) return null
+  if (isSectorId(raw)) return raw
+  return LEGACY_SECTOR_MAP[raw] ?? 'entreprise'
+}
 
 // ── COUCHE 1 : Core ERP ───────────────────────────────────────────────────────
 // Ces 10 modules apparaissent dans TOUTES les sidebars, tous secteurs confondus.
@@ -23,7 +66,7 @@ export const CORE_ERP_MODULES = [
   { id: 'comptabilite', href: '/dashboard/comptabilite', label: 'Comptabilité',        sublabel: 'Journal OHADA'            },
   { id: 'tresorerie',   href: '/dashboard/tresorerie',   label: 'Trésorerie',          sublabel: 'Caisse, banque, wallets'  },
   { id: 'stock',        href: '/dashboard/stocks',       label: 'Stock & Inventaire',  sublabel: 'Gestion des stocks'       },
-  { id: 'achats',       href: '/dashboard/achats',       label: 'Achats',              sublabel: 'Commandes & fournisseurs' },
+  { id: 'achats',       href: '/dashboard/stocks/achats', label: 'Achats',              sublabel: 'Commandes & fournisseurs' },
   { id: 'crm',           href: '/dashboard/crm',           label: 'CRM Clients',         sublabel: 'Relations, pipeline, activités' },
   { id: 'facturation',  href: '/dashboard/facturation',  label: 'Facturation',         sublabel: 'Devis & factures'               },
   { id: 'recouvrement', href: '/dashboard/recouvrement', label: 'Recouvrement',        sublabel: 'Relances & scoring risque'      },
@@ -203,16 +246,6 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
       roleFilter:  ['DIRECTION_GENERALE', 'DAAC'],
       minSousType: 'universite' },
   ],
-  restaurant: [
-    { id: 'resto-direction',    href: '/dashboard/restaurant/direction',    label: 'Direction',       sublabel: 'KPIs & rentabilité'      },
-    { id: 'restaurant',         href: '/dashboard/restaurant',              label: 'Caisse POS',      sublabel: 'Commandes & service'     },
-    { id: 'cuisine',            href: '/dashboard/restaurant/cuisine',      label: 'Cuisine',         sublabel: 'Préparation & suivi'     },
-    { id: 'resto-reservations', href: '/dashboard/restaurant/reservations', label: 'Réservations',    sublabel: 'Tables & planning'       },
-    { id: 'resto-livraisons',   href: '/dashboard/restaurant/livraisons',   label: 'Livraisons',      sublabel: 'Suivi livraisons'        },
-    { id: 'resto-formules',     href: '/dashboard/restaurant/formules',     label: 'Formules',        sublabel: 'Menus & formules du jour' },
-    { id: 'resto-inventaire',   href: '/dashboard/restaurant/inventaire',   label: 'Inventaire',      sublabel: 'Ingrédients & stocks'    },
-    { id: 'resto-miaa',         href: '/dashboard/miaa?context=restaurant', label: 'MIAA+',            sublabel: 'IA & prévisions'        },
-  ],
   sante: [
     { id: 'sante-direction',       href: '/dashboard/sante/direction',       label: 'Direction Médicale',  sublabel: 'KPIs & tableau de bord HIS'      },
     { id: 'sante',                 href: '/dashboard/sante',                 label: 'Clinique',            sublabel: 'Tableau de bord santé'           },
@@ -231,11 +264,6 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'sante-rh',              href: '/dashboard/sante/rh',              label: 'RH Médical',          sublabel: 'Personnel paramédical & gardes'  },
     { id: 'sante-miaa',            href: '/dashboard/miaa?context=sante',    label: 'MIAA+',               sublabel: 'IA assistant médical'            },
   ],
-  pharmacie: [
-    { id: 'pharmacie',           href: '/dashboard/pharmacie',            label: 'Pharmacie',       sublabel: 'Tableau de bord'           },
-    { id: 'pharmacie-meds',     href: '/dashboard/pharmacie/medicaments',label: 'Médicaments',     sublabel: 'Stock & catalogue'         },
-    { id: 'pharmacie-ventes',   href: '/dashboard/pharmacie/ventes',     label: 'Ventes / POS',    sublabel: 'Caisse & ordonnances'      },
-  ],
   hotel: [
     { id: 'hotel',               href: '/dashboard/hotel',               label: 'Hébergement',    sublabel: 'Tableau de bord hôtel'        },
     { id: 'hotel-reservations',  href: '/dashboard/hotel/reservations',  label: 'Réservations',   sublabel: 'Check-in & check-out'         },
@@ -244,37 +272,14 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'hotel-maintenance',   href: '/dashboard/hotel/maintenance',   label: 'Maintenance',    sublabel: 'Pannes & interventions'       },
     { id: 'hotel-miaa',          href: '/dashboard/miaa?context=hotel',  label: 'MIAA+',          sublabel: 'IA assistant hôtelier'        },
   ],
-  transport: [
-    { id: 'transport',          href: '/dashboard/transport',             label: 'Courses & Flotte', sublabel: 'Véhicules & courses'    },
-    { id: 'transport-flotte',   href: '/dashboard/transport/flotte',      label: 'Flotte',           sublabel: 'Véhicules & entretien'  },
-    { id: 'transport-carburant',href: '/dashboard/transport/carburant',   label: 'Carburant',        sublabel: 'Consommation & dépenses'},
-    { id: 'transport-analytique',href: '/dashboard/transport/analytiques',label: 'Analytiques',      sublabel: 'KPIs & rentabilité'     },
-  ],
-  transport_public: [
-    { id: 'transport_public', href: '/dashboard/transport', label: 'Transport public', sublabel: 'Lignes & voyageurs' },
-  ],
-  btp: [
-    { id: 'btp',             href: '/dashboard/btp',               label: 'Tableau de bord', sublabel: 'KPIs & chantiers BTP'     },
-    { id: 'btp-devis',       href: '/dashboard/btp/devis',         label: 'Devis & AO',      sublabel: 'Devis & appels d\'offres' },
-    { id: 'btp-chantiers',   href: '/dashboard/btp/chantiers',     label: 'Chantiers',       sublabel: 'Projets & budgets'        },
-    { id: 'btp-avancement',  href: '/dashboard/btp/avancement',    label: 'Avancement',      sublabel: 'Phases & progression'     },
-    { id: 'btp-materiaux',   href: '/dashboard/btp/materiaux',     label: 'Matériaux',       sublabel: 'Stock & équipements'      },
-  ],
-  banque: [
-    { id: 'banque',            href: '/dashboard/banque',                label: 'Microfinance', sublabel: 'Tableau de bord'           },
-    { id: 'banque-clients',    href: '/dashboard/banque/clients',        label: 'Membres',      sublabel: 'Comptes & membres'         },
-    { id: 'banque-credits',    href: '/dashboard/banque/credits',        label: 'Crédits',      sublabel: 'Prêts & remboursements'    },
-    { id: 'banque-epargne',    href: '/dashboard/banque/epargne',        label: 'Épargne',      sublabel: 'Dépôts & retraits'         },
-    { id: 'banque-operations', href: '/dashboard/banque/operations',     label: 'Opérations',   sublabel: 'Transactions & virements'  },
-  ],
-  agriculture: [
-    { id: 'agriculture',           href: '/dashboard/agriculture',           label: 'Exploitation', sublabel: 'Tableau de bord agricole'  },
-    { id: 'agriculture-parcelles', href: '/dashboard/agriculture/parcelles', label: 'Parcelles',    sublabel: 'Cultures & superficies'    },
-    { id: 'agriculture-recoltes',  href: '/dashboard/agriculture/recoltes',  label: 'Récoltes',     sublabel: 'Production & stocks'       },
-    { id: 'agriculture-intrants',  href: '/dashboard/agriculture/intrants',  label: 'Intrants',     sublabel: 'Semences, engrais & outils'},
+  garage: [
+    { id: 'garage',            href: '/dashboard/garage',           label: 'Atelier',      sublabel: 'Ordres de réparation'      },
+    { id: 'garage-vehicules',  href: '/dashboard/garage/vehicules', label: 'Véhicules',    sublabel: 'Parc clients & historique' },
+    { id: 'garage-pieces',     href: '/dashboard/stocks/produits',  label: 'Pièces',       sublabel: 'Stock de pièces détachées' },
+    { id: 'garage-factures',   href: '/dashboard/facturation',      label: 'Facturation',  sublabel: 'Factures & encaissements'  },
   ],
   cabinet: [
-    { id: 'cabinet',              href: '/dashboard/cabinet',              label: 'Cabinet',       sublabel: 'Tableau de bord direction'   },
+    { id: 'cabinet',              href: '/dashboard/cabinet',            label: 'Cabinet',       sublabel: 'Tableau de bord direction'   },
     { id: 'cabinet-clients',      href: '/dashboard/cabinet/clients',      label: 'Portefeuille',  sublabel: 'Clients & dossiers'          },
     // Agenda fiscal — uniquement comptable & fiscal
     { id: 'cabinet-declarations', href: '/dashboard/cabinet/declarations', label: 'Déclarations',  sublabel: 'Agenda fiscal & social',
@@ -291,38 +296,11 @@ export const SECTOR_SPECIFIC: Partial<Record<SectorId, Array<{
     { id: 'cabinet-documents',    href: '/dashboard/ged',                  label: 'Documents',     sublabel: 'GED & dossiers clients'      },
     { id: 'cabinet-miaa',         href: '/dashboard/miaa?context=cabinet', label: 'MIAA+ Expert',  sublabel: 'IA assistant cabinet'        },
   ],
-  petrole: [
-    { id: 'petrole',            href: '/dashboard/petrole',            label: 'Tableau de bord', sublabel: 'KPIs exploitation pétrolière'},
-    { id: 'petrole-sites',      href: '/dashboard/petrole/sites',      label: 'Sites',           sublabel: 'Puits & sites d\'extraction' },
-    { id: 'petrole-production', href: '/dashboard/petrole/production', label: 'Production',      sublabel: 'Rapports journaliers & bilans'},
-  ],
-  ong: [
-    { id: 'ong',           href: '/dashboard/ong',           label: 'Tableau de bord', sublabel: 'KPIs associatif'            },
-    { id: 'ong-projets',   href: '/dashboard/ong/projets',   label: 'Projets',         sublabel: 'Programmes & financement'   },
-    { id: 'ong-bailleurs', href: '/dashboard/ong/bailleurs', label: 'Bailleurs',       sublabel: 'Donateurs & engagements'    },
-    { id: 'ong-dons',      href: '/dashboard/ong/dons',      label: 'Dons',            sublabel: 'Collecte & affectation'     },
-  ],
   commerce: [
     { id: 'commerce',         href: '/dashboard/commerce',            label: 'Point de Vente',  sublabel: 'Caisse & ventes'          },
     { id: 'commerce-catalogue',href: '/dashboard/commerce/catalogue', label: 'Catalogue',       sublabel: 'Produits & prix'          },
     { id: 'commerce-clients', href: '/dashboard/commerce/clients',    label: 'Clients',         sublabel: 'Fidélisation & historique'},
     { id: 'commerce-analytics',href: '/dashboard/commerce/analytics', label: 'Analytics',       sublabel: 'KPIs & performances'      },
-  ],
-  boisson: [
-    { id: 'boisson',           href: '/dashboard/boisson',            label: 'Tableau de bord', sublabel: 'KPIs distribution boissons' },
-    { id: 'boisson-tournees',  href: '/dashboard/boisson/tournees',   label: 'Tournées',        sublabel: 'Livraisons & chauffeurs'    },
-    { id: 'boisson-commandes', href: '/dashboard/boisson/commandes',  label: 'Commandes',       sublabel: 'Commandes clients & suivi'  },
-  ],
-  assurance: [
-    { id: 'assurance-direction',   href: '/dashboard/assurance',                  label: 'Direction Générale', sublabel: 'KPIs & portefeuille exécutif'   },
-    { id: 'assurance-polices',     href: '/dashboard/assurance/polices',           label: 'Polices',            sublabel: 'Contrats, renouvellements & résiliations' },
-    { id: 'assurance-sinistres',   href: '/dashboard/assurance/sinistres',         label: 'Sinistres',          sublabel: 'Déclarations, expertise & règlements'     },
-    { id: 'assurance-clients',     href: '/dashboard/assurance/clients',           label: 'Clients & Assurés',  sublabel: 'Portefeuille & historique'      },
-    { id: 'assurance-produits',    href: '/dashboard/assurance/produits',          label: 'Produits',           sublabel: 'Catalogue & tarification'       },
-    { id: 'assurance-partenaires', href: '/dashboard/assurance/partenaires',       label: 'Partenaires',        sublabel: 'Réassureurs, garages & experts' },
-    { id: 'assurance-commissions', href: '/dashboard/assurance/commissions',       label: 'Commissions',        sublabel: 'Agents, courtiers & paiements'  },
-    { id: 'assurance-analytics',   href: '/dashboard/assurance/analytics',         label: 'Analytics',          sublabel: 'Ratio sinistres, rentabilité'   },
-    { id: 'assurance-miaa',        href: '/dashboard/miaa?context=assurance',      label: 'MIAA+ Expert',       sublabel: 'IA assistant assurance'         },
   ],
   recrutement: [
     { id: 'recrutement-direction',    href: '/dashboard/recrutement',                  label: 'Direction RH',      sublabel: 'KPIs & tableau de bord RH'          },
@@ -359,26 +337,21 @@ export const PLATFORM_MODULES = [
 
 // ── Meta secteurs ─────────────────────────────────────────────────────────────
 
-export const SECTOR_LABELS: Record<string, string> = {
-  ecole:            'École & Université',
-  restaurant:       'Restauration',
-  commerce:         'Commerce',
-  supermarche:      'Supermarché',
-  boutique:         'Boutique',
-  boisson:          'Boissons & Distribution',
-  sante:            'Santé & Clinique',
-  transport:        'Transport & Logistique',
-  transport_public: 'Transport Public',
-  hotel:            'Hôtellerie',
-  btp:              'BTP & Construction',
-  cabinet:          'Cabinet & Conseil',
-  petrole:          'Pétrole & Mines',
-  ong:              'ONG & Association',
-  banque:           'Banque & Microfinance',
-  pharmacie:        'Pharmacie',
-  agriculture:      'Agriculture',
-  assurance:        'Assurance & Réassurance',
-  recrutement:      'Recrutement & Placement RH',
+export const SECTOR_LABELS: Record<SectorId, string> = {
+  entreprise:  'Entreprise & PME',
+  ecole:       'École & Université',
+  commerce:    'Commerce & Boutique',
+  cabinet:     'Cabinet & Conseil',
+  sante:       'Santé & Clinique',
+  hotel:       'Hôtellerie',
+  garage:      'Garage & Atelier auto',
+  recrutement: 'Recrutement & Placement RH',
+}
+
+/** Libellé lisible d'une valeur brute (historique ou actuelle) de secteur. */
+export function sectorLabel(raw: string | null | undefined): string {
+  const id = normalizeSecteur(raw)
+  return id ? SECTOR_LABELS[id] : ''
 }
 
 // ── Rôles école (visibilité sidebar core) ─────────────────────────────────────
@@ -395,6 +368,21 @@ export const ECOLE_CORE_ROLE_FILTER: Record<string, string[]> = {
   facturation:   ['DIRECTION_GENERALE', 'RAF', 'SCOLARITE'],
   recouvrement:  ['DIRECTION_GENERALE', 'RAF'],
   depenses:      ['DIRECTION_GENERALE', 'RAF'],
+}
+
+/**
+ * Rôle école effectif — même règle que fn_get_my_ecole_role() (migration 034)
+ * et que le proxy : le propriétaire du compte est la Direction Générale.
+ * Sans cette règle, un propriétaire d'école (ecole_role_name vide, jamais
+ * renseigné à l'inscription) perdait toute la partie administration du menu
+ * (Direction, RH, Finance, Comptabilité, Trésorerie, Facturation…).
+ */
+export function roleEcoleEffectif(
+  role: string | null | undefined,
+  ecoleRoleName: string | null | undefined,
+): string | null {
+  if (role === 'owner') return 'DIRECTION_GENERALE'
+  return ecoleRoleName ?? null
 }
 
 // ── Set d'IDs core pour le check rapide ───────────────────────────────────────

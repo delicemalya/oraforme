@@ -152,7 +152,7 @@ export default function SemestresPage() {
         className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>
-            Semestres & Délibérations
+            Semestres &amp; Délibérations
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
             Validation semestrielle LMD — crédits ECTS, mentions, jurys de délibération.

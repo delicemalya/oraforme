@@ -66,6 +66,8 @@ interface BulletinRow {
   avantages_nature:     number
   autres_gains:         number
   salaire_brut:         number
+  indemnites_non_imposables: number
+  brut_imposable:       number
   // Retenues salarié
   cnss_employe:         number
   base_irpp:            number
@@ -104,6 +106,14 @@ interface ElementsVariables {
   indemnite_deplacement?:  number
   avantages_nature?:       number
   autres_gains?:           number
+  /**
+   * Indemnités non imposables (ex : prime de transport, indemnité de
+   * représentation) à exclure de la base CNSS/TUS/IRPP. Base cotisable =
+   * salaire_brut - indemnites_non_imposables — vérifié exact sur cas réel
+   * juin 2026 (887 213 - 171 111 = 716 102, Mission P0 paie 2026-09-17).
+   * Défaut 0 : comportement inchangé tant que ce champ n'est pas renseigné.
+   */
+  indemnites_non_imposables?: number
   mutuelle?:               number
   acompte?:                number
   opposition?:             number
@@ -114,7 +124,7 @@ type CalcResult = Omit<BulletinRow,
   'employe_id'|'nom'|'prenom'|'poste'|'type_employe'|'cnss_num'|'situation'|
   'nb_enfants'|'annees_anciennete'|'existingId'|'statut'|'heures_sup'|'taux_horaire'|'salaire_base'>
 
-function computeBulletin(
+export function computeBulletin(
   cfg: CountryConfig,
   codePays: CodePays,
   el: ElementsVariables,
@@ -136,19 +146,24 @@ function computeBulletin(
     prime_anciennete + prime_transport + prime_logement + prime_risque +
     prime_responsabilite + indemnite_deplacement + avantages_nature + autres_gains
 
+  // Base réellement soumise à cotisation CNSS/TUS/IRPP = brut global -
+  // indemnités non imposables (défaut 0 = comportement inchangé).
+  const indemnites_non_imposables = el.indemnites_non_imposables || 0
+  const brut_imposable = Math.max(0, salaire_brut - indemnites_non_imposables)
+
   let cnss_employe = 0; let cnss_patronal = 0; let tus_patronal = 0
   try {
-    const cnssRes = calculerChargesSociales({ codePays, salaireBrut: salaire_brut })
+    const cnssRes = calculerChargesSociales({ codePays, salaireBrut: brut_imposable })
     cnss_employe = cnssRes.total_salarie
     const tusBranch = cnssRes.branches.find(b => b.code === 'TUS')
     tus_patronal  = tusBranch?.montant_patronal ?? 0
     cnss_patronal = cnssRes.total_patronal_net - tus_patronal
   } catch { void cfg }
 
-  const base_irpp = Math.max(0, salaire_brut - cnss_employe)
+  const base_irpp = Math.max(0, brut_imposable - cnss_employe)
   let irpp = 0; let irpp_detail: DetailIRPP[] = []
   try {
-    const irppRes = calculerIRPP({ codePays, salaireBrut: base_irpp, salaireBrutOriginal: salaire_brut, situation, nombreEnfants: nb_enfants })
+    const irppRes = calculerIRPP({ codePays, salaireBrut: base_irpp, salaireBrutOriginal: brut_imposable, situation, nombreEnfants: nb_enfants })
     irpp = irppRes.irpp_net
     irpp_detail = irppRes.tranches
       .filter(t => t.impot_total > 0)
@@ -162,12 +177,12 @@ function computeBulletin(
   const total_retenues  = cnss_employe + irpp + mutuelle + acompte + opposition + autres_retenues
   const salaire_net     = salaire_brut - total_retenues
   const medecine_travail = 0
-  const cout_total_employeur = salaire_brut + cnss_patronal + tus_patronal
+  const cout_total_employeur = brut_imposable + cnss_patronal + tus_patronal
 
   return {
     heures_sup_montant, prime_rendement, prime_anciennete, prime_transport, prime_logement,
     prime_risque, prime_responsabilite, indemnite_deplacement, avantages_nature, autres_gains,
-    salaire_brut, cnss_employe, base_irpp, irpp, irpp_detail,
+    salaire_brut, indemnites_non_imposables, brut_imposable, cnss_employe, base_irpp, irpp, irpp_detail,
     mutuelle, acompte, opposition, autres_retenues, total_retenues, salaire_net,
     cnss_patronal, tus_patronal, medecine_travail, cout_total_employeur,
   }
@@ -418,7 +433,7 @@ function ModalDetailBulletin({
                 <div className="rounded-xl border border-[var(--border)] p-4">
                   <p className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                    Primes & indemnités
+                    Primes &amp; indemnités
                   </p>
                   <div className="space-y-2">
                     {([

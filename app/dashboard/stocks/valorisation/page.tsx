@@ -21,7 +21,6 @@ interface ProductValuation {
   prix_achat: number
   prix_vente: number
   seuil_alerte: number
-  stock_max: number | null
   // CMP calculé
   cmp: number
   valeur_stock: number
@@ -59,7 +58,7 @@ export default function ValorisationPage() {
     try {
       const { data: prods, error: e1 } = await supabase
         .from('v_products_stock')
-        .select('id, nom, sku, categorie, unite, stock_actuel, prix_achat, prix_vente, seuil_alerte, stock_max')
+        .select('id, nom, sku, categorie, unite, stock_actuel, prix_achat, prix_vente, seuil_alerte')
         .eq('tenant_id', tenantId)
         .order('nom')
 
@@ -96,11 +95,12 @@ export default function ValorisationPage() {
         const qtySortie = (sorties || []).filter((s: any) => s.product_id === p.id).reduce((acc: number, s: any) => acc + (s.quantite || 0), 0)
         const rotation = (p.stock_actuel || 0) > 0 ? qtySortie / (p.stock_actuel || 1) : 0
 
-        // Statut
+        // Statut — pas de branche Surplus : dépendait de stock_max, colonne
+        // jamais existée en base (migration 050 jamais appliquée, voir
+        // docs/BOI-005-AUDIT-MODELE-PRODUIT.md).
         let statut = 'OK'
         if ((p.stock_actuel || 0) <= 0) statut = 'Rupture'
         else if ((p.stock_actuel || 0) <= (p.seuil_alerte || 0)) statut = 'Faible'
-        else if (p.stock_max && (p.stock_actuel || 0) >= p.stock_max) statut = 'Surplus'
 
         return { ...p, cmp, valeur_stock, marge_brute, pct_marge, rotation, statut }
       })

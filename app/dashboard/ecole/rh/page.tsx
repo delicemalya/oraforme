@@ -14,6 +14,7 @@ import { useLocale } from '@/lib/hooks/useLocale'
 import { useRoleGuard } from '@/lib/hooks/useRoleGuard'
 import { useFmt } from '@/lib/hooks/useFmt'
 import { writeComptaEntry, modeToAccount } from '@/lib/compta-sync-client'
+import { calculerChargesSociales, calculerIRPP, type SituationFamiliale } from '@/lib/fiscal/universal-tax-engine'
 import { type Enseignant, type StatutEnseignant, STATUT_ENS, fmt, Avatar, FI, KpiCard } from '../_lib/shared'
 import { CreateEmployeeWizard } from './_components/CreateEmployeeWizard'
 import { ProfilDrawer, type ProfilPerson, type EmployeFull, type StaffFull } from './_components/ProfilDrawer'
@@ -1015,6 +1016,39 @@ function SectionConges({ tenantId, enseignants }: { tenantId: string; enseignant
   )
 }
 
+// -- Moteur fiscal central (Congo) — plus aucun taux codé en dur ici ----------
+//
+// Avant Mission P0 (2026-09-17), ce module recalculait localement CNSS/TUS/IRPP
+// avec des taux erronés (4/8/12,28/7,5 %, et un « IRPP » qui n'était en réalité
+// qu'un résidu 8 %-4 %, sans barème progressif). Toute la logique fiscale passe
+// désormais par lib/fiscal/universal-tax-engine.ts, la même source que
+// app/dashboard/rh/paie/page.tsx. Ce module reste Congo-only (aucun sélecteur
+// de pays n'a jamais existé ici) — codePays 'CG' en dur, comportement inchangé
+// sur ce point précis.
+export function calculerRetenuesEcole(
+  salaireBrut: number,
+  situation: SituationFamiliale | null,
+  nbEnfants: number,
+) {
+  const cnss = calculerChargesSociales({ codePays: 'CG', salaireBrut })
+  const baseIrpp = Math.max(0, salaireBrut - cnss.total_salarie)
+  const irppRes = calculerIRPP({
+    codePays: 'CG', salaireBrut: baseIrpp, salaireBrutOriginal: salaireBrut,
+    situation: situation ?? 'celibataire', nombreEnfants: nbEnfants,
+  })
+  const branche = (code: string) => cnss.branches.find(b => b.code === code)?.montant_patronal ?? 0
+  return {
+    cnss_salarie:        cnss.total_salarie,
+    cnss_vid_patronal:    branche('VID_PAT'),
+    cnss_pf_patronal:     branche('AF'),
+    cnss_at_patronal:     branche('AT'),
+    tus_patronal:         branche('TUS'),
+    cnss_patronal_total:  cnss.total_patronal_net,
+    irpp:                 irppRes.irpp_net,
+    retenues:             cnss.total_salarie + irppRes.irpp_net,
+  }
+}
+
 // -- Bulletin HTML generator ---------------------------------------------------
 
 function buildBulletinHTML(opts: {
@@ -1024,20 +1058,27 @@ function buildBulletinHTML(opts: {
   prime_risque?: number; prime_rendement?: number
   nomEcole: string; logoUrl: string
   mode_paiement?: string; date_recrutement?: string
+  /** Détail fiscal précalculé par le moteur central (calculerRetenuesEcole). */
+  cnss_salarie: number; cnss_vid_patronal: number
+  cnss_pf_patronal: number; cnss_at_patronal: number
+  tus_patronal: number; irpp: number
 }) {
   const {
     employe, poste, cnss, periode, salaire_base, primes, retenues, net,
     prime_logement = 0, prime_transport = 0, prime_risque = 0, prime_rendement = 0,
     nomEcole, logoUrl, mode_paiement = 'virement', date_recrutement,
+    cnss_salarie, cnss_vid_patronal, cnss_pf_patronal, cnss_at_patronal, tus_patronal, irpp,
   } = opts
   const fmtN    = (n: number) => new Intl.NumberFormat('fr-FR').format(Math.round(n))
   const pdfName = `bulletin_${employe.replace(/\s+/g, '_')}_${periode.replace(/\s+/g, '_')}.pdf`
   const brut  = salaire_base + primes
-  const cnss_sal   = Math.round(brut * 0.04)
-  const irpp       = retenues - cnss_sal > 0 ? retenues - cnss_sal : 0
-  const cnss_pf    = Math.round(brut * 0.08)
-  const cnss_at    = Math.round(brut * 0.1228)
-  const tus        = Math.round(brut * 0.075)
+  // Taux affichés = montant réel / brut (dérivés, jamais codés en dur) : ils
+  // suivent automatiquement toute évolution future de lib/countries/CG.ts.
+  const pct = (montant: number) => brut > 0 ? (montant / brut * 100).toLocaleString('fr-FR', { maximumFractionDigits: 3 }) : '0'
+  const cnss_sal   = cnss_salarie
+  const cnss_pf    = cnss_vid_patronal
+  const cnss_at    = cnss_pf_patronal + cnss_at_patronal   // PF + AT/MP combinés, même présentation qu'auparavant
+  const tus        = tus_patronal
   const tol        = 1000
   const pat_total  = cnss_pf + cnss_at + tus + tol
   const today      = new Date().toLocaleDateString('fr-FR')
@@ -1248,12 +1289,12 @@ function downloadPDF() {
           <td style="text-align:right;">�</td>
         </tr>
         <tr class="section-header"><td colspan="5">Cotisations sociales</td></tr>
-        <tr><td>${cnssRowN}</td><td>Retenue CNSS salariale</td><td style="text-align:right">${fmtN(brut)} � 4 %</td><td>�</td><td class="ret">${fmtN(cnss_sal)}</td></tr>
-        <tr><td></td><td>CNSS patronale � Prestations familiales</td><td style="text-align:right">${fmtN(brut)} � 8 %</td><td>�</td><td class="pat">${fmtN(cnss_pf)} *</td></tr>
-        <tr><td></td><td>CNSS patronale � Accidents du travail</td><td style="text-align:right">${fmtN(brut)} � 12,28 %</td><td>�</td><td class="pat">${fmtN(cnss_at)} *</td></tr>
+        <tr><td>${cnssRowN}</td><td>Retenue CNSS salariale</td><td style="text-align:right">${fmtN(brut)} � ${pct(cnss_sal)} %</td><td>�</td><td class="ret">${fmtN(cnss_sal)}</td></tr>
+        <tr><td></td><td>CNSS patronale � Vieillesse</td><td style="text-align:right">${fmtN(brut)} � ${pct(cnss_pf)} %</td><td>�</td><td class="pat">${fmtN(cnss_pf)} *</td></tr>
+        <tr><td></td><td>CNSS patronale � Prestations familiales + Accidents du travail</td><td style="text-align:right">${fmtN(brut)} � ${pct(cnss_at)} %</td><td>�</td><td class="pat">${fmtN(cnss_at)} *</td></tr>
         <tr class="section-header"><td colspan="5">Cotisations fiscales</td></tr>
         <tr><td></td><td>IRPP (Imp�t sur le Revenu des Personnes Physiques)</td><td style="text-align:right">Bar�me progressif</td><td>�</td><td class="ret">${fmtN(irpp)}</td></tr>
-        <tr><td></td><td>TUS (Taxe Unique sur les Salaires)</td><td style="text-align:right">${fmtN(brut)} � 7,5 %</td><td>�</td><td class="pat">${fmtN(tus)} *</td></tr>
+        <tr><td></td><td>TUS (Taxe Unique sur les Salaires)</td><td style="text-align:right">${fmtN(brut)} � ${pct(tus)} %</td><td>�</td><td class="pat">${fmtN(tus)} *</td></tr>
         <tr><td></td><td>TOL � usage d'habitation</td><td style="text-align:right">Forfait</td><td>�</td><td class="pat">${fmtN(tol)} *</td></tr>
       </tbody>
     </table>
@@ -1313,6 +1354,15 @@ type AgentPaie = {
   mode_paiement: string; banque: string | null; rib: string | null
   mobile_money_type: string | null; mobile_money_numero: string | null
   numero_cnss: string | null; email: string | null
+  /**
+   * Situation familiale / enfants — n'existe que sur la table `employes`
+   * (colonnes `situation_matrimoniale`/`nb_enfants`). Absente sur
+   * `enseignants` et `staff_ecole` (vérifié, aucune colonne équivalente) :
+   * null/0 pour ces deux types, traité explicitement comme célibataire sans
+   * enfant par le moteur fiscal — pas une donnée déduite ou inventée.
+   */
+  situation_matrimoniale: SituationFamiliale | null
+  nb_enfants: number
 }
 
 type PaieRecord = {
@@ -1373,6 +1423,8 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       mode_paiement: e.mode_paiement ?? 'banque', banque: e.banque, rib: e.rib,
       mobile_money_type: e.mobile_money_type, mobile_money_numero: e.mobile_money_numero,
       numero_cnss: e.numero_cnss, email: e.email_pro,
+      situation_matrimoniale: (e.situation_matrimoniale as SituationFamiliale) ?? null,
+      nb_enfants: e.nb_enfants ?? 0,
     }))
     const ensA: AgentPaie[] = (ens ?? []).map((e: any) => ({
       id: e.id, nom: e.nom, prenom: e.prenom, postnom: null,
@@ -1384,6 +1436,8 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       banque: e.banque, rib: e.rib,
       mobile_money_type: e.mobile_money_type, mobile_money_numero: e.mobile_money_numero,
       numero_cnss: e.numero_cnss, email: e.email,
+      // table `enseignants` : aucune colonne situation/enfants — voir AgentPaie
+      situation_matrimoniale: null, nb_enfants: 0,
     }))
     const stfA: AgentPaie[] = (stf ?? []).map((s: any) => ({
       id: s.id, nom: s.nom, prenom: s.prenom, postnom: null,
@@ -1394,6 +1448,8 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       banque: s.banque, rib: s.rib,
       mobile_money_type: s.mobile_money_type, mobile_money_numero: s.mobile_money_numero,
       numero_cnss: s.numero_cnss, email: s.email,
+      // table `staff_ecole` : aucune colonne situation/enfants — voir AgentPaie
+      situation_matrimoniale: null, nb_enfants: 0,
     }))
     setAgents([...empA, ...ensA, ...stfA])
     setPaies((pai ?? []) as PaieRecord[])
@@ -1428,7 +1484,8 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
     try {
       const primes   = form.prime_logement + form.prime_transport + form.prime_risque + form.prime_rendement
       const brut     = form.salaire_base + primes
-      const retenues = Math.round(brut * 0.08)
+      const calc     = calculerRetenuesEcole(brut, agent.situation_matrimoniale, agent.nb_enfants)
+      const retenues = calc.retenues
       const net      = brut - retenues
       const today    = new Date().toISOString().split('T')[0]
       const nomC     = `${agent.prenom}${agent.postnom ? ' ' + agent.postnom : ''} ${agent.nom}`
@@ -1464,11 +1521,12 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
           source: 'paie', sourceId: paie.id,
         }),
 
-        // Charges CNSS patronales (8%) ? �criture distincte
+        // Charges CNSS + TUS patronales (VID + PF + AT/MP + TUS, moteur fiscal
+        // central lib/fiscal/universal-tax-engine.ts) ? �criture distincte
         writeComptaEntry({
           tenantId, date: today,
           libelle: `CNSS patronale ${MOIS[form.mois]} ${form.annee} � ${nomC}`,
-          type: 'depense', montant: Math.round(brut * 0.08),
+          type: 'depense', montant: calc.cnss_patronal_total,
           categorie: 'CNSS',
           debitAccount: '664',   // Charges sociales CNSS patronal (SYSCOHADA)
           creditAccount: '431',  // CNSS (SYSCOHADA)
@@ -1503,6 +1561,10 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
   function downloadBulletin(p: PaieRecord) {
     const a   = agents.find(x => x.id === p.employe_id)
     const nom = a ? `${a.prenom}${a.postnom ? ' ' + a.postnom : ''} ${a.nom}` : '�'
+    // Brut historique du bulletin (salaire_base + primes tels que pay�s), pas
+    // le brut courant de l'agent qui peut avoir chang� depuis.
+    const brutHistorique = p.salaire_base + p.primes
+    const calc = calculerRetenuesEcole(brutHistorique, a?.situation_matrimoniale ?? null, a?.nb_enfants ?? 0)
     const html = buildBulletinHTML({
       employe: nom, poste: a?.poste ?? '�', cnss: a?.numero_cnss ?? '',
       periode: `${MOIS[p.mois]} ${p.annee}`,
@@ -1513,6 +1575,12 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
       prime_rendement: a?.prime_rendement ?? 0,
       mode_paiement: p.mode_paiement ?? 'virement',
       nomEcole, logoUrl,
+      cnss_salarie:      calc.cnss_salarie,
+      cnss_vid_patronal: calc.cnss_vid_patronal,
+      cnss_pf_patronal:  calc.cnss_pf_patronal,
+      cnss_at_patronal:  calc.cnss_at_patronal,
+      tus_patronal:      calc.tus_patronal,
+      irpp:              calc.irpp,
     })
     const w = window.open('', '_blank')
     if (!w) return
@@ -1522,7 +1590,8 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
   }
 
   const brut     = form.salaire_base + form.prime_logement + form.prime_transport + form.prime_risque + form.prime_rendement
-  const retenues = Math.round(brut * 0.08)
+  const calcPreview = calculerRetenuesEcole(brut, agent?.situation_matrimoniale ?? null, agent?.nb_enfants ?? 0)
+  const retenues = calcPreview.retenues
   const net      = brut - retenues
   const totalNet = paies.reduce((s, p) => s + p.net, 0)
 
@@ -1632,7 +1701,7 @@ function SectionPaie({ tenantId, nomEcole }: { tenantId: string; nomEcole: strin
                   <p className="text-base font-bold text-[#101729] mt-0.5">{fmt(brut)} <span className="text-[9px] text-[var(--text-secondary)]">FCFA</span></p>
                 </div>
                 <div className="p-3 text-center">
-                  <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">CNSS 8%</p>
+                  <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Retenues (CNSS + IRPP)</p>
                   <p className="text-base font-bold mt-0.5" style={{ color: '#DC2626' }}>-{fmt(retenues)} <span className="text-[9px] text-[var(--text-secondary)]">FCFA</span></p>
                 </div>
                 <div className="p-3 text-center" style={{ background: 'rgba(46,160,67,0.06)' }}>

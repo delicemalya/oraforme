@@ -167,7 +167,7 @@ export interface WorkflowPreset {
   id: string
   name: string
   description: string
-  category: 'rh' | 'finance' | 'ecole' | 'hotel' | 'restaurant' | 'stock' | 'system'
+  category: 'rh' | 'finance' | 'ecole' | 'hotel' | 'stock' | 'system'
   trigger_type: TriggerType
   trigger_config: Record<string, unknown>
   conditions: WorkflowCondition[]

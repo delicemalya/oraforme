@@ -11,12 +11,16 @@
  * lib/architecture/erp-core-comptabilite.test.ts.
  */
 
+import { readFileSync } from 'fs'
+import path from 'path'
 import { describe, it, expect } from 'vitest'
 import {
   periodeMensuelle,
   computeBalance,
   computeGrandLivre,
+  computeTVAFromJournal,
   type JournalLedgerRow,
+  type JournalBalanceRow,
 } from './accounting'
 
 // ── Période ───────────────────────────────────────────────────────────────────
@@ -254,5 +258,195 @@ describe('computeGrandLivre — détail par compte', () => {
     expect(vide.comptes).toEqual([])
     expect(vide.nb_ecritures).toBe(0)
     expect(vide.total_anomalies).toBe(0)
+  })
+})
+
+// ── computeTVAFromJournal — Mission P0-FISCAL-CG-2026 (2026-09-18) ────────────
+//
+// Fixtures A-I de la mission. Étiquetées RÉEL (dérivé d'un document réel
+// consulté lors de l'audit préalable) ou SYNTHÉTIQUE (aucun document réel
+// disponible pour ce cas — voir rapport de mission, section K). Aucun montant
+// « réaliste » n'est inventé : les cas synthétiques utilisent des chiffres
+// ronds pour rester lisibles.
+
+function ecritureTVA(
+  date: string,
+  compte: '4441' | '4445',
+  montant: number,
+  sens: 'debit' | 'credit' = compte === '4441' ? 'credit' : 'debit',
+): JournalBalanceRow {
+  return sens === 'credit'
+    ? { date_operation: date, debit_account: '411', credit_account: compte, montant }
+    : { date_operation: date, debit_account: compte, credit_account: '401', montant }
+}
+
+describe('computeTVAFromJournal — cas A/B : vente 18% et opération 5% (SYNTHÉTIQUE)', () => {
+  // Le journal ne porte qu'un montant déjà liquidé, jamais le taux qui l'a
+  // produit (voir engine-adapter.ts::calculerTVAUnifie) : une vente à 18% et
+  // une opération à 5% sont donc indiscernables à ce niveau — seul le montant
+  // posté sur 4441 compte. Les deux cas exercent le même chemin de code ; ils
+  // sont conservés séparément pour documenter cette limite plutôt que la
+  // masquer.
+  it('cas A — vente 18% : le montant crédité sur 4441 devient tva_collectee du mois', () => {
+    const r = computeTVAFromJournal([ecritureTVA('2026-03-05', '4441', 18_000)], 2026)
+    const mars = r.mensuel.find(m => m.mois === 3)!
+    expect(mars.tva_collectee).toBe(18_000)
+    expect(mars.tva_nette).toBe(18_000)
+    expect(mars.a_payer).toBe(18_000)
+  })
+
+  it('cas B — opération à 5% : même chemin de code qu’une vente 18%, seul le montant diffère', () => {
+    const r = computeTVAFromJournal([ecritureTVA('2026-03-05', '4441', 5_000)], 2026)
+    const mars = r.mensuel.find(m => m.mois === 3)!
+    expect(mars.tva_collectee).toBe(5_000)
+  })
+})
+
+describe('computeTVAFromJournal — cas C : facture sans TVA (RÉEL — 6 factures Congo consultées lors de l’audit préalable, aucune n’a de ligne TVA)', () => {
+  it('un mois sans aucune écriture sur 4441/4442/4445/4446 donne une déclaration à zéro, pas une erreur', () => {
+    const r = computeTVAFromJournal(
+      [{ date_operation: '2026-05-10', debit_account: '411', credit_account: '706', montant: 100_000 }],
+      2026,
+    )
+    const mai = r.mensuel.find(m => m.mois === 5)!
+    expect(mai.tva_collectee).toBe(0)
+    expect(mai.tva_deductible).toBe(0)
+    expect(mai.a_payer).toBe(0)
+    expect(mai.credit_nouveau).toBe(0)
+  })
+})
+
+describe('computeTVAFromJournal — cas E : achat avec TVA déductible (SYNTHÉTIQUE — voir fiabilité)', () => {
+  it('un débit sur 4445 alimente tva_deductible mais deductible_fiabilite.fiable reste false', () => {
+    const r = computeTVAFromJournal([ecritureTVA('2026-06-12', '4445', 9_000)], 2026)
+    const juin = r.mensuel.find(m => m.mois === 6)!
+    expect(juin.tva_deductible).toBe(9_000)
+    expect(r.deductible_fiabilite.fiable).toBe(false)
+    expect(r.deductible_fiabilite.raison).toMatch(/écriture manuelle/)
+  })
+
+  it('sans aucune écriture 4445/4446, la raison explique l’absence structurelle (pas juste « rien ce mois »)', () => {
+    const r = computeTVAFromJournal([ecritureTVA('2026-06-12', '4441', 20_000)], 2026)
+    expect(r.deductible_fiabilite.fiable).toBe(false)
+    expect(r.deductible_fiabilite.raison).toMatch(/aucun champ TVA/)
+  })
+})
+
+describe('computeTVAFromJournal — cas F/G : report de crédit d’un mois sur l’autre (SYNTHÉTIQUE)', () => {
+  it('un mois en crédit (déductible > collectée) reporte le crédit au mois suivant', () => {
+    const entries: JournalBalanceRow[] = [
+      ecritureTVA('2026-01-15', '4441', 10_000),   // collectée janvier
+      ecritureTVA('2026-01-15', '4445', 40_000),   // déductible janvier → nette = -30 000
+      ecritureTVA('2026-02-15', '4441', 50_000),   // collectée février
+    ]
+    const r = computeTVAFromJournal(entries, 2026)
+    const jan = r.mensuel.find(m => m.mois === 1)!
+    const fev = r.mensuel.find(m => m.mois === 2)!
+
+    expect(jan.tva_nette).toBe(-30_000)
+    expect(jan.a_payer).toBe(0)
+    expect(jan.credit_nouveau).toBe(30_000)
+
+    expect(fev.credit_anterieur).toBe(30_000)
+    expect(fev.tva_nette).toBe(50_000)
+    // solde = 50 000 - 30 000 = 20 000 à payer, plus de crédit
+    expect(fev.a_payer).toBe(20_000)
+    expect(fev.credit_nouveau).toBe(0)
+  })
+
+  it('creditInitial reporte un crédit d’une période antérieure à `year` — jamais déduit automatiquement', () => {
+    const sansReport = computeTVAFromJournal([ecritureTVA('2026-01-10', '4441', 10_000)], 2026)
+    const avecReport = computeTVAFromJournal([ecritureTVA('2026-01-10', '4441', 10_000)], 2026, 4_000)
+
+    expect(sansReport.mensuel[0].a_payer).toBe(10_000)
+    expect(avecReport.mensuel[0].credit_anterieur).toBe(4_000)
+    expect(avecReport.mensuel[0].a_payer).toBe(6_000)
+  })
+})
+
+describe('computeTVAFromJournal — réconciliation source = calcul canonique (section L du rapport)', () => {
+  const entries: JournalBalanceRow[] = [
+    ecritureTVA('2026-03-05', '4441', 18_000),
+    ecritureTVA('2026-03-20', '4441', 7_000),
+    ecritureTVA('2026-03-20', '4445', 4_000),
+    ecritureTVA('2026-04-02', '4441', 12_000),
+  ]
+
+  it('la somme des tva_collectee mensuels égale la somme brute des crédits 4441/4442 dans les écritures sources', () => {
+    const r = computeTVAFromJournal(entries, 2026)
+    const sommeCanonique = r.mensuel.reduce((s, m) => s + m.tva_collectee, 0)
+    const sommeSource = entries
+      .filter(e => e.credit_account === '4441' || e.credit_account === '4442')
+      .reduce((s, e) => s + (e.montant ?? 0), 0)
+    expect(sommeCanonique).toBe(sommeSource)
+    expect(r.total_collectee).toBe(sommeCanonique)
+  })
+
+  it('écart documenté vs l’ancienne méthode (lib/fiscalite/engine.ts::calculerTVA, sans report de crédit)', () => {
+    // Ancienne méthode : chaque mois calculé indépendamment, credit_tva = max(-nette, 0)
+    // jamais réinjecté dans le mois suivant.
+    const r = computeTVAFromJournal(entries, 2026)
+    const mars = r.mensuel.find(m => m.mois === 3)!  // nette = 18000+7000-4000 = 21000
+    const avril = r.mensuel.find(m => m.mois === 4)! // nette = 12000, sans crédit antérieur ici
+
+    const ancienTotalAPayer = r.mensuel.reduce((s, m) => s + Math.max(0, m.tva_nette), 0)
+    const nouveauTotalAPayer = r.total_a_payer
+
+    // Dans ce jeu précis, aucun mois n'est en crédit : les deux méthodes
+    // convergent — la divergence n'apparaît QUE quand un mois a une nette
+    // négative (voir le test « report de crédit » ci-dessus, où l'ancienne
+    // méthode aurait fait payer 50 000 en février au lieu de 20 000).
+    expect(nouveauTotalAPayer).toBe(ancienTotalAPayer)
+    expect(mars.tva_nette).toBe(21_000)
+    expect(avril.tva_nette).toBe(12_000)
+  })
+
+  it('limite connue, non corrigée : un débit sur 4441 (ex. hypothèse d’avoir/annulation) n’est PAS déduit de tva_collectee', () => {
+    // computeTVAFromJournal ne lit que le CRÉDIT de 4441/4442 (voir son code).
+    // Si un avoir se journalise par un débit sur 4441, cette fonction ne le
+    // voit pas — ni en plus, ni en moins. Aucun mécanisme d'annulation n'a
+    // été inventé ici faute de preuve documentaire sur la façon réelle dont
+    // un avoir Congo se journalise (aucun avoir réel trouvé lors de l'audit
+    // préalable). Voir rapport de mission, section N.
+    const withReversal = computeTVAFromJournal(
+      [
+        ecritureTVA('2026-07-01', '4441', 18_000),
+        { date_operation: '2026-07-15', debit_account: '4441', credit_account: '411', montant: 18_000 },
+      ],
+      2026,
+    )
+    const juillet = withReversal.mensuel.find(m => m.mois === 7)!
+    expect(juillet.tva_collectee).toBe(18_000)   // le débit de contrepartie est invisible ici
+  })
+})
+
+describe('computeTVAFromJournal — isolation multi-tenant (section 7 du rapport)', () => {
+  it('la fonction est pure sur les écritures reçues : deux jeux de tenants différents ne se mélangent jamais', () => {
+    const tenantA: JournalBalanceRow[] = [ecritureTVA('2026-03-05', '4441', 18_000)]
+    const tenantB: JournalBalanceRow[] = [ecritureTVA('2026-03-05', '4441', 99_000)]
+
+    const rA = computeTVAFromJournal(tenantA, 2026)
+    const rB = computeTVAFromJournal(tenantB, 2026)
+
+    expect(rA.total_collectee).toBe(18_000)
+    expect(rB.total_collectee).toBe(99_000)
+    // Rejouer A ne change rien à B : aucun état partagé entre deux appels.
+    expect(computeTVAFromJournal(tenantA, 2026).total_collectee).toBe(18_000)
+  })
+
+  it('les deux appelants réels filtrent tenant_id AVANT d’appeler computeTVAFromJournal (vérification statique)', () => {
+    const root = path.resolve(__dirname, '../../..')
+    const route = readFileSync(path.join(root, 'app/api/fiscalite/tva/route.ts'), 'utf-8')
+    const decl  = readFileSync(path.join(root, 'lib/declarations/declaration-generale.ts'), 'utf-8')
+
+    for (const src of [route, decl]) {
+      const posJournal = src.indexOf(`.from('journal_entries')`)
+      const posTenantFilter = src.indexOf(`.eq('tenant_id'`, posJournal)
+      // Cherché après le filtre : l'import du nom en haut de fichier ne compte pas.
+      const posCompute = src.indexOf('computeTVAFromJournal(', posTenantFilter)
+      expect(posJournal).toBeGreaterThan(-1)
+      expect(posTenantFilter).toBeGreaterThan(posJournal)
+      expect(posCompute).toBeGreaterThan(posTenantFilter)
+    }
   })
 })

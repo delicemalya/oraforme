@@ -154,7 +154,7 @@ volontairement est celui qui produisait les montants faux.
 
 ## P0-02 — GRAND LIVRE ET BALANCE (ERP Core comptabilité)
 
-**Statut :** CODE PASS — non déployé, non vérifié en production
+**Statut :** **VERIFIED — déployé et vérifié en production le 2026-09-07** (mission R-004)
 **Date :** 2026-09-02
 **Anomalie couverte :** ANO-C09 de `docs/RESTART-AUDIT-AZ.md`
 
@@ -307,11 +307,31 @@ ORDER  BY m.mois;
 La première requête doit renvoyer `piece_number` et `reference_piece`, et
 seulement elles. La seconde doit renvoyer cinq lignes sans erreur 22008.
 
+### Résultat réel en production (2026-09-07, mission R-004)
+
+Requête étendue à 12 mois × 4 années (2024-2027) au lieu des 5 mois d'origine.
+
+| Contrôle | Résultat |
+|---|---|
+| Colonnes | `piece_number`, `reference_piece` présentes ; `reference`, `journal_type` absentes |
+| 48 combinaisons année×mois | **Aucune erreur 22008**, y compris les 5 mois auparavant cassés (février, avril, juin, septembre, novembre), sur les 4 années testées |
+| Policies RLS sur `journal_entries` | 6 policies réelles, toutes scopées `tenant_id = get_my_tenant_id()` (`select`, `insert`, `update`, `delete`, `financial read`, `financial write`) |
+
+**ANO-C09 / P0-02 : VERIFIED.** Résidu distinct non corrigé par ce ticket :
+NEW-05 (pages UI Balance/Grand Livre/Bilan dupliquent la logique sans la
+réutiliser — non couvertes par les tests, jamais exposées au bug d'origine).
+
+**Anomalie non liée découverte pendant ce contrôle** : le tableau 12×4 révèle
+que `journal_entries` porte exactement 56 écritures par mois sur 24 mois
+consécutifs (2024-01 → 2025-12, ~1344 lignes), hors périmètre de P0-02 —
+investiguée séparément, voir §« FORENSIQUE journal_entries 2024-2025 » plus
+loin dans ce journal.
+
 ---
 
 ## P0-03 — CHAÎNE PAIE → COMPTABILITÉ ROMPUE
 
-**Statut :** CODE PASS — non déployé, non vérifié en production
+**Statut :** CODE_FIXED — déployé, **NOT PRODUCTION EXERCISED** (vérifié le 2026-09-07, mission R-004 : 0 événement PAI-001/PAI-002 émis depuis le déploiement — le correctif n'a encore été exercé par aucune paie réelle)
 **Date :** 2026-09-02
 **Anomalie couverte :** §6.2 de `docs/RESTART-AUDIT-AZ.md` (classée P0 en §27)
 
@@ -494,6 +514,65 @@ La première requête chiffre la dette héritée (bulletins jamais comptabilisé
 depuis la migration 141). La deuxième doit montrer les nouveaux événements en
 `processed`. La troisième doit renvoyer `transaction_id` NULL sur tous les
 PAI-001 : la sortie de trésorerie n'apparaît que sur PAI-002.
+
+### Résultat réel en production (2026-09-07, mission R-004)
+
+| Contrôle | Résultat |
+|---|---|
+| Dette héritée (bulletins validés/payés sans événement comptable) | **4 bulletins `payee`, 2 536 534 F, toujours sans événement comptable** — inchangé depuis le diagnostic du 2026-09-02, jamais rejoué |
+| Événements PAI-001/PAI-002 émis depuis le déploiement (2026-09-04) | **0 ligne** — aucun bulletin n'a été validé ni payé via la route corrigée depuis la mise en ligne |
+| `transaction_id` sur les PAI-001 récents | **0 ligne** (rien à contrôler, cohérent avec l'absence totale d'événements) |
+
+**Conclusion :** le correctif est déployé et testé unitairement (186/186), mais
+n'a été exercé par **aucune action réelle** en production depuis le
+déploiement — ni succès ni échec observable. Statut `CODE_FIXED — NOT
+PRODUCTION EXERCISED`, distinct de `VERIFIED` : il n'existe littéralement
+aucun événement PAI post-déploiement à vérifier. La dette héritée (4
+bulletins, 2 536 534 F) reste un résidu séparé, non traité par ce ticket
+(rejouable manuellement depuis la page de paie, jamais fait).
+
+### Chemin de code vérifié (2026-09-07)
+
+`app/dashboard/rh/paie/page.tsx` → `POST/PATCH /api/paie/bulletins`
+(`app/api/paie/bulletins/route.ts:22-41`) → `evenementsComptablesBulletin()`
+(`lib/paie/evenements-comptables.ts:129-201`, contrat pur, aucun accès
+réseau) → `supabaseAdmin.rpc('emit_accounting_event', ev)` → trigger
+`trg_process_accounting_event` (migration 138:815-818, `AFTER INSERT ... WHEN
+(NEW.status='pending')`) → `fn_ae_execute_event()` (migration 175) →
+`journal_entries` (+ `transactions` pour PAI-002 uniquement, `montant_ttc=0`
+sur PAI-001 pour éviter la contrainte unique) → `accounting_event_log.transaction_id`.
+
+**Couverture de tests réelle** (fichiers relus intégralement) :
+- **Émission PAI-001/PAI-002** : couverte en détail (`evenements-comptables.test.ts:78-172`) — types d'événement, montants HT/TTC/net, dates, libellés.
+- **Idempotence** : **partielle** — un seul test documente que les deux événements partagent le même `source_id` avec un `event_type` différent (ligne 164-167, assertion sur la forme des paramètres) ; **aucun test n'appelle `emit_accounting_event` deux fois** pour vérifier la contrainte `uidx_ae_inflight` sur des PAI réels (cette contrainte a été vérifiée en session sur ACH-001/ACH-002 via le Bloc SQL 4, pas sur PAI).
+- **`transaction_id`** : **non testé** dans ces fichiers (nécessite un test d'intégration DB, hors périmètre des tests unitaires purs).
+- **`tenant_id`** : couvert (identité de la source, ligne 87 ; garde 403 sur la route, `chaine-paie-comptabilite.test.ts:126-129`).
+- **Montant** : couvert extensivement (brut/net/cnss/irpp, formes NUMERIC-en-chaîne de PostgREST).
+- **Période comptable** : couverte (12 mois + bissextile pour `dernierJourDuMois`, `fiscal_year`).
+- **Échec/rollback** : **partiel** — les gardes de la fonction pure (montants négatifs, mois invalide, id/tenant manquant → `RangeError`) sont testées ; le comportement de la **route** en cas d'échec d'émission (statut 500, message explicite) est vérifié par correspondance de motif sur le code source (`chaine-paie-comptabilite.test.ts:121-124`), pas par une simulation réelle d'échec réseau/DB suivie d'une vérification d'état.
+
+**Aucune validation de production réelle n'existe** — ce constat n'est pas
+contredit par ce qui précède.
+
+### Validation E2E isolée possible, non exécutée
+
+Sur le modèle du Bloc SQL 4 (tenant jetable, `ROLLBACK` en fin de script,
+utilisé cette session pour ACH-001/ACH-002/178) : créer un tenant de test,
+insérer une ligne `bulletins_paie` minimale (`tenant_id`, `employe_id` NULL ou
+un employé de test, `mois`, `annee`, `statut='payee'`, `brut`, `net`,
+`cnss_salarie`, `cnss_patronal`, `irpp`, `mode_paiement`), puis appeler
+directement `emit_accounting_event` deux fois avec les paramètres exacts que
+produirait `evenementsComptablesBulletin()` pour PAI-001 (une fois) et
+PAI-002 (une fois, puis une ré-émission pour tester l'idempotence) — en
+répliquant manuellement le calcul (`p_montant_ht=brut`, `p_montant_ttc=0` pour
+PAI-001 ; `p_montant_ttc=net` pour PAI-002), puisqu'appeler la fonction
+TypeScript elle-même n'est pas possible depuis l'éditeur SQL. Vérifier ensuite
+: 4 lignes `journal_entries` pour PAI-001 (661/421, 664/431, 421/431, 421/447),
+1 ligne pour PAI-002, `accounting_event_log.transaction_id` renseigné
+uniquement pour PAI-002, et qu'une ré-émission ne double aucune des deux.
+**Non exécuté dans cette session**, conformément à l'instruction de ne rejouer
+aucun événement financier ni fabriquer de donnée de test sans autorisation
+explicite pour ce ticket précis.
 
 ---
 
@@ -837,7 +916,7 @@ Reste : CI verte sur la PR, revue, merge → déploiement automatique Vercel dep
 
 ## TICKET — TRIGGERS HÉRITÉS SUR ACHATS (doublons journal_entries/transactions)
 
-**Statut :** FERMÉ le 2026-09-04 — 48 doublons archivés puis supprimés (migration 177)
+**Statut :** FERMÉ le 2026-09-04 — 48 doublons archivés puis supprimés (migration 177). Mécanisme d'idempotence ACH-001 (contrainte `uidx_ae_inflight`) confirmé le 2026-09-07 sur tenant isolé (mission R-004, Bloc SQL 4) : une ré-émission du même achat ne crée pas de seconde écriture.
 **Anomalie couverte :** résidu relevé pendant P0-04 (§P0-04, « Résidus, hors périmètre de ce ticket ») — non classée dans `docs/RESTART-AUDIT-AZ.md`, ouverte ici par prudence avant qu'elle ne s'aggrave (chaque nouvel achat en production continue de créer un doublon tant que les triggers ne sont pas retirés).
 
 ### Contexte
@@ -958,3 +1037,1027 @@ bancaire/caisse créé via l'UI (Trésorerie › Banques) n'est pas marqué
 explicite ou une évolution de l'UI de création. Comportement sûr par défaut
 (pas de nouveau triplement), mais pas de suivi automatique tant qu'il n'est
 pas désigné principal.
+
+---
+
+## TICKET — R004-DB-TRIGGER-TRANSACTIONS (promesse non tenue par la migration 177)
+
+**Statut :** OUVERT — **risque latent confirmé, pas d'incident actif** (diagnostic exécuté le 2026-09-07)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-02)
+
+### Résultat du diagnostic (production, 2026-09-07)
+
+`pg_trigger` sur `transactions` : seul `trg_update_account_balance` est actif.
+`trg_auto_journal_entry` et `trg_transaction_to_journal` **confirmés absents**
+(re-vérifié, le diagnostic du 2026-09-02 datait de 5 jours et n'avait jamais été
+refait). **Aucun doublon actif en production.** Le risque reste réel mais
+**latent** : rien dans le dépôt n'empêche ces triggers d'être recréés si les
+migrations 026/027 sont rejouées intégralement (nouvel environnement,
+disaster recovery). Ticket laissé `OPEN` — le gap de dépôt n'est pas corrigé,
+seule son absence d'impact actuel est établie.
+
+### Contexte
+
+Le diagnostic du 2026-09-02 (§P0-04, « Diagnostic complémentaire ») affirmait que
+`trg_auto_journal_entry` et `trg_transaction_to_journal` (`AFTER INSERT ON
+transactions`, migrations 023/027 — `fn_auto_journal_entry` sans aucune garde,
+comptes devinés `571000`/`709000` par mot-clé de catégorie) **n'existaient pas en
+production**, et annonçait : « le dépôt et la production divergent (ANO-P04) : la
+migration 177 alignera le dépôt en supprimant ces deux triggers, sans effet en
+production. »
+
+**Vérifié le 2026-09-04 (mission R-004) sur le fichier réel** :
+`supabase/migrations/177_repair_achats_legacy_doublons.sql`, tel qu'écrit et
+committé, **ne contient aucun `DROP TRIGGER` pour ces deux noms** — il ne traite
+que les 48 doublons `achats_enregistrement`. La promesse n'a pas été tenue.
+
+**Cause racine** : le ticket 177 a été scopé, en session, sur le seul défaut
+confirmé et chiffré (doublons achats) ; la promesse d'alignement du dépôt pour ces
+deux autres triggers, formulée dans une session antérieure au moment du diagnostic
+P0-04, n'a pas été reportée dans le périmètre de 177 au moment de son écriture.
+
+**Conséquence si non traité** : si le dépôt est rejoué intégralement (nouvel
+environnement de recette, disaster recovery, `supabase db reset`), ces deux
+triggers seraient recréés (rien ne les supprime après leur création en 026/027) et
+le bug de double écriture — déjà vu pour les achats — se reproduirait à l'échelle
+de **tous** les événements du moteur central à impact trésorerie (FAC-002,
+PAI-002, RES-001, ECO-001, SAN-002, etc.), pas seulement ACH-001.
+
+**État réel en production actuelle** : non re-vérifié depuis le 2026-09-02 (2
+jours). Diagnostic demandé, Bloc SQL 1 de la mission R-004 (lecture seule,
+`pg_trigger` sur `transactions`).
+
+### Interdiction explicite de cette mission
+
+Ne pas appliquer de `DROP TRIGGER` avant d'avoir la confirmation de l'état réel en
+production. Si les triggers sont bien absents (diagnostic 2026-09-02 confirmé), le
+correctif à apporter est uniquement dans le **dépôt** (aligner 177 ou une nouvelle
+migration avec les `DROP TRIGGER`), sans effet en production. S'ils sont présents,
+traiter avec la méthodologie 176/177 (garde-fous, archivage `repair_archive`,
+contrôle chiffré avant/après) — hors périmètre de la mission R-004, qui est
+strictement une mission de vérification.
+
+---
+
+## TICKET — R004-CAISSE-DUPLICATE-WRITER (double écriture confirmée au niveau code)
+
+**Statut :** OUVERT — **risque latent uniquement, pas d'incident actif** (diagnostic exécuté le 2026-09-07)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-01), `docs/RESTART-AUDIT-AZ.md` ANO-M10
+
+### Résultat du diagnostic (production, 2026-09-07) — corrige l'hypothèse initiale
+
+Le Writer A supposé (`trg_caisse_operation`, migration 046) **n'existe pas en
+production** — vérifié par `pg_trigger`. Le seul trigger actif sur
+`caisse_operations` est `trg_sync_caisse_solde` (migration 042), dont le code a
+été relu intégralement : il ne fait qu'`UPDATE caisses SET solde = solde ±
+NEW.montant`, **aucune écriture comptable**. De plus, `0` ligne
+`caisse_operations` n'existe à ce jour en production. **Aucun doublon possible
+aujourd'hui**, ni au niveau du mécanisme (le trigger risqué est absent) ni au
+niveau des données (rien à doubler). Le risque reste latent : si la migration
+046 était un jour rejouée, `trg_caisse_operation` réapparaîtrait aux côtés de
+`writeComptaEntry()` (Writer B, toujours actif dans le code). Ticket laissé
+`OPEN` pour ce risque latent, requalifié depuis « double écriture confirmée »
+vers « risque latent, pas d'incident actif ».
+
+### Deux writers identifiés pour la même opération
+
+**Writer A — `trg_caisse_operation`** (`fn_caisse_operation_to_journal()`, migration
+046:542-587, `AFTER INSERT ON caisse_operations`, jamais droppé). Pour une
+`dépense` : écrit une ligne `transactions` (source=`caisse_operations`,
+source_id=`NEW.id`, débit=`NEW.compte_charge`, crédit=`'571000'`) **et** une ligne
+`journal_entries` (mêmes source/source_id, mêmes comptes).
+
+**Writer B — `writeComptaEntry()`** (`lib/compta-sync-client.ts:133-175`, exemption
+officielle EXM-JE-003), appelé depuis `app/dashboard/tresorerie/caisses/page.tsx:97-105`
+juste après l'insert `caisse_operations` du même clic utilisateur (ligne 87). Écrit
+une ligne `journal_comptable` **et** une ligne `journal_entries` (source=`caisse`,
+**source_id NULL**, débit/crédit fixés dans la page : `658`/`571` pour une dépense —
+**valeurs différentes du Writer A**, qui utilise `571000` à 6 chiffres au lieu de
+`571` à 3 chiffres).
+
+### Cause racine
+
+Aucune garde d'idempotence commune entre les deux mécanismes : le Writer A se
+protège contre son propre re-déclenchement (`IF EXISTS (... source='caisse_operations'
+AND source_id=NEW.id)`) mais ne voit pas l'insert du Writer B, qui porte un
+`source` différent et aucun `source_id`. Si les deux sont actifs, **chaque
+dépense/approvisionnement de caisse produit 2 écritures `journal_entries`**, avec
+des codes de compte incohérents entre elles (`571000` vs `571` — la même
+divergence de normalisation déjà rencontrée en migration 133).
+
+### Diagnostic demandé
+
+Bloc SQL 1 de la mission R-004 (lecture seule) : présence réelle de
+`trg_caisse_operation` en production, et quantification des doublons par
+recoupement montant/date/tenant (le Writer B n'a pas de `source_id` exploitable).
+
+### Interdiction explicite de cette mission
+
+Ne pas corriger avant d'avoir confirmé l'ampleur réelle (nombre d'opérations
+concernées, montants). Hors périmètre de la mission R-004.
+
+---
+
+## TICKET — R004-TREASURY-VERIFICATION (généralisation de la preuve du correctif 178)
+
+**Statut :** VERIFIED — confirmé le 2026-09-07 sur 3 tenants isolés (`ROLLBACK` en fin de script, aucune donnée réelle touchée)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-04)
+
+### Résultat (tenants isolés, 2026-09-07)
+
+| Cas | Attendu | Obtenu |
+|---|---|---|
+| Tenant 1 compte : entrée 50 000, sortie 5 000 | solde = 45 000 | **45 000** |
+| Tenant 2 comptes, principal : entrée 100 000, sortie 30 000, transfert 20 000, puis règlement ACH-002 de 10 000 (resync automatique post-175) | solde = 40 000 (100000-30000-20000-10000) | **40 000** |
+| Tenant 2 comptes, secondaire | jamais touché | **0** |
+| Tenant 2 comptes, caisse | 20 000 (transfert reçu) | **20 000** |
+| Tenant 3 comptes, principal : entrée 999 000, sortie 111 000 | solde = 888 000 | **888 000** |
+| Tenant 3 comptes, secondaire A et B | jamais touchés | **0** et **0** |
+| Isolation inter-tenant (tenant B à 999 999, tenant A à 40 000/45 000/888 000) | aucun mélange | confirmé |
+
+Deux écarts initialement relevés (40 000 au lieu de 50 000 « attendu », lecture
+`journal_entries` à 3 au lieu de 2 « attendu ») se sont révélés être des erreurs
+d'assertion dans le script de test lui-même, pas des anomalies système : depuis
+la migration 175, `fn_ae_execute_event` resynchronise automatiquement la
+trésorerie après tout événement à impact trésorerie, ACH inclus — la
+resynchronisation post-ACH-002 était donc correcte et attendue, et la 3ᵉ ligne
+`journal_entries` correspondait légitimement à l'écriture ACH-002 (règlement),
+distincte de l'écriture ACH-001 (constatation), sur le même `source_id`.
+**Faux positifs, classés définitivement clos — aucune anomalie système.**
+**Ne duplique pas le ticket « VENTILATION TRÉSORERIE PAR COMPTE » ci-dessus**, qui
+reste `FERMÉ` pour l'incident historique AMD FINANCE (preuve chiffrée réelle déjà
+obtenue). Ce ticket suit uniquement la généralisation de la preuve, demandée par
+la mission R-004 : plusieurs tenants, 1/2/3 comptes bancaires, entrée/sortie/
+transfert, compte principal/secondaire/caisse — pas seulement le cas AMD FINANCE
+à 3 comptes déjà corrigé.
+
+### Ce qui reste à prouver
+
+Que `solde calculé = somme des mouvements réels du compte principal` — et non
+`solde × nombre de comptes` — tient pour :
+- un tenant à 1 seul compte (cas trivial, doit rester correct) ;
+- un tenant à 2 comptes (principal + secondaire, avec un transfert vers une
+  caisse) ;
+- un tenant à 3 comptes (principal + 2 secondaires) ;
+- l'isolation stricte entre tenants (aucune fuite de montant d'un tenant à
+  l'autre dans le recalcul).
+
+### Résidu déjà documenté, non traité par ce ticket
+
+`comptes_bancaires.solde` reste modifiable par arithmétique cliente depuis
+plusieurs pages UI (`banques/page.tsx:352`, `transferts/page.tsx:207-218`,
+`decaissements`/`encaissements`), en concurrence avec le recalcul absolu du
+moteur — la migration 178 réduit le *scope* du problème (un seul compte
+auto-géré) mais n'élimine pas cette concurrence d'écriture. Voir NEW-04 dans le
+registre maître.
+
+### Diagnostic demandé
+
+Bloc SQL 4 de la mission R-004 (tenants isolés, `ROLLBACK` en fin de script — voir
+ce bloc pour le détail complet).
+
+---
+
+## TICKET — R004-ACH-002-UNTESTABLE (suivi formel)
+
+**Statut :** NOT_TESTABLE — NO PRODUCTION DATA (2026-09-04, mission R-004)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`
+
+0 achat marqué payé en production à ce jour (confirmé par le diagnostic du
+2026-09-04, §« Ticket triggers hérités achats », section 8 : « 48 achats total, 0
+payé »). Conformément à l'interdiction explicite de la mission R-004, aucune
+donnée n'a été écrite en production pour fabriquer artificiellement une
+transaction.
+
+Un test isolé sur tenant jetable (`ROLLBACK` en fin de script, Bloc SQL 4 de la
+mission R-004, exécuté le 2026-09-07) a vérifié le mécanisme générique : achat
+marqué payé → émission ACH-002 (1 `accounting_events`, 1 `journal_entries`
+401, 1 `transactions`) → ré-émission (double clic/retry simulé) → toujours 1
+seul de chacun, malgré la tentative de doublon (même contrainte
+`uidx_ae_inflight` que pour ACH-001, déjà vérifiée). **Mécanisme confirmé.**
+Ce test prouve le **mécanisme**, pas le comportement avec un vrai achat
+production — le statut `NOT_TESTABLE` ne se lèvera que lorsqu'un achat sera
+réellement marqué payé en production et qu'un contrôle réel sera exécuté sur
+ce cas précis. Ne pas déclarer `VERIFIED` avant cet événement, même si le test
+isolé passe.
+
+---
+
+## FORENSIQUE — journal_entries 2024-2025 (résolu — migration 179)
+
+**Statut :** FERMÉ le 2026-09-08 — purge complète, réversible (`repair_archive`, tag `SEED-CLEANUP-AMD`)
+**Découvert pendant :** le contrôle de production étendu de P0-02 (§P0-02, tableau 12×4)
+
+### Constat initial
+
+`journal_entries` porte exactement 56 écritures par mois, 24 mois consécutifs
+sans exception (2024-01 → 2025-12), pour un total avoisinant 1344 lignes — un
+volume constant mois après mois qui ne ressemble pas à une activité comptable
+organique.
+
+### Indice fort trouvé par lecture de code (pas encore confirmé en base)
+
+`scripts/seed-demo-data.ts:1-11` (docstring) : « Produit : 8 employés · 30
+fournisseurs · 3 comptes bancaires · 192 factures (24 mois) · 192 bulletins
+paie · 48 achats · 192 transactions · 96 mouvements stock · **~1 400
+écritures journal via moteur accounting_engine** » — chiffre quasi identique
+au volume observé. Le script boucle explicitement `for (const year of [2024,
+2025]) { for (let month = 1; month <= 12; month++) { ... } }` à 5 endroits
+distincts (lignes 255, 326, 397, 437, 544 — probablement un par générateur :
+factures, paie, achats, transactions, stock). `getTenantId()` (ligne 55-59)
+sélectionne **le tenant le plus ancien de la base**
+(`order('created_at').limit(1).single()`) — un seul tenant, pas plusieurs.
+Le script lit `.env.local`, qui pointe vers le projet Supabase de
+**production** (déjà relevé par l'audit R-003 des writers).
+
+Ce script a très probablement été exécuté le 2026-06-27 contre le tenant AMD
+FINANCE (b93b7c3d-815b-4336-bbb2-ac24cda0edb2) — cohérent avec le récit déjà
+établi en P0-04 (« le script de démonstration y a été exécuté le 2026-06-27
+avec l'ancien moteur ») et avec les 23 écritures réelles restantes en juin
+2026 après les réparations 176/177/178 (les entrées 2024-2025, elles, n'ont
+jamais été nettoyées — hors périmètre de ces réparations, qui ne portaient
+que sur les doublons de juin 2026).
+
+### Classification définitive (confirmée empiriquement, 2026-09-07)
+
+**DONNÉES DE TEST/SEED — confirmé, pas une hypothèse.** Diagnostic exhaustif
+en production :
+- Un seul tenant concerné : **AMD FINANCE**, 1344/1344 lignes.
+- `created_at` clustering sur **2 jours seulement** (2026-06-27 : 1248 lignes ;
+  2026-09-02 : 96 lignes) malgré des `date_operation` étalées sur 24 mois —
+  signature définitive d'une génération en masse, pas d'activité organique.
+- Le lot du 2026-09-02 s'explique entièrement : ce sont les 96 règlements
+  FAC-002 rejoués par la migration 176 (P0-04) sur ces mêmes factures de
+  démo — `date_operation` reste celle du fait d'origine (2024-2025),
+  `created_at` celle du rejeu.
+- 100% des lignes liées à un `accounting_events` réel (0 orpheline).
+- Correspondance **exacte** (total = scope) confirmée table par table :
+  `comptes_bancaires` (3), `employes` (8), `fournisseurs` (30),
+  `bulletins_paie` (192), `achats` (48), `stock_movements` (96) — aucune
+  donnée réelle mélangée sur ces 6 tables.
+- `factures` : 192, `created_at` backdaté individuellement sur toute la
+  période (pas de clustering, contrairement aux autres tables) mais total
+  exactement conforme au script — aucune facture supplémentaire.
+  `facture_lignes` : 0 ligne liée à AMD FINANCE.
+- `transactions` : 300 au total, 288 dans le périmètre du script — **12
+  lignes distinctes, datées du 2026-06-26/29**, catégories plausibles
+  d'activité réelle (Honoraires conseil, Loyers, Charges personnel,
+  Remboursements, ONG, Restaurant), montants de 100 000 à 8 500 000 F.
+  `accounting_events` : 771 au total, 768 dans le périmètre — **3 événements
+  hors script** (ONG-001 ×2, RES-001 ×1, mêmes 2026-06-26). Ces 15 lignes ne
+  viennent pas du script — **identifiées et préservées**, pas touchées par
+  la purge.
+
+**Découverte notable** : les 3 comptes bancaires (BGFI, LCB, BOCEC) que la
+migration 178 avait corrigés pour le triplement de solde faisaient
+eux-mêmes partie du jeu de démo (créés le 2026-06-27) — la correction de
+178 portait donc sur des données de démonstration, pas sur les comptes
+bancaires réels d'AMD FINANCE (dont on ignore l'état, puisqu'ils n'existent
+pas en base à ce jour).
+
+### Réparation appliquée — migration 179
+
+`supabase/migrations/179_purge_seed_demo_amd_finance.sql` — garde-fous sur
+les 11 comptes exacts diagnostiqués, archivage JSONB intégral dans
+`repair_archive` (tag `SEED-CLEANUP-AMD`) avant suppression, ordre
+respectant les clés étrangères (`journal_entries` → `accounting_event_log`
+→ `accounting_events` → `transactions` → `stock_movements` → `achats` →
+`bulletins_paie` → `factures` → `comptes_bancaires` → `employes` →
+`fournisseurs`). Décision utilisateur : purge complète, y compris comptes
+bancaires/employés/fournisseurs, après confirmation qu'aucune donnée réelle
+n'y est mélangée.
+
+`cheques`/`virements` référencent `comptes_bancaires` en `ON DELETE SET
+NULL` (vérifié avant exécution) — aucun risque de casse ou d'orphelin.
+
+### Contrôle post-exécution (production, 2026-09-08)
+
+| Contrôle | Résultat |
+|---|---|
+| `journal_entries`/`comptes_bancaires`/`employes`/`fournisseurs`/`factures`/`bulletins_paie`/`achats`/`stock_movements` restants pour AMD FINANCE | **0** sur les 8 tables |
+| `transactions` préservées (hors script) | **12** — conforme |
+| `accounting_events` préservés (hors script) | **3** — conforme |
+| `repair_archive` (SEED-CLEANUP-AMD) | journal_entries=1344, accounting_event_log=768, accounting_events=768, transactions=288, stock_movements=96, achats=48, bulletins_paie=192, factures=192, comptes_bancaires=3, employes=8, fournisseurs=30 |
+
+**Statut : FERMÉ.** Réversible via `repair_archive` (ordre de réinsertion
+documenté dans la migration 179) si besoin.
+
+---
+
+## TICKET — R005-OCR-PROXY-GAP (`/api/ocr/extract` absente de `AUTOMATION_PATHS`)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code, non vérifié en HTTP réel
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §B
+
+`proxy.ts` (`AUTOMATION_PATHS`, lignes 32-47) liste 14 chemins d'automatisation, pas 15 —
+`/api/ocr/extract` en est absente, et n'est pas non plus dans `PUBLIC_API_PREFIXES`.
+`app/api/storage/upload/route.ts:70-74` déclenche l'OCR via `fetch()` avec un
+`Authorization: Bearer <CRON_SECRET>` valide (`automationHeaders()`), mais sans cookie de
+session. Le proxy voit `user=null`, la route n'est exemptée nulle part → **401 renvoyé par le
+proxy avant que `requireAutomationSecret` ne soit jamais évalué**. L'échec est avalé
+silencieusement (`.catch(() => {})`, ligne 74) — aucune alerte, aucun log.
+
+**Cause racine** : `AUTOMATION_PATHS` a été construite à partir des 14 routes déjà connues au
+moment de la correction ANO-C01 (commit `f0d43f2`) ; `ocr/extract` a son propre garde
+`requireAutomationSecret` mais n'a jamais été ajoutée à la liste d'exemption du proxy — décalage
+entre deux mécanismes qui devraient être synchronisés.
+
+**Impact** : fonctionnel, pas une exposition de sécurité (le proxy bloque, il n'ouvre rien).
+L'OCR asynchrone post-upload semble structurellement en échec en production.
+
+**Gap CI associé** : `lib/architecture/automation-guard.test.ts` vérifie que chaque chemin de
+`AUTOMATION_PATHS` appelle le garde, mais pas l'inverse (qu'une route appelant le garde soit bien
+listée) — c'est cet angle mort qui laisse passer le cas sans échec CI.
+
+**Interdiction explicite de cette mission** : ne rien corriger sans validation. Diagnostic
+uniquement.
+
+---
+
+## TICKET — R005-AUTOMATION-RUN-TIMING (`automation/run` hors garde unique)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §B
+
+`app/api/automation/run/route.ts` est une 16ᵉ route d'automatisation, non couverte par
+`requireAutomationSecret`/`safeEqual`. Elle réimplémente son propre contrôle :
+`secret !== process.env.AUTOMATION_SECRET` — comparaison **directe**, pas à temps constant.
+Accepte aussi une session utilisateur en parallèle (mode double), ce qui limite l'exposition
+réelle. Non couverte par `lib/architecture/automation-guard.test.ts`.
+
+**Sévérité : LOW** — timing attack théorique sur la comparaison de secret, mitigée par le mode
+session parallèle et par le fait que l'attaquant devrait déjà connaître l'existence de cette route
+spécifique (hors des 15 documentées).
+
+---
+
+## TICKET — R005-RLS-FUNCTION-BODY-GAP (gisement de performance hors périmètre de 168)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §A
+**Dépend de :** migration 168
+
+`get_my_tenant_id()` (migration 118), `get_my_role()` (053) et `fn_is_user_financial()` (030)
+contiennent `WHERE user_id = auth.uid()` **non encapsulé, dans le corps de la fonction**
+(`get_my_tenant_id`/`get_my_role` en `STABLE` ; `fn_is_user_financial` sans marqueur `STABLE`
+explicite, donc `VOLATILE` par défaut — pire cas, aucune mise en cache possible par appel). La
+migration 168 ne réécrit que `pg_policies` — elle ne touche jamais le corps d'une fonction. Or la
+quasi-totalité des ~110+ tables du dépôt délèguent leur isolation tenant à `get_my_tenant_id()`
+plutôt qu'à un `auth.uid()` direct dans leur policy — **le point d'optimisation le plus
+impactant en volume n'est donc pas couvert par 168**, même si elle est appliquée intégralement.
+
+**Non vérifiable depuis le dépôt seul** : si Postgres *inline* effectivement ces fonctions
+`STABLE` dans le plan d'exécution des policies appelantes (auquel cas le défaut se propage à
+chaque appelant) dépend de la version Postgres et du contenu exact de la requête — seul un
+`EXPLAIN (ANALYZE, BUFFERS)` réel en base trancherait.
+
+**Recommandation** : ticket séparé de 168, à traiter en recette une fois celle-ci disponible
+(ANO-P03).
+
+---
+
+## TICKET — R005-STORAGE-RLS-GAP (`storage.objects` hors périmètre de 168)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-005) — diagnostic par lecture de code
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R005-SECURITY-HARDENING-DIAGNOSTIC.md` §A
+**Dépend de :** migration 168
+
+`168_fix_auth_rls_initplan.sql:54` filtre `schemaname = 'public'` — le schéma `storage` est donc
+hors périmètre, alors que l'introduction du fichier (lignes 3-4) prétend couvrir `auth.role()`
+sans réserve. `storage.objects` (`logos_auth_insert`/`logos_auth_update`, migration
+`041_storage_logos_bucket.sql:26-32`) utilise `auth.role() = 'authenticated'` non encapsulé et ne
+sera jamais touché par 168 telle qu'écrite.
+
+**Sévérité : LOW** — performance uniquement, petite table (bucket logos).
+
+**Recommandation** : ticket séparé de 168 (« 168-bis »), même mécanisme, périmètre `storage`.
+
+---
+
+## TICKET — R006-MIGRATION-PHANTOM-TABLES (rejeu bloqué dès le fichier 68/179)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03) — **BLOCKED**, priorité haute
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R006-ANO-P03-RECETTE-ENVIRONMENT.md` §D
+
+Quatre migrations référencent des tables **jamais créées par aucune migration du dépôt**
+(existent uniquement en production, hors gouvernance des migrations) :
+
+- `068_entretiens_ia.sql:7` — `REFERENCES candidatures(id)`. **Premier point de rupture du rejeu
+  séquentiel complet** (fichier 68 sur 179) : `ERROR: relation "candidatures" does not exist`.
+- `110_ats_pipeline.sql` (lignes 7,14,17,38,57,76,97) — `candidatures`/`candidats`, même cause.
+- `120_wave4a_rls_security.sql` (lignes 8,10,11) — `candidatures`, même cause. Le même fichier
+  (lignes 19-52) montre pourtant le bon pattern défensif pour une autre table
+  (`IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='cabinet_affaires' ...)`)
+  sans l'appliquer ici.
+- `164_fix_fiscal_declarations_rls_bypass.sql` (lignes 29,31,33) — `fiscal_declarations`, même
+  cause. **Cette migration corrige la faille de sécurité la plus critique identifiée dans
+  `docs/RESTART-AUDIT-AZ.md`** (accès non authentifié aux déclarations fiscales de n'importe quel
+  tenant) — sur une base de recette neuve, elle ne peut même pas s'appliquer.
+
+**Cause racine** : ces tables ont été créées directement en production (dashboard Supabase ou
+script ad hoc), jamais versionnées comme migration — cohérent avec le constat P0-05 déjà établi
+(« la production n'a jamais été construite par rejeu strict des migrations »).
+
+**Impact** : bloque totalement la construction d'une base de recette au-delà du fichier 68 — tout
+ce qui suit (069→179, y compris l'essentiel du moteur comptable SYSCOHADA) ne serait jamais
+appliqué par un rejeu complet.
+
+**Interdiction explicite de cette mission : ne pas corriger.** Diagnostic uniquement — correction
+minimale proposée dans `docs/R006-ANO-P03-RECETTE-ENVIRONMENT.md` §D (créer les tables manquantes
+dans une migration antérieure, ou rendre ces 4 fichiers défensifs sur le modèle de
+`090_nif_to_niu.sql`), non appliquée.
+
+---
+
+## TICKET — R006-REPAIR-MIGRATIONS-NOT-REPLAYABLE (176-179 échouent sur base vierge)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03) — **BLOCKED**, priorité haute
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`, `docs/R006-ANO-P03-RECETTE-ENVIRONMENT.md` §D
+
+`176_repair_p0_04_amd_finance.sql:48`, `177_repair_achats_legacy_doublons.sql:47-48`,
+`178_tresorerie_compte_principal.sql:47-48`, `179_purge_seed_demo_amd_finance.sql:65` sont chacune
+encapsulées dans `BEGIN; ... COMMIT;` avec un garde-fou `DO $$ ... RAISE EXCEPTION ... END $$;` à
+comptage **exact** (« 240 originaux », « 48 écritures », « 3 comptes »…) — conçu pour vérifier
+l'état diagnostiqué en production avant de réparer. Sur une base vierge, tous les comptages valent
+0, ce qui ne correspond à aucune valeur attendue non nulle → **exception levée, transaction
+annulée, rejeu séquentiel arrêté à ce fichier**.
+
+**Confirmation précise (mission R-006)** : ces migrations ne sont **pas** des no-op silencieux sur
+base vide — ce sont des échecs bruyants qui propagent l'erreur au client SQL. Sous
+`supabase db reset`/rejeu séquentiel avec arrêt-sur-erreur, tout le reste s'arrêterait ici.
+
+**Cause racine** : ce ne sont pas des migrations de schéma rejouables — ce sont des réparations
+ponctuelles de données de production spécifiques, avec leur propre en-tête « BLOC À EXÉCUTER »
+manuel, jamais conçues pour un rejeu automatique sur base neuve.
+
+**Interdiction explicite de cette mission : ne pas corriger.** Correction minimale proposée :
+sortir ces 4 fichiers de `supabase/migrations/` vers `docs/runbooks/` (cohérent avec
+`p0-05-bloc-A.sql`/`p0-05-bloc-B.sql` déjà présents) — non appliquée dans cette session.
+
+---
+
+## TICKET — R006-EMPLOYES-FK-CASCADE-LOSS (perte silencieuse de contraintes)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`
+
+`038_employes.sql:2` (`DROP TABLE IF EXISTS employes CASCADE;`) détruit et recrée la table
+`employes` (déjà créée par `001_initial.sql:81`) avec un schéma étendu. Le `CASCADE` supprime
+silencieusement 3 contraintes de clé étrangère posées par des migrations antérieures, jamais
+restaurées ensuite :
+- `006_rh_lifecycle.sql:21` — `conges.employe_id REFERENCES employes(id) ON DELETE CASCADE`
+- `007_paie.sql:8` — `bulletins_paie.employe_id REFERENCES employes(id) ON DELETE SET NULL`
+- `017_hr_complete.sql:35` — `contrats.manager_id REFERENCES employes(id) ON DELETE SET NULL`
+
+**Impact** : sur un rejeu complet, `conges.employe_id`, `bulletins_paie.employe_id` et
+`contrats.manager_id` seraient orphelins de toute contrainte référentielle — état différent de
+l'intention du code source, sans erreur (pas bloquant), mais intégrité référentielle affaiblie.
+
+**Sévérité : MEDIUM.** Non corrigé dans cette session.
+
+---
+
+## TICKET — R006-MIGRATION-NAMING-ORDER (fichiers hors convention numérique)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md`
+
+Trois anomalies de nommage/ordre sans impact bloquant constaté aujourd'hui, mais fragiles :
+- `142.5_fix_fn_ae_execute_event_country.sql` trie **avant** `142_accounting_rules_restaurant.sql`
+  (`.` < `_` en tri lexicographique) — sans dépendance réelle entre les deux aujourd'hui, mais un
+  futur fichier `14X.5_*` qui dépendrait du contenu de `14X_*` casserait silencieusement le rejeu.
+- `CATCHUP_008_to_025.sql` — entièrement redondant avec les migrations 008-025 numérotées
+  (contenu vérifié identique en substance, toutes protégées `IF NOT EXISTS`), conçu comme script
+  manuel de rattrapage hors-migration (son en-tête le dit explicitement) — sa présence dans
+  `supabase/migrations/` est trompeuse.
+- `20260524_mission_critique.sql` — non redondant (ajoute `profiles.created_at`,
+  `tenants.status`/`deleted_at`), mais trie après `179_*`, alors que d'autres migrations y font
+  implicitement référence en corps de fonction (sans blocage constaté, la validation n'a lieu qu'à
+  l'exécution, pas à la création).
+
+**Sévérité : LOW.** Non corrigé dans cette session.
+
+---
+
+## TICKET — R006-SEED-SCRIPT-NO-GUARD (risque de récidive de l'incident AMD FINANCE)
+
+**Statut :** OUVERT le 2026-09-08 (mission R-006/ANO-P03)
+**Registre :** `docs/MASTER-REPAIR-REGISTER.md` (NEW-06, incident historique déjà nettoyé)
+
+`scripts/seed-demo-data.ts` reste, tel quel, exécutable contre n'importe quel `.env.local` — y
+compris celui qui pointe vers production. `getTenantId()` (ligne 55-59) sélectionne automatiquement
+« le tenant le plus ancien de la base » sans aucune vérification d'environnement. C'est exactement
+le mécanisme qui a produit l'incident nettoyé par la migration 179 (1344 écritures fictives sur
+AMD FINANCE). Rien n'empêche une récidive si ce script est ré-exécuté, par erreur ou par un futur
+développeur qui ne connaît pas cet historique.
+
+**Recommandation (non appliquée)** : refuser l'exécution si l'URL Supabase cible correspond au
+projet de production connu ; exiger un `--tenant-id` explicite plutôt que « le plus ancien
+tenant ».
+
+**Sévérité : MEDIUM** (risque de récidive, indépendant de l'existence ou non d'un environnement de
+recette). Non corrigé dans cette session.
+
+---
+
+## CLÔTURE — R006-SEED-SCRIPT-NO-GUARD (mission P0-A, 2026-09-07)
+
+**Statut : CODE_FIXED.**
+
+**Cause racine.** `scripts/seed-demo-data.ts` ne contenait aucune vérification d'environnement.
+`getTenantId()` sélectionnait « le tenant le plus ancien » sans distinction dev/prod, et la clé
+utilisée (`SUPABASE_SERVICE_ROLE_KEY`) contourne RLS — combinaison identique à celle qui a produit
+l'incident nettoyé par la migration 179 (1344 écritures fictives sur AMD FINANCE).
+
+**Protection implémentée.** `scripts/lib/seed-production-guard.ts` — fonction pure
+`assertSeedTargetIsNotProduction()`, appelée dans `scripts/seed-demo-data.ts` immédiatement après
+le chargement de `.env.local`, avant toute création de client Supabase (`createClient`) et avant
+toute opération réseau. Quatre signaux, dont trois non contournables :
+
+1. **URL Supabase de production connue** (`KNOWN_PRODUCTION_SUPABASE_URL`, comparaison
+   normalisée) — bloque inconditionnellement, quelle que soit la configuration déclarée. Ce n'est
+   pas un secret : c'est une variable `NEXT_PUBLIC_*`, déjà publique dans le bundle client envoyé
+   au navigateur.
+2. `VERCEL_ENV === 'production'` — bloque inconditionnellement.
+3. `NODE_ENV === 'production'` — bloque inconditionnellement (défense en profondeur ; **jamais**
+   utilisé pour autoriser, seulement pour refuser — conforme à l'exigence « NODE_ENV seul n'est
+   jamais une preuve suffisante »).
+4. `SEED_TARGET_ENV` — déclaration explicite **obligatoire**, liste blanche
+   (`development`/`local`/`recette`/`test`), absence ou valeur non reconnue = refus par défaut
+   (fail-closed). Documentée dans `.env.example`. Cette variable n'est pas un interrupteur qui
+   désactive la protection : même correctement déclarée, elle ne permet jamais de contourner les
+   signaux 1 à 3.
+
+Aucun mécanisme de contournement (`--force-prod` ou équivalent) n'existe. Aucun secret ni clé
+Supabase n'est codé en dur — uniquement une URL publique utilisée en comparaison de blocage.
+
+**Tests ajoutés** — `scripts/lib/seed-production-guard.test.ts` (16 tests, tous déterministes,
+aucune connexion Supabase réelle) :
+- (A) `recette`/`development`/`local`/`test` explicites → autorisé.
+- (B) `SEED_TARGET_ENV="production"` refusé ; `VERCEL_ENV="production"` refusé même avec
+  `SEED_TARGET_ENV="recette"`.
+- (C) URL Supabase de production refusée même avec `SEED_TARGET_ENV="development"` +
+  `NODE_ENV="development"` (le signal URL prime) ; détection insensible à la casse et au slash
+  final.
+- (D) configuration ambiguë refusée par défaut (`SEED_TARGET_ENV` absent, vide, ou valeur inconnue
+  type `staging`/`prod`) ; `NODE_ENV="development"` seul, sans `SEED_TARGET_ENV`, n'autorise pas.
+- (E) test statique sur `scripts/seed-demo-data.ts` : vérifie que l'appel au garde précède
+  textuellement `createClient(` dans le fichier — garantit qu'aucune opération DB ne peut se
+  produire avant validation.
+
+`vitest.config.ts` étendu (`include`) pour couvrir `scripts/**/*.test.ts`, en plus de `lib/` et
+`__tests__/`.
+
+**Résultats réels (exécutés le 2026-09-07, pas de connexion Supabase, comme exigé par la mission)**
+- `npx vitest run scripts/lib/seed-production-guard.test.ts` → **16/16 passés**.
+- `npx vitest run` (suite complète) → **751/751 passés, 32 fichiers**, aucune régression.
+- `npx tsc --noEmit` → **0 erreur**.
+- `npx eslint` sur les fichiers modifiés → **0 erreur** (avertissements « file ignored » attendus :
+  `scripts/` est déjà exclu du lint dans ce dépôt, convention préexistante, non introduite ici).
+
+**Limites documentées.** Le garde n'a pas été exercé en conditions réelles contre le vrai projet
+Supabase de production (interdit par le périmètre de la mission — « ne pas se connecter à la
+production »). Sa robustesse repose sur la justesse de `KNOWN_PRODUCTION_SUPABASE_URL` : si le
+projet de production change d'URL sans mise à jour de cette constante, le signal 1 perdrait sa
+force et le garde reposerait uniquement sur les signaux 2-4 (toujours fail-closed par défaut, donc
+toujours sûr, mais moins redondant).
+
+---
+
+## TICKET — P0A-SEED-EMPLOYES-TEST-HARDCODED-PROD (découvert en marge de P0-A, 2026-09-07)
+
+**Statut :** OUVERT, non corrigé (hors périmètre de la mission P0-A, qui portait exclusivement sur
+`scripts/seed-demo-data.ts` — signalement uniquement, conformément à l'instruction « flag only »).
+
+En auditant `scripts/` à la recherche d'autres scripts à risque, `scripts/seed-employes-test.mjs`
+s'est révélé **plus dangereux** que `seed-demo-data.ts` :
+
+- **L'URL Supabase de production est codée en dur dans le source** (ligne 21 :
+  `const SUPABASE_URL = 'https://mrzixapnaqsbqmagivvf.supabase.co'`), confirmée identique à
+  `NEXT_PUBLIC_SUPABASE_URL` de `.env.local` (comparaison faite sans afficher la valeur). Cela
+  signifie que même un `.env.local` correctement reconfigué vers un futur projet de recette ne
+  protège pas : ce script ignore `.env.local` pour l'URL et cible toujours la production.
+- **Un `DELETE` inconditionnel s'exécute au chargement du module**, hors de toute fonction :
+  `await sb.from('employes').delete().eq('tenant_id', TENANT_ID).in('nom', [...])` (lignes 30-33),
+  avant même l'insertion des employés de test. Aucune confirmation, aucun garde d'environnement.
+- `TENANT_ID` est également codé en dur (`64c244e5-02fd-4cf7-a56f-b0bdd48fdc09`), avec des données
+  nominatives associées à un client réel (`amdfinance.cg` dans les adresses email).
+- Absent de `package.json` (aucun script npm ne l'invoque) — exécutable uniquement via
+  `node scripts/seed-employes-test.mjs` manuel, comme `seed-demo-data.ts`.
+
+**Recommandation (non appliquée)** : appliquer le même garde-fou (`seed-production-guard.ts`,
+adapté en `.mjs` ou converti en `.ts`), et supprimer l'URL/le tenant codés en dur au profit de
+`.env.local` + variable explicite. Priorité plus haute que R006-SEED-SCRIPT-NO-GUARD ne l'était,
+car le contournement de `.env.local` rend inefficace toute protection basée uniquement sur la
+configuration locale.
+
+**Sévérité : HIGH** (URL de production non contournable par la configuration de l'environnement
+d'exécution, suppression de données au chargement du module sans aucun garde).
+
+---
+
+## CLÔTURE — P0A-SEED-EMPLOYES-TEST-HARDCODED-PROD (mission P0-A.2, 2026-09-07)
+
+**Statut : VERIFIED FIX.**
+
+**Cause racine.** `scripts/seed-employes-test.mjs` codait en dur l'URL Supabase de production
+(`https://mrzixapnaqsbqmagivvf.supabase.co`, confirmée identique à `.env.local`), rendant inopérante
+toute protection basée sur la configuration locale (`.env.local`, `SEED_TARGET_ENV`, etc.) : même un
+`.env.local` de recette correctement configuré n'aurait aucun effet, le fichier ignorait
+totalement `.env.local` pour l'URL. De plus, le `DELETE FROM employes ...` s'exécutait au chargement
+du module — au niveau racine du fichier, hors de toute fonction — donc un simple `import` (par un
+outil, un test, un futur refactor) l'aurait déclenché.
+
+**Comportement avant/après.**
+
+| | Avant | Après |
+|---|---|---|
+| URL Supabase | codée en dur dans le source, ignore `.env.local` | lue depuis `NEXT_PUBLIC_SUPABASE_URL` (`.env.local`/environnement), aucune valeur codée en dur |
+| Garde d'environnement | aucun | `assertSeedTargetIsNotProduction()` (réutilisé tel quel depuis `scripts/lib/seed-production-guard.ts` — même module que `seed-demo-data.ts`, aucun système concurrent créé) |
+| `DELETE FROM employes` | exécuté au chargement du module, avant toute vérification | déplacé dans `deleteExistingTestEmployes()`, appelée uniquement par `main()`, elle-même appelée uniquement si le garde n'a pas levé d'exception, et uniquement quand le fichier est exécuté directement (`npx tsx scripts/seed-employes-test.ts`) — un `import` du module ne déclenche ni le garde ni `main()` |
+| Point d'entrée | tout le corps du script au niveau racine | racine = déclarations pures (constantes, fonctions) ; exécution réelle gardée par `if (isMainModule) { main()... }`, détectée via `import.meta.url === pathToFileURL(process.argv[1]).href` |
+| Extension/exécution | `.mjs`, `node scripts/seed-employes-test.mjs` | `.ts`, `npx tsx scripts/seed-employes-test.ts` (même convention que `seed-demo-data.ts`, nécessaire pour importer le garde TypeScript sans dupliquer sa logique) |
+
+**Tests ajoutés** — `scripts/seed-employes-test.test.ts` (9 tests, `@supabase/supabase-js` et
+`dotenv` mockés, aucune connexion réelle) :
+1. `SEED_TARGET_ENV=recette` → autorisé, delete puis 5 insert exécutés.
+2. URL Supabase de production (`KNOWN_PRODUCTION_SUPABASE_URL`) → refusé, `createClient` jamais
+   appelé, même avec `SEED_TARGET_ENV=recette`.
+3. `VERCEL_ENV=production` → refusé, même avec `SEED_TARGET_ENV=recette`.
+4. `NODE_ENV=production` → refusé, même avec `SEED_TARGET_ENV=recette`.
+5. `SEED_TARGET_ENV` absent → refusé (fail-closed).
+6. `SEED_TARGET_ENV="staging"` (valeur inconnue) → refusé (fail-closed).
+7. **Import du module sans appeler `main()`** → `createClient` jamais appelé, aucune entrée dans le
+   journal d'appels (`callLog`) — preuve directe qu'un import seul ne modifie jamais la base.
+8. Quand autorisé : le premier appel enregistré est toujours `delete`, avant tout `insert`.
+9. Quand refusé : ni `createClient`, ni `delete`, ni `insert` ne sont jamais appelés — le refus
+   intervient strictement avant toute opération, y compris la création du client.
+
+**Résultats réels (exécutés le 2026-09-07, pas de connexion Supabase)**
+- `npx vitest run scripts/seed-employes-test.test.ts` → **9/9 passés**.
+- `npx vitest run` (suite complète) → **760/760 passés, 33 fichiers**, aucune régression (751 avant
+  + 9 nouveaux).
+- `npx tsc --noEmit` → **0 erreur**.
+- `npx eslint` sur les fichiers modifiés → **0 erreur** (avertissements « file ignored » attendus,
+  `scripts/` déjà exclu du lint, convention préexistante) ; `npx eslint .` (projet complet) →
+  **0 erreur**, warnings préexistants sans rapport avec ces fichiers.
+
+**Limites documentées.** Comme pour R006-SEED-SCRIPT-NO-GUARD, le garde n'a pas été exercé contre le
+vrai projet de production (interdit par le périmètre de la mission). `TENANT_ID` reste codé en dur
+(`64c244e5-…`) — hors périmètre explicite de cette mission (qui portait sur l'URL, le garde, et le
+side-effect au chargement, pas sur l'identifiant de tenant).
+
+---
+
+## RECHERCHE EXHAUSTIVE — autres scripts pouvant modifier une base (mission P0-A.2, 2026-09-07)
+
+Recherche dans `scripts/`, `supabase/`, `.github/`, `package.json` : `seed`, `demo`, `fixture`,
+`DELETE FROM`, `TRUNCATE`, `SUPABASE_SERVICE_ROLE_KEY`, URLs Supabase codées en dur, `createClient(`.
+
+| Fichier | Classe | Constat |
+|---|---|---|
+| `scripts/seed-demo-data.ts` | **GUARDED** | Corrigé mission P0-A (`R006-SEED-SCRIPT-NO-GUARD`) |
+| `scripts/seed-employes-test.ts` | **GUARDED** | Corrigé cette mission (P0-A.2) |
+| `scripts/*.js`/`*.mjs`/`*.ts` restants (outillage i18n : `apply_sw.js`, `audit_values.js`, `check2.js`, `check_coverage.js`, `find_untranslated.js`, `fix-i18n-*.mjs`, `gen_*.ts/js`, `generate-i18n.js`, `insert-i18n-keys.mjs`, `insert-sidebar-keys.mjs`, `migrate-fmt*.mjs`, `translate_batch.js`) | **SAFE** | Aucun de ces fichiers n'appelle `createClient(` ni ne référence `SUPABASE_SERVICE_ROLE_KEY` (recherche exhaustive du dépôt) — n'opèrent que sur des fichiers JSON locaux |
+| `scripts/semgrep.sh` | **SAFE** | Wrapper d'analyse statique, aucun accès DB |
+| `supabase/seed_ecam_congo.sql` | **UNSAFE — CRITIQUE, NOUVEAU** | Fichier SQL brut hors `migrations/`, en-tête « Exécuter dans Supabase → SQL Editor ». `DELETE FROM employes/staff_ecole/etudiants/enseignants WHERE tenant_id = 'c9651476-…'` inconditionnel puis `INSERT` — tenant codé en dur, vraisemblablement le client réel ECAM CONGO. **Aucun garde de script ne peut le protéger** : conçu pour un copier-coller manuel direct. Voir ticket dédié ci-dessous |
+| `supabase/backfill_paie_comptabilite.sql` | **GUARDED (idempotent)** | Même tenant ECAM CONGO codé en dur, mais `INSERT` protégé par `NOT EXISTS` — pas de perte de données possible en cas de ré-exécution. Voir ticket dédié |
+| `supabase/tests/validate_rls_wave4a.sql` | **SAFE** | Gabarit de test RLS avec placeholders `<TENANT_B>`/`<USER_A>` — non exécutable tel quel, nécessite substitution manuelle |
+| `supabase/migrations/*.sql` (179 fichiers, dont 176/177/179 et les migrations `accounting_rules_*` 139-148) | **GUARDED (collectif)** | Les `DELETE FROM` trouvés sont soit des sections de rollback idempotentes sur des tables de règles (ex. `139_accounting_rules_facturation.sql:300`), soit des migrations de réparation déjà auditées sous R-006 — non ré-audités individuellement ici pour éviter le doublon avec l'audit des 179 migrations (R-006) |
+| `.github/workflows/ci.yml` | **SAFE** | Aucune étape n'invoque `npx tsx scripts/seed-*` ; le job `build` utilise des valeurs de remplacement explicites (`https://placeholder.supabase.co`) — même en cas d'appel accidentel, aucune cible réelle ; le job `quality` exécute uniquement `vitest run` (aucune DB réelle) |
+| `.github/workflows/semgrep.yml` | **SAFE** | Analyse statique uniquement, aucun accès DB |
+| `package.json` | **SAFE** | Aucun script `seed`/`demo`/`fixture` — recherche vide confirmée |
+
+**Correction : le P0-A initial affirmait à tort l'absence de tout pipeline CI** (`.github/workflows`
+n'avait pas été trouvé par un glob qui a échoué silencieusement). Il existe bien deux workflows
+(`ci.yml`, `semgrep.yml`), inspectés ci-dessus — verdict inchangé : aucun ne peut invoquer un script
+de seed contre production, aucun guard CI supplémentaire n'est nécessaire (§7 de la mission).
+
+---
+
+## TICKET — P0A2-SEED-ECAM-CONGO-SQL-UNGUARDABLE (découvert en marge de P0-A.2, 2026-09-07)
+
+**Statut :** OUVERT, non corrigé (hors périmètre de la mission P0-A.2, qui portait exclusivement sur
+`scripts/seed-employes-test.mjs` — signalement uniquement).
+
+`supabase/seed_ecam_congo.sql` est un fichier SQL brut placé directement sous `supabase/` (hors
+`migrations/`), avec l'en-tête explicite « Exécuter dans Supabase → SQL Editor ». Il exécute, pour
+le tenant codé en dur `c9651476-2fc4-407a-8a4e-778fa1332689` :
+
+```
+DELETE FROM employes    WHERE tenant_id = tid;
+DELETE FROM staff_ecole WHERE tenant_id = tid;
+DELETE FROM etudiants   WHERE tenant_id = tid;
+DELETE FROM enseignants WHERE tenant_id = tid;
+```
+
+suivi d'`INSERT` de données nominatives (enseignants, étudiants, personnel). Le nom du tenant —
+« ECAM CONGO » — et la présence d'un dossier utilisateur `OneDrive - GROUPE ECAM CONGO` suggèrent
+fortement qu'il s'agit d'un **client réel**, pas d'une donnée de démo abstraite comme AMD FINANCE
+dans `seed-demo-data.ts`.
+
+**Différence fondamentale avec les tickets précédents** : ce fichier n'est pas du code exécuté par
+Node — c'est un script SQL destiné à être copié-collé manuellement dans l'éditeur SQL Supabase.
+**Aucun garde applicatif (TypeScript/JavaScript) ne peut l'intercepter.** Toute protection doit être
+structurelle : retrait du dépôt de code, déplacement vers un emplacement clairement hors-production
+(ex. `docs/runbooks/` avec avertissement explicite), ou suppression pure si la donnée n'est plus
+nécessaire.
+
+**Recommandation (non appliquée)** : vérifier auprès de l'utilisateur si `c9651476-…` est le tenant
+de production réel d'ECAM CONGO ; si oui, retirer ce fichier du dépôt (ou le déplacer hors de
+`supabase/` avec un avertissement) et considérer le remplacer par un script paramétrable protégé par
+le même garde que `seed-demo-data.ts`/`seed-employes-test.ts`, s'il doit être conservé pour usage
+futur sur un tenant de démonstration distinct.
+
+**Sévérité : HIGH** (aucune protection technique possible par un garde de script ; DELETE
+inconditionnel sur des données potentiellement réelles d'un client nommé).
+
+---
+
+## TICKET — P0A2-BACKFILL-ECAM-CONGO-SQL (découvert en marge de P0-A.2, 2026-09-07)
+
+**Statut :** OUVERT, non corrigé (signalement uniquement, hors périmètre).
+
+`supabase/backfill_paie_comptabilite.sql` cible le même tenant ECAM CONGO codé en dur, mais
+n'exécute que des `INSERT` protégés par une clause `NOT EXISTS` (ne réinsère que les écritures de
+paie absentes de `journal_comptable`) — idempotent par construction, aucune perte de données
+possible en cas de ré-exécution accidentelle. Même remarque que ci-dessus sur l'impossibilité d'un
+garde applicatif pour un fichier SQL destiné au copier-coller manuel.
+
+**Recommandation (non appliquée)** : si conservé, déplacer vers `docs/runbooks/` avec le même
+avertissement que `seed_ecam_congo.sql`.
+
+**Sévérité : LOW** (idempotent, pas de risque de perte de données — signalé pour traçabilité et
+cohérence avec le ticket précédent, même tenant).
+
+---
+
+## DIAGNOSTIC — P0A2-SEED-ECAM-CONGO-SQL-UNGUARDABLE (mission P0-A.3, 2026-09-07)
+
+**Objet : déterminer si le fichier représente encore un risque réel, avant toute décision de
+déplacement/suppression. Aucune donnée modifiée, aucun SQL exécuté, aucune connexion DB en
+écriture.** Le ticket **reste OPEN** — ce diagnostic ne le ferme pas.
+
+**Contenu fonctionnel exact du seed** (`supabase/seed_ecam_congo.sql`, 102 lignes) :
+- 1 `ALTER TABLE enseignants ADD COLUMN IF NOT EXISTS ...` (8 colonnes, idempotent, ré-application
+  sans danger de la migration 036).
+- 1 bloc `DO $$ ... END $$` — statement unique, donc atomique (tout ou rien en cas d'erreur) :
+  - `DELETE FROM employes/staff_ecole/etudiants/enseignants WHERE tenant_id = 'c9651476-…'` (4
+    tables, inconditionnel sur ce tenant).
+  - `INSERT INTO enseignants` (7 lignes), `INSERT INTO etudiants` (8 lignes, données nominatives de
+    mineurs : nom, date de naissance, contacts parents), `INSERT INTO staff_ecole` (5 lignes),
+    `INSERT INTO employes` (5 lignes, dont un enregistrement `Gordon Mabiala` — à rapprocher de
+    l'adresse `adjigordon@gmail.com` déjà vue dans l'en-tête de `seed-employes-test.ts`).
+- 1 `SELECT ... UNION ALL` final, lecture seule (vérification de comptage).
+- **UUID codé en dur unique** : tenant `c9651476-2fc4-407a-8a4e-778fa1332689` — aucun autre UUID en
+  dur dans le fichier.
+- **Ré-exécutable sans doublon** : chaque section `DELETE` précède son `INSERT`, donc rejouer le
+  fichier ne crée jamais de doublons — mais **écrase silencieusement tout ce qui existe pour ce
+  tenant au moment de l'exécution**, y compris des données réelles accumulées depuis.
+- **Exécution partielle** : le bloc `DO $$…$$` est un statement unique, atomique par nature
+  PostgreSQL (rollback automatique en cas d'erreur en cours de bloc) — risque d'incohérence faible
+  pour ce bloc. Le seul risque de partiel concerne le `ALTER TABLE` (statement séparé, avant le
+  bloc) : il est idempotent (`IF NOT EXISTS`), donc son omission ou sa ré-exécution isolée ne laisse
+  aucune incohérence.
+- **Nature des données** : ambiguë par construction. La forme (noms, téléphones, RIB, CNSS,
+  emails `@ecamcongo.cd`) est typique d'un jeu de démonstration soigné — mais rien dans le fichier
+  ne permet de distinguer une fabrication pure d'une copie de données réelles anonymisées à moitié.
+
+**Identification du tenant : UNKNOWN (non vérifiable cette session).** L'accès en lecture seule à la
+base (`mcp__postgres__query`, seul outil disponible pour une requête SQL réelle) a échoué à la
+connexion — erreur `(ENOTFOUND) tenant/user postgres.mrzixapnaqsbqmagivvf not found` — un échec de
+connexion (cohérent avec les échecs déjà documentés en mémoire des serveurs MCP `supabase` et
+`supabase-moonbank`, `CONNECTION_CLOSED`), pas un refus d'accès délibéré. Le nom du projet dans
+l'erreur (`mrzixapnaqsbqmagivvf`) confirme que l'outil visait bien le projet de production connu,
+mais la connexion elle-même n'a pas abouti. Aucun contournement n'a été tenté (hors périmètre
+explicite de la mission). **Aucune requête SQL réelle n'a donc pu être exécutée, ni en lecture ni en
+écriture.**
+
+**Preuves indirectes (code source, non une confirmation DB) pointant vers un tenant réel plutôt
+qu'une donnée de démonstration abstraite :**
+1. `components/dashboard/Sidebar.tsx:215` — la navigation **de production** contient littéralement
+   `{ id: 'salaires', label: 'Paie & Bulletins', sublabel: 'ECAM Congo', href: '/dashboard/rh/paie' }`.
+   Un sous-libellé d'interface nommant explicitement « ECAM Congo » dans le code de navigation
+   suggère un client identifié, pas une donnée fictive interchangeable.
+2. `supabase/migrations/053_rbac_enterprise.sql:7-10` — commentaire décrivant un bug RLS multi-tenant
+   réel : « BUG : sans ORDER BY, PostgreSQL choisit n'importe quelle ligne pour un utilisateur
+   multi-tenant... Résultat : **ECAM CONGO** peut voir les données de **BADIBA** et vice-versa. » —
+   un correctif de sécurité réel citant des noms d'entreprises concrets pour illustrer un incident
+   observé est un signal fort (mais indirect) de tenants réels, pas de placeholders.
+
+Ces deux éléments sont des **indices**, pas une preuve d'identité formelle (pas de confirmation
+`tenant_id` ↔ raison sociale en base). Conformément à l'instruction de ne pas transformer une
+hypothèse en fait, le statut d'identification reste **UNKNOWN**.
+
+**Données encore présentes dans le tenant : NON VÉRIFIABLE** (même cause — connexion DB en échec).
+Aucun comptage réel n'a pu être obtenu pour `enseignants`/`etudiants`/`staff_ecole`/`employes` sur ce
+tenant.
+
+**Historique Git :**
+- `seed_ecam_congo.sql` : **un seul commit** dans tout l'historique —
+  `436d8a13accd1cdceacbced5f3960304bca7d8b8` (2026-05-18 23:55:47 +0100, auteur « Oraforme Dev »,
+  co-auteur Claude), message **« @ refonte(couleurs): theme clair permanent, sidebar marine, accents
+  marque »** — un commit de **refonte de thème CSS touchant 94+ fichiers**, sans aucun rapport avec
+  le contenu du fichier. Le fichier n'a donc jamais été introduit par un commit dédié et documenté —
+  il a été balayé accidentellement dans un commit massif et non lié (probablement via un `git add`
+  large pendant une session de travail). Aucune trace de revue ou de justification explicite.
+- `backfill_paie_comptabilite.sql` : même schéma — commit unique `9db5fd0d657837ba354e73aa7d4731d0df8d8672`
+  (2026-05-16 23:06:38 +0100), message « fix(compta): align categorie format with Grand Livre OHADA
+  code grouping » — également sans rapport.
+- **Aucun lien avec l'incident AMD FINANCE** (migration 179) : tenant différent
+  (`b93b7c3d-815b-4336-bbb2-ac24cda0edb2`, domaine comptabilité/finance) contre `c9651476-…` (domaine
+  scolaire : `enseignants`/`etudiants`/`staff_ecole`) — deux verticaux métier distincts de l'ERP.
+- **Autres références « ECAM » dans le dépôt** (recherche exhaustive, insensible à la casse, sur
+  `seed_ecam_congo`, `c9651476`, `ECAM CONGO`, `ECAM`, `seed_ecam`, `ecamcongo`) : uniquement
+  `components/dashboard/Sidebar.tsx` (sous-libellé UI, voir ci-dessus) et
+  `supabase/migrations/053_rbac_enterprise.sql` (commentaire de bug, voir ci-dessus), en plus des
+  fichiers de ce diagnostic lui-même (`docs/REPAIR-LOG.md`, `docs/MASTER-REPAIR-REGISTER.md`) et des
+  deux fichiers SQL déjà connus. Aucune autre occurrence. « BADIBA » (cité dans la migration 053)
+  n'apparaît nulle part ailleurs dans le dépôt.
+
+**Classification : D. UNSAFE AND PRODUCTION-RELEVANT (sous réserve — voir justification).**
+Justification : le fichier est objectivement UNSAFE (DELETE inconditionnel sur un tenant codé en
+dur, aucun garde possible). Le classement en D plutôt qu'en C (« UNSAFE BUT UNUSED ») repose sur les
+deux indices indirects ci-dessus (libellé UI de production + commentaire de bug citant le nom comme
+tenant réel) — suffisants pour ne pas classer le fichier comme sûrement inoffensif, insuffisants pour
+en faire une certitude absolue en l'absence de confirmation DB. Si l'identité du tenant était
+confirmée `UNKNOWN` de façon définitive (jamais vérifiable), la classification prudente resterait D
+par précaution plutôt que de rétrograder vers C sur la base d'une simple absence de preuve.
+
+**Risque réel :** si `c9651476-…` est effectivement le tenant de production d'ECAM Congo et que ce
+tenant est en usage actif (l'entrée dans `Sidebar.tsx` suggère que le module Paie de ce client est
+opérationnel), toute ré-exécution de ce fichier — accidentelle ou par un développeur pensant
+« régénérer les données de démo » — **effacerait silencieusement les données réelles actuelles**
+(enseignants, étudiants, personnel, employés RH) au profit du jeu de données du 2026-05-18. Le
+fichier ne peut être déclenché que manuellement (copier-coller SQL Editor), donc le risque est lié à
+l'erreur humaine ou à une mauvaise compréhension du fichier par un futur développeur — pas à une
+automatisation.
+
+**Stratégie recommandée (proposition uniquement — aucune action effectuée) :**
+Compte tenu de l'incertitude sur l'identité réelle du tenant, la stratégie recommandée est un
+**DÉPLACEMENT vers `docs/runbooks/`** avec un avertissement explicite en tête de fichier (« ⚠️ ce
+script efface les données actuelles du tenant ciblé avant de les remplacer — ne jamais exécuter sans
+confirmation explicite de l'identité et de l'état du tenant »), plutôt qu'une suppression pure : la
+suppression serait prématurée sans confirmation que le fichier est obsolète, et le maintien en l'état
+dans `supabase/` (à côté des migrations versionnées) est trompeur car il laisse penser à un artefact
+de déploiement légitime. Ceci reste une **proposition** ; aucun déplacement n'a été effectué dans
+cette mission, conformément à la consigne.
+
+**Modifications NON effectuées dans ce diagnostic :** aucune donnée modifiée, aucun fichier
+déplacé/supprimé/renommé, aucun SQL exécuté, aucune tentative de contournement de l'échec de
+connexion DB.
+
+**Prochaine action exacte recommandée :** obtenir confirmation de votre part sur l'identité réelle du
+tenant `c9651476-2fc4-407a-8a4e-778fa1332689` (est-ce le tenant de production d'un client réel nommé
+ECAM Congo, actuellement actif ?). Si confirmé actif → exécuter le déplacement vers
+`docs/runbooks/` avec avertissement (mission dédiée, hors du présent diagnostic). Si confirmé
+obsolète/tenant de test jamais mis en production → suppression du dépôt (mission dédiée). Si accès
+DB rétabli entre-temps → relancer la vérification READ-ONLY décrite en §2-3 de la présente mission
+avant de trancher.
+
+---
+
+## CLÔTURE — MISSION P0-CRITICAL-01 (2026-09-15/16) — 5 risques CRITICAL de l'audit A→Z
+
+**Source :** `docs/MASTER-A-Z-AUDIT-2026-09.md` (audit forensique complet, 2026-09-14). Mission
+explicitement limitée à la correction de 5 problèmes CRITICAL — aucun HIGH/MEDIUM/LOW commencé.
+
+### Étape 0 — Revérification des preuves avant modification
+
+Chaque preuve de l'audit a été revérifiée directement (requêtes `pg_policies`/`pg_proc`/`pg_roles`/
+`pg_class` en lecture seule sur le projet de production `mrzixapnaqsbqmagivvf`, et lecture intégrale
+des 2 fichiers SQL + du helper Playwright) avant toute modification. Toutes les preuves se sont
+révélées **toujours exactes** — aucune conclusion du rapport n'a dû être invalidée.
+
+Vérification technique supplémentaire effectuée avant d'écrire la migration RLS : `emit_accounting_event()`,
+`fn_ae_execute_event()`, `fn_reverse_accounting_event()`, `fn_replay_accounting_event()` sont toutes
+`SECURITY DEFINER`, appartiennent au rôle `postgres` (`rolbypassrls = true`), et `journal_entries`/
+`tenants` n'ont pas `FORCE ROW LEVEL SECURITY` (`relforcerowsecurity = false`). Conclusion : ces
+fonctions et le service_role des routes API contournent déjà RLS entièrement, indépendamment des
+policies — retirer les policies larges ne pouvait donc pas casser le moteur comptable ni les routes
+serveur légitimes. C'est cette vérification qui a permis de procéder avec confiance.
+
+### CRITICAL #1 — Fuite RLS `tenants`
+
+- **Cause racine :** policy `tenants_select` (`qual: auth.uid() IS NOT NULL`, aucun filtre tenant),
+  absente de toute migration versionnée du dépôt (`grep tenants_select supabase/migrations/*.sql` =
+  0 résultat) — dérive de configuration appliquée hors-pipeline (SQL Editor/Dashboard), non datable.
+- **Correction :** `supabase/migrations/180_fix_rls_tenants_journal_entries_leak.sql` —
+  `DROP POLICY IF EXISTS "tenants_select" ON public.tenants;`. Les policies restantes
+  (`tenants: select` → `id = get_my_tenant_id()`, `tenants: visibilite groupe membres` → hiérarchie
+  de groupe légitime) suffisent et restent inchangées.
+- **Tests :** `lib/architecture/rls-tenants-journal-entries-fix.test.ts` (statique — vérifie que la
+  migration retire bien `tenants_select` et ne touche pas les policies légitimes). **Comportement RLS
+  réel en exécution NOT TESTABLE** : aucun environnement de recette n'existe (ANO-P03, toujours
+  BLOCKED) pour exécuter un vrai test d'isolation tenant A/tenant B.
+- **Statut :** CODE VERIFIED (migration écrite, vérifiée par test statique) / TEST VERIFIED (test
+  statique passant) / **PRODUCTION VERIFIED : EN ATTENTE** — la migration n'a pas été exécutée par
+  l'assistant (convention de l'engagement : le bloc SQL est fourni à l'utilisateur pour exécution
+  manuelle dans Supabase SQL Editor, cf. décision explicite de l'utilisateur au début de cette
+  mission). Se reporter au message de conversation contenant le bloc SQL complet.
+
+### CRITICAL #2 — Fuite RLS `journal_entries`
+
+- **Cause racine :** migration `026_erp_interconnection.sql` (lignes 118-131) a créé 4 policies
+  larges (`select`/`insert`/`update`/`delete`, tenant seul, sans `fn_is_user_financial()`) ; la
+  migration `030_financial_rls.sql` (lignes 66-80) a ajouté des policies strictes
+  (`financial read`/`financial write`) **sans jamais `DROP POLICY`** les 4 larges. En RLS Postgres,
+  les policies permissives d'une même commande s'additionnent en OR — la policy stricte n'avait
+  donc jamais eu d'effet réel.
+- **Correction :** même migration 180 — `DROP POLICY IF EXISTS` sur les 4 policies larges
+  (`journal_entries: select/insert/update/delete`), conservation de `financial read`/`financial write`.
+- **Tests :** même fichier statique, section dédiée journal_entries (vérifie les 4 DROP, la
+  non-suppression des policies financières, l'idempotence de toutes les instructions `DROP POLICY`,
+  et l'absence de toute instruction `DELETE FROM`/`TRUNCATE` dans la migration).
+- **Statut :** CODE VERIFIED / TEST VERIFIED / **PRODUCTION VERIFIED : EN ATTENTE** (même migration
+  180, même convention d'exécution manuelle par l'utilisateur).
+
+### SQL #1 — `supabase/tests/demo_data_sprint_s02_p3.sql`
+
+- **Cause racine :** SQL brut destiné au copier-coller dans Supabase SQL Editor, ciblant
+  automatiquement `SELECT id INTO v_tid FROM tenants ORDER BY created_at LIMIT 1` — le tenant le
+  plus ancien de la base connectée, qui en production est un tenant AMD FINANCE réel (mécanisme
+  identique à l'incident NEW-06 nettoyé par la migration 179). Committé 2026-09-02, jamais couvert
+  par P0-A/A.2/A.3 (qui ne portaient que sur `scripts/` et les fichiers `.sql` à la racine de
+  `supabase/`).
+- **Correction :** déplacé vers `docs/runbooks/demo_data_sprint_s02_p3.sql` (rupture de l'apparence
+  de script de test légitime sous `supabase/tests/`) **et** garde technique ajoutée directement dans
+  le SQL — `RAISE EXCEPTION` inconditionnel si le tenant trouvé correspond à l'un des 3 UUID AMD
+  FINANCE connus de production (`b93b7c3d-…`, `64c244e5-…`, `810892b1-…`). Ce n'est pas un simple
+  commentaire d'avertissement : c'est une instruction SQL qui bloque réellement l'exécution.
+  **Limite assumée et documentée** : cette garde protège spécifiquement contre les 3 tenants
+  actuellement connus, elle ne remplace pas un véritable environnement de recette isolé (toujours
+  BLOCKED).
+- **Tests :** `lib/architecture/rls-tenants-journal-entries-fix.test.ts` (section dédiée) — vérifie
+  que l'ancien chemin `supabase/tests/demo_data_sprint_s02_p3.sql` n'existe plus, que le nouveau
+  existe, et que la garde `RAISE EXCEPTION`/les 3 UUID sont bien présents dans son contenu.
+- **Statut :** VERIFIED FIX (déplacement + garde confirmés par test statique réel sur le système de
+  fichiers).
+
+### SQL #2 — `supabase/tests/seed_amd_finance.sql`
+
+- **Cause racine :** cible explicitement AMD FINANCE par recherche floue
+  (`nom_entreprise ILIKE '%amd%' OR ILIKE '%finance%'`), committé le 2026-06-29 — 2 jours après
+  l'incident NEW-06 daté du 2026-06-27. Sa finalité même (injecter des factures/transactions
+  fictives sur AMD FINANCE) contredit la règle établie que ce tenant est un client réel à ne jamais
+  polluer avec des données de démonstration.
+- **Correction :** même traitement que SQL #1 — déplacé vers `docs/runbooks/seed_amd_finance.sql`,
+  garde technique `RAISE EXCEPTION` sur les 3 mêmes UUID AMD FINANCE ajoutée.
+- **Nuance non tranchée dans cette mission :** la pertinence métier de conserver ce fichier reste
+  questionnable (voir ticket `P0CRIT01-SEED-AMD-FINANCE` au registre) — une suppression complète
+  aurait été une décision plus lourde et irréversible que le périmètre de cette mission
+  (« neutraliser le risque d'exécution accidentelle ») ne le justifiait à lui seul ; signalé pour
+  revue séparée.
+- **Tests :** même fichier statique que SQL #1.
+- **Statut :** VERIFIED FIX (déplacement + garde confirmés par test statique).
+
+### Playwright DB Helper — `tests/certifications/helpers/db.ts`
+
+- **Cause racine :** `SUPABASE_URL` codée en dur en littéral (`https://mrzixapnaqsbqmagivvf.supabase.co`),
+  `SUPABASE_SERVICE_ROLE_KEY` lue sans aucun garde d'environnement — `createTestAccount`/
+  `createEcoleAccount` créent de vrais tenants en production via l'API PostgREST/Auth admin,
+  `deleteTestAccount` a ses 4 `DELETE` chacun encapsulé dans `.catch(() => {})` (nettoyage
+  silencieusement défaillant, non corrigé dans cette mission — hors périmètre explicite, qui ne
+  portait que sur les credentials codées en dur).
+- **Correction :** `SUPABASE_URL` lue depuis `process.env.NEXT_PUBLIC_SUPABASE_URL` ; garde
+  `assertSeedTargetIsNotProduction()` **réutilisé tel quel** depuis
+  `scripts/lib/seed-production-guard.ts` (aucun système de sécurité concurrent créé, conformément à
+  la consigne explicite de la mission), appelé au chargement du module — avant toute création de
+  requête réseau, avant même la vérification de présence de `SUPABASE_SERVICE_ROLE_KEY`.
+- **Tests :** `tests/certifications/helpers/db.test.ts` (9 tests, mêmes techniques de mock que
+  `scripts/seed-employes-test.test.ts`) : import réussi en configuration recette ; refus si URL de
+  production même avec `SEED_TARGET_ENV=recette` ; refus si `VERCEL_ENV=production` ; refus
+  (fail-closed) si `SEED_TARGET_ENV` absent ou inconnu ; messages d'erreur clairs si
+  `NEXT_PUBLIC_SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` manquants après le garde ; vérification
+  directe que le fichier source ne contient plus l'URL de production en littéral.
+- **Statut :** VERIFIED FIX (9/9 tests réels passants, aucune connexion Supabase requise).
+
+### Résultats réels (exécutés le 2026-09-15/16)
+
+- `npx vitest run lib/architecture/rls-tenants-journal-entries-fix.test.ts tests/certifications/helpers/db.test.ts`
+  → **22/22 passés** (un faux positif dans mon propre test corrigé en cours de route — une regex
+  capturait un commentaire prose contenant les mots « DROP POLICY », pas un défaut de la migration).
+- `npx vitest run` (suite complète) → **782/782 passés, 35 fichiers** (760 avant + 22 nouveaux),
+  aucune régression.
+- `npx tsc --noEmit` → **0 erreur**.
+- `npx eslint .` (projet complet) → voir résultat rapporté dans la sortie finale de la mission.
+- `npm run build` (avec les valeurs de remplacement de la CI) → voir résultat rapporté dans la
+  sortie finale de la mission.
+
+### Scan global après correction — nouveaux vecteurs comparables détectés, NON corrigés
+
+Recherche exhaustive (`scripts/`, `supabase/`, `tests/`, `.github/`) pour : URL Supabase de
+production, `service_role`, `DELETE FROM`/`TRUNCATE`, UUID de tenant, `seed`/`demo`/`fixture`,
+`createClient(`. Résultat : les 5 vecteurs de cette mission sont neutralisés. **4 nouveaux fichiers
+comparables détectés, signalés mais non corrigés (hors périmètre explicite)** :
+- `tests/certifications/c002-tenant-core.spec.ts` (URL de production en dur, ×2)
+- `tests/certifications/c003-flash-reload.spec.ts` (URL de production en dur, ×2)
+- `tests/certifications/c005-erp-certification.spec.ts` (URL de production en dur, ×2)
+- `tests/qa/sql-client.ts` (`PROJECT_ID` de production en dur, utilise `createClient`/service_role)
+
+Également signalé (déjà noté au §0 de l'audit A→Z, confirmé toujours ouvert) : la policy
+`tenants: insert` (`auth.uid() IS NOT NULL`, sans validation) reste ouverte — non corrigée dans
+cette mission, hors périmètre explicite des 5 problèmes autorisés.
+
+Voir tickets `P0CRIT01-OTHER-HARDCODED-PROD-REFS` et `P0CRIT01-TENANTS-INSERT-OPEN` au registre
+maître.

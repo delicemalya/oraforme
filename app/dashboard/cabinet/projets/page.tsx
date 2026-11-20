@@ -66,7 +66,7 @@ export default function CabinetProjetsPage() {
     <div style={{ fontFamily:'Inter,sans-serif', color:'#0F172A' }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24 }}>
         <div>
-          <h1 style={{ fontSize:22, fontWeight:700, margin:0 }}>Projets & Missions</h1>
+          <h1 style={{ fontSize:22, fontWeight:700, margin:0 }}>Projets &amp; Missions</h1>
           <p style={{ color:'#64748B', margin:'4px 0 0', fontSize:14 }}>Suivi de vos missions de conseil</p>
         </div>
         <button onClick={openCreate} style={{ display:'flex', alignItems:'center', gap:8, background:'#2563EB', color:'#fff', border:'none', borderRadius:8, padding:'10px 16px', cursor:'pointer', fontWeight:600, fontSize:14 }}>

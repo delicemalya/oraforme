@@ -154,10 +154,14 @@ export default function RapportsPage() {
     const yearStart = `${selectedYear}-01-01`
     const yearEnd   = `${selectedYear}-12-31`
 
-    const [facRes, depRes, achRes, empRes, txRes, bpRes, fyRes] = await Promise.all([
+    const [facRes, depRes, achRes, purchRes, empRes, txRes, bpRes, fyRes] = await Promise.all([
       supabase.from('factures').select('total, montant_ht, tva, ca, statut').eq('tenant_id', tid).limit(200),
       supabase.from('depenses').select('montant, categorie').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd).limit(200),
       supabase.from('achats').select('montant, statut').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd).limit(200),
+      // BOI-004 : fournisseurs/achats (legacy) est dépréciée au profit de
+      // suppliers/purchases (canonique) — les deux sont additionnées ici pour
+      // ne pas perdre l'historique tant que la première n'est pas retirée.
+      supabase.from('purchases').select('montant_total, statut').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd).limit(200),
       supabase.from('employes').select('salaire_base, statut').eq('tenant_id', tid).limit(200),
       supabase.from('transactions').select('montant, type, source, categorie').eq('tenant_id', tid).gte('date', yearStart).lte('date', yearEnd).limit(200),
       supabase.from('bulletins_paie').select('net, cnss_salarie, cnss_patronal, statut').eq('tenant_id', tid).limit(200),
@@ -167,6 +171,10 @@ export default function RapportsPage() {
     const factures     = facRes.data  ?? []
     const depenses     = depRes.data  ?? []
     const achats       = achRes.data  ?? []
+    // Achats comptabilisés uniquement à partir de 'reçu' (voir BOI-004,
+    // ACH-001 émis à la réception, pas au brouillon/commandé) — un achat non
+    // encore reçu n'est pas une dette réelle.
+    const purchases    = (purchRes.data ?? []).filter(p => ['reçu', 'payé'].includes(p.statut))
     const employes     = empRes.data  ?? []
     const transactions = txRes.data   ?? []
     const bulletins    = bpRes.data   ?? []
@@ -186,6 +194,7 @@ export default function RapportsPage() {
     // Charges par catégorie depense
     const depBycat = (cat: string) => depenses.filter(d => d.categorie === cat).reduce((s, d) => s + d.montant, 0)
     const achatsTotal   = achats.reduce((s, a) => s + a.montant, 0)
+                          + purchases.reduce((s, p) => s + (p.montant_total || 0), 0)
     const salairesTotal = bulletins.filter(b => b.statut === 'payee').reduce((s, b) => s + b.net, 0)
       || employes.filter(e => e.statut === 'actif').reduce((s, e) => s + (e.salaire_base ?? 0), 0)
     const loyerTotal    = depBycat('loyer') + depBycat('electricite') + depBycat('telephone')
@@ -197,6 +206,7 @@ export default function RapportsPage() {
     // Bilan
     const clientsCreances     = factures.filter(f => f.statut !== 'payee' && f.statut !== 'annulee').reduce((s, f) => s + (f.total ?? 0), 0)
     const dettesFournisseurs  = achats.filter(a => a.statut !== 'paye').reduce((s, a) => s + a.montant, 0)
+                              + purchases.filter(p => p.statut !== 'payé').reduce((s, p) => s + (p.montant_total || 0), 0)
 
     setData({
       totalEntrees, totalSorties, soldeTresorerie: openingBalance + totalEntrees - totalSorties,

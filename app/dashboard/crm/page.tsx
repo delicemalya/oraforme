@@ -339,7 +339,7 @@ export default function CRMPage() {
               <Users size={18} className="text-amber-600" />
             </div>
             <div>
-              <h1 className="text-[16px] font-bold text-[#0F172A]">CRM — Clients & Ventes</h1>
+              <h1 className="text-[16px] font-bold text-[#0F172A]">CRM — Clients &amp; Ventes</h1>
               <p className="text-[12px] text-[#64748B]">Relations commerciales, pipeline, activités</p>
             </div>
           </div>

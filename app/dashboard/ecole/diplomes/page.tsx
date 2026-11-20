@@ -298,7 +298,7 @@ export default function EcoleDiplomesPage() {
             <span className="text-[#E2E8F0]">/</span>
             <div className="flex items-center gap-2">
               <Award size={16} className="text-amber-500" />
-              <h1 className="text-[16px] font-black text-[#0F172A]">Diplômes & Attestations</h1>
+              <h1 className="text-[16px] font-black text-[#0F172A]">Diplômes &amp; Attestations</h1>
             </div>
           </div>
           <div className="flex gap-2">

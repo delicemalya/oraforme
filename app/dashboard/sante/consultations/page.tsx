@@ -134,7 +134,7 @@ export default function ConsultationsPage() {
             <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2">
               <Stethoscope size={18} className="text-[#7C3AED]" /> Consultations ({consults.length})
             </h1>
-            <p className="text-xs text-[#64748B]">Diagnostics & ordonnances · Revenu mois : {fmtFCFA(totalMois)}</p>
+            <p className="text-xs text-[#64748B]">Diagnostics &amp; ordonnances · Revenu mois : {fmtFCFA(totalMois)}</p>
           </div>
         </div>
         <button onClick={() => { setError(''); setShowModal(true) }}

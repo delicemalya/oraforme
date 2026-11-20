@@ -69,7 +69,7 @@ export default function BiDgClient({ initial, year: initialYear }: Props) {
             <Activity size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-[20px] font-bold text-[#0F172A] tracking-tight">Analytics & BI</h1>
+            <h1 className="text-[20px] font-bold text-[#0F172A] tracking-tight">Analytics &amp; BI</h1>
             <p className="text-[11px] text-[#6B7280]">Intelligence économique · Exercice {year}</p>
           </div>
           {critAlerts > 0 && (

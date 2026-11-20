@@ -59,45 +59,23 @@ const ALWAYS_VISIBLE = new Set([
   'ecole-direction', 'ecole-rh', 'ecole-comptabilite', 'scolarite',
   'daac', 'espace-formateur', 'espace-etudiant', 'espace-parent',
   'parametres-academiques', 'ecole-miaa',
-  'restaurant', 'cuisine', 'resto-direction', 'resto-reservations',
-  'resto-livraisons', 'resto-formules', 'resto-inventaire', 'resto-miaa',
   'sante', 'sante-patients', 'sante-rdv', 'sante-consultations',
   'sante-urgences', 'sante-hospitalisation', 'sante-labo', 'sante-imagerie',
   'sante-bloc', 'sante-pharmacie', 'sante-facturation', 'sante-assurances',
   'sante-medecins', 'sante-rh', 'sante-direction', 'sante-miaa',
-  'hotel', 'hotel-reservations', 'housekeeping', 'hotel-maintenance', 'hotel-miaa',
-  'pharmacie', 'pharmacie-meds', 'pharmacie-ventes',
-  'transport', 'transport_public',
-  'btp', 'btp-devis', 'btp-chantiers', 'btp-materiaux',
-  'banque', 'banque-clients', 'banque-credits', 'banque-epargne', 'banque-operations',
-  'cabinet', 'cabinet-clients', 'cabinet-declarations', 'cabinet-documents',
+  'hotel', 'hotel-reservations', 'hotel-chambres', 'housekeeping', 'hotel-maintenance', 'hotel-miaa',
+  'garage', 'garage-vehicules', 'garage-pieces', 'garage-factures',
+  'cabinet','cabinet-clients', 'cabinet-declarations', 'cabinet-documents',
   'cabinet-taches', 'cabinet-projets', 'cabinet-honoraires', 'cabinet-conformite',
   'cabinet-analytiques', 'cabinet-miaa', 'cabinet-affaires',
-  'agriculture', 'agriculture-parcelles', 'agriculture-recoltes', 'agriculture-intrants',
-  'ong', 'ong-projets', 'ong-dons',
-  'boisson', 'boisson-tournees',
-  'petrole', 'petrole-sites',
-  'assurance-direction', 'assurance-polices', 'assurance-sinistres',
-  'assurance-clients', 'assurance-produits', 'assurance-partenaires',
-  'assurance-commissions', 'assurance-analytics', 'assurance-miaa',
   'recrutement-direction', 'recrutement-offres', 'recrutement-ats', 'recrutement-candidatures',
   'recrutement-entretiens', 'recrutement-cvtheque', 'recrutement-placement',
   'recrutement-mad', 'recrutement-contrats', 'recrutement-partenaires', 'recrutement-analytics',
   'recrutement-miaa',
   // Commerce
   'commerce', 'commerce-catalogue', 'commerce-clients', 'commerce-analytics',
-  // Boisson
-  'boisson-commandes',
-  // Transport
-  'transport-flotte', 'transport-carburant', 'transport-analytique',
-  // Hôtel
-  'hotel-chambres',
   // École — niveaux supérieurs
   'ecole-theses', 'ecole-soutenances', 'ecole-diplomes',
-  // BTP
-  'btp-avancement',
-  // ONG
-  'ong-bailleurs',
   // Portails externes
   'portail-client', 'portail-candidat',
 ])

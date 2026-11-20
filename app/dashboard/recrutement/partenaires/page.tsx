@@ -45,7 +45,7 @@ export default function PartenairesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-[18px] sm:text-xl font-bold text-[#0F172A]">Partenaires</h1>
-          <p className="text-[11px] text-[#64748B]">Clients entreprises & sources de candidats</p>
+          <p className="text-[11px] text-[#64748B]">Clients entreprises &amp; sources de candidats</p>
         </div>
         <button
           onClick={() => setShowModal(true)}

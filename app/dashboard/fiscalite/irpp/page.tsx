@@ -5,8 +5,9 @@ import { TrendingUp, Calculator, Info, Loader2, RefreshCw } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { PAYS_LIST, getPaysConfig } from '@/lib/fiscalite/pays'
-import { calculerIRPP, calculerCNSS, fmtMontantPays } from '@/lib/fiscalite/engine'
+import { PAYS_LIST } from '@/lib/fiscalite/pays'
+import { fmtMontantPays } from '@/lib/fiscalite/engine'
+import { calculerCNSSUnifie, calculerIRPPUnifie, getConfigAffichageUnifie, paysMigreVersCentral } from '@/lib/fiscalite/engine-adapter'
 import type { PaysFiscal } from '@/lib/fiscalite/types'
 
 const TEXT  = '#0F172A'
@@ -34,13 +35,13 @@ export default function IRPPPage() {
   const [simBrut, setSimBrut] = useState('')
   const simResult = simBrut ? (() => {
     const brut = Number(simBrut.replace(/\s/g, ''))
-    const cnss = calculerCNSS(brut, pays)
-    const irpp = calculerIRPP(brut, pays)
+    const cnss = calculerCNSSUnifie(brut, pays)
+    const irpp = calculerIRPPUnifie(brut, pays)
     const net  = brut - cnss.salarie - irpp.irpp
     return { brut, cnss, irpp, net }
   })() : null
 
-  const cfg = getPaysConfig(pays)
+  const cfg = getConfigAffichageUnifie(pays)
   const devise = PAYS_LIST.find(p => p.code === pays)?.devise ?? 'FCFA'
 
   const load = useCallback(async () => {
@@ -143,6 +144,10 @@ export default function IRPPPage() {
                   fontSize: 14, color: TEXT, outline: 'none', boxSizing: 'border-box',
                 }}
               />
+              <span style={{ fontSize: 10, color: MUTED, display: 'block', marginTop: 6 }}>
+                Simulation à 1 part fiscale (célibataire, sans enfant) — aucune situation familiale saisie ici.
+                {!paysMigreVersCentral(pays) && ' Barème de référence non revérifié pour ce pays.'}
+              </span>
             </label>
             {simResult && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

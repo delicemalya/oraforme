@@ -1,28 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-server'
+import { requireTenant } from '@/lib/api/require-tenant'
 
 export const maxDuration = 30
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: NextRequest) {
-  const { messages, tenantId } = await req.json() as {
+  const ctx = await requireTenant(req)
+  if (!ctx.ok) return ctx.error
+
+  const { messages } = await req.json() as {
     messages: { role: 'user' | 'assistant'; content: string }[]
-    tenantId?: string
   }
   if (!messages?.length) return NextResponse.json({ error: 'Messages requis' }, { status: 400 })
 
-  let context = ''
-  if (tenantId) {
-    const [{ count: nbOffres }, { count: nbCands }, { data: top3 }] = await Promise.all([
-      supabaseAdmin.from('offres_emploi').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('statut', 'active'),
-      supabaseAdmin.from('candidatures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
-      supabaseAdmin.from('candidats').select('nom, prenom, score_global').eq('tenant_id', tenantId).gt('score_global', 0).order('score_global', { ascending: false }).limit(3),
-    ])
-    const top3Str = (top3 ?? []).map(c => `${c.prenom ?? ''} ${c.nom ?? ''} (${c.score_global}/100)`).join(', ') || 'aucun scoré'
-    context = `\n\nContexte : ${nbOffres ?? 0} offres actives, ${nbCands ?? 0} candidatures totales. Top 3 candidats : ${top3Str}.`
-  }
+  // tenantId dérivé exclusivement de la session serveur — jamais du corps de la
+  // requête (IDOR cross-tenant corrigé, même famille que MIAA chat).
+  const tenantId = ctx.tid
+  const [{ count: nbOffres }, { count: nbCands }, { data: top3 }] = await Promise.all([
+    supabaseAdmin.from('offres_emploi').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('statut', 'active'),
+    supabaseAdmin.from('candidatures').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+    supabaseAdmin.from('candidats').select('nom, prenom, score_global').eq('tenant_id', tenantId).gt('score_global', 0).order('score_global', { ascending: false }).limit(3),
+  ])
+  const top3Str = (top3 ?? []).map(c => `${c.prenom ?? ''} ${c.nom ?? ''} (${c.score_global}/100)`).join(', ') || 'aucun scoré'
+  const context = `\n\nContexte : ${nbOffres ?? 0} offres actives, ${nbCands ?? 0} candidatures totales. Top 3 candidats : ${top3Str}.`
 
   const response = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',

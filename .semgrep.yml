@@ -19,16 +19,19 @@
 rules:
 
   # ── Sécurité : pas de dangerouslySetInnerHTML sans commentaire explicite ──────
+  # Pattern corrigé le 2026-10-09 (P0-B) : l'ancienne forme
+  # `dangerouslySetInnerHTML={{ __html: $X }}` ne provoquait pas seulement une
+  # erreur YAML (deux-points non échappé), mais était aussi un pattern Semgrep
+  # invalide (Parse_error) qui faisait échouer TOUTE la configuration
+  # multi-fichiers (0 fichier scanné). La forme ci-dessous, avec l'élément JSX
+  # explicite et `...` pour les autres attributs, est celle qui matche
+  # réellement le code réel (vérifié : 3/3 occurrences connues détectées).
   - id: no-unreviewed-dangerouslySetInnerHTML
-    patterns:
-      - pattern: dangerouslySetInnerHTML={{ __html: $X }}
-      - pattern-not-inside: |
-          // xss-safe
-          dangerouslySetInnerHTML={{ __html: $X }}
+    pattern: <$EL dangerouslySetInnerHTML={$X} ... />
     message: |
       dangerouslySetInnerHTML expose l'application aux attaques XSS.
-      Ajouter le commentaire `// xss-safe` au-dessus si le contenu est bien assaini.
-    languages: [typescript, javascript]
+      Vérifier que $X est assaini (DOMPurify ou équivalent) avant ce commit.
+    languages: [typescript]
     severity: ERROR
     paths:
       include:

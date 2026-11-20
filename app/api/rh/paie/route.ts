@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { hrAuth } from '../../hr/_auth'
 import { createWhatsappService } from '@/lib/whatsapp-business'
+import { calculerChampsFiscauxDerives } from '@/lib/paie/calcul-paie'
+import type { SituationFamiliale } from '@/lib/fiscal/universal-tax-engine'
 
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -45,19 +47,24 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const {
     employe_id, mois, annee,
-    brut, cnss_salarie, cnss_patronal, irpp, net,
+    brut,
     primes, heures_sup, taux_horaire,
     mode_paiement,
   } = body
+  // cnss_salarie, cnss_patronal, irpp et net ne sont jamais lus depuis le body :
+  // ces montants déterminent l'impôt dû et doivent être recalculés côté serveur
+  // (Critical #3 — IRPP falsifiable côté client), jamais acceptés du client.
 
   if (!employe_id) return NextResponse.json({ error: 'employe_id requis' }, { status: 400 })
   if (!mois || !annee) return NextResponse.json({ error: 'mois et annee requis' }, { status: 400 })
   if (!brut || Number(brut) < 0) return NextResponse.json({ error: 'brut invalide' }, { status: 400 })
 
-  // Verify employee belongs to this tenant and is payable
+  // Verify employee belongs to this tenant and is payable — situation_matrimoniale
+  // et nb_enfants sont l'autorité serveur pour le quotient familial IRPP, jamais
+  // une valeur transmise par le client.
   const { data: emp } = await supabaseAdmin
     .from('employes')
-    .select('id, nom, poste, matricule, statut')
+    .select('id, nom, poste, matricule, statut, situation_matrimoniale, nb_enfants')
     .eq('id', employe_id)
     .eq('tenant_id', auth.tenantId)
     .maybeSingle()
@@ -81,14 +88,22 @@ export async function POST(req: NextRequest) {
 
   /* ── Valeurs numériques ───────────────────────────────────────────────── */
   const numBrut        = Number(brut)
-  const numNet         = Number(net)         || numBrut
-  const numCnssSalarie = Number(cnss_salarie)  || 0
-  const numCnssPatron  = Number(cnss_patronal) || 0
-  const numIrpp        = Number(irpp)          || 0
   const numPrimes      = Number(primes)        || 0
   const numHeuresSup   = Number(heures_sup)    || 0
   const numTauxHoraire = Number(taux_horaire)  || 0
   const modePaie       = mode_paiement || 'virement'
+
+  /* ── CNSS / IRPP — recalcul serveur, moteur fiscal canonique ───────────────
+   * lib/paie/calcul-paie.ts::calculerChampsFiscauxDerives() — même noyau que
+   * calculerPaie() et que app/api/paie/bulletins (pas deux calculs qui
+   * pourraient diverger). situation/nombreEnfants viennent du dossier RH de
+   * l'employé (serveur), jamais du corps de la requête. */
+  const situation: SituationFamiliale = (emp.situation_matrimoniale as SituationFamiliale) ?? 'celibataire'
+  const nombreEnfants = emp.nb_enfants ?? 0
+
+  const { cnss_salarie: cnssEmploye, cnss_patronal: cnssPatronal, irpp: irppCalcule } =
+    calculerChampsFiscauxDerives(numBrut, situation, nombreEnfants)
+  const netCalcule = numBrut - cnssEmploye - irppCalcule
 
   /* ── Insérer le bulletin ─────────────────────────────────────────────── */
   const { data: bulletin, error: bulErr } = await supabaseAdmin
@@ -99,10 +114,10 @@ export async function POST(req: NextRequest) {
       mois:           parseInt(mois),
       annee:          parseInt(annee),
       brut:           numBrut,
-      cnss_salarie:   numCnssSalarie,
-      cnss_patronal:  numCnssPatron,
-      irpp:           numIrpp,
-      net:            numNet,
+      cnss_salarie:   cnssEmploye,
+      cnss_patronal:  cnssPatronal,
+      irpp:           irppCalcule,
+      net:            netCalcule,
       primes:         numPrimes,
       heures_sup:     numHeuresSup,
       taux_horaire:   numTauxHoraire,
@@ -143,7 +158,7 @@ export async function POST(req: NextRequest) {
           toName:       emp.nom,
           employeeName: emp.nom,
           period:       `${MOIS_FULL[parseInt(mois) - 1]} ${annee}`,
-          netSalary:    `${numNet.toLocaleString('fr-FR')} FCFA`,
+          netSalary:    `${netCalcule.toLocaleString('fr-FR')} FCFA`,
           companyName:  cfgData?.nom ?? 'Votre employeur',
         })
       }

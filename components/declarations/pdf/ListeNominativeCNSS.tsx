@@ -122,7 +122,7 @@ export function ListeNominativeCNSS({ decl, entreprise, numero_cnss_employeur }:
             <Text style={[s.th, { flex: W.af }]}>AF 10.03%</Text>
             <Text style={[s.th, { flex: W.at }]}>AT 2.25%</Text>
             {/* TUS */}
-            <Text style={[s.th, { flex: W.tus }]}>TUS 3%</Text>
+            <Text style={[s.th, { flex: W.tus }]}>TUS 5,475%</Text>
             {/* Totaux */}
             <Text style={[s.th, { flex: W.totP }]}>Tot. Patron.</Text>
             <Text style={[s.th, { flex: W.totA }]}>Tot. à Verser</Text>

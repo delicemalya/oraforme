@@ -91,7 +91,7 @@ export default function EntretiensPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-[18px] sm:text-xl font-bold text-[#0F172A]">Entretiens</h1>
-          <p className="text-[11px] text-[#64748B]">Planning & évaluations</p>
+          <p className="text-[11px] text-[#64748B]">Planning &amp; évaluations</p>
         </div>
         <button
           onClick={() => setShowModal(true)}

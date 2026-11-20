@@ -199,7 +199,7 @@ export function OrdonnancePDFDocument({ data }: { data: OrdonnancePDFData }) {
         {/* Signature */}
         <View style={S.signatureBox}>
           <View>
-            <Text style={S.signatureLabel}>Cachet & Signature du médecin</Text>
+            <Text style={S.signatureLabel}>Cachet &amp; Signature du médecin</Text>
             <View style={S.signatureLine} />
             <Text style={[S.signatureLabel, { textAlign: 'center' }]}>Dr {data.medecin_prenom} {data.medecin_nom}</Text>
           </View>

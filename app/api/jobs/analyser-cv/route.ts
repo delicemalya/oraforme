@@ -41,9 +41,20 @@ export async function POST(req: NextRequest) {
     // Fetch candidature + offre criteria for scoring
     const { data: candidature } = await supabaseAdmin
       .from('candidatures')
-      .select('id, offre_id, offres_emploi(competences_obligatoires, competences_souhaitees, langues, certifications, logiciels, experience_min, diplome_requis)')
+      .select('id, offre_id, candidat_id, offres_emploi(competences_obligatoires, competences_souhaitees, langues, certifications, logiciels, experience_min, diplome_requis)')
       .eq('id', candidatureId)
       .maybeSingle()
+
+    // Endpoint public (déclenché sans session par le formulaire de candidature) :
+    // pas de tenant à vérifier ici, mais candidatId et candidatureId sont deux
+    // identifiants indépendants fournis par l'appelant — sans ce contrôle, un
+    // candidatId et un candidatureId appartenant à deux candidats différents
+    // (voire deux tenants différents) pouvaient être mélangés, corrompant le
+    // profil de l'un avec les données de l'autre et renvoyant le CV analysé
+    // d'un tiers dans la réponse.
+    if (!candidature || candidature.candidat_id !== candidatId) {
+      return NextResponse.json({ error: 'candidatId/candidatureId incohérents.' }, { status: 403 })
+    }
 
     const offreRaw = candidature?.offres_emploi as unknown as OffreCriteres | null
     const offreCriteres: OffreCriteres = {

@@ -199,7 +199,7 @@ export default function AffairesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-[22px] font-bold text-[#0F172A]">Affaires & Dossiers</h1>
+          <h1 className="text-[22px] font-bold text-[#0F172A]">Affaires &amp; Dossiers</h1>
           <p className="text-sm text-[#64748B] mt-0.5">Gestion des dossiers judiciaires et procédures</p>
         </div>
         <button onClick={() => { setShowModal(true); setError('') }}

@@ -61,7 +61,7 @@ export default async function AdminRevenusPage() {
           <TrendingUp size={18} className="text-[#DC2626]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[var(--text)]">Revenus & MRR</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">Revenus &amp; MRR</h1>
           <p className="text-xs text-[var(--text-secondary)]">Tableau de bord financier oraforme</p>
         </div>
       </div>

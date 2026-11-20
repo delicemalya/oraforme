@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { requireTenant } from '@/lib/tenant-guard'
-import { calculerTVACongo } from '@/lib/fiscalite-congo'
+import { calculerTVASurMontantUnifie } from '@/lib/fiscalite/engine-adapter'
+import { getPaysTenant } from '@/lib/api/pays-tenant'
 import { createWhatsappService } from '@/lib/whatsapp-business'
 
 export const dynamic = 'force-dynamic'
@@ -52,7 +53,8 @@ export async function POST(req: NextRequest) {
   const ht = lignes.reduce(
     (s: number, l: { price: number; quantity: number }) => s + l.price * l.quantity, 0
   )
-  const { tva, ca, ttc } = calculerTVACongo(ht)
+  const pays = await getPaysTenant(ctx.tenantId)
+  const { tva, ca, ttc } = calculerTVASurMontantUnifie(ht, pays)
 
   // Créer la facture
   const { data: facture, error: facErr } = await supabaseAdmin
@@ -122,7 +124,7 @@ export async function POST(req: NextRequest) {
       p_libelle:       `Facture ${pieceNum} — ${client_name}`,
       p_date_event:    today,
       p_fiscal_year:   fiscYear,
-      p_metadata:      { piece_number: pieceNum, client_name, ca, country_code: 'CG' },
+      p_metadata:      { piece_number: pieceNum, client_name, ca, country_code: pays },
     })
   }
 

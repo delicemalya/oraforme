@@ -8,8 +8,8 @@ import {
   TrendingUp, Users, Package, AlertTriangle, Download,
   Clock, GraduationCap, UserX, CalendarOff, Lock,
   Wallet, CheckCircle, FileText, ArrowUpRight,
-  Zap, BarChart2, Star, ChevronRight, ChefHat, Bot, ShoppingCart,
-  Receipt, Truck, Hotel, BookOpen, Calculator, HeartHandshake,
+  Zap, BarChart2, Star, ChevronRight, Bot, ShoppingCart,
+  Hotel, BookOpen, Calculator, HeartHandshake,
   Award, Layers, Settings, RefreshCw,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -314,35 +314,13 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
     { labelKey: 'sc.comptaOhada',   href: '/dashboard/ecole/comptabilite',     icon: Calculator,    color: '#DC2626', descKey: 'sc.d.comptaOhada' },
     { labelKey: 'sc.miaaIA',        href: '/dashboard/ecole/miaa',             icon: Bot,           color: '#DC2626', descKey: 'sc.d.miaaIA' },
   ],
-  restaurant: [
-    { labelKey: 'sc.cashierPOS',  href: '/dashboard/restaurant', icon: ChefHat, color: '#DC2626', descKey: 'sc.d.cashierPOS' },
-    { labelKey: 'sc.kitchenStock',href: '/dashboard/stocks',      icon: Package, color: '#DC2626', descKey: 'sc.d.kitchenStock' },
-    { labelKey: 'nav.rhPaie',     href: '/dashboard/rh',         icon: Users,   color: '#DC2626', descKey: 'sc.d.rhPaie' },
-    { labelKey: 'nav.tresorerie', href: '/dashboard/tresorerie', icon: Wallet,  color: '#DC2626', descKey: 'sc.d.tresoSuivi' },
-    { labelKey: 'nav.depenses',   href: '/dashboard/depenses',   icon: Receipt, color: '#DC2626', descKey: 'sc.d.depenses' },
-    { labelKey: 'sc.miaaPlus',    href: '/dashboard/miaa',       icon: Bot,     color: '#DC2626', descKey: 'sc.d.miaaPlus' },
-  ],
   commerce: [
     { labelKey: 'nav.facturation',  href: '/dashboard/facturation',  icon: FileText,    color: '#DC2626', descKey: 'sc.d.facturation' },
     { labelKey: 'sc.stockShort',    href: '/dashboard/stocks',        icon: Package,     color: '#DC2626', descKey: 'sc.d.stock' },
     { labelKey: 'nav.tresorerie',   href: '/dashboard/tresorerie',   icon: Wallet,      color: '#DC2626', descKey: 'sc.d.finances' },
-    { labelKey: 'nav.achats',       href: '/dashboard/achats',       icon: ShoppingCart,color: '#DC2626', descKey: 'sc.d.achats' },
+    { labelKey: 'nav.achats',       href: '/dashboard/stocks/achats',icon: ShoppingCart,color: '#DC2626', descKey: 'sc.d.achats' },
     { labelKey: 'nav.rhPaie',       href: '/dashboard/rh',           icon: Users,       color: '#DC2626', descKey: 'sc.d.rh' },
     { labelKey: 'nav.comptabilite', href: '/dashboard/comptabilite', icon: Calculator,  color: '#DC2626', descKey: 'sc.d.comptabilite' },
-  ],
-  supermarche: [
-    { labelKey: 'sc.caisse',       href: '/dashboard/facturation', icon: FileText,     color: '#DC2626', descKey: 'sc.d.caisse' },
-    { labelKey: 'sc.rayonsStock',  href: '/dashboard/stocks',       icon: Package,      color: '#DC2626', descKey: 'sc.d.stock' },
-    { labelKey: 'nav.achats',      href: '/dashboard/achats',      icon: ShoppingCart, color: '#DC2626', descKey: 'sc.d.achats' },
-    { labelKey: 'nav.rhPaie',      href: '/dashboard/rh',          icon: Users,        color: '#DC2626', descKey: 'sc.d.rh' },
-    { labelKey: 'nav.tresorerie',  href: '/dashboard/tresorerie',  icon: Wallet,       color: '#DC2626', descKey: 'sc.d.finances' },
-  ],
-  transport: [
-    { labelKey: 'sc.fleet',         href: '/dashboard/transport',   icon: Truck,    color: '#DC2626', descKey: 'sc.d.fleet' },
-    { labelKey: 'nav.facturation',  href: '/dashboard/facturation', icon: FileText, color: '#DC2626', descKey: 'sc.d.facturation' },
-    { labelKey: 'sc.chauffeurs',    href: '/dashboard/rh',          icon: Users,    color: '#DC2626', descKey: 'sc.d.chauffeurs' },
-    { labelKey: 'nav.tresorerie',   href: '/dashboard/tresorerie',  icon: Wallet,   color: '#DC2626', descKey: 'sc.d.finances' },
-    { labelKey: 'sc.miaaPlus',      href: '/dashboard/miaa',        icon: Bot,      color: '#DC2626', descKey: 'sc.d.miaaPlus' },
   ],
   hotel: [
     { labelKey: 'sc.reservations',  href: '/dashboard/hotel',       icon: Hotel,    color: '#DC2626', descKey: 'sc.d.reservations' },
@@ -350,6 +328,14 @@ const SECTOR_SHORTCUTS: Record<string, Shortcut[]> = {
     { labelKey: 'nav.rhPaie',       href: '/dashboard/rh',          icon: Users,    color: '#DC2626', descKey: 'sc.d.rh' },
     { labelKey: 'nav.tresorerie',   href: '/dashboard/tresorerie',  icon: Wallet,   color: '#DC2626', descKey: 'sc.d.finances' },
     { labelKey: 'sc.miaaPlus',      href: '/dashboard/miaa',        icon: Bot,      color: '#DC2626', descKey: 'sc.d.miaaPlus' },
+  ],
+  garage: [
+    { labelKey: 'Atelier',          href: '/dashboard/garage',            icon: Settings, color: '#DC2626', descKey: 'Ordres de réparation' },
+    { labelKey: 'Véhicules',        href: '/dashboard/garage/vehicules',  icon: Layers,   color: '#DC2626', descKey: 'Parc clients & historique' },
+    { labelKey: 'sc.stockShort',    href: '/dashboard/stocks/produits',   icon: Package,  color: '#DC2626', descKey: 'sc.d.stock' },
+    { labelKey: 'nav.facturation',  href: '/dashboard/facturation',       icon: FileText, color: '#DC2626', descKey: 'sc.d.facturation' },
+    { labelKey: 'nav.tresorerie',   href: '/dashboard/tresorerie',        icon: Wallet,   color: '#DC2626', descKey: 'sc.d.finances' },
+    { labelKey: 'sc.miaaPlus',      href: '/dashboard/miaa',              icon: Bot,      color: '#DC2626', descKey: 'sc.d.miaaPlus' },
   ],
   sante: [
     { labelKey: 'sc.consultations', href: '/dashboard/facturation', icon: FileText, color: '#DC2626', descKey: 'sc.d.consultations' },

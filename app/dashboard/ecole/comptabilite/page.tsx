@@ -815,7 +815,7 @@ function SectionPrevisions({ tenantId }: { tenantId: string }) {
 
       {/* Insights */}
       <div>
-        <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Analyses & Recommandations</p>
+        <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Analyses &amp; Recommandations</p>
         <div className="space-y-2">
           {insights.map((ins, i) => {
             const Icon = ins.icon

@@ -2,8 +2,28 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import { hrAuth } from '../../../_auth'
 import { getCountryConfig } from '@/lib/countries'
-import { calculerIRPP, calculerChargesSociales } from '@/lib/fiscal/universal-tax-engine'
+import { calculerIRPP, calculerChargesSociales, type SituationFamiliale } from '@/lib/fiscal/universal-tax-engine'
 import type { CodePays } from '@/lib/countries/types'
+
+const SITUATIONS_FAMILIALES: readonly SituationFamiliale[] =
+  ['celibataire', 'marie', 'divorce', 'veuf', 'concubinage']
+
+/**
+ * Avant Mission P0 (2026-09-17), cette route réduisait toute situation
+ * différente de 'marie' (y compris 'veuf', 'divorce', 'concubinage') à
+ * 'celibataire' — perdant une information métier réelle sans preuve que
+ * cette simplification était nécessaire. Le moteur (calcNombreParts, dans
+ * universal-tax-engine.ts) accepte déjà les 5 valeurs sans erreur ; les
+ * transmettre telles quelles ne change aucun résultat aujourd'hui (aucune
+ * des 3 valeurs 'divorce'/'veuf'/'concubinage' ne reçoit de traitement
+ * distinct de 'celibataire' dans la formule actuelle — voir CG.ts), mais
+ * préserve la donnée pour le jour où une règle les distinguera.
+ */
+function situationFamiliale(brut: unknown): SituationFamiliale {
+  return SITUATIONS_FAMILIALES.includes(brut as SituationFamiliale)
+    ? (brut as SituationFamiliale)
+    : 'celibataire'
+}
 
 export const runtime = 'nodejs'
 
@@ -147,7 +167,7 @@ export async function GET(
     const resIRPP = calculerIRPP({
       codePays,
       salaireBrut:   emp.salaire_base,
-      situation:     emp.situation_matrimoniale === 'marie' ? 'marie' : 'celibataire',
+      situation:     situationFamiliale(emp.situation_matrimoniale),
       nombreEnfants: emp.nb_enfants ?? 0,
     })
     irpp_mensuel = resIRPP.irpp_net

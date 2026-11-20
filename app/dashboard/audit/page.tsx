@@ -121,7 +121,7 @@ export default function AuditDashboard() {
             <Shield size={22} style={{ color: '#DC2626' }} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text)]">Audit & Conformité</h1>
+            <h1 className="text-2xl font-bold text-[var(--text)]">Audit &amp; Conformité</h1>
             <p className="text-sm text-[var(--text-secondary)] mt-0.5">
               {nomEntreprise} · Diagnostic OHADA complet {lastRun && `· Dernière analyse : ${lastRun}`}
             </p>

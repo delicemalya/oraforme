@@ -12,7 +12,7 @@ import { chargerMemoireMIAA } from '@/lib/miaa/memory'
 import { getDocById } from '@/lib/miaa/expertise-catalog'
 import { getPaysConfig } from '@/lib/miaa/pays-localization'
 import type { DocContext } from '@/lib/miaa/expertise-catalog'
-import { checkPlanAccess } from '@/lib/api/require-tenant'
+import { checkPlanAccess, requireTenant } from '@/lib/api/require-tenant'
 
 export const runtime     = 'nodejs'
 export const maxDuration = 60
@@ -32,16 +32,19 @@ function getSupabase() {
 
 export async function POST(req: Request) {
   try {
+    const authCtx = await requireTenant()
+    if (!authCtx.ok) return authCtx.error
+    const tenant_id = authCtx.tid
+
     const body = await req.json() as {
-      tenant_id: string
       type_doc:  string
       pays:      string
       inputs:    Record<string, string>
     }
-    const { tenant_id, type_doc, pays, inputs } = body
+    const { type_doc, pays, inputs } = body
 
-    if (!tenant_id || !type_doc) {
-      return Response.json({ error: 'tenant_id et type_doc requis' }, { status: 400 })
+    if (!type_doc) {
+      return Response.json({ error: 'type_doc requis' }, { status: 400 })
     }
 
     const planDenied = await checkPlanAccess(tenant_id, 'academy')
@@ -127,14 +130,13 @@ export async function POST(req: Request) {
 // ── GET — Historique des documents ────────────────────────────────────────────
 
 export async function GET(req: Request) {
+  const ctx = await requireTenant()
+  if (!ctx.ok) return ctx.error
+  const tenantId = ctx.tid
+
   const url       = new URL(req.url)
-  const tenantId  = url.searchParams.get('tenant_id')
   const categorie = url.searchParams.get('categorie')
   const limit     = Math.min(Number(url.searchParams.get('limit') ?? '20'), 50)
-
-  if (!tenantId) {
-    return Response.json({ error: 'tenant_id requis' }, { status: 400 })
-  }
 
   try {
     const supabase = getSupabase()

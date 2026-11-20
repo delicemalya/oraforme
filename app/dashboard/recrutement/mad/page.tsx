@@ -674,7 +674,7 @@ export default function MiseADispositionPage() {
         <div>
           <h1 className="text-[17px] sm:text-xl font-extrabold text-white">Mise à Disposition du Personnel</h1>
           <p className="text-[11px] text-[#94A3B8] mt-0.5">
-            Secondment, outsourcing RH, paie & social — {affActives.length} mission{affActives.length !== 1 ? 's' : ''} active{affActives.length !== 1 ? 's' : ''}
+            Secondment, outsourcing RH, paie &amp; social — {affActives.length} mission{affActives.length !== 1 ? 's' : ''} active{affActives.length !== 1 ? 's' : ''}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">

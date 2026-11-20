@@ -77,7 +77,7 @@ export default function MedecinsPage() {
           </Link>
           <div>
             <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2"><Activity size={18} className="text-[#D97706]" /> Médecins ({medecins.length})</h1>
-            <p className="text-xs text-[#64748B]">Personnel médical & spécialistes</p>
+            <p className="text-xs text-[#64748B]">Personnel médical &amp; spécialistes</p>
           </div>
         </div>
         <button onClick={openNew} className="flex items-center gap-1.5 bg-[#DC2626] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#B91C1C]">

@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const { ctx, error } = await requireTenant()
   if (error) return error
 
-  const { product_id, warehouse_id, type, quantite, reference, note } = await req.json()
+  const { product_id, warehouse_id, type, quantite, reference, note, origine, purchase_item_id } = await req.json()
 
   if (!product_id || !type || quantite == null) {
     return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 })
@@ -17,6 +17,13 @@ export async function POST(req: NextRequest) {
   if (!['entree', 'sortie', 'reception', 'retour', 'ajustement', 'transfert'].includes(type)) {
     return NextResponse.json({ error: 'Type de mouvement invalide' }, { status: 400 })
   }
+  // BOI-010 : origine optionnelle, jamais déduite. C'est notamment le point
+  // d'entrée minimal pour une entrée de production locale — pas de module de
+  // production, juste ce paramètre explicite sur le mouvement générique déjà
+  // existant (aucune nouvelle table, aucun nouvel écran).
+  if (origine != null && !['achat_fournisseur', 'production_locale', 'import_direct'].includes(origine)) {
+    return NextResponse.json({ error: 'Origine invalide' }, { status: 400 })
+  }
 
   // Verify the product belongs to the authenticated user's tenant
   const ownershipError = await assertResourceOwnership('products', product_id, ctx.tenantId)
@@ -24,15 +31,20 @@ export async function POST(req: NextRequest) {
 
   // Le contrôle anti-négatif et l'insertion se font sous verrou côté base
   // (fn_stock_move, migration 173) : deux sorties simultanées ne peuvent plus
-  // passer sous zéro.
+  // passer sous zéro. Depuis BOI-010, si `origine` est fourni sur un
+  // mouvement qui diminue le stock, ce même verrou refuse aussi de faire
+  // passer le solde de CETTE provenance sous zéro — sans jamais basculer
+  // automatiquement vers une autre provenance (choix manuel, BOI-009).
   const { data: moveId, error: insertError } = await supabaseAdmin.rpc('fn_stock_move', {
-    p_tenant_id:    ctx.tenantId,
-    p_product_id:   product_id,
-    p_type:         type,
-    p_quantite:     Number(quantite),
-    p_warehouse_id: warehouse_id ?? null,
-    p_reference:    reference ?? null,
-    p_notes:        note ?? null,
+    p_tenant_id:        ctx.tenantId,
+    p_product_id:       product_id,
+    p_type:             type,
+    p_quantite:         Number(quantite),
+    p_warehouse_id:     warehouse_id ?? null,
+    p_reference:        reference ?? null,
+    p_notes:            note ?? null,
+    p_origine:          origine ?? null,
+    p_purchase_item_id: purchase_item_id ?? null,
   })
 
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 422 })

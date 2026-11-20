@@ -556,7 +556,7 @@ export default function RecrutementPremiumDashboard() {
         <div className="min-w-0">
           <h1 className="text-[17px] sm:text-xl font-extrabold text-white leading-tight">Direction RH</h1>
           <p className="text-[11px] text-[#94A3B8] mt-0.5">
-            Recrutement & Placement —{' '}
+            Recrutement &amp; Placement —{' '}
             {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>

@@ -4,7 +4,10 @@
  * Tests unitaires du UniversalTaxEngine
  *
  * Stratégie de validation :
- *   ① Alignement arithmétique avec congo-calculs.ts (source de vérité CG)
+ *   ① CG : règles CNSS/TUS/IRPP vérifiées contre documents réels ECAM Congo
+ *      2024/2026 (Mission P0 paie 2026-09-17) — voir lib/fiscal/cg-paie-2026.test.ts
+ *      pour les fixtures complètes. lib/fiscal/congo-calculs.ts est orphelin,
+ *      non consommé, et n'est plus une référence (voir son en-tête).
  *   ② Cohérence multi-pays (CM, GA, CD, CF, TD, GQ)
  *   ③ Cas limites (brut=0, plafond CNSS, 5 tranches, quotient familial)
  *   ④ Mesures spéciales LF 2026 (prise en charge État)
@@ -31,7 +34,7 @@ import {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GROUPE 1 — CNSS CONGO (CG)
-// Référence : congo-calculs.ts — calculerBulletinPaie()
+// Référence : documents réels ECAM Congo (Mission P0 paie 2026-09-17)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('CG — Charges sociales CNSS', () => {
@@ -51,7 +54,12 @@ describe('CG — Charges sociales CNSS', () => {
     expect(vidSal!.base_calcul).toBe(1_200_000)
   })
 
-  it('VID patronal 8% + AF 10,035% + AT 2,25% + TUS 3%', () => {
+  // PF 10,03% et TUS 5,475% — vérifiés exacts contre documents réels ECAM Congo
+  // (CNSS_Cotisation_Fevrier_2026.docx, Model Declaration Mensuelle CNSS TUS
+  // juin 2026, 20/20 salariés). Remplacent 10,035%/3%, non observés en 2026.
+  // Mission P0 paie 2026-09-17 — voir lib/fiscal/cg-paie-2026.test.ts pour les
+  // fixtures réelles complètes.
+  it('VID patronal 8% + PF 10,03% + AT/MP 2,25% + TUS CNSS 5,475%', () => {
     const brut = 849_000
     const res  = calculerChargesSociales({ codePays: 'CG', salaireBrut: brut })
 
@@ -61,80 +69,91 @@ describe('CG — Charges sociales CNSS', () => {
     const tus    = res.branches.find(b => b.code === 'TUS')
 
     expect(vidPat!.montant_patronal).toBe(Math.round(849_000 * 0.08))      // 67 920
-    expect(af!.montant_patronal).toBe(Math.round(849_000 * 0.10035))       // 85 197
-    expect(at!.montant_patronal).toBe(Math.round(600_000 * 0.0225))        // 13 500 (plafonné 600k)
-    expect(tus!.montant_patronal).toBe(Math.round(849_000 * 0.03))         // 25 470 (déplafonné)
+    expect(af!.montant_patronal).toBe(Math.round(849_000 * 0.1003))        // 85 155
+    expect(at!.montant_patronal).toBe(Math.round(600_000 * 0.0225))        // 13 500 (plafonné 600k — À confirmer, voir CG.ts)
+    expect(tus!.montant_patronal).toBe(Math.round(849_000 * 0.05475))      // 46 483 (déplafonné)
   })
 
-  it('AT plafonné à 600 000 (brut 849 000)', () => {
+  it('AT plafonné à 600 000 (brut 849 000) — comportement actuel du code, plafond marqué À confirmer', () => {
     const res = calculerChargesSociales({ codePays: 'CG', salaireBrut: 849_000 })
     const at  = res.branches.find(b => b.code === 'AT')
     expect(at!.base_calcul).toBe(600_000)
     expect(at!.montant_patronal).toBe(13_500)
   })
 
-  it('TUS déplafonné (brut 2 000 000)', () => {
+  it('TUS CNSS 5,475% déplafonné (brut 2 000 000)', () => {
     const res = calculerChargesSociales({ codePays: 'CG', salaireBrut: 2_000_000 })
     const tus = res.branches.find(b => b.code === 'TUS')
     expect(tus!.base_calcul).toBe(2_000_000)
-    expect(tus!.montant_patronal).toBe(60_000)             // 2M × 3%
+    expect(tus!.montant_patronal).toBe(109_500)             // 2M × 5,475%
+  })
+
+  it('aucune branche « TUS DGI » / 2,025% — non démontrée, non implémentée (Mission P0 paie 2026-09-17)', () => {
+    const res = calculerChargesSociales({ codePays: 'CG', salaireBrut: 1_000_000 })
+    expect(res.branches.find(b => b.taux_patronal === 0.02025)).toBeUndefined()
+    expect(res.branches.filter(b => b.code.startsWith('TUS'))).toHaveLength(1)
   })
 
   it('getTauxCNSSSalarie CG = 4%', () => {
     expect(getTauxCNSSSalarie('CG')).toBeCloseTo(0.04)
   })
 
-  it('getTauxCNSSPatronal CG ≈ 23,285%', () => {
+  it('getTauxCNSSPatronal CG ≈ 25,755%', () => {
     const taux = getTauxCNSSPatronal('CG')
-    expect(taux).toBeCloseTo(0.08 + 0.10035 + 0.0225 + 0.03, 3)   // 23.285%
+    expect(taux).toBeCloseTo(0.08 + 0.1003 + 0.0225 + 0.05475, 3)   // 25,755%
   })
 
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // GROUPE 2 — IRPP CONGO (CG)
-// Référence arithmétique : congo-calculs.ts calculerIRPP()
-// Méthode : annuelle_div12, quotient familial, abattement aucun
+// Méthode : annuelle_div12 (seuils annuels/part ÷12), quotient familial,
+// abattement 20% sur (brut - CNSS salarié). Barème et abattement corrigés et
+// vérifiés exacts contre 3 bulletins réels ECAM Congo janvier 2024 — Mission
+// P0 paie 2026-09-17. Voir lib/fiscal/cg-paie-2026.test.ts pour ces fixtures
+// réelles complètes (bulletins individuels, avec CNSS + abattement + parts).
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('CG — IRPP', () => {
 
-  it('IRPP = 0 pour base < 464 000 FCFA/mois (T1 exonérée — seuil mensuel direct)', () => {
-    const res = calculerIRPP({ codePays: 'CG', salaireBrut: 300_000, situation: 'celibataire', nombreEnfants: 0 })
-    expect(res.irpp_net).toBe(0)
-    expect(res.nombre_parts).toBe(1)
-  })
-
-  it('IRPP T2 seulement (brut 700 000 — entre T2Min=464k et T2Max=1M, taux 1%)', () => {
-    const res = calculerIRPP({ codePays: 'CG', salaireBrut: 700_000, situation: 'celibataire', nombreEnfants: 0 })
-    // mensuelle_directe — seuils appliqués directement (Art. 76 CGI LF 2026)
-    // T1 (0%): 0 → 464 000 = 0
-    // T2 (1%): 464 001 → 700 000 = 235 999 × 1% ≈ 2 360
-    expect(res.irpp_net).toBe(Math.round((700_000 - 464_001) * 0.01))
-  })
-
-  it('IRPP T2+T3 (brut 1 500 000 — mensuelle_directe)', () => {
-    const res = calculerIRPP({ codePays: 'CG', salaireBrut: 1_500_000, situation: 'celibataire', nombreEnfants: 0 })
-    // T1 (0%): 0 → 464 000 = 0
-    // T2 (1%): 464 001 → 1 000 000 = 535 999 × 1%
-    // T3 (10%): 1 000 001 → 1 500 000 = 499 999 × 10%
-    const expected = Math.round(
-      (Math.min(1_500_000, 1_000_000) - 464_001) * 0.01 +
-      (1_500_000 - 1_000_001) * 0.10,
-    )
-    expect(res.irpp_net).toBe(expected)
-  })
-
-  it('méthode_base = mensuelle_directe pour CG (seuils mensuels directs — Art. 76 CGI)', () => {
+  it('méthode_base = annuelle_div12 pour CG (seuils ÷12, vérifié contre bulletins réels)', () => {
     const res = calculerIRPP({ codePays: 'CG', salaireBrut: 100_000, situation: 'celibataire', nombreEnfants: 0 })
-    expect(res.methode_base).toBe('mensuelle_directe')
+    expect(res.methode_base).toBe('annuelle_div12')
   })
 
-  it('abattement = 0 pour CG (type: aucun)', () => {
+  it('abattement 20% sur (brut - CNSS salarié) — type pct_net_cnss', () => {
     const res = calculerIRPP({ codePays: 'CG', salaireBrut: 500_000, situation: 'celibataire', nombreEnfants: 0 })
-    expect(res.abattement_montant).toBe(0)
-    expect(res.abattement_type).toBe('aucun')
-    expect(res.base_apres_abattement).toBe(res.base_brut)
+    expect(res.abattement_type).toBe('pct_net_cnss')
+    expect(res.abattement_montant).toBe(Math.round(500_000 * 0.20))   // 100 000
+    expect(res.base_apres_abattement).toBe(500_000 - Math.round(500_000 * 0.20))   // 400 000
+  })
+
+  it('IRPP T1 seul (1%) — base après abattement sous le premier seuil/part (38 667)', () => {
+    const res = calculerIRPP({ codePays: 'CG', salaireBrut: 40_000, situation: 'celibataire', nombreEnfants: 0 })
+    // abattement 20% : base_apres = 40 000 - 8 000 = 32 000 (< 38 667 → tranche 1 seule, 1%)
+    expect(res.irpp_net).toBe(Math.round(32_000 * 0.01))   // 320
+  })
+
+  it('IRPP traverse T1→T4 (base après abattement 800 000, 1 part)', () => {
+    const res = calculerIRPP({ codePays: 'CG', salaireBrut: 1_000_000, situation: 'celibataire', nombreEnfants: 0 })
+    // abattement 20% : base_apres = 800 000
+    // T1 (1%) : 0 → 38 667  = 38 666,667 × 1%
+    // T2 (10%): 38 667 → 83 333 = 44 666,667 × 10%
+    // T3 (25%): 83 333 → 250 000 = 166 666,667 × 25%
+    // T4 (40%): 250 000 → 800 000 = 550 000 × 40%
+    const t1 = (464_000 / 12) * 0.01
+    const t2 = (1_000_000 / 12 - 464_000 / 12) * 0.10
+    const t3 = (3_000_000 / 12 - 1_000_000 / 12) * 0.25
+    const t4 = (800_000 - 3_000_000 / 12) * 0.40
+    expect(res.irpp_net).toBe(Math.round(t1 + t2 + t3 + t4))
+    expect(res.tranches).toHaveLength(4)
+  })
+
+  it('nombreParts explicite prioritaire sur situation/nombreEnfants (rejoue un bulletin réel)', () => {
+    const derive  = calculerIRPP({ codePays: 'CG', salaireBrut: 500_000, situation: 'celibataire', nombreEnfants: 1 })
+    const force   = calculerIRPP({ codePays: 'CG', salaireBrut: 500_000, situation: 'celibataire', nombreEnfants: 1, nombreParts: 2 })
+    expect(force.nombre_parts).toBe(2)
+    expect(force.nombre_parts).not.toBe(derive.nombre_parts)
   })
 
   it('quotient familial : marié + 2 enfants = 3 parts', () => {
@@ -164,13 +183,14 @@ describe('CG — IRPP', () => {
     expect(res.irpp_net).toBe(res.irpp_total)
   })
 
-  it('5 tranches présentes dans la config CG (brut 10M > T5Min=8M)', () => {
+  it('4 tranches présentes dans la config CG (base élevée traverse T1→T4)', () => {
     const res = calculerIRPP({
-      codePays: 'CG', salaireBrut: 10_000_000,  // mensuelle_directe → T5 atteint si brut > 8M
+      codePays: 'CG', salaireBrut: 10_000_000,
       situation: 'celibataire', nombreEnfants: 0,
     })
-    // Toutes les tranches traversées : T1(0%) T2(1%) T3(10%) T4(25%) T5(40%)
-    expect(res.tranches.length).toBe(5)
+    // Toutes les tranches traversées : T1(1%) T2(10%) T3(25%) T4(40%) — pas de tranche 0%
+    // (voir CG.ts : aucune tranche 0% observée dans les bulletins réels)
+    expect(res.tranches.length).toBe(4)
   })
 
 })

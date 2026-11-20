@@ -187,13 +187,14 @@ describe('CG — Congo-Brazzaville', () => {
       expect(r.total_salarie).toBe(32_000)
     })
 
-    it('CNSS patronal = VID 8% + AF 10,035% + AT 2,25% (plaf. 600k) + TUS 3% = 181 780', () => {
+    it('CNSS patronal = VID 8% + PF 10,03% + AT/MP 2,25% (plaf. 600k) + TUS CNSS 5,475% = 201 540', () => {
       // VID 8% × 800k = 64 000
-      // AF 10,035% × 800k = 80 280
-      // AT 2,25% × 600k (plaf.) = 13 500
-      // TUS 3% × 800k = 24 000
-      // Total = 181 780
-      expect(r.total_patronal_net).toBe(181_780)
+      // PF 10,03% × 800k = 80 240
+      // AT/MP 2,25% × 600k (plaf.) = 13 500
+      // TUS CNSS 5,475% × 800k = 43 800
+      // Total = 201 540 — taux vérifiés contre documents réels ECAM Congo
+      // (Mission P0 paie 2026-09-17), remplacent 10,035%/3%
+      expect(r.total_patronal_net).toBe(201_540)
     })
 
     it('5 branches déclarées dans CountryConfig', () => {
@@ -214,33 +215,40 @@ describe('CG — Congo-Brazzaville', () => {
     })
   })
 
-  // ── IRPP mensuelle_directe ───────────────────────────────────────────────────
+  // ── IRPP annuelle_div12, abattement 20%, division par parts ─────────────────
+  // Règles vérifiées contre 3 bulletins réels ECAM Congo janvier 2024 — voir
+  // lib/fiscal/cg-paie-2026.test.ts pour les fixtures complètes (Mission P0
+  // paie 2026-09-17). Remplace l'ancien modèle mensuelle_directe / abattement
+  // aucun, qui ne reproduisait aucun bulletin réel.
 
   describe('IRPP — base 768 000 FCFA (brut 800k − CNSS 32k)', () => {
     const r = calculerIRPP({ codePays: 'CG', salaireBrut: 768_000, situation: 'celibataire', nombreEnfants: 0 })
 
-    it('abattement = 0 (aucun — Art. 76 CGI)', () => {
-      expect(r.abattement_montant).toBe(0)
-      expect(r.abattement_type).toBe('aucun')
+    it('abattement 20% sur (brut - CNSS salarié) — type pct_net_cnss', () => {
+      expect(r.abattement_montant).toBe(Math.round(768_000 * 0.20))   // 153 600
+      expect(r.abattement_type).toBe('pct_net_cnss')
     })
 
-    it('méthode = mensuelle_directe', () => {
-      expect(r.methode_base).toBe('mensuelle_directe')
+    it('méthode = annuelle_div12', () => {
+      expect(r.methode_base).toBe('annuelle_div12')
     })
 
     it('1 part (célibataire)', () => {
       expect(r.nombre_parts).toBe(1)
     })
 
-    it('T1 exonéré (0% ≤ 464 000) = 0', () => {
+    it('T1 taxée dès le premier FCFA à 1% (aucune tranche 0% dans le barème vérifié)', () => {
       const t1 = r.tranches[0]
-      expect(t1.taux).toBe(0)
-      expect(t1.impot_total).toBe(0)
+      expect(t1.taux).toBe(0.01)
+      expect(t1.impot_total).toBeGreaterThan(0)
     })
 
-    it('T2 à 1% : (768 000 − 464 001) × 1% = 3 040', () => {
-      // Math.round(303 999 × 0.01) = Math.round(3 039.99) = 3 040
-      expect(r.irpp_net).toBe(3_040)
+    it('IRPP net = 192 280 (4 tranches traversées, base après abattement 614 400)', () => {
+      const t1 = (464_000 / 12) * 0.01
+      const t2 = (1_000_000 / 12 - 464_000 / 12) * 0.10
+      const t3 = (3_000_000 / 12 - 1_000_000 / 12) * 0.25
+      const t4 = (614_400 - 3_000_000 / 12) * 0.40
+      expect(r.irpp_net).toBe(Math.round(t1 + t2 + t3 + t4))   // 192 280
     })
 
     it('pas de centimes additionnels Congo', () => {
@@ -276,12 +284,12 @@ describe('CG — Congo-Brazzaville', () => {
       expect(b.cotisations.total_salarie).toBe(32_000)
     })
 
-    it('CNSS patronal = 181 780', () => {
-      expect(b.cotisations.total_patronal_net).toBe(181_780)
+    it('CNSS patronal = 201 540', () => {
+      expect(b.cotisations.total_patronal_net).toBe(201_540)
     })
 
-    it('IRPP = 3 040', () => {
-      expect(b.irpp.irpp_net).toBe(3_040)
+    it('IRPP = 192 280', () => {
+      expect(b.irpp.irpp_net).toBe(192_280)
     })
 
     it('TOL = 1 000 FCFA (taxe fixe mensuelle)', () => {
@@ -290,12 +298,12 @@ describe('CG — Congo-Brazzaville', () => {
       expect(b.taxes_fixes[0].montant).toBe(1_000)
     })
 
-    it('net à payer = 800k − 32k − 3 040 − 1 000 = 763 960', () => {
-      expect(b.net_a_payer).toBe(763_960)
+    it('net à payer = 800k − 32k − 192 280 − 1 000 = 574 720', () => {
+      expect(b.net_a_payer).toBe(574_720)
     })
 
-    it('coût employeur = 800k + 181 780 = 981 780', () => {
-      expect(b.cout_employeur).toBe(981_780)
+    it('coût employeur = 800k + 201 540 = 1 001 540', () => {
+      expect(b.cout_employeur).toBe(1_001_540)
     })
   })
 
@@ -1007,9 +1015,10 @@ describe('Inter-pays — Cohérence et différenciateurs', () => {
     const bCD = genererBulletinPaie({ periode: '2026-06', employe: employe('CD'), salaire_base: 500_000 })
     const bGA = genererBulletinPaie({ periode: '2026-06', employe: employe('GA'), salaire_base: 500_000 })
 
-    it('CG patronal 116 425 (5 branches ~23,3% effectif à 500k)', () => {
-      // VID_PAT 8%×500k=40k + AF 10,035%×500k=50175 + AT 2,25%×500k=11250 + TUS 3%×500k=15k = 116 425
-      expect(bCG.cotisations.total_patronal_net).toBe(116_425)
+    it('CG patronal 128 775 (5 branches ~25,8% effectif à 500k)', () => {
+      // VID_PAT 8%×500k=40k + PF 10,03%×500k=50150 + AT/MP 2,25%×500k=11250 + TUS CNSS 5,475%×500k=27375 = 128 775
+      // Taux vérifiés contre documents réels ECAM Congo (Mission P0 paie 2026-09-17)
+      expect(bCG.cotisations.total_patronal_net).toBe(128_775)
     })
 
     it('GA patronal 100 500 (20,1%×500k)', () => {
@@ -1023,8 +1032,13 @@ describe('Inter-pays — Cohérence et différenciateurs', () => {
       expect(bCM.cotisations.total_patronal_net).toBeGreaterThan(bCD.cotisations.total_patronal_net)
     })
 
-    it('net CG > net CM (CNSS + IRPP CG plus faibles à 500k)', () => {
-      expect(bCG.net_a_payer).toBeGreaterThan(bCM.net_a_payer)
+    it('net CM > net CG à 500k, célibataire sans enfant (IRPP CG sans abattement effectif à 1 part — quotient familial concentre l\'avantage sur les familles nombreuses)', () => {
+      // Avant Mission P0 paie (2026-09-17), l'IRPP CG était sous-évalué (pas
+      // d'abattement, pas de division par parts) et paraissait plus faible que
+      // CM à ce niveau de revenu. Le moteur corrigé, vérifié contre des
+      // bulletins réels, donne un IRPP CG nettement supérieur pour un salarié
+      // à 1 part (sans conjoint ni enfant) à ce niveau de brut.
+      expect(bCM.net_a_payer).toBeGreaterThan(bCG.net_a_payer)
     })
 
     it('chaque pays a ses propres taxes fixes (CG=TOL, CM/CD/GA=rien)', () => {
