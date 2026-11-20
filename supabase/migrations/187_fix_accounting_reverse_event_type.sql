@@ -106,12 +106,15 @@ BEGIN
     RAISE EXCEPTION 'fn_reverse_accounting_event: événement % introuvable', p_event_id;
   END IF;
   -- Revue d'application 2026-11-21 — SECURITY DEFINER appelée aussi depuis le
-  -- navigateur (app/dashboard/facturation) : un utilisateur connecté ne peut
-  -- extourner que les événements de son propre tenant. Les appels serveur
-  -- (service_role, auth.uid() NULL) ne sont pas concernés.
-  IF auth.uid() IS NOT NULL AND v_event.tenant_id IS DISTINCT FROM get_my_tenant_id() THEN
-    RAISE EXCEPTION 'fn_reverse_accounting_event: événement % introuvable', p_event_id
-      USING ERRCODE = 'insufficient_privilege';
+  -- navigateur (app/dashboard/facturation). Seul le serveur (service_role)
+  -- est exempté, et il est identifié positivement : tout autre appelant —
+  -- y compris anon, dont auth.uid() est NULL — doit être connecté et ne
+  -- peut extourner que les événements de son propre tenant.
+  IF auth.role() IS DISTINCT FROM 'service_role' THEN
+    IF auth.uid() IS NULL OR v_event.tenant_id IS DISTINCT FROM get_my_tenant_id() THEN
+      RAISE EXCEPTION 'fn_reverse_accounting_event: événement % introuvable', p_event_id
+        USING ERRCODE = 'insufficient_privilege';
+    END IF;
   END IF;
   IF v_event.status != 'processed' THEN
     RAISE EXCEPTION 'fn_reverse_accounting_event: statut % — seul ''processed'' peut être extourné',
@@ -175,6 +178,10 @@ $$;
 
 COMMENT ON FUNCTION fn_reverse_accounting_event IS
   'Extourne un événement comptable processed (ACCOUNTING-REVERSE-001-FIX : event_type d''extourne = <original>-EXT, conforme à chk_ae_event_type, corrige le défaut universel de la version migration 138 qui n''a jamais pu se compléter pour aucun event_type).';
+
+-- Jamais anon : seuls les utilisateurs connectés (contrôlés ci-dessus) et le serveur.
+REVOKE ALL ON FUNCTION fn_reverse_accounting_event(UUID, TEXT, UUID) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION fn_reverse_accounting_event(UUID, TEXT, UUID) TO authenticated, service_role;
 
 DO $$
 BEGIN

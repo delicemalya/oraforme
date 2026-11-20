@@ -108,7 +108,14 @@ describe('Revue d\'application 2026-11-21 — isolation tenant de fn_reverse_acc
   const src = read(MIGRATION_187)
 
   it('un utilisateur connecté ne peut extourner que les événements de son tenant', () => {
-    expect(src).toContain('IF auth.uid() IS NOT NULL AND v_event.tenant_id IS DISTINCT FROM get_my_tenant_id() THEN')
+    expect(src).toContain("IF auth.role() IS DISTINCT FROM 'service_role' THEN")
+    expect(src).toContain('IF auth.uid() IS NULL OR v_event.tenant_id IS DISTINCT FROM get_my_tenant_id() THEN')
+    expect(src).not.toContain('IF auth.uid() IS NOT NULL AND')
+  })
+
+  it('jamais exécutable par anon', () => {
+    expect(src).toContain('REVOKE ALL ON FUNCTION fn_reverse_accounting_event(UUID, TEXT, UUID) FROM PUBLIC, anon;')
+    expect(src).toContain('TO authenticated, service_role;')
   })
 
   it('SECURITY DEFINER avec search_path figé', () => {
